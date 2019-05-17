@@ -1,0 +1,125 @@
+cmake_minimum_required(VERSION 3.10)
+project(Neko)
+
+
+set (CMAKE_CXX_STANDARD 17)
+set (CMAKE_CXX_STANDARD_REQUIRED ON)
+
+
+set(EXTERNAL_DIR ${CMAKE_SOURCE_DIR}/externals)
+
+
+include_directories(include ${CMAKE_SOURCE_DIR}/include)
+
+
+file(GLOB_RECURSE Neko_ENGINE_SRC src/engine/*.cpp include/engine/*.h)
+file(GLOB_RECURSE Neko_GRAPHICS_SRC src/graphics/*.cpp include/graphics/*.h)
+file(GLOB_RECURSE Neko_UTILITY_SRC src/utility/*.cpp include/utility/*.h)
+
+set_property(GLOBAL PROPERTY USE_FOLDERS On)
+SET_SOURCE_FILES_PROPERTIES( ${Neko_SRC} PROPERTIES
+                FOLDER "${CMAKE_SOURCE_DIR}/src" )
+				
+source_group("Graphics"            FILES ${Neko_GRAPHICS_SRC})
+source_group("Engine"            FILES ${Neko_ENGINE_SRC})
+source_group("Utility"            FILES ${Neko_UTILITY_SRC})
+
+List(APPEND Neko_SRC ${Neko_ENGINE_SRC} ${Neko_GRAPHICS_SRC} ${Neko_UTILITY_SRC})
+
+if(MSVC)
+    add_compile_options(
+        $<$<CONFIG:>:/MT> #---------|
+        $<$<CONFIG:Debug>:/MTd> #---|-- Statically link the runtime libraries
+        $<$<CONFIG:RelWithDebInfo>:/MTd>
+		$<$<CONFIG:Release>:/MT> #--|
+    )
+endif()
+
+
+#SFML
+set(SFML_DIR ${EXTERNAL_DIR}/SFML-2.5.1)
+set(SFML_BUILD_EXAMPLES FALSE)
+set(BUILD_SHARED_LIBS FALSE)
+set(SFML_STATIC_LIBRARIES TRUE)
+add_subdirectory(${SFML_DIR})
+include_directories(${SFML_DIR}/include ${SFML_DIR}/src)
+
+LIST(APPEND Neko_LIBRARIES
+		sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
+		
+#Google Test
+enable_testing()
+set(GOOGLE_TEST_DIR ${EXTERNAL_DIR}/googletest-1.8.1)
+set(BUILD_GMOCK OFF CACHE INTERNAL "")
+set(INSTALL_GTEST OFF CACHE INTERNAL "")
+add_subdirectory(${GOOGLE_TEST_DIR})
+include_directories(${GOOGLE_TEST_DIR}/include)
+
+set_target_properties (gtest gtest_main PROPERTIES
+		FOLDER GTest)
+#SFML Imgui
+set(SFML_IMGUI ${EXTERNAL_DIR}/imgui-sfml-2.0.1/)
+set(IMGUI_ROOT ${EXTERNAL_DIR}/imgui-1.70/ CACHE INTERNAL "")
+set(IMGUI_DIR ${EXTERNAL_DIR}/imgui-1.70/ CACHE INTERNAL "")
+set(IMGUI_SFML_FIND_SFML OFF CACHE INTERNAL "")
+set(SFML_ROOT ${SFML_DIR})
+add_subdirectory(${SFML_IMGUI})
+include_directories(${IMGUI_ROOT} ${SFML_IMGUI})
+LIST(APPEND Neko_LIBRARIES
+	imgui-sfml)
+	
+#BOX2D
+set(BOX2D_DIR ${EXTERNAL_DIR}/Box2D-2.3.1)
+set(BOX2D_BUILD_EXAMPLES OFF CACHE INTERNAL "")
+SET(BOX2D_INSTALL ON CACHE INTERNAL "")
+SET(BOX2D_BUILD_STATIC ON  CACHE INTERNAL "")
+
+add_subdirectory(${BOX2D_DIR})
+include_directories(${BOX2D_DIR}/Box2D/)
+LIST(APPEND Neko_LIBRARIES
+	Box2D)
+#Utility
+set(UTILITIES_DIR ${EXTERNAL_DIR}/utilities/)
+include_directories(${UTILITIES_DIR})
+
+#Remotery
+set(REMOTERY_DIR ${EXTERNAL_DIR}/Remotery)
+add_subdirectory(${REMOTERY_DIR})
+include_directories(${REMOTERY_DIR})
+LIST(APPEND Neko_LIBRARIES Remotery)
+#Neko_COMMON
+include_directories(include/)
+
+add_library(Neko_COMMON STATIC ${Neko_SRC})
+target_link_libraries(Neko_COMMON PUBLIC ${Neko_LIBRARIES})
+set_property(TARGET Neko_COMMON PROPERTY CXX_STANDARD 17)
+
+#Neko TEST
+SET(Neko_TEST_DIR ${CMAKE_SOURCE_DIR}/test)
+file(GLOB TEST_FILES ${Neko_TEST_DIR}/*.cpp )
+add_executable(Neko_TEST ${TEST_FILES})
+target_link_libraries(Neko_TEST gtest gtest_main Neko_COMMON)
+
+#Neko COURSES
+SET(Neko_COURSE_DIR ${CMAKE_SOURCE_DIR}/main)
+file(GLOB COURSE_FILES ${Neko_COURSE_DIR}/*.cpp )
+foreach(course_file ${COURSE_FILES} )
+    # I used a simple string replace, to cut off .cpp.
+    file(RELATIVE_PATH course_relative_path ${Neko_COURSE_DIR} ${course_file} )
+    string( REPLACE ".cpp" "" course_name ${course_relative_path} )
+	
+    add_executable(${course_name} ${Neko_COURSE_DIR}/${course_relative_path} ${SHADERS_SRC})
+    # Make sure YourLib is linked to each app
+    target_link_libraries(${course_name} PUBLIC Neko_COMMON)
+	set_property(TARGET ${course_name} PROPERTY CXX_STANDARD 17)
+	set_target_properties (${course_name} PROPERTIES
+    FOLDER Main)
+endforeach()
+
+if(MSVC)
+if(NOT CMAKE_CL_64)
+file(COPY ${SFML_DIR}/extlibs/bin/x86/openal32.dll DESTINATION ${CMAKE_BINARY_DIR}/)
+else()
+file(COPY ${SFML_DIR}/extlibs/bin/x64/openal32.dll DESTINATION ${CMAKE_BINARY_DIR}/)
+endif()
+endif()
