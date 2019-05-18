@@ -66,7 +66,7 @@ set(SFML_ROOT ${SFML_DIR})
 add_subdirectory(${SFML_IMGUI})
 include_directories(${IMGUI_ROOT} ${SFML_IMGUI})
 LIST(APPEND Neko_LIBRARIES
-	imgui-sfml)
+	ImGui-SFML)
 	
 #BOX2D
 set(BOX2D_DIR ${EXTERNAL_DIR}/Box2D-2.3.1)
