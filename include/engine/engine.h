@@ -2,21 +2,31 @@
 
 #include <thread>
 #include <engine/system.h>
+#include <graphics/graphics.h>
 #include <ctpl_stl.h>
+#include <SFML/Graphics/RenderWindow.hpp>
 
 namespace neko
 {
 
-class Engine : public System
+class Engine : sf::NonCopyable
 {
-	Engine();
-	void Init() override;
-	void Update() override;
+public:
+    Engine();
+    ~Engine();
+    void Init();
+    void EngineLoop();
 
-	static Engine* GetInstance();
+    std::atomic<bool> isRunning = false;
+    sf::RenderWindow* renderWindow;
+    static Engine *GetInstance();
 private:
-	ctpl::thread_pool workingThreadPool;
-	std::thread renderThread;
-	static Engine* instance;
+
+    ctpl::thread_pool workingThreadPool;
+    std::thread renderThread;
+    GraphicsManager graphicsManager;
+    std::condition_variable condSyncRender;
+    std::mutex renderMutex;
+    static Engine *instance;
 };
 }
