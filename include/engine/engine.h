@@ -9,24 +9,53 @@
 namespace neko
 {
 
-class Engine : sf::NonCopyable
+class Engine : public sf::NonCopyable, public System
 {
 public:
     Engine();
-    ~Engine();
-    void Init();
-    void EngineLoop();
+    virtual ~Engine();
+    void Init() override;
+	void Update() override;
+	void Destroy() override;
+    
+	virtual void EngineLoop();
+
+	virtual void OnEvent(sf::Event& event);
 
     std::atomic<bool> isRunning = false;
-    sf::RenderWindow* renderWindow;
-    static Engine *GetInstance();
-private:
+    sf::RenderTarget* renderTarget = nullptr;
+	sf::Vector2u renderTargetSize;
 
-    ctpl::thread_pool workingThreadPool;
+	std::mutex renderMutex;
+protected:
+
     std::thread renderThread;
-    GraphicsManager graphicsManager;
+    GraphicsManager* graphicsManager;
     std::condition_variable condSyncRender;
-    std::mutex renderMutex;
-    static Engine *instance;
+
 };
+
+
+class MainEngine : public Engine
+{
+public:
+	MainEngine();
+	virtual ~MainEngine();
+
+	void Init() override;
+	void Update() override;
+	void Destroy() override;
+
+
+	void OnEvent(sf::Event& event) override;
+
+	sf::RenderWindow* renderWindow = nullptr;
+	
+	static MainEngine *GetInstance();
+private:
+	ctpl::thread_pool workingThreadPool;
+
+	static MainEngine *instance;
+};
+
 }

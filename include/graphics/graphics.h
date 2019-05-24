@@ -3,19 +3,33 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <condition_variable>
 #include <queue>
+#include <atomic>
 
 namespace neko
 {
-class CommandBuffer
+
+class Engine;
+
+struct Command
 {
-    virtual void Draw(sf::RenderTarget * window) = 0;
+    virtual void Draw(sf::RenderTarget * renderTarget) = 0;
+};
+
+struct SfmlCommand : public Command
+{
+	sf::Drawable* drawable;
+	void Draw(sf::RenderTarget* renderTarget) override;
 };
 
 class GraphicsManager
 {
 public:
-    void RenderLoop(std::condition_variable& condSyncRender, std::mutex& renderMutex);
-private:
-    std::queue<CommandBuffer*> commandBuffers;
+	std::atomic<bool> isRendering = false;
+	virtual void Draw(sf::Drawable& drawable);
+    virtual void RenderLoop(Engine* engine, std::condition_variable& condSyncRender, std::mutex& renderMutex);
+protected:
+	Engine* engine = nullptr;
+	std::vector<SfmlCommand> commands[2];
+    std::queue<Command*> commandBuffer;
 };
 }

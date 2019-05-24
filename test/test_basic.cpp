@@ -4,7 +4,7 @@
 
 TEST(Basic, Engine)
 {
-    neko::Engine engine;
+    neko::MainEngine engine;
     engine.Init();
     engine.EngineLoop();
 }
