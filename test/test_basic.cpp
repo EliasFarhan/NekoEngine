@@ -18,7 +18,7 @@ public:
 	void Init() override
 	{
 		MainEngine::Init();
-		if(texture.loadFromFile("data/sprites/"))
+		if(texture.loadFromFile("data/sprites/wall.jpg"))
 		{
 			sprite.setTexture(texture);
 		}

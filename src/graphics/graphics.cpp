@@ -18,7 +18,7 @@ void GraphicsManager::Draw(sf::Drawable& drawable)
 
 	SfmlCommand sfmlCommand;
 	sfmlCommand.drawable = &drawable;
-	commands[(frameIndex-1)%2].push_back(sfmlCommand);
+	commands[(frameIndex-1) % 2].push_back(sfmlCommand);
 	commandBuffers[(frameIndex - 1) % 2].push(&commands[(frameIndex - 1) % 2].back());
 }
 
@@ -45,8 +45,8 @@ void GraphicsManager::RenderLoop(Engine* engine,
 			while(!commandBuffer.empty())
 			{
 				auto* command = commandBuffer.front();
-				commandBuffer.pop();
 				command->Draw(renderTarget);
+				commandBuffer.pop();
 			}
 
 			auto* renderWindow = dynamic_cast<sf::RenderWindow*>(renderTarget);

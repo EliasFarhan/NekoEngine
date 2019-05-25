@@ -39,11 +39,6 @@ void Engine::EngineLoop()
 	{
 
 		Update();
-		{
-			//TODO Push to render loop
-			std::unique_lock<std::mutex> lock(renderMutex);
-
-		}
 		condSyncRender.notify_all();
 	}
 
