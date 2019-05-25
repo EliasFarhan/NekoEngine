@@ -30,6 +30,7 @@ public:
 protected:
 	Engine* engine = nullptr;
 	std::vector<SfmlCommand> commands[2];
-    std::queue<Command*> commandBuffer;
+    std::queue<Command*> commandBuffers[2];
+	std::atomic<unsigned int> frameIndex = 0;
 };
 }

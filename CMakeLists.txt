@@ -87,11 +87,37 @@ set(REMOTERY_DIR ${EXTERNAL_DIR}/Remotery)
 add_subdirectory(${REMOTERY_DIR})
 include_directories(${REMOTERY_DIR})
 LIST(APPEND Neko_LIBRARIES Remotery)
+#data
+file(GLOB_RECURSE DATA_FILES
+		"${PROJECT_SOURCE_DIR}/data/*.jpg"
+		"${PROJECT_SOURCE_DIR}/data/*.png"
+		)
+		
+foreach(DATA ${DATA_FILES})
+	get_filename_component(FILE_NAME ${DATA} NAME)
+	get_filename_component(PATH_NAME ${DATA} DIRECTORY)
+	get_filename_component(EXTENSION ${DATA} EXT)
+	file(RELATIVE_PATH PATH_NAME "${PROJECT_SOURCE_DIR}/shaders/" ${PATH_NAME})
+	#MESSAGE("GLSL PATH: ${PATH_NAME} NAME: ${FILE_NAME}")
+	set(DATA_OUTPUT "${PROJECT_BINARY_DIR}/data/${PATH_NAME}/${FILE_NAME}")
+
+	add_custom_command(
+			OUTPUT ${DATA_OUTPUT}
+			COMMAND ${CMAKE_COMMAND} -E make_directory "${PROJECT_BINARY_DIR}/data/"
+			COMMAND ${CMAKE_COMMAND} -E make_directory "${PROJECT_BINARY_DIR}/data/${PATH_NAME}"
+			COMMAND ${CMAKE_COMMAND} -E copy ${DATA} "${PROJECT_BINARY_DIR}/data/${PATH_NAME}/${FILE_NAME}")
+	list(APPEND DATA_BINARY_FILES ${DATA_OUTPUT})
+endforeach(DATA)
+add_custom_target(
+		DataTarget
+		DEPENDS ${DATA_BINARY_FILES}
+)
 #Neko_COMMON
 include_directories(include/)
 
 add_library(Neko_COMMON STATIC ${Neko_SRC})
 target_link_libraries(Neko_COMMON PUBLIC ${Neko_LIBRARIES})
+add_dependencies(Neko_COMMON DataTarget)
 set_property(TARGET Neko_COMMON PROPERTY CXX_STANDARD 17)
 
 #Neko TEST

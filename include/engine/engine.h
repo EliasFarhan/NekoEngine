@@ -15,8 +15,6 @@ public:
     Engine();
     virtual ~Engine();
     void Init() override;
-	void Update() override;
-	void Destroy() override;
     
 	virtual void EngineLoop();
 

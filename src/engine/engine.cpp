@@ -30,15 +30,6 @@ void Engine::Init()
 	renderThread.detach();
 }
 
-void Engine::Update()
-{
-
-}
-
-void Engine::Destroy()
-{
-
-}
 
 void Engine::EngineLoop()
 {

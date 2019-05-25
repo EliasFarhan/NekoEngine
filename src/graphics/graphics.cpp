@@ -12,6 +12,14 @@ void SfmlCommand::Draw(sf::RenderTarget* renderTarget)
 void GraphicsManager::Draw(sf::Drawable& drawable)
 {
 	//TODO schedule the command for the draw render loop
+
+	//We have to wait for the previous frame rendering to be over
+	std::unique_lock<std::mutex> lock(engine->renderMutex);
+
+	SfmlCommand sfmlCommand;
+	sfmlCommand.drawable = &drawable;
+	commands[(frameIndex-1)%2].push_back(sfmlCommand);
+	commandBuffers[(frameIndex - 1) % 2].push(&commands[(frameIndex - 1) % 2].back());
 }
 
 void GraphicsManager::RenderLoop(Engine* engine, 
@@ -26,13 +34,14 @@ void GraphicsManager::RenderLoop(Engine* engine,
         std::unique_lock<std::mutex> lock(renderMutex);
 
         using namespace std::chrono_literals;
-        condSyncRender.wait_for(lock, 0.5ms);
+        condSyncRender.wait(lock);
         if (engine->isRunning)
         {
 			isRendering = true;
             renderTarget->clear(sf::Color::Black);
             
         	//TODO manage command buffers
+			auto& commandBuffer = commandBuffers[frameIndex % 2];
 			while(!commandBuffer.empty())
 			{
 				auto* command = commandBuffer.front();
@@ -50,7 +59,11 @@ void GraphicsManager::RenderLoop(Engine* engine,
 			{
 				renderTexture->display();
 			}
-			isRendering = false;
+			
+        	isRendering = false;
+			commands[frameIndex % 2].clear();
+        	++frameIndex;
+			
         }
 	} while (engine->isRunning);
 }
