@@ -25,6 +25,7 @@ class GraphicsManager
 {
 public:
 	std::atomic<bool> isRendering = false;
+	std::atomic<bool> isReady = false;
 	virtual void Draw(sf::Drawable& drawable);
     virtual void RenderLoop(Engine* engine, std::condition_variable& condSyncRender, std::mutex& renderMutex);
 protected:

@@ -28,13 +28,16 @@ void GraphicsManager::RenderLoop(Engine* engine,
 {
 	this->engine = engine;
     auto* renderTarget = engine->renderTarget;
-    renderTarget->setActive(true);
+
     do
     {
+        isReady = true;
         std::unique_lock<std::mutex> lock(renderMutex);
 
-        using namespace std::chrono_literals;
+
         condSyncRender.wait(lock);
+        isReady = false;
+        renderTarget->setActive(true);
         if (engine->isRunning)
         {
 			isRendering = true;
@@ -63,8 +66,10 @@ void GraphicsManager::RenderLoop(Engine* engine,
         	isRendering = false;
 			commands[frameIndex % 2].clear();
         	++frameIndex;
-			
+
+            isReady = true;
         }
+        renderTarget->setActive(false);
 	} while (engine->isRunning);
 }
 }

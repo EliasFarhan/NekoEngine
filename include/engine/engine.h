@@ -52,7 +52,7 @@ public:
 	static MainEngine *GetInstance();
 private:
 	ctpl::thread_pool workingThreadPool;
-
+unsigned frameIndex = 0;
 	static MainEngine *instance;
 };
 
