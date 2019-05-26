@@ -1,11 +1,13 @@
 #include <engine/engine.h>
 #include <SFML/Window/Event.hpp>
+
 #ifdef __linux__
 #include <X11/Xlib.h>
-#endif
-#include "SFML/Graphics/RenderTexture.hpp"
-#include "engine/log.h"
+#endif //__linux__
+
+#include <engine/log.h>
 #include <sstream>
+#include <Remotery.h>
 
 namespace neko
 {
@@ -22,6 +24,7 @@ void MainEngine::EngineLoop()
 	renderThread.detach();
 	while (isRunning)
 	{
+		rmt_ScopedCPUSample(EngineLoop, 0);
 		if(frameIndex > 0)
 		{
 			std::unique_lock<std::mutex> lock(renderMutex);
@@ -38,21 +41,29 @@ void MainEngine::EngineLoop()
 MainEngine::MainEngine()
 {
 	initLog();
+
+	rmt_CreateGlobalInstance(&rmt);
 }
 
 MainEngine::~MainEngine()
 {
+
+	logDebug("Destroy Main Engine");
 	destroyLog();
+	rmt_DestroyGlobalInstance(rmt);
+
 }
 
 void MainEngine::Init()
 {
-	workingThreadPool.resize(std::max(1u,std::thread::hardware_concurrency() - 3));//removing main and render and audio thread
+
+	//workingThreadPool.resize(std::max(1u,std::thread::hardware_concurrency() - 3));//removing main and render and audio thread
 #ifdef __linux__
     XInitThreads();
 #endif
 	renderWindow = new sf::RenderWindow(sf::VideoMode(1280, 720), "Neko Engine");
 	renderWindow->setVerticalSyncEnabled(true);
+
 	renderWindow->setActive(false);
 	instance = this;
 
@@ -63,6 +74,7 @@ void MainEngine::Init()
 
 void MainEngine::Update()
 {
+	rmt_ScopedCPUSample(EngineManageEvent, 0);
 	sf::Event event{};
 	while (renderWindow->pollEvent(event))
 	{
@@ -78,9 +90,13 @@ void MainEngine::Update()
 
 void MainEngine::Destroy()
 {
+	std::unique_lock<std::mutex> lock(renderMutex);
+	condSyncRender.wait(lock); //waiting for render thread to finish
+	renderWindow->setActive(true);
 	renderWindow->close();
 	delete renderWindow;
 	renderWindow = nullptr;
+	instance = nullptr;
 }
 
 void MainEngine::OnEvent(sf::Event& event)

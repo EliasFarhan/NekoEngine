@@ -6,6 +6,8 @@
 #include <ctpl_stl.h>
 #include <SFML/Graphics/RenderWindow.hpp>
 
+struct Remotery;
+
 namespace neko
 {
 
@@ -32,11 +34,14 @@ public:
 	//used to sync with the render thread
 	std::condition_variable condSyncRender;
 	std::mutex renderMutex;
-protected:
-	ctpl::thread_pool workingThreadPool;
+
 	unsigned frameIndex = 0;
+protected:
+
+	Remotery* rmt = nullptr;
+	ctpl::thread_pool workingThreadPool;
 	std::thread renderThread;
-	GraphicsManager* graphicsManager;
+	GraphicsManager* graphicsManager{};
 	static MainEngine *instance;
 };
 
