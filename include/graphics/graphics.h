@@ -17,13 +17,14 @@ struct Command
 
 struct SfmlCommand : public Command
 {
-	sf::Drawable* drawable;
+	sf::Drawable* drawable = nullptr;
 	void Draw(sf::RenderTarget* renderTarget) override;
 };
 
 class GraphicsManager
 {
 public:
+	GraphicsManager();
 	std::atomic<bool> isRendering = false;
 	std::atomic<bool> isReady = false;
 

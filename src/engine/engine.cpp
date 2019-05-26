@@ -25,11 +25,13 @@ void MainEngine::EngineLoop()
 	while (isRunning)
 	{
 		rmt_ScopedCPUSample(EngineLoop, 0);
+		isReady = true;
 		if(frameIndex > 0)
 		{
 			std::unique_lock<std::mutex> lock(renderMutex);
 			condSyncRender.wait(lock);
 		}
+		isReady = false;
 		Update();
 
 		frameIndex++;
@@ -38,8 +40,12 @@ void MainEngine::EngineLoop()
 	Destroy();
 }
 
-MainEngine::MainEngine()
+MainEngine::MainEngine(Configuration* config)
 {
+	if(config != nullptr)
+	{
+		this->config = *config;
+	}
 	initLog();
 
 	rmt_CreateGlobalInstance(&rmt);
@@ -56,7 +62,6 @@ MainEngine::~MainEngine()
 
 void MainEngine::Init()
 {
-
 	//workingThreadPool.resize(std::max(1u,std::thread::hardware_concurrency() - 3));//removing main and render and audio thread
 #ifdef __linux__
     XInitThreads();
