@@ -2,6 +2,7 @@
 #include <engine/engine.h>
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
+#include "engine/log.h"
 
 
 TEST(Basic, OpenWindow)
@@ -27,6 +28,7 @@ public:
 	{
 		MainEngine::Update();
 		graphicsManager->Draw(sprite);
+		
 	}
 
 private:

@@ -4,84 +4,66 @@
 #include <X11/Xlib.h>
 #endif
 #include "SFML/Graphics/RenderTexture.hpp"
+#include "engine/log.h"
+#include <sstream>
 
 namespace neko
 {
 
-
 MainEngine * MainEngine::instance = nullptr;
 
-Engine::Engine()
+
+
+void MainEngine::EngineLoop()
 {
 
-}
-
-Engine::~Engine()
-{
-}
-
-void Engine::Init()
-{
-	graphicsManager = new GraphicsManager();
-	if (renderTarget == nullptr)
-	{
-		auto* renderTexture = new sf::RenderTexture();
-		renderTexture->create(renderTargetSize.x, renderTargetSize.y);
-		renderTarget = renderTexture;
-	}
-	renderThread = std::thread(&GraphicsManager::RenderLoop, graphicsManager, this, std::ref(condSyncRender), std::ref(renderMutex));
-	renderThread.detach();
-}
-
-
-void Engine::EngineLoop()
-{
 	isRunning = true;
-    while(!graphicsManager->isReady)
-    {
-        using namespace std::chrono_literals;
-        std::this_thread::sleep_for(1ms);
-    }
+	renderThread = std::thread(&GraphicsManager::RenderLoop, graphicsManager);
+	renderThread.detach();
 	while (isRunning)
 	{
+		if(frameIndex > 0)
+		{
+			std::unique_lock<std::mutex> lock(renderMutex);
+			condSyncRender.wait(lock);
+		}
 		Update();
-		condSyncRender.notify_all();
+
+		frameIndex++;
 	}
 
 	Destroy();
-	delete(renderTarget);
-	renderTarget = nullptr;
-}
-
-void Engine::OnEvent(sf::Event& event)
-{
 }
 
 MainEngine::MainEngine()
 {
+	initLog();
 }
 
 MainEngine::~MainEngine()
 {
+	destroyLog();
 }
 
 void MainEngine::Init()
 {
-	workingThreadPool.resize(std::thread::hardware_concurrency() - 2);//removing main and render thread
+	workingThreadPool.resize(std::max(1u,std::thread::hardware_concurrency() - 3));//removing main and render and audio thread
 #ifdef __linux__
     XInitThreads();
 #endif
 	renderWindow = new sf::RenderWindow(sf::VideoMode(1280, 720), "Neko Engine");
-	renderTarget = renderWindow;
-	renderTarget->setActive(false);
-	MainEngine::instance = this;
+	renderWindow->setVerticalSyncEnabled(true);
+	renderWindow->setActive(false);
+	instance = this;
 
-	Engine::Init();
+	graphicsManager = new GraphicsManager();
+	
+	
 }
 
 void MainEngine::Update()
 {
-	sf::Event event;
+	sf::Event event{};
 	while (renderWindow->pollEvent(event))
 	{
 		// "close requested" event: we close the window
@@ -91,18 +73,26 @@ void MainEngine::Update()
 		}
 		OnEvent(event);
 	}
-	frameIndex++;
+
 }
 
 void MainEngine::Destroy()
 {
 	renderWindow->close();
+	delete renderWindow;
 	renderWindow = nullptr;
-
 }
 
 void MainEngine::OnEvent(sf::Event& event)
 {
+	if(event.type == sf::Event::KeyReleased)
+	{
+		if(event.key.code == sf::Keyboard::Escape)
+		{
+			isRunning = false;
+		}
+
+	}
 }
 
 MainEngine* MainEngine::GetInstance()

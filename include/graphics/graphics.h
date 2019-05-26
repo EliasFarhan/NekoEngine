@@ -8,7 +8,7 @@
 namespace neko
 {
 
-class Engine;
+class MainEngine;
 
 struct Command
 {
@@ -26,12 +26,13 @@ class GraphicsManager
 public:
 	std::atomic<bool> isRendering = false;
 	std::atomic<bool> isReady = false;
+
+	std::atomic<unsigned int> frameIndex = 0;
 	virtual void Draw(sf::Drawable& drawable);
-    virtual void RenderLoop(Engine* engine, std::condition_variable& condSyncRender, std::mutex& renderMutex);
+    virtual void RenderLoop();
 protected:
-	Engine* engine = nullptr;
+	sf::RenderWindow* renderWindow = nullptr;
 	std::vector<SfmlCommand> commands[2];
     std::queue<Command*> commandBuffers[2];
-	std::atomic<unsigned int> frameIndex = 0;
 };
 }

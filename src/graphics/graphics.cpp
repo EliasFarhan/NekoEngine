@@ -1,6 +1,8 @@
 #include <graphics/graphics.h>
 #include <engine/engine.h>
 #include "SFML/Graphics/RenderTexture.hpp"
+#include "engine/log.h"
+#include <sstream>
 
 namespace neko
 {
@@ -11,65 +13,49 @@ void SfmlCommand::Draw(sf::RenderTarget* renderTarget)
 
 void GraphicsManager::Draw(sf::Drawable& drawable)
 {
-	//TODO schedule the command for the draw render loop
-
-	//We have to wait for the previous frame rendering to be over
-	std::unique_lock<std::mutex> lock(engine->renderMutex);
-
+	
 	SfmlCommand sfmlCommand;
 	sfmlCommand.drawable = &drawable;
-	commands[(frameIndex-1) % 2].push_back(sfmlCommand);
-	commandBuffers[(frameIndex - 1) % 2].push(&commands[(frameIndex - 1) % 2].back());
+	commands[(frameIndex + 1) % 2].push_back(sfmlCommand);
+	commandBuffers[(frameIndex + 1) % 2].push(&commands[(frameIndex + 1) % 2].back());
 }
 
-void GraphicsManager::RenderLoop(Engine* engine, 
-	std::condition_variable &condSyncRender,
-	std::mutex &renderMutex)
+void GraphicsManager::RenderLoop()
 {
-	this->engine = engine;
-    auto* renderTarget = engine->renderTarget;
-
+	auto* engine = MainEngine::GetInstance();
+	renderWindow = engine->renderWindow;
     do
     {
         isReady = true;
-        std::unique_lock<std::mutex> lock(renderMutex);
-
-
-        condSyncRender.wait(lock);
+		{
+			std::unique_lock<std::mutex> lock(engine->renderMutex);
+			engine->condSyncRender.notify_all();
+		}
         isReady = false;
-        renderTarget->setActive(true);
+        renderWindow->setActive(true);
         if (engine->isRunning)
         {
 			isRendering = true;
-            renderTarget->clear(sf::Color::Black);
+            renderWindow->clear(sf::Color::Black);
             
-        	//TODO manage command buffers
+        	//manage command buffers
 			auto& commandBuffer = commandBuffers[frameIndex % 2];
 			while(!commandBuffer.empty())
 			{
 				auto* command = commandBuffer.front();
-				command->Draw(renderTarget);
+				command->Draw(renderWindow);
 				commandBuffer.pop();
 			}
 
-			auto* renderWindow = dynamic_cast<sf::RenderWindow*>(renderTarget);
-			if (renderWindow != nullptr)
-			{
-				renderWindow->display();
-			}
-			auto* renderTexture= dynamic_cast<sf::RenderTexture*>(renderTarget);
-			if (renderTexture != nullptr)
-			{
-				renderTexture->display();
-			}
+			renderWindow->display();
+			
 			
         	isRendering = false;
 			commands[frameIndex % 2].clear();
         	++frameIndex;
 
-            isReady = true;
         }
-        renderTarget->setActive(false);
+        renderWindow->setActive(false);
 	} while (engine->isRunning);
 }
 }
