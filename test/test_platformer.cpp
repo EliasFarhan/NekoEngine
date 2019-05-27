@@ -11,6 +11,7 @@ public:
 	void Init() override
 	{
 		MainEngine::Init();
+		physicsManager.Init();
 	}
 
 	void Update() override
@@ -20,6 +21,7 @@ public:
 
 	void Destroy() override
 	{
+		physicsManager.Destroy();
 		MainEngine::Destroy();
 	}
 
