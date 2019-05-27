@@ -15,6 +15,7 @@ include_directories(include ${CMAKE_SOURCE_DIR}/include)
 file(GLOB_RECURSE Neko_ENGINE_SRC src/engine/*.cpp include/engine/*.h)
 file(GLOB_RECURSE Neko_GRAPHICS_SRC src/graphics/*.cpp include/graphics/*.h)
 file(GLOB_RECURSE Neko_UTILITY_SRC src/utilities/*.cpp include/utilities/*.h)
+file(GLOB_RECURSE Neko_PHYSICS_SRC src/physics/*.cpp include/physics/*.h)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS On)
 SET_SOURCE_FILES_PROPERTIES( ${Neko_SRC} PROPERTIES
@@ -23,8 +24,9 @@ SET_SOURCE_FILES_PROPERTIES( ${Neko_SRC} PROPERTIES
 source_group("Graphics"            FILES ${Neko_GRAPHICS_SRC})
 source_group("Engine"            FILES ${Neko_ENGINE_SRC})
 source_group("Utility"            FILES ${Neko_UTILITY_SRC})
+source_group("Physics"            FILES ${Neko_PHYSICS_SRC})
 
-List(APPEND Neko_SRC ${Neko_ENGINE_SRC} ${Neko_GRAPHICS_SRC} ${Neko_UTILITY_SRC})
+List(APPEND Neko_SRC ${Neko_ENGINE_SRC} ${Neko_GRAPHICS_SRC} ${Neko_UTILITY_SRC} ${Neko_PHYSICS_SRC})
 
 if(MSVC)
     add_compile_options(
@@ -75,7 +77,7 @@ SET(BOX2D_INSTALL ON CACHE INTERNAL "")
 SET(BOX2D_BUILD_STATIC ON  CACHE INTERNAL "")
 
 add_subdirectory(${BOX2D_DIR})
-include_directories(${BOX2D_DIR}/Box2D/)
+include_directories(${BOX2D_DIR}/)
 LIST(APPEND Neko_LIBRARIES
 	Box2D)
 #Utility

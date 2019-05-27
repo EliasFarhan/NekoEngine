@@ -32,25 +32,27 @@
 namespace fs = boost::filesystem;
 #else
 #include <filesystem>
+#ifdef __linux__
 namespace fs = std::filesystem;
+#endif
 #endif
 
 namespace neko
 {
 bool FileExists(const std::string & filename)
 {
-	fs::path p = filename;
+	const fs::path p = filename;
 	return fs::exists(p);
 }
 bool IsRegularFile(std::string& filename)
 {
-    fs::path p = filename;
+	const fs::path p = filename;
     return fs::is_regular_file(p);
 
 }
 bool IsDirectory(std::string & filename)
 {
-	fs::path p = filename;
+	const fs::path p = filename;
 	return fs::is_directory(p);
 }
 void IterateDirectory(std::string & dirname, std::function<void(std::string)> func)
@@ -79,7 +81,8 @@ bool RemoveDirectory(const std::string &dirname, bool removeAll)
 	if(removeAll)
 	{
 		return fs::remove_all(dirname);
-	} else
+	} 
+	else
 	{
 		return fs::remove(dirname);
 	}
