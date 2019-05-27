@@ -113,6 +113,10 @@ add_custom_target(
 		DEPENDS ${DATA_BINARY_FILES}
 )
 #Neko_COMMON
+if(UNIX AND NOT APPLE)
+	LIST(APPEND Neko_LIBRARIES
+			stdc++fs)
+ENDIF()
 include_directories(include/)
 
 add_library(Neko_COMMON STATIC ${Neko_SRC})
