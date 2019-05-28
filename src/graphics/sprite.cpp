@@ -13,43 +13,49 @@ SpriteManager::SpriteManager()
 	sprites[1].reserve(InitEntityNmb);
 }
 
-void SpriteManager::CopyTransformPosition(Transform2dManager& transformManager)
+void SpriteManager::AddSprite(sf::Sprite sprite)
+{
+	sprites[0].push_back(sprite);
+	sprites[1].push_back(sprite);
+}
+
+void SpriteManager::CopyTransformPosition(Transform2dManager& transformManager, size_t start, size_t length)
 {
 	rmt_ScopedCPUSample(CopySpritePositions, 0);
 	const int frameIndex = MainEngine::GetInstance()->frameIndex%2;
-	for(auto i = 0u; i < transformManager.positions.size();i++)
+	for(auto i = start; i < start+length; i++)
 	{
 		sprites[frameIndex][i].setPosition(transformManager.positions[i]);
 	}
 }
 
-void SpriteManager::CopyTransformScales(Transform2dManager& transformManager)
+void SpriteManager::CopyTransformScales(Transform2dManager& transformManager, size_t start, size_t length)
 {
 	rmt_ScopedCPUSample(CopySpriteScales, 0);
 	const int frameIndex = MainEngine::GetInstance()->frameIndex%2;
-	for (auto i = 0u; i < transformManager.positions.size(); i++)
+	for (auto i = start; i < start + length; i++)
 	{
 		sprites[frameIndex][i].setScale(transformManager.scales[i]);
 	}
 }
 
-void SpriteManager::CopyTransformAngles(Transform2dManager& transformManager)
+void SpriteManager::CopyTransformAngles(Transform2dManager& transformManager, size_t start, size_t length)
 {
 	rmt_ScopedCPUSample(CopySpriteAngles, 0);
 	const int frameIndex = MainEngine::GetInstance()->frameIndex%2;
-	for (auto i = 0u; i < transformManager.positions.size(); i++)
+	for (auto i = start; i < start + length; i++)
 	{
 		sprites[frameIndex][i].setRotation(transformManager.angles[i]);
 	}
 }
 
-void SpriteManager::PushCommands(GraphicsManager* graphicsManager)
+void SpriteManager::PushCommands(GraphicsManager* graphicsManager, size_t start, size_t length)
 {
 	rmt_ScopedCPUSample(PushSpriteCommands, 0);
 	const int frameIndex = MainEngine::GetInstance()->frameIndex%2;
-	for (auto& sprite : sprites[frameIndex])
+	for (auto i = start; i < start + length; i++)
 	{
-		graphicsManager->Draw(sprite);
+		graphicsManager->Draw(sprites[frameIndex][i]);
 	}
 }
 }

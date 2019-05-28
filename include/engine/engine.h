@@ -12,7 +12,7 @@ struct Remotery;
 
 namespace neko
 {
-
+struct Collider;
 struct Configuration
 {
 	sf::Vector2u screenSize = sf::Vector2u(1280, 720);
@@ -20,6 +20,8 @@ struct Configuration
 	float physicsTimeStep = 1.0f/50.0f;
 	int velocityIterations = 8;
 	int positionIterations = 3;
+	float pixelPerMeter = 100.0f;
+	sf::Color bgColor = sf::Color::Black;
 };
 
 class MainEngine : public sf::NonCopyable, public System
@@ -28,12 +30,13 @@ public:
 	explicit MainEngine(Configuration* config = nullptr);
 	virtual ~MainEngine();
 
-	virtual void Init() override;
-	virtual void Update() override;
-	virtual void Destroy() override;
+	void Init() override;
+	void Update() override;
+	void Destroy() override;
 
 	void EngineLoop();
-
+	virtual void OnBeginContact(Collider* colliderA, Collider* colliderB){}
+	virtual void OnEndContact(Collider* colliderA, Collider* colliderB){}
 	virtual void OnEvent(sf::Event& event);
 	Configuration config;
 	sf::RenderWindow* renderWindow = nullptr;
@@ -48,7 +51,8 @@ public:
 
 	unsigned frameIndex = 0;
 protected:
-
+	sf::Clock engineClock;
+	sf::Time dt;
 	Remotery* rmt = nullptr;
 	ctpl::thread_pool workingThreadPool;
 	std::thread renderThread;

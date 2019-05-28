@@ -24,6 +24,7 @@ void MainEngine::EngineLoop()
 	renderThread.detach();
 	while (isRunning)
 	{
+		dt = engineClock.restart();
 		rmt_ScopedCPUSample(EngineLoop, 0);
 		isReady = true;
 		if(frameIndex > 0)

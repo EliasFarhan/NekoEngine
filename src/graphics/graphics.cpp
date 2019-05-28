@@ -62,7 +62,7 @@ void GraphicsManager::RenderLoop()
 			rmt_ScopedCPUSample(RenderLoop, 0);
 			rmt_ScopedOpenGLSample(RenderLoop);
 			isRendering = true;
-            renderWindow->clear(sf::Color::Black);
+            renderWindow->clear(engine->config.bgColor);
             
         	//manage command buffers
 			auto& commandBuffer = commandBuffers[frameIndex % 2];

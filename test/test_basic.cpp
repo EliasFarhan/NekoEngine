@@ -8,6 +8,7 @@
 #include "engine/transform.h"
 #include "engine/globals.h"
 #include <random>
+#include "utilities/time_utility.h"
 
 
 TEST(Basic, OpenWindow)
@@ -69,8 +70,7 @@ public:
 				texture->getSize().x * 0.5f,
 				texture->getSize().y * 0.5f
 			));
-			spriteManager.sprites[0].push_back(sprite);
-			spriteManager.sprites[1].push_back(sprite);
+			spriteManager.AddSprite(sprite);
 
 			transformManager.positions.emplace_back(randomX(generator), randomY(generator));
 			const float scale = randomScale(generator);

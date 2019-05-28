@@ -80,6 +80,10 @@ add_subdirectory(${BOX2D_DIR})
 include_directories(${BOX2D_DIR}/)
 LIST(APPEND Neko_LIBRARIES
 	Box2D)
+
+	#glm
+set(GLM_DIR ${EXTERNAL_DIR}/glm)
+include_directories(${GLM_DIR})
 #Utility
 set(UTILITIES_DIR ${EXTERNAL_DIR}/utilities/)
 include_directories(${UTILITIES_DIR})
@@ -93,6 +97,14 @@ LIST(APPEND Neko_LIBRARIES Remotery)
 file(GLOB_RECURSE DATA_FILES
 		"${PROJECT_SOURCE_DIR}/data/*.jpg"
 		"${PROJECT_SOURCE_DIR}/data/*.png"
+		"${PROJECT_SOURCE_DIR}/data/*.jpeg"
+		"${PROJECT_SOURCE_DIR}/data/*.bmp"
+		"${PROJECT_SOURCE_DIR}/data/*.tga"
+		"${PROJECT_SOURCE_DIR}/data/*.gif"
+		"${PROJECT_SOURCE_DIR}/data/*.psd"
+		"${PROJECT_SOURCE_DIR}/data/*.hdr"
+		"${PROJECT_SOURCE_DIR}/data/*.pic"
+		"${PROJECT_SOURCE_DIR}/data/*.json"
 		)
 		
 foreach(DATA ${DATA_FILES})
