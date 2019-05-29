@@ -4,6 +4,7 @@
 #include <engine/engine.h>
 #include "engine/globals.h"
 #include <Remotery.h>
+#include <SFML/Graphics/Texture.hpp>
 
 namespace neko
 {
@@ -13,8 +14,11 @@ SpriteManager::SpriteManager()
 	sprites[1].reserve(InitEntityNmb);
 }
 
-void SpriteManager::AddSprite(sf::Sprite sprite)
+void SpriteManager::AddSprite(const sf::Texture &texture)
 {
+    sf::Sprite sprite;
+    sprite.setTexture(texture);
+    sprite.setOrigin(sf::Vector2f(texture.getSize())/2.0f);
 	sprites[0].push_back(sprite);
 	sprites[1].push_back(sprite);
 }
@@ -58,4 +62,6 @@ void SpriteManager::PushCommands(GraphicsManager* graphicsManager, size_t start,
 		graphicsManager->Draw(sprites[frameIndex][i]);
 	}
 }
+
+
 }

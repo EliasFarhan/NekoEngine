@@ -64,13 +64,8 @@ public:
 		std::uniform_real_distribution<float> randomAngle(0.0f, 360.0f); // generates random floats between 0.0 and 1.0
 		for(auto i = 0u; i < InitEntityNmb; i++)
 		{
-			sf::Sprite sprite;
-			sprite.setTexture(*texture);
-			sprite.setOrigin(sf::Vector2f(
-				texture->getSize().x * 0.5f,
-				texture->getSize().y * 0.5f
-			));
-			spriteManager.AddSprite(sprite);
+
+			spriteManager.AddSprite(*texture);
 
 			transformManager.positions.emplace_back(randomX(generator), randomY(generator));
 			const float scale = randomScale(generator);

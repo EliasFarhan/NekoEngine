@@ -62,17 +62,20 @@ void GraphicsManager::RenderLoop()
 			rmt_ScopedCPUSample(RenderLoop, 0);
 			rmt_ScopedOpenGLSample(RenderLoop);
 			isRendering = true;
-            renderWindow->clear(engine->config.bgColor);
-            
-        	//manage command buffers
-			auto& commandBuffer = commandBuffers[frameIndex % 2];
-			while(!commandBuffer.empty())
-			{
-				auto* command = commandBuffer.front();
-				command->Draw(renderWindow);
-				commandBuffer.pop();
-			}
+            {
+                //we need to lock the render thread while drawing
+                std::unique_lock<std::mutex> lock(engine->renderMutex);
+                renderWindow->clear(engine->config.bgColor);
 
+                //manage command buffers
+                auto &commandBuffer = commandBuffers[frameIndex % 2];
+                while (!commandBuffer.empty())
+                {
+                    auto *command = commandBuffer.front();
+                    command->Draw(renderWindow);
+                    commandBuffer.pop();
+                }
+            }
 			renderWindow->display();
 			
 			

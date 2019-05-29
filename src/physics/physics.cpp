@@ -39,6 +39,8 @@ b2Body* Physics2dManager::CreateBody(b2BodyDef& bodyDef, b2FixtureDef* fixturesD
 		fixturesDef[i].userData = collider;
 		auto* fixture = body->CreateFixture(&fixturesDef[i]);
 		collider->fixture = fixture;
+
+
 	}
 	return body;
 }

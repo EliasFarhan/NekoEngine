@@ -137,7 +137,8 @@ add_library(Neko_COMMON STATIC ${Neko_SRC})
 target_link_libraries(Neko_COMMON PUBLIC ${Neko_LIBRARIES})
 add_dependencies(Neko_COMMON DataTarget)
 set_property(TARGET Neko_COMMON PROPERTY CXX_STANDARD 17)
-
+add_compile_definitions(Neko_COMMON PUBLIC $<$<CONFIG:Debug>:__neko_dbg__>)
+add_compile_definitions(Neko_COMMON PUBLIC $<$<CONFIG:RelWithDebInfo>:__neko_dbg__>)
 #Neko TEST
 SET(Neko_TEST_DIR ${CMAKE_SOURCE_DIR}/test)
 file(GLOB TEST_FILES ${Neko_TEST_DIR}/*.cpp )
@@ -156,8 +157,7 @@ foreach(course_file ${COURSE_FILES} )
     # Make sure YourLib is linked to each app
     target_link_libraries(${course_name} PUBLIC Neko_COMMON)
 	set_property(TARGET ${course_name} PROPERTY CXX_STANDARD 17)
-	set_target_properties (${course_name} PROPERTIES
-    FOLDER Main)
+	set_target_properties (${course_name} PROPERTIES FOLDER Main)
 endforeach()
 
 if(MSVC)

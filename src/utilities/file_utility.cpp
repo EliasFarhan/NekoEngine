@@ -30,11 +30,15 @@
 
 #include <boost/filesystem.hpp>
 namespace fs = boost::filesystem;
-#else
-#include <filesystem>
-#ifdef __linux__
-namespace fs = std::filesystem;
 #endif
+
+#ifdef WIN32
+#include <filesystem>
+#endif
+
+#ifdef __linux__
+#include <filesystem>
+namespace fs = std::filesystem;
 #endif
 
 namespace neko

@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <graphics/shape.h>
 #include "engine/engine.h"
 #include "graphics/sprite.h"
 #include "graphics/texture.h"
@@ -33,9 +34,7 @@ public:
 			transformManager.angles.push_back(0.0f);
 
 			auto* texture = textureManager.LoadTexture("data/sprites/hero/jump/hero1.png");
-			sf::Sprite sprite;
-			sprite.setTexture(*texture);
-			spriteManager.AddSprite(sprite);
+			spriteManager.AddSprite(*texture);
 
 			const auto physicsSize = neko::pixel2meter(sf::Vector2f(texture->getSize()));
 			b2BodyDef bodyDef;
@@ -47,16 +46,24 @@ public:
 			playerBox[0].SetAsBox(physicsSize.x/2.0f, physicsSize.y/2.0f);
 
 			const float footOffset = 5.0f;
-			const b2Vec2 positions[3] = {
+			const b2Vec2 footPoints[3] = {
 				b2Vec2(0,physicsSize.y/2.0f),
 				b2Vec2(neko::pixel2meter(footOffset),physicsSize.y/2.0f + neko::pixel2meter(footOffset)),
 				b2Vec2(neko::pixel2meter(-footOffset),physicsSize.y/2.0f + neko::pixel2meter(footOffset)),
 			};
-			playerBox[1].Set(positions, 3);
+			playerBox[1].Set(footPoints, 3);
 
 			b2FixtureDef fixtureDef[2];
 
 			neko::Collider mainPlayerCollider{};
+#ifdef __neko_dbg__
+			neko::ShapeDef shapeDef;
+			shapeDef.fillColor = sf::Color::Transparent;
+			shapeDef.outlineColor = sf::Color::Green;
+			shapeDef.outlineThickness = 1.0f;
+			auto mainPlayerShapeIndex = shapeManager.AddBox(playerPos, neko::meter2pixel(b2Vec2(physicsSize.x/2.0f, physicsSize.y/2.0f)), shapeDef);
+			mainPlayerCollider.shapeIndex = mainPlayerShapeIndex;
+#endif
 			fixtureDef[0].shape = &playerBox[0];
 			mainPlayerCollider.entity = playerData.playerEntity;
 			physicsManager.colliders.push_back(mainPlayerCollider);
@@ -65,7 +72,17 @@ public:
 			footCollider.entity = playerData.playerEntity;
 			fixtureDef[1].shape = &playerBox[1];
 			fixtureDef[1].isSensor = true;
-			mainPlayerCollider.entity = playerData.playerEntity;
+#ifdef __neko_dbg__
+
+			sf::Vector2f points[3];
+			for(int i = 0; i < 3; i++)
+            {
+			    points[i] = neko::meter2pixel(footPoints[i]);
+            }
+
+            //auto footShapeIndex = shapeManager.AddPolygon(neko::meter2pixel(footPoints[0]), points, 3, shapeDef);
+            //footCollider.shapeIndex = footShapeIndex;
+#endif
 			physicsManager.colliders.push_back(footCollider);
 
 			playerData.playerBody = physicsManager.CreateBody(bodyDef, fixtureDef, 2);
@@ -77,8 +94,6 @@ public:
 				sf::Vector2f(300,500)
 			};
 			auto* platformTexture = textureManager.LoadTexture("data/sprites/platform.jpg");
-			sf::Sprite platformSprite;
-			platformSprite.setTexture(*platformTexture);
 
 			for (auto i = 0u ; i < platformsNmb;i++)
 			{
@@ -100,9 +115,17 @@ public:
 
 				neko::Collider platformCollider{};
 				platformCollider.entity = playerData.playerEntity + i + 1;
+#ifdef __neko_dbg__
+                neko::ShapeDef shapeDef;
+                shapeDef.fillColor = sf::Color::Transparent;
+                shapeDef.outlineColor = sf::Color::Green;
+                shapeDef.outlineThickness = 1.0f;
+                auto platformShapeIndex = shapeManager.AddBox(platformPositions[i], neko::meter2pixel(b2Vec2(physicsSize.x/2.0f, physicsSize.y/2.0f)), shapeDef);
+                platformCollider.shapeIndex = platformShapeIndex;
+#endif
 				physicsManager.colliders.push_back(platformCollider);
 				physicsManager.CreateBody(bodyDef, &fixtureDef, 1);
-				spriteManager.AddSprite(platformSprite);
+				spriteManager.AddSprite(*platformTexture);
 			}
 		}
 		physicsTimer.period = config.physicsTimeStep;
@@ -143,10 +166,20 @@ public:
 			spriteManager.CopyTransformPosition(transformManager, 0, 1);
 			spriteManager.PushCommands(graphicsManager, 0, 1);
 		}
+
+
 		{
 			spriteManager.CopyTransformPosition(transformManager, 1, platformsNmb);
 			spriteManager.PushCommands(graphicsManager, 1, platformsNmb);
 		}
+#ifdef __neko_dbg__
+        {
+            //Main playerbox
+            shapeManager.CopyPosition(&transformManager.positions[0], 0, 1);
+            shapeManager.PushCommands(graphicsManager, 0, 1+platformsNmb);
+        }
+#endif
+
 	}
 
 	void Destroy() override
@@ -184,6 +217,7 @@ protected:
 	neko::Transform2dManager transformManager;
 	neko::Physics2dManager physicsManager;
 	neko::KeyboardManager keyboardManager;
+    neko::ShapeManager shapeManager;
 	PlayerData playerData = {};
 	static const size_t platformsNmb = 3;
 	const float jumpVelocity = 4.0f;

@@ -13,6 +13,9 @@ struct Collider
 	b2Fixture* fixture;
 	b2Body* body;
 	neko::Entity entity;
+#ifdef __neko_dbg__
+	int shapeIndex = -1;
+#endif
 };
 
 
