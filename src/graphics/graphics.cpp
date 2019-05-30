@@ -15,13 +15,16 @@ void SfmlCommand::Draw(sf::RenderTarget* renderTarget)
 
 GraphicsManager::GraphicsManager()
 {
-	commands[0].reserve(InitEntityNmb);
-	commands[1].reserve(InitEntityNmb);
+
 }
 
 void GraphicsManager::Draw(sf::Drawable& drawable)
 {
-
+    if(nextRenderLength >= MAX_COMMAND_NMB)
+    {
+        logDebug("[Error] Too many draw calls compare to MAX_COMMAND_NMB");
+        return;
+    }
 	const int index = MainEngine::GetInstance()->frameIndex % 2;
 	/*{
 		std::ostringstream oss;
@@ -30,8 +33,10 @@ void GraphicsManager::Draw(sf::Drawable& drawable)
 	}*/
 	SfmlCommand command;
 	command.drawable = &drawable;
-	commands[index].push_back(command);
-	commandBuffers[index].push(&commands[index].back());
+	commands[index][nextRenderLength] = command;
+	commandBuffers[index][nextRenderLength] = &commands[index][nextRenderLength];
+
+	nextRenderLength++;
 }
 
 void GraphicsManager::RenderLoop()
@@ -53,6 +58,8 @@ void GraphicsManager::RenderLoop()
 				logDebug(oss.str());
 			}*/
 			std::unique_lock<std::mutex> lock(engine->renderMutex);
+			renderLength = nextRenderLength;
+			nextRenderLength = 0;
 			engine->condSyncRender.notify_all();
 		}
         renderWindow->setActive(true);
@@ -69,19 +76,16 @@ void GraphicsManager::RenderLoop()
 
                 //manage command buffers
                 auto &commandBuffer = commandBuffers[frameIndex % 2];
-                while (!commandBuffer.empty())
+                for(auto i = 0u; i<renderLength;i++)
                 {
-                    auto *command = commandBuffer.front();
+                    auto *command = commandBuffer[i];
                     command->Draw(renderWindow);
-                    commandBuffer.pop();
                 }
             }
 			renderWindow->display();
 			
 			
         	isRendering = false;
-			commands[frameIndex % 2].clear();
-			commands[frameIndex % 2].reserve(InitEntityNmb);
         	++frameIndex;
 
         }
