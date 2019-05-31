@@ -2,12 +2,13 @@
 
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <condition_variable>
-#include <queue>
+#include <array>
 #include <atomic>
 
 namespace neko
 {
 
+const size_t MAX_COMMAND_NMB = 1024;
 class MainEngine;
 
 struct Command
@@ -33,7 +34,9 @@ public:
     virtual void RenderLoop();
 protected:
 	sf::RenderWindow* renderWindow = nullptr;
-	std::vector<SfmlCommand> commands[2];
-    std::queue<Command*> commandBuffers[2];
+	std::array<SfmlCommand, MAX_COMMAND_NMB> commands[2];
+    std::array<Command*, MAX_COMMAND_NMB> commandBuffers[2];
+    size_t renderLength = 0;
+    size_t nextRenderLength = 0;
 };
 }
