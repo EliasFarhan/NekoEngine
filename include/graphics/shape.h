@@ -10,7 +10,7 @@ class GraphicsManager;
 struct ShapeDef
 {
     sf::Color fillColor = sf::Color::White;
-    sf::Color outlineColor= sf::Color::White;
+    sf::Color outlineColor = sf::Color::White;
     float outlineThickness=0.0f;
 };
 

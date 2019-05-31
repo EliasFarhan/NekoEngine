@@ -14,13 +14,15 @@ SpriteManager::SpriteManager()
 	sprites[1].reserve(InitEntityNmb);
 }
 
-void SpriteManager::AddSprite(const sf::Texture &texture)
+int SpriteManager::AddSprite(const sf::Texture &texture)
 {
     sf::Sprite sprite;
     sprite.setTexture(texture);
     sprite.setOrigin(sf::Vector2f(texture.getSize())/2.0f);
+	const int index = sprites[0].size();
 	sprites[0].push_back(sprite);
 	sprites[1].push_back(sprite);
+	return index;
 }
 
 void SpriteManager::CopyTransformPosition(Transform2dManager& transformManager, size_t start, size_t length)

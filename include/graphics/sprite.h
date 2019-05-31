@@ -13,7 +13,7 @@ class SpriteManager
 {
 public:
 	SpriteManager();
-	void AddSprite(const sf::Texture& texture);
+	int AddSprite(const sf::Texture& texture);
 	void CopyTransformPosition(Transform2dManager& transformManager, size_t start=0, size_t length=InitEntityNmb);
 	void CopyTransformScales(Transform2dManager& transformManager, size_t start = 0, size_t length = InitEntityNmb);
 	void CopyTransformAngles(Transform2dManager& transformManager, size_t start = 0, size_t length = InitEntityNmb);
