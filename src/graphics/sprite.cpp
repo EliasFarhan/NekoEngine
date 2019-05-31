@@ -14,11 +14,14 @@ SpriteManager::SpriteManager()
 	sprites[1].reserve(InitEntityNmb);
 }
 
-int SpriteManager::AddSprite(const sf::Texture &texture)
+int SpriteManager::AddSprite(const sf::Texture *texture)
 {
     sf::Sprite sprite;
-    sprite.setTexture(texture);
-    sprite.setOrigin(sf::Vector2f(texture.getSize())/2.0f);
+    if(texture != nullptr)
+    {
+        sprite.setTexture(*texture);
+        sprite.setOrigin(sf::Vector2f(texture->getSize())/2.0f);
+    }
 	const int index = sprites[0].size();
 	sprites[0].push_back(sprite);
 	sprites[1].push_back(sprite);
@@ -63,6 +66,19 @@ void SpriteManager::PushCommands(GraphicsManager* graphicsManager, size_t start,
 	{
 		graphicsManager->Draw(sprites[frameIndex][i]);
 	}
+}
+
+sf::Sprite *SpriteManager::GetSpriteAt(int spriteIndex)
+{
+    const int frameIndex = MainEngine::GetInstance()->frameIndex%2;
+    if(spriteIndex >= sprites[frameIndex].size())
+    {
+        return nullptr;
+    }
+    else
+    {
+        return &sprites[frameIndex][spriteIndex];
+    }
 }
 
 

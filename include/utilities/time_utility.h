@@ -38,10 +38,6 @@ public:
 
 	float GetCurrentRatio() const;
 	float GetTimeFromStart() const;
-	float GetPeriod() const;
-	void SetPeriod(float period);
-	float GetTime() const;
-	void SetTime(float time);
 
 
 	float time;

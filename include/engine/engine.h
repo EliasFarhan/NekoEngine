@@ -22,6 +22,8 @@ struct Configuration
 	int positionIterations = 3;
 	float pixelPerMeter = 100.0f;
 	sf::Color bgColor = sf::Color::Black;
+    bool vSync = true;
+    unsigned int framerateLimit = 0u;
 };
 
 class MainEngine : public sf::NonCopyable, public System

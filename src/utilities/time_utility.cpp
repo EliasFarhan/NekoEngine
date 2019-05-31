@@ -48,7 +48,7 @@ void Timer::Reset()
 {
 	if(time < 0.0f)
 	{
-		time = period + time;
+		time += period;
 	}
 	else
 	{

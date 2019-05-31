@@ -68,8 +68,14 @@ void MainEngine::Init()
     XInitThreads();
 #endif
 	renderWindow = new sf::RenderWindow(sf::VideoMode(1280, 720), "Neko Engine");
-	renderWindow->setVerticalSyncEnabled(true);
-
+	if(config.vSync)
+    {
+	    renderWindow->setVerticalSyncEnabled(config.vSync);
+    }
+	else
+    {
+	    renderWindow->setFramerateLimit(config.framerateLimit);
+    }
 	renderWindow->setActive(false);
 	instance = this;
 

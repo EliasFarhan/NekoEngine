@@ -31,6 +31,7 @@
 using json = nlohmann::json;
 
 #include <SFML/System/Vector2.hpp>
+#include <SFML/Graphics/Rect.hpp>
 
 
 
@@ -41,6 +42,7 @@ namespace neko
 	bool CheckJsonParameter(const json& jsonObject, std::string parameterName, json::value_t expectedType);
 	bool CheckJsonNumber(const json& jsonObject, std::string parameterName);
 	sf::Vector2f GetVectorFromJson(const json& jsonObject, std::string parameterName);
+	sf::IntRect GetRectFromJson(const json &jsonObject, std::string parameterName);
 	std::unique_ptr<json> LoadJson(std::string jsonPath);
 }
 #endif

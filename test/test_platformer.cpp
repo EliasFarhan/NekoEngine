@@ -34,7 +34,7 @@ public:
 			transformManager.angles.push_back(0.0f);
 
 			auto* texture = textureManager.LoadTexture("data/sprites/hero/jump/hero1.png");
-			spriteManager.AddSprite(*texture);
+			spriteManager.AddSprite(texture);
 
 			const auto physicsSize = neko::pixel2meter(sf::Vector2f(texture->getSize()));
 			b2BodyDef bodyDef;
@@ -125,7 +125,7 @@ public:
 #endif
 				physicsManager.colliders.push_back(platformCollider);
 				physicsManager.CreateBody(bodyDef, &fixtureDef, 1);
-				spriteManager.AddSprite(*platformTexture);
+				spriteManager.AddSprite(platformTexture);
 			}
 		}
 		physicsTimer.period = config.physicsTimeStep;

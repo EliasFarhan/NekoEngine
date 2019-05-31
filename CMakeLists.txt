@@ -5,6 +5,17 @@ project(Neko)
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
 
+if(UNIX AND NOT APPLE)
+	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+		# using Clang
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lstdc++")
+	elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+
+	endif()
+	# using GCC
+	LIST(APPEND Neko_LIBRARIES
+			stdc++fs)
+ENDIF()
 
 set(EXTERNAL_DIR ${CMAKE_SOURCE_DIR}/externals)
 
@@ -127,10 +138,7 @@ add_custom_target(
 		DEPENDS ${DATA_BINARY_FILES}
 )
 #Neko_COMMON
-if(UNIX AND NOT APPLE)
-	LIST(APPEND Neko_LIBRARIES
-			stdc++fs)
-ENDIF()
+
 include_directories(include/)
 
 add_library(Neko_COMMON STATIC ${Neko_SRC})
