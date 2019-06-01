@@ -46,18 +46,25 @@ void DebugLogger::logLoop()
 {
 	while(isRunning)
 	{
-		std::unique_lock<std::mutex> lock(msgMutex);
-		newMsgSync.wait(lock);
-		if (!isRunning) return;
 		
+		{
+			std::unique_lock<std::mutex> lock(msgMutex);
+			newMsgSync.wait(lock);
+			if (!isRunning) return;
+		}
 		{
 			std::ofstream logFile( "neko_log.txt",std::ios::out | std::ios::app);
 			while (!msgQueue.empty())
 			{
-				auto msg = msgQueue.front();
+				std::string msg;
+				{
+					std::unique_lock<std::mutex> lock(msgMutex);
+					msg = msgQueue.front();
+
+					msgQueue.pop();
+				}
 				logFile << msg << "\n";
 				std::cout << msg << "\n";
-				msgQueue.pop();
 			}
 		}
 	}

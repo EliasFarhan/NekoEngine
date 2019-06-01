@@ -195,7 +195,6 @@ public:
         MainEngine::Destroy();
     }
 
-public:
 
 protected:
     neko::KeyboardManager keyboardManager;
