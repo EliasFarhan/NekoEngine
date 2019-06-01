@@ -109,6 +109,8 @@ void MainEngine::Destroy()
 	delete renderWindow;
 	renderWindow = nullptr;
 	instance = nullptr;
+	delete graphicsManager;
+	graphicsManager = nullptr;
 }
 
 void MainEngine::OnEvent(sf::Event& event)
