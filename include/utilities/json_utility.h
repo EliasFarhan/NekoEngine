@@ -1,3 +1,5 @@
+#pragma once
+
 /*
  MIT License
 
@@ -21,28 +23,31 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-#ifndef SFGE_JSON_UTILITY_H
-#define SFGE_JSON_UTILITY_H
 
 #include <string>
 #include <memory>
- //Externals includes
+//Externals includes
 #include <json.hpp>
+
 using json = nlohmann::json;
 
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/Rect.hpp>
 
 
-
 namespace neko
 {
-	bool IsJsonValueNumeric(const json::value_type& jsonValue);
-	bool CheckJsonExists(const json& jsonObject, std::string parameterName);
-	bool CheckJsonParameter(const json& jsonObject, std::string parameterName, json::value_t expectedType);
-	bool CheckJsonNumber(const json& jsonObject, std::string parameterName);
-	sf::Vector2f GetVectorFromJson(const json& jsonObject, std::string parameterName);
-	sf::IntRect GetRectFromJson(const json &jsonObject, std::string parameterName);
-	std::unique_ptr<json> LoadJson(std::string jsonPath);
+bool IsJsonValueNumeric(const json::value_type& jsonValue);
+
+bool CheckJsonExists(const json& jsonObject, std::string parameterName);
+
+bool CheckJsonParameter(const json& jsonObject, std::string parameterName, json::value_t expectedType);
+
+bool CheckJsonNumber(const json& jsonObject, std::string parameterName);
+
+sf::Vector2f GetVectorFromJson(const json& jsonObject, std::string parameterName);
+
+sf::IntRect GetRectFromJson(const json& jsonObject, std::string parameterName);
+
+std::unique_ptr<json> LoadJson(std::string jsonPath);
 }
-#endif

@@ -31,17 +31,21 @@ namespace neko
 class Timer
 {
 public:
-	Timer(float time, float period);
-	void Update(float dt);
-	bool IsOver() const;
-	void Reset();
+    Timer(float time, float period);
 
-	float GetCurrentRatio() const;
-	float GetTimeFromStart() const;
+    void Update(float dt);
+
+    bool IsOver() const;
+
+    void Reset();
+
+    float GetCurrentRatio() const;
+
+    float GetTimeFromStart() const;
 
 
-	float time;
-	float period;
+    float time;
+    float period;
 private:
 };
 }

@@ -1,7 +1,7 @@
 /*
  MIT License
 
- Copyright (c) 2017 SAE Institute Switzerland AG
+ Copyright (c) 2019 SAE Institute Switzerland AG
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -43,77 +43,96 @@ namespace fs = std::filesystem;
 
 namespace neko
 {
-bool FileExists(const std::string & filename)
+bool FileExists(const std::string& filename)
 {
-	const fs::path p = filename;
-	return fs::exists(p);
+    const fs::path p = filename;
+    return fs::exists(p);
 }
-bool IsRegularFile(std::string& filename)
+
+bool IsRegularFile(const std::string& filename)
 {
-	const fs::path p = filename;
+    const fs::path p = filename;
     return fs::is_regular_file(p);
 
 }
-bool IsDirectory(std::string & filename)
+
+bool IsDirectory(const std::string& filename)
 {
-	const fs::path p = filename;
-	return fs::is_directory(p);
+    const fs::path p = filename;
+    return fs::is_directory(p);
 }
-void IterateDirectory(std::string & dirname, std::function<void(std::string)> func)
+
+void IterateDirectory(std::string& dirname, std::function<void(std::string)> func)
 {
-	
-	if (IsDirectory(dirname))
-	{
-		for (auto& p : fs::directory_iterator(dirname))
-		{
-			func(p.path().generic_string());
-		}
-	}
+
+    if (IsDirectory(dirname))
+    {
+        for (auto& p : fs::directory_iterator(dirname))
+        {
+            func(p.path().generic_string());
+        }
+    }
 }
 
 std::ifstream::pos_type CalculateFileSize(const std::string& filename)
 {
-	std::ifstream in(filename, std::ifstream::binary | std::ifstream::ate);
-	return in.tellg();
+    std::ifstream in(filename, std::ifstream::binary | std::ifstream::ate);
+    return in.tellg();
 }
+
 bool CreateDirectory(const std::string& dirname)
 {
-	return fs::create_directory(dirname);
-}
-bool RemoveDirectory(const std::string &dirname, bool removeAll)
-{
-	if(removeAll)
-	{
-		return fs::remove_all(dirname);
-	} 
-	else
-	{
-		return fs::remove(dirname);
-	}
+    return fs::create_directory(dirname);
 }
 
-const std::string LoadFile(std::string path)
+bool RemoveDirectory(const std::string& dirname, bool removeAll)
 {
-	std::ifstream t(path);
-	std::string str((std::istreambuf_iterator<char>(t)),
-		std::istreambuf_iterator<char>());
-	return str;
+    if (removeAll)
+    {
+        return fs::remove_all(dirname);
+    }
+    else
+    {
+        return fs::remove(dirname);
+    }
 }
 
-std::string GetFilenameExtension(std::string path)
+const std::string LoadFile(const std::string& path)
 {
-	std::string extension = "";
-	const auto folderLastIndex = path.find_last_of('/');
-	std::string filename = path.substr(folderLastIndex + 1, path.size());
-	const auto filenameExtensionIndex = filename.find_last_of('.');
-	if (filenameExtensionIndex > path.size())
-	{
-		std::ostringstream oss;
-		oss << "[Error] Path: " << path << " has not a correct extension";
-		logDebug(oss.str());
-		return extension;
-	}
-	extension = filename.substr(filenameExtensionIndex);
-	return extension;
+    std::ifstream t(path);
+    std::string str((std::istreambuf_iterator<char>(t)),
+                    std::istreambuf_iterator<char>());
+    return str;
+}
+
+std::string GetFilenameExtension(const std::string& path)
+{
+    std::string extension = "";
+    const auto folderLastIndex = path.find_last_of('/');
+    std::string filename = path.substr(folderLastIndex + 1, path.size());
+    const auto filenameExtensionIndex = filename.find_last_of('.');
+    if (filenameExtensionIndex > path.size())
+    {
+        std::ostringstream oss;
+        oss << "[Error] Path: " << path << " has not a correct extension";
+        logDebug(oss.str());
+        return extension;
+    }
+    extension = filename.substr(filenameExtensionIndex);
+    return extension;
+}
+
+std::string GetFileParentPath(const std::string& path)
+{
+    fs::path p = path;
+    return p.parent_path().string();
+}
+
+std::string LinkFolderAndFile(const std::string& folderPath, const std::string& filePath)
+{
+    fs::path f = folderPath;
+    fs::path p = filePath;
+    fs::path l = f / p;
+    return l.string();
 }
 }

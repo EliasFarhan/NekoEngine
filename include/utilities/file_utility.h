@@ -1,3 +1,5 @@
+#pragma once
+
 /*
  MIT License
 
@@ -21,26 +23,20 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-#ifndef SFGE_FILE_UTILITY_H
-#define SFGE_FILE_UTILITY_H
+
 #include <functional>
 
-#ifdef WIN32
-#include <experimental/filesystem>
-// for convenience
-namespace fs = std::experimental::filesystem;
-#endif
 #include <string>
 #include <fstream>
 
 namespace neko
-{	
+{
 
 bool FileExists(const std::string& filename);
 
-bool IsRegularFile(std::string& filename);
+bool IsRegularFile(const std::string& filename);
 
-bool IsDirectory(std::string& filename);
+bool IsDirectory(const std::string& filename);
 
 void IterateDirectory(std::string& dirname, std::function<void(std::string)>);
 
@@ -48,11 +44,13 @@ std::ifstream::pos_type CalculateFileSize(const std::string& filename);
 
 bool CreateDirectory(const std::string& dirname);
 
-bool RemoveDirectory(const std::string& dirname, bool removeAll=true);
+bool RemoveDirectory(const std::string& dirname, bool removeAll = true);
 
-const std::string LoadFile(std::string path);
+const std::string LoadFile(const std::string& path);
 
-std::string GetFilenameExtension(std::string path);
+std::string LinkFolderAndFile(const std::string& folderPath, const std::string& filePath);
+
+std::string GetFilenameExtension(const std::string& path);
+
+std::string GetFileParentPath(const std::string& path);
 }
-
-#endif

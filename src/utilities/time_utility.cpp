@@ -1,7 +1,7 @@
 /*
  MIT License
 
- Copyright (c) 2017 SAE Institute Switzerland AG
+ Copyright (c) 2019 SAE Institute Switzerland AG
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -27,43 +27,44 @@
 namespace neko
 {
 
-Timer::Timer(float time, float period):
-	time(time), period(period)
+Timer::Timer(float time, float period) :
+        time(time), period(period)
 {
 }
 
 void Timer::Update(float dt)
 {
-	if(time>0.0f)
-	{
-		time -= dt;
-	}
+    if (time > 0.0f)
+    {
+        time -= dt;
+    }
 }
+
 bool Timer::IsOver() const
 {
-	return !(time > 0.0f);
+    return !(time > 0.0f);
 }
 
 void Timer::Reset()
 {
-	if(time < 0.0f)
-	{
-		time += period;
-	}
-	else
-	{
-		time = period;
-	}
+    if (time < 0.0f)
+    {
+        time += period;
+    }
+    else
+    {
+        time = period;
+    }
 }
 
 float Timer::GetCurrentRatio() const
 {
-	return GetTimeFromStart() / period;
+    return GetTimeFromStart() / period;
 }
 
 float Timer::GetTimeFromStart() const
 {
-	return period - time;
+    return period - time;
 }
 }
 
