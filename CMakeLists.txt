@@ -8,13 +8,17 @@ set (CMAKE_CXX_STANDARD_REQUIRED ON)
 if(UNIX AND NOT APPLE)
 	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 		# using Clang
-		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address -lc++")
+		set(CMAKE_LINKER lld)
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address")
+		LIST(APPEND Neko_LIBRARIES
+				c++fs)
 	elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+        # using GCC
 
 	endif()
-	# using GCC
 	LIST(APPEND Neko_LIBRARIES
 			stdc++fs)
+
 ENDIF()
 
 set(EXTERNAL_DIR ${CMAKE_SOURCE_DIR}/externals)

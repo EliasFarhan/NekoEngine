@@ -26,6 +26,7 @@
 #include <utilities/file_utility.h>
 #include <graphics/texture.h>
 #include <engine/engine.h>
+#include <physics/physics.h>
 
 namespace neko
 {
@@ -91,7 +92,7 @@ void TiledMap::Init(const std::string& tilemapPath, TextureManager& textureManag
                     sf::Vertex quad[6];
                     sf::Vector2f topLeft = sf::Vector2f((x + offset.x) * tileSize.x,
                                                         (y + offset.y) * tileSize.y);
-                    //Counterclockwise
+                    //Counterclockwise two triangles for a quaq
                     quad[0].position = topLeft;
                     quad[1].position = topLeft + sf::Vector2f(0, tileSize.y);
                     quad[2].position = topLeft + tileSize;
@@ -119,7 +120,26 @@ void TiledMap::Init(const std::string& tilemapPath, TextureManager& textureManag
         {
             if (physics2DManager != nullptr)
             {
+                for(auto& objectJson : layer["objects"])
+                {
+                    sf::Vector2f position = sf::Vector2f(objectJson["x"], objectJson["y"]);
+                    sf::Vector2f size = sf::Vector2f(objectJson["width"], objectJson["height"]);
 
+                    b2BodyDef bodyDef;
+                    bodyDef.position = pixel2meter(position+size/2.0f);
+                    bodyDef.type = b2_staticBody;
+
+                    b2PolygonShape platformBox;
+                    platformBox.SetAsBox(pixel2meter(size.x/2.0f), pixel2meter(size.y/2.0f));
+
+                    b2FixtureDef fixtureDef;
+                    fixtureDef.shape = &platformBox;
+                    neko::Collider boxCollider;
+                    boxCollider.entity =2;
+                    physics2DManager->colliders.push_back(boxCollider);
+                    physics2DManager->CreateBody(bodyDef, &fixtureDef, 1);
+
+                }
             }
         }
     }

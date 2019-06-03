@@ -65,10 +65,10 @@ public:
 
     void EngineLoop();
 
-    virtual void OnBeginContact(Collider* colliderA, Collider* colliderB)
+    virtual void OnBeginContact(const Collider* colliderA, const Collider* colliderB)
     {}
 
-    virtual void OnEndContact(Collider* colliderA, Collider* colliderB)
+    virtual void OnEndContact(const Collider* colliderA, const Collider* colliderB)
     {}
 
     virtual void OnEvent(sf::Event& event);

@@ -188,7 +188,7 @@ public:
 		MainEngine::Destroy();
 	}
 
-	void OnBeginContact(neko::Collider* colliderA, neko::Collider* colliderB) override
+	void OnBeginContact(const neko::Collider* colliderA, const neko::Collider* colliderB) override
 	{
 		if(colliderA->entity == playerData.playerEntity && colliderA->fixture->IsSensor())
 		{
@@ -199,7 +199,7 @@ public:
 			playerData.contactNmb++;
 		}
 	}
-	void OnEndContact(neko::Collider* colliderA, neko::Collider* colliderB) override
+	void OnEndContact(const neko::Collider* colliderA, const neko::Collider* colliderB) override
 	{
 		if (colliderA->entity == playerData.playerEntity && colliderA->fixture->IsSensor())
 		{

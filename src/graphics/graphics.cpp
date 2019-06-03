@@ -132,7 +132,8 @@ void GraphicsManager::RenderLoop()
                 for (auto i = 0u; i < renderLength; i++)
                 {
                     auto* command = commandBuffer[i];
-                    command->Draw(renderWindow);
+                    if(command != nullptr)
+                        command->Draw(renderWindow);
                 }
             }
             renderWindow->display();
