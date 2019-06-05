@@ -33,7 +33,7 @@
 
 namespace neko
 {
-class Configuration;
+struct Configuration;
 
 class Physics2dManager : public System
 {

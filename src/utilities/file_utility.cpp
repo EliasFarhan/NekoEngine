@@ -34,6 +34,7 @@ namespace fs = boost::filesystem;
 
 #ifdef WIN32
 #include <filesystem>
+namespace fs = std::filesystem;
 #endif
 
 #ifdef __linux__
