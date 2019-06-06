@@ -6,18 +6,34 @@ set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(UNIX AND NOT APPLE)
+	MESSAGE("Linux Compiler ${CMAKE_CXX_COMPILER_ID}")
 	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+		MESSAGE("LLVM_ROOT ${LLVM_ROOT}")
 		# using Clang
-		set(CMAKE_LINKER lld)
-		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address")
-		LIST(APPEND Neko_LIBRARIES
-				c++fs)
+
+		if(LLVM_ROOT)
+            link_directories(BEFORE ${LLVM_ROOT}/lib)
+			set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++ -lc++ -lc++abi")
+				set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -nostdinc++")
+
+			include_directories(${LLVM_ROOT}/include/c++/v1/)
+			LIST(APPEND Neko_LIBRARIES
+					c++fs)
+			SET (CMAKE_AR      "${LLVM_ROOT}/bin/llvm-ar")
+			SET (CMAKE_LINKER  "${LLVM_ROOT}/bin/llvm-ld")
+			SET (CMAKE_NM      "${LLVM_ROOT}/bin/llvm-nm")
+			SET (CMAKE_OBJDUMP "${LLVM_ROOT}/bin/llvm-objdump")
+			SET (CMAKE_RANLIB  "${LLVM_ROOT}/bin/llvm-ranlib")
+		else()
+			set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address")
+		endif()
+
 	elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
         # using GCC
-
+		LIST(APPEND Neko_LIBRARIES
+				stdc++fs)
 	endif()
-	LIST(APPEND Neko_LIBRARIES
-			stdc++fs)
+
 
 ENDIF()
 
@@ -149,8 +165,8 @@ add_library(Neko_COMMON STATIC ${Neko_SRC})
 target_link_libraries(Neko_COMMON PUBLIC ${Neko_LIBRARIES})
 add_dependencies(Neko_COMMON DataTarget)
 set_property(TARGET Neko_COMMON PROPERTY CXX_STANDARD 17)
-add_compile_definitions(Neko_COMMON PUBLIC $<$<CONFIG:Debug>:__neko_dbg__>)
-add_compile_definitions(Neko_COMMON PUBLIC $<$<CONFIG:RelWithDebInfo>:__neko_dbg__>)
+target_compile_definitions(Neko_COMMON PUBLIC $<$<CONFIG:Debug>:__neko_dbg__>)
+target_compile_definitions(Neko_COMMON PUBLIC $<$<CONFIG:RelWithDebInfo>:__neko_dbg__>)
 #Neko TEST
 SET(Neko_TEST_DIR ${CMAKE_SOURCE_DIR}/test)
 file(GLOB TEST_FILES ${Neko_TEST_DIR}/*.cpp )
@@ -179,3 +195,5 @@ else()
 file(COPY ${SFML_DIR}/extlibs/bin/x64/openal32.dll DESTINATION ${CMAKE_BINARY_DIR}/)
 endif()
 endif()
+
+
