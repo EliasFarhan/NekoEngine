@@ -27,6 +27,7 @@
 #include <graphics/texture.h>
 #include <engine/engine.h>
 #include <physics/physics.h>
+#include <Remotery.h>
 
 namespace neko
 {
@@ -149,6 +150,7 @@ void TiledMap::Init(const std::string& tilemapPath, TextureManager& textureManag
 
 void Tilemap::PushCommand(GraphicsManager* graphicsManager)
 {
+    rmt_ScopedCPUSample(PushTilemapCommands, 0)
     const int frameIndex = MainEngine::GetInstance()->frameIndex % 2;
     for (auto& tilesheet: tileSheets)
     {

@@ -48,11 +48,14 @@ void MainEngine::EngineLoop()
     renderThread.detach();
     while (isRunning)
     {
-        dt = engineClock.restart();
+
         rmt_ScopedCPUSample(EngineLoop, 0);
+        dt = engineClock.restart();
         isReady = true;
         if (frameIndex > 0)
         {
+
+            rmt_ScopedCPUSample(WaitForGraphics, 0);
             std::unique_lock<std::mutex> lock(renderMutex);
             condSyncRender.wait(lock);
         }
@@ -110,7 +113,7 @@ void MainEngine::Init()
 
 void MainEngine::Update()
 {
-    rmt_ScopedCPUSample(EngineManageEvent, 0);
+    rmt_ScopedCPUSample(EngineUpdate, 0);
     sf::Event event{};
     while (renderWindow->pollEvent(event))
     {

@@ -86,7 +86,7 @@ public:
     std::condition_variable condSyncRender;
     std::mutex renderMutex;
 
-    unsigned frameIndex = 0;
+    std::atomic<unsigned> frameIndex = 0;
 protected:
     sf::Clock engineClock;
     sf::Time dt;

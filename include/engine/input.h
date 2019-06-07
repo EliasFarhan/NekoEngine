@@ -55,8 +55,13 @@ public:
 
     bool IsKeyUp(sf::Keyboard::Key key) const;
 
+    void AddPressKey(sf::Keyboard::Key key);
+    void AddReleaseKey(sf::Keyboard::Key key);
+
 private:
-    std::array<KeyPressedStatus, sf::Keyboard::Key::KeyCount> keyPressedStatusArray = {};
+    std::vector<sf::Keyboard::Key> pressedKey;
+    std::vector<sf::Keyboard::Key> releasedKey;
+    std::array<bool, sf::Keyboard::KeyCount> isKeyHeld;
 };
 
 namespace MouseManager

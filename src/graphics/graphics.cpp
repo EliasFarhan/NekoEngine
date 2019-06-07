@@ -95,8 +95,8 @@ void GraphicsManager::RenderLoop()
     renderWindow->setActive(false);
     do
     {
-
-        const bool isReady = engine->isReady;
+        rmt_ScopedCPUSample(RenderLoop, 0);
+        if(engine->isReady)
         {
             /*{
                 std::ostringstream oss;
@@ -106,42 +106,49 @@ void GraphicsManager::RenderLoop()
             std::unique_lock<std::mutex> lock(engine->renderMutex);
             renderLength = nextRenderLength;
             nextRenderLength = 0;
+            frameIndex = engine->frameIndex-1;
             engine->condSyncRender.notify_all();
         }
-        //We only start the new graphics frame if the engine had time to loop
-        if (engine->isRunning && isReady)
+        else
         {
-
+            continue;
+        }
+        //We only start the new graphics frame if the engine had time to loop
+        if (engine->isRunning)
+        {
+            rmt_ScopedCPUSample(ActiveRenderLoop, 0);
+            rmt_ScopedOpenGLSample(ActiveRenderLoop);
             renderWindow->setActive(true);
-            rmt_ScopedCPUSample(RenderLoop, 0);
-            rmt_ScopedOpenGLSample(RenderLoop);
+
             isRendering = true;
+
+
+            renderWindow->clear(engine->config.bgColor);
+
+            //manage command buffers
+            auto& commandBuffer = commandBuffers[frameIndex % 2];
+#ifdef __neko_dbg__
             {
-                //we need to lock the render thread while drawing
-                std::unique_lock<std::mutex> lock(engine->renderMutex);
-                renderWindow->clear(engine->config.bgColor);
+                std::ostringstream oss;
+                oss << "Command Buffers length: "<<renderLength<<"\n";
+                oss << "Engine frame: "<< engine->frameIndex <<" Graphics Frame: "<< frameIndex;
+                logDebug(oss.str());
 
-                //manage command buffers
-                auto& commandBuffer = commandBuffers[frameIndex % 2];
-                /*{
-                    std::ostringstream oss;
-                    oss << "Command Buffers length: "<<renderLength;
-                    logDebug(oss.str());
-
-                }*/
-                for (auto i = 0u; i < renderLength; i++)
-                {
-                    auto* command = commandBuffer[i];
-                    if(command != nullptr)
-                        command->Draw(renderWindow);
-                }
             }
+#endif
+            for (auto i = 0u; i < renderLength; i++)
+            {
+                std::unique_lock<std::mutex> lock(engine->renderMutex);
+                auto* command = commandBuffer[i];
+                if(command != nullptr)
+                    command->Draw(renderWindow);
+            }
+
             renderWindow->display();
 
 
             isRendering = false;
 
-            ++frameIndex;
 
         }
 

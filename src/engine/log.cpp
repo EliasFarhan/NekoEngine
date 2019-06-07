@@ -26,6 +26,7 @@
 #include <iostream>
 #include <chrono>
 #include <ctime>
+#include <Remotery.h>
 
 class DebugLogger
 {
@@ -63,8 +64,10 @@ DebugLogger::DebugLogger()
 
 void DebugLogger::write(std::string msg)
 {
-    std::unique_lock<std::mutex> lock(msgMutex);
-    msgQueue.push(msg);
+    {
+        std::unique_lock<std::mutex> lock(msgMutex);
+        msgQueue.push(msg);
+    }
     newMsgSync.notify_one();
 }
 
@@ -110,6 +113,6 @@ void destroyLog()
 {
 
     debugLogger->isRunning = false;
-    debugLogger->newMsgSync.notify_one();
+    debugLogger->newMsgSync.notify_all();
     debugLogger = nullptr;
 }

@@ -7,6 +7,8 @@
 #include "engine/entity.h"
 #include "utilities/time_utility.h"
 #include "engine/input.h"
+#include <Remotery.h>
+#include <SFML/Window/Event.hpp>
 
 
 struct PlayerData
@@ -22,6 +24,8 @@ public:
     void Init() override
     {
         config.bgColor = sf::Color::White;
+        config.vSync = true;
+
         MainEngine::Init();
         physicsManager.Init();
         //Player Initialization
@@ -94,40 +98,57 @@ public:
         tiledMap.Init("data/tilemap/platformer.json", textureManager, &physicsManager);
     }
 
-
-
+    void OnEvent(sf::Event& event) override
+    {
+        MainEngine::OnEvent(event);
+        if(event.type == sf::Event::KeyPressed)
+        {
+            keyboardManager.AddPressKey(event.key.code);
+        }
+        if(event.type == sf::Event::KeyReleased)
+        {
+            keyboardManager.AddReleaseKey(event.key.code);
+        }
+    }
 
     void Update() override
     {
-        MainEngine::Update();
+        rmt_ScopedCPUSample(PlatformerLoop, 0);
         keyboardManager.Update();
+        MainEngine::Update();
         physicsTimer.Update(dt.asSeconds());
         if(physicsTimer.IsOver())
         {
+            rmt_ScopedCPUSample(PhysicsStep, 0);
             physicsManager.Update();
             physicsTimer.time += physicsTimer.period;
         }
         tiledMap.PushCommand(graphicsManager);
         //Player management
         {
+            rmt_ScopedCPUSample(PlayerManageLoop, 0)
             //Jumping
             if(playerData.contactNmb > 0 && keyboardManager.IsKeyDown(sf::Keyboard::Space))
             {
+                rmt_ScopedCPUSample(CMakePlayerJump, 0);
                 const auto playerVelocity = playerData.playerBody->GetLinearVelocity();
                 playerData.playerBody->SetLinearVelocity(b2Vec2(playerVelocity.x, -jumpVelocity));
             }
             //Move horizontal
             {
+                rmt_ScopedCPUSample(MovePlayer, 0);
                 int move = 0;
                 move -= keyboardManager.IsKeyHeld(sf::Keyboard::Left);
                 move += keyboardManager.IsKeyHeld(sf::Keyboard::Right);
                 const auto playerVelocity = playerData.playerBody->GetLinearVelocity();
                 playerData.playerBody->SetLinearVelocity(b2Vec2(move*moveVelocity, playerVelocity.y));
             }
-
-            transformManager.CopyPositionsFromPhysics2d(physicsManager, 0, 1);
-            spriteManager.CopyTransformPosition(transformManager, 0, 1);
-            spriteManager.PushCommands(graphicsManager, 0, 1);
+            {
+                rmt_ScopedCPUSample(CopyPlayerGraphics, 0);
+                transformManager.CopyPositionsFromPhysics2d(physicsManager, 0, 1);
+                spriteManager.CopyTransformPosition(transformManager, 0, 1);
+                spriteManager.PushCommands(graphicsManager, 0, 1);
+            }
         }
 
     }

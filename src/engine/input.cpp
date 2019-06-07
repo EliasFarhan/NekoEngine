@@ -26,39 +26,42 @@
 #include <sstream>
 #include "engine/engine.h"
 #include "SFML/Window/Mouse.hpp"
+#include <Remotery.h>
 
 namespace neko
 {
 void KeyboardManager::Update()
 {
-    for (int i = 0; i < sf::Keyboard::KeyCount; i++)
-    {
-        keyPressedStatusArray[i].previousKeyPressed = keyPressedStatusArray[i].keyPressed;
-        keyPressedStatusArray[i].keyPressed = sf::Keyboard::isKeyPressed(static_cast<sf::Keyboard::Key>(i));
-        if (IsKeyDown(static_cast<sf::Keyboard::Key>(i)))
-        {
-            std::ostringstream oss;
-            oss << "[Input] Pressing key: " << i;
-            logDebug(oss.str());
-        }
-    }
+    rmt_ScopedCPUSample(KeyboardLoop, 0)
+    pressedKey.clear();
+    releasedKey.clear();
 }
 
 bool KeyboardManager::IsKeyHeld(sf::Keyboard::Key key) const
 {
-    return keyPressedStatusArray[static_cast<int>(key)].keyPressed;
+    return isKeyHeld[(int)key];
 }
 
 bool KeyboardManager::IsKeyDown(sf::Keyboard::Key key) const
 {
-    return !keyPressedStatusArray[static_cast<int>(key)].previousKeyPressed &&
-           keyPressedStatusArray[static_cast<int>(key)].keyPressed;
+    return std::find(pressedKey.begin(), pressedKey.end(), key) != pressedKey.end();
 }
 
 bool KeyboardManager::IsKeyUp(sf::Keyboard::Key key) const
 {
-    return !keyPressedStatusArray[static_cast<int>(key)].keyPressed &&
-           keyPressedStatusArray[static_cast<int>(key)].previousKeyPressed;
+    return std::find(releasedKey.begin(), releasedKey.end(), key) != releasedKey.end();
+}
+
+void KeyboardManager::AddPressKey(sf::Keyboard::Key key)
+{
+    isKeyHeld[(int)key] = true;
+    pressedKey.push_back(key);
+}
+
+void KeyboardManager::AddReleaseKey(sf::Keyboard::Key key)
+{
+    isKeyHeld[(int)key] = false;
+    releasedKey.push_back(key);
 }
 
 namespace MouseManager
