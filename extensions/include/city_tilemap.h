@@ -1,9 +1,8 @@
 #pragma once
-
 /*
  MIT License
 
- Copyright (c) 2017 SAE Institute Switzerland AG
+ Copyright (c) 2019 SAE Institute Switzerland AG
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -24,50 +23,65 @@
  SOFTWARE.
  */
 
+#include <array>
 
-#include <SFML/Graphics/VertexArray.hpp>
-#include <SFML/Graphics/Texture.hpp>
-#include <physics/physics.h>
-#include <graphics/texture.h>
+#include <graphics/tilemap.h>
+#include <SFML/Graphics/Rect.hpp>
 
 namespace neko
 {
-class GraphicsManager;
 
-struct Tilesheet
+class TextureManager;
+
+	enum class CityBuilderTileType : int
+	{
+		NONE = -1,
+		GRASS = 0,
+		ROAD_LINE,
+		ROAD_TURN,
+		CROSS_ROAD,
+		ROAD_T,
+		PARKING,
+		RAIL_TURN,
+		RAIL_LINE,
+		ROAD_BRIDGE_UP,
+		ROAD_BRIDGE_DOWN,
+		ROAD_ROUNDABOUT,
+		CHURCH,
+		TREES,
+		TRAIN_STATION,
+		BUILDING,
+		HOUSE,
+		WATER_DOWN_RIGHT,
+		WATER_DOWN_LEFT,
+		WATER_HORIZONTAL,
+		WATER_UP_RIGHT,
+		WATER_UP_LEFT,
+		WATER_VERTICAL,
+		LENGTH
+	};
+
+struct CityBuilderTile
 {
-	sf::Texture* texture = nullptr;
-	sf::VertexArray tilemap[2]; //for double buffering
+	sf::Vector2i position;
+
 };
 
-class Tilemap
+struct CityBuilderTilesheet : public Tilesheet
+{
+	std::array<sf::IntRect, (size_t)CityBuilderTileType::LENGTH> rect;
+	std::array<sf::Vector2f, (size_t)CityBuilderTileType::LENGTH> center;
+};
+class CityBuilderTilemap : public neko::Tilemap
 {
 public:
-    virtual void PushCommand(GraphicsManager* graphicsManager) = 0;
-};
-
-/*
- * Abstraction of Tiled tilesheets
- */
-struct Tiledsheet : public Tilesheet
-{
-	sf::Vector2u tileSize;
-	sf::Vector2u size;
-	unsigned firstId;
-	unsigned tileNmb;
-};
-
-/*
-* Abstraction of Tiled tilemap with different tilesheets with their own vertex arrays
-*/
-class TiledMap : public Tilemap
-{
-public:
-    void
-    Init(const std::string& tilemapPath, TextureManager& textureManager, Physics2dManager* physics2DManager = nullptr);
+	void Init(TextureManager& textureManager);
 	void PushCommand(GraphicsManager* graphicsManager) override;
 protected:
-	std::vector<Tiledsheet> tileSheets;
+	CityBuilderTilesheet tilesheet;
+	const std::string textureName = "data/tilemap/CuteCityBuilder.png";
+	const sf::Vector2i tileSize = sf::Vector2i(20, 20);
+	const sf::Vector2u mapSize = sf::Vector2u(100, 100);
 
 };
 }

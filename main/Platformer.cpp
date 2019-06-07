@@ -69,6 +69,7 @@ public:
 			mainPlayerCollider.shapeIndex = mainPlayerShapeIndex;
 #endif
             fixtureDef[0].shape = &playerBox[0];
+			fixtureDef[0].friction = 0.0f;
             mainPlayerCollider.entity = playerData.playerEntity;
             physicsManager.colliders.push_back(mainPlayerCollider);
 

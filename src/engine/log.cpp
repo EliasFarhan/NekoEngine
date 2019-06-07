@@ -26,6 +26,7 @@
 #include <iostream>
 #include <chrono>
 #include <ctime>
+#include <vector>
 #include <Remotery.h>
 
 class DebugLogger
@@ -39,10 +40,11 @@ public:
 
     std::atomic<bool> isRunning = true;
     std::condition_variable newMsgSync;
+
+	std::mutex msgMutex;
 private:
     std::thread logThread;
-    std::queue<std::string> msgQueue;
-    std::mutex msgMutex;
+    std::vector<std::string> msgQueue;
 
 };
 
@@ -66,7 +68,7 @@ void DebugLogger::write(std::string msg)
 {
     {
         std::unique_lock<std::mutex> lock(msgMutex);
-        msgQueue.push(msg);
+        msgQueue.push_back(msg);
     }
     newMsgSync.notify_one();
 }
@@ -88,14 +90,14 @@ void DebugLogger::logLoop()
                 {
                     std::unique_lock<std::mutex> lock(msgMutex);
                     msg = msgQueue.front();
-                    msgQueue.pop();
+					msgQueue.erase(msgQueue.begin());
                 }
                 logFile << msg << "\n";
                 std::cout << msg << "\n";
             }
         }
     }
-    delete this;
+	newMsgSync.notify_all();
 }
 
 void initLog()
@@ -111,8 +113,12 @@ void logDebug(std::string msg)
 
 void destroyLog()
 {
-
-    debugLogger->isRunning = false;
     debugLogger->newMsgSync.notify_all();
-    debugLogger = nullptr;
+	debugLogger->isRunning = false;
+    {
+		std::unique_lock<std::mutex> lock(debugLogger->msgMutex);
+		debugLogger->newMsgSync.wait(lock);
+    }
+	delete(debugLogger);
+	debugLogger = nullptr;
 }

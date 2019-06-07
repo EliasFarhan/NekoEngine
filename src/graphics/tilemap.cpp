@@ -47,7 +47,7 @@ void TiledMap::Init(const std::string& tilemapPath, TextureManager& textureManag
         auto tiledSheetJsonPtr = LoadJson(LinkFolderAndFile(sourceFolderPath, source));
         auto tiledSheetJson = *tiledSheetJsonPtr;
 
-        TileSheet tileSheet;
+        Tiledsheet tileSheet;
 
         std::string textureSource = tiledSheetJson["image"];
         tileSheet.texture = textureManager.LoadTexture(LinkFolderAndFile(sourceFolderPath, textureSource));
@@ -74,7 +74,7 @@ void TiledMap::Init(const std::string& tilemapPath, TextureManager& textureManag
                 unsigned y = (i / layerSize.x);
 
                 unsigned tile = layer["data"][i];
-                TileSheet* currentTilesheet = nullptr;
+                Tiledsheet* currentTilesheet = nullptr;
                 for (auto& tilesheet : tileSheets)
                 {
                     if (tile >= tilesheet.firstId && tile < tilesheet.firstId + tilesheet.tileNmb)
@@ -148,7 +148,7 @@ void TiledMap::Init(const std::string& tilemapPath, TextureManager& textureManag
 
 }
 
-void Tilemap::PushCommand(GraphicsManager* graphicsManager)
+void TiledMap::PushCommand(GraphicsManager* graphicsManager)
 {
     rmt_ScopedCPUSample(PushTilemapCommands, 0)
     const int frameIndex = MainEngine::GetInstance()->frameIndex % 2;

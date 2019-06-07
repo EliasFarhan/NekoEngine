@@ -91,7 +91,6 @@ void GraphicsManager::RenderLoop()
 
     renderWindow = engine->renderWindow;
     renderWindow->setActive(true);
-    rmt_BindOpenGL();
     renderWindow->setActive(false);
     do
     {
@@ -117,7 +116,6 @@ void GraphicsManager::RenderLoop()
         if (engine->isRunning)
         {
             rmt_ScopedCPUSample(ActiveRenderLoop, 0);
-            rmt_ScopedOpenGLSample(ActiveRenderLoop);
             renderWindow->setActive(true);
 
             isRendering = true;
@@ -159,7 +157,6 @@ void GraphicsManager::RenderLoop()
 
     renderWindow->setActive(true);
     logDebug("Graphics Loop Destroy");
-    rmt_UnbindOpenGL();
     renderWindow->setActive(false);
 
     engine->condSyncRender.notify_all();
