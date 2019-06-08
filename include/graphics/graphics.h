@@ -28,6 +28,7 @@
 #include <condition_variable>
 #include <array>
 #include <atomic>
+#include <engine/editor.h>
 #include "tilemap.h"
 
 namespace neko
@@ -71,6 +72,7 @@ public:
 
     virtual void RenderLoop();
 
+    Editor editor;
 protected:
     sf::RenderWindow* renderWindow = nullptr;
     std::array<SfmlCommand, MAX_COMMAND_NMB> commands[2];

@@ -162,7 +162,7 @@ add_custom_target(
 
 include_directories(include/ extensions/include/)
 
-add_library(Neko_COMMON STATIC ${Neko_SRC})
+add_library(Neko_COMMON STATIC ${Neko_SRC} src/engine/editor.cpp)
 target_link_libraries(Neko_COMMON PUBLIC ${Neko_LIBRARIES})
 add_dependencies(Neko_COMMON DataTarget)
 set_property(TARGET Neko_COMMON PROPERTY CXX_STANDARD 17)

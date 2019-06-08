@@ -33,6 +33,8 @@
 #include <engine/log.h>
 #include <sstream>
 #include <Remotery.h>
+#include "imgui.h"
+#include "imgui-SFML.h"
 
 namespace neko
 {
@@ -103,6 +105,7 @@ void MainEngine::Init()
     {
         renderWindow->setFramerateLimit(config.framerateLimit);
     }
+    ImGui::SFML::Init(*renderWindow);
     renderWindow->setActive(false);
     instance = this;
 
@@ -123,6 +126,7 @@ void MainEngine::Update()
             isRunning = false;
         }
         OnEvent(event);
+        ImGui::SFML::ProcessEvent(event);
     }
 
 }
@@ -132,7 +136,9 @@ void MainEngine::Destroy()
     std::unique_lock<std::mutex> lock(renderMutex);
     condSyncRender.wait(lock); //waiting for render thread to finish
     renderWindow->setActive(true);
+
     renderWindow->close();
+    ImGui::SFML::Shutdown();
     delete renderWindow;
     renderWindow = nullptr;
     instance = nullptr;

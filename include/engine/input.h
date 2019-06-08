@@ -41,8 +41,11 @@ struct KeyPressedStatus
 class KeyboardManager : public System
 {
 public:
+    using System::System;
     void Init() override
-    {}
+    {
+        isKeyHeld.fill(0);
+    }
 
     void Update() override;
 

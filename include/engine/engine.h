@@ -87,9 +87,10 @@ public:
     std::mutex renderMutex;
 
     std::atomic<unsigned> frameIndex = 0;
+
+    sf::Time dt;
 protected:
     sf::Clock engineClock;
-    sf::Time dt;
     Remotery* rmt = nullptr;
     ctpl::thread_pool workingThreadPool;
     std::thread renderThread;

@@ -30,7 +30,7 @@
 
 namespace neko
 {
-static std::set<std::string> imgExtensionSet
+static std::set<std::string_view> imgExtensionSet
         {
                 ".png",
                 ".jpg",
@@ -51,16 +51,16 @@ TextureManager::TextureManager()
     m_Textures.reserve(InitEntityNmb);
 }
 
-bool TextureManager::HasValidExtension(std::string filename)
+bool TextureManager::HasValidExtension(const std::string& filename)
 {
-    const std::string::size_type filenameExtensionIndex = filename.find_last_of('.');
+    const auto filenameExtensionIndex = filename.find_last_of('.');
     if (filenameExtensionIndex >= filename.size())
     {
         return false;
     }
 
     //Check extension first
-    const std::string extension = filename.substr(filenameExtensionIndex);
+    const std::string_view extension(&filename.at(filenameExtensionIndex));
     return imgExtensionSet.find(extension) != imgExtensionSet.end();
 }
 

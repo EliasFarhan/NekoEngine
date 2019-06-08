@@ -44,26 +44,26 @@ namespace fs = std::filesystem;
 
 namespace neko
 {
-bool FileExists(const std::string& filename)
+bool FileExists(const std::string_view& filename)
 {
     const fs::path p = filename;
     return fs::exists(p);
 }
 
-bool IsRegularFile(const std::string& filename)
+bool IsRegularFile(const std::string_view& filename)
 {
     const fs::path p = filename;
     return fs::is_regular_file(p);
 
 }
 
-bool IsDirectory(const std::string& filename)
+bool IsDirectory(const std::string_view& filename)
 {
     const fs::path p = filename;
     return fs::is_directory(p);
 }
 
-void IterateDirectory(std::string& dirname, std::function<void(std::string)> func)
+void IterateDirectory(const std::string_view& dirname, std::function<void(const std::string_view&)> func)
 {
 
     if (IsDirectory(dirname))
@@ -75,18 +75,18 @@ void IterateDirectory(std::string& dirname, std::function<void(std::string)> fun
     }
 }
 
-std::ifstream::pos_type CalculateFileSize(const std::string& filename)
+std::ifstream::pos_type CalculateFileSize(const std::string_view& filename)
 {
     std::ifstream in(filename, std::ifstream::binary | std::ifstream::ate);
     return in.tellg();
 }
 
-bool CreateDirectory(const std::string& dirname)
+bool CreateDirectory(const std::string_view& dirname)
 {
     return fs::create_directory(dirname);
 }
 
-bool RemoveDirectory(const std::string& dirname, bool removeAll)
+bool RemoveDirectory(const std::string_view& dirname, bool removeAll)
 {
     if (removeAll)
     {
@@ -98,7 +98,7 @@ bool RemoveDirectory(const std::string& dirname, bool removeAll)
     }
 }
 
-const std::string LoadFile(const std::string& path)
+const std::string LoadFile(const std::string_view& path)
 {
     std::ifstream t(path);
     std::string str((std::istreambuf_iterator<char>(t)),
@@ -106,11 +106,11 @@ const std::string LoadFile(const std::string& path)
     return str;
 }
 
-std::string GetFilenameExtension(const std::string& path)
+std::string GetFilenameExtension(const std::string_view& path)
 {
     std::string extension = "";
     const auto folderLastIndex = path.find_last_of('/');
-    std::string filename = path.substr(folderLastIndex + 1, path.size());
+    const auto filename = path.substr(folderLastIndex + 1, path.size());
     const auto filenameExtensionIndex = filename.find_last_of('.');
     if (filenameExtensionIndex > path.size())
     {
@@ -123,13 +123,13 @@ std::string GetFilenameExtension(const std::string& path)
     return extension;
 }
 
-std::string GetFileParentPath(const std::string& path)
+std::string GetFileParentPath(const std::string_view& path)
 {
     fs::path p = path;
     return p.parent_path().string();
 }
 
-std::string LinkFolderAndFile(const std::string& folderPath, const std::string& filePath)
+std::string LinkFolderAndFile(const std::string_view& folderPath, const std::string_view& filePath)
 {
     fs::path f = folderPath;
     fs::path p = filePath;

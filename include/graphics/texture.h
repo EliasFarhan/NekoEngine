@@ -34,7 +34,7 @@ public:
 
     TextureManager();
 
-    bool HasValidExtension(std::string filename);
+    bool HasValidExtension(const std::string& filename);
 
     sf::Texture* LoadTexture(std::string filename);
 

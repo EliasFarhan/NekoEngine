@@ -91,6 +91,8 @@ void GraphicsManager::RenderLoop()
 
     renderWindow = engine->renderWindow;
     renderWindow->setActive(true);
+    editor.graphicsManager = this;
+    editor.renderWindow = renderWindow;
     renderWindow->setActive(false);
     do
     {
@@ -141,7 +143,7 @@ void GraphicsManager::RenderLoop()
                 if(command != nullptr)
                     command->Draw(renderWindow);
             }
-
+            editor.Update();
             renderWindow->display();
 
 

@@ -8,6 +8,8 @@
 #include "engine/entity.h"
 #include "utilities/time_utility.h"
 #include "engine/input.h"
+#include <engine/log.h>
+#include <SFML/Window/Event.hpp>
 
 struct PlayerData
 {
@@ -24,6 +26,7 @@ public:
 		config.bgColor = sf::Color::White;
 		MainEngine::Init();
 		physicsManager.Init();
+		keyboardManager.Init();
 
 		{
 			playerData.playerEntity = 1;
@@ -39,6 +42,7 @@ public:
 			const auto physicsSize = neko::pixel2meter(sf::Vector2f(texture->getSize()));
 			b2BodyDef bodyDef;
 			bodyDef.position = neko::pixel2meter(playerPos);
+			bodyDef.linearVelocity = b2Vec2(0,0);
 			bodyDef.fixedRotation = true;
 			bodyDef.type = b2_dynamicBody;
 
@@ -137,8 +141,9 @@ public:
 
 	void Update() override
 	{
+
+        keyboardManager.Update();
 		MainEngine::Update();
-		keyboardManager.Update();
 		physicsTimer.Update(dt.asSeconds());
 		if(physicsTimer.IsOver())
 		{
@@ -158,6 +163,11 @@ public:
 				int move = 0;
 				move -= keyboardManager.IsKeyHeld(sf::Keyboard::Left);
 				move += keyboardManager.IsKeyHeld(sf::Keyboard::Right);
+                {
+                    std::ostringstream oss;
+                    oss << "Player Key Move: "<<move;
+                    logDebug(oss.str());
+                }
 				const auto playerVelocity = playerData.playerBody->GetLinearVelocity();
 				playerData.playerBody->SetLinearVelocity(b2Vec2(move*moveVelocity, playerVelocity.y));
 			}
@@ -174,9 +184,21 @@ public:
 		}
 #ifdef __neko_dbg__
         {
+
             //Main playerbox
             shapeManager.CopyPosition(&transformManager.positions[0], 0, 1);
             shapeManager.PushCommands(graphicsManager, 0, 1+platformsNmb);
+        }
+        {
+            std::ostringstream oss;
+            oss << "("<<transformManager.positions[0].x<<", "<<transformManager.positions[0].y<<")";
+            graphicsManager->editor.AddInspectorInfo("PlayerPos", oss.str());
+        }
+        {
+            std::ostringstream oss;
+            b2Vec2 velocity = physicsManager.bodies[0]->GetLinearVelocity();
+            oss << "("<<velocity.x<<", "<<velocity.y<<")";
+            graphicsManager->editor.AddInspectorInfo("PlayerVel", oss.str());
         }
 #endif
 
@@ -210,6 +232,20 @@ public:
 			playerData.contactNmb--;
 		}
 	}
+
+    void OnEvent(sf::Event& event) override
+    {
+        MainEngine::OnEvent(event);
+        if(event.type == sf::Event::KeyPressed)
+        {
+            keyboardManager.AddPressKey(event.key.code);
+        }
+        if(event.type == sf::Event::KeyReleased)
+        {
+            keyboardManager.AddReleaseKey(event.key.code);
+        }
+    }
+
 protected:
 	neko::Timer physicsTimer{0.0f,0.0f};
 	neko::SpriteManager spriteManager;
