@@ -77,9 +77,5 @@ sf::Vector2i GetLocalPosition(sf::Window& window)
     return sf::Mouse::getPosition(window);
 }
 
-float GetWheelDelta()
-{
-    return 0.0f;
-}
 }
 }

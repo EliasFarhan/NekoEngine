@@ -73,6 +73,5 @@ sf::Vector2i GetPosition();
 
 sf::Vector2i GetLocalPosition(sf::Window& window);
 
-float GetWheelDelta();
 }
 }

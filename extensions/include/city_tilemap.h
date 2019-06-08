@@ -69,7 +69,7 @@ struct CityBuilderTile
 
 struct CityBuilderTilesheet : public Tilesheet
 {
-	std::array<sf::IntRect, (size_t)CityBuilderTileType::LENGTH> rect;
+	std::array<sf::FloatRect, (size_t)CityBuilderTileType::LENGTH> rect;
 	std::array<sf::Vector2f, (size_t)CityBuilderTileType::LENGTH> center;
 };
 class CityBuilderTilemap : public neko::Tilemap

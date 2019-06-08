@@ -69,7 +69,7 @@ public:
 
     virtual void Draw(sf::Drawable& drawable);
     virtual void Draw(sf::VertexArray* vertexArray, sf::Texture* texture);
-
+	virtual void SetView(sf::View view);
     virtual void RenderLoop();
 
     Editor editor;
@@ -78,6 +78,7 @@ protected:
     std::array<SfmlCommand, MAX_COMMAND_NMB> commands[2];
     std::array<TilemapCommand, MAX_COMMAND_NMB> tileCommands[2];
     std::array<Command*, MAX_COMMAND_NMB> commandBuffers[2];
+	sf::View views[2];
     size_t renderLength = 0;
     size_t nextRenderLength = 0;
 };
