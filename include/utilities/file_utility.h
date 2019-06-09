@@ -27,6 +27,7 @@
 #include <functional>
 
 #include <string>
+#include <string_view>
 #include <fstream>
 
 namespace neko
@@ -40,13 +41,13 @@ bool IsDirectory(const std::string_view& filename);
 
 void IterateDirectory(const std::string_view& dirname, std::function<void(const std::string_view&)> func);
 
-std::ifstream::pos_type CalculateFileSize(const std::string_view& filename);
+std::ifstream::pos_type CalculateFileSize(const std::string& filename);
 
 bool CreateDirectory(const std::string_view& dirname);
 
 bool RemoveDirectory(const std::string_view& dirname, bool removeAll = true);
 
-const std::string LoadFile(const std::string_view& path);
+const std::string LoadFile(const std::string& path);
 
 std::string LinkFolderAndFile(const std::string_view& folderPath, const std::string_view& filePath);
 

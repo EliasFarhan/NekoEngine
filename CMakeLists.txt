@@ -13,7 +13,7 @@ if(UNIX AND NOT APPLE)
 
 		if(LLVM_ROOT)
 			set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}  --stdlib=libc++ -L${LLVM_ROOT}/lib -Wl,-rpath,${LLVM_ROOT}/lib  -lc++ -lc++abi ")
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -nostdinc++")
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -nostdinc++ -ftime-report")
 
 			include_directories(${LLVM_ROOT}/include/c++/v1/)
 			LIST(APPEND Neko_LIBRARIES

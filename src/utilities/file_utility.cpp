@@ -75,7 +75,7 @@ void IterateDirectory(const std::string_view& dirname, std::function<void(const 
     }
 }
 
-std::ifstream::pos_type CalculateFileSize(const std::string_view& filename)
+std::ifstream::pos_type CalculateFileSize(const std::string& filename)
 {
     std::ifstream in(filename, std::ifstream::binary | std::ifstream::ate);
     return in.tellg();
@@ -98,7 +98,7 @@ bool RemoveDirectory(const std::string_view& dirname, bool removeAll)
     }
 }
 
-const std::string LoadFile(const std::string_view& path)
+const std::string LoadFile(const std::string& path)
 {
     std::ifstream t(path);
     std::string str((std::istreambuf_iterator<char>(t)),
