@@ -1,7 +1,7 @@
 /*
  MIT License
 
- Copyright (c) 2017 SAE Institute Switzerland AG
+ Copyright (c) 2019 SAE Institute Switzerland AG
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -21,16 +21,18 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
+
+#include <sstream>
 #include <engine/input.h>
 #include <engine/log.h>
-#include <sstream>
-#include "engine/engine.h"
-#include "SFML/Window/Mouse.hpp"
+#include <engine/engine.h>
+#include <SFML/Window/Mouse.hpp>
+#include <SFML/Window/Event.hpp>
 #include <Remotery.h>
 
 namespace neko
 {
-void KeyboardManager::Update()
+void KeyboardManager::ClearKeys()
 {
     rmt_ScopedCPUSample(KeyboardLoop, 0)
     pressedKey.clear();
@@ -39,7 +41,7 @@ void KeyboardManager::Update()
 
 bool KeyboardManager::IsKeyHeld(sf::Keyboard::Key key) const
 {
-    return isKeyHeld[(int)key];
+    return keyStatusArray[int(key)];
 }
 
 bool KeyboardManager::IsKeyDown(sf::Keyboard::Key key) const
@@ -54,28 +56,52 @@ bool KeyboardManager::IsKeyUp(sf::Keyboard::Key key) const
 
 void KeyboardManager::AddPressKey(sf::Keyboard::Key key)
 {
-    isKeyHeld[(int)key] = true;
+    keyStatusArray[int(key)] = true;
     pressedKey.push_back(key);
 }
 
 void KeyboardManager::AddReleaseKey(sf::Keyboard::Key key)
 {
-    isKeyHeld[(int)key] = false;
+    keyStatusArray[int(key)] = false;
     releasedKey.push_back(key);
 }
 
-namespace MouseManager
-{
-sf::Vector2i GetPosition()
+sf::Vector2i MouseManager::GetPosition() const
 {
     auto* engine = MainEngine::GetInstance();
     return GetLocalPosition(*engine->renderWindow);
 }
 
-sf::Vector2i GetLocalPosition(sf::Window& window)
+sf::Vector2i MouseManager::GetLocalPosition(sf::Window& window) const
 {
     return sf::Mouse::getPosition(window);
 }
 
+bool MouseManager::IsButtonPressed(sf::Mouse::Button button) const
+{
+	return sf::Mouse::isButtonPressed(button);
+}
+
+void MouseManager::OnWheelScrolled(const sf::Event& e)
+{
+	wheelDelta = e.mouseWheelScroll.delta;
+}
+
+void MouseManager::ClearFrameData()
+{
+	wheelDelta = 0.0f;
+
+	previousMousePos = currentMousePos;
+	currentMousePos = GetPosition();
+}
+
+float MouseManager::GetWheelDelta() const
+{
+	return wheelDelta;
+}
+
+sf::Vector2i MouseManager::GetMouseDelta() const
+{
+	return currentMousePos - previousMousePos;
 }
 }

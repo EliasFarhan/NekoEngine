@@ -29,6 +29,7 @@
 #include <array>
 #include "SFML/System/Vector2.hpp"
 #include "SFML/Window/Window.hpp"
+#include "SFML/Window/Mouse.hpp"
 
 namespace neko
 {
@@ -38,19 +39,10 @@ struct KeyPressedStatus
     bool keyPressed;
 };
 
-class KeyboardManager : public System
+class KeyboardManager 
 {
 public:
-    using System::System;
-    void Init() override
-    {
-        isKeyHeld.fill(0);
-    }
-
-    void Update() override;
-
-    void Destroy() override
-    {}
+	void ClearKeys();
 
     bool IsKeyHeld(sf::Keyboard::Key key) const;
 
@@ -64,14 +56,22 @@ public:
 private:
     std::vector<sf::Keyboard::Key> pressedKey;
     std::vector<sf::Keyboard::Key> releasedKey;
-    std::array<bool, sf::Keyboard::KeyCount> isKeyHeld;
+    std::array<bool, sf::Keyboard::KeyCount> keyStatusArray;
 };
 
-namespace MouseManager
+class MouseManager
 {
-sf::Vector2i GetPosition();
-
-sf::Vector2i GetLocalPosition(sf::Window& window);
-
-}
+public:
+	sf::Vector2i GetPosition() const;
+	sf::Vector2i GetLocalPosition(sf::Window& window) const;
+	bool IsButtonPressed(sf::Mouse::Button button) const;
+	void OnWheelScrolled(const sf::Event& e);
+	void ClearFrameData();
+	float GetWheelDelta() const;
+	sf::Vector2i GetMouseDelta() const;
+private:
+	float wheelDelta = 0.0f;
+	sf::Vector2i previousMousePos = sf::Vector2i(0, 0);
+	sf::Vector2i currentMousePos = sf::Vector2i(0, 0);
+};
 }

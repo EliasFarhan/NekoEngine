@@ -62,6 +62,14 @@ void MainEngine::EngineLoop()
             condSyncRender.wait(lock);
         }
         isReady = false;
+		keyboardManager.ClearKeys();
+		mouseManager.ClearFrameData();
+		sf::Event event{};
+		while (renderWindow->pollEvent(event))
+		{
+			OnEvent(event);
+			ImGui::SFML::ProcessEvent(event);
+		}
         Update();
 
         frameIndex++;
@@ -116,19 +124,6 @@ void MainEngine::Init()
 
 void MainEngine::Update()
 {
-    rmt_ScopedCPUSample(EngineUpdate, 0);
-    sf::Event event{};
-    while (renderWindow->pollEvent(event))
-    {
-        // "close requested" event: we close the window
-        if (event.type == sf::Event::Closed)
-        {
-            isRunning = false;
-        }
-        OnEvent(event);
-        ImGui::SFML::ProcessEvent(event);
-    }
-
 }
 
 void MainEngine::Destroy()
@@ -148,14 +143,38 @@ void MainEngine::Destroy()
 
 void MainEngine::OnEvent(sf::Event& event)
 {
-    if (event.type == sf::Event::KeyReleased)
-    {
-        if (event.key.code == sf::Keyboard::Escape)
-        {
-            isRunning = false;
-        }
-
-    }
+	switch(event.type)
+	{
+		case sf::Event::Closed:
+		{
+			isRunning = false;
+			break;
+		}
+		case sf::Event::KeyPressed:
+		{
+			
+			keyboardManager.AddPressKey(event.key.code);
+			break;
+		}
+		case sf::Event::KeyReleased:
+		{
+			if (event.key.code == sf::Keyboard::Escape)
+			{
+				isRunning = false;
+			}
+			keyboardManager.AddReleaseKey(event.key.code);
+			break; 
+		}
+		case sf::Event::MouseWheelScrolled:
+		{
+			mouseManager.OnWheelScrolled(event);
+			break;
+		}
+		default:
+		{
+			break;
+		}
+	}
 }
 
 MainEngine* MainEngine::GetInstance()

@@ -30,6 +30,7 @@
 #include <ctpl_stl.h>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <Box2D/Common/b2Math.h>
+#include "input.h"
 
 
 struct Remotery;
@@ -95,6 +96,10 @@ protected:
     ctpl::thread_pool workingThreadPool;
     std::thread renderThread;
     GraphicsManager* graphicsManager{};
+
+	KeyboardManager keyboardManager;
+	MouseManager mouseManager;
+
     static MainEngine* instance;
 };
 
