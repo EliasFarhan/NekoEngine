@@ -24,6 +24,7 @@
 #include <sstream>
 #include <engine/engine.h>
 #include <city_tilemap.h>
+#include <city_map.h>
 #include "engine/input.h"
 
 #include <SFML/Window/Event.hpp>
@@ -33,10 +34,14 @@ class CityBuilderEngine : public neko::MainEngine
 {
 public:
 
+	
+
 	void Init() override
 	{
 		MainEngine::Init();
+		cityBuilderMap.Init();
 		environmentTilemap.Init(textureManager);
+		environmentTilemap.UpdateTilemap(cityBuilderMap);
 		mainView = renderWindow->getView();
 	}
 
@@ -82,6 +87,7 @@ private:
 	neko::EntityManager entityManager;
 	neko::TextureManager textureManager;
 	neko::CityBuilderTilemap environmentTilemap;
+	neko::CityBuilderMap cityBuilderMap;
 
 	const float scrollDelta = 0.1f;
 	float currentZoom = 1.0f;

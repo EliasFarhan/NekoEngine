@@ -32,34 +32,35 @@ namespace neko
 {
 
 class TextureManager;
+class CityBuilderMap;
 
-	enum class CityBuilderTileType : int
-	{
-		NONE = -1,
-		GRASS = 0,
-		ROAD_LINE,
-		ROAD_TURN,
-		CROSS_ROAD,
-		ROAD_T,
-		PARKING,
-		RAIL_TURN,
-		RAIL_LINE,
-		ROAD_BRIDGE_UP,
-		ROAD_BRIDGE_DOWN,
-		ROAD_ROUNDABOUT,
-		CHURCH,
-		TREES,
-		TRAIN_STATION,
-		BUILDING,
-		HOUSE,
-		WATER_DOWN_RIGHT,
-		WATER_DOWN_LEFT,
-		WATER_HORIZONTAL,
-		WATER_UP_RIGHT,
-		WATER_UP_LEFT,
-		WATER_VERTICAL,
-		LENGTH
-	};
+enum class CityBuilderTileType : int
+{
+	NONE = -1,
+	GRASS = 0,
+	ROAD_LINE,
+	ROAD_TURN,
+	CROSS_ROAD,
+	ROAD_T,
+	PARKING,
+	RAIL_TURN,
+	RAIL_LINE,
+	ROAD_BRIDGE_UP,
+	ROAD_BRIDGE_DOWN,
+	ROAD_ROUNDABOUT,
+	CHURCH,
+	TREES,
+	TRAIN_STATION,
+	BUILDING,
+	HOUSE,
+	WATER_DOWN_RIGHT,
+	WATER_DOWN_LEFT,
+	WATER_HORIZONTAL,
+	WATER_UP_RIGHT,
+	WATER_UP_LEFT,
+	WATER_VERTICAL,
+	LENGTH
+};
 
 struct CityBuilderTile
 {
@@ -69,19 +70,20 @@ struct CityBuilderTile
 
 struct CityBuilderTilesheet : public Tilesheet
 {
-	std::array<sf::FloatRect, (size_t)CityBuilderTileType::LENGTH> rect;
-	std::array<sf::Vector2f, (size_t)CityBuilderTileType::LENGTH> center;
+	std::array<sf::FloatRect, size_t(CityBuilderTileType::LENGTH)> rect;
+	std::array<sf::Vector2f, size_t(CityBuilderTileType::LENGTH)> center;
 };
 class CityBuilderTilemap : public neko::Tilemap
 {
 public:
 	void Init(TextureManager& textureManager);
+	void UpdateTilemap(CityBuilderMap& cityBuilderMap);
 	void PushCommand(GraphicsManager* graphicsManager) override;
 protected:
+	void AddNewTile(sf::Vector2f position, const sf::Vector2f size, sf::FloatRect rect, sf::Vector2f center);
 	CityBuilderTilesheet tilesheet;
 	const std::string textureName = "data/tilemap/CuteCityBuilder.png";
 	const sf::Vector2i tileSize = sf::Vector2i(20, 20);
-	const sf::Vector2u mapSize = sf::Vector2u(100, 100);
 
 };
 }

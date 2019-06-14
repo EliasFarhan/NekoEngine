@@ -85,8 +85,7 @@ void TiledMap::Init(const std::string& tilemapPath, TextureManager& textureManag
                 }
                 if (currentTilesheet != nullptr)
                 {
-
-                    auto tileSize = sf::Vector2f(currentTilesheet->tileSize);
+	                const auto tileSize = sf::Vector2f(currentTilesheet->tileSize);
                     sf::Vector2f tilesheetPos = sf::Vector2f(
                             ((tile - currentTilesheet->firstId) % currentTilesheet->size.x) * tileSize.x,
                             ((tile - currentTilesheet->firstId) / currentTilesheet->size.x) * tileSize.y);

@@ -1,3 +1,4 @@
+#pragma once
 /*
  MIT License
 
@@ -21,14 +22,16 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-#pragma once
+#include <vector>
 #include "SFML/System/Vector2.hpp"
 #include "engine/system.h"
+#include <PerlinNoise.hpp>
+
 
 namespace neko
 {
 
-enum class ENvironmentTile : unsigned
+enum class EnvironmentTile : unsigned
 {
 	GRASS = 0,
 	WATER
@@ -48,6 +51,13 @@ enum class CityElementType : unsigned
 
 };
 
+struct City
+{
+	sf::Vector2u mapSize = sf::Vector2u(100,100);
+	float forestRatio = 0.5f;
+	float perlinFreq = 20.0f;
+};
+
 struct CityElement
 {
 	sf::Vector2i position;
@@ -61,8 +71,9 @@ public:
 	void Init() override;
 	void Update() override;
 	void Destroy() override;
-private:
 
+	City city;
+	std::vector<CityElement> elements;
 };
 
 }
