@@ -53,7 +53,7 @@ enum class CityElementType : unsigned
 
 struct City
 {
-	sf::Vector2u mapSize = sf::Vector2u(100,100);
+	sf::Vector2u mapSize = sf::Vector2u(256,128);
 	float forestRatio = 0.5f;
 	float perlinFreq = 20.0f;
 };

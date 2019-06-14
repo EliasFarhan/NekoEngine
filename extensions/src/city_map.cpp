@@ -73,8 +73,8 @@ void CityBuilderMap::Init()
         }
         //RAIL
         const int trainStationX = (rand() % (city.mapSize.x / 3)) + city.mapSize.x / 3;
-        const int railUpX = (rand() % (city.mapSize.x / 4)) + city.mapSize.x / 4;
-        const int railDownX = city.mapSize.x - ((rand() % (city.mapSize.x / 4)) + city.mapSize.x / 4);
+        const int railUpX = (rand() % (city.mapSize.x / 6)) + city.mapSize.x / 6;
+        const int railDownX = city.mapSize.x - ((rand() % (city.mapSize.x / 6)) + city.mapSize.x / 6);
         pos.x = 0;
         pos.y -= 2;
         for (int x = 0; x < city.mapSize.x; x++)
@@ -196,7 +196,7 @@ void CityBuilderMap::Destroy()
 
 size_t CityBuilderMap::Position2Index(sf::Vector2i pos) const
 {
-    return pos.x * city.mapSize.x + pos.y;
+    return pos.x + pos.y * city.mapSize.x;
 }
 
 sf::Vector2i CityBuilderMap::Index2Position(size_t index) const
