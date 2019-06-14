@@ -218,8 +218,8 @@ void CityBuilderTilemap::UpdateTilemap(CityBuilderMap& cityBuilderMap)
 				const auto rect = tilesheet.rect[treesIndex];
 				const auto center = tilesheet.center[treesIndex];
 				const auto size = sf::Vector2f(
-					element.size.x * tileSize.x,
-					element.size.y * tileSize.y
+					 tileSize.x,
+					2.0f * tileSize.y
 				);
 
 				AddNewTile(position, size, rect, center);
@@ -249,7 +249,7 @@ void CityBuilderTilemap::AddNewTile(
 	const sf::Vector2f sizeOffset = (size - sf::Vector2f(tileSize));
 	sf::Vertex quad[6];
 	quad[0].position = position - center - sizeOffset;
-	quad[1].position = position - sf::Vector2f(center.x, -center.y) + sizeOffset;
+	quad[1].position = position - sf::Vector2f(center.x, -center.y) - sizeOffset;
 	quad[2].position = position + center - sizeOffset;
 	quad[3].position = position - center - sizeOffset;
 	quad[4].position = position + center - sizeOffset;
