@@ -148,9 +148,8 @@ void CityBuilderMap::Init()
     {
         siv::PerlinNoise perlinNoise;
         const auto elementsNmb = elements.size();
-        CityElement obstacles[elementsNmb];
-        memcpy(obstacles, &elements[0], elements.size() * sizeof(CityElement));
-        for (auto x = 0u; x < city.mapSize.x; x++)
+        std::vector<CityElement> obstacles(elements);
+		for (auto x = 0u; x < city.mapSize.x; x++)
         {
             for (auto y = 0u; y < city.mapSize.y; y++)
             {
@@ -159,7 +158,7 @@ void CityBuilderMap::Init()
                 const auto pnoise = perlinNoise.noise0_1(
                         float(pos.x) / city.mapSize.x * city.perlinFreq,
                         float(pos.y) / city.mapSize.y * city.perlinFreq);
-                auto result = std::find_if(obstacles, obstacles + elementsNmb, [&pos](CityElement& elem)
+                auto result = std::find_if(obstacles.begin(), obstacles.end(), [&pos](CityElement& elem)
                 {
                     for (int dx = 0; dx < elem.size.x; dx++)
                     {
@@ -172,7 +171,7 @@ void CityBuilderMap::Init()
                     return false;
                 });
 
-                if (pnoise < city.forestRatio && result == obstacles + elementsNmb)//
+                if (pnoise < city.forestRatio && result == obstacles.end())
                 {
                     CityElement element{};
                     element.position = pos;

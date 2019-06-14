@@ -75,7 +75,7 @@ public:
 	size_t Position2Index(sf::Vector2i pos) const;
 	sf::Vector2i Index2Position(size_t index) const;
 
-	City city;
+	City city{};
 	std::vector<EnvironmentTile> environmentTiles;
 	std::vector<CityElement> elements;
 };
