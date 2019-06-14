@@ -34,7 +34,7 @@ void CityBuilderTilemap::Init(TextureManager& textureManager)
 
 	tilesheet.texture = textureManager.LoadTexture(textureName);
 	tilesheet.texture->setRepeated(true);
-	
+
 	{
 		//GRASS TILE
 		const auto grassIndex = int(CityBuilderTileType::GRASS);
@@ -47,9 +47,9 @@ void CityBuilderTilemap::Init(TextureManager& textureManager)
 		auto waterIndex = int(CityBuilderTileType::WATER_VERTICAL);
 		tilesheet.center[waterIndex] = sf::Vector2f(tileSize) / 2.0f;
 		tilesheet.rect[waterIndex] = sf::FloatRect(
-			7 * tileSize.x, 
-			5 * tileSize.y, 
-			tileSize.x, 
+			7 * tileSize.x,
+			5 * tileSize.y,
+			tileSize.x,
 			tileSize.y);
 		waterIndex = int(CityBuilderTileType::WATER_HORIZONTAL);
 		tilesheet.center[waterIndex] = sf::Vector2f(tileSize) / 2.0f;
@@ -93,6 +93,12 @@ void CityBuilderTilemap::Init(TextureManager& textureManager)
 		tilesheet.center[treesIndex] = sf::Vector2f(tileSize.x, 2.0f * tileSize.y) / 2.0f;
 		tilesheet.rect[treesIndex] = sf::FloatRect(5 * tileSize.x, tileSize.y, tileSize.x, 2 * tileSize.y);
 	}
+	{
+		//ROAD
+		auto roadIndex = int(CityBuilderTileType::ROAD_LINE);
+		tilesheet.center[roadIndex] = sf::Vector2f(tileSize.x, tileSize.y) / 2.0f;
+		tilesheet.rect[roadIndex] = sf::FloatRect(tileSize.x, 0, tileSize.x, tileSize.y);
+	}
 	tilesheet.tilemap[0].setPrimitiveType(sf::Triangles);
 	tilesheet.tilemap[1].setPrimitiveType(sf::Triangles);
 }
@@ -111,7 +117,7 @@ void CityBuilderTilemap::UpdateTilemap(CityBuilderMap& cityBuilderMap)
 			{
 
 				const auto position = sf::Vector2f(x * tileSize.x, y * tileSize.y);
-				auto rect = tilesheet.rect[ grassIndex ];
+				auto rect = tilesheet.rect[grassIndex];
 				auto center = tilesheet.center[grassIndex];
 				AddNewTile(position, sf::Vector2f(tileSize), rect, center);
 			}
@@ -121,9 +127,9 @@ void CityBuilderTilemap::UpdateTilemap(CityBuilderMap& cityBuilderMap)
 		{
 			for (auto y = 0u; y < cityBuilderMap.city.mapSize.y; y++)
 			{
-				
+
 				int waterIndex = 0;
-				bool direction[] = { 0,0,0,0 };//UP, DOWN, LEFT, RIGHT
+				bool directions[] = { 0,0,0,0 };//UP, DOWN, LEFT, RIGHT
 
 				const sf::Vector2i tmpPos = sf::Vector2i(x, y);
 				if (cityBuilderMap.environmentTiles[cityBuilderMap.Position2Index(tmpPos)] != EnvironmentTile::WATER)
@@ -133,60 +139,60 @@ void CityBuilderTilemap::UpdateTilemap(CityBuilderMap& cityBuilderMap)
 				//UP
 				{
 					const sf::Vector2i upPos = tmpPos + sf::Vector2i(0, -1);
-					if(upPos.y < 0 ||
+					if (upPos.y < 0 ||
 						cityBuilderMap.environmentTiles[cityBuilderMap.Position2Index(upPos)] == EnvironmentTile::WATER)
 					{
-						direction[0] = true;
+						directions[0] = true;
 					}
 				}
 				//DOWN
 				{
 					const sf::Vector2i downPos = tmpPos + sf::Vector2i(0, 1);
-					if (downPos.y == cityBuilderMap.city.mapSize.y || 
+					if (downPos.y == cityBuilderMap.city.mapSize.y ||
 						cityBuilderMap.environmentTiles[cityBuilderMap.Position2Index(downPos)] == EnvironmentTile::WATER)
 					{
-						direction[1] = true;
+						directions[1] = true;
 					}
 				}
 				//LEFT
 				{
 					const sf::Vector2i leftPos = tmpPos + sf::Vector2i(-1, 0);
-					if (leftPos.x > 0 && 
+					if (leftPos.x > 0 &&
 						cityBuilderMap.environmentTiles[cityBuilderMap.Position2Index(leftPos)] == EnvironmentTile::WATER)
 					{
-						direction[2] = true;
+						directions[2] = true;
 					}
 				}
 				//RIGHT
 				{
-					const sf::Vector2i rightPos = tmpPos + sf::Vector2i(1,0);
-					if (rightPos.x < cityBuilderMap.city.mapSize.x && 
+					const sf::Vector2i rightPos = tmpPos + sf::Vector2i(1, 0);
+					if (rightPos.x < cityBuilderMap.city.mapSize.x &&
 						cityBuilderMap.environmentTiles[cityBuilderMap.Position2Index(rightPos)] == EnvironmentTile::WATER)
 					{
-						direction[3] = true;
+						directions[3] = true;
 					}
 				}
-				if (direction[1] && direction[3])
+				if (directions[1] && directions[3])
 				{
 					waterIndex = int(CityBuilderTileType::WATER_DOWN_RIGHT);
 				}
-				if (direction[1] && direction[2])
+				if (directions[1] && directions[2])
 				{
 					waterIndex = int(CityBuilderTileType::WATER_DOWN_LEFT);
 				}
-				if (direction[0] && direction[3])
+				if (directions[0] && directions[3])
 				{
 					waterIndex = int(CityBuilderTileType::WATER_UP_RIGHT);
 				}
-				if (direction[0] && direction[2])
+				if (directions[0] && directions[2])
 				{
 					waterIndex = int(CityBuilderTileType::WATER_UP_LEFT);
 				}
-				if(direction[0] && direction[1])
+				if (directions[0] && directions[1])
 				{
 					waterIndex = int(CityBuilderTileType::WATER_VERTICAL);
 				}
-				if(direction[2] && direction[3])
+				if (directions[2] && directions[3])
 				{
 					waterIndex = int(CityBuilderTileType::WATER_HORIZONTAL);
 				}
@@ -198,6 +204,84 @@ void CityBuilderTilemap::UpdateTilemap(CityBuilderMap& cityBuilderMap)
 		}
 	}
 	{
+		//ROAD
+		std::vector<CityElement> roads;
+		std::copy_if(cityBuilderMap.elements.begin(), cityBuilderMap.elements.end(), std::back_inserter(roads), [](CityElement& elem)
+		{
+			return elem.elementType == CityElementType::ROAD;
+		});
+		for (auto& road : roads)
+		{
+			bool directions[] = { 0,0,0,0 };//UP, DOWN, LEFT, RIGHT
+
+			if (road.position.y == 0)
+			{
+				directions[0] = true;
+			}
+			if (road.position.y == cityBuilderMap.city.mapSize.y - 1)
+			{
+				directions[1] = true;
+			}
+			if (road.position.x == 0)
+			{
+				directions[2] = true;
+			}
+			if (road.position.x == cityBuilderMap.city.mapSize.x - 1)
+			{
+				directions[3] = true;
+			}
+
+			for (auto& otherRoad : roads)
+			{
+				if (otherRoad.position == road.position)
+				{
+					continue;
+				}
+				const sf::Vector2i deltaPos = otherRoad.position - road.position;
+				if (deltaPos == sf::Vector2i(0, -1))
+				{
+					directions[0] = true;
+				}
+				if (deltaPos == sf::Vector2i(0, 1))
+				{
+					directions[1] = true;
+				}
+				if (deltaPos == sf::Vector2i(-1, 0))
+				{
+					directions[2] = true;
+				}
+				if (deltaPos == sf::Vector2i(1, 0))
+				{
+					directions[3] = true;
+				}
+			}
+			const auto position = sf::Vector2f(
+				road.position.x * tileSize.x,
+				road.position.y * tileSize.y);
+			int roadIndex = -1;
+			if (directions[0] && directions[1] && !directions[2] && !directions[3])
+			{
+				roadIndex = int(CityBuilderTileType::ROAD_LINE);
+				const auto rect = tilesheet.rect[roadIndex];
+				const auto center = tilesheet.center[roadIndex];
+				const auto size = sf::Vector2f(tileSize);
+
+				AddNewTile(position, size, rect, center);
+			}
+			if (!directions[0] && !directions[1] && directions[2] && directions[3])
+			{
+				roadIndex = int(CityBuilderTileType::ROAD_LINE);
+				const auto rect = tilesheet.rect[roadIndex];
+				const auto center = tilesheet.center[roadIndex];
+				const auto size = sf::Vector2f(tileSize);
+
+				AddNewTile(position, size, rect, center, false, false, true);
+			}
+		}
+	}
+
+
+	{
 		//TREES
 		const int treesIndex = int(CityBuilderTileType::TREES);
 
@@ -207,8 +291,7 @@ void CityBuilderTilemap::UpdateTilemap(CityBuilderMap& cityBuilderMap)
 			{
 			case CityElementType::TREES:
 			{
-
-				if(cityBuilderMap.environmentTiles[cityBuilderMap.Position2Index(element.position)] == EnvironmentTile::WATER)
+				if (cityBuilderMap.environmentTiles[cityBuilderMap.Position2Index(element.position)] == EnvironmentTile::WATER)
 				{
 					continue;
 				}
@@ -218,7 +301,7 @@ void CityBuilderTilemap::UpdateTilemap(CityBuilderMap& cityBuilderMap)
 				const auto rect = tilesheet.rect[treesIndex];
 				const auto center = tilesheet.center[treesIndex];
 				const auto size = sf::Vector2f(
-					 tileSize.x,
+					tileSize.x,
 					2.0f * tileSize.y
 				);
 
@@ -230,6 +313,7 @@ void CityBuilderTilemap::UpdateTilemap(CityBuilderMap& cityBuilderMap)
 			}
 		}
 	}
+	
 }
 
 void CityBuilderTilemap::PushCommand(GraphicsManager* graphicsManager)
@@ -243,8 +327,11 @@ void CityBuilderTilemap::PushCommand(GraphicsManager* graphicsManager)
 void CityBuilderTilemap::AddNewTile(
 	const sf::Vector2f position,
 	const sf::Vector2f size,
-	const sf::FloatRect rect, 
-	const sf::Vector2f center)
+	const sf::FloatRect rect,
+	const sf::Vector2f center,
+	bool flipX,
+	bool flipY,
+	bool rotate90)
 {
 	const sf::Vector2f sizeOffset = (size - sf::Vector2f(tileSize));
 	sf::Vertex quad[6];
@@ -255,24 +342,42 @@ void CityBuilderTilemap::AddNewTile(
 	quad[4].position = position + center - sizeOffset;
 	quad[5].position = position - sf::Vector2f(-center.x, center.y) - sizeOffset;
 
-	quad[0].texCoords = sf::Vector2f(
-		rect.left,
-		rect.top);
-	quad[1].texCoords = sf::Vector2f(
-		rect.left,
-		rect.top + rect.height);
-	quad[2].texCoords = sf::Vector2f(
-		rect.left + rect.width,
-		rect.top + rect.height);
-	quad[3].texCoords = sf::Vector2f(
-		rect.left,
-		rect.top);
-	quad[4].texCoords = sf::Vector2f(
-		rect.left + rect.width,
-		rect.top + rect.height);
-	quad[5].texCoords = sf::Vector2f(
-		rect.left + rect.width,
-		rect.top);
+	if (rotate90)
+	{
+		quad[0].texCoords = sf::Vector2f(//rect.left + rect.width,rect.top
+			rect.left + rect.width, rect.top);
+		quad[1].texCoords = sf::Vector2f(//rect.left,rect.top
+			rect.left, rect.top);
+		quad[2].texCoords = sf::Vector2f(//rect.left,rect.top + rect.height
+			rect.left, rect.top + rect.height);
+		quad[3].texCoords = sf::Vector2f(//rect.left + rect.width,rect.top
+			rect.left + rect.width, rect.top);
+		quad[4].texCoords = sf::Vector2f(//rect.left,rect.top + rect.height
+			rect.left, rect.top + rect.height);
+		quad[5].texCoords = sf::Vector2f(//rect.left + rect.width,rect.top + rect.height
+			rect.left + rect.width, rect.top + rect.height);
+	}
+	else
+	{
+		quad[0].texCoords = sf::Vector2f(
+			flipX ? rect.left + rect.width : rect.left,
+			flipY ? rect.top + rect.height : rect.top);
+		quad[1].texCoords = sf::Vector2f(
+			flipX ? rect.left + rect.width : rect.left,
+			flipY ? rect.top : rect.top + rect.height);
+		quad[2].texCoords = sf::Vector2f(
+			flipX ? rect.left : rect.left + rect.width,
+			flipY ? rect.top : rect.top + rect.height);
+		quad[3].texCoords = sf::Vector2f(
+			flipX ? rect.left + rect.width : rect.left,
+			flipY ? rect.top + rect.height : rect.top);
+		quad[4].texCoords = sf::Vector2f(
+			flipX ? rect.left : rect.left + rect.width,
+			flipY ? rect.top : rect.top + rect.height);
+		quad[5].texCoords = sf::Vector2f(
+			flipX ? rect.left : rect.left + rect.width,
+			flipY ? rect.top + rect.height : rect.top);
+	}
 	for (auto& v : quad)
 	{
 		tilesheet.tilemap[0].append(v);

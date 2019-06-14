@@ -57,25 +57,51 @@ void CityBuilderMap::Init()
 		}
 
 	}
-	//Trees
-	siv::PerlinNoise perlinNoise;
-	
-	for(auto x = 0u; x < city.mapSize.x; x++)
+	//ROAD
 	{
-		for(auto y = 0u; y < city.mapSize.y; y++)
-		{
-			const sf::Vector2i pos = sf::Vector2i(x, y);
+		sf::Vector2i pos = sf::Vector2i(0, (rand() % (city.mapSize.y/3))+ city.mapSize.y / 3);
 
-			const auto pnoise = perlinNoise.noise0_1(
-				float(pos.x) / city.mapSize.x*city.perlinFreq,
-				float(pos.y) / city.mapSize.y*city.perlinFreq);
-			if(pnoise < city.forestRatio)
+		for (int x = 0; x < city.mapSize.x; x++)
+		{
+			pos.x = x;
+			CityElement element{};
+			element.position = pos;
+			element.size = sf::Vector2u(1, 1);
+			element.elementType = CityElementType::ROAD;
+			elements.push_back(element);
+		}
+	}
+	//Trees
+	{
+		siv::PerlinNoise perlinNoise;
+		std::vector<CityElement> roads;
+		std::copy_if(elements.begin(), elements.end(), std::back_inserter(roads), [](CityElement& elem)
+		{
+			return elem.elementType == CityElementType::ROAD;
+		});
+		for (auto x = 0u; x < city.mapSize.x; x++)
+		{
+			for (auto y = 0u; y < city.mapSize.y; y++)
 			{
-				CityElement element{};
-				element.position = pos;
-				element.size = sf::Vector2u(1, 1);
-				element.elementType = CityElementType::TREES;
-				elements.push_back(element);
+				const sf::Vector2i pos = sf::Vector2i(x, y);
+
+				const auto pnoise = perlinNoise.noise0_1(
+					float(pos.x) / city.mapSize.x*city.perlinFreq,
+					float(pos.y) / city.mapSize.y*city.perlinFreq);
+
+				auto result = std::find_if(roads.begin(), roads.end(), [&pos](CityElement& elem)
+				{
+					return elem.position == pos;
+				});
+
+				if (pnoise < city.forestRatio && result == roads.end())
+				{
+					CityElement element{};
+					element.position = pos;
+					element.size = sf::Vector2u(1, 1);
+					element.elementType = CityElementType::TREES;
+					elements.push_back(element);
+				}
 			}
 		}
 	}

@@ -80,7 +80,13 @@ public:
 	void UpdateTilemap(CityBuilderMap& cityBuilderMap);
 	void PushCommand(GraphicsManager* graphicsManager) override;
 protected:
-	void AddNewTile(sf::Vector2f position, const sf::Vector2f size, sf::FloatRect rect, sf::Vector2f center);
+	void AddNewTile(sf::Vector2f position, 
+		const sf::Vector2f size, 
+		sf::FloatRect rect, 
+		sf::Vector2f center, 
+		bool flipX = false, 
+		bool flipY = false, 
+		bool rotate90 = false);
 	CityBuilderTilesheet tilesheet;
 	const std::string textureName = "data/tilemap/CuteCityBuilder.png";
 	const sf::Vector2i tileSize = sf::Vector2i(20, 20);
