@@ -91,7 +91,7 @@ sf::Texture* TextureManager::LoadTexture(std::string filename)
         if (m_Textures[textureIndex].getNativeHandle() != 0U)
         {
             m_TextureIdsRefCounts[textureIndex]++;
-            return nullptr;
+            return &m_Textures[textureIndex];
         }
         else
         {

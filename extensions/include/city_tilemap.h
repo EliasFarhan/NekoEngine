@@ -24,6 +24,7 @@
  */
 
 #include <array>
+#include <vector>
 
 #include <graphics/tilemap.h>
 #include <SFML/Graphics/Rect.hpp>
@@ -34,7 +35,7 @@ namespace neko
 class TextureManager;
 class CityBuilderMap;
 
-enum class CityBuilderTileType : int
+enum class CityTileType : int
 {
 	NONE = -1,
 	GRASS = 0,
@@ -62,34 +63,39 @@ enum class CityBuilderTileType : int
 	LENGTH
 };
 
+enum class CityTilesheetType : unsigned
+{
+    ENVIRONMENT = 0u,
+    TRANSPORT,
+    CITY,
+    CAR,
+    LENGTH
+
+};
+
 struct CityBuilderTile
 {
 	sf::Vector2i position;
 
 };
 
-struct CityBuilderTilesheet : public Tilesheet
-{
-	std::array<sf::FloatRect, size_t(CityBuilderTileType::LENGTH)> rect;
-	std::array<sf::Vector2f, size_t(CityBuilderTileType::LENGTH)> center;
-};
 class CityBuilderTilemap : public neko::Tilemap
 {
 public:
 	void Init(TextureManager& textureManager);
-	void UpdateTilemap(CityBuilderMap& cityBuilderMap);
+	void UpdateTilemap(CityBuilderMap& cityBuilderMap, CityTilesheetType updatedCityTileType = CityTilesheetType::LENGTH);
 	void PushCommand(GraphicsManager* graphicsManager) override;
 protected:
-	void AddNewTile(sf::Vector2f position, 
-		const sf::Vector2f size, 
-		sf::FloatRect rect, 
-		sf::Vector2f center, 
-		bool flipX = false, 
-		bool flipY = false, 
-		bool rotate90 = false);
-	CityBuilderTilesheet tilesheet;
-	const std::string textureName = "data/tilemap/CuteCityBuilder.png";
+	void AddNewTile(const sf::Vector2f position, const sf::Vector2f size, const sf::FloatRect rect,
+                    const sf::Vector2f center, CityTilesheetType updatedCityTileType, bool flipX,
+                    bool flipY, bool rotate90);
+	std::array<Tilesheet, unsigned(CityTilesheetType::LENGTH)> tilesheets;
+    std::array<sf::FloatRect, size_t(CityTileType::LENGTH)> textureRects;
+    std::array<sf::Vector2f, size_t(CityTileType::LENGTH)> rectCenter;
+	const std::string cityTextureName = "data/tilemap/CuteCityBuilder.png";
+	const std::string carTextureName = "data/tilemap/car.png";
 	const sf::Vector2i tileSize = sf::Vector2i(20, 20);
+
 
 };
 }

@@ -31,57 +31,61 @@ namespace neko
 {
 void CityBuilderTilemap::Init(TextureManager& textureManager)
 {
-
-    tilesheet.texture = textureManager.LoadTexture(textureName);
-    tilesheet.texture->setRepeated(true);
+    for(int i = 0; i < int(CityTilesheetType::CAR); i++)
+    {
+        tilesheets[i].texture = textureManager.LoadTexture(cityTextureName);
+        tilesheets[i].texture->setRepeated(true);
+    }
+    tilesheets[unsigned(CityTilesheetType::CAR)].texture = textureManager.LoadTexture(carTextureName);
+    tilesheets[unsigned(CityTilesheetType::CAR)].texture->setRepeated(true);
 
     {
         //GRASS TILE
-        const auto grassIndex = int(CityBuilderTileType::GRASS);
-        tilesheet.center[grassIndex] = sf::Vector2f(tileSize) / 2.0f;
-        tilesheet.rect[grassIndex] = sf::FloatRect(0, 0, tileSize.x, tileSize.y);
+        const auto grassIndex = int(CityTileType::GRASS);
+        rectCenter[grassIndex] = sf::Vector2f(tileSize) / 2.0f;
+        textureRects[grassIndex] = sf::FloatRect(0, 0, tileSize.x, tileSize.y);
 
     }
     {
         //WATER
-        auto waterIndex = int(CityBuilderTileType::WATER_VERTICAL);
-        tilesheet.center[waterIndex] = sf::Vector2f(tileSize) / 2.0f;
-        tilesheet.rect[waterIndex] = sf::FloatRect(
+        auto waterIndex = int(CityTileType::WATER_VERTICAL);
+        rectCenter[waterIndex] = sf::Vector2f(tileSize) / 2.0f;
+        textureRects[waterIndex] = sf::FloatRect(
                 7 * tileSize.x,
                 5 * tileSize.y,
                 tileSize.x,
                 tileSize.y);
-        waterIndex = int(CityBuilderTileType::WATER_HORIZONTAL);
-        tilesheet.center[waterIndex] = sf::Vector2f(tileSize) / 2.0f;
-        tilesheet.rect[waterIndex] = sf::FloatRect(
+        waterIndex = int(CityTileType::WATER_HORIZONTAL);
+        rectCenter[waterIndex] = sf::Vector2f(tileSize) / 2.0f;
+        textureRects[waterIndex] = sf::FloatRect(
                 7 * tileSize.x,
                 4 * tileSize.y,
                 tileSize.x,
                 tileSize.y);
-        waterIndex = int(CityBuilderTileType::WATER_DOWN_LEFT);
-        tilesheet.center[waterIndex] = sf::Vector2f(tileSize) / 2.0f;
-        tilesheet.rect[waterIndex] = sf::FloatRect(
+        waterIndex = int(CityTileType::WATER_DOWN_LEFT);
+        rectCenter[waterIndex] = sf::Vector2f(tileSize) / 2.0f;
+        textureRects[waterIndex] = sf::FloatRect(
                 6 * tileSize.x,
                 4 * tileSize.y,
                 tileSize.x,
                 tileSize.y);
-        waterIndex = int(CityBuilderTileType::WATER_DOWN_RIGHT);
-        tilesheet.center[waterIndex] = sf::Vector2f(tileSize) / 2.0f;
-        tilesheet.rect[waterIndex] = sf::FloatRect(
+        waterIndex = int(CityTileType::WATER_DOWN_RIGHT);
+        rectCenter[waterIndex] = sf::Vector2f(tileSize) / 2.0f;
+        textureRects[waterIndex] = sf::FloatRect(
                 5 * tileSize.x,
                 4 * tileSize.y,
                 tileSize.x,
                 tileSize.y);
-        waterIndex = int(CityBuilderTileType::WATER_UP_LEFT);
-        tilesheet.center[waterIndex] = sf::Vector2f(tileSize) / 2.0f;
-        tilesheet.rect[waterIndex] = sf::FloatRect(
+        waterIndex = int(CityTileType::WATER_UP_LEFT);
+        rectCenter[waterIndex] = sf::Vector2f(tileSize) / 2.0f;
+        textureRects[waterIndex] = sf::FloatRect(
                 6 * tileSize.x,
                 5 * tileSize.y,
                 tileSize.x,
                 tileSize.y);
-        waterIndex = int(CityBuilderTileType::WATER_UP_RIGHT);
-        tilesheet.center[waterIndex] = sf::Vector2f(tileSize) / 2.0f;
-        tilesheet.rect[waterIndex] = sf::FloatRect(
+        waterIndex = int(CityTileType::WATER_UP_RIGHT);
+        rectCenter[waterIndex] = sf::Vector2f(tileSize) / 2.0f;
+        textureRects[waterIndex] = sf::FloatRect(
                 5 * tileSize.x,
                 5 * tileSize.y,
                 tileSize.x,
@@ -89,392 +93,418 @@ void CityBuilderTilemap::Init(TextureManager& textureManager)
     }
     {
         //TREES
-        const auto treesIndex = int(CityBuilderTileType::TREES);
-        tilesheet.center[treesIndex] = sf::Vector2f(tileSize.x, 2.0f * tileSize.y) / 2.0f;
-        tilesheet.rect[treesIndex] = sf::FloatRect(5 * tileSize.x, tileSize.y, tileSize.x, 2 * tileSize.y);
+        const auto treesIndex = int(CityTileType::TREES);
+        rectCenter[treesIndex] = sf::Vector2f(tileSize.x, 2.0f * tileSize.y) / 2.0f;
+        textureRects[treesIndex] = sf::FloatRect(5 * tileSize.x, tileSize.y, tileSize.x, 2 * tileSize.y);
     }
     {
         //ROAD
-        auto roadIndex = int(CityBuilderTileType::ROAD_LINE);
-        tilesheet.center[roadIndex] = sf::Vector2f(tileSize.x, tileSize.y) / 2.0f;
-        tilesheet.rect[roadIndex] = sf::FloatRect(tileSize.x, 0, tileSize.x, tileSize.y);
+        auto roadIndex = int(CityTileType::ROAD_LINE);
+        rectCenter[roadIndex] = sf::Vector2f(tileSize.x, tileSize.y) / 2.0f;
+        textureRects[roadIndex] = sf::FloatRect(tileSize.x, 0, tileSize.x, tileSize.y);
 
-        roadIndex = int(CityBuilderTileType::ROAD_BRIDGE_HORIZONTAL);
-        tilesheet.center[roadIndex] = sf::Vector2f(tileSize.x, 2.0f * tileSize.y) / 2.0f;
-        tilesheet.rect[roadIndex] = sf::FloatRect(0, tileSize.y, tileSize.x, 2 * tileSize.y);
+        roadIndex = int(CityTileType::ROAD_BRIDGE_HORIZONTAL);
+        rectCenter[roadIndex] = sf::Vector2f(tileSize.x, 2.0f * tileSize.y) / 2.0f;
+        textureRects[roadIndex] = sf::FloatRect(0, tileSize.y, tileSize.x, 2 * tileSize.y);
     }
     {
         //RAIL
-        auto railIndex = int(CityBuilderTileType::RAIL_LINE);
-        tilesheet.center[railIndex] = sf::Vector2f(tileSize.x, tileSize.y) / 2.0f;
-        tilesheet.rect[railIndex] = sf::FloatRect(7.0f * tileSize.x, tileSize.y, tileSize.x, tileSize.y);
+        auto railIndex = int(CityTileType::RAIL_LINE);
+        rectCenter[railIndex] = sf::Vector2f(tileSize.x, tileSize.y) / 2.0f;
+        textureRects[railIndex] = sf::FloatRect(7.0f * tileSize.x, tileSize.y, tileSize.x, tileSize.y);
 
-        railIndex = int(CityBuilderTileType::RAIL_TURN);
-        tilesheet.center[railIndex] = sf::Vector2f(tileSize.x, tileSize.y) / 2.0f;
-        tilesheet.rect[railIndex] = sf::FloatRect(6.0f * tileSize.x, tileSize.y, tileSize.x, tileSize.y);
+        railIndex = int(CityTileType::RAIL_TURN);
+        rectCenter[railIndex] = sf::Vector2f(tileSize.x, tileSize.y) / 2.0f;
+        textureRects[railIndex] = sf::FloatRect(6.0f * tileSize.x, tileSize.y, tileSize.x, tileSize.y);
     }
     {
         //TRAIN STATION
-        auto trainIndex = int(CityBuilderTileType::TRAIN_STATION);
-        tilesheet.center[trainIndex] = sf::Vector2f(5.0f * tileSize.x, 3.0f * tileSize.y) / 2.0f;
-        tilesheet.rect[trainIndex] = sf::FloatRect(0.0f, 3.0f * tileSize.y, 5.0f * tileSize.x, 3.0f * tileSize.y);
+        auto trainIndex = int(CityTileType::TRAIN_STATION);
+        rectCenter[trainIndex] = sf::Vector2f(5.0f * tileSize.x, 3.0f * tileSize.y) / 2.0f;
+        textureRects[trainIndex] = sf::FloatRect(0.0f, 3.0f * tileSize.y, 5.0f * tileSize.x, 3.0f * tileSize.y);
     }
-    tilesheet.tilemap[0].setPrimitiveType(sf::Triangles);
-    tilesheet.tilemap[1].setPrimitiveType(sf::Triangles);
+    for(int i = 0; i < int(CityTilesheetType::LENGTH);i++)
+    {
+        tilesheets[i].tilemap[0].setPrimitiveType(sf::Triangles);
+        tilesheets[i].tilemap[1].setPrimitiveType(sf::Triangles);
+    }
+
 }
 
-void CityBuilderTilemap::UpdateTilemap(CityBuilderMap& cityBuilderMap)
+void CityBuilderTilemap::UpdateTilemap(CityBuilderMap& cityBuilderMap, CityTilesheetType updatedCityTileType)
 {
-    tilesheet.tilemap[0].clear();
-    tilesheet.tilemap[1].clear();
-    //ENVIRONMENT
+    if(updatedCityTileType == CityTilesheetType::LENGTH)
     {
-        const int grassIndex = int(CityBuilderTileType::GRASS);
-        //Fill the vertex array with grass
-        for (auto x = 0u; x < cityBuilderMap.city.mapSize.x; x++)
+        for(unsigned i = 0u; i < unsigned(CityTilesheetType::LENGTH);i++)
         {
-            for (auto y = 0u; y < cityBuilderMap.city.mapSize.y; y++)
-            {
-
-                const auto position = sf::Vector2f(x * tileSize.x, y * tileSize.y);
-                auto rect = tilesheet.rect[grassIndex];
-                auto center = tilesheet.center[grassIndex];
-                AddNewTile(position, sf::Vector2f(tileSize), rect, center);
-            }
+            UpdateTilemap(cityBuilderMap, CityTilesheetType(i));
         }
-        //Add water on top of it
-        for (auto x = 0u; x < cityBuilderMap.city.mapSize.x; x++)
-        {
-            for (auto y = 0u; y < cityBuilderMap.city.mapSize.y; y++)
-            {
-
-                int waterIndex = 0;
-                bool directions[] = {0, 0, 0, 0};//UP, DOWN, LEFT, RIGHT
-
-                const sf::Vector2i tmpPos = sf::Vector2i(x, y);
-                if (cityBuilderMap.environmentTiles[cityBuilderMap.Position2Index(tmpPos)] != EnvironmentTile::WATER)
-                {
-                    continue;
-                }
-                //UP
-                {
-                    const sf::Vector2i upPos = tmpPos + sf::Vector2i(0, -1);
-                    if (upPos.y < 0 ||
-                        cityBuilderMap.environmentTiles[cityBuilderMap.Position2Index(upPos)] == EnvironmentTile::WATER)
-                    {
-                        directions[0] = true;
-                    }
-                }
-                //DOWN
-                {
-                    const sf::Vector2i downPos = tmpPos + sf::Vector2i(0, 1);
-                    if (downPos.y == cityBuilderMap.city.mapSize.y ||
-                        cityBuilderMap.environmentTiles[cityBuilderMap.Position2Index(downPos)] ==
-                        EnvironmentTile::WATER)
-                    {
-                        directions[1] = true;
-                    }
-                }
-                //LEFT
-                {
-                    const sf::Vector2i leftPos = tmpPos + sf::Vector2i(-1, 0);
-                    if (leftPos.x > 0 &&
-                        cityBuilderMap.environmentTiles[cityBuilderMap.Position2Index(leftPos)] ==
-                        EnvironmentTile::WATER)
-                    {
-                        directions[2] = true;
-                    }
-                }
-                //RIGHT
-                {
-                    const sf::Vector2i rightPos = tmpPos + sf::Vector2i(1, 0);
-                    if (rightPos.x < cityBuilderMap.city.mapSize.x &&
-                        cityBuilderMap.environmentTiles[cityBuilderMap.Position2Index(rightPos)] ==
-                        EnvironmentTile::WATER)
-                    {
-                        directions[3] = true;
-                    }
-                }
-                if (directions[1] && directions[3])
-                {
-                    waterIndex = int(CityBuilderTileType::WATER_DOWN_RIGHT);
-                }
-                if (directions[1] && directions[2])
-                {
-                    waterIndex = int(CityBuilderTileType::WATER_DOWN_LEFT);
-                }
-                if (directions[0] && directions[3])
-                {
-                    waterIndex = int(CityBuilderTileType::WATER_UP_RIGHT);
-                }
-                if (directions[0] && directions[2])
-                {
-                    waterIndex = int(CityBuilderTileType::WATER_UP_LEFT);
-                }
-                if (directions[0] && directions[1])
-                {
-                    waterIndex = int(CityBuilderTileType::WATER_VERTICAL);
-                }
-                if (directions[2] && directions[3])
-                {
-                    waterIndex = int(CityBuilderTileType::WATER_HORIZONTAL);
-                }
-                const auto position = sf::Vector2f(x * tileSize.x, y * tileSize.y);
-                auto rect = tilesheet.rect[waterIndex];
-                auto center = tilesheet.center[waterIndex];
-                AddNewTile(position, sf::Vector2f(tileSize), rect, center);
-            }
-        }
-    }
-    {
-        //ROAD
-        std::vector<CityElement> roads;
-        std::copy_if(cityBuilderMap.elements.begin(), cityBuilderMap.elements.end(), std::back_inserter(roads),
-                     [](CityElement& elem)
-                     {
-                         return elem.elementType == CityElementType::ROAD;
-                     });
-        for (auto& road : roads)
-        {
-            bool directions[] = {0, 0, 0, 0};//UP, DOWN, LEFT, RIGHT
-
-            if (road.position.y == 0)
-            {
-                directions[0] = true;
-            }
-            if (road.position.y == cityBuilderMap.city.mapSize.y - 1)
-            {
-                directions[1] = true;
-            }
-            if (road.position.x == 0)
-            {
-                directions[2] = true;
-            }
-            if (road.position.x == cityBuilderMap.city.mapSize.x - 1)
-            {
-                directions[3] = true;
-            }
-
-            for (auto& otherRoad : roads)
-            {
-                if (otherRoad.position == road.position)
-                {
-                    continue;
-                }
-                const sf::Vector2i deltaPos = otherRoad.position - road.position;
-                if (deltaPos == sf::Vector2i(0, -1))
-                {
-                    directions[0] = true;
-                }
-                if (deltaPos == sf::Vector2i(0, 1))
-                {
-                    directions[1] = true;
-                }
-                if (deltaPos == sf::Vector2i(-1, 0))
-                {
-                    directions[2] = true;
-                }
-                if (deltaPos == sf::Vector2i(1, 0))
-                {
-                    directions[3] = true;
-                }
-            }
-            const auto position = sf::Vector2f(
-                    road.position.x * tileSize.x,
-                    road.position.y * tileSize.y);
-            int roadIndex = -1;
-            bool isWater = cityBuilderMap.environmentTiles[cityBuilderMap.Position2Index(road.position)] ==
-                           EnvironmentTile::WATER;
-            if (directions[0] && directions[1] && !directions[2] && !directions[3])
-            {
-                roadIndex = int(isWater ? CityBuilderTileType::ROAD_BRIDGE_VERTICAL : CityBuilderTileType::ROAD_LINE);
-                const auto rect = tilesheet.rect[roadIndex];
-                const auto center = tilesheet.center[roadIndex];
-                const auto size = sf::Vector2f(tileSize.x, (isWater ? 2.0f : 1.0f) * tileSize.y);
-
-                AddNewTile(position, size, rect, center);
-            }
-            if (!directions[0] && !directions[1] && directions[2] && directions[3])
-            {
-                roadIndex = int(isWater ? CityBuilderTileType::ROAD_BRIDGE_HORIZONTAL : CityBuilderTileType::ROAD_LINE);
-                const auto rect = tilesheet.rect[roadIndex];
-                const auto center = tilesheet.center[roadIndex];
-                const auto size = sf::Vector2f(tileSize.x, (isWater ? 2.0f : 1.0f) * tileSize.y);
-
-                AddNewTile(position, size, rect, center, false, false, !isWater);
-            }
-        }
+        return;
     }
 
+    tilesheets[unsigned(updatedCityTileType)].tilemap[0].clear();
+    tilesheets[unsigned(updatedCityTileType)].tilemap[1].clear();
+
+    switch(updatedCityTileType)
     {
-        //RAILS
-
-        std::vector<CityElement> rails;
-        std::copy_if(cityBuilderMap.elements.begin(), cityBuilderMap.elements.end(), std::back_inserter(rails),
-                     [](CityElement& elem)
-                     {
-                         return elem.elementType == CityElementType::RAIL;
-                     });
-        for (auto& rail : rails)
+        //ENVIRONMENT
+        case CityTilesheetType::ENVIRONMENT:
         {
-            bool directions[] = {0, 0, 0, 0};//UP, DOWN, LEFT, RIGHT
+            const int grassIndex = int(CityTileType::GRASS);
+            //Fill the vertex array with grass
+            for (auto x = 0u; x < cityBuilderMap.city.mapSize.x; x++)
+            {
+                for (auto y = 0u; y < cityBuilderMap.city.mapSize.y; y++)
+                {
 
-            if (rail.position.y == 0)
-            {
-                directions[0] = true;
-            }
-            if (rail.position.y == cityBuilderMap.city.mapSize.y - 1)
-            {
-                directions[1] = true;
-            }
-            if (rail.position.x == 0)
-            {
-                directions[2] = true;
-            }
-            if (rail.position.x == cityBuilderMap.city.mapSize.x - 1)
-            {
-                directions[3] = true;
-            }
-
-            for (auto& otherRoad : rails)
-            {
-                if (otherRoad.position == rail.position)
-                {
-                    continue;
-                }
-                const sf::Vector2i deltaPos = otherRoad.position - rail.position;
-                if (deltaPos == sf::Vector2i(0, -1))
-                {
-                    directions[0] = true;
-                }
-                if (deltaPos == sf::Vector2i(0, 1))
-                {
-                    directions[1] = true;
-                }
-                if (deltaPos == sf::Vector2i(-1, 0))
-                {
-                    directions[2] = true;
-                }
-                if (deltaPos == sf::Vector2i(1, 0))
-                {
-                    directions[3] = true;
+                    const auto position = sf::Vector2f(x * tileSize.x, y * tileSize.y);
+                    auto& rect = textureRects[grassIndex];
+                    auto& center = rectCenter[grassIndex];
+                    AddNewTile(position, sf::Vector2f(tileSize), rect, center, updatedCityTileType, false, false, false);
                 }
             }
-            const auto position = sf::Vector2f(
-                    rail.position.x * tileSize.x,
-                    rail.position.y * tileSize.y);
-            //HORIZONTAL FIRST
-            if (directions[2] && directions[3])
+            //Add water on top of it
+            for (auto x = 0u; x < cityBuilderMap.city.mapSize.x; x++)
             {
-                const int railIndex = int(CityBuilderTileType::RAIL_LINE);
-                const auto rect = tilesheet.rect[railIndex];
-                const auto center = tilesheet.center[railIndex];
-                const auto size = sf::Vector2f(tileSize);
-
-                AddNewTile(position, size, rect, center);
-            }
-
-                //UP RIGHT
-            else if (directions[0] && directions[3])
-            {
-                const int railIndex = int(CityBuilderTileType::RAIL_TURN);
-                const auto rect = tilesheet.rect[railIndex];
-                const auto center = tilesheet.center[railIndex];
-                const auto size = sf::Vector2f(tileSize);
-
-                AddNewTile(position, size, rect, center);
-            }
-                //DOWN LEFT
-            else if (directions[1] && directions[2])
-            {
-                const int railIndex = int(CityBuilderTileType::RAIL_TURN);
-                const auto rect = tilesheet.rect[railIndex];
-                const auto center = tilesheet.center[railIndex];
-                const auto size = sf::Vector2f(tileSize);
-
-                AddNewTile(position, size, rect, center, true, true);
-            }
-                //DOWN RIGHT
-            else if (directions[1] && directions[3])
-            {
-                const int railIndex = int(CityBuilderTileType::RAIL_TURN);
-                const auto rect = tilesheet.rect[railIndex];
-                const auto center = tilesheet.center[railIndex];
-                const auto size = sf::Vector2f(tileSize);
-
-                AddNewTile(position, size, rect, center, false, true);
-            }
-                //UP LEFT
-            else if (directions[0] && directions[2])
-            {
-                const int railIndex = int(CityBuilderTileType::RAIL_TURN);
-                const auto rect = tilesheet.rect[railIndex];
-                const auto center = tilesheet.center[railIndex];
-                const auto size = sf::Vector2f(tileSize);
-
-                AddNewTile(position, size, rect, center, true);
-            }
-                //VERTICAL LAST
-            else if (directions[0] && directions[1])
-            {
-                const int railIndex = int(CityBuilderTileType::RAIL_LINE);
-                const auto rect = tilesheet.rect[railIndex];
-                const auto center = tilesheet.center[railIndex];
-                const auto size = sf::Vector2f(tileSize);
-
-                AddNewTile(position, size, rect, center, false, false, true);
-            }
-        }
-    }
-
-
-    {
-        //TREES
-        const int treesIndex = int(CityBuilderTileType::TREES);
-
-        for (auto& element : cityBuilderMap.elements)
-        {
-            switch (element.elementType)
-            {
-                case CityElementType::TREES:
+                for (auto y = 0u; y < cityBuilderMap.city.mapSize.y; y++)
                 {
-                    if (cityBuilderMap.environmentTiles[cityBuilderMap.Position2Index(element.position)] ==
+
+                    int waterIndex = 0;
+                    bool directions[] = {0, 0, 0, 0};//UP, DOWN, LEFT, RIGHT
+
+                    const sf::Vector2i tmpPos = sf::Vector2i(x, y);
+                    if (cityBuilderMap.environmentTiles[cityBuilderMap.Position2Index(tmpPos)] !=
                         EnvironmentTile::WATER)
                     {
                         continue;
                     }
-                    const auto position = sf::Vector2f(
-                            element.position.x * tileSize.x,
-                            element.position.y * tileSize.y);
-                    const auto rect = tilesheet.rect[treesIndex];
-                    const auto center = tilesheet.center[treesIndex];
-                    const auto size = sf::Vector2f(
-                            tileSize.x,
-                            2.0f * tileSize.y
-                    );
-
-                    AddNewTile(position, size, rect, center);
-                    break;
+                    //UP
+                    {
+                        const sf::Vector2i upPos = tmpPos + sf::Vector2i(0, -1);
+                        if (upPos.y < 0 ||
+                            cityBuilderMap.environmentTiles[cityBuilderMap.Position2Index(upPos)] ==
+                            EnvironmentTile::WATER)
+                        {
+                            directions[0] = true;
+                        }
+                    }
+                    //DOWN
+                    {
+                        const sf::Vector2i downPos = tmpPos + sf::Vector2i(0, 1);
+                        if (downPos.y == cityBuilderMap.city.mapSize.y ||
+                            cityBuilderMap.environmentTiles[cityBuilderMap.Position2Index(downPos)] ==
+                            EnvironmentTile::WATER)
+                        {
+                            directions[1] = true;
+                        }
+                    }
+                    //LEFT
+                    {
+                        const sf::Vector2i leftPos = tmpPos + sf::Vector2i(-1, 0);
+                        if (leftPos.x > 0 &&
+                            cityBuilderMap.environmentTiles[cityBuilderMap.Position2Index(leftPos)] ==
+                            EnvironmentTile::WATER)
+                        {
+                            directions[2] = true;
+                        }
+                    }
+                    //RIGHT
+                    {
+                        const sf::Vector2i rightPos = tmpPos + sf::Vector2i(1, 0);
+                        if (rightPos.x < cityBuilderMap.city.mapSize.x &&
+                            cityBuilderMap.environmentTiles[cityBuilderMap.Position2Index(rightPos)] ==
+                            EnvironmentTile::WATER)
+                        {
+                            directions[3] = true;
+                        }
+                    }
+                    if (directions[1] && directions[3])
+                    {
+                        waterIndex = int(CityTileType::WATER_DOWN_RIGHT);
+                    }
+                    if (directions[1] && directions[2])
+                    {
+                        waterIndex = int(CityTileType::WATER_DOWN_LEFT);
+                    }
+                    if (directions[0] && directions[3])
+                    {
+                        waterIndex = int(CityTileType::WATER_UP_RIGHT);
+                    }
+                    if (directions[0] && directions[2])
+                    {
+                        waterIndex = int(CityTileType::WATER_UP_LEFT);
+                    }
+                    if (directions[0] && directions[1])
+                    {
+                        waterIndex = int(CityTileType::WATER_VERTICAL);
+                    }
+                    if (directions[2] && directions[3])
+                    {
+                        waterIndex = int(CityTileType::WATER_HORIZONTAL);
+                    }
+                    const auto position = sf::Vector2f(x * tileSize.x, y * tileSize.y);
+                    auto rect = textureRects[waterIndex];
+                    auto center = rectCenter[waterIndex];
+                    AddNewTile(position, sf::Vector2f(tileSize), rect, center, updatedCityTileType, false, false, false);
                 }
-                case CityElementType::TRAIN_STATION:
-                {
-                    const int trainStationIndex = int(CityBuilderTileType::TRAIN_STATION);
-                    const auto position = sf::Vector2f(
-                            element.position.x * tileSize.x,
-                            element.position.y * tileSize.y);
-                    const auto rect = tilesheet.rect[trainStationIndex];
-                    const auto center = tilesheet.center[trainStationIndex];
-                    const auto size = sf::Vector2f(
-                            element.size.x * tileSize.x,
-                            element.size.y * tileSize.y
-                    );
-                    AddNewTile(position, size, rect, center);
-                    break;
-                }
-                default:
-                    break;
             }
+            break;
         }
+        case CityTilesheetType::TRANSPORT:
+        {
+            //ROAD
+            std::vector<CityElement> roads;
+            std::copy_if(cityBuilderMap.elements.begin(), cityBuilderMap.elements.end(), std::back_inserter(roads),
+                         [](CityElement& elem)
+                         {
+                             return elem.elementType == CityElementType::ROAD;
+                         });
+            for (auto& road : roads)
+            {
+                bool directions[] = {0, 0, 0, 0};//UP, DOWN, LEFT, RIGHT
+
+                if (road.position.y == 0)
+                {
+                    directions[0] = true;
+                }
+                if (road.position.y == cityBuilderMap.city.mapSize.y - 1)
+                {
+                    directions[1] = true;
+                }
+                if (road.position.x == 0)
+                {
+                    directions[2] = true;
+                }
+                if (road.position.x == cityBuilderMap.city.mapSize.x - 1)
+                {
+                    directions[3] = true;
+                }
+
+                for (auto& otherRoad : roads)
+                {
+                    if (otherRoad.position == road.position)
+                    {
+                        continue;
+                    }
+                    const sf::Vector2i deltaPos = otherRoad.position - road.position;
+                    if (deltaPos == sf::Vector2i(0, -1))
+                    {
+                        directions[0] = true;
+                    }
+                    if (deltaPos == sf::Vector2i(0, 1))
+                    {
+                        directions[1] = true;
+                    }
+                    if (deltaPos == sf::Vector2i(-1, 0))
+                    {
+                        directions[2] = true;
+                    }
+                    if (deltaPos == sf::Vector2i(1, 0))
+                    {
+                        directions[3] = true;
+                    }
+                }
+                const auto position = sf::Vector2f(
+                        road.position.x * tileSize.x,
+                        road.position.y * tileSize.y);
+                int roadIndex = -1;
+                bool isWater = cityBuilderMap.environmentTiles[cityBuilderMap.Position2Index(road.position)] ==
+                               EnvironmentTile::WATER;
+                if (directions[0] && directions[1] && !directions[2] && !directions[3])
+                {
+                    roadIndex = int(
+                            isWater ? CityTileType::ROAD_BRIDGE_VERTICAL : CityTileType::ROAD_LINE);
+                    const auto rect = textureRects[roadIndex];
+                    const auto center = rectCenter[roadIndex];
+                    const auto size = sf::Vector2f(tileSize.x, (isWater ? 2.0f : 1.0f) * tileSize.y);
+
+                    AddNewTile(position, size, rect, center, updatedCityTileType, false, false, false);
+                }
+                if (!directions[0] && !directions[1] && directions[2] && directions[3])
+                {
+                    roadIndex = int(
+                            isWater ? CityTileType::ROAD_BRIDGE_HORIZONTAL : CityTileType::ROAD_LINE);
+                    const auto rect = textureRects[roadIndex];
+                    const auto center = rectCenter[roadIndex];
+                    const auto size = sf::Vector2f(tileSize.x, (isWater ? 2.0f : 1.0f) * tileSize.y);
+
+                    AddNewTile(position, size, rect, center, updatedCityTileType, false, false, !isWater);
+                }
+            }
+
+            //RAILS
+
+            std::vector<CityElement> rails;
+            std::copy_if(cityBuilderMap.elements.begin(), cityBuilderMap.elements.end(), std::back_inserter(rails),
+                         [](CityElement& elem)
+                         {
+                             return elem.elementType == CityElementType::RAIL;
+                         });
+            for (auto& rail : rails)
+            {
+                bool directions[] = {0, 0, 0, 0};//UP, DOWN, LEFT, RIGHT
+
+                if (rail.position.y == 0)
+                {
+                    directions[0] = true;
+                }
+                if (rail.position.y == cityBuilderMap.city.mapSize.y - 1)
+                {
+                    directions[1] = true;
+                }
+                if (rail.position.x == 0)
+                {
+                    directions[2] = true;
+                }
+                if (rail.position.x == cityBuilderMap.city.mapSize.x - 1)
+                {
+                    directions[3] = true;
+                }
+
+                for (auto& otherRoad : rails)
+                {
+                    if (otherRoad.position == rail.position)
+                    {
+                        continue;
+                    }
+                    const sf::Vector2i deltaPos = otherRoad.position - rail.position;
+                    if (deltaPos == sf::Vector2i(0, -1))
+                    {
+                        directions[0] = true;
+                    }
+                    if (deltaPos == sf::Vector2i(0, 1))
+                    {
+                        directions[1] = true;
+                    }
+                    if (deltaPos == sf::Vector2i(-1, 0))
+                    {
+                        directions[2] = true;
+                    }
+                    if (deltaPos == sf::Vector2i(1, 0))
+                    {
+                        directions[3] = true;
+                    }
+                }
+                const auto position = sf::Vector2f(
+                        rail.position.x * tileSize.x,
+                        rail.position.y * tileSize.y);
+                //HORIZONTAL FIRST
+                if (directions[2] && directions[3])
+                {
+                    const int railIndex = int(CityTileType::RAIL_LINE);
+                    const auto rect = textureRects[railIndex];
+                    const auto center = rectCenter[railIndex];
+                    const auto size = sf::Vector2f(tileSize);
+
+                    AddNewTile(position, size, rect, center, updatedCityTileType, false, false, false);
+                }
+
+                    //UP RIGHT
+                else if (directions[0] && directions[3])
+                {
+                    const int railIndex = int(CityTileType::RAIL_TURN);
+                    const auto rect = textureRects[railIndex];
+                    const auto center = rectCenter[railIndex];
+                    const auto size = sf::Vector2f(tileSize);
+
+                    AddNewTile(position, size, rect, center, updatedCityTileType, false, false, false);
+                }
+                    //DOWN LEFT
+                else if (directions[1] && directions[2])
+                {
+                    const int railIndex = int(CityTileType::RAIL_TURN);
+                    const auto rect = textureRects[railIndex];
+                    const auto center = rectCenter[railIndex];
+                    const auto size = sf::Vector2f(tileSize);
+
+                    AddNewTile(position, size, rect, center, updatedCityTileType, true, true, false);
+                }
+                    //DOWN RIGHT
+                else if (directions[1] && directions[3])
+                {
+                    const int railIndex = int(CityTileType::RAIL_TURN);
+                    const auto rect = textureRects[railIndex];
+                    const auto center = rectCenter[railIndex];
+                    const auto size = sf::Vector2f(tileSize);
+
+                    AddNewTile(position, size, rect, center, updatedCityTileType, false, true, false);
+                }
+                    //UP LEFT
+                else if (directions[0] && directions[2])
+                {
+                    const int railIndex = int(CityTileType::RAIL_TURN);
+                    const auto rect = textureRects[railIndex];
+                    const auto center = rectCenter[railIndex];
+                    const auto size = sf::Vector2f(tileSize);
+
+                    AddNewTile(position, size, rect, center, updatedCityTileType, true, false, false);
+                }
+                    //VERTICAL LAST
+                else if (directions[0] && directions[1])
+                {
+                    const int railIndex = int(CityTileType::RAIL_LINE);
+                    const auto rect = textureRects[railIndex];
+                    const auto center = rectCenter[railIndex];
+                    const auto size = sf::Vector2f(tileSize);
+
+                    AddNewTile(position, size, rect, center, updatedCityTileType, false, false, true);
+                }
+            }
+            break;
+        }
+
+        case CityTilesheetType::CITY:
+        {
+            //TREES
+            const int treesIndex = int(CityTileType::TREES);
+
+            for (auto& element : cityBuilderMap.elements)
+            {
+                switch (element.elementType)
+                {
+                    case CityElementType::TREES:
+                    {
+                        if (cityBuilderMap.environmentTiles[cityBuilderMap.Position2Index(element.position)] ==
+                            EnvironmentTile::WATER)
+                        {
+                            continue;
+                        }
+                        const auto position = sf::Vector2f(
+                                element.position.x * tileSize.x,
+                                element.position.y * tileSize.y);
+                        const auto rect = textureRects[treesIndex];
+                        const auto center = rectCenter[treesIndex];
+                        const auto size = sf::Vector2f(
+                                tileSize.x,
+                                2.0f * tileSize.y
+                        );
+
+                        AddNewTile(position, size, rect, center, updatedCityTileType, false, false, false);
+                        break;
+                    }
+                    case CityElementType::TRAIN_STATION:
+                    {
+                        const int trainStationIndex = int(CityTileType::TRAIN_STATION);
+                        const auto position = sf::Vector2f(
+                                element.position.x * tileSize.x,
+                                element.position.y * tileSize.y);
+                        const auto rect = textureRects[trainStationIndex];
+                        const auto center = rectCenter[trainStationIndex];
+                        const auto size = sf::Vector2f(
+                                element.size.x * tileSize.x,
+                                element.size.y * tileSize.y
+                        );
+                        AddNewTile(position, size, rect, center, updatedCityTileType, false, false, false);
+                        break;
+                    }
+                    default:
+                        break;
+                }
+            }
+            break;
+        }
+        default:
+            break;
     }
 
 }
@@ -483,18 +513,16 @@ void CityBuilderTilemap::PushCommand(GraphicsManager* graphicsManager)
 {
     rmt_ScopedCPUSample(PushCityTilemapCommands, 0);
     const int frameIndex = MainEngine::GetInstance()->frameIndex % 2;
-    graphicsManager->Draw(&tilesheet.tilemap[frameIndex], tilesheet.texture);
+    graphicsManager->Draw(&tilesheets[unsigned(CityTilesheetType::ENVIRONMENT)].tilemap[frameIndex], tilesheets[unsigned(CityTilesheetType::ENVIRONMENT)].texture);
+    graphicsManager->Draw(&tilesheets[unsigned(CityTilesheetType::TRANSPORT)].tilemap[frameIndex], tilesheets[unsigned(CityTilesheetType::TRANSPORT)].texture);
+    graphicsManager->Draw(&tilesheets[unsigned(CityTilesheetType::CAR)].tilemap[frameIndex], tilesheets[unsigned(CityTilesheetType::CAR)].texture);
+    graphicsManager->Draw(&tilesheets[unsigned(CityTilesheetType::CITY)].tilemap[frameIndex], tilesheets[unsigned(CityTilesheetType::CITY)].texture);
 
 }
 
-void CityBuilderTilemap::AddNewTile(
-        const sf::Vector2f position,
-        const sf::Vector2f size,
-        const sf::FloatRect rect,
-        const sf::Vector2f center,
-        bool flipX,
-        bool flipY,
-        bool rotate90)
+void CityBuilderTilemap::AddNewTile(const sf::Vector2f position, const sf::Vector2f size, const sf::FloatRect rect,
+                                    const sf::Vector2f center, CityTilesheetType updatedCityTileType, bool flipX,
+                                    bool flipY, bool rotate90)
 {
     sf::Vector2f sizeOffset = (size - sf::Vector2f(tileSize)) / 2.0f;
     sizeOffset.x = -sizeOffset.x;
@@ -544,8 +572,8 @@ void CityBuilderTilemap::AddNewTile(
     }
     for (auto& v : quad)
     {
-        tilesheet.tilemap[0].append(v);
-        tilesheet.tilemap[1].append(v);
+        tilesheets[unsigned(updatedCityTileType)].tilemap[0].append(v);
+        tilesheets[unsigned(updatedCityTileType)].tilemap[1].append(v);
     }
 }
 }

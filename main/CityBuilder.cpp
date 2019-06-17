@@ -41,7 +41,7 @@ public:
 		MainEngine::Init();
 		cityBuilderMap.Init();
 		environmentTilemap.Init(textureManager);
-		environmentTilemap.UpdateTilemap(cityBuilderMap);
+        environmentTilemap.UpdateTilemap(cityBuilderMap, neko::CityTilesheetType::LENGTH);
 		mainView = renderWindow->getView();
 	}
 

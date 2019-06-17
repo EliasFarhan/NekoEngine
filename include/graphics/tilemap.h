@@ -24,7 +24,7 @@
  SOFTWARE.
  */
 
-
+#include <vector>
 #include <SFML/Graphics/VertexArray.hpp>
 #include <SFML/Graphics/Texture.hpp>
 #include <physics/physics.h>
