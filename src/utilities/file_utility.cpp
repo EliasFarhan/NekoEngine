@@ -44,26 +44,26 @@ namespace fs = std::filesystem;
 
 namespace neko
 {
-bool FileExists(std::string_view filename)
+bool FileExists(const std::string_view filename)
 {
     const fs::path p = filename;
     return fs::exists(p);
 }
 
-bool IsRegularFile(std::string_view filename)
+bool IsRegularFile(const std::string_view filename)
 {
     const fs::path p = filename;
     return fs::is_regular_file(p);
 
 }
 
-bool IsDirectory(std::string_view filename)
+bool IsDirectory(const std::string_view filename)
 {
     const fs::path p = filename;
     return fs::is_directory(p);
 }
 
-void IterateDirectory(std::string_view dirname, std::function<void(std::string_view)> func)
+void IterateDirectory(const std::string_view dirname, std::function<void(const std::string_view)> func)
 {
 
     if (IsDirectory(dirname))
@@ -81,12 +81,12 @@ std::ifstream::pos_type CalculateFileSize(const std::string& filename)
     return in.tellg();
 }
 
-bool CreateDirectory(std::string_view dirname)
+bool CreateDirectory(const std::string_view dirname)
 {
     return fs::create_directory(dirname);
 }
 
-bool RemoveDirectory(std::string_view dirname, bool removeAll)
+bool RemoveDirectory(const std::string_view dirname, bool removeAll)
 {
     if (removeAll)
     {
@@ -106,7 +106,7 @@ const std::string LoadFile(const std::string& path)
     return str;
 }
 
-std::string GetFilenameExtension(std::string_view path)
+std::string GetFilenameExtension(const std::string_view path)
 {
     std::string extension = "";
     const auto folderLastIndex = path.find_last_of('/');
@@ -123,13 +123,13 @@ std::string GetFilenameExtension(std::string_view path)
     return extension;
 }
 
-std::string GetFileParentPath(std::string_view path)
+std::string GetFileParentPath(const std::string_view path)
 {
     fs::path p = path;
     return p.parent_path().string();
 }
 
-std::string LinkFolderAndFile(std::string_view folderPath, std::string_view filePath)
+std::string LinkFolderAndFile(const std::string_view folderPath, const std::string_view filePath)
 {
     fs::path f = folderPath;
     fs::path p = filePath;

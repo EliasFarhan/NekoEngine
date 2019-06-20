@@ -33,25 +33,25 @@
 namespace neko
 {
 
-bool FileExists(std::string_view filename);
+bool FileExists(const std::string_view filename);
 
-bool IsRegularFile(std::string_view filename);
+bool IsRegularFile(const std::string_view filename);
 
-bool IsDirectory(std::string_view filename);
+bool IsDirectory(const std::string_view filename);
 
-void IterateDirectory(std::string_view dirname, std::function<void(std::string_view)> func);
+void IterateDirectory(const std::string_view dirname, std::function<void(const std::string_view)> func);
 
 std::ifstream::pos_type CalculateFileSize(const std::string& filename);
 
-bool CreateDirectory(std::string_view dirname);
+bool CreateDirectory(const std::string_view dirname);
 
-bool RemoveDirectory(std::string_view dirname, bool removeAll = true);
+bool RemoveDirectory(const std::string_view dirname, bool removeAll = true);
 
 const std::string LoadFile(const std::string& path);
 
-std::string LinkFolderAndFile(std::string_view folderPath, std::string_view filePath);
+std::string LinkFolderAndFile(const std::string_view folderPath, const std::string_view filePath);
 
-std::string GetFilenameExtension(std::string_view path);
+std::string GetFilenameExtension(const std::string_view path);
 
-std::string GetFileParentPath(std::string_view path);
+std::string GetFileParentPath(const std::string_view path);
 }
