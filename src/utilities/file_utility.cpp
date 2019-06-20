@@ -46,20 +46,32 @@ namespace neko
 {
 bool FileExists(const std::string_view filename)
 {
+#ifdef __APPLE__
+    const fs::path p = std::string(filename);
+#else
     const fs::path p = filename;
+#endif
     return fs::exists(p);
 }
 
 bool IsRegularFile(const std::string_view filename)
 {
+#ifdef __APPLE__
+    const fs::path p = std::string(filename);
+#else
     const fs::path p = filename;
+#endif
     return fs::is_regular_file(p);
 
 }
 
 bool IsDirectory(const std::string_view filename)
 {
+#ifdef __APPLE__
+    const fs::path p = std::string(filename);
+#else
     const fs::path p = filename;
+#endif
     return fs::is_directory(p);
 }
 
@@ -68,7 +80,11 @@ void IterateDirectory(const std::string_view dirname, std::function<void(const s
 
     if (IsDirectory(dirname))
     {
+#ifdef __APPLE__
+        for (auto& p : fs::directory_iterator(std::string(dirname)))
+#else
         for (auto& p : fs::directory_iterator(dirname))
+#endif
         {
             func(p.path().generic_string());
         }
@@ -83,18 +99,30 @@ std::ifstream::pos_type CalculateFileSize(const std::string& filename)
 
 bool CreateDirectory(const std::string_view dirname)
 {
+#ifdef __APPLE__
+    return fs::create_directory(std::string(dirname));
+#else
     return fs::create_directory(dirname);
+#endif
 }
 
 bool RemoveDirectory(const std::string_view dirname, bool removeAll)
 {
     if (removeAll)
     {
+#ifdef  __APPLE__
+        return fs::remove_all(std::string(dirname));
+#else
         return fs::remove_all(dirname);
+#endif
     }
     else
     {
+#ifdef __APPLE__
+        return fs::remove(std::string(dirname));
+#else
         return fs::remove(dirname);
+#endif
     }
 }
 
@@ -125,14 +153,23 @@ std::string GetFilenameExtension(const std::string_view path)
 
 std::string GetFileParentPath(const std::string_view path)
 {
+#ifdef __APPLE__
+    fs::path p = std::string(path);
+#else
     fs::path p = path;
+#endif
     return p.parent_path().string();
 }
 
 std::string LinkFolderAndFile(const std::string_view folderPath, const std::string_view filePath)
 {
+#ifdef __APPLE__
+    fs::path f = std::string(folderPath);
+    fs::path p = std::string(filePath);
+#else
     fs::path f = folderPath;
     fs::path p = filePath;
+#endif
     fs::path l = f / p;
     return l.string();
 }
