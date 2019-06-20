@@ -36,7 +36,9 @@
 namespace neko
 {
 class SpriteManager;
-
+/**
+ * \brief 2d animation data used to switch between the textures at the given frequency, used in Init and Update
+ */
 struct SpriteAnimDef
 {
     std::string name = "";
@@ -44,14 +46,18 @@ struct SpriteAnimDef
     std::vector<int> imgIndexes;
     std::vector<sf::IntRect> imgRect; //allow to have subtexture
 };
-
+/**
+ * \brief 2d animator description file used to initialize an animator, only used on Init
+ */
 struct SpriteAnimatorDef
 {
     int spriteIndex = -1;
     sf::Texture** textures = nullptr;
     size_t textureCount = 0;
 };
-
+/**
+ * \brief manage an animator with several animations (SpriteAnimDef)
+ */
 class SpriteAnimator
 {
 public:
@@ -73,12 +79,14 @@ private:
     int currentIndex = 0;
     std::vector<sf::Texture*> textures;
 };
-
+/**
+ * \brief manages animators
+ */
 class AnimatorManager
 {
 public:
     AnimatorManager();
-
+//TODO should return an index
     SpriteAnimator& CreateSpriteAnimator();
 
     void Update(SpriteManager& spriteManager, float dt);

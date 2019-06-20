@@ -33,6 +33,9 @@ namespace neko
 
 class MainEngine;
 
+/**
+ * \brief class used in the void* of box2d fixture to be able to get info from contact and collisions
+ */
 struct Collider
 {
     b2Fixture* fixture;
@@ -43,7 +46,9 @@ struct Collider
 #endif
 };
 
-
+/**
+ * \brief override the default box2d contact listener and communicate directly to the MainEngine
+ */
 class CollisionListener : public b2ContactListener
 {
 public:

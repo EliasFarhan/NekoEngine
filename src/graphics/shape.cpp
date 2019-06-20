@@ -35,20 +35,20 @@ ShapeManager::ShapeManager()
 }
 
 
-int ShapeManager::AddBox(const sf::Vector2f& pos, const sf::Vector2f& halfsize, const ShapeDef& shapeDef)
+uint32_t ShapeManager::AddBox(const sf::Vector2f& pos, const sf::Vector2f& halfSize, const ShapeDef& shapeDef)
 {
     sf::Vector2f points[4] =
     {
-        -halfsize,
-        sf::Vector2f(-halfsize.x, halfsize.y),
-        halfsize,
-        sf::Vector2f(halfsize.x, -halfsize.y)
+        -halfSize,
+        sf::Vector2f(-halfSize.x, halfSize.y),
+        halfSize,
+        sf::Vector2f(halfSize.x, -halfSize.y)
     };
     return AddPolygon(pos, points, 4, shapeDef);
 
 }
 
-int
+uint32_t
 ShapeManager::AddPolygon(const sf::Vector2f& pos, const sf::Vector2f* points, size_t pointNmb, const ShapeDef& shapeDef)
 {
     sf::ConvexShape newPolygon;
@@ -62,7 +62,7 @@ ShapeManager::AddPolygon(const sf::Vector2f& pos, const sf::Vector2f* points, si
     newPolygon.setOutlineColor(shapeDef.outlineColor);
     newPolygon.setOutlineThickness(shapeDef.outlineThickness);
 
-    const int index = convexShape[0].size();
+    const Index index = convexShape[0].size();
     convexShape[0].push_back(newPolygon);
     convexShape[1].push_back(newPolygon);
     return index;

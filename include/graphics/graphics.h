@@ -38,38 +38,70 @@ const size_t MAX_COMMAND_NMB = 1024;
 
 class MainEngine;
 
+/**
+ * \brief abstraction of a graphic command send to the render thread
+ */
 struct Command
 {
     virtual void Draw(sf::RenderTarget* renderTarget) = 0;
 };
 
+/**
+ * \brief specialization for SFML basic drawable type
+ */
 struct SfmlCommand : public Command
 {
+    /**
+     * \brief non owning raw pointer of an SFML Drawable stored in a graphic class with double buffering (SpriteManager, ShapeManager, etc...)
+     */
     sf::Drawable* drawable = nullptr;
 
     void Draw(sf::RenderTarget* renderTarget) override;
 };
-
+/**
+ * \brief specialization for SFML vertex array drawing type
+ */
 struct TilemapCommand : public Command
 {
     sf::Texture* texture = nullptr;
     sf::VertexArray* vertexArray = nullptr;
-    void Draw(sf::RenderTarget* renderTarget) override ;
+
+    void Draw(sf::RenderTarget* renderTarget) override;
 };
 
+/**
+ * \brief graphics manager run in a render thread by the MainEngine
+ */
 class GraphicsManager
 {
 public:
     GraphicsManager();
-
+//TODO change to non atomic to manage sync
     std::atomic<bool> isRendering = false;
     std::atomic<bool> isReady = false;
-
+    //TODO change to non atomic but manage with lock to sync
     std::atomic<unsigned int> frameIndex = 0;
-
+/**
+ * \brief called by the render loop when iterating through all the basic sfml commands
+ * Should not be called from engine thread
+ * @param drawable
+ */
     virtual void Draw(sf::Drawable& drawable);
+/**
+ * \brief called by the render loop when iterating through all the tilemap commands
+ * Should not be called from engine thread
+ * @param vertexArray
+ * @param texture
+ */
     virtual void Draw(sf::VertexArray* vertexArray, sf::Texture* texture);
-	virtual void SetView(sf::View view);
+/**
+ * \brief called from engine loop, changing the view for the next frame
+ * @param view
+ */
+    virtual void SetView(sf::View view);
+/**
+ * \brief run by MainEngine in the render thread
+ */
     virtual void RenderLoop();
 
     Editor editor;
@@ -78,7 +110,7 @@ protected:
     std::array<SfmlCommand, MAX_COMMAND_NMB> commands[2];
     std::array<TilemapCommand, MAX_COMMAND_NMB> tileCommands[2];
     std::array<Command*, MAX_COMMAND_NMB> commandBuffers[2];
-	sf::View views[2];
+    sf::View views[2];
     size_t renderLength = 0;
     size_t nextRenderLength = 0;
 };

@@ -38,6 +38,10 @@ struct Remotery;
 namespace neko
 {
 struct Collider;
+
+/**
+ * \brief store various Engine constant or global values
+ */
 struct Configuration
 {
     sf::Vector2u screenSize = sf::Vector2u(1280, 720);
@@ -50,6 +54,10 @@ struct Configuration
     bool vSync = true;
     unsigned int framerateLimit = 0u;
 };
+
+/**
+ * \brief main loop engine class, it runs its own graphics manager thread and manage the window events
+ */
 
 class MainEngine : public sf::NonCopyable, public System
 {
@@ -79,14 +87,16 @@ public:
 
     static MainEngine* GetInstance();
 
+    //TODO change to non atomic and to avoid data race with render thread
     std::atomic<bool> isRunning = false;
+    //TODO find a way with frameIndex, condition_variable to sync with render thread without using atomic
     std::atomic<bool> isReady = false;
     sf::Vector2u renderTargetSize;
 
     //used to sync with the render thread
     std::condition_variable condSyncRender;
     std::mutex renderMutex;
-
+    //TODO change using lock with frame initialization outside of graphics manager context
     std::atomic<unsigned> frameIndex = 0;
 
     sf::Time dt;
@@ -99,7 +109,9 @@ protected:
 
 	KeyboardManager keyboardManager;
 	MouseManager mouseManager;
-
+/**
+ * static instance use to access the engine from anywhere, because I don't want to have thousands of MainEngine& ref
+ */
     static MainEngine* instance;
 };
 

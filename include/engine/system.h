@@ -26,6 +26,10 @@
 namespace neko
 {
 
+/**
+ * \brief abstraction of System in the Entity-Component-System engine, movable non-copyable.
+ * Needs to implement Init, Update and Destroy
+ */
 class System
 {
 public:
