@@ -42,7 +42,7 @@ public:
 
     int AddSprite(const sf::Texture* texture);
 
-    sf::Sprite* GetSpriteAt(int spriteIndex);
+    sf::Sprite* GetSpriteAt(unsigned int spriteIndex);
 
     void CopyTransformPosition(Transform2dManager& transformManager, size_t start = 0, size_t length = InitEntityNmb);
 

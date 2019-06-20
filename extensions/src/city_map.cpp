@@ -62,7 +62,7 @@ void CityBuilderMap::Init()
     {
         sf::Vector2i pos = sf::Vector2i(0, (rand() % (city.mapSize.y / 3)) + city.mapSize.y / 3);
 
-        for (int x = 0; x < city.mapSize.x; x++)
+        for (unsigned int x = 0; x < city.mapSize.x; x++)
         {
             pos.x = x;
             CityElement element{};
@@ -77,7 +77,7 @@ void CityBuilderMap::Init()
         const int railDownX = city.mapSize.x - ((rand() % (city.mapSize.x / 6)) + city.mapSize.x / 6);
         pos.x = 0;
         pos.y -= 2;
-        for (int x = 0; x < city.mapSize.x; x++)
+        for (int x = 0; x < static_cast<int>(city.mapSize.x); x++)
         {
             pos.x = x;
 
@@ -115,7 +115,7 @@ void CityBuilderMap::Init()
             }
             else if(x == railDownX)
             {
-                for(int y = pos.y; y < city.mapSize.y;y++)
+                for (unsigned int y = pos.y; y < city.mapSize.y; y++)
                 {
                     element.position = sf::Vector2i(railDownX, y);
                     element.size = sf::Vector2u(1, 1);
@@ -160,9 +160,9 @@ void CityBuilderMap::Init()
                         float(pos.y) / city.mapSize.y * city.perlinFreq);
                 auto result = std::find_if(obstacles.begin(), obstacles.end(), [&pos](CityElement& elem)
                 {
-                    for (int dx = 0; dx < elem.size.x; dx++)
+                    for (unsigned int dx = 0; dx < elem.size.x; dx++)
                     {
-                        for (int dy = 0; dy < elem.size.y; dy++)
+                        for (int dy = 0; dy < static_cast<int>(elem.size.y); dy++)
                         {
                             if (elem.position + sf::Vector2i(dx, -dy) == pos)
                                 return true;

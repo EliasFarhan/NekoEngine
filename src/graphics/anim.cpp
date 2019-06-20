@@ -67,7 +67,7 @@ void SpriteAnimator::Init(json& animatorJson, TextureManager& textureManager, in
 void SpriteAnimator::Init(SpriteAnimatorDef& spriteAnimatorDef, SpriteAnimDef* animsDef, size_t animsCount)
 {
     anims.resize(animsCount);
-    for (int i = 0; i < animsCount; i++)
+    for (unsigned int i = 0; i < animsCount; i++)
     {
         anims[i] = animsDef[i];
     }
@@ -79,7 +79,7 @@ void SpriteAnimator::Init(SpriteAnimatorDef& spriteAnimatorDef, SpriteAnimDef* a
 
 void SpriteAnimator::PlayAnim(const std::string& animName)
 {
-    for (int i = 0; i < anims.size(); i++)
+    for (unsigned int i = 0; i < anims.size(); i++)
     {
         auto& anim = anims[i];
         if (anim.name == animName)
@@ -91,9 +91,9 @@ void SpriteAnimator::PlayAnim(const std::string& animName)
     logDebug("Cannot play anim: " + animName);
 }
 
-void SpriteAnimator::PlayAnim(int animIndex)
+void SpriteAnimator::PlayAnim(unsigned int animIndex)
 {
-    if (animIndex >= anims.size())
+    if (animIndex >= (unsigned int)anims.size())
     {
         logDebug("[Error] Invalid anim index");
         return;
@@ -113,7 +113,7 @@ void SpriteAnimator::Update(sf::Sprite* sprite, float dt)
         if (animTimer.IsOver())
         {
             currentIndex++;
-            if (currentIndex >= currentAnim->imgIndexes.size())
+            if (currentIndex >= static_cast<int>(currentAnim->imgIndexes.size()))
             {
                 currentIndex = 0;
             }
@@ -150,7 +150,7 @@ void AnimatorManager::Update(SpriteManager& spriteManager, float dt)
     }
 }
 
-SpriteAnimator* AnimatorManager::GetAnimatorAt(int i)
+SpriteAnimator* AnimatorManager::GetAnimatorAt(unsigned int i)
 {
     if (i >= animators.size())
         return nullptr;

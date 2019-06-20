@@ -91,7 +91,7 @@ void SpriteManager::PushCommands(GraphicsManager* graphicsManager, size_t start,
     }
 }
 
-sf::Sprite* SpriteManager::GetSpriteAt(int spriteIndex)
+sf::Sprite* SpriteManager::GetSpriteAt(unsigned int spriteIndex)
 {
     const int frameIndex = MainEngine::GetInstance()->frameIndex % 2;
     if (spriteIndex >= sprites[frameIndex].size())

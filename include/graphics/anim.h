@@ -61,7 +61,7 @@ public:
 
     void PlayAnim(const std::string& animName);
 
-    void PlayAnim(int animIndex);
+    void PlayAnim(unsigned int animIndex);
 
     void Update(sf::Sprite* sprite, float dt);
 
@@ -83,7 +83,7 @@ public:
 
     void Update(SpriteManager& spriteManager, float dt);
 
-    SpriteAnimator* GetAnimatorAt(int i);
+    SpriteAnimator* GetAnimatorAt(unsigned int i);
 
 private:
     std::vector<SpriteAnimator> animators;
