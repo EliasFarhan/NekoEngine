@@ -39,21 +39,26 @@ struct ShapeDef
     float outlineThickness = 0.0f;
 };
 
+/**
+ * \brief managing graphic shape from the SFML API
+ */
 class ShapeManager
 {
 public:
     ShapeManager();
 
-    int AddBox(const sf::Vector2f& pos, const sf::Vector2f& halfSize, const ShapeDef& shapeDef);
+    Index AddBox(const sf::Vector2f& pos, const sf::Vector2f& halfSize, const ShapeDef& shapeDef);
 
-    int AddPolygon(const sf::Vector2f& pos, const sf::Vector2f* points, size_t pointNmb, const ShapeDef& shapeDef);
+    Index AddPolygon(const sf::Vector2f& pos, const sf::Vector2f* points, size_t pointNmb, const ShapeDef& shapeDef);
 
     void CopyPosition(const sf::Vector2f* positions, size_t start, size_t length);
 
     void PushCommands(GraphicsManager* graphicsManager, size_t start = 0, size_t length = InitEntityNmb);
 
 private:
-    //for double buffer
+    /**
+     * \brief storing the shape and putting two vectors for double buffering with the render thread
+     */
     std::vector<sf::ConvexShape> convexShape[2];
 };
 

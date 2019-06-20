@@ -35,6 +35,9 @@ namespace neko
 {
 struct Configuration;
 
+/**
+ * \brief system using box2d to manage physics
+ */
 class Physics2dManager : public System
 {
 public:
@@ -52,6 +55,9 @@ public:
     std::vector<Collider> colliders;
     Configuration* config = nullptr;
     CollisionListener collisionListener;
+    /**
+     * \brief value used to define how many pixels per meter to translate from graphics to physics
+     */
     static float pixelPerMeter;
 };
 

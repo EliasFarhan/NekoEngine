@@ -26,7 +26,7 @@
 
 #include <vector>
 #include <SFML/Graphics/Sprite.hpp>
-#include "engine/globals.h"
+#include <engine/globals.h>
 
 
 namespace neko
@@ -35,12 +35,16 @@ class Transform2dManager;
 
 class GraphicsManager;
 
+/**
+ * \brief store the sfml sprite and allow to copy transform from Transform2dManager,
+ * but transform need to be at the same index as sprite in an Entity Component System way
+ */
 class SpriteManager
 {
 public:
     SpriteManager();
 
-    int AddSprite(const sf::Texture* texture);
+    Index AddSprite(const sf::Texture* texture);
 
     sf::Sprite* GetSpriteAt(unsigned int spriteIndex);
 
@@ -49,10 +53,18 @@ public:
     void CopyTransformScales(Transform2dManager& transformManager, size_t start = 0, size_t length = InitEntityNmb);
 
     void CopyTransformAngles(Transform2dManager& transformManager, size_t start = 0, size_t length = InitEntityNmb);
-
+/**
+ * \brief push basic graphic command to the render thread to be processed next frame
+ * @param graphicsManager
+ * @param start
+ * @param length
+ */
     void PushCommands(GraphicsManager* graphicsManager, size_t start = 0, size_t length = InitEntityNmb);
 
 private:
+    /**
+     * \brief store the sfml sprites with two vectors for double buffering with the render thread
+     */
     std::vector<sf::Sprite> sprites[2];
 };
 }

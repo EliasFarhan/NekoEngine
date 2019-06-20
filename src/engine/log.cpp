@@ -77,7 +77,6 @@ void DebugLogger::logLoop()
 {
     while (isRunning)
     {
-
         {
             std::unique_lock<std::mutex> lock(msgMutex);
             newMsgSync.wait(lock);
@@ -108,13 +107,13 @@ void initLog()
 void logDebug(std::string msg)
 {
     debugLogger->write(msg);
-
 }
 
 void destroyLog()
 {
+
+    debugLogger->isRunning = false;
     debugLogger->newMsgSync.notify_all();
-	debugLogger->isRunning = false;
     {
 		std::unique_lock<std::mutex> lock(debugLogger->msgMutex);
 		debugLogger->newMsgSync.wait(lock);

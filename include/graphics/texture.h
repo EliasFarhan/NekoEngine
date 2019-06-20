@@ -35,7 +35,7 @@ public:
     TextureManager();
 
     bool HasValidExtension(const std::string& filename);
-
+//TODO should return an index to avoid pointer invalidation
     sf::Texture* LoadTexture(std::string filename);
 
     std::vector<std::string> m_TexturePaths;

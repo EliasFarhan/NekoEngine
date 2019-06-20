@@ -39,9 +39,18 @@ struct KeyPressedStatus
     bool keyPressed;
 };
 
+/**
+ * \brief manages the inputs from the keyboards through the window events.
+ * It is part of the MainEngine class by default
+ */
+
 class KeyboardManager 
 {
 public:
+    /**
+     * \brief Should be called each frame before retrieving the new window event
+     * it is called by MainEngine::Update
+     */
 	void ClearKeys();
 
     bool IsKeyHeld(sf::Keyboard::Key key) const;
@@ -50,7 +59,17 @@ public:
 
     bool IsKeyUp(sf::Keyboard::Key key) const;
 
+    /**
+     * \brief Should be called for each PressKeyEvent
+     * it is called by MainEngine::Update
+     * @param key
+     */
     void AddPressKey(sf::Keyboard::Key key);
+    /**
+     * \brief Should be called for each ReleaseKeyEvent
+     * it is called by MainEngine::Update
+     * @param key
+     */
     void AddReleaseKey(sf::Keyboard::Key key);
 
 private:
@@ -59,13 +78,26 @@ private:
     std::array<bool, sf::Keyboard::KeyCount> keyStatusArray;
 };
 
+/**
+ * \brief manages the position of the mouse as well as the wheel state and button press
+ * It is part of the MainEngine class by default
+ */
 class MouseManager
 {
 public:
 	sf::Vector2i GetPosition() const;
 	sf::Vector2i GetLocalPosition(sf::Window& window) const;
 	bool IsButtonPressed(sf::Mouse::Button button) const;
+	/**
+	 *  \brief should be called for each WheelScrollEvent
+	 *  it is called by MainEngine::Update
+	 * @param e
+	 */
 	void OnWheelScrolled(const sf::Event& e);
+	/**
+	 * \brief Should be called before retrieving MainEngine::Update
+	 * it is called by MainEngine::Update
+	 */
 	void ClearFrameData();
 	float GetWheelDelta() const;
 	sf::Vector2i GetMouseDelta() const;

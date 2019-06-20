@@ -33,6 +33,9 @@ using EntityMask = unsigned;
 enum class ComponentType : unsigned;
 const Entity INVALID_ENTITY = 0U;
 
+/**
+ * \brief Used in an Entity-Component-System to store all entities and what components they have
+ */
 class EntityManager
 {
 public:

@@ -32,6 +32,9 @@ namespace neko
 {
 class Physics2dManager;
 
+/**
+ * \brief manage the graphic transform of any kind of objects in a SOA fashions
+ */
 class Transform2dManager
 {
 public:

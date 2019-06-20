@@ -33,11 +33,16 @@
 namespace neko
 {
 class GraphicsManager;
-
+/**
+ * \brief simple abstraction for one tilesheet with a tilemap texture with a double buffered vertex array
+ */
 struct Tilesheet
 {
 	sf::Texture* texture = nullptr;
-	sf::VertexArray tilemap[2]; //for double buffering
+	/**
+	 * \brief vertex array with 2 vectors for double buffering with the render thread
+	 */
+	sf::VertexArray tilemap[2];
 };
 
 class Tilemap
@@ -46,8 +51,8 @@ public:
     virtual void PushCommand(GraphicsManager* graphicsManager) = 0;
 };
 
-/*
- * Abstraction of Tiled tilesheets
+/**
+ * \brief Abstraction of Tiled (https://www.mapeditor.org/) tilesheets
  */
 struct Tiledsheet : public Tilesheet
 {

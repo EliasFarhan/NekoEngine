@@ -7,6 +7,9 @@
 namespace neko
 {
 class GraphicsManager;
+/**
+ * \brief used in the graphics manager to show informations from the engine/game/systems in used
+ */
 class Editor : public System
 {
 public:
