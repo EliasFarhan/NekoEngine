@@ -25,6 +25,8 @@ if(UNIX AND NOT APPLE)
 			SET (CMAKE_RANLIB  "${LLVM_ROOT}/bin/llvm-ranlib")
 		else()
 			set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address")
+			LIST(APPEND Neko_LIBRARIES
+					stdc++fs)
 		endif()
 
 	elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
