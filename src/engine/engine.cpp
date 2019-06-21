@@ -124,6 +124,7 @@ void MainEngine::Init()
 
 void MainEngine::Update()
 {
+	
 }
 
 void MainEngine::Destroy()

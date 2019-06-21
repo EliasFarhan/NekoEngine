@@ -91,6 +91,7 @@ public:
 			mainPlayerCollider.shapeIndex = mainPlayerShapeIndex;
 #endif
 			fixtureDef[0].shape = &playerBox[0];
+			fixtureDef[0].friction = 0.0f;
 			mainPlayerCollider.entity = playerData.playerEntity;
 			physicsManager.colliders.push_back(mainPlayerCollider);
 
@@ -156,6 +157,7 @@ public:
 		}
 		physicsTimer.period = config.physicsTimeStep;
 		physicsTimer.Reset();
+
 	}
 
 
@@ -190,7 +192,7 @@ public:
                     logDebug(oss.str());
                 }
 				const auto playerVelocity = playerData.playerBody->GetLinearVelocity();
-				playerData.playerBody->SetLinearVelocity(b2Vec2(move*moveVelocity, playerVelocity.y));
+ 				playerData.playerBody->SetLinearVelocity(b2Vec2(move*moveVelocity, playerVelocity.y));
 			}
 
 			transformManager.CopyPositionsFromPhysics2d(physicsManager, 0, 1);
@@ -254,26 +256,12 @@ public:
 		}
 	}
 
-    void OnEvent(sf::Event& event) override
-    {
-        MainEngine::OnEvent(event);
-        if(event.type == sf::Event::KeyPressed)
-        {
-            keyboardManager.AddPressKey(event.key.code);
-        }
-        if(event.type == sf::Event::KeyReleased)
-        {
-            keyboardManager.AddReleaseKey(event.key.code);
-        }
-    }
-
 protected:
 	neko::Timer physicsTimer{0.0f,0.0f};
 	neko::SpriteManager spriteManager;
 	neko::TextureManager textureManager;
 	neko::Transform2dManager transformManager;
 	neko::Physics2dManager physicsManager;
-	neko::KeyboardManager keyboardManager;
     neko::ShapeManager shapeManager;
 	PlayerData playerData = {};
 	static const size_t platformsNmb = 3;

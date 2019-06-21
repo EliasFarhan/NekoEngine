@@ -25,6 +25,8 @@
 #include <physics/physics.h>
 #include <engine/engine.h>
 #include "engine/globals.h"
+#include "engine/log.h"
+#include <sstream>
 
 namespace neko
 {
@@ -36,7 +38,7 @@ void Physics2dManager::Init()
 	MainEngine* engine = MainEngine::GetInstance();
 	config = &engine->config;
 	pixelPerMeter = config->pixelPerMeter;
-	world = new b2World(config->gravity);
+	world = std::make_unique<b2World>(config->gravity);
 	world->SetContactListener(&collisionListener);
 	colliders.reserve(InitEntityNmb);
 }
@@ -48,7 +50,7 @@ void Physics2dManager::Update()
 
 void Physics2dManager::Destroy()
 {
-	delete world;
+	world = nullptr;
 }
 
 b2Body* Physics2dManager::CreateBody(b2BodyDef& bodyDef, b2FixtureDef* fixturesDef, size_t fixturesNmb)
@@ -64,6 +66,15 @@ b2Body* Physics2dManager::CreateBody(b2BodyDef& bodyDef, b2FixtureDef* fixturesD
 		auto* fixture = body->CreateFixture(&fixturesDef[i]);
 		collider->fixture = fixture;
 	}
+#ifdef __neko_dbg__
+	{
+		std::ostringstream oss;
+		oss << "Body initialization: (" << body->GetPosition().x << ", " << body->GetPosition().y << "),\n("<<
+			body->GetLinearVelocity().x<<", "<<body->GetLinearVelocity().y<<")";
+		logDebug(oss.str());
+
+	}
+#endif
 	return body;
 }
 

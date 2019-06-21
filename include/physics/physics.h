@@ -50,7 +50,7 @@ public:
 
     b2Body* CreateBody(b2BodyDef& bodyDef, b2FixtureDef* fixturesDef, size_t fixturesNmb);
 
-    b2World* world = nullptr;
+    std::unique_ptr<b2World> world = nullptr;
     std::vector<b2Body*> bodies;
     std::vector<Collider> colliders;
     Configuration* config = nullptr;

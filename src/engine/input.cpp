@@ -32,6 +32,11 @@
 
 namespace neko
 {
+KeyboardManager::KeyboardManager()
+{
+	keyStatusArray.fill(false);
+}
+
 void KeyboardManager::ClearKeys()
 {
     rmt_ScopedCPUSample(KeyboardLoop, 0)

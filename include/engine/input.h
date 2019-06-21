@@ -47,6 +47,7 @@ struct KeyPressedStatus
 class KeyboardManager 
 {
 public:
+	KeyboardManager();
     /**
      * \brief Should be called each frame before retrieving the new window event
      * it is called by MainEngine::Update
