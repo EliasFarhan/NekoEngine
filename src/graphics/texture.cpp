@@ -95,8 +95,8 @@ sf::Texture* TextureManager::LoadTexture(std::string filename)
         }
         else
         {
-            auto& texture = m_Textures[textureIndex];
-            if (!texture.loadFromFile(filename))
+            auto* texture = &m_Textures[textureIndex];
+            if (!texture->loadFromFile(filename))
             {
                 std::ostringstream oss;
                 oss << "[ERROR] Could not load texture file: " << filename;
@@ -104,13 +104,12 @@ sf::Texture* TextureManager::LoadTexture(std::string filename)
                 return nullptr;
             }
             m_TextureIdsRefCounts[textureIndex] = 1U;
-            return &texture;
+            return texture;
         }
     }
     //Texture was never loaded
     if (FileExists(filename))
     {
-        auto newIndex = m_Textures.size();
         auto texture = sf::Texture();
         if (!texture.loadFromFile(filename))
         {
@@ -119,7 +118,7 @@ sf::Texture* TextureManager::LoadTexture(std::string filename)
             logDebug(oss.str());
             return nullptr;
         }
-        m_Textures.push_back(texture);
+        m_Textures.emplace_back(texture);
         m_TexturePaths.push_back(filename);
         m_TextureIdsRefCounts.push_back(1U);
 
