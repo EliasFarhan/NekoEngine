@@ -28,6 +28,7 @@
 
 #include <graphics/tilemap.h>
 #include <SFML/Graphics/Rect.hpp>
+#include <SFML/Graphics/View.hpp>
 
 namespace neko
 {
@@ -83,18 +84,24 @@ class CityBuilderTilemap : public neko::Tilemap
 {
 public:
 	void Init(TextureManager& textureManager);
-	void UpdateTilemap(CityBuilderMap& cityBuilderMap, CityTilesheetType updatedCityTileType = CityTilesheetType::LENGTH);
+
+	void UpdateTilemap(CityBuilderMap& cityBuilderMap, sf::View mainView,
+                       CityTilesheetType updatedCityTileType = CityTilesheetType::LENGTH);
 	void PushCommand(GraphicsManager* graphicsManager) override;
 protected:
 	void AddNewTile(const sf::Vector2f position, const sf::Vector2f size, const sf::FloatRect rect,
                     const sf::Vector2f center, CityTilesheetType updatedCityTileType, bool flipX,
                     bool flipY, bool rotate90);
-	std::array<Tilesheet, unsigned(CityTilesheetType::LENGTH)> tilesheets;
-    std::array<sf::FloatRect, size_t(CityTileType::LENGTH)> textureRects;
-    std::array<sf::Vector2f, size_t(CityTileType::LENGTH)> rectCenter;
-	const std::string cityTextureName = "data/tilemap/CuteCityBuilder.png";
-	const std::string carTextureName = "data/tilemap/car.png";
-	const sf::Vector2i tileSize = sf::Vector2i(20, 20);
+	/**
+	 * \brief use for tile culling
+	 */
+	sf::FloatRect windowView_{};
+	std::array<Tilesheet, unsigned(CityTilesheetType::LENGTH)> tilesheets_;
+    std::array<sf::FloatRect, size_t(CityTileType::LENGTH)> textureRects_;
+    std::array<sf::Vector2f, size_t(CityTileType::LENGTH)> rectCenter_;
+	const std::string cityTextureName_ = "data/tilemap/CuteCityBuilder.png";
+	const std::string carTextureName_ = "data/tilemap/car.png";
+	const sf::Vector2i tileSize_ = sf::Vector2i(20, 20);
 
 
 };

@@ -33,11 +33,6 @@
 
 namespace neko
 {
-struct KeyPressedStatus
-{
-    bool previousKeyPressed;
-    bool keyPressed;
-};
 
 /**
  * \brief manages the inputs from the keyboards through the window events.
@@ -74,9 +69,18 @@ public:
     void AddReleaseKey(sf::Keyboard::Key key);
 
 private:
-    std::vector<sf::Keyboard::Key> pressedKey;
-    std::vector<sf::Keyboard::Key> releasedKey;
-    std::array<bool, sf::Keyboard::KeyCount> keyStatusArray;
+    /**
+     * \brief list of current frame pressed key
+     */
+    std::vector<sf::Keyboard::Key> pressedKeys_;
+    /**
+     * \brief list of current frame released key
+     */
+    std::vector<sf::Keyboard::Key> releasedKeys_;
+    /**
+     * \brief store the status of each key to check if
+     */
+    std::array<bool, sf::Keyboard::KeyCount> keyStatusArray_;
 };
 
 /**
@@ -103,8 +107,8 @@ public:
 	float GetWheelDelta() const;
 	sf::Vector2i GetMouseDelta() const;
 private:
-	float wheelDelta = 0.0f;
-	sf::Vector2i previousMousePos = sf::Vector2i(0, 0);
-	sf::Vector2i currentMousePos = sf::Vector2i(0, 0);
+	float wheelDelta_ = 0.0f;
+	sf::Vector2i previousMousePos_ = sf::Vector2i(0, 0);
+	sf::Vector2i currentMousePos_ = sf::Vector2i(0, 0);
 };
 }

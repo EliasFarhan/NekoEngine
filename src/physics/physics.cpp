@@ -36,31 +36,31 @@ float Physics2dManager::pixelPerMeter = 100.0f;
 void Physics2dManager::Init()
 {
 	MainEngine* engine = MainEngine::GetInstance();
-	config = &engine->config;
-	pixelPerMeter = config->pixelPerMeter;
-	world = std::make_unique<b2World>(config->gravity);
-	world->SetContactListener(&collisionListener);
-	colliders.reserve(InitEntityNmb);
+	config_ = &engine->config;
+	pixelPerMeter = config_->pixelPerMeter;
+	world_ = std::make_unique<b2World>(config_->gravity);
+	world_->SetContactListener(&collisionListener_);
+	colliders_.reserve(InitEntityNmb);
 }
 
 void Physics2dManager::Update()
 {
-	world->Step(config->physicsTimeStep, config->velocityIterations, config->positionIterations);
+	world_->Step(config_->physicsTimeStep, config_->velocityIterations, config_->positionIterations);
 }
 
 void Physics2dManager::Destroy()
 {
-	world = nullptr;
+	world_ = nullptr;
 }
 
 b2Body* Physics2dManager::CreateBody(b2BodyDef& bodyDef, b2FixtureDef* fixturesDef, size_t fixturesNmb)
 {
-	auto* body = world->CreateBody(&bodyDef);
-	bodies.push_back(body);
-	const auto colliderOffset = colliders.size() - fixturesNmb;
+	auto* body = world_->CreateBody(&bodyDef);
+	bodies_.push_back(body);
+	const auto colliderOffset = colliders_.size() - fixturesNmb;
 	for(auto i = 0u; i < fixturesNmb;i++)
 	{
-		auto* collider = &colliders[colliderOffset+i];
+		auto* collider = &colliders_[colliderOffset+i];
 		collider->body = body;
 		fixturesDef[i].userData = collider;
 		auto* fixture = body->CreateFixture(&fixturesDef[i]);
@@ -76,6 +76,16 @@ b2Body* Physics2dManager::CreateBody(b2BodyDef& bodyDef, b2FixtureDef* fixturesD
 	}
 #endif
 	return body;
+}
+
+void Physics2dManager::AddCollider(const Collider& collider)
+{
+    colliders_.push_back(collider);
+}
+
+b2Body* Physics2dManager::GetBodyAt(Index i)
+{
+    return bodies_[i];
 }
 
 float pixel2meter(float pixel)

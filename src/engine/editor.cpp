@@ -17,19 +17,19 @@ void Editor::Init()
 void Editor::Update()
 {
     auto dt = MainEngine::GetInstance()->dt;
-    const int frameIndex = graphicsManager->frameIndex%2;
-    ImGui::SFML::Update(*renderWindow, dt);
+    const int frameIndex = graphicsManager_->frameIndex%2;
+    ImGui::SFML::Update(*renderWindow_, dt);
 
     ImGui::Begin("Inspector");
     //TODO Draw inspector data
-    for(auto& inspectorData : inspectorValues[frameIndex])
+    for(auto& inspectorData : inspectorValues_[frameIndex])
     {
         ImGui::LabelText(inspectorData.first.c_str(), inspectorData.second.c_str());
     }
     ImGui::End();
-    inspectorValues[frameIndex].clear();
+    inspectorValues_[frameIndex].clear();
 
-    ImGui::SFML::Render(*renderWindow);
+    ImGui::SFML::Render(*renderWindow_);
 }
 
 void Editor::Destroy()
@@ -40,6 +40,6 @@ void Editor::Destroy()
 void Editor::AddInspectorInfo(const std::string_view name, const std::string_view value)
 {
     const int frameIndex = MainEngine::GetInstance()->frameIndex%2;
-    inspectorValues[frameIndex].push_back(std::pair<std::string, std::string>(name, value));
+    inspectorValues_[frameIndex].push_back(std::pair<std::string, std::string>(name, value));
 }
 }

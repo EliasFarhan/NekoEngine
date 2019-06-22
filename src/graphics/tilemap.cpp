@@ -60,7 +60,7 @@ void TiledMap::Init(const std::string& tilemapPath, TextureManager& textureManag
 
         tileSheet.tilemap[0].setPrimitiveType(sf::Triangles);
         tileSheet.tilemap[1].setPrimitiveType(sf::Triangles);
-        tileSheets.push_back(tileSheet);
+        tileSheets_.push_back(tileSheet);
     }
 
     for (auto& layer : tileMapJson["layers"])
@@ -76,7 +76,7 @@ void TiledMap::Init(const std::string& tilemapPath, TextureManager& textureManag
 
                 unsigned tile = layer["data"][i];
                 Tiledsheet* currentTilesheet = nullptr;
-                for (auto& tilesheet : tileSheets)
+                for (auto& tilesheet : tileSheets_)
                 {
                     if (tile >= tilesheet.firstId && tile < tilesheet.firstId + tilesheet.tileNmb)
                     {
@@ -137,7 +137,7 @@ void TiledMap::Init(const std::string& tilemapPath, TextureManager& textureManag
                     fixtureDef.shape = &platformBox;
                     neko::Collider boxCollider;
                     boxCollider.entity =2;
-                    physics2DManager->colliders.push_back(boxCollider);
+                    physics2DManager->colliders_.push_back(boxCollider);
                     physics2DManager->CreateBody(bodyDef, &fixtureDef, 1);
 
                 }
@@ -152,7 +152,7 @@ void TiledMap::PushCommand(GraphicsManager* graphicsManager)
 {
     rmt_ScopedCPUSample(PushTilemapCommands, 0)
     const int frameIndex = MainEngine::GetInstance()->frameIndex % 2;
-    for (auto& tilesheet: tileSheets)
+    for (auto& tilesheet: tileSheets_)
     {
 		// TODO probably move the graphics manager to handle share_ptr also.
         graphicsManager->Draw(&tilesheet.tilemap[frameIndex], tilesheet.texture.get());

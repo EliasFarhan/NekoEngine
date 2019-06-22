@@ -34,41 +34,41 @@ namespace neko
 {
 KeyboardManager::KeyboardManager()
 {
-	keyStatusArray.fill(false);
+	keyStatusArray_.fill(false);
 }
 
 void KeyboardManager::ClearKeys()
 {
     rmt_ScopedCPUSample(KeyboardLoop, 0)
-    pressedKey.clear();
-    releasedKey.clear();
+    pressedKeys_.clear();
+    releasedKeys_.clear();
 }
 
 bool KeyboardManager::IsKeyHeld(sf::Keyboard::Key key) const
 {
-    return keyStatusArray[int(key)];
+    return keyStatusArray_[int(key)];
 }
 
 bool KeyboardManager::IsKeyDown(sf::Keyboard::Key key) const
 {
-    return std::find(pressedKey.begin(), pressedKey.end(), key) != pressedKey.end();
+    return std::find(pressedKeys_.begin(), pressedKeys_.end(), key) != pressedKeys_.end();
 }
 
 bool KeyboardManager::IsKeyUp(sf::Keyboard::Key key) const
 {
-    return std::find(releasedKey.begin(), releasedKey.end(), key) != releasedKey.end();
+    return std::find(releasedKeys_.begin(), releasedKeys_.end(), key) != releasedKeys_.end();
 }
 
 void KeyboardManager::AddPressKey(sf::Keyboard::Key key)
 {
-    keyStatusArray[int(key)] = true;
-    pressedKey.push_back(key);
+    keyStatusArray_[int(key)] = true;
+    pressedKeys_.push_back(key);
 }
 
 void KeyboardManager::AddReleaseKey(sf::Keyboard::Key key)
 {
-    keyStatusArray[int(key)] = false;
-    releasedKey.push_back(key);
+    keyStatusArray_[int(key)] = false;
+    releasedKeys_.push_back(key);
 }
 
 sf::Vector2i MouseManager::GetPosition() const
@@ -89,24 +89,24 @@ bool MouseManager::IsButtonPressed(sf::Mouse::Button button) const
 
 void MouseManager::OnWheelScrolled(const sf::Event& e)
 {
-	wheelDelta = e.mouseWheelScroll.delta;
+	wheelDelta_ = e.mouseWheelScroll.delta;
 }
 
 void MouseManager::ClearFrameData()
 {
-	wheelDelta = 0.0f;
+	wheelDelta_ = 0.0f;
 
-	previousMousePos = currentMousePos;
-	currentMousePos = GetPosition();
+	previousMousePos_ = currentMousePos_;
+	currentMousePos_ = GetPosition();
 }
 
 float MouseManager::GetWheelDelta() const
 {
-	return wheelDelta;
+	return wheelDelta_;
 }
 
 sf::Vector2i MouseManager::GetMouseDelta() const
 {
-	return currentMousePos - previousMousePos;
+	return currentMousePos_ - previousMousePos_;
 }
 }

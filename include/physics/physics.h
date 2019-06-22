@@ -50,15 +50,24 @@ public:
 
     b2Body* CreateBody(b2BodyDef& bodyDef, b2FixtureDef* fixturesDef, size_t fixturesNmb);
 
-    std::unique_ptr<b2World> world = nullptr;
-    std::vector<b2Body*> bodies;
-    std::vector<Collider> colliders;
-    Configuration* config = nullptr;
-    CollisionListener collisionListener;
+
     /**
      * \brief value used to define how many pixels per meter to translate from graphics to physics
      */
     static float pixelPerMeter;
+
+    void AddCollider(const Collider& collider);
+
+    b2Body* GetBodyAt(Index i);
+
+private:
+    friend class Transform2dManager;
+    friend class TiledMap;
+    std::unique_ptr<b2World> world_ = nullptr;
+    std::vector<b2Body*> bodies_;
+    std::vector<Collider> colliders_;
+    Configuration* config_ = nullptr;
+    CollisionListener collisionListener_;
 };
 
 float meter2pixel(float v);

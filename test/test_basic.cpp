@@ -61,7 +61,7 @@ public:
     void Update() override
     {
         MainEngine::Update();
-        graphicsManager->Draw(sprite);
+        graphicsManager_->Draw(sprite);
 
     }
 
@@ -99,10 +99,10 @@ public:
 
             spriteManager.AddSprite(texture);
 
-            transformManager.positions.emplace_back(randomX(generator), randomY(generator));
+            transformManager.AddPosition(sf::Vector2f(randomX(generator), randomY(generator)));
             const float scale = randomScale(generator);
-            transformManager.scales.emplace_back(scale, scale);
-            transformManager.angles.push_back(randomAngle(generator));
+            transformManager.AddScale(sf::Vector2f(scale, scale));
+            transformManager.AddAngle(randomAngle(generator));
 
         }
 
@@ -114,7 +114,7 @@ public:
         spriteManager.CopyTransformPosition(transformManager);
         spriteManager.CopyTransformScales(transformManager);
         spriteManager.CopyTransformAngles(transformManager);
-        spriteManager.PushCommands(graphicsManager.get());
+        spriteManager.PushCommands(graphicsManager_.get());
     }
 
 protected:
@@ -140,7 +140,7 @@ public:
         MainEngine::Init();
 
         {
-            transformManager.positions.push_back(sf::Vector2f(renderWindow->getSize()) / 2.0f);
+            transformManager.AddPosition(sf::Vector2f(renderWindow->getSize()) / 2.0f);
             auto spriteIndex = spriteManager.AddSprite(nullptr);
             auto& animator = animatorManager.CreateSpriteAnimator();
 
@@ -200,24 +200,24 @@ public:
     void Update() override
     {
         MainEngine::Update();
-        if (keyboardManager.IsKeyDown(sf::Keyboard::Up))
+        if (keyboardManager_.IsKeyDown(sf::Keyboard::Up))
         {
             auto* animator = animatorManager.GetAnimatorAt(0);
             animator->PlayAnim("jump");
         }
-        if (keyboardManager.IsKeyDown(sf::Keyboard::Down))
+        if (keyboardManager_.IsKeyDown(sf::Keyboard::Down))
         {
             auto* animator = animatorManager.GetAnimatorAt(0);
             animator->PlayAnim("idle");
         }
-        if (keyboardManager.IsKeyDown(sf::Keyboard::Right))
+        if (keyboardManager_.IsKeyDown(sf::Keyboard::Right))
         {
             auto* animator = animatorManager.GetAnimatorAt(0);
             animator->PlayAnim("walk");
         }
         animatorManager.Update(spriteManager, dt.asSeconds());
         spriteManager.CopyTransformPosition(transformManager, 0, 1);
-        spriteManager.PushCommands(graphicsManager.get(), 0, 1);
+        spriteManager.PushCommands(graphicsManager_.get(), 0, 1);
     }
 
     void Destroy() override
@@ -253,7 +253,7 @@ public:
     void Update() override
     {
         MainEngine::Update();
-        tiledMap.PushCommand(graphicsManager.get());
+        tiledMap.PushCommand(graphicsManager_.get());
     }
 
     void Destroy() override

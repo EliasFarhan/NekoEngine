@@ -28,7 +28,8 @@
 #include "engine/globals.h"
 #include "utilities/file_utility.h"
 
-namespace neko {
+namespace neko
+{
 
 static std::set<std::string_view> imgExtensionSet
         {
@@ -128,11 +129,13 @@ Index TextureManager::LoadTexture(std::string filename)
     return INDEX_INVALID;
 }
 
-const std::shared_ptr<sf::Texture> TextureManager::GetTexture(const Index index) const {
-	if (index == INDEX_INVALID || index >= textures_.size()) {
-		return {}; // Same as return nullptr.
-	}
-	return textures_[index];
+const std::shared_ptr<sf::Texture> TextureManager::GetTexture(const Index index) const
+{
+    if (index == INDEX_INVALID || index >= textures_.size())
+    {
+        return {}; // Same as return nullptr.
+    }
+    return textures_[index];
 }
 
 } // namespace neko

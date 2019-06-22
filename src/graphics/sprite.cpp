@@ -33,8 +33,8 @@ namespace neko
 {
 SpriteManager::SpriteManager()
 {
-    sprites[0].reserve(InitEntityNmb);
-    sprites[1].reserve(InitEntityNmb);
+    sprites_[0].reserve(InitEntityNmb);
+    sprites_[1].reserve(InitEntityNmb);
 }
 
 Index SpriteManager::AddSprite(const std::shared_ptr<sf::Texture> texture)
@@ -45,9 +45,9 @@ Index SpriteManager::AddSprite(const std::shared_ptr<sf::Texture> texture)
         sprite.setTexture(*texture);
         sprite.setOrigin(sf::Vector2f(texture->getSize()) / 2.0f);
     }
-    const Index index = sprites[0].size();
-    sprites[0].push_back(sprite);
-    sprites[1].push_back(sprite);
+    const Index index = sprites_[0].size();
+    sprites_[0].push_back(sprite);
+    sprites_[1].push_back(sprite);
     return index;
 }
 
@@ -57,7 +57,7 @@ void SpriteManager::CopyTransformPosition(Transform2dManager& transformManager, 
     const int frameIndex = MainEngine::GetInstance()->frameIndex % 2;
     for (auto i = start; i < start + length; i++)
     {
-        sprites[frameIndex][i].setPosition(transformManager.positions[i]);
+        sprites_[frameIndex][i].setPosition(transformManager.positions_[i]);
     }
 }
 
@@ -67,7 +67,7 @@ void SpriteManager::CopyTransformScales(Transform2dManager& transformManager, si
     const int frameIndex = MainEngine::GetInstance()->frameIndex % 2;
     for (auto i = start; i < start + length; i++)
     {
-        sprites[frameIndex][i].setScale(transformManager.scales[i]);
+        sprites_[frameIndex][i].setScale(transformManager.scales_[i]);
     }
 }
 
@@ -77,7 +77,7 @@ void SpriteManager::CopyTransformAngles(Transform2dManager& transformManager, si
     const int frameIndex = MainEngine::GetInstance()->frameIndex % 2;
     for (auto i = start; i < start + length; i++)
     {
-        sprites[frameIndex][i].setRotation(transformManager.angles[i]);
+        sprites_[frameIndex][i].setRotation(transformManager.angles_[i]);
     }
 }
 
@@ -87,20 +87,20 @@ void SpriteManager::PushCommands(GraphicsManager* graphicsManager, size_t start,
     const int frameIndex = MainEngine::GetInstance()->frameIndex % 2;
     for (auto i = start; i < start + length; i++)
     {
-        graphicsManager->Draw(sprites[frameIndex][i]);
+        graphicsManager->Draw(sprites_[frameIndex][i]);
     }
 }
 
 sf::Sprite* SpriteManager::GetSpriteAt(unsigned int spriteIndex)
 {
     const int frameIndex = MainEngine::GetInstance()->frameIndex % 2;
-    if (spriteIndex >= sprites[frameIndex].size())
+    if (spriteIndex >= sprites_[frameIndex].size())
     {
         return nullptr;
     }
     else
     {
-        return &sprites[frameIndex][spriteIndex];
+        return &sprites_[frameIndex][spriteIndex];
     }
 }
 

@@ -66,6 +66,6 @@ private:
     /**
      * \brief store the sfml sprites with two vectors for double buffering with the render thread
      */
-    std::vector<sf::Sprite> sprites[2];
+    std::vector<sf::Sprite> sprites_[2];
 };
 }

@@ -54,9 +54,9 @@ public:
 			playerData.playerEntity = 1;
 			const auto playerPos = sf::Vector2f(200, 200);
 			
-			transformManager.positions.push_back(playerPos);
-			transformManager.scales.emplace_back(1,1);
-			transformManager.angles.push_back(0.0f);
+			transformManager.AddPosition(playerPos);
+			transformManager.AddScale(sf::Vector2f(1,1));
+			transformManager.AddAngle(0.0f);
 
 			const Index textureIndex = textureManager.LoadTexture("data/sprites/hero/jump/hero1.png");
 			std::shared_ptr<sf::Texture> texture = textureManager.GetTexture(textureIndex);
@@ -94,7 +94,7 @@ public:
 			fixtureDef[0].shape = &playerBox[0];
 			fixtureDef[0].friction = 0.0f;
 			mainPlayerCollider.entity = playerData.playerEntity;
-			physicsManager.colliders.push_back(mainPlayerCollider);
+			physicsManager.AddCollider(mainPlayerCollider);
 
 			neko::Collider footCollider{};
 			footCollider.entity = playerData.playerEntity;
@@ -111,7 +111,7 @@ public:
             //auto footShapeIndex = shapeManager.AddPolygon(neko::meter2pixel(footPoints[0]), points, 3, shapeDef);
             //footCollider.shapeIndex = footShapeIndex;
 #endif
-			physicsManager.colliders.push_back(footCollider);
+			physicsManager.AddCollider(footCollider);
 
 			playerData.playerBody = physicsManager.CreateBody(bodyDef, fixtureDef, 2);
 		}
@@ -126,9 +126,9 @@ public:
 
 			for (auto i = 0u ; i < platformsNmb;i++)
 			{
-				transformManager.positions.push_back(platformPositions[i]);
-				transformManager.scales.emplace_back(1, 1);
-				transformManager.angles.push_back(0.0f);
+				transformManager.AddPosition(platformPositions[i]);
+				transformManager.AddScale(sf::Vector2f(1, 1));
+				transformManager.AddAngle(0.0f);
 
 				const auto physicsSize = neko::pixel2meter(sf::Vector2f(platformTexture->getSize()));
 				b2BodyDef bodyDef;
@@ -152,7 +152,7 @@ public:
                 auto platformShapeIndex = shapeManager.AddBox(platformPositions[i], neko::meter2pixel(b2Vec2(physicsSize.x/2.0f, physicsSize.y/2.0f)), shapeDef);
                 platformCollider.shapeIndex = platformShapeIndex;
 #endif
-				physicsManager.colliders.push_back(platformCollider);
+				physicsManager.AddCollider(platformCollider);
 				physicsManager.CreateBody(bodyDef, &fixtureDef, 1);
 				spriteManager.AddSprite(platformTexture);
 			}
@@ -178,7 +178,7 @@ public:
 		//Player management
 		{
 			//Jumping
-			if(playerData.contactNmb > 0 && keyboardManager.IsKeyDown(sf::Keyboard::Space))
+			if(playerData.contactNmb > 0 && keyboardManager_.IsKeyDown(sf::Keyboard::Space))
 			{
 				const auto playerVelocity = playerData.playerBody->GetLinearVelocity();
 				playerData.playerBody->SetLinearVelocity(b2Vec2(playerVelocity.x, -jumpVelocity));
@@ -186,8 +186,8 @@ public:
 			//Move horizontal
 			{
 				int move = 0;
-				move -= keyboardManager.IsKeyHeld(sf::Keyboard::Left);
-				move += keyboardManager.IsKeyHeld(sf::Keyboard::Right);
+				move -= keyboardManager_.IsKeyHeld(sf::Keyboard::Left);
+				move += keyboardManager_.IsKeyHeld(sf::Keyboard::Right);
                 {
                     std::ostringstream oss;
                     oss << "Player Key Move: "<<move;
@@ -199,31 +199,33 @@ public:
 
 			transformManager.CopyPositionsFromPhysics2d(physicsManager, 0, 1);
 			spriteManager.CopyTransformPosition(transformManager, 0, 1);
-			spriteManager.PushCommands(graphicsManager.get(), 0, 1);
+			spriteManager.PushCommands(graphicsManager_.get(), 0, 1);
 		}
 
 
 		{
 			spriteManager.CopyTransformPosition(transformManager, 1, platformsNmb);
-			spriteManager.PushCommands(graphicsManager.get(), 1, platformsNmb);
+			spriteManager.PushCommands(graphicsManager_.get(), 1, platformsNmb);
 		}
 #ifdef __neko_dbg__
         {
 
             //Main playerbox
-            shapeManager.CopyPosition(&transformManager.positions[0], 0, 1);
-            shapeManager.PushCommands(graphicsManager, 0, 1+platformsNmb);
+            shapeManager.CopyTransformPosition(transformManager, 0, 1);
+            shapeManager.PushCommands(graphicsManager_.get(), 0, 1+platformsNmb);
         }
         {
             std::ostringstream oss;
-            oss << "("<<transformManager.positions[0].x<<", "<<transformManager.positions[0].y<<")";
-            graphicsManager->editor.AddInspectorInfo("PlayerPos", oss.str());
+            auto pos = transformManager.GetPosition(playerData.playerEntity);
+            oss << "("<<pos.x<<", "<<pos.y<<")";
+            graphicsManager_->editor.AddInspectorInfo("PlayerPos", oss.str());
         }
         {
             std::ostringstream oss;
-            b2Vec2 velocity = physicsManager.bodies[0]->GetLinearVelocity();
+            auto* body = physicsManager.GetBodyAt(playerData.playerEntity);
+            b2Vec2 velocity = body->GetLinearVelocity();
             oss << "("<<velocity.x<<", "<<velocity.y<<")";
-            graphicsManager->editor.AddInspectorInfo("PlayerVel", oss.str());
+            graphicsManager_->editor.AddInspectorInfo("PlayerVel", oss.str());
         }
 #endif
 

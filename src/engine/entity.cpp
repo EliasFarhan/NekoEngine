@@ -29,19 +29,19 @@ namespace neko
 
 EntityManager::EntityManager()
 {
-    m_MaskArray.reserve(InitEntityNmb);
+    maskArray_.reserve(InitEntityNmb);
 }
 
 EntityMask EntityManager::GetMask(Entity entity)
 {
-    return m_MaskArray[entity - 1];
+    return maskArray_[entity - 1];
 }
 
 Entity EntityManager::CreateEntity(Entity wantedEntity)
 {
-    for (Entity entity = 1U; entity <= m_MaskArray.size(); entity++)
+    for (Entity entity = 1U; entity <= maskArray_.size(); entity++)
     {
-        if (m_MaskArray[entity - 1] == INVALID_ENTITY)
+        if (maskArray_[entity - 1] == INVALID_ENTITY)
         {
             return entity;
         }
@@ -51,21 +51,21 @@ Entity EntityManager::CreateEntity(Entity wantedEntity)
 
 void EntityManager::DestroyEntity(Entity entity)
 {
-    m_MaskArray[entity - 1] = INVALID_ENTITY;
+    maskArray_[entity - 1] = INVALID_ENTITY;
 }
 
 bool EntityManager::HasComponent(Entity entity, ComponentType componentType)
 {
-    return (m_MaskArray[entity - 1] & static_cast<EntityMask>(componentType)) == static_cast<EntityMask>(componentType);
+    return (maskArray_[entity - 1] & static_cast<EntityMask>(componentType)) == static_cast<EntityMask>(componentType);
 }
 
 void EntityManager::AddComponentType(Entity entity, ComponentType componentType)
 {
-    m_MaskArray[entity - 1] = m_MaskArray[entity - 1] | static_cast<EntityMask>(componentType);
+    maskArray_[entity - 1] = maskArray_[entity - 1] | static_cast<EntityMask>(componentType);
 }
 
 void EntityManager::RemoveComponentType(Entity entity, ComponentType componentType)
 {
-    m_MaskArray[entity - 1] &= ~static_cast<EntityMask>(componentType);
+    maskArray_[entity - 1] &= ~static_cast<EntityMask>(componentType);
 }
 }

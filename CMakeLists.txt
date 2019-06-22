@@ -12,7 +12,7 @@ if(UNIX AND NOT APPLE)
 		# using Clang
 
 		if(LLVM_ROOT)
-			set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}  --stdlib=libc++ -L${LLVM_ROOT}/lib -Wl,-rpath,${LLVM_ROOT}/lib  -lc++ -lc++abi ")
+			set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}  --stdlib=libc++ -L${LLVM_ROOT}/lib -Wl,-rpath,${LLVM_ROOT}/lib  -lc++ -lc++abi")
 			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -nostdinc++")
 
 			include_directories(${LLVM_ROOT}/include/c++/v1/)
@@ -24,7 +24,7 @@ if(UNIX AND NOT APPLE)
 			SET (CMAKE_OBJDUMP "${LLVM_ROOT}/bin/llvm-objdump")
 			SET (CMAKE_RANLIB  "${LLVM_ROOT}/bin/llvm-ranlib")
 		else()
-			set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address")
+			set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ")
 		endif()
 
 	elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")

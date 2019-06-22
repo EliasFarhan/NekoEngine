@@ -73,7 +73,7 @@ public:
     Init(const std::string& tilemapPath, TextureManager& textureManager, Physics2dManager* physics2DManager = nullptr);
 	void PushCommand(GraphicsManager* graphicsManager) override;
 protected:
-	std::vector<Tiledsheet> tileSheets;
+	std::vector<Tiledsheet> tileSheets_;
 
 };
 }

@@ -32,7 +32,7 @@ namespace neko
 
 void SpriteAnimator::Init(json& animatorJson, TextureManager& textureManager, int spriteIndex)
 {
-    SpriteAnimatorDef spriteAnimatorDef;
+    SpriteAnimatorDef spriteAnimatorDef{};
     std::vector<SpriteAnimDef> spriteAnimDefs;
     std::vector<std::shared_ptr<sf::Texture>> texturesTmp;
 
@@ -56,33 +56,31 @@ void SpriteAnimator::Init(json& animatorJson, TextureManager& textureManager, in
     {
         std::string pathName = texturePath;
         auto textureIndex = textureManager.LoadTexture(pathName);
-		std::weak_ptr<sf::Texture> texture = textureManager.GetTexture(textureIndex);
-        texturesTmp.emplace_back(texture);
+		std::shared_ptr<sf::Texture> texture = textureManager.GetTexture(textureIndex);
+        spriteAnimatorDef.textures.push_back(texture);
     }
-    spriteAnimatorDef.textures.resize(texturesTmp.size());
-    spriteAnimatorDef.textures.push_back(texturesTmp[0]);
     spriteAnimatorDef.spriteIndex = spriteIndex;
     Init(spriteAnimatorDef, &spriteAnimDefs[0], spriteAnimDefs.size());
 }
 
 void SpriteAnimator::Init(SpriteAnimatorDef& spriteAnimatorDef, SpriteAnimDef* animsDef, size_t animsCount)
 {
-    anims.resize(animsCount);
+    anims_.resize(animsCount);
     for (unsigned int i = 0; i < animsCount; i++)
     {
-        anims[i] = animsDef[i];
+        anims_[i] = animsDef[i];
     }
     PlayAnim(0);
     spriteIndex = spriteAnimatorDef.spriteIndex;
-    textures.resize(spriteAnimatorDef.textures.size());
-	textures = spriteAnimatorDef.textures;
+    textures_.resize(spriteAnimatorDef.textures.size());
+	textures_ = spriteAnimatorDef.textures;
 }
 
 void SpriteAnimator::PlayAnim(const std::string& animName)
 {
-    for (unsigned int i = 0; i < anims.size(); i++)
+    for (unsigned int i = 0; i < anims_.size(); i++)
     {
-        auto& anim = anims[i];
+        auto& anim = anims_[i];
         if (anim.name == animName)
         {
             PlayAnim(i);
@@ -94,57 +92,64 @@ void SpriteAnimator::PlayAnim(const std::string& animName)
 
 void SpriteAnimator::PlayAnim(unsigned int animIndex)
 {
-    if (animIndex >= (unsigned int)anims.size())
+    if (animIndex >= (unsigned int)anims_.size())
     {
         logDebug("[Error] Invalid anim index");
         return;
     }
-    auto& anim = anims[animIndex];
-    animTimer.period = 1.0f / anim.freq;
-    animTimer.Reset();
-    currentIndex = 0;
-    currentAnim = &anims[animIndex];
+    auto& anim = anims_[animIndex];
+    animTimer_.period = 1.0f / anim.freq;
+    animTimer_.Reset();
+    currentIndex_ = 0;
+    currentAnim_ = &anims_[animIndex];
 }
 
 void SpriteAnimator::Update(sf::Sprite* sprite, float dt)
 {
-    if (currentAnim != nullptr)
+    if (currentAnim_ != nullptr)
     {
-        animTimer.Update(dt);
-        if (animTimer.IsOver())
+        animTimer_.Update(dt);
+        if (animTimer_.IsOver())
         {
-            currentIndex++;
-            if (currentIndex >= static_cast<int>(currentAnim->imgIndexes.size()))
+            currentIndex_++;
+            if (currentIndex_ >= static_cast<int>(currentAnim_->imgIndexes.size()))
             {
-                currentIndex = 0;
+                currentIndex_ = 0;
             }
 
-            animTimer.Reset();
+            animTimer_.Reset();
         }
-        auto& texture = *textures[currentAnim->imgIndexes[currentIndex]];
-        sprite->setTexture(texture);
-        sprite->setTextureRect(currentAnim->imgRect[currentIndex]);
-        sprite->setOrigin(sf::Vector2f(texture.getSize()) / 2.0f);
+        if(textures_[currentAnim_->imgIndexes[currentIndex_]]!= nullptr)
+        {
+            auto& texture = *textures_[currentAnim_->imgIndexes[currentIndex_]];
+            sprite->setTexture(texture);
+            sprite->setTextureRect(currentAnim_->imgRect[currentIndex_]);
+            sprite->setOrigin(sf::Vector2f(texture.getSize()) / 2.0f);
+        }
+        else
+        {
+            //missing texture for animation
+        }
     }
 }
 
 
 AnimatorManager::AnimatorManager()
 {
-    animators.reserve(InitEntityNmb);
+    animators_.reserve(InitEntityNmb);
 }
 
 SpriteAnimator& AnimatorManager::CreateSpriteAnimator()
 {
     SpriteAnimator newSpriteAnimator;
-    animators.push_back(newSpriteAnimator);
-    return animators.back();
+    animators_.push_back(newSpriteAnimator);
+    return animators_.back();
 }
 
 void AnimatorManager::Update(SpriteManager& spriteManager, float dt)
 {
 
-    for (auto& animator : animators)
+    for (auto& animator : animators_)
     {
         auto sprite = spriteManager.GetSpriteAt(animator.spriteIndex);
         animator.Update(sprite, dt);
@@ -153,9 +158,9 @@ void AnimatorManager::Update(SpriteManager& spriteManager, float dt)
 
 SpriteAnimator* AnimatorManager::GetAnimatorAt(unsigned int i)
 {
-    if (i >= animators.size())
+    if (i >= animators_.size())
         return nullptr;
-    return &animators[i];
+    return &animators_[i];
 }
 
 }

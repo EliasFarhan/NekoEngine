@@ -44,7 +44,7 @@ GraphicsManager::GraphicsManager()
 
 void GraphicsManager::Draw(sf::Drawable& drawable)
 {
-	if (nextRenderLength >= MAX_COMMAND_NMB)
+	if (nextRenderLength_ >= MAX_COMMAND_NMB)
 	{
 		logDebug("[Error] Too many draw calls compare to MAX_COMMAND_NMB");
 		return;
@@ -57,10 +57,10 @@ void GraphicsManager::Draw(sf::Drawable& drawable)
 	}*/
 	SfmlCommand command;
 	command.drawable = &drawable;
-	commands[index][nextRenderLength] = command;
-	commandBuffers[index][nextRenderLength] = &commands[index][nextRenderLength];
+	commands_[index][nextRenderLength_] = command;
+	commandBuffers_[index][nextRenderLength_] = &commands_[index][nextRenderLength_];
 
-	nextRenderLength++;
+	nextRenderLength_++;
 }
 
 
@@ -79,29 +79,29 @@ void GraphicsManager::Draw(sf::VertexArray* vertexArray, sf::Texture* texture)
 	tilemapCommand.vertexArray = vertexArray;
 	tilemapCommand.texture = texture;
 
-	tileCommands[index][nextRenderLength] = tilemapCommand;
-	commandBuffers[index][nextRenderLength] = &tileCommands[index][nextRenderLength];
+	tileCommands_[index][nextRenderLength_] = tilemapCommand;
+	commandBuffers_[index][nextRenderLength_] = &tileCommands_[index][nextRenderLength_];
 
-	nextRenderLength++;
+	nextRenderLength_++;
 }
 
 void GraphicsManager::SetView(sf::View view)
 {
 	const int index = MainEngine::GetInstance()->frameIndex % 2;
-	views[index] = view;
+	views_[index] = view;
 }
 
 void GraphicsManager::RenderLoop()
 {
 	auto* engine = MainEngine::GetInstance();
 
-	renderWindow = engine->renderWindow.get();
-	renderWindow->setActive(true);
-	views[0] = renderWindow->getView();
-	views[1] = views[0];
-	editor.graphicsManager = this;
-	editor.renderWindow = renderWindow;
-	renderWindow->setActive(false);
+	renderWindow_ = engine->renderWindow.get();
+	renderWindow_->setActive(true);
+	views_[0] = renderWindow_->getView();
+	views_[1] = views_[0];
+	editor.graphicsManager_ = this;
+	editor.renderWindow_ = renderWindow_;
+	renderWindow_->setActive(false);
 	do
 	{
 		rmt_ScopedCPUSample(RenderLoop, 0);
@@ -113,8 +113,8 @@ void GraphicsManager::RenderLoop()
 				logDebug(oss.str());
 			}*/
 			std::unique_lock<std::mutex> lock(engine->renderMutex);
-			renderLength = nextRenderLength;
-			nextRenderLength = 0;
+			renderLength_ = nextRenderLength_;
+			nextRenderLength_ = 0;
 			frameIndex = engine->frameIndex - 1;
 			engine->condSyncRender.notify_all();
 		}
@@ -126,33 +126,33 @@ void GraphicsManager::RenderLoop()
 		if (engine->isRunning)
 		{
 			rmt_ScopedCPUSample(ActiveRenderLoop, 0);
-			renderWindow->setActive(true);
-			renderWindow->setView(views[frameIndex % 2]);
+			renderWindow_->setActive(true);
+			renderWindow_->setView(views_[frameIndex % 2]);
 			isRendering = true;
 
 
-			renderWindow->clear(engine->config.bgColor);
+			renderWindow_->clear(engine->config.bgColor);
 
 			//manage command buffers
-			auto& commandBuffer = commandBuffers[frameIndex % 2];
+			auto& commandBuffer = commandBuffers_[frameIndex % 2];
 #ifdef __neko_dbg__
 			{
 				std::ostringstream oss;
-				oss << "Command Buffers length: " << renderLength << "\n";
+				oss << "Command Buffers length: " << renderLength_ << "\n";
 				oss << "Engine frame: " << engine->frameIndex << " Graphics Frame: " << frameIndex;
 				logDebug(oss.str());
 
 		}
 #endif
-			for (auto i = 0u; i < renderLength; i++)
+			for (auto i = 0u; i < renderLength_; i++)
 			{
 				std::unique_lock<std::mutex> lock(engine->renderMutex);
 				auto* command = commandBuffer[i];
 				if (command != nullptr)
-					command->Draw(renderWindow);
+					command->Draw(renderWindow_);
 			}
 			editor.Update();
-			renderWindow->display();
+			renderWindow_->display();
 
 
 			isRendering = false;
@@ -160,14 +160,14 @@ void GraphicsManager::RenderLoop()
 
 	}
 
-		renderWindow->setActive(false);
+		renderWindow_->setActive(false);
 
 }
 	while (engine->isRunning);
 
-renderWindow->setActive(true);
+renderWindow_->setActive(true);
 logDebug("Graphics Loop Destroy");
-renderWindow->setActive(false);
+renderWindow_->setActive(false);
 
 engine->condSyncRender.notify_all();
 

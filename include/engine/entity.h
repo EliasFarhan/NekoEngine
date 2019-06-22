@@ -25,13 +25,14 @@
  */
 
 #include <vector>
+#include <engine/globals.h>
 
 namespace neko
 {
-using Entity = unsigned;
-using EntityMask = unsigned;
+using Entity = Index;
+using EntityMask = std::uint32_t;
 enum class ComponentType : unsigned;
-const Entity INVALID_ENTITY = 0U;
+const Entity INVALID_ENTITY = 0u;
 
 /**
  * \brief Used in an Entity-Component-System to store all entities and what components they have
@@ -52,7 +53,7 @@ public:
     void AddComponentType(Entity entity, ComponentType componentType);
 
     void RemoveComponentType(Entity entity, ComponentType componentType);
-
-    std::vector<EntityMask> m_MaskArray;
+private:
+    std::vector<EntityMask> maskArray_;
 };
 }

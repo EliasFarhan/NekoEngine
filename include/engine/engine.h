@@ -101,18 +101,18 @@ public:
 
     sf::Time dt;
 protected:
-    sf::Clock engineClock;
-    Remotery* rmt = nullptr;
-    ctpl::thread_pool workingThreadPool;
-    std::thread renderThread;
-    std::unique_ptr<GraphicsManager> graphicsManager = nullptr;
+    sf::Clock engineClock_;
+    Remotery* rmt_ = nullptr;
+    ctpl::thread_pool workingThreadPool_;
+    std::thread renderThread_;
+    std::unique_ptr<GraphicsManager> graphicsManager_ = nullptr;
 
-	KeyboardManager keyboardManager;
-	MouseManager mouseManager;
+	KeyboardManager keyboardManager_;
+	MouseManager mouseManager_;
 /**
  * static instance use to access the engine from anywhere, because I don't want to have thousands of MainEngine& ref
  */
-    static MainEngine* instance;
+    static MainEngine* instance_;
 };
 
 }

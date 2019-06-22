@@ -10,7 +10,7 @@ namespace neko
 void CityBuilderMap::Init()
 {
     //River
-    environmentTiles.resize(city.mapSize.x * city.mapSize.y, EnvironmentTile::GRASS);
+    environmentTiles_.resize(city.mapSize.x * city.mapSize.y, EnvironmentTile::GRASS);
     {
         sf::Vector2i pos = sf::Vector2i((rand() % (city.mapSize.x / 3)) + city.mapSize.x / 3, 0);
         int previousX = 0;
@@ -50,7 +50,7 @@ void CityBuilderMap::Init()
             }
 
 
-            environmentTiles[Position2Index(pos)] = EnvironmentTile::WATER;
+            environmentTiles_[Position2Index(pos)] = EnvironmentTile::WATER;
             pos = pos + dir;
             if (pos.y == city.mapSize.y)
                 continue;
@@ -69,7 +69,7 @@ void CityBuilderMap::Init()
             element.position = pos;
             element.size = sf::Vector2u(1, 1);
             element.elementType = CityElementType::ROAD;
-            elements.push_back(element);
+            elements_.push_back(element);
         }
         //RAIL
         const int trainStationX = (rand() % (city.mapSize.x / 3)) + city.mapSize.x / 3;
@@ -88,7 +88,7 @@ void CityBuilderMap::Init()
                 trainStation.position = pos + sf::Vector2i(0, 1);
                 trainStation.size = sf::Vector2u(5, 3);
                 trainStation.elementType = CityElementType::TRAIN_STATION;
-                elements.push_back(trainStation);
+                elements_.push_back(trainStation);
             }
             if (x > trainStationX && x < trainStationX + 4)
             {
@@ -111,7 +111,7 @@ void CityBuilderMap::Init()
                 element.position = pos;
                 element.size = sf::Vector2u(1, 1);
                 element.elementType = CityElementType::RAIL;
-                elements.push_back(element);
+                elements_.push_back(element);
             }
             else if(x == railDownX)
             {
@@ -120,7 +120,7 @@ void CityBuilderMap::Init()
                     element.position = sf::Vector2i(railDownX, y);
                     element.size = sf::Vector2u(1, 1);
                     element.elementType = CityElementType::RAIL;
-                    elements.push_back(element);
+                    elements_.push_back(element);
                 }
             }
 
@@ -130,7 +130,7 @@ void CityBuilderMap::Init()
                 element.position = pos-sf::Vector2i(0,1);
 
                 element.elementType = CityElementType::RAIL;
-                elements.push_back(element);
+                elements_.push_back(element);
             }
             else if(x == railUpX)
             {
@@ -139,7 +139,7 @@ void CityBuilderMap::Init()
                     element.position = sf::Vector2i(railUpX, y);
                     element.size = sf::Vector2u(1, 1);
                     element.elementType = CityElementType::RAIL;
-                    elements.push_back(element);
+                    elements_.push_back(element);
                 }
             }
         }
@@ -147,8 +147,8 @@ void CityBuilderMap::Init()
     //Trees
     {
         siv::PerlinNoise perlinNoise;
-        const auto elementsNmb = elements.size();
-        std::vector<CityElement> obstacles(elements);
+        const auto elementsNmb = elements_.size();
+        std::vector<CityElement> obstacles(elements_);
 		for (auto x = 0u; x < city.mapSize.x; x++)
         {
             for (auto y = 0u; y < city.mapSize.y; y++)
@@ -177,7 +177,7 @@ void CityBuilderMap::Init()
                     element.position = pos;
                     element.size = sf::Vector2u(1, 1);
                     element.elementType = CityElementType::TREES;
-                    elements.push_back(element);
+                    elements_.push_back(element);
                 }
             }
         }

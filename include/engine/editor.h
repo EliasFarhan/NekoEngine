@@ -21,9 +21,15 @@ public:
 
     void AddInspectorInfo(const std::string_view name, const std::string_view value);
 
-    GraphicsManager* graphicsManager;
-    sf::RenderWindow* renderWindow = nullptr;
+    /**
+     * \brief Non owning ptr on graphics manager
+     */
+    GraphicsManager* graphicsManager_ = nullptr;
+    /**
+     * \brief Non owning ptr to renderwindow
+     */
+    sf::RenderWindow* renderWindow_ = nullptr;
 private:
-    std::vector<std::pair<std::string, std::string>> inspectorValues[2];
+    std::vector<std::pair<std::string, std::string>> inspectorValues_[2];
 };
 }

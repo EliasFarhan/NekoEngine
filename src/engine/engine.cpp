@@ -39,20 +39,20 @@
 namespace neko
 {
 
-MainEngine* MainEngine::instance = nullptr;
+MainEngine* MainEngine::instance_ = nullptr;
 
 
 void MainEngine::EngineLoop()
 {
 
     isRunning = true;
-    renderThread = std::thread(&GraphicsManager::RenderLoop, graphicsManager.get());
-    renderThread.detach();
+    renderThread_ = std::thread(&GraphicsManager::RenderLoop, graphicsManager_.get());
+    renderThread_.detach();
     while (isRunning)
     {
 
         rmt_ScopedCPUSample(EngineLoop, 0);
-        dt = engineClock.restart();
+        dt = engineClock_.restart();
         isReady = true;
         if (frameIndex > 0)
         {
@@ -62,8 +62,8 @@ void MainEngine::EngineLoop()
             condSyncRender.wait(lock);
         }
         isReady = false;
-		keyboardManager.ClearKeys();
-		mouseManager.ClearFrameData();
+		keyboardManager_.ClearKeys();
+		mouseManager_.ClearFrameData();
 		sf::Event event{};
 		while (renderWindow->pollEvent(event))
 		{
@@ -86,7 +86,7 @@ MainEngine::MainEngine(Configuration* config)
     }
     initLog();
 
-    rmt_CreateGlobalInstance(&rmt);
+    rmt_CreateGlobalInstance(&rmt_);
 }
 
 MainEngine::~MainEngine()
@@ -94,7 +94,7 @@ MainEngine::~MainEngine()
 
     logDebug("Destroy Main Engine");
     destroyLog();
-    rmt_DestroyGlobalInstance(rmt);
+    rmt_DestroyGlobalInstance(rmt_);
 
 }
 
@@ -104,7 +104,7 @@ void MainEngine::Init()
 #ifdef __linux__
     XInitThreads();
 #endif
-    renderWindow = std::make_unique<sf::RenderWindow>(sf::VideoMode(1280, 720), "Neko Engine");
+    renderWindow = std::make_unique<sf::RenderWindow>(sf::VideoMode(config.screenSize.x, config.screenSize.y), "Neko Engine");
     if (config.vSync)
     {
         renderWindow->setVerticalSyncEnabled(config.vSync);
@@ -115,9 +115,9 @@ void MainEngine::Init()
     }
     ImGui::SFML::Init(*renderWindow);
     renderWindow->setActive(false);
-    instance = this;
+    instance_ = this;
 
-    graphicsManager = std::make_unique<GraphicsManager>();
+    graphicsManager_ = std::make_unique<GraphicsManager>();
 
 
 }
@@ -136,8 +136,8 @@ void MainEngine::Destroy()
     renderWindow->close();
     ImGui::SFML::Shutdown();
     renderWindow = nullptr;
-    instance = nullptr;
-    graphicsManager = nullptr;
+    instance_ = nullptr;
+    graphicsManager_ = nullptr;
 }
 
 void MainEngine::OnEvent(sf::Event& event)
@@ -152,7 +152,7 @@ void MainEngine::OnEvent(sf::Event& event)
 		case sf::Event::KeyPressed:
 		{
 			
-			keyboardManager.AddPressKey(event.key.code);
+			keyboardManager_.AddPressKey(event.key.code);
 			break;
 		}
 		case sf::Event::KeyReleased:
@@ -161,12 +161,12 @@ void MainEngine::OnEvent(sf::Event& event)
 			{
 				isRunning = false;
 			}
-			keyboardManager.AddReleaseKey(event.key.code);
+			keyboardManager_.AddReleaseKey(event.key.code);
 			break; 
 		}
 		case sf::Event::MouseWheelScrolled:
 		{
-			mouseManager.OnWheelScrolled(event);
+			mouseManager_.OnWheelScrolled(event);
 			break;
 		}
 		default:
@@ -178,7 +178,7 @@ void MainEngine::OnEvent(sf::Event& event)
 
 MainEngine* MainEngine::GetInstance()
 {
-    return instance;
+    return instance_;
 }
 
 }

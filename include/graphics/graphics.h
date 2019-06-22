@@ -76,7 +76,7 @@ class GraphicsManager
 {
 public:
     GraphicsManager();
-//TODO change to non atomic to manage sync
+    //TODO change to non atomic to manage sync
     std::atomic<bool> isRendering = false;
     std::atomic<bool> isReady = false;
     //TODO change to non atomic but manage with lock to sync
@@ -106,12 +106,15 @@ public:
 
     Editor editor;
 protected:
-    sf::RenderWindow* renderWindow = nullptr;
-    std::array<SfmlCommand, MAX_COMMAND_NMB> commands[2];
-    std::array<TilemapCommand, MAX_COMMAND_NMB> tileCommands[2];
-    std::array<Command*, MAX_COMMAND_NMB> commandBuffers[2];
-    sf::View views[2];
-    size_t renderLength = 0;
-    size_t nextRenderLength = 0;
+    /**
+     * \brief non owning ptr to renderwindow
+     */
+    sf::RenderWindow* renderWindow_ = nullptr;
+    std::array<SfmlCommand, MAX_COMMAND_NMB> commands_[2];
+    std::array<TilemapCommand, MAX_COMMAND_NMB> tileCommands_[2];
+    std::array<Command*, MAX_COMMAND_NMB> commandBuffers_[2];
+    sf::View views_[2];
+    size_t renderLength_ = 0;
+    size_t nextRenderLength_ = 0;
 };
 }

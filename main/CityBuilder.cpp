@@ -22,6 +22,7 @@
  SOFTWARE.
  */
 #include <sstream>
+#include <string>
 #include <engine/engine.h>
 #include <city_tilemap.h>
 #include <city_map.h>
@@ -41,7 +42,6 @@ public:
 		MainEngine::Init();
 		cityBuilderMap.Init();
 		environmentTilemap.Init(textureManager);
-        environmentTilemap.UpdateTilemap(cityBuilderMap, neko::CityTilesheetType::LENGTH);
 		mainView = renderWindow->getView();
 	}
 
@@ -49,14 +49,16 @@ public:
 	{
 		MainEngine::Update();
 
-		if(mouseManager.IsButtonPressed(sf::Mouse::Button::Middle))
+		if(mouseManager_.IsButtonPressed(sf::Mouse::Button::Middle))
 		{
-			const auto delta = sf::Vector2f(mouseManager.GetMouseDelta());
+			const auto delta = sf::Vector2f(mouseManager_.GetMouseDelta());
 			mainView.setCenter(mainView.getCenter() - currentZoom*delta);
-		}
 
-		environmentTilemap.PushCommand(graphicsManager.get());
-		graphicsManager->SetView(mainView);
+		}
+        environmentTilemap.UpdateTilemap(cityBuilderMap, mainView, neko::CityTilesheetType::LENGTH);
+		environmentTilemap.PushCommand(graphicsManager_.get());
+		graphicsManager_->SetView(mainView);
+		graphicsManager_->editor.AddInspectorInfo("FPS", std::to_string(1.0f/dt.asSeconds()));
 	}
 
 	void OnEvent(sf::Event& event) override
@@ -82,8 +84,8 @@ public:
 		MainEngine::Destroy();
 	}
 
+    sf::View mainView;
 private:
-	sf::View mainView;
 	neko::EntityManager entityManager;
 	neko::TextureManager textureManager;
 	neko::CityBuilderTilemap environmentTilemap;

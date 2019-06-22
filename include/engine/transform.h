@@ -45,8 +45,18 @@ public:
 
     void CopyAnglesFromPhysics2d(Physics2dManager& physics2dManager, size_t start = 0, size_t length = InitEntityNmb);
 
-    std::vector<sf::Vector2f> positions;
-    std::vector<sf::Vector2f> scales;
-    std::vector<float> angles;
+    void AddPosition(sf::Vector2f position);
+    void AddScale(sf::Vector2f scale);
+    void AddAngle(float angle);
+
+    sf::Vector2f GetPosition(Index i);
+
+private:
+    friend class SpriteManager;
+    friend class ShapeManager;
+
+    std::vector<sf::Vector2f> positions_;
+    std::vector<sf::Vector2f> scales_;
+    std::vector<float> angles_;
 };
 }

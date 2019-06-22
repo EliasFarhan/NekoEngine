@@ -70,13 +70,13 @@ public:
 
     void Update(sf::Sprite* sprite, float dt);
 
-    int spriteIndex = 0;
+    Index spriteIndex = 0;
 private:
-    std::vector<SpriteAnimDef> anims;
-    SpriteAnimDef* currentAnim = nullptr;
-    Timer animTimer = {0.0f, 0.0f};
-    int currentIndex = 0;
-    std::vector<std::shared_ptr<sf::Texture>> textures;
+    std::vector<SpriteAnimDef> anims_;
+    SpriteAnimDef* currentAnim_ = nullptr;
+    Timer animTimer_ = {0.0f, 0.0f};
+    Index currentIndex_ = 0u;
+    std::vector<std::shared_ptr<sf::Texture>> textures_;
 };
 /**
  * \brief manages animators
@@ -93,6 +93,6 @@ public:
     SpriteAnimator* GetAnimatorAt(unsigned int i);
 
 private:
-    std::vector<SpriteAnimator> animators;
+    std::vector<SpriteAnimator> animators_;
 };
 }

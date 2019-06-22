@@ -31,16 +31,16 @@ namespace neko
 
 Transform2dManager::Transform2dManager()
 {
-    positions.reserve(InitEntityNmb);
-    scales.reserve(InitEntityNmb);
-    angles.reserve(InitEntityNmb);
+    positions_.reserve(InitEntityNmb);
+    scales_.reserve(InitEntityNmb);
+    angles_.reserve(InitEntityNmb);
 }
 
 void Transform2dManager::CopyPositionsFromPhysics2d(Physics2dManager& physics2dManager, size_t start, size_t length)
 {
     for (auto i = start; i < start + length; i++)
     {
-        positions[i] = meter2pixel(physics2dManager.bodies[i]->GetPosition());
+        positions_[i] = meter2pixel(physics2dManager.bodies_[i]->GetPosition());
     }
 }
 
@@ -48,7 +48,27 @@ void Transform2dManager::CopyAnglesFromPhysics2d(Physics2dManager& physics2dMana
 {
     for (auto i = start; i < start + length; i++)
     {
-        angles[i] = meter2pixel(glm::radians(physics2dManager.bodies[i]->GetAngle()));
+        angles_[i] = meter2pixel(glm::radians(physics2dManager.bodies_[i]->GetAngle()));
     }
+}
+
+void Transform2dManager::AddPosition(sf::Vector2f position)
+{
+    positions_.push_back(position);
+}
+
+void Transform2dManager::AddScale(sf::Vector2f scale)
+{
+    scales_.push_back(scale);
+}
+
+void Transform2dManager::AddAngle(float angle)
+{
+    angles_.push_back(angle);
+}
+
+sf::Vector2f Transform2dManager::GetPosition(Index i)
+{
+    return positions_[i];
 }
 }
