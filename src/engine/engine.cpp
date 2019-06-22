@@ -46,7 +46,7 @@ void MainEngine::EngineLoop()
 {
 
     isRunning = true;
-    renderThread = std::thread(&GraphicsManager::RenderLoop, graphicsManager);
+    renderThread = std::thread(&GraphicsManager::RenderLoop, graphicsManager.get());
     renderThread.detach();
     while (isRunning)
     {
@@ -104,7 +104,7 @@ void MainEngine::Init()
 #ifdef __linux__
     XInitThreads();
 #endif
-    renderWindow = new sf::RenderWindow(sf::VideoMode(1280, 720), "Neko Engine");
+    renderWindow = std::make_unique<sf::RenderWindow>(sf::VideoMode(1280, 720), "Neko Engine");
     if (config.vSync)
     {
         renderWindow->setVerticalSyncEnabled(config.vSync);
@@ -117,7 +117,7 @@ void MainEngine::Init()
     renderWindow->setActive(false);
     instance = this;
 
-    graphicsManager = new GraphicsManager();
+    graphicsManager = std::make_unique<GraphicsManager>();
 
 
 }
@@ -135,10 +135,8 @@ void MainEngine::Destroy()
 
     renderWindow->close();
     ImGui::SFML::Shutdown();
-    delete renderWindow;
     renderWindow = nullptr;
     instance = nullptr;
-    delete graphicsManager;
     graphicsManager = nullptr;
 }
 

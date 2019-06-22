@@ -114,7 +114,7 @@ public:
         spriteManager.CopyTransformPosition(transformManager);
         spriteManager.CopyTransformScales(transformManager);
         spriteManager.CopyTransformAngles(transformManager);
-        spriteManager.PushCommands(graphicsManager);
+        spriteManager.PushCommands(graphicsManager.get());
     }
 
 protected:
@@ -217,7 +217,7 @@ public:
         }
         animatorManager.Update(spriteManager, dt.asSeconds());
         spriteManager.CopyTransformPosition(transformManager, 0, 1);
-        spriteManager.PushCommands(graphicsManager, 0, 1);
+        spriteManager.PushCommands(graphicsManager.get(), 0, 1);
     }
 
     void Destroy() override
@@ -253,7 +253,7 @@ public:
     void Update() override
     {
         MainEngine::Update();
-        tiledMap.PushCommand(graphicsManager);
+        tiledMap.PushCommand(graphicsManager.get());
     }
 
     void Destroy() override

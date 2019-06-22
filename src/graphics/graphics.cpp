@@ -95,7 +95,7 @@ void GraphicsManager::RenderLoop()
 {
 	auto* engine = MainEngine::GetInstance();
 
-	renderWindow = engine->renderWindow;
+	renderWindow = engine->renderWindow.get();
 	renderWindow->setActive(true);
 	views[0] = renderWindow->getView();
 	views[1] = views[0];
