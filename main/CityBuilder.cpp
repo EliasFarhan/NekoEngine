@@ -55,7 +55,7 @@ public:
 			mainView.setCenter(mainView.getCenter() - currentZoom*delta);
 		}
 
-		environmentTilemap.PushCommand(graphicsManager);
+		environmentTilemap.PushCommand(graphicsManager.get());
 		graphicsManager->SetView(mainView);
 	}
 

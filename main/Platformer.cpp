@@ -148,7 +148,7 @@ public:
             physicsManager.Update();
             physicsTimer.time += physicsTimer.period;
         }
-        tiledMap.PushCommand(graphicsManager);
+        tiledMap.PushCommand(graphicsManager.get());
         //Player management
         {
             rmt_ScopedCPUSample(PlayerManageLoop, 0)
@@ -172,7 +172,7 @@ public:
                 rmt_ScopedCPUSample(CopyPlayerGraphics, 0);
                 transformManager.CopyPositionsFromPhysics2d(physicsManager, 0, 1);
                 spriteManager.CopyTransformPosition(transformManager, 0, 1);
-                spriteManager.PushCommands(graphicsManager, 0, 1);
+                spriteManager.PushCommands(graphicsManager.get(), 0, 1);
             }
         }
 
