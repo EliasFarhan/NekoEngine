@@ -29,6 +29,7 @@
 #include <array>
 #include <vector>
 #include <map>
+#include "engine/globals.h"
 
 namespace neko
 {
@@ -37,7 +38,7 @@ struct Node
 {
 	sf::Vector2i position = sf::Vector2i(0,0);
     std::array<sf::Vector2i, 4> neighbors;
-    std::array<Node*, 4> neighborsPtr;
+    std::array<Index, 4> neighborsIndex;
     size_t neighborsSize = 0;
 };
 

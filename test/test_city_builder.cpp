@@ -107,7 +107,7 @@ public:
 private:
 	std::vector<sf::RectangleShape> rects_;
     neko::TileMapGraph graph_;
-	const sf::Vector2u tileNmb = sf::Vector2u(100, 100);
+	const sf::Vector2u tileNmb = sf::Vector2u(200, 200);
 
 };
 

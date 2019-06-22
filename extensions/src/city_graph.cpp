@@ -69,7 +69,7 @@ void TileMapGraph::AddNode(sf::Vector2i pos)
 		{
 			if (dx == dy || dx == -dy)
 				continue;
-			sf::Vector2i neighborPos = pos + sf::Vector2i(dx, dy);
+			const sf::Vector2i neighborPos = pos + sf::Vector2i(dx, dy);
 			auto neighborIt = std::find_if(nodes_.begin(), nodes_.end(), [&neighborPos](const Node& node) {
 				return node.position == neighborPos;
 			});
@@ -78,16 +78,17 @@ void TileMapGraph::AddNode(sf::Vector2i pos)
 				auto checkNeighbor = std::find_if(neighborIt->neighbors.begin(), neighborIt->neighbors.begin() + neighborIt->neighborsSize, [&pos](sf::Vector2i localNeighborPos) {
 					return pos == localNeighborPos;
 				});
+				auto* nodePtr = &nodes_.back();
 				if (checkNeighbor == neighborIt->neighbors.begin()+neighborIt->neighborsSize)
 				{
 					neighborIt->neighbors[neighborIt->neighborsSize] = pos;
-					neighborIt->neighborsPtr[neighborIt->neighborsSize] = &nodes_.back();
+					neighborIt->neighborsIndex[neighborIt->neighborsSize] = nodes_.size()-1;
 					neighborIt->neighborsSize++;
 				}
 
-				newNode.neighbors[newNode.neighborsSize] = neighborIt->position;
-				newNode.neighborsPtr[newNode.neighborsSize] = &(*neighborIt);
-				newNode.neighborsSize++;
+				nodePtr->neighbors[nodePtr->neighborsSize] = neighborIt->position;
+				nodePtr->neighborsIndex[nodePtr->neighborsSize] = (neighborIt-nodes_.begin());
+				nodePtr->neighborsSize++;
 			}
 		}
 	}
@@ -111,7 +112,7 @@ void TileMapGraph::RemoveNode(sf::Vector2i pos)
 				for (int j = i + 1; j < otherNode.neighborsSize; j++)
 				{
 					otherNode.neighbors[j - 1] = otherNode.neighbors[j];
-					otherNode.neighborsPtr[j - 1] = otherNode.neighborsPtr[j];
+					otherNode.neighborsIndex[j - 1] = otherNode.neighborsIndex[j];
 				}
 				otherNode.neighborsSize--;
 				if (otherNode.neighborsSize < 0)
@@ -163,7 +164,7 @@ TileMapGraph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vect
 		logDebug("[Error] Because of end pos");
 		return path;
 	}
-	using NodePair = std::pair<sf::Vector2i, float>;
+	using NodePair = std::pair<const Node*, float>;
 	std::unordered_map < sf::Vector2i, float> costs;
 	std::unordered_map<sf::Vector2i, sf::Vector2i> parentMap;
 	auto comp = [](const NodePair& nodeA, const NodePair& nodeB) -> bool
@@ -172,7 +173,7 @@ TileMapGraph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vect
 	};
 	std::vector <NodePair> frontier;
 
-	frontier.push_back(NodePair(startNodeIt->position, 0.0f));
+	frontier.emplace_back(&(*startNodeIt), 0.0f);
 	costs[startNodeIt->position] = 0.0f;
 	parentMap[startNodeIt->position] = startNodeIt->position;
 
@@ -180,35 +181,28 @@ TileMapGraph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vect
 	{
 		auto currentNodePair = frontier.front();
 		frontier.erase(frontier.begin());
-		auto currentPos = currentNodePair.first;
-		auto currentNodeIt = std::find_if(nodes_.begin(), nodes_.end(), [&currentPos](const Node& node) {
-			return node.position == currentPos;
-		});
-		if (currentNodeIt == nodes_.end())
-		{
-			std::ostringstream oss;
-			oss << "No node for current node: (" << currentPos.x << ", " << currentPos.y << ")";
-			logDebug(oss.str());
-			continue;
-		}
-		if (currentPos == endPos)
+		auto* currentNode = currentNodePair.first;
+
+		if (currentNode->position == endPos)
 		{
 			logDebug("Manage to go to the end");
 			break;
 		}
-		for (int i = 0; i < currentNodeIt->neighborsSize; i++)
+		for (size_t i = 0; i < currentNode->neighborsSize; i++)
 		{
-			const auto neighborPos = currentNodeIt->neighbors[i];
-			const auto* neighborPtr = currentNodeIt->neighborsPtr[i];
-			const float newCost = costs[currentNodeIt->position] + distance(neighborPos, endPos);
+			const auto neighborPos = currentNode->neighbors[i];
+			const auto* neighborPtr = &nodes_[currentNode->neighborsIndex[i]];
+			const float newCost = costs[currentNode->position] + distance(neighborPos, endPos);
 			auto costsIt = costs.find(neighborPos);
 			if (costsIt == costs.end() || newCost < costs[neighborPos])
 			{
-				if (costsIt != costs.end())
+				auto neighborIt = std::find_if(frontier.begin(), frontier.end(), [&neighborPos](const NodePair& pair) {
+					return pair.first->position == neighborPos;
+				});
+				if (costsIt != costs.end() && neighborIt != frontier.end())
 				{
-					auto neighborIt = std::find_if(frontier.begin(), frontier.end(), [&neighborPos](const NodePair& pair) {
-						return pair.first == neighborPos;
-					});
+					
+					//Remove pair and put it back with new cost
 					auto neighbor = *neighborIt;
 					frontier.erase(neighborIt);
 					neighbor.second = newCost;
@@ -219,13 +213,13 @@ TileMapGraph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vect
 				else
 				{
 					NodePair neighbor;
-					neighbor.first = neighborPos;
+					neighbor.first = neighborPtr;
 					neighbor.second = newCost;
 					auto upper = std::lower_bound(frontier.begin(), frontier.end(), neighbor, comp);
 					frontier.insert(upper, neighbor);
 				}
 				costs[neighborPos] = newCost;
-				parentMap[neighborPos] = currentPos;
+				parentMap[neighborPos] = currentNode->position;
 			}
 		}
 	}
