@@ -87,10 +87,12 @@ public:
 		const Index textureIndex = textureManager.LoadTexture("data/sprites/wall.jpg");
 		const std::shared_ptr<sf::Texture> texture = textureManager.GetTexture(textureIndex);
 
-        std::uniform_real_distribution<float> randomX(0.0f,
-                                                      config.screenSize.x); // generates random floats between 0.0 and 1.0
-        std::uniform_real_distribution<float> randomY(0.0f,
-                                                      config.screenSize.y); // generates random floats between 0.0 and 1.0
+        std::uniform_real_distribution<float> randomX(
+			0.0f,
+			static_cast<float>(config.screenSize.x)); // generates random floats between 0.0 and 1.0
+        std::uniform_real_distribution<float> randomY(
+			0.0f,
+			static_cast<float>(config.screenSize.y)); // generates random floats between 0.0 and 1.0
         std::uniform_real_distribution<float> randomScale(0.01f, 0.1f); // generates random floats between 0.0 and 1.0
         std::default_random_engine generator;
         std::uniform_real_distribution<float> randomAngle(0.0f, 360.0f); // generates random floats between 0.0 and 1.0

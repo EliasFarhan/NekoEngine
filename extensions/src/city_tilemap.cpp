@@ -45,85 +45,124 @@ void CityBuilderTilemap::Init(TextureManager& textureManager)
         //GRASS TILE
         const auto grassIndex = int(CityTileType::GRASS);
         rectCenter_[grassIndex] = sf::Vector2f(tileSize_) / 2.0f;
-        textureRects_[grassIndex] = sf::FloatRect(0, 0, tileSize_.x, tileSize_.y);
-
+        textureRects_[grassIndex] = sf::FloatRect(
+			0.0f, 
+			0.0f, 
+			static_cast<float>(tileSize_.x), 
+			static_cast<float>(tileSize_.y));
     }
     {
         //WATER
         auto waterIndex = int(CityTileType::WATER_VERTICAL);
         rectCenter_[waterIndex] = sf::Vector2f(tileSize_) / 2.0f;
         textureRects_[waterIndex] = sf::FloatRect(
-                7 * tileSize_.x,
-                5 * tileSize_.y,
-                tileSize_.x,
-                tileSize_.y);
+            7.0f * tileSize_.x,
+			5.0f * tileSize_.y,
+			static_cast<float>(tileSize_.x),
+			static_cast<float>(tileSize_.y));
         waterIndex = int(CityTileType::WATER_HORIZONTAL);
         rectCenter_[waterIndex] = sf::Vector2f(tileSize_) / 2.0f;
         textureRects_[waterIndex] = sf::FloatRect(
-                7 * tileSize_.x,
-                4 * tileSize_.y,
-                tileSize_.x,
-                tileSize_.y);
+            7.0f * tileSize_.x,
+            4.0f * tileSize_.y,
+			static_cast<float>(tileSize_.x),
+			static_cast<float>(tileSize_.y));
         waterIndex = int(CityTileType::WATER_DOWN_LEFT);
         rectCenter_[waterIndex] = sf::Vector2f(tileSize_) / 2.0f;
         textureRects_[waterIndex] = sf::FloatRect(
-                6 * tileSize_.x,
-                4 * tileSize_.y,
-                tileSize_.x,
-                tileSize_.y);
+                6.0f * tileSize_.x,
+                4.0f * tileSize_.y,
+			static_cast<float>(tileSize_.x),
+			static_cast<float>(tileSize_.y));
         waterIndex = int(CityTileType::WATER_DOWN_RIGHT);
         rectCenter_[waterIndex] = sf::Vector2f(tileSize_) / 2.0f;
         textureRects_[waterIndex] = sf::FloatRect(
-                5 * tileSize_.x,
-                4 * tileSize_.y,
-                tileSize_.x,
-                tileSize_.y);
+                5.0f * tileSize_.x,
+                4.0f * tileSize_.y,
+			static_cast<float>(tileSize_.x),
+			static_cast<float>(tileSize_.y));
         waterIndex = int(CityTileType::WATER_UP_LEFT);
         rectCenter_[waterIndex] = sf::Vector2f(tileSize_) / 2.0f;
         textureRects_[waterIndex] = sf::FloatRect(
-                6 * tileSize_.x,
-                5 * tileSize_.y,
-                tileSize_.x,
-                tileSize_.y);
+                6.0f * tileSize_.x,
+                5.0f * tileSize_.y,
+			static_cast<float>(tileSize_.x),
+			static_cast<float>(tileSize_.y));
         waterIndex = int(CityTileType::WATER_UP_RIGHT);
         rectCenter_[waterIndex] = sf::Vector2f(tileSize_) / 2.0f;
         textureRects_[waterIndex] = sf::FloatRect(
-                5 * tileSize_.x,
-                5 * tileSize_.y,
-                tileSize_.x,
-                tileSize_.y);
+                5.0f * tileSize_.x,
+                5.0f * tileSize_.y,
+			static_cast<float>(tileSize_.x),
+			static_cast<float>(tileSize_.y));
     }
     {
         //TREES
         const auto treesIndex = int(CityTileType::TREES);
-        rectCenter_[treesIndex] = sf::Vector2f(tileSize_.x, 2.0f * tileSize_.y) / 2.0f;
-        textureRects_[treesIndex] = sf::FloatRect(5 * tileSize_.x, tileSize_.y, tileSize_.x, 2 * tileSize_.y);
+        rectCenter_[treesIndex] = sf::Vector2f(
+			static_cast<float>(tileSize_.x), 
+			2.0f * tileSize_.y) / 2.0f;
+        textureRects_[treesIndex] = sf::FloatRect(
+			5.0f * tileSize_.x, 
+			static_cast<float>(tileSize_.y), 
+			static_cast<float>(tileSize_.x), 
+			2.0f * tileSize_.y);
     }
     {
         //ROAD
         auto roadIndex = int(CityTileType::ROAD_LINE);
-        rectCenter_[roadIndex] = sf::Vector2f(tileSize_.x, tileSize_.y) / 2.0f;
-        textureRects_[roadIndex] = sf::FloatRect(tileSize_.x, 0, tileSize_.x, tileSize_.y);
+        rectCenter_[roadIndex] = sf::Vector2f(
+			static_cast<float>(tileSize_.x), 
+			static_cast<float>(tileSize_.y)) / 2.0f;
+        textureRects_[roadIndex] = sf::FloatRect(
+			static_cast<float>(tileSize_.x), 
+			0.0f, 
+			static_cast<float>(tileSize_.x), 
+			static_cast<float>(tileSize_.y));
 
         roadIndex = int(CityTileType::ROAD_BRIDGE_HORIZONTAL);
-        rectCenter_[roadIndex] = sf::Vector2f(tileSize_.x, 2.0f * tileSize_.y) / 2.0f;
-        textureRects_[roadIndex] = sf::FloatRect(0, tileSize_.y, tileSize_.x, 2 * tileSize_.y);
+        rectCenter_[roadIndex] = sf::Vector2f(
+			static_cast<float>(tileSize_.x), 
+			2.0f * tileSize_.y) / 2.0f;
+        textureRects_[roadIndex] = sf::FloatRect(
+			0.0f, 
+			static_cast<float>(tileSize_.y), 
+			static_cast<float>(tileSize_.x), 
+			2.0f * tileSize_.y);
     }
     {
         //RAIL
         auto railIndex = int(CityTileType::RAIL_LINE);
-        rectCenter_[railIndex] = sf::Vector2f(tileSize_.x, tileSize_.y) / 2.0f;
-        textureRects_[railIndex] = sf::FloatRect(7.0f * tileSize_.x, tileSize_.y, tileSize_.x, tileSize_.y);
+        rectCenter_[railIndex] = sf::Vector2f(
+			static_cast<float>(tileSize_.x), 
+			static_cast<float>(tileSize_.y)) / 2.0f;
+        textureRects_[railIndex] = sf::FloatRect(
+			7.0f * tileSize_.x, 
+			static_cast<float>(tileSize_.y), 
+			static_cast<float>(tileSize_.x), 
+			static_cast<float>(tileSize_.y));
 
         railIndex = int(CityTileType::RAIL_TURN);
-        rectCenter_[railIndex] = sf::Vector2f(tileSize_.x, tileSize_.y) / 2.0f;
-        textureRects_[railIndex] = sf::FloatRect(6.0f * tileSize_.x, tileSize_.y, tileSize_.x, tileSize_.y);
+        rectCenter_[railIndex] = sf::Vector2f(
+			static_cast<float>(tileSize_.x), 
+			static_cast<float>(tileSize_.y)) / 2.0f;
+        textureRects_[railIndex] = sf::FloatRect(
+			6.0f * tileSize_.x, 
+			static_cast<float>(tileSize_.y), 
+			static_cast<float>(tileSize_.x), 
+			static_cast<float>(tileSize_.y));
     }
     {
         //TRAIN STATION
         auto trainIndex = int(CityTileType::TRAIN_STATION);
-        rectCenter_[trainIndex] = sf::Vector2f(5.0f * tileSize_.x, 3.0f * tileSize_.y) / 2.0f;
-        textureRects_[trainIndex] = sf::FloatRect(0.0f, 3.0f * tileSize_.y, 5.0f * tileSize_.x, 3.0f * tileSize_.y);
+        rectCenter_[trainIndex] = sf::Vector2f(
+			5.0f * tileSize_.x, 
+			3.0f * tileSize_.y) / 2.0f;
+        textureRects_[trainIndex] = sf::FloatRect(
+			0.0f, 
+			3.0f * tileSize_.y, 
+			5.0f * tileSize_.x, 
+			3.0f * tileSize_.y);
     }
     for (int i = 0; i < int(CityTilesheetType::LENGTH); i++)
     {
@@ -164,7 +203,9 @@ void CityBuilderTilemap::UpdateTilemap(CityBuilderMap& cityBuilderMap, sf::View 
                 for (auto y = 0u; y < cityBuilderMap.city.mapSize.y; y++)
                 {
 
-                    const auto position = sf::Vector2f(x * tileSize_.x, y * tileSize_.y);
+                    const auto position = sf::Vector2f(
+						static_cast<float>(x * tileSize_.x), 
+						static_cast<float>(y * tileSize_.y));
                     auto& rect = textureRects_[grassIndex];
                     auto& center = rectCenter_[grassIndex];
                     AddNewTile(position, sf::Vector2f(tileSize_), rect, center, updatedCityTileType);
@@ -218,7 +259,7 @@ void CityBuilderTilemap::UpdateTilemap(CityBuilderMap& cityBuilderMap, sf::View 
                     //RIGHT
                     {
                         const sf::Vector2i rightPos = tmpPos + sf::Vector2i(1, 0);
-                        if (rightPos.x < cityBuilderMap.city.mapSize.x &&
+                        if (static_cast<unsigned int>(rightPos.x) < cityBuilderMap.city.mapSize.x &&
                             cityBuilderMap.environmentTiles_[cityBuilderMap.Position2Index(rightPos)] ==
                             EnvironmentTile::WATER)
                         {
@@ -249,7 +290,9 @@ void CityBuilderTilemap::UpdateTilemap(CityBuilderMap& cityBuilderMap, sf::View 
                     {
                         waterIndex = int(CityTileType::WATER_HORIZONTAL);
                     }
-                    const auto position = sf::Vector2f(x * tileSize_.x, y * tileSize_.y);
+                    const auto position = sf::Vector2f(
+						static_cast<float>(x * tileSize_.x), 
+						static_cast<float>(y * tileSize_.y));
                     auto rect = textureRects_[waterIndex];
                     auto center = rectCenter_[waterIndex];
                     AddNewTile(position, sf::Vector2f(tileSize_), rect, center, updatedCityTileType);
@@ -312,8 +355,8 @@ void CityBuilderTilemap::UpdateTilemap(CityBuilderMap& cityBuilderMap, sf::View 
                     }
                 }
                 const auto position = sf::Vector2f(
-                        road.position.x * tileSize_.x,
-                        road.position.y * tileSize_.y);
+					static_cast<float>(road.position.x * tileSize_.x),
+					static_cast<float>(road.position.y * tileSize_.y));
                 int roadIndex = -1;
                 bool isWater = cityBuilderMap.environmentTiles_[cityBuilderMap.Position2Index(road.position)] ==
                                EnvironmentTile::WATER;
@@ -323,7 +366,9 @@ void CityBuilderTilemap::UpdateTilemap(CityBuilderMap& cityBuilderMap, sf::View 
                             isWater ? CityTileType::ROAD_BRIDGE_VERTICAL : CityTileType::ROAD_LINE);
                     const auto rect = textureRects_[roadIndex];
                     const auto center = rectCenter_[roadIndex];
-                    const auto size = sf::Vector2f(tileSize_.x, (isWater ? 2.0f : 1.0f) * tileSize_.y);
+                    const auto size = sf::Vector2f(
+						static_cast<float>(tileSize_.x), 
+						(isWater ? 2.0f : 1.0f) * tileSize_.y);
 
                     AddNewTile(position, size, rect, center, updatedCityTileType);
                 }
@@ -333,7 +378,9 @@ void CityBuilderTilemap::UpdateTilemap(CityBuilderMap& cityBuilderMap, sf::View 
                             isWater ? CityTileType::ROAD_BRIDGE_HORIZONTAL : CityTileType::ROAD_LINE);
                     const auto rect = textureRects_[roadIndex];
                     const auto center = rectCenter_[roadIndex];
-                    const auto size = sf::Vector2f(tileSize_.x, (isWater ? 2.0f : 1.0f) * tileSize_.y);
+                    const auto size = sf::Vector2f(
+						static_cast<float>(tileSize_.x), 
+						(isWater ? 2.0f : 1.0f) * tileSize_.y);
 
                     AddNewTile(position, size, rect, center, updatedCityTileType, false, false, !isWater, true);
                 }
@@ -393,8 +440,8 @@ void CityBuilderTilemap::UpdateTilemap(CityBuilderMap& cityBuilderMap, sf::View 
                     }
                 }
                 const auto position = sf::Vector2f(
-                        rail.position.x * tileSize_.x,
-                        rail.position.y * tileSize_.y);
+					static_cast<float>(rail.position.x * tileSize_.x),
+					static_cast<float>(rail.position.y * tileSize_.y));
                 //HORIZONTAL FIRST
                 if (directions[2] && directions[3])
                 {
@@ -477,14 +524,13 @@ void CityBuilderTilemap::UpdateTilemap(CityBuilderMap& cityBuilderMap, sf::View 
                             continue;
                         }
                         const auto position = sf::Vector2f(
-                                element.position.x * tileSize_.x,
-                                element.position.y * tileSize_.y);
+							static_cast<float>(element.position.x * tileSize_.x),
+							static_cast<float>(element.position.y * tileSize_.y));
                         const auto rect = textureRects_[treesIndex];
                         const auto center = rectCenter_[treesIndex];
                         const auto size = sf::Vector2f(
-                                tileSize_.x,
-                                2.0f * tileSize_.y
-                        );
+							static_cast<float>(tileSize_.x),
+                            2.0f * tileSize_.y);
 
                         AddNewTile(position, size, rect, center, updatedCityTileType);
                         break;
@@ -493,14 +539,13 @@ void CityBuilderTilemap::UpdateTilemap(CityBuilderMap& cityBuilderMap, sf::View 
                     {
                         const int trainStationIndex = int(CityTileType::TRAIN_STATION);
                         const auto position = sf::Vector2f(
-                                element.position.x * tileSize_.x,
-                                element.position.y * tileSize_.y);
+							static_cast<float>(element.position.x * tileSize_.x),
+							static_cast<float>(element.position.y * tileSize_.y));
                         const auto rect = textureRects_[trainStationIndex];
                         const auto center = rectCenter_[trainStationIndex];
                         const auto size = sf::Vector2f(
-                                element.size.x * tileSize_.x,
-                                element.size.y * tileSize_.y
-                        );
+							static_cast<float>(element.size.x * tileSize_.x),
+							static_cast<float>(element.size.y * tileSize_.y));
                         AddNewTile(position, size, rect, center, updatedCityTileType);
                         break;
                     }
