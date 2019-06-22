@@ -35,13 +35,15 @@ namespace neko
 
 struct Node
 {
-    sf::Vector2i position;
+	sf::Vector2i position = sf::Vector2i(0,0);
     std::array<sf::Vector2i, 4> neighbors;
+    std::array<Node*, 4> neighborsPtr;
     size_t neighborsSize = 0;
 };
 
 class TileMapGraph
 {
+public:
     void AddNode(sf::Vector2i pos);
     void RemoveNode(sf::Vector2i pos);
     const std::vector<Node>& GetNodesVector() const;
@@ -50,7 +52,4 @@ class TileMapGraph
 private:
     std::vector<Node> nodes_;
 };
-
-
-
 }
