@@ -56,10 +56,43 @@ struct Configuration
 };
 
 /**
+ * \brief basic engine class with no graphics manager implementation
+ */
+
+class BasicEngine : public sf::NonCopyable, public System
+{
+public:
+    explicit BasicEngine(Configuration* config = nullptr);
+
+    virtual ~BasicEngine();
+    void Init() override;
+
+    void Update() override;
+
+    void Destroy() override;
+
+    virtual void EngineLoop();
+
+
+    virtual void OnEvent(sf::Event& event);
+
+    Configuration config;
+    bool isRunning = false;
+    std::unique_ptr<sf::RenderWindow> renderWindow = nullptr;
+
+    sf::Time dt;
+protected:
+    sf::Clock engineClock_;
+    Remotery* rmt_ = nullptr;
+    KeyboardManager keyboardManager_;
+    MouseManager mouseManager_;
+};
+
+/**
  * \brief main loop engine class, it runs its own graphics manager thread and manage the window events
  */
 
-class MainEngine : public sf::NonCopyable, public System
+class MainEngine : public BasicEngine
 {
 public:
     explicit MainEngine(Configuration* config = nullptr);
@@ -71,8 +104,10 @@ public:
     void Update() override;
 
     void Destroy() override;
-
-    void EngineLoop();
+    /**
+     * \brief completely override the BasicEngine loop due to the render thread synchronization
+     */
+    void EngineLoop() override;
 
     virtual void OnBeginContact(const Collider* colliderA, const Collider* colliderB)
     {}
@@ -80,13 +115,11 @@ public:
     virtual void OnEndContact(const Collider* colliderA, const Collider* colliderB)
     {}
 
-    virtual void OnEvent(sf::Event& event);
 
-    Configuration config;
-    std::unique_ptr<sf::RenderWindow> renderWindow = nullptr;
+
+
 
     static MainEngine* GetInstance();
-    bool isRunning = false;
 
     sf::Vector2u renderTargetSize;
 
@@ -96,16 +129,13 @@ public:
 
     Index frameIndex = 0;
 
-    sf::Time dt;
 protected:
-    sf::Clock engineClock_;
-    Remotery* rmt_ = nullptr;
+
     ctpl::thread_pool workingThreadPool_;
     std::thread renderThread_;
     std::unique_ptr<GraphicsManager> graphicsManager_ = nullptr;
 
-	KeyboardManager keyboardManager_;
-	MouseManager mouseManager_;
+
 /**
  * static instance use to access the engine from anywhere, because I don't want to have thousands of MainEngine& ref
  */

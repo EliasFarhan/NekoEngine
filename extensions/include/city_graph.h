@@ -1,4 +1,7 @@
 #pragma once
+
+#include <unordered_map>
+
 /*
  MIT License
 
@@ -22,3 +25,30 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
+
+#include <SFML/System/Vector2.hpp>
+#include <array>
+#include <vector>
+#include <map>
+
+namespace neko
+{
+struct Node
+{
+    sf::Vector2i position;
+    std::array<sf::Vector2i, 4> neighbors;
+    size_t neighborsSize = 0;
+};
+class Graph
+{
+    void AddNode(sf::Vector2i pos);
+    const std::map<std::pair<float,float>, Node>& GetNodesMap() const;
+
+    const std::vector<sf::Vector2i> CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vector2i& endPos) const;
+private:
+    std::map<std::pair<float,float>, Node> nodesMap_;
+};
+
+
+
+}

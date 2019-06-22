@@ -27,7 +27,9 @@
 
 namespace neko
 {
-
+/**
+ * \brief simple timer class in second, that needs to be updated with the current delta time of the framce
+ */
 class Timer
 {
 public:

@@ -39,6 +39,118 @@
 namespace neko
 {
 
+BasicEngine::BasicEngine(Configuration* config)
+{
+    if (config != nullptr)
+    {
+        this->config = *config;
+    }
+    initLog();
+
+    rmt_CreateGlobalInstance(&rmt_);
+}
+
+BasicEngine::~BasicEngine()
+{
+    logDebug("Destroy Basic Engine");
+    destroyLog();
+    rmt_DestroyGlobalInstance(rmt_);
+}
+
+void BasicEngine::Update()
+{
+
+}
+
+void BasicEngine::Init()
+{
+    renderWindow = std::make_unique<sf::RenderWindow>(sf::VideoMode(config.screenSize.x, config.screenSize.y),
+                                                      "Neko Engine");
+    if (config.vSync)
+    {
+        renderWindow->setVerticalSyncEnabled(config.vSync);
+    }
+    else
+    {
+        renderWindow->setFramerateLimit(config.framerateLimit);
+    }
+    ImGui::SFML::Init(*renderWindow);
+}
+
+void BasicEngine::Destroy()
+{
+    renderWindow->close();
+    ImGui::SFML::Shutdown();
+    renderWindow = nullptr;
+}
+
+void BasicEngine::EngineLoop()
+{
+    isRunning = true;
+    while (isRunning)
+    {
+
+        rmt_ScopedCPUSample(EngineLoop, 0);
+        dt = engineClock_.restart();
+
+        keyboardManager_.ClearKeys();
+        mouseManager_.ClearFrameData();
+        sf::Event event{};
+        while (renderWindow->pollEvent(event))
+        {
+            OnEvent(event);
+            ImGui::SFML::ProcessEvent(event);
+        }
+
+        {
+            rmt_ScopedCPUSample(Draw, 0);
+            renderWindow->clear(config.bgColor);
+            ImGui::SFML::Update(*renderWindow, dt);
+            Update();
+            ImGui::SFML::Render(*renderWindow);
+            renderWindow->display();
+        }
+    }
+
+    Destroy();
+}
+
+void BasicEngine::OnEvent(sf::Event& event)
+{
+    switch (event.type)
+    {
+        case sf::Event::Closed:
+        {
+            isRunning = false;
+            break;
+        }
+        case sf::Event::KeyPressed:
+        {
+
+            keyboardManager_.AddPressKey(event.key.code);
+            break;
+        }
+        case sf::Event::KeyReleased:
+        {
+            if (event.key.code == sf::Keyboard::Escape)
+            {
+                isRunning = false;
+            }
+            keyboardManager_.AddReleaseKey(event.key.code);
+            break;
+        }
+        case sf::Event::MouseWheelScrolled:
+        {
+            mouseManager_.OnWheelScrolled(event);
+            break;
+        }
+        default:
+        {
+            break;
+        }
+    }
+}
+
 MainEngine* MainEngine::instance_ = nullptr;
 
 
@@ -80,23 +192,16 @@ void MainEngine::EngineLoop()
     Destroy();
 }
 
-MainEngine::MainEngine(Configuration* config)
+MainEngine::MainEngine(Configuration* config) : BasicEngine(config)
 {
-    if (config != nullptr)
-    {
-        this->config = *config;
-    }
-    initLog();
 
-    rmt_CreateGlobalInstance(&rmt_);
 }
 
 MainEngine::~MainEngine()
 {
 
     logDebug("Destroy Main Engine");
-    destroyLog();
-    rmt_DestroyGlobalInstance(rmt_);
+
 
 }
 
@@ -106,17 +211,7 @@ void MainEngine::Init()
 #ifdef __linux__
     XInitThreads();
 #endif
-    renderWindow = std::make_unique<sf::RenderWindow>(sf::VideoMode(config.screenSize.x, config.screenSize.y),
-                                                      "Neko Engine");
-    if (config.vSync)
-    {
-        renderWindow->setVerticalSyncEnabled(config.vSync);
-    }
-    else
-    {
-        renderWindow->setFramerateLimit(config.framerateLimit);
-    }
-    ImGui::SFML::Init(*renderWindow);
+    BasicEngine::Init();
     renderWindow->setActive(false);
     instance_ = this;
 
@@ -137,52 +232,15 @@ void MainEngine::Destroy()
     }
     renderWindow->setActive(true);
 
-    renderWindow->close();
-    ImGui::SFML::Shutdown();
-    renderWindow = nullptr;
+    BasicEngine::Destroy();
     instance_ = nullptr;
     graphicsManager_ = nullptr;
-}
-
-void MainEngine::OnEvent(sf::Event& event)
-{
-    switch (event.type)
-    {
-        case sf::Event::Closed:
-        {
-            isRunning = false;
-            break;
-        }
-        case sf::Event::KeyPressed:
-        {
-
-            keyboardManager_.AddPressKey(event.key.code);
-            break;
-        }
-        case sf::Event::KeyReleased:
-        {
-            if (event.key.code == sf::Keyboard::Escape)
-            {
-                isRunning = false;
-            }
-            keyboardManager_.AddReleaseKey(event.key.code);
-            break;
-        }
-        case sf::Event::MouseWheelScrolled:
-        {
-            mouseManager_.OnWheelScrolled(event);
-            break;
-        }
-        default:
-        {
-            break;
-        }
-    }
 }
 
 MainEngine* MainEngine::GetInstance()
 {
     return instance_;
 }
+
 
 }

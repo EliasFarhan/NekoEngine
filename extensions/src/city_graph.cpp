@@ -23,3 +23,47 @@
  */
 
 #include <city_graph.h>
+
+namespace neko
+{
+const std::map<std::pair<float,float>, neko::Node>& Graph::GetNodesMap() const
+{
+    return nodesMap_;
+}
+
+
+void Graph::AddNode(sf::Vector2i pos)
+{
+    const auto posPair = std::pair<float,float>(pos.x, pos.y);
+    if (!(nodesMap_.find(posPair) == nodesMap_.end()))
+        return;
+    Node newNode{};
+    newNode.position = pos;
+
+    for (int dx = -1; dx <= 1; dx++)
+    {
+        for (int dy = -1; dy <= 1; dy++)
+        {
+            sf::Vector2i neighborPos = pos + sf::Vector2i(dx, dy);
+            const auto neighborPosPair = std::pair<float,float>(neighborPos.x, neighborPos.y);
+            auto neighborIt = nodesMap_.find(neighborPosPair);
+            if (neighborIt != nodesMap_.end())
+            {
+                neighborIt->second.neighbors[neighborIt->second.neighborsSize] = pos;
+                neighborIt->second.neighborsSize++;
+
+                newNode.neighbors[newNode.neighborsSize] = neighborIt->second.position;
+                newNode.neighborsSize++;
+            }
+        }
+    }
+    nodesMap_[posPair] = newNode;
+}
+
+const std::vector<sf::Vector2i>
+Graph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vector2i& endPos) const
+{
+    return std::vector<sf::Vector2i>();
+}
+
+}

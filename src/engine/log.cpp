@@ -133,7 +133,8 @@ void destroyLog()
     debugLogger->newMsgSync.notify_all();
     {
 		std::unique_lock<std::mutex> lock(debugLogger->loggingMutex);
-		debugLogger->newMsgSync.wait(lock);
+        using namespace std::chrono_literals;
+		debugLogger->newMsgSync.wait_for(lock, 5ms);
     }
 	debugLogger = nullptr;
 }
