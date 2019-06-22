@@ -83,7 +83,7 @@ public:
     virtual void OnEvent(sf::Event& event);
 
     Configuration config;
-    sf::RenderWindow* renderWindow = nullptr;
+    std::unique_ptr<sf::RenderWindow> renderWindow = nullptr;
 
     static MainEngine* GetInstance();
 
@@ -105,7 +105,7 @@ protected:
     Remotery* rmt = nullptr;
     ctpl::thread_pool workingThreadPool;
     std::thread renderThread;
-    GraphicsManager* graphicsManager{};
+    std::unique_ptr<GraphicsManager> graphicsManager = nullptr;
 
 	KeyboardManager keyboardManager;
 	MouseManager mouseManager;

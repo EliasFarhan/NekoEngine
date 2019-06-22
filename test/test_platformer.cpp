@@ -197,13 +197,13 @@ public:
 
 			transformManager.CopyPositionsFromPhysics2d(physicsManager, 0, 1);
 			spriteManager.CopyTransformPosition(transformManager, 0, 1);
-			spriteManager.PushCommands(graphicsManager, 0, 1);
+			spriteManager.PushCommands(graphicsManager.get(), 0, 1);
 		}
 
 
 		{
 			spriteManager.CopyTransformPosition(transformManager, 1, platformsNmb);
-			spriteManager.PushCommands(graphicsManager, 1, platformsNmb);
+			spriteManager.PushCommands(graphicsManager.get(), 1, platformsNmb);
 		}
 #ifdef __neko_dbg__
         {
