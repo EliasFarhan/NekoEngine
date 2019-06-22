@@ -90,6 +90,7 @@ private:
 class MouseManager
 {
 public:
+    void SetWindow(sf::Window* window);
 	sf::Vector2i GetPosition() const;
 	sf::Vector2i GetLocalPosition(sf::Window& window) const;
 	bool IsButtonPressed(sf::Mouse::Button button) const;
@@ -107,6 +108,7 @@ public:
 	float GetWheelDelta() const;
 	sf::Vector2i GetMouseDelta() const;
 private:
+    sf::Window* window_ = nullptr;
 	float wheelDelta_ = 0.0f;
 	sf::Vector2i previousMousePos_ = sf::Vector2i(0, 0);
 	sf::Vector2i currentMousePos_ = sf::Vector2i(0, 0);

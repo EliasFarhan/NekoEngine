@@ -26,16 +26,18 @@
 
 namespace neko
 {
-const std::map<std::pair<float,float>, neko::Node>& Graph::GetNodesMap() const
+const std::vector<Node>& TileMapGraph::GetNodesVector() const
 {
-    return nodesMap_;
+    return nodes_;
 }
 
 
-void Graph::AddNode(sf::Vector2i pos)
+void TileMapGraph::AddNode(sf::Vector2i pos)
 {
-    const auto posPair = std::pair<float,float>(pos.x, pos.y);
-    if (!(nodesMap_.find(posPair) == nodesMap_.end()))
+    auto checkIfAlreadyExistResult = std::find_if(nodes_.begin(),nodes_.end(),[&pos](const Node& node){
+        return node.position == pos;
+    });
+    if (checkIfAlreadyExistResult != nodes_.end())
         return;
     Node newNode{};
     newNode.position = pos;
@@ -45,25 +47,57 @@ void Graph::AddNode(sf::Vector2i pos)
         for (int dy = -1; dy <= 1; dy++)
         {
             sf::Vector2i neighborPos = pos + sf::Vector2i(dx, dy);
-            const auto neighborPosPair = std::pair<float,float>(neighborPos.x, neighborPos.y);
-            auto neighborIt = nodesMap_.find(neighborPosPair);
-            if (neighborIt != nodesMap_.end())
+            auto neighborIt = std::find_if(nodes_.begin(),nodes_.end(),[&neighborPos](const Node& node){
+                return node.position == neighborPos;
+            });
+            if (neighborIt != nodes_.end())
             {
-                neighborIt->second.neighbors[neighborIt->second.neighborsSize] = pos;
-                neighborIt->second.neighborsSize++;
+                neighborIt->neighbors[neighborIt->neighborsSize] = pos;
+                neighborIt->neighborsSize++;
 
-                newNode.neighbors[newNode.neighborsSize] = neighborIt->second.position;
+                newNode.neighbors[newNode.neighborsSize] = neighborIt->position;
                 newNode.neighborsSize++;
             }
         }
     }
-    nodesMap_[posPair] = newNode;
+    nodes_.push_back(newNode);
+}
+
+void TileMapGraph::RemoveNode(sf::Vector2i pos)
+{
+    auto nodeIt = std::find_if(nodes_.begin(),nodes_.end(),[&pos](const Node& node){
+        return node.position == pos;
+    });
+    //Cannot remove a node that does not exist
+    if (nodeIt == nodes_.end())
+        return;
+    nodes_.erase(nodeIt);
+    for(auto& otherNode : nodes_)
+    {
+        for(int i = 0; i < otherNode.neighborsSize;i++)
+        {
+            if(otherNode.neighbors[i] == pos)
+            {
+                for(int j = i+1; j < otherNode.neighborsSize;j++)
+                {
+                    otherNode.neighbors[j-1] = otherNode.neighbors[j];
+                }
+                otherNode.neighborsSize--;
+                if(otherNode.neighborsSize < 0)
+                {
+                    otherNode.neighborsSize = 0;
+                }
+                break;
+            }
+        }
+    }
 }
 
 const std::vector<sf::Vector2i>
-Graph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vector2i& endPos) const
+TileMapGraph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vector2i& endPos) const
 {
     return std::vector<sf::Vector2i>();
 }
+
 
 }

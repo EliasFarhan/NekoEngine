@@ -75,6 +75,7 @@ void BasicEngine::Init()
         renderWindow->setFramerateLimit(config.framerateLimit);
     }
     ImGui::SFML::Init(*renderWindow);
+    mouseManager_.SetWindow(renderWindow.get());
 }
 
 void BasicEngine::Destroy()

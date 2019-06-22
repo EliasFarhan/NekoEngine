@@ -1,6 +1,3 @@
-#pragma once
-
-
 /*
  MIT License
 
@@ -24,33 +21,20 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
+#include <gtest/gtest.h>
+#include <engine/engine.h>
+#include <city_graph.h>
 
-#include <SFML/System/Vector2.hpp>
-#include <array>
-#include <vector>
-#include <map>
-
-namespace neko
+class PathfindingEngine : public neko::BasicEngine
 {
-
-struct Node
-{
-    sf::Vector2i position;
-    std::array<sf::Vector2i, 4> neighbors;
-    size_t neighborsSize = 0;
-};
-
-class TileMapGraph
-{
-    void AddNode(sf::Vector2i pos);
-    void RemoveNode(sf::Vector2i pos);
-    const std::vector<Node>& GetNodesVector() const;
-
-    const std::vector<sf::Vector2i> CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vector2i& endPos) const;
+public:
 private:
-    std::vector<Node> nodes_;
+    neko::TileMapGraph graph_;
 };
 
-
-
+TEST(CityBuilder, Pathfinding)
+{
+    PathfindingEngine engine;
+    engine.Init();
+    engine.EngineLoop();
 }

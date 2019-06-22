@@ -34,7 +34,7 @@ namespace neko
 {
 KeyboardManager::KeyboardManager()
 {
-	keyStatusArray_.fill(false);
+    keyStatusArray_.fill(false);
 }
 
 void KeyboardManager::ClearKeys()
@@ -73,8 +73,7 @@ void KeyboardManager::AddReleaseKey(sf::Keyboard::Key key)
 
 sf::Vector2i MouseManager::GetPosition() const
 {
-    auto* engine = MainEngine::GetInstance();
-    return GetLocalPosition(*engine->renderWindow);
+    return GetLocalPosition(*window_);
 }
 
 sf::Vector2i MouseManager::GetLocalPosition(sf::Window& window) const
@@ -84,29 +83,34 @@ sf::Vector2i MouseManager::GetLocalPosition(sf::Window& window) const
 
 bool MouseManager::IsButtonPressed(sf::Mouse::Button button) const
 {
-	return sf::Mouse::isButtonPressed(button);
+    return sf::Mouse::isButtonPressed(button);
 }
 
 void MouseManager::OnWheelScrolled(const sf::Event& e)
 {
-	wheelDelta_ = e.mouseWheelScroll.delta;
+    wheelDelta_ = e.mouseWheelScroll.delta;
 }
 
 void MouseManager::ClearFrameData()
 {
-	wheelDelta_ = 0.0f;
+    wheelDelta_ = 0.0f;
 
-	previousMousePos_ = currentMousePos_;
-	currentMousePos_ = GetPosition();
+    previousMousePos_ = currentMousePos_;
+    currentMousePos_ = GetPosition();
 }
 
 float MouseManager::GetWheelDelta() const
 {
-	return wheelDelta_;
+    return wheelDelta_;
 }
 
 sf::Vector2i MouseManager::GetMouseDelta() const
 {
-	return currentMousePos_ - previousMousePos_;
+    return currentMousePos_ - previousMousePos_;
+}
+
+void MouseManager::SetWindow(sf::Window* window)
+{
+    this->window_ = window;
 }
 }
