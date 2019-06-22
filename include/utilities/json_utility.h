@@ -49,5 +49,5 @@ sf::Vector2f GetVectorFromJson(const json& jsonObject, std::string parameterName
 
 sf::IntRect GetRectFromJson(const json& jsonObject, std::string parameterName);
 
-std::unique_ptr<json> LoadJson(std::string jsonPath);
+std::unique_ptr<json> LoadJson(const std::string& jsonPath);
 }

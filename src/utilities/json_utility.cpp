@@ -89,7 +89,7 @@ sf::Vector2f GetVectorFromJson(const json & jsonObject, std::string parameterNam
 	return vector;
 }
 
-std::unique_ptr<json> LoadJson(std::string jsonPath)
+std::unique_ptr<json> LoadJson(const std::string& jsonPath)
 {
 	std::ifstream jsonFile(jsonPath.c_str());
 	if (jsonFile.peek() == std::ifstream::traits_type::eof())
