@@ -109,7 +109,7 @@ public:
 
 protected:
     std::vector<std::shared_ptr<BehaviorTreeNode>> children_;
-    uint32_t currentCount_;
+    uint32_t currentCount_ = 0;
 };
 
 // Leaf in a behavior tree.
