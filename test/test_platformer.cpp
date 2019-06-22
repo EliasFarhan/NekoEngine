@@ -58,7 +58,8 @@ public:
 			transformManager.scales.emplace_back(1,1);
 			transformManager.angles.push_back(0.0f);
 
-			auto* texture = textureManager.LoadTexture("data/sprites/hero/jump/hero1.png");
+			const Index textureIndex = textureManager.LoadTexture("data/sprites/hero/jump/hero1.png");
+			std::shared_ptr<sf::Texture> texture = textureManager.GetTexture(textureIndex);
 			spriteManager.AddSprite(texture);
 
 			const auto physicsSize = neko::pixel2meter(sf::Vector2f(texture->getSize()));
@@ -120,7 +121,8 @@ public:
 				sf::Vector2f(300,300),
 				sf::Vector2f(300,500)
 			};
-			auto* platformTexture = textureManager.LoadTexture("data/sprites/platform.jpg");
+			const Index textureIndex = textureManager.LoadTexture("data/sprites/platform.jpg");
+			std::shared_ptr<sf::Texture> platformTexture = textureManager.GetTexture(textureIndex);
 
 			for (auto i = 0u ; i < platformsNmb;i++)
 			{

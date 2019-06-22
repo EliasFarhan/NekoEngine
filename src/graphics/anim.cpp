@@ -34,7 +34,7 @@ void SpriteAnimator::Init(json& animatorJson, TextureManager& textureManager, in
 {
     SpriteAnimatorDef spriteAnimatorDef;
     std::vector<SpriteAnimDef> spriteAnimDefs;
-    std::vector<sf::Texture*> texturesTmp;
+    std::vector<std::shared_ptr<sf::Texture>> texturesTmp;
 
     for (auto& spriteAnimJson : animatorJson["anims"])
     {
@@ -55,11 +55,12 @@ void SpriteAnimator::Init(json& animatorJson, TextureManager& textureManager, in
     for (auto& texturePath : animatorJson["textures"])
     {
         std::string pathName = texturePath;
-        auto* texture = textureManager.LoadTexture(pathName);
-        texturesTmp.push_back(texture);
+        auto textureIndex = textureManager.LoadTexture(pathName);
+		std::weak_ptr<sf::Texture> texture = textureManager.GetTexture(textureIndex);
+        texturesTmp.emplace_back(texture);
     }
-    spriteAnimatorDef.textureCount = texturesTmp.size();
-    spriteAnimatorDef.textures = &texturesTmp[0];
+    spriteAnimatorDef.textures.resize(texturesTmp.size());
+    spriteAnimatorDef.textures.push_back(texturesTmp[0]);
     spriteAnimatorDef.spriteIndex = spriteIndex;
     Init(spriteAnimatorDef, &spriteAnimDefs[0], spriteAnimDefs.size());
 }
@@ -73,8 +74,8 @@ void SpriteAnimator::Init(SpriteAnimatorDef& spriteAnimatorDef, SpriteAnimDef* a
     }
     PlayAnim(0);
     spriteIndex = spriteAnimatorDef.spriteIndex;
-    textures.resize(spriteAnimatorDef.textureCount);
-    memcpy(&textures[0], spriteAnimatorDef.textures, spriteAnimatorDef.textureCount * sizeof(sf::Texture*));
+    textures.resize(spriteAnimatorDef.textures.size());
+	textures = spriteAnimatorDef.textures;
 }
 
 void SpriteAnimator::PlayAnim(const std::string& animName)

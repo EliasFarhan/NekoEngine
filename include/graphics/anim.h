@@ -52,8 +52,7 @@ struct SpriteAnimDef
 struct SpriteAnimatorDef
 {
     int spriteIndex = -1;
-    sf::Texture** textures = nullptr;
-    size_t textureCount = 0;
+    std::vector<std::shared_ptr<sf::Texture>> textures;
 };
 /**
  * \brief manage an animator with several animations (SpriteAnimDef)
@@ -77,7 +76,7 @@ private:
     SpriteAnimDef* currentAnim = nullptr;
     Timer animTimer = {0.0f, 0.0f};
     int currentIndex = 0;
-    std::vector<sf::Texture*> textures;
+    std::vector<std::shared_ptr<sf::Texture>> textures;
 };
 /**
  * \brief manages animators

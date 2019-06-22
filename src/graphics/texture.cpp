@@ -28,8 +28,8 @@
 #include "engine/globals.h"
 #include "utilities/file_utility.h"
 
-namespace neko
-{
+namespace neko {
+
 static std::set<std::string_view> imgExtensionSet
         {
                 ".png",
@@ -46,9 +46,8 @@ static std::set<std::string_view> imgExtensionSet
 
 TextureManager::TextureManager()
 {
-    m_TexturePaths.reserve(InitEntityNmb);
-    m_TextureIdsRefCounts.reserve(InitEntityNmb);
-    m_Textures.reserve(InitEntityNmb);
+    texturePaths_.reserve(InitEntityNmb);
+    textures_.reserve(InitEntityNmb);
 }
 
 bool TextureManager::HasValidExtension(const std::string& filename)
@@ -64,7 +63,7 @@ bool TextureManager::HasValidExtension(const std::string& filename)
     return imgExtensionSet.find(extension) != imgExtensionSet.end();
 }
 
-sf::Texture* TextureManager::LoadTexture(std::string filename)
+Index TextureManager::LoadTexture(std::string filename)
 {
 
 
@@ -73,38 +72,35 @@ sf::Texture* TextureManager::LoadTexture(std::string filename)
         std::ostringstream oss;
         oss << "[ERROR] Texture path: " << filename << " has invalid extension";
         logDebug(oss.str());
-        return nullptr;
+        return INDEX_INVALID;
     }
-    int textureIndex = -1;
-    for (auto i = 0u; i < m_TexturePaths.size(); i++)
+    int textureIndex = INDEX_INVALID;
+    for (auto i = 0u; i < texturePaths_.size(); i++)
     {
-        if (filename == m_TexturePaths[i])
+        if (filename == texturePaths_[i])
         {
             textureIndex = i;
             break;
         }
     }
     //Was or still is loaded
-    if (textureIndex != -1)
+    if (textureIndex != INDEX_INVALID)
     {
         //Check if the texture was destroyed
-        if (m_Textures[textureIndex].getNativeHandle() != 0U)
+        if (textures_[textureIndex]->getNativeHandle() != 0U)
         {
-            m_TextureIdsRefCounts[textureIndex]++;
-            return &m_Textures[textureIndex];
+            return textureIndex;
         }
         else
         {
-            auto* texture = &m_Textures[textureIndex];
-            if (!texture->loadFromFile(filename))
+            if (!textures_[textureIndex]->loadFromFile(filename))
             {
                 std::ostringstream oss;
                 oss << "[ERROR] Could not load texture file: " << filename;
                 logDebug(oss.str());
-                return nullptr;
+                return INDEX_INVALID;
             }
-            m_TextureIdsRefCounts[textureIndex] = 1U;
-            return texture;
+            return textureIndex;
         }
     }
     //Texture was never loaded
@@ -116,13 +112,12 @@ sf::Texture* TextureManager::LoadTexture(std::string filename)
             std::ostringstream oss;
             oss << "[ERROR] Could not load texture file: " << filename;
             logDebug(oss.str());
-            return nullptr;
+            return INDEX_INVALID;
         }
-        m_Textures.emplace_back(texture);
-        m_TexturePaths.push_back(filename);
-        m_TextureIdsRefCounts.push_back(1U);
+        textures_.emplace_back(std::make_shared<sf::Texture>(texture));
+        texturePaths_.push_back(filename);
 
-        return &m_Textures.back();
+        return static_cast<Index>(textures_.size() - 1);
     }
     else
     {
@@ -130,6 +125,14 @@ sf::Texture* TextureManager::LoadTexture(std::string filename)
         oss << "[ERROR] Could not load texture file: " << filename;
         logDebug(oss.str());
     }
-    return nullptr;
+    return INDEX_INVALID;
 }
+
+const std::shared_ptr<sf::Texture> TextureManager::GetTexture(const Index index) const {
+	if (index == INDEX_INVALID || index >= textures_.size()) {
+		return {}; // Same as return nullptr.
+	}
+	return textures_[index];
 }
+
+} // namespace neko

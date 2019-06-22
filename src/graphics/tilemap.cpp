@@ -50,7 +50,8 @@ void TiledMap::Init(const std::string& tilemapPath, TextureManager& textureManag
         Tiledsheet tileSheet;
 
         std::string textureSource = tiledSheetJson["image"];
-        tileSheet.texture = textureManager.LoadTexture(LinkFolderAndFile(sourceFolderPath, textureSource));
+		Index textureIndex = textureManager.LoadTexture(LinkFolderAndFile(sourceFolderPath, textureSource));
+		tileSheet.texture = textureManager.GetTexture(textureIndex);
         tileSheet.tileSize = sf::Vector2u(tiledSheetJson["tilewidth"], tiledSheetJson["tileheight"]);
         tileSheet.firstId = tilesheetPathJson["firstgid"];
         tileSheet.size = sf::Vector2u(tileSheet.texture->getSize().x / tileSheet.tileSize.x,
@@ -153,7 +154,8 @@ void TiledMap::PushCommand(GraphicsManager* graphicsManager)
     const int frameIndex = MainEngine::GetInstance()->frameIndex % 2;
     for (auto& tilesheet: tileSheets)
     {
-        graphicsManager->Draw(&tilesheet.tilemap[frameIndex], tilesheet.texture);
+		// TODO probably move the graphics manager to handle share_ptr also.
+        graphicsManager->Draw(&tilesheet.tilemap[frameIndex], tilesheet.texture.get());
     }
 }
 }

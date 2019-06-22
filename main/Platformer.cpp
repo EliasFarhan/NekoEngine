@@ -61,7 +61,8 @@ public:
             transformManager.scales.emplace_back(1,1);
             transformManager.angles.push_back(0.0f);
 
-            auto* texture = textureManager.LoadTexture("data/sprites/hero/jump/hero1.png");
+            auto textureIndex = textureManager.LoadTexture("data/sprites/hero/jump/hero1.png");
+			const std::shared_ptr<sf::Texture> texture = textureManager.GetTexture(textureIndex);
             spriteManager.AddSprite(texture);
 
             const auto physicsSize = neko::pixel2meter(sf::Vector2f(texture->getSize()));

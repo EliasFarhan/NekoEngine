@@ -52,7 +52,8 @@ public:
     void Init() override
     {
         MainEngine::Init();
-        texture = textureManager.LoadTexture("data/sprites/wall.jpg");
+		const Index textureIndex = textureManager.LoadTexture("data/sprites/wall.jpg");
+		texture = textureManager.GetTexture(textureIndex);
         sprite.setTexture(*texture);
 
     }
@@ -66,7 +67,7 @@ public:
 
 private:
     neko::TextureManager textureManager;
-    sf::Texture* texture;
+    std::shared_ptr<sf::Texture> texture;
     sf::Sprite sprite;
 };
 
@@ -83,7 +84,8 @@ public:
     void Init() override
     {
         MainEngine::Init();
-        const auto* texture = textureManager.LoadTexture("data/sprites/wall.jpg");
+		const Index textureIndex = textureManager.LoadTexture("data/sprites/wall.jpg");
+		const std::shared_ptr<sf::Texture> texture = textureManager.GetTexture(textureIndex);
 
         std::uniform_real_distribution<float> randomX(0.0f,
                                                       config.screenSize.x); // generates random floats between 0.0 and 1.0

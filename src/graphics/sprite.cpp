@@ -37,10 +37,10 @@ SpriteManager::SpriteManager()
     sprites[1].reserve(InitEntityNmb);
 }
 
-Index SpriteManager::AddSprite(const sf::Texture* texture)
+Index SpriteManager::AddSprite(const std::shared_ptr<sf::Texture> texture)
 {
     sf::Sprite sprite;
-    if (texture != nullptr)
+    if (texture.get() != nullptr)
     {
         sprite.setTexture(*texture);
         sprite.setOrigin(sf::Vector2f(texture->getSize()) / 2.0f);

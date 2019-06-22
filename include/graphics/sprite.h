@@ -25,6 +25,7 @@
  */
 
 #include <vector>
+#include <memory>
 #include <SFML/Graphics/Sprite.hpp>
 #include <engine/globals.h>
 
@@ -44,7 +45,7 @@ class SpriteManager
 public:
     SpriteManager();
 
-    Index AddSprite(const sf::Texture* texture);
+    Index AddSprite(const std::shared_ptr<sf::Texture> texture);
 
     sf::Sprite* GetSpriteAt(unsigned int spriteIndex);
 

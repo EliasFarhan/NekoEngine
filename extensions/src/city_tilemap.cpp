@@ -33,10 +33,12 @@ void CityBuilderTilemap::Init(TextureManager& textureManager)
 {
     for(int i = 0; i < int(CityTilesheetType::CAR); i++)
     {
-        tilesheets[i].texture = textureManager.LoadTexture(cityTextureName);
+		Index textureIndex = textureManager.LoadTexture(cityTextureName);
+		tilesheets[i].texture = textureManager.GetTexture(textureIndex);
         tilesheets[i].texture->setRepeated(true);
     }
-    tilesheets[unsigned(CityTilesheetType::CAR)].texture = textureManager.LoadTexture(carTextureName);
+	const Index textureIndex = textureManager.LoadTexture(carTextureName);
+	tilesheets[unsigned(CityTilesheetType::CAR)].texture = textureManager.GetTexture(textureIndex);
     tilesheets[unsigned(CityTilesheetType::CAR)].texture->setRepeated(true);
 
     {
@@ -513,10 +515,10 @@ void CityBuilderTilemap::PushCommand(GraphicsManager* graphicsManager)
 {
     rmt_ScopedCPUSample(PushCityTilemapCommands, 0);
     const int frameIndex = MainEngine::GetInstance()->frameIndex % 2;
-    graphicsManager->Draw(&tilesheets[unsigned(CityTilesheetType::ENVIRONMENT)].tilemap[frameIndex], tilesheets[unsigned(CityTilesheetType::ENVIRONMENT)].texture);
-    graphicsManager->Draw(&tilesheets[unsigned(CityTilesheetType::TRANSPORT)].tilemap[frameIndex], tilesheets[unsigned(CityTilesheetType::TRANSPORT)].texture);
-    graphicsManager->Draw(&tilesheets[unsigned(CityTilesheetType::CAR)].tilemap[frameIndex], tilesheets[unsigned(CityTilesheetType::CAR)].texture);
-    graphicsManager->Draw(&tilesheets[unsigned(CityTilesheetType::CITY)].tilemap[frameIndex], tilesheets[unsigned(CityTilesheetType::CITY)].texture);
+    graphicsManager->Draw(&tilesheets[unsigned(CityTilesheetType::ENVIRONMENT)].tilemap[frameIndex], tilesheets[unsigned(CityTilesheetType::ENVIRONMENT)].texture.get());
+    graphicsManager->Draw(&tilesheets[unsigned(CityTilesheetType::TRANSPORT)].tilemap[frameIndex], tilesheets[unsigned(CityTilesheetType::TRANSPORT)].texture.get());
+    graphicsManager->Draw(&tilesheets[unsigned(CityTilesheetType::CAR)].tilemap[frameIndex], tilesheets[unsigned(CityTilesheetType::CAR)].texture.get());
+    graphicsManager->Draw(&tilesheets[unsigned(CityTilesheetType::CITY)].tilemap[frameIndex], tilesheets[unsigned(CityTilesheetType::CITY)].texture.get());
 
 }
 
