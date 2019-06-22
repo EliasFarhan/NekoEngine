@@ -53,25 +53,27 @@ void MainEngine::EngineLoop()
 
         rmt_ScopedCPUSample(EngineLoop, 0);
         dt = engineClock_.restart();
-        isReady = true;
         if (frameIndex > 0)
         {
 
             rmt_ScopedCPUSample(WaitForGraphics, 0);
-            std::unique_lock<std::mutex> lock(renderMutex);
-            condSyncRender.wait(lock);
+            std::unique_lock<std::mutex> lock(renderStartMutex);
+            condSyncRender.notify_all();
         }
-        isReady = false;
-		keyboardManager_.ClearKeys();
-		mouseManager_.ClearFrameData();
-		sf::Event event{};
-		while (renderWindow->pollEvent(event))
-		{
-			OnEvent(event);
-			ImGui::SFML::ProcessEvent(event);
-		}
+        keyboardManager_.ClearKeys();
+        mouseManager_.ClearFrameData();
+        sf::Event event{};
+        while (renderWindow->pollEvent(event))
+        {
+            OnEvent(event);
+            ImGui::SFML::ProcessEvent(event);
+        }
         Update();
-
+        if (frameIndex > 0)
+        {
+            //wait for the end of the rendering
+            std::unique_lock<std::mutex> lock(graphicsManager_->renderingMutex);
+        }
         frameIndex++;
     }
 
@@ -104,7 +106,8 @@ void MainEngine::Init()
 #ifdef __linux__
     XInitThreads();
 #endif
-    renderWindow = std::make_unique<sf::RenderWindow>(sf::VideoMode(config.screenSize.x, config.screenSize.y), "Neko Engine");
+    renderWindow = std::make_unique<sf::RenderWindow>(sf::VideoMode(config.screenSize.x, config.screenSize.y),
+                                                      "Neko Engine");
     if (config.vSync)
     {
         renderWindow->setVerticalSyncEnabled(config.vSync);
@@ -124,13 +127,14 @@ void MainEngine::Init()
 
 void MainEngine::Update()
 {
-	
+
 }
 
 void MainEngine::Destroy()
 {
-    std::unique_lock<std::mutex> lock(renderMutex);
-    condSyncRender.wait(lock); //waiting for render thread to finish
+    {
+        std::unique_lock<std::mutex> lock(graphicsManager_->renderingMutex);
+    }
     renderWindow->setActive(true);
 
     renderWindow->close();
@@ -142,38 +146,38 @@ void MainEngine::Destroy()
 
 void MainEngine::OnEvent(sf::Event& event)
 {
-	switch(event.type)
-	{
-		case sf::Event::Closed:
-		{
-			isRunning = false;
-			break;
-		}
-		case sf::Event::KeyPressed:
-		{
-			
-			keyboardManager_.AddPressKey(event.key.code);
-			break;
-		}
-		case sf::Event::KeyReleased:
-		{
-			if (event.key.code == sf::Keyboard::Escape)
-			{
-				isRunning = false;
-			}
-			keyboardManager_.AddReleaseKey(event.key.code);
-			break; 
-		}
-		case sf::Event::MouseWheelScrolled:
-		{
-			mouseManager_.OnWheelScrolled(event);
-			break;
-		}
-		default:
-		{
-			break;
-		}
-	}
+    switch (event.type)
+    {
+        case sf::Event::Closed:
+        {
+            isRunning = false;
+            break;
+        }
+        case sf::Event::KeyPressed:
+        {
+
+            keyboardManager_.AddPressKey(event.key.code);
+            break;
+        }
+        case sf::Event::KeyReleased:
+        {
+            if (event.key.code == sf::Keyboard::Escape)
+            {
+                isRunning = false;
+            }
+            keyboardManager_.AddReleaseKey(event.key.code);
+            break;
+        }
+        case sf::Event::MouseWheelScrolled:
+        {
+            mouseManager_.OnWheelScrolled(event);
+            break;
+        }
+        default:
+        {
+            break;
+        }
+    }
 }
 
 MainEngine* MainEngine::GetInstance()

@@ -90,8 +90,8 @@ public:
 	void PushCommand(GraphicsManager* graphicsManager) override;
 protected:
 	void AddNewTile(const sf::Vector2f position, const sf::Vector2f size, const sf::FloatRect rect,
-                    const sf::Vector2f center, CityTilesheetType updatedCityTileType, bool flipX,
-                    bool flipY, bool rotate90);
+                    const sf::Vector2f center, CityTilesheetType updatedCityTileType, bool flipX=false,
+                    bool flipY=false, bool rotate90=false, bool culling=true);
 	/**
 	 * \brief use for tile culling
 	 */

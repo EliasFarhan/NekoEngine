@@ -39,6 +39,7 @@ public:
 
 	void Init() override
 	{
+	    config.vSync = true;
 		MainEngine::Init();
 		cityBuilderMap.Init();
 		environmentTilemap.Init(textureManager);

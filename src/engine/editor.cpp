@@ -16,8 +16,9 @@ void Editor::Init()
 
 void Editor::Update()
 {
-    auto dt = MainEngine::GetInstance()->dt;
-    const int frameIndex = graphicsManager_->frameIndex%2;
+    const auto* engine = MainEngine::GetInstance();
+    auto dt = engine->dt;
+    const int frameIndex = (engine->frameIndex-1)%2; //Render frame is always the previous one
     ImGui::SFML::Update(*renderWindow_, dt);
 
     ImGui::Begin("Inspector");

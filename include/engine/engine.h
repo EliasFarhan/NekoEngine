@@ -86,18 +86,15 @@ public:
     std::unique_ptr<sf::RenderWindow> renderWindow = nullptr;
 
     static MainEngine* GetInstance();
+    bool isRunning = false;
 
-    //TODO change to non atomic and to avoid data race with render thread
-    std::atomic<bool> isRunning = false;
-    //TODO find a way with frameIndex, condition_variable to sync with render thread without using atomic
-    std::atomic<bool> isReady = false;
     sf::Vector2u renderTargetSize;
 
     //used to sync with the render thread
     std::condition_variable condSyncRender;
-    std::mutex renderMutex;
-    //TODO change using lock with frame initialization outside of graphics manager context
-    std::atomic<unsigned> frameIndex = 0;
+    std::mutex renderStartMutex;
+
+    Index frameIndex = 0;
 
     sf::Time dt;
 protected:

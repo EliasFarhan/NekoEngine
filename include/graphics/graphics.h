@@ -76,11 +76,7 @@ class GraphicsManager
 {
 public:
     GraphicsManager();
-    //TODO change to non atomic to manage sync
-    std::atomic<bool> isRendering = false;
-    std::atomic<bool> isReady = false;
-    //TODO change to non atomic but manage with lock to sync
-    std::atomic<unsigned int> frameIndex = 0;
+
 /**
  * \brief called by the render loop when iterating through all the basic sfml commands
  * Should not be called from engine thread
@@ -105,6 +101,8 @@ public:
     virtual void RenderLoop();
 
     Editor editor;
+    //Used for Engine loop to wait for graphics thread
+    std::mutex renderingMutex;
 protected:
     /**
      * \brief non owning ptr to renderwindow
@@ -116,5 +114,6 @@ protected:
     sf::View views_[2];
     size_t renderLength_ = 0;
     size_t nextRenderLength_ = 0;
+    Index frameIndex = 0u;
 };
 }
