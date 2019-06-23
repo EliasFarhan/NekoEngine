@@ -31,7 +31,7 @@
 namespace neko
 {
 	BehaviorTreeNode::BehaviorTreeNode(
-		std::vector<std::pair<std::string, std::string>> il)
+		const std::vector<std::pair<std::string, std::string>>& il)
 	{
 		std::for_each(il.begin(), il.end(),
 			[this](std::pair<std::string, std::string> elem) {

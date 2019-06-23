@@ -74,7 +74,8 @@ namespace neko
 	{
 	public:
 		BehaviorTreeNode() = default;
-		BehaviorTreeNode(std::vector<std::pair<std::string, std::string>> il);
+		BehaviorTreeNode(
+			const std::vector<std::pair<std::string, std::string>>& il);
 
 		virtual BehaviorTreeFlow Execute() = 0;
 		virtual CompositeObjectType GetType() const = 0;
@@ -95,7 +96,7 @@ namespace neko
 	public:
 		BehaviorTreeDecorator() = default;
 		BehaviorTreeDecorator(
-			std::vector<std::pair<std::string, std::string>> il) :
+			const std::vector<std::pair<std::string, std::string>>& il) :
 			BehaviorTreeNode(il) {}
 
 		virtual BehaviorTreeFlow Execute() override { return FAILURE; }
@@ -122,14 +123,14 @@ namespace neko
 	public:
 		BehaviorTreeComposite() = default;
 		BehaviorTreeComposite(
-			std::vector<std::shared_ptr<BehaviorTreeNode>> ilNodes) :
+			const std::vector<std::shared_ptr<BehaviorTreeNode>>& ilNodes) :
 			children_(ilNodes) {}
 		BehaviorTreeComposite(
-			std::vector<std::pair<std::string, std::string>> ilVariables) :
+			const std::vector<std::pair<std::string, std::string>>& ilVariables) :
 			BehaviorTreeNode(ilVariables) {}
 		BehaviorTreeComposite(
-			std::vector<std::shared_ptr<BehaviorTreeNode>> ilNodes,
-			std::vector<std::pair<std::string, std::string>> ilVariables) :
+			const std::vector<std::shared_ptr<BehaviorTreeNode>>& ilNodes,
+			const std::vector<std::pair<std::string, std::string>>& ilVariables) :
 			BehaviorTreeNode(ilVariables),
 			children_(ilNodes) {}
 
@@ -159,7 +160,7 @@ namespace neko
 	public:
 		BehaviorTreeLeaf() = default;
 		BehaviorTreeLeaf(
-			std::vector<std::pair<std::string, std::string>> ilVariables) :
+			const std::vector<std::pair<std::string, std::string>>& ilVariables) :
 			BehaviorTreeNode(ilVariables) {}
 
 		virtual BehaviorTreeFlow Execute() override { return FAILURE; }
@@ -175,14 +176,14 @@ namespace neko
 	public:
 		BehaviorTreeComponentSequence() = default;
 		BehaviorTreeComponentSequence(
-			std::vector<std::shared_ptr<BehaviorTreeNode>> ilNodes) :
+			const std::vector<std::shared_ptr<BehaviorTreeNode>>& ilNodes) :
 			BehaviorTreeComposite(ilNodes) {}
 		BehaviorTreeComponentSequence(
-			std::vector<std::pair<std::string, std::string>> ilVariables) :
+			const std::vector<std::pair<std::string, std::string>>& ilVariables) :
 			BehaviorTreeComposite(ilVariables) {}
 		BehaviorTreeComponentSequence(
-			std::vector<std::shared_ptr<BehaviorTreeNode>> ilNodes,
-			std::vector<std::pair<std::string, std::string>> ilVariables) :
+			const std::vector<std::shared_ptr<BehaviorTreeNode>>& ilNodes,
+			const std::vector<std::pair<std::string, std::string>>& ilVariables) :
 			BehaviorTreeComposite(ilNodes, ilVariables) {}
 
 		virtual BehaviorTreeFlow Execute() final;
@@ -198,14 +199,14 @@ namespace neko
 	public:
 		BehaviorTreeComponentSelector() = default;
 		BehaviorTreeComponentSelector(
-			std::vector<std::shared_ptr<BehaviorTreeNode>> ilNodes) :
+			const std::vector<std::shared_ptr<BehaviorTreeNode>>& ilNodes) :
 			BehaviorTreeComposite(ilNodes) {}
 		BehaviorTreeComponentSelector(
-			std::vector<std::pair<std::string, std::string>> ilVariables) :
+			const std::vector<std::pair<std::string, std::string>>& ilVariables) :
 			BehaviorTreeComposite(ilVariables) {}
 		BehaviorTreeComponentSelector(
-			std::vector<std::shared_ptr<BehaviorTreeNode>> ilNodes,
-			std::vector<std::pair<std::string, std::string>> ilVariables) :
+			const std::vector<std::shared_ptr<BehaviorTreeNode>>& ilNodes,
+			const std::vector<std::pair<std::string, std::string>>& ilVariables) :
 			BehaviorTreeComposite(ilNodes, ilVariables) {}
 
 		virtual BehaviorTreeFlow Execute() final;
@@ -222,7 +223,7 @@ namespace neko
 	public:
 		BehaviorTreeLeafWait() = default;
 		BehaviorTreeLeafWait(
-			std::vector<std::pair<std::string, std::string>> ilVariables) :
+			const std::vector<std::pair<std::string, std::string>>& ilVariables) :
 			BehaviorTreeLeaf(ilVariables) {}
 
 		virtual BehaviorTreeFlow Execute() final;
@@ -243,7 +244,7 @@ namespace neko
 	public:
 		BehaviorTreeLeafMoveTo() = default;
 		BehaviorTreeLeafMoveTo(
-			std::vector<std::pair<std::string, std::string>> ilVariables) :
+			const std::vector<std::pair<std::string, std::string>>& ilVariables) :
 			BehaviorTreeLeaf(ilVariables) {}
 
 		virtual BehaviorTreeFlow Execute() final;
