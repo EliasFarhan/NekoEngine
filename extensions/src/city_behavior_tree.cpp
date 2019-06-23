@@ -23,70 +23,350 @@
  */
 
 #include <algorithm>
+#include <sstream>
 #include <city_behavior_tree.h>
 #include "engine/engine.h"
+#include "engine/log.h"
 
 namespace neko
 {
+	BehaviorTreeNode::BehaviorTreeNode(
+		std::vector<std::pair<std::string, std::string>> il)
+	{
+		std::for_each(il.begin(), il.end(),
+			[this](std::pair<std::string, std::string> elem) {
+			variables_.insert(elem);
+		});
+	}
 
-void BehaviorTreeNode::SetVariable(const std::string& variable, const std::string& value)
-{
-    variables_.insert({variable, value});
-}
+	void BehaviorTreeNode::SetVariable(
+		const std::string& variable, 
+		const std::string& value)
+	{
+		variables_.insert({ variable, value });
+	}
 
-std::string BehaviorTreeNode::GetVariable(const std::string& variable) const
-{
-    auto it = variables_.find(variable);
-    if (it != variables_.end())
-    {
-        return it->second;
-    }
-    return "null";
-}
+	const std::string BehaviorTreeNode::GetVariable(
+		const std::string& variable) const
+	{
+		auto it = variables_.find(variable);
+		if (it != variables_.end())
+		{
+			return it->second;
+		}
+		return "null";
+	}
 
-BehaviorTreeFlow BehaviorTreeComponentSequence::Execute()
-{
-    if (currentCount_ >= children_.size()) currentCount_ = 0;
-    BehaviorTreeFlow flow = children_[currentCount_]->Execute();
-    currentCount_++;
-    if (flow == RUNNING) return RUNNING;
-    if (flow == FAILURE) return FAILURE;
-    return SUCCESS;
-}
+	BehaviorTreeFlow BehaviorTreeComponentSequence::Execute()
+	{
+		if (currentCount_ >= children_.size()) currentCount_ = 0;
+		BehaviorTreeFlow flow = children_[currentCount_]->Execute();
+		currentCount_++;
+		if (flow == RUNNING) return RUNNING;
+		if (flow == FAILURE) return FAILURE;
+		return SUCCESS;
+	}
 
-BehaviorTreeFlow BehaviorTreeComponentSelector::Execute()
-{
-    if (currentCount_ >= children_.size()) currentCount_ = 0;
-    BehaviorTreeFlow flow = children_[currentCount_]->Execute();
-    currentCount_++;
-    if (flow == RUNNING) return RUNNING;
-    if (flow == SUCCESS) return SUCCESS;
-    return FAILURE;
-}
+	BehaviorTreeFlow BehaviorTreeComponentSelector::Execute()
+	{
+		if (currentCount_ >= children_.size()) currentCount_ = 0;
+		BehaviorTreeFlow flow = children_[currentCount_]->Execute();
+		currentCount_++;
+		if (flow == RUNNING) return RUNNING;
+		if (flow == SUCCESS) return SUCCESS;
+		return FAILURE;
+	}
 
-BehaviorTreeFlow BehaviorTreeWait::Execute()
-{
-    if (!started_)
-    {
-        float delay = std::stof(GetVariable("delay"));
-        timer_.time = 0.0f;
-        timer_.period = delay;
-        timer_.Reset();
-        started_ = true;
-        return RUNNING;
-    }
-    timer_.Update(MainEngine::GetInstance()->dt.asSeconds());
-    if (timer_.IsOver())
-    {
-        started_ = false;
-        return SUCCESS;
-    }
-    return RUNNING;
-}
+	BehaviorTreeFlow BehaviorTreeLeafWait::Execute()
+	{
+		if (!started_)
+		{
+			float delay = std::stof(GetVariable("delay"));
+			timer_.time = 0.0f;
+			timer_.period = delay;
+			timer_.Reset();
+			started_ = true;
+			return RUNNING;
+		}
+		timer_.Update(MainEngine::GetInstance()->dt.asSeconds());
+		if (timer_.IsOver())
+		{
+			started_ = false;
+			return SUCCESS;
+		}
+		return RUNNING;
+	}
 
-BehaviorTreeFlow BehaviorTreeLeafMoveTo::Execute()
-{
-    return SUCCESS;
-}
+	BehaviorTreeFlow BehaviorTreeLeafMoveTo::Execute()
+	{
+		return SUCCESS;
+	}
+
+	void PrintBehaviorTree(const BehaviorTreeNode* behaviorTree)
+	{
+		static int indent = 0;
+		std::ostringstream oss_indent;
+		for (int i = 0; i < indent; ++i) {
+			oss_indent << "\t";
+		}
+		if (behaviorTree == nullptr) {
+			logDebug(oss_indent.str() + "ERROR nullptr as a behaviorTree.");
+			return;
+		}
+		logDebug(oss_indent.str() + mapCompositeString.at(behaviorTree->GetType()));
+		const auto& mapVariables = behaviorTree->GetVariables();
+		for (const std::pair<std::string, std::string>& pair : mapVariables) {
+			logDebug(oss_indent.str() + pair.first + "\t\t" + pair.second);
+		}
+		switch (behaviorTree->GetType()) {
+		case COMPOSITE_SEQUENCE:
+		case COMPOSITE_SELECTOR:
+		case INTERFACE_COMPOSITE:
+		{
+			logDebug(oss_indent.str() + "children : {");
+			indent++;
+			const auto* interfaceComposite =
+				dynamic_cast<const BehaviorTreeComposite*>(behaviorTree);
+			if (interfaceComposite == nullptr) {
+				logDebug(oss_indent.str() + "ERROR in composite!");
+			}
+			else
+			{
+				for (const auto& child : interfaceComposite->GetChildrenList()) {
+					PrintBehaviorTree(child.get());
+				}
+			}
+			indent--;
+			logDebug(oss_indent.str() + "}");
+			break;
+		}
+		case INTERFACE_DECORATOR:
+		{
+			logDebug(oss_indent.str() + "decorator : {");
+			indent++;
+			const auto* childDecorator =
+				dynamic_cast<const BehaviorTreeDecorator*>(behaviorTree);
+			if (childDecorator == nullptr) {
+				logDebug(oss_indent.str() + "ERROR in decorator!");
+			}
+			else
+			{
+				PrintBehaviorTree(childDecorator->GetChild().get());
+			}
+			indent--;
+			logDebug(oss_indent.str() + "}");
+			break;
+		}
+		case LEAF_WAIT:
+		case LEAF_MOVE_TO:
+		case INTERFACE_LEAF:
+		{
+			logDebug(oss_indent.str() + "leaf {}");
+			break;
+		}
+		default:
+		{
+			logDebug(oss_indent.str() + "ERROR (unknown type?)!");
+			break;
+		}
+		}
+	}
+
+	struct NodeVariableDesc
+	{
+		std::vector<std::pair<std::string, std::string>> vecVariables;
+		std::vector<std::shared_ptr<BehaviorTreeNode>> vecNodes;
+	};
+
+	// Declaration used in the parsing.
+	static std::shared_ptr<BehaviorTreeNode> ParseJsonObject(
+		const std::string& name, const json& jsonContent);
+
+	static NodeVariableDesc ParseJsonVariablesNodes(
+		const json& jsonContent,
+		bool parseComposite = false)
+	{
+		NodeVariableDesc nodeVariables;
+		for (const auto& element : jsonContent.items())
+		{
+			if (element.value().is_null())
+			{
+				logDebug("ERROR in parsing json value: " + element.value());
+				return {};
+			}
+			if (element.value().is_boolean())
+			{
+				nodeVariables.vecVariables.push_back(
+					{ element.key(), 
+					(element.value().get<bool>()) ? "true" : "false" });
+			}
+			if (element.value().is_number())
+			{
+				nodeVariables.vecVariables.push_back(
+					{ element.key(), 
+					std::to_string(element.value().get<double>()) });
+			}
+			if (element.value().is_object() && parseComposite)
+			{
+				nodeVariables.vecNodes.push_back(
+					ParseJsonObject(element.key(), element.value()));
+			}
+			if (element.value().is_string())
+			{
+				nodeVariables.vecVariables.push_back(
+					{ element.key(), 
+					std::string(element.value().get<std::string>()) });
+			}
+		}
+		return nodeVariables;
+	}
+
+	static std::shared_ptr<BehaviorTreeNode> ParseJsonCompositeSequence(
+		const json& jsonContent)
+	{
+		auto nodeVariables = ParseJsonVariablesNodes(jsonContent, true);
+		std::shared_ptr<BehaviorTreeComponentSequence> compositeSequence =
+			std::make_shared<BehaviorTreeComponentSequence>(
+				nodeVariables.vecNodes,
+				nodeVariables.vecVariables);
+		return compositeSequence;
+	}
+
+	static std::shared_ptr<BehaviorTreeNode> ParseJsonCompositeSelector(
+		const json& jsonContent)
+	{
+		auto nodeVariables = ParseJsonVariablesNodes(jsonContent, true);
+		std::shared_ptr<BehaviorTreeComponentSelector> compositeSelector =
+			std::make_shared<BehaviorTreeComponentSelector>(
+				nodeVariables.vecNodes,
+				nodeVariables.vecVariables);
+		return compositeSelector;
+	}
+
+	static std::shared_ptr<BehaviorTreeNode> ParseJsonComposite(
+		const json& jsonContent) 
+	{
+		logDebug("WARNING trying to parse a composite node!");
+		auto nodeVariables = ParseJsonVariablesNodes(jsonContent, true);
+		std::shared_ptr<BehaviorTreeComposite> composite =
+			std::make_shared<BehaviorTreeComposite>(
+				nodeVariables.vecNodes,
+				nodeVariables.vecVariables);
+		return composite;
+	}
+
+	static std::shared_ptr<BehaviorTreeNode> ParseJsonDecorator(const json& jsonContent) 
+	{
+		logDebug("WARNING trying to parse a decorator node!");
+		auto nodeVariables = ParseJsonVariablesNodes(jsonContent, true);
+		std::shared_ptr<BehaviorTreeDecorator> decorator =
+			std::make_shared<BehaviorTreeDecorator>(
+				nodeVariables.vecVariables);
+		assert(nodeVariables.vecNodes.size() == 1);
+		decorator->SetChild(nodeVariables.vecNodes[0]);
+		return decorator;
+	}
+
+	static std::shared_ptr<BehaviorTreeNode> ParseJsonLeafWait(const json& jsonContent) 
+	{
+		auto nodeVariables = ParseJsonVariablesNodes(jsonContent);
+		std::shared_ptr<BehaviorTreeLeafWait> wait =
+			std::make_shared<BehaviorTreeLeafWait>(
+				nodeVariables.vecVariables);
+		return wait;
+	}
+
+	static std::shared_ptr<BehaviorTreeNode> ParseJsonLeafMoveTo(
+		const json& jsonContent) 
+	{
+		auto nodeVariables = ParseJsonVariablesNodes(jsonContent);
+		std::shared_ptr<BehaviorTreeLeafMoveTo> moveTo =
+			std::make_shared<BehaviorTreeLeafMoveTo>(
+				nodeVariables.vecVariables);
+		return moveTo;
+	}
+
+	static std::shared_ptr<BehaviorTreeNode> ParseJsonLeaf(
+		const json& jsonContent) 
+	{
+		logDebug("WARNING trying to parse a leaf node!");
+		auto nodeVariables = ParseJsonVariablesNodes(jsonContent);
+		std::shared_ptr<BehaviorTreeLeaf> leaf =
+			std::make_shared<BehaviorTreeLeaf>(
+				nodeVariables.vecVariables);
+		return leaf;
+	}
+
+	static std::shared_ptr<BehaviorTreeNode> ParseJsonObject(
+		const std::string& name, 
+		const json& jsonContent)
+	{
+		static const std::map<std::string, CompositeObjectType> reverseMap =
+			[]() ->std::map<std::string, CompositeObjectType> 
+		{
+			std::map<std::string, CompositeObjectType> reverse;
+			std::for_each(mapCompositeString.begin(), mapCompositeString.end(),
+				[&reverse](std::pair<CompositeObjectType, std::string> pair)
+			{
+				reverse.insert({ pair.second, pair.first });
+			});
+			return reverse;
+		}();
+		assert(reverseMap.size() == mapCompositeString.size());
+		auto it = reverseMap.find(name);
+		if (it != reverseMap.end())
+		{
+			switch (it->second) {
+			case COMPOSITE_SEQUENCE:
+				return ParseJsonCompositeSequence(jsonContent);
+			case COMPOSITE_SELECTOR:
+				return ParseJsonCompositeSelector(jsonContent);
+			case INTERFACE_COMPOSITE:
+				return ParseJsonComposite(jsonContent);
+			case INTERFACE_DECORATOR:
+				return ParseJsonDecorator(jsonContent);
+			case LEAF_WAIT:
+				return ParseJsonLeafWait(jsonContent);
+			case LEAF_MOVE_TO:
+				return ParseJsonLeafMoveTo(jsonContent);
+			case INTERFACE_LEAF:
+				return ParseJsonLeaf(jsonContent);
+			default:
+			{
+				std::ostringstream oss;
+				oss << "Error parsing json: " << jsonContent;
+				logDebug(oss.str());
+				return {};
+			}
+			}
+		}
+		else
+		{
+			logDebug("ERROR parsing jsonContent at key: " + name);
+		}
+		return {};
+	}
+
+	std::shared_ptr<BehaviorTreeNode> ParseBehaviorTreeFromJson(
+		const json& jsonContent)
+	{
+		for (const auto& el : jsonContent.items()) {
+			if (el.key() == "behavior_tree") {
+				return ParseBehaviorTreeFromJson(el.value());
+			}
+			else
+			{
+				return ParseJsonObject(el.key(), el.value());
+			}
+		}
+		return {};
+	}
+
+	std::shared_ptr<BehaviorTreeNode> LoadBehaviorTreeFromJsonFile(
+		const std::string & jsonFile)
+	{
+		std::unique_ptr<json> jsonPtr = LoadJson(jsonFile);
+		return ParseBehaviorTreeFromJson(*jsonPtr);
+	}
 
 } // end namespace neko

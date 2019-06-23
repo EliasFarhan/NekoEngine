@@ -55,29 +55,35 @@ namespace neko
 	};
 
 	// Object type list used to parse the behavior tree in json format.
-	const static std::map<CompositeObjectType, std::string> mapCompositeString = {
-			{INTERFACE_COMPOSITE, "interface_composite"},
-			{INTERFACE_DECORATOR, "interface_decorator"},
-			{INTERFACE_LEAF,      "interface_leaf"},
-			// Composite are connected to more than one sub element derives from Composite.
-			{COMPOSITE_SEQUENCE,  "composite_sequence"},
-			{COMPOSITE_SELECTOR,  "composite_selector"},
-			// Leaf component that derives from leaf node.
-			{LEAF_WAIT,           "leaf_wait"},
-			{LEAF_MOVE_TO,        "leaf_move_to"},
+	const static std::map<CompositeObjectType, std::string> mapCompositeString = 
+	{
+		{INTERFACE_COMPOSITE, "interface_composite"},
+		{INTERFACE_DECORATOR, "interface_decorator"},
+		{INTERFACE_LEAF,      "interface_leaf"},
+		// Composite are connected to more than one sub element derives from
+		// Composite.
+		{COMPOSITE_SEQUENCE,  "composite_sequence"},
+		{COMPOSITE_SELECTOR,  "composite_selector"},
+		// Leaf component that derives from leaf node.
+		{LEAF_WAIT,           "leaf_wait"},
+		{LEAF_MOVE_TO,        "leaf_move_to"},
 	};
 
 	// Global interface for a node in a behavior tree.
 	class BehaviorTreeNode
 	{
 	public:
+		BehaviorTreeNode() = default;
+		BehaviorTreeNode(std::vector<std::pair<std::string, std::string>> il);
+
 		virtual BehaviorTreeFlow Execute() = 0;
-
 		virtual CompositeObjectType GetType() const = 0;
-
-		virtual void SetVariable(const std::string& variable, const std::string& value);
-
-		virtual std::string GetVariable(const std::string& variable) const;
+		void SetVariable(const std::string& variable, const std::string& value);
+		const std::string GetVariable(const std::string& name) const;
+		const std::map<std::string, std::string>& GetVariables() const 
+		{
+			return variables_;
+		}
 
 	protected:
 		std::map<std::string, std::string> variables_;
@@ -87,9 +93,20 @@ namespace neko
 	class BehaviorTreeDecorator : public BehaviorTreeNode
 	{
 	public:
-		virtual BehaviorTreeFlow Execute() override
-		{}
+		BehaviorTreeDecorator() = default;
+		BehaviorTreeDecorator(
+			std::vector<std::pair<std::string, std::string>> il) :
+			BehaviorTreeNode(il) {}
 
+		virtual BehaviorTreeFlow Execute() override { return FAILURE; }
+		void SetChild(const std::shared_ptr<BehaviorTreeNode>& child)
+		{
+			child_ = child;
+		}
+		const std::shared_ptr<BehaviorTreeNode> GetChild() const
+		{
+			return child_;
+		}
 		virtual CompositeObjectType GetType() const
 		{
 			return INTERFACE_DECORATOR;
@@ -103,9 +120,29 @@ namespace neko
 	class BehaviorTreeComposite : public BehaviorTreeNode
 	{
 	public:
-		virtual BehaviorTreeFlow Execute() override
-		{}
+		BehaviorTreeComposite() = default;
+		BehaviorTreeComposite(
+			std::vector<std::shared_ptr<BehaviorTreeNode>> ilNodes) :
+			children_(ilNodes) {}
+		BehaviorTreeComposite(
+			std::vector<std::pair<std::string, std::string>> ilVariables) :
+			BehaviorTreeNode(ilVariables) {}
+		BehaviorTreeComposite(
+			std::vector<std::shared_ptr<BehaviorTreeNode>> ilNodes,
+			std::vector<std::pair<std::string, std::string>> ilVariables) :
+			BehaviorTreeNode(ilVariables),
+			children_(ilNodes) {}
 
+		void AddChild(const std::shared_ptr<BehaviorTreeNode>& child)
+		{
+			children_.push_back(child);
+		}
+		const std::vector<std::shared_ptr<BehaviorTreeNode>> 
+			GetChildrenList() const
+		{
+			return children_;
+		}
+		virtual BehaviorTreeFlow Execute() override { return FAILURE; }
 		virtual CompositeObjectType GetType() const
 		{
 			return INTERFACE_COMPOSITE;
@@ -120,9 +157,12 @@ namespace neko
 	class BehaviorTreeLeaf : public BehaviorTreeNode
 	{
 	public:
-		virtual BehaviorTreeFlow Execute() override
-		{}
+		BehaviorTreeLeaf() = default;
+		BehaviorTreeLeaf(
+			std::vector<std::pair<std::string, std::string>> ilVariables) :
+			BehaviorTreeNode(ilVariables) {}
 
+		virtual BehaviorTreeFlow Execute() override { return FAILURE; }
 		virtual CompositeObjectType GetType() const
 		{
 			return INTERFACE_LEAF;
@@ -133,8 +173,19 @@ namespace neko
 	class BehaviorTreeComponentSequence : public BehaviorTreeComposite
 	{
 	public:
-		virtual BehaviorTreeFlow Execute() final;
+		BehaviorTreeComponentSequence() = default;
+		BehaviorTreeComponentSequence(
+			std::vector<std::shared_ptr<BehaviorTreeNode>> ilNodes) :
+			BehaviorTreeComposite(ilNodes) {}
+		BehaviorTreeComponentSequence(
+			std::vector<std::pair<std::string, std::string>> ilVariables) :
+			BehaviorTreeComposite(ilVariables) {}
+		BehaviorTreeComponentSequence(
+			std::vector<std::shared_ptr<BehaviorTreeNode>> ilNodes,
+			std::vector<std::pair<std::string, std::string>> ilVariables) :
+			BehaviorTreeComposite(ilNodes, ilVariables) {}
 
+		virtual BehaviorTreeFlow Execute() final;
 		virtual CompositeObjectType GetType() const final
 		{
 			return COMPOSITE_SEQUENCE;
@@ -145,8 +196,19 @@ namespace neko
 	class BehaviorTreeComponentSelector : public BehaviorTreeComposite
 	{
 	public:
-		virtual BehaviorTreeFlow Execute() final;
+		BehaviorTreeComponentSelector() = default;
+		BehaviorTreeComponentSelector(
+			std::vector<std::shared_ptr<BehaviorTreeNode>> ilNodes) :
+			BehaviorTreeComposite(ilNodes) {}
+		BehaviorTreeComponentSelector(
+			std::vector<std::pair<std::string, std::string>> ilVariables) :
+			BehaviorTreeComposite(ilVariables) {}
+		BehaviorTreeComponentSelector(
+			std::vector<std::shared_ptr<BehaviorTreeNode>> ilNodes,
+			std::vector<std::pair<std::string, std::string>> ilVariables) :
+			BehaviorTreeComposite(ilNodes, ilVariables) {}
 
+		virtual BehaviorTreeFlow Execute() final;
 		virtual CompositeObjectType GetType() const final
 		{
 			return COMPOSITE_SELECTOR;
@@ -155,18 +217,22 @@ namespace neko
 
 	// Leaf Wait in a behavior tree.
 	// The delay can be set with the SetVariable("delay", "1.0");.
-	class BehaviorTreeWait : public BehaviorTreeLeaf
+	class BehaviorTreeLeafWait : public BehaviorTreeLeaf
 	{
 	public:
-		virtual BehaviorTreeFlow Execute() final;
+		BehaviorTreeLeafWait() = default;
+		BehaviorTreeLeafWait(
+			std::vector<std::pair<std::string, std::string>> ilVariables) :
+			BehaviorTreeLeaf(ilVariables) {}
 
+		virtual BehaviorTreeFlow Execute() final;
 		virtual CompositeObjectType GetType() const final
 		{
 			return LEAF_WAIT;
 		}
 
 	private:
-		Timer timer_;
+		Timer timer_ = { 0.0, 0.0 };
 		bool started_ = false;
 	};
 
@@ -175,12 +241,22 @@ namespace neko
 	class BehaviorTreeLeafMoveTo : public BehaviorTreeLeaf
 	{
 	public:
-		virtual BehaviorTreeFlow Execute() final;
+		BehaviorTreeLeafMoveTo() = default;
+		BehaviorTreeLeafMoveTo(
+			std::vector<std::pair<std::string, std::string>> ilVariables) :
+			BehaviorTreeLeaf(ilVariables) {}
 
+		virtual BehaviorTreeFlow Execute() final;
 		virtual CompositeObjectType GetType() const final
 		{
 			return LEAF_MOVE_TO;
 		}
 	};
+
+	void PrintBehaviorTree(const BehaviorTreeNode* behaviorTree);
+	std::shared_ptr<BehaviorTreeNode> ParseBehaviorTreeFromJson(
+		const json& jsonContent);
+	std::shared_ptr<BehaviorTreeNode> LoadBehaviorTreeFromJsonFile(
+		const std::string& jsonFile);
 
 }    // namespace neko
