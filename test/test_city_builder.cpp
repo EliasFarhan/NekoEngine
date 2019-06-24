@@ -37,29 +37,59 @@ public:
 		config.screenSize = sf::Vector2u(800, 800);
 		
 		BasicEngine::Init();
-		for (int dx = 0; dx < tileNmb.x; dx++)
-		{
-			for (int dy = 0; dy < tileNmb.y; dy++)
-			{
-				const sf::Vector2i pos = sf::Vector2i(dx, dy);
+		roadPositions_.reserve(roadNmb_);
+		rects_.reserve(roadNmb_);
+		sf::Vector2i direction = sf::Vector2i(1,0);
+		sf::Vector2i currentPos = sf::Vector2i(-1,0);
+		const auto inverseVector2i = [](const sf::Vector2i dir, bool negative = false)->sf::Vector2i{
+		    return (negative?-1:1)*sf::Vector2i(dir.y, dir.x);
+		};
+		for(Index i = 0u; i < roadNmb_;i++)
+        {
+		    const int randValue = rand()%20;
+		    if(randValue == 0)
+            {
+		        direction = inverseVector2i(direction);
+            }
+            if(randValue == 1)
+            {
+                direction = inverseVector2i(direction, true);
+            }
 
-				bool inactive = (rand() % 10 == 1) && pos != sf::Vector2i(0,0);
-				if(!inactive)
-				{
-					graph_.AddNode(pos);
-				}
+            sf::Vector2i newPos = currentPos+direction;
+            if(newPos.x < 0 || newPos.x >= tileNmb.x)
+            {
+                direction.x = -direction.x;
+                newPos = currentPos+direction;
+            }
 
-				sf::RectangleShape rect;
-				auto rectSize = sf::Vector2f(config.screenSize.x / tileNmb.x, config.screenSize.y / tileNmb.y);
-				rect.setFillColor(inactive?sf::Color::Black:sf::Color::Blue);
-				rect.setOutlineColor(sf::Color::Green);
-				rect.setOutlineThickness(2.0f);
-				rect.setOrigin(rectSize/2.0f);
-				rect.setPosition(sf::Vector2f(rectSize.x*dx, rectSize.y*dy)+ rectSize / 2.0f);
-				rect.setSize(rectSize);
-				rects_.push_back(rect);
-			}
-		}
+            if(newPos.y < 0 || newPos.y >= tileNmb.y)
+            {
+                direction.y = -direction.y;
+                newPos = currentPos+direction;
+            }
+            currentPos = newPos;
+            if(graph_.ContainNode(newPos))
+            {
+                i--;
+                continue;
+            }
+            sf::RectangleShape rect;
+
+            const auto rectSize = sf::Vector2f(config.screenSize.x / tileNmb.x, config.screenSize.y / tileNmb.y);
+            rect.setFillColor(sf::Color::Blue);
+            rect.setOutlineColor(sf::Color::Green);
+            rect.setOutlineThickness(outlineThickness);
+            rect.setOrigin(rectSize/2.0f);
+            rect.setPosition(sf::Vector2f(rectSize.x * newPos.x, rectSize.y * newPos.y) + rectSize / 2.0f);
+            rect.setSize(rectSize-sf::Vector2f(outlineThickness, outlineThickness)*2.0f);
+            roadPositions_.push_back(newPos);
+            rects_.push_back(rect);
+            graph_.AddNode(newPos);
+
+
+
+        }
 	}
 	void Update() override
 	{
@@ -68,28 +98,22 @@ public:
 		auto rectSize = sf::Vector2f(config.screenSize.x / tileNmb.x, config.screenSize.y / tileNmb.y);
 		sf::Vector2i tilePos = sf::Vector2i(mousePos.x / rectSize.x, mousePos.y / rectSize.y);
 		const auto path = graph_.CalculateShortestPath(sf::Vector2i(0, 0), tilePos);
-		int i = 0;
-		for (int dx = 0; dx < tileNmb.x; dx++)
+
+		for (Index i = 0; i < roadPositions_.size();i++)
 		{
-			for (int dy = 0; dy < tileNmb.y; dy++)
-			{
-				const sf::Vector2i pos = sf::Vector2i(dx, dy);
-				const Index rectIndex = i;
-				if (std::find(path.begin(), path.end(), pos) != path.end())
-				{
-					rects_[rectIndex].setFillColor(sf::Color::Red);
-				}
-				else
-				{
-					bool inactive = rects_[rectIndex].getFillColor() == sf::Color::Black;
-					rects_[rectIndex].setFillColor(inactive?sf::Color::Black:sf::Color::Blue);
-				}
-				i++;
-			}
+            const sf::Vector2i pos = roadPositions_[i];
+            if (std::find(path.begin(), path.end(), pos) != path.end())
+            {
+                rects_[i].setFillColor(sf::Color::Red);
+            }
+            else
+            {
+                rects_[i].setFillColor(sf::Color::Blue);
+            }
 		}
 		{
 			rmt_ScopedCPUSample(DrawRectangles, 0);
-			for (auto& rect : rects_)
+			for (const auto& rect : rects_)
 			{
 				renderWindow->draw(rect);
 			}
@@ -107,8 +131,10 @@ public:
 private:
 	std::vector<sf::RectangleShape> rects_;
     neko::TileMapGraph graph_;
-	const sf::Vector2u tileNmb = sf::Vector2u(200, 200);
-
+	const sf::Vector2u tileNmb = sf::Vector2u(100, 100);
+	const size_t roadNmb_ = 1000;
+	const float outlineThickness = 1.0f;
+    std::vector<sf::Vector2i> roadPositions_;
 };
 
 TEST(CityBuilder, Pathfinding)
