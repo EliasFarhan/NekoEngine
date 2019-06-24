@@ -127,7 +127,7 @@ public:
     std::condition_variable condSyncRender;
     std::mutex renderStartMutex;
 
-    Index frameIndex = 0;
+    std::atomic<Index> frameIndex = 0;
 
 protected:
 

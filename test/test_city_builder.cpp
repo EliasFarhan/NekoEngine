@@ -40,10 +40,25 @@ public:
 		roadPositions_.reserve(roadNmb_);
 		rects_.reserve(roadNmb_);
 		sf::Vector2i direction = sf::Vector2i(1,0);
-		sf::Vector2i currentPos = sf::Vector2i(-1,0);
+		sf::Vector2i currentPos = sf::Vector2i(0,0);
 		const auto inverseVector2i = [](const sf::Vector2i dir, bool negative = false)->sf::Vector2i{
 		    return (negative?-1:1)*sf::Vector2i(dir.y, dir.x);
 		};
+		//Adding initial pos
+		{
+			sf::RectangleShape rect;
+
+			const auto rectSize = sf::Vector2f(config.screenSize.x / tileNmb.x, config.screenSize.y / tileNmb.y);
+			rect.setFillColor(sf::Color::Blue);
+			rect.setOutlineColor(sf::Color::Green);
+			rect.setOutlineThickness(outlineThickness);
+			rect.setOrigin(rectSize / 2.0f);
+			rect.setPosition(sf::Vector2f(rectSize.x * currentPos.x, rectSize.y * currentPos.y) + rectSize / 2.0f);
+			rect.setSize(rectSize - sf::Vector2f(outlineThickness, outlineThickness)*2.0f);
+			roadPositions_.push_back(currentPos);
+			rects_.push_back(rect);
+			graph_.AddNode(currentPos);
+		}
 		for(Index i = 0u; i < roadNmb_;i++)
         {
 		    const int randValue = rand()%20;
