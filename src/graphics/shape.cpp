@@ -62,7 +62,7 @@ ShapeManager::AddPolygon(const sf::Vector2f& pos, const sf::Vector2f* points, si
     newPolygon.setOutlineColor(shapeDef.outlineColor);
     newPolygon.setOutlineThickness(shapeDef.outlineThickness);
 
-    const Index index = convexShape_[0].size();
+    const Index index = Index(convexShape_[0].size());
     convexShape_[0].push_back(newPolygon);
     convexShape_[1].push_back(newPolygon);
     return index;

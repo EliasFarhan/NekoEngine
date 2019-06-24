@@ -25,6 +25,7 @@
  */
 #include <vector>
 #include <limits>
+#include <memory>
 #include <SFML/Graphics/Texture.hpp>
 #include "engine/globals.h"
 

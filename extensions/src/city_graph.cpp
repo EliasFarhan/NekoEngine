@@ -80,12 +80,12 @@ void TileMapGraph::AddNode(sf::Vector2i pos)
 				if (checkNeighbor == neighborIt->neighbors.begin()+neighborIt->neighborsSize)
 				{
 					neighborIt->neighbors[neighborIt->neighborsSize] = pos;
-					neighborIt->neighborsIndex[neighborIt->neighborsSize] = nodes_.size()-1;
+					neighborIt->neighborsIndex[neighborIt->neighborsSize] = Index(nodes_.size()-1);
 					neighborIt->neighborsSize++;
 				}
 
 				nodePtr->neighbors[nodePtr->neighborsSize] = neighborIt->position;
-				nodePtr->neighborsIndex[nodePtr->neighborsSize] = (neighborIt-nodes_.begin());
+				nodePtr->neighborsIndex[nodePtr->neighborsSize] = Index(neighborIt-nodes_.begin());
 				nodePtr->neighborsSize++;
 			}
 		}
@@ -133,7 +133,7 @@ float distance(Node nodeA, Node nodeB)
 float distance(sf::Vector2i posA, sf::Vector2i posB)
 {
 	const auto deltaPos = posB - posA;
-	return sqrtf(deltaPos.x*deltaPos.x + deltaPos.y*deltaPos.y);
+	return sqrtf(float(deltaPos.x*deltaPos.x + deltaPos.y*deltaPos.y));
 }
 
 

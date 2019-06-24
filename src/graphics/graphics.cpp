@@ -39,6 +39,8 @@ void SfmlCommand::Draw(sf::RenderTarget* renderTarget)
 
 GraphicsManager::GraphicsManager()
 {
+	commandBuffers_[0].fill(nullptr);
+	commandBuffers_[1].fill(nullptr);
 }
 
 void GraphicsManager::Draw(sf::Drawable& drawable)
@@ -51,7 +53,7 @@ void GraphicsManager::Draw(sf::Drawable& drawable)
     const int index = MainEngine::GetInstance()->frameIndex % 2;
     /*{
         std::ostringstream oss;
-        oss << "Graphics Command On Engine Frame: " << MainEngine::GetInstance()->frameIndex <<" and Graphics frame: "<<frameIndex;
+        oss << "Graphics Command On Engine Frame: " << MainEngine::GetInstance()->frameIndex <<" and Graphics frame: "<<frameIndex<<" with render length: "<< nextRenderLength_;
         logDebug(oss.str());
     }*/
     SfmlCommand command;
@@ -101,6 +103,7 @@ void GraphicsManager::RenderLoop()
     editor.graphicsManager_ = this;
     editor.renderWindow_ = renderWindow_;
     renderWindow_->setActive(false);
+
     do
     {
         rmt_ScopedCPUSample(RenderLoop, 0);
@@ -112,6 +115,8 @@ void GraphicsManager::RenderLoop()
                 logDebug(oss.str());
             }*/
             std::unique_lock<std::mutex> lock(engine->renderStartMutex);
+
+			isRendering_ = true;
             engine->condSyncRender.wait(lock);
             renderLength_ = nextRenderLength_;
             nextRenderLength_ = 0;
@@ -140,13 +145,15 @@ void GraphicsManager::RenderLoop()
 
             }
 #endif
-            for (auto i = 0u; i < renderLength_; i++)
-            {
-                std::unique_lock<std::mutex> lock(engine->renderStartMutex);
-                auto* command = commandBuffer[i];
-                if (command != nullptr)
-                    command->Draw(renderWindow_);
-            }
+			for (auto i = 0u; i < renderLength_; i++)
+			{
+				std::unique_lock<std::mutex> renderLock(engine->renderStartMutex);
+				auto* command = commandBuffer[i];
+				if (command != nullptr)
+				{
+					command->Draw(renderWindow_);
+				}
+			}
             editor.Update();
             renderWindow_->display();
             renderWindow_->setActive(false);
@@ -160,6 +167,11 @@ void GraphicsManager::RenderLoop()
     renderWindow_->setActive(false);
 
 
+}
+
+bool GraphicsManager::DidRenderingStart()
+{
+	return isRendering_;
 }
 
 

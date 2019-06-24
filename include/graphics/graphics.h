@@ -100,6 +100,7 @@ public:
  */
     virtual void RenderLoop();
 
+	bool DidRenderingStart();
     Editor editor;
     //Used for Engine loop to wait for graphics thread
     std::mutex renderingMutex;
@@ -115,5 +116,6 @@ protected:
     size_t renderLength_ = 0;
     size_t nextRenderLength_ = 0;
     Index frameIndex = 0u;
+	bool isRendering_ = false;
 };
 }

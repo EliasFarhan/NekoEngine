@@ -164,14 +164,23 @@ void MainEngine::EngineLoop()
     while (isRunning)
     {
 
+
+
         rmt_ScopedCPUSample(EngineLoop, 0);
         dt = engineClock_.restart();
         if (frameIndex > 0)
         {
-
             rmt_ScopedCPUSample(WaitForGraphics, 0);
             std::unique_lock<std::mutex> lock(renderStartMutex);
-            condSyncRender.notify_all();
+			if (graphicsManager_->DidRenderingStart())
+			{
+				condSyncRender.notify_all();
+			}
+			else
+			{
+				//Wait until the graphics manager is ready to draw the next frame
+				continue;
+			}
         }
         keyboardManager_.ClearKeys();
         mouseManager_.ClearFrameData();
@@ -182,12 +191,14 @@ void MainEngine::EngineLoop()
             ImGui::SFML::ProcessEvent(event);
         }
         Update();
+
         if (frameIndex > 0)
         {
             //wait for the end of the rendering
             std::unique_lock<std::mutex> lock(graphicsManager_->renderingMutex);
         }
-        frameIndex++;
+
+		++frameIndex;
     }
 
     Destroy();

@@ -45,7 +45,7 @@ Index SpriteManager::AddSprite(const std::shared_ptr<sf::Texture> texture)
         sprite.setTexture(*texture);
         sprite.setOrigin(sf::Vector2f(texture->getSize()) / 2.0f);
     }
-    const Index index = sprites_[0].size();
+    const Index index = Index(sprites_[0].size());
     sprites_[0].push_back(sprite);
     sprites_[1].push_back(sprite);
     return index;

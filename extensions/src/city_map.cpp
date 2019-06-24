@@ -201,6 +201,6 @@ size_t CityBuilderMap::Position2Index(sf::Vector2i pos) const
 
 sf::Vector2i CityBuilderMap::Index2Position(size_t index) const
 {
-    return sf::Vector2i(index % city.mapSize.x, index / city.mapSize.y);
+    return sf::Vector2i(int(index) % city.mapSize.x, int(index) / city.mapSize.y);
 }
 }

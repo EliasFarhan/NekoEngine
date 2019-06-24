@@ -48,7 +48,7 @@ public:
 		{
 			sf::RectangleShape rect;
 
-			const auto rectSize = sf::Vector2f(config.screenSize.x / tileNmb.x, config.screenSize.y / tileNmb.y);
+			const auto rectSize = sf::Vector2f(float(config.screenSize.x / tileNmb.x), float(config.screenSize.y / tileNmb.y));
 			rect.setFillColor(sf::Color::Blue);
 			rect.setOutlineColor(sf::Color::Green);
 			rect.setOutlineThickness(outlineThickness);
@@ -91,7 +91,7 @@ public:
             }
             sf::RectangleShape rect;
 
-            const auto rectSize = sf::Vector2f(config.screenSize.x / tileNmb.x, config.screenSize.y / tileNmb.y);
+            const auto rectSize = sf::Vector2f(float(config.screenSize.x / tileNmb.x), float(config.screenSize.y / tileNmb.y));
             rect.setFillColor(sf::Color::Blue);
             rect.setOutlineColor(sf::Color::Green);
             rect.setOutlineThickness(outlineThickness);
@@ -109,9 +109,9 @@ public:
 	void Update() override
 	{
 		BasicEngine::Update();
-		auto mousePos = mouseManager_.GetPosition();
-		auto rectSize = sf::Vector2f(config.screenSize.x / tileNmb.x, config.screenSize.y / tileNmb.y);
-		sf::Vector2i tilePos = sf::Vector2i(mousePos.x / rectSize.x, mousePos.y / rectSize.y);
+		const auto mousePos = mouseManager_.GetPosition();
+		const auto rectSize = sf::Vector2f(float(config.screenSize.x / tileNmb.x), float(config.screenSize.y / tileNmb.y));
+		const sf::Vector2i tilePos = sf::Vector2i(int(mousePos.x / rectSize.x), int(mousePos.y / rectSize.y));
 		const auto path = graph_.CalculateShortestPath(sf::Vector2i(0, 0), tilePos);
 
 		for (Index i = 0; i < roadPositions_.size();i++)
@@ -146,7 +146,7 @@ public:
 private:
 	std::vector<sf::RectangleShape> rects_;
     neko::TileMapGraph graph_;
-	const sf::Vector2u tileNmb = sf::Vector2u(100, 100);
+	const sf::Vector2i tileNmb = sf::Vector2i(100, 100);
 	const size_t roadNmb_ = 1000;
 	const float outlineThickness = 1.0f;
     std::vector<sf::Vector2i> roadPositions_;

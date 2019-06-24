@@ -56,9 +56,8 @@ static std::unique_ptr<DebugLogger> debugLogger = nullptr;
 DebugLogger::DebugLogger()
 {
     {
-        std::chrono::time_point<std::chrono::system_clock> end;
-        end = std::chrono::system_clock::now();
-        std::time_t end_time = std::chrono::system_clock::to_time_t(end);
+	    const auto end = std::chrono::system_clock::now();
+        const auto end_time = std::chrono::system_clock::to_time_t(end);
         std::ofstream logFile("neko_log.txt", std::ios::out | std::ios::app);
         logFile << "\nNeko Engine : " << std::ctime(&end_time) << "\n";
     }
@@ -88,7 +87,7 @@ void DebugLogger::logLoop()
             std::unique_lock<std::mutex> lock(loggingMutex);
             bool msgQueueEmpty = true;
             {
-                std::unique_lock<std::mutex> lock(msgMutex);
+                std::unique_lock<std::mutex> checkingQueueLock(msgMutex);
                 msgQueueEmpty = msgQueue_.empty();
             }
             if(!msgQueueEmpty)
@@ -98,14 +97,14 @@ void DebugLogger::logLoop()
                 {
                     std::string msg;
                     {
-                        std::unique_lock<std::mutex> lock(msgMutex);
+                        std::unique_lock<std::mutex> masgLock(msgMutex);
                         msg = msgQueue_.front();
                         msgQueue_.erase(msgQueue_.begin());
                     }
                     logFile << msg << "\n";
                     std::cout << msg << "\n";
                     {
-                        std::unique_lock<std::mutex> lock(msgMutex);
+                        std::unique_lock<std::mutex> msgLock(msgMutex);
                         msgQueueEmpty = msgQueue_.empty();
                     }
 
