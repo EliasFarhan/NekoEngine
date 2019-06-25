@@ -26,6 +26,8 @@
 #include "SFML/System/Vector2.hpp"
 #include "engine/system.h"
 #include <PerlinNoise.hpp>
+#include "engine/globals.h"
+#include "city_command.h"
 
 
 namespace neko
@@ -37,7 +39,7 @@ enum class EnvironmentTile : unsigned
 	WATER
 };
 
-enum class CityElementType : unsigned 
+enum class CityElementType : Index
 {
 	ROAD,
 	BRIDGE,
@@ -49,6 +51,17 @@ enum class CityElementType : unsigned
 	BUILDING,
 	HOUSE
 
+};
+
+struct BuildElementCommand : CityCommand
+{
+	CityElementType elementType;
+	sf::Vector2i position;
+};
+
+struct DestroyElementCommand : CityCommand
+{
+	sf::Vector2i position;
 };
 
 enum class NeighborType : unsigned
@@ -64,6 +77,7 @@ struct City
 	sf::Vector2u mapSize = sf::Vector2u(256,128);
 	float forestRatio = 0.5f;
 	float perlinFreq = 20.0f;
+	sf::Vector2u tileSize = sf::Vector2u(20, 20);
 };
 
 struct CityElement
@@ -91,7 +105,8 @@ public:
 
 	size_t Position2Index(sf::Vector2i pos) const;
 	sf::Vector2i Index2Position(size_t index) const;
-
+	void AddCityElement(CityElementType cityElement, const sf::Vector2i& position);
+	void RemoveCityElement(const sf::Vector2i& position);
 	City city{};
 	std::vector<EnvironmentTile> environmentTiles_;
 	std::vector<CityElement> elements_;

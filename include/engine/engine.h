@@ -79,7 +79,7 @@ public:
     Configuration config;
     bool isRunning = false;
     std::unique_ptr<sf::RenderWindow> renderWindow = nullptr;
-
+	MouseManager& GetMouseManager();
     sf::Time dt;
 protected:
     sf::Clock engineClock_;
@@ -115,9 +115,8 @@ public:
     virtual void OnEndContact(const Collider* colliderA, const Collider* colliderB)
     {}
 
-
-
-
+    GraphicsManager* GetGraphicsManager() const;
+	
 
     static MainEngine* GetInstance();
 

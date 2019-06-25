@@ -41,6 +41,7 @@ GraphicsManager::GraphicsManager()
 {
 	commandBuffers_[0].fill(nullptr);
 	commandBuffers_[1].fill(nullptr);
+	editor = std::make_unique<Editor>();
 }
 
 void GraphicsManager::Draw(sf::Drawable& drawable)
@@ -50,7 +51,7 @@ void GraphicsManager::Draw(sf::Drawable& drawable)
         logDebug("[Error] Too many draw calls compare to MAX_COMMAND_NMB");
         return;
     }
-    const int index = MainEngine::GetInstance()->frameIndex % 2;
+    const Index index = MainEngine::GetInstance()->frameIndex % 2;
     /*{
         std::ostringstream oss;
         oss << "Graphics Command On Engine Frame: " << MainEngine::GetInstance()->frameIndex <<" and Graphics frame: "<<frameIndex<<" with render length: "<< nextRenderLength_;
@@ -100,8 +101,8 @@ void GraphicsManager::RenderLoop()
     renderWindow_->setActive(true);
     views_[0] = renderWindow_->getView();
     views_[1] = views_[0];
-    editor.graphicsManager_ = this;
-    editor.renderWindow_ = renderWindow_;
+    editor->graphicsManager_ = this;
+    editor->renderWindow_ = renderWindow_;
     renderWindow_->setActive(false);
 
     do
@@ -154,7 +155,7 @@ void GraphicsManager::RenderLoop()
 					command->Draw(renderWindow_);
 				}
 			}
-            editor.Update();
+            editor->Update();
             renderWindow_->display();
             renderWindow_->setActive(false);
         }
@@ -169,7 +170,7 @@ void GraphicsManager::RenderLoop()
 
 }
 
-bool GraphicsManager::DidRenderingStart()
+bool GraphicsManager::DidRenderingStart() const
 {
 	return isRendering_;
 }

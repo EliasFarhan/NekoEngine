@@ -1,7 +1,9 @@
+#pragma once
+
 /*
  MIT License
 
- Copyright (c) 2019 SAE Institute Switzerland AG
+ Copyright (c) 2017 SAE Institute Switzerland AG
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -22,13 +24,41 @@
  SOFTWARE.
  */
 
+#include <engine/editor.h>
+#include "city_command.h"
+#include "engine/globals.h"
 
-#include <city_engine.h>
-
-int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
+namespace neko
 {
-	neko::CityBuilderEngine engine;
-	engine.Init();
-	engine.EngineLoop();
-	return EXIT_SUCCESS;
+
+enum class ButtonIconType : Index
+{
+	ROAD,
+	BULLDOZER,
+	LENGTH,
+	NONE
+};
+
+struct ChangeModeCommand : public CityCommand
+{
+	ButtonIconType newCursorMode = ButtonIconType::NONE;
+};
+
+const static std::string buttonIconTexture[Index(ButtonIconType::LENGTH)] =
+{
+	"data/sprites/icons/icons8-road-48.png",
+	"data/sprites/icons/icons8-bulldozer-48.png"
+};
+
+class CityEditor : public Editor
+{
+public:
+	void Init() override;
+	void Update() override;
+	void Destroy() override;
+private:
+	CityBuilderEngine* engine_ = nullptr;
+	Index buttonUiIndex[Index(ButtonIconType::LENGTH)] = {};
+	bool buttonSelected[Index(ButtonIconType::LENGTH)] = {};
+};
 }

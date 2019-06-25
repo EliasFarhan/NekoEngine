@@ -100,8 +100,8 @@ public:
  */
     virtual void RenderLoop();
 
-	bool DidRenderingStart();
-    Editor editor;
+	bool DidRenderingStart() const;
+    std::unique_ptr<Editor> editor = nullptr;
     //Used for Engine loop to wait for graphics thread
     std::mutex renderingMutex;
 protected:

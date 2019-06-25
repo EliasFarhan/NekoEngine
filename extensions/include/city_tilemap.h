@@ -37,11 +37,11 @@ namespace neko
 class TextureManager;
 class CityBuilderMap;
 
-enum class CityTileType : int
+enum class CityTileType : Index
 {
-	NONE = -1,
+	
 	GRASS = 0,
-	ROAD_LINE,
+	ROAD_LINE = 1,
 	ROAD_TURN,
 	CROSS_ROAD,
 	ROAD_T,
@@ -62,7 +62,8 @@ enum class CityTileType : int
 	WATER_UP_RIGHT,
 	WATER_UP_LEFT,
 	WATER_VERTICAL,
-	LENGTH
+	LENGTH,
+	NONE,
 };
 
 // Object type list used to parse the city tile type in json format.

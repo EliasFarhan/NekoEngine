@@ -1,7 +1,10 @@
+#pragma once
+#include <queue>
+
 /*
  MIT License
 
- Copyright (c) 2019 SAE Institute Switzerland AG
+ Copyright (c) 2017 SAE Institute Switzerland AG
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -22,13 +25,39 @@
  SOFTWARE.
  */
 
+#include <queue>
+#include <memory>
+#include "engine/system.h"
 
-#include <city_engine.h>
-
-int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
+namespace neko
 {
-	neko::CityBuilderEngine engine;
-	engine.Init();
-	engine.EngineLoop();
-	return EXIT_SUCCESS;
+class CityBuilderEngine;
+enum class CityCommandType
+{
+	CHANGE_CURSOR_MODE,
+	CREATE_CITY_ELEMENT,
+	DELETE_CITY_ELEMENT,
+	NONE
+};
+
+struct CityCommand
+{
+	CityCommand() = default;
+	virtual ~CityCommand() = default;
+	CityCommandType commandType = CityCommandType::NONE;
+};
+
+class CityCommandManager : public System
+{
+	
+public:
+	void Init() override;
+	void ExecuteCommand(const std::unique_ptr<CityCommand>& command);
+	void Update() override;
+	void Destroy() override;
+	void AddCommand(std::unique_ptr<CityCommand> command, bool fromRenderThread = false);
+protected:
+	std::queue<std::unique_ptr<CityCommand>>commandQueue_[2];
+	CityBuilderEngine* engine_ = nullptr;
+};
 }

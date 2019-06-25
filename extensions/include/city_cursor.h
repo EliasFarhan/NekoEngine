@@ -1,7 +1,9 @@
+#pragma once
+
 /*
  MIT License
 
- Copyright (c) 2019 SAE Institute Switzerland AG
+ Copyright (c) 2017 SAE Institute Switzerland AG
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -21,14 +23,28 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
+#include <SFML/Graphics/RectangleShape.hpp>
+#include "engine/system.h"
+#include "city_editor.h"
 
-
-#include <city_engine.h>
-
-int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
+namespace neko
 {
-	neko::CityBuilderEngine engine;
-	engine.Init();
-	engine.EngineLoop();
-	return EXIT_SUCCESS;
+class CityBuilderEngine;
+
+class CityCursor : public System
+{
+public:
+	void Init() override;
+	void Update() override;
+	void Destroy() override;
+	void OnEvent(sf::Event& event);
+	sf::Vector2i GetMouseWorldPos() const;
+	sf::Vector2i GetMouseTilePos() const;
+	ButtonIconType cursorMode = ButtonIconType::NONE;
+	CityBuilderEngine* engine_;
+protected:
+	//for double buffering
+	sf::RectangleShape cursorRect_[2];
+	sf::Vector2i originPos_ {};
+};
 }

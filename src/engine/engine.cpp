@@ -152,6 +152,11 @@ void BasicEngine::OnEvent(sf::Event& event)
     }
 }
 
+MouseManager& BasicEngine::GetMouseManager()
+{
+	return mouseManager_;
+}
+
 MainEngine* MainEngine::instance_ = nullptr;
 
 
@@ -247,6 +252,11 @@ void MainEngine::Destroy()
     BasicEngine::Destroy();
     instance_ = nullptr;
     graphicsManager_ = nullptr;
+}
+
+GraphicsManager* MainEngine::GetGraphicsManager() const
+{
+	return graphicsManager_.get();
 }
 
 MainEngine* MainEngine::GetInstance()

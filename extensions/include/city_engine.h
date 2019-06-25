@@ -1,7 +1,9 @@
+#pragma once
+
 /*
  MIT License
 
- Copyright (c) 2019 SAE Institute Switzerland AG
+ Copyright (c) 2017 SAE Institute Switzerland AG
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -23,12 +25,44 @@
  */
 
 
-#include <city_engine.h>
+#include <engine/engine.h>
+#include <city_tilemap.h>
+#include <city_map.h>
+#include "engine/input.h"
 
-int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
+#include <SFML/Window/Event.hpp>
+#include "city_command.h"
+#include <city_cursor.h>
+
+namespace neko
 {
-	neko::CityBuilderEngine engine;
-	engine.Init();
-	engine.EngineLoop();
-	return EXIT_SUCCESS;
+class CityBuilderEngine : public neko::MainEngine
+{
+public:
+	void Init() override;
+
+	void Update() override;
+
+	void OnEvent(sf::Event& event) override;
+
+	void Destroy() override;
+
+	TextureManager& GetTextureManager();
+	CityCommandManager& GetCommandManager();
+	CityCursor& GetCursor();
+	float GetCurrentZoom() const;
+	CityBuilderMap& GetCityMap();
+
+	sf::View mainView;
+private:
+	EntityManager entityManager_;
+	TextureManager textureManager_;
+
+	CityCommandManager commandManager_;
+	CityBuilderTilemap environmentTilemap_;
+	CityBuilderMap cityBuilderMap_;
+	CityCursor cursor_;
+	const float scrollDelta_ = 0.1f;
+	float currentZoom_ = 1.0f;
+};
 }

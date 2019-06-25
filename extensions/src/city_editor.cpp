@@ -21,29 +21,30 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-#include <engine/editor.h>
 
-#include <imgui.h>
+#include <city_editor.h>
 #include <imgui-SFML.h>
-#include <engine/engine.h>
-#include <graphics/graphics.h>
-
-#include <utility>
+#include <imgui.h>
+#include "engine/engine.h"
+#include <city_engine.h>
 
 namespace neko
 {
-void Editor::Init()
+void CityEditor::Init()
 {
-
+	engine_ = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+	for (Index i = 0; i < Index(ButtonIconType::LENGTH); i++)
+	{
+		buttonUiIndex[i] = engine_->GetTextureManager().LoadTexture(buttonIconTexture[i]);
+	}
 }
 
-void Editor::Update()
+void CityEditor::Update()
 {
-	const auto* engine = MainEngine::GetInstance();
-	const auto dt = engine->dt;
-	const Index frameIndex = (engine->frameIndex - 1) % 2; //Render frame is always the previous one
+	const auto dt = engine_->dt;
+	const Index frameIndex = (engine_->frameIndex - 1) % 2; //Render frame is always the previous one
 	ImGui::SFML::Update(*renderWindow_, dt);
-
+#ifdef __neko_dbg__
 	ImGui::Begin("Inspector");
 	//Draw inspector data
 	for (auto& inspectorData : inspectorValues_[frameIndex])
@@ -51,19 +52,30 @@ void Editor::Update()
 		ImGui::LabelText(inspectorData.first.c_str(), inspectorData.second.c_str());
 	}
 	ImGui::End();
+#endif
+
+	ImGui::Begin("Gameplay");
+	for (Index i = 0; i < Index(ButtonIconType::LENGTH); i++)
+	{
+		const auto buttonTexture = engine_->GetTextureManager().GetTexture(buttonUiIndex[i]);
+		if(ImGui::ImageButton(*buttonTexture))
+		{
+			std::fill(std::begin(buttonSelected), std::end(buttonSelected), false);
+			buttonSelected[i] = true;
+
+			auto newCommand = std::make_unique<ChangeModeCommand>();
+			newCommand->newCursorMode = ButtonIconType(i);
+			newCommand->commandType = CityCommandType::CHANGE_CURSOR_MODE;
+			engine_->GetCommandManager().AddCommand(std::move(newCommand), true);
+		}
+	}
+	ImGui::End();
 	inspectorValues_[frameIndex].clear();
 
 	ImGui::SFML::Render(*renderWindow_);
 }
 
-void Editor::Destroy()
+void CityEditor::Destroy()
 {
-
-}
-
-void Editor::AddInspectorInfo(const std::string_view name, const std::string_view value)
-{
-	const Index frameIndex = MainEngine::GetInstance()->frameIndex % 2;
-	inspectorValues_[frameIndex].push_back(std::pair<std::string, std::string>(name, value));
 }
 }

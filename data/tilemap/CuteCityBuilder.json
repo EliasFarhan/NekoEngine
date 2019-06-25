@@ -51,6 +51,21 @@
       "rect": [ 20, 0, 20, 20 ]
     },
     {
+      "type": "road_turn",
+      "center": [ 10, 10 ],
+      "rect": [ 40, 0, 20, 20 ]
+    },
+    {
+      "type": "cross_road",
+      "center": [ 10, 10 ],
+      "rect": [ 60, 0, 20, 20 ]
+    },
+    {
+      "type": "road_t",
+      "center": [ 10, 10 ],
+      "rect": [ 80, 0, 20, 20 ]
+    },
+    {
       "type": "road_bridge_horizontal",
       "center": [ 10, 20 ],
       "rect": [ 0, 20, 20, 40 ]
