@@ -104,5 +104,5 @@ protected:
 TEST_F(BehaviorTreeTest, IsInitFromJsonWorking) {
 	behaviorTreeNodePtr_ = neko::ParseBehaviorTreeFromJson(jsonBehaviorTree_);
 	EXPECT_TRUE(behaviorTreeNodePtr_);
-	PrintBehaviorTree(behaviorTreeNodePtr_.get());
+	LogBehaviorTree(behaviorTreeNodePtr_.get());
 }

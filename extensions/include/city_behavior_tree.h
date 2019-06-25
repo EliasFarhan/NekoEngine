@@ -283,7 +283,7 @@ namespace neko
 		}
 	};
 
-	void PrintBehaviorTree(const BehaviorTreeNode* behaviorTree);
+	void LogBehaviorTree(const BehaviorTreeNode* behaviorTree);
 	std::shared_ptr<BehaviorTreeNode> ParseBehaviorTreeFromJson(
 		const json& jsonContent);
 	std::shared_ptr<BehaviorTreeNode> LoadBehaviorTreeFromJsonFile(
