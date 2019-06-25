@@ -102,7 +102,34 @@ protected:
 };
 
 TEST_F(BehaviorTreeTest, IsInitFromJsonWorking) {
+	EXPECT_TRUE(neko::ParseBehaviorTreeFromJson(jsonBehaviorTree_));
+}
+
+TEST_F(BehaviorTreeTest, IsBehaviorTreeCorrect) {
 	behaviorTreeNodePtr_ = neko::ParseBehaviorTreeFromJson(jsonBehaviorTree_);
 	EXPECT_TRUE(behaviorTreeNodePtr_);
-	LogBehaviorTree(behaviorTreeNodePtr_.get());
+	{	// Base selector
+		const neko::BehaviorTreeCompositeSelector* selector =
+			dynamic_cast<neko::BehaviorTreeCompositeSelector*>(behaviorTreeNodePtr_.get());
+		ASSERT_NE(selector, nullptr);
+		const std::vector<std::shared_ptr<neko::BehaviorTreeNode>>& selector_children =
+			selector->GetChildrenList();
+		EXPECT_EQ(selector_children.size(), 2);
+		{	// First sequence
+			const neko::BehaviorTreeCompositeSequence* sequence =
+				dynamic_cast<neko::BehaviorTreeCompositeSequence*>(selector_children[0].get());
+			ASSERT_NE(sequence, nullptr);
+			const std::vector<std::shared_ptr<neko::BehaviorTreeNode>>& sequence_children =
+				sequence->GetChildrenList();
+			EXPECT_EQ(sequence_children.size(), 3);
+		}
+		{	// Second sequence
+			const neko::BehaviorTreeCompositeSequence* sequence =
+				dynamic_cast<neko::BehaviorTreeCompositeSequence*>(selector_children[1].get());
+			ASSERT_NE(sequence, nullptr);
+			const std::vector<std::shared_ptr<neko::BehaviorTreeNode>>& sequence_children =
+				sequence->GetChildrenList();
+			EXPECT_EQ(sequence_children.size(), 3);
+		}
+	}
 }

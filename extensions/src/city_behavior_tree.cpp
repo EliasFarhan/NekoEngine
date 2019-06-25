@@ -58,7 +58,7 @@ namespace neko
 		return "null";
 	}
 
-	BehaviorTreeFlow BehaviorTreeComponentSequence::Execute()
+	BehaviorTreeFlow BehaviorTreeCompositeSequence::Execute()
 	{
 		if (currentCount_ >= children_.size()) currentCount_ = 0;
 		BehaviorTreeFlow flow = children_[currentCount_]->Execute();
@@ -68,7 +68,7 @@ namespace neko
 		return SUCCESS;
 	}
 
-	BehaviorTreeFlow BehaviorTreeComponentSelector::Execute()
+	BehaviorTreeFlow BehaviorTreeCompositeSelector::Execute()
 	{
 		if (currentCount_ >= children_.size()) currentCount_ = 0;
 		BehaviorTreeFlow flow = children_[currentCount_]->Execute();
@@ -185,8 +185,8 @@ namespace neko
 		const json& jsonContent)
 	{
 		auto nodeVariables = ParseJsonVariablesNodes(jsonContent, BTT_COMPOSITE);
-		std::shared_ptr<BehaviorTreeComponentSequence> compositeSequence =
-			std::make_shared<BehaviorTreeComponentSequence>(
+		std::shared_ptr<BehaviorTreeCompositeSequence> compositeSequence =
+			std::make_shared<BehaviorTreeCompositeSequence>(
 				nodeVariables.vecNodes,
 				nodeVariables.vecVariables);
 		return compositeSequence;
@@ -196,8 +196,8 @@ namespace neko
 		const json& jsonContent)
 	{
 		auto nodeVariables = ParseJsonVariablesNodes(jsonContent, BTT_COMPOSITE);
-		std::shared_ptr<BehaviorTreeComponentSelector> compositeSelector =
-			std::make_shared<BehaviorTreeComponentSelector>(
+		std::shared_ptr<BehaviorTreeCompositeSelector> compositeSelector =
+			std::make_shared<BehaviorTreeCompositeSelector>(
 				nodeVariables.vecNodes,
 				nodeVariables.vecVariables);
 		return compositeSelector;
@@ -318,7 +318,7 @@ namespace neko
 		return {};
 	}
 
-	void PrintBehaviorTree(const BehaviorTreeNode* behaviorTree)
+	void LogBehaviorTree(const BehaviorTreeNode* behaviorTree)
 	{
 		static int indent = 0;
 		std::ostringstream oss_indent;
@@ -349,7 +349,7 @@ namespace neko
 			else
 			{
 				for (const auto& child : interfaceComposite->GetChildrenList()) {
-					PrintBehaviorTree(child.get());
+					LogBehaviorTree(child.get());
 				}
 			}
 			indent--;
@@ -367,7 +367,7 @@ namespace neko
 			}
 			else
 			{
-				PrintBehaviorTree(childDecorator->GetChild().get());
+				LogBehaviorTree(childDecorator->GetChild().get());
 			}
 			indent--;
 			logDebug(oss_indent.str() + "}");

@@ -182,17 +182,17 @@ namespace neko
 	};
 
 	// Sequence in a behavior tree.
-	class BehaviorTreeComponentSequence : public BehaviorTreeComposite
+	class BehaviorTreeCompositeSequence : public BehaviorTreeComposite
 	{
 	public:
-		BehaviorTreeComponentSequence() = default;
-		BehaviorTreeComponentSequence(
+		BehaviorTreeCompositeSequence() = default;
+		BehaviorTreeCompositeSequence(
 			const std::vector<std::shared_ptr<BehaviorTreeNode>>& ilNodes) :
 			BehaviorTreeComposite(ilNodes) {}
-		BehaviorTreeComponentSequence(
+		BehaviorTreeCompositeSequence(
 			const std::vector<std::pair<std::string, std::string>>& ilVariables) :
 			BehaviorTreeComposite(ilVariables) {}
-		BehaviorTreeComponentSequence(
+		BehaviorTreeCompositeSequence(
 			const std::vector<std::shared_ptr<BehaviorTreeNode>>& ilNodes,
 			const std::vector<std::pair<std::string, std::string>>& ilVariables) :
 			BehaviorTreeComposite(ilNodes, ilVariables) {}
@@ -205,17 +205,17 @@ namespace neko
 	};
 
 	// Selector in a behavior tree.
-	class BehaviorTreeComponentSelector : public BehaviorTreeComposite
+	class BehaviorTreeCompositeSelector : public BehaviorTreeComposite
 	{
 	public:
-		BehaviorTreeComponentSelector() = default;
-		BehaviorTreeComponentSelector(
+		BehaviorTreeCompositeSelector() = default;
+		BehaviorTreeCompositeSelector(
 			const std::vector<std::shared_ptr<BehaviorTreeNode>>& ilNodes) :
 			BehaviorTreeComposite(ilNodes) {}
-		BehaviorTreeComponentSelector(
+		BehaviorTreeCompositeSelector(
 			const std::vector<std::pair<std::string, std::string>>& ilVariables) :
 			BehaviorTreeComposite(ilVariables) {}
-		BehaviorTreeComponentSelector(
+		BehaviorTreeCompositeSelector(
 			const std::vector<std::shared_ptr<BehaviorTreeNode>>& ilNodes,
 			const std::vector<std::pair<std::string, std::string>>& ilVariables) :
 			BehaviorTreeComposite(ilNodes, ilVariables) {}
