@@ -118,7 +118,7 @@ std::unique_ptr<json> LoadJson(const std::string& jsonPath)
 	return jsonContent;
 }
 
-sf::IntRect GetRectFromJson(const json &jsonObject, std::string parameterName)
+sf::IntRect GetIntRectFromJson(const json &jsonObject, std::string parameterName)
 {
     sf::IntRect rect;
     try
@@ -138,5 +138,27 @@ sf::IntRect GetRectFromJson(const json &jsonObject, std::string parameterName)
         logDebug(oss.str());
     }
     return rect;
+}
+
+sf::FloatRect GetFloatRectFromJson(const json& jsonObject, std::string parameterName)
+{
+	sf::FloatRect rect;
+	try
+	{
+		if (CheckJsonParameter(jsonObject, parameterName, json::value_t::array))
+		{
+			rect = { jsonObject[parameterName][0],
+					jsonObject[parameterName][1],
+					jsonObject[parameterName][2],
+					jsonObject[parameterName][3] };
+		}
+	}
+	catch (json::type_error& e)
+	{
+		std::ostringstream oss;
+		oss << "[Error] Input is not rect: " << parameterName << "\n" << e.what();
+		logDebug(oss.str());
+	}
+	return rect;
 }
 }

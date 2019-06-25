@@ -25,6 +25,7 @@
 
 #include <array>
 #include <vector>
+#include <map>
 
 #include <graphics/tilemap.h>
 #include <SFML/Graphics/Rect.hpp>
@@ -62,6 +63,29 @@ enum class CityTileType : int
 	WATER_UP_LEFT,
 	WATER_VERTICAL,
 	LENGTH
+};
+
+// Object type list used to parse the city tile type in json format.
+const static std::map<CityTileType, std::string> mapCityTileString =
+{
+	{CityTileType::GRASS, "grass"},
+	{CityTileType::WATER_UP_LEFT, "water_up_left"},
+	{CityTileType::WATER_DOWN_LEFT, "water_down_left"},
+	{CityTileType::WATER_DOWN_RIGHT, "water_down_right"},
+	{CityTileType::WATER_UP_RIGHT, "water_up_right"},
+	{CityTileType::WATER_HORIZONTAL, "water_horizontal"},
+	{CityTileType::WATER_VERTICAL, "water_vertical"},
+	{CityTileType::ROAD_LINE, "road_line"},
+	{CityTileType::ROAD_TURN, "road_turn"},
+	{CityTileType::CROSS_ROAD, "cross_road"},
+	{CityTileType::ROAD_T, "road_t"},
+	{CityTileType::ROAD_BRIDGE_HORIZONTAL, "road_bridge_horizontal"},
+	{CityTileType::ROAD_BRIDGE_VERTICAL, "road_bridge_vertical"},
+	{CityTileType::RAIL_LINE, "rail_line"},
+	{CityTileType::RAIL_TURN, "rail_turn"},
+	{CityTileType::TREES, "trees"},
+	{CityTileType::TRAIN_STATION, "train_station"},
+	
 };
 
 enum class CityTilesheetType : unsigned

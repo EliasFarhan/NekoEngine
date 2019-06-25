@@ -43,7 +43,7 @@ void SpriteAnimator::Init(json& animatorJson, TextureManager& textureManager, in
         spriteAnimDef.freq = spriteAnimJson["freq"];
         for (auto& spriteAnimKeyJson : spriteAnimJson["keys"])
         {
-            auto rect = GetRectFromJson(spriteAnimKeyJson, "rects");
+            auto rect = GetIntRectFromJson(spriteAnimKeyJson, "rects");
             int textureKey = spriteAnimKeyJson["value"];
             spriteAnimDef.imgRect.push_back(rect);
             spriteAnimDef.imgIndexes.push_back(textureKey);

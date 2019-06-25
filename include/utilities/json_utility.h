@@ -26,7 +26,7 @@
 
 #include <string>
 #include <memory>
-//Externals includes
+ //Externals includes
 #include <json.hpp>
 
 using json = nlohmann::json;
@@ -47,7 +47,9 @@ bool CheckJsonNumber(const json& jsonObject, std::string parameterName);
 
 sf::Vector2f GetVectorFromJson(const json& jsonObject, std::string parameterName);
 
-sf::IntRect GetRectFromJson(const json& jsonObject, std::string parameterName);
+sf::IntRect GetIntRectFromJson(const json& jsonObject, std::string parameterName);
+
+sf::FloatRect GetFloatRectFromJson(const json& jsonObject, std::string parameterName);
 
 std::unique_ptr<json> LoadJson(const std::string& jsonPath);
 }

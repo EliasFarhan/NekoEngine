@@ -58,15 +58,48 @@ endif(UNIX)
 set(EXTERNAL_DIR ${CMAKE_SOURCE_DIR}/externals)
 
 
-include_directories(include ${CMAKE_SOURCE_DIR}/include)
 
+#data
 
+file(GLOB_RECURSE JSON_FILES "${PROJECT_SOURCE_DIR}/data/*.json")
+file(GLOB_RECURSE IMG_FILES
+		"${PROJECT_SOURCE_DIR}/data/*.jpg"
+		"${PROJECT_SOURCE_DIR}/data/*.png"
+		"${PROJECT_SOURCE_DIR}/data/*.jpeg"
+		"${PROJECT_SOURCE_DIR}/data/*.bmp"
+		"${PROJECT_SOURCE_DIR}/data/*.tga"
+		"${PROJECT_SOURCE_DIR}/data/*.gif"
+		"${PROJECT_SOURCE_DIR}/data/*.psd"
+		"${PROJECT_SOURCE_DIR}/data/*.hdr"
+		"${PROJECT_SOURCE_DIR}/data/*.pic"
+		)
+LIST(APPEND DATA_FILES ${IMG_FILES} ${JSON_FILES})
+foreach(DATA ${DATA_FILES})
+	get_filename_component(FILE_NAME ${DATA} NAME)
+	get_filename_component(PATH_NAME ${DATA} DIRECTORY)
+	get_filename_component(EXTENSION ${DATA} EXT)
+	file(RELATIVE_PATH PATH_NAME "${PROJECT_SOURCE_DIR}/shaders/" ${PATH_NAME})
+	#MESSAGE("GLSL PATH: ${PATH_NAME} NAME: ${FILE_NAME}")
+	set(DATA_OUTPUT "${PROJECT_BINARY_DIR}/data/${PATH_NAME}/${FILE_NAME}")
+
+	add_custom_command(
+			OUTPUT ${DATA_OUTPUT}
+			COMMAND ${CMAKE_COMMAND} -E make_directory "${PROJECT_BINARY_DIR}/data/"
+			COMMAND ${CMAKE_COMMAND} -E make_directory "${PROJECT_BINARY_DIR}/data/${PATH_NAME}"
+			COMMAND ${CMAKE_COMMAND} -E copy ${DATA} "${PROJECT_BINARY_DIR}/data/${PATH_NAME}/${FILE_NAME}")
+	list(APPEND DATA_BINARY_FILES ${DATA_OUTPUT})
+endforeach(DATA)
+add_custom_target(
+		DataTarget
+		DEPENDS ${DATA_BINARY_FILES}
+)
+#source files
 file(GLOB_RECURSE Neko_ENGINE_SRC src/engine/*.cpp include/engine/*.h)
 file(GLOB_RECURSE Neko_GRAPHICS_SRC src/graphics/*.cpp include/graphics/*.h)
 file(GLOB_RECURSE Neko_UTILITY_SRC src/utilities/*.cpp include/utilities/*.h)
 file(GLOB_RECURSE Neko_PHYSICS_SRC src/physics/*.cpp include/physics/*.h)
 file(GLOB_RECURSE Neko_EXTENSIONS_SRC extensions/src/*.cpp extensions/include/*.h)
-
+include_directories(include ${CMAKE_SOURCE_DIR}/include)
 set_property(GLOBAL PROPERTY USE_FOLDERS On)
 SET_SOURCE_FILES_PROPERTIES( ${Neko_SRC} PROPERTIES
                 FOLDER "${CMAKE_SOURCE_DIR}/src" )
@@ -76,8 +109,10 @@ source_group("Engine"            FILES ${Neko_ENGINE_SRC})
 source_group("Utility"            FILES ${Neko_UTILITY_SRC})
 source_group("Physics"            FILES ${Neko_PHYSICS_SRC})
 source_group("Extensions"            FILES ${Neko_EXTENSIONS_SRC})
+source_group("Data\\Json"            FILES ${JSON_FILES})
+source_group("Data\\Img"            FILES ${IMG_FILES})
 
-List(APPEND Neko_SRC ${Neko_ENGINE_SRC} ${Neko_GRAPHICS_SRC} ${Neko_UTILITY_SRC} ${Neko_PHYSICS_SRC} ${Neko_EXTENSIONS_SRC})
+List(APPEND Neko_SRC ${Neko_ENGINE_SRC} ${Neko_GRAPHICS_SRC} ${Neko_UTILITY_SRC} ${Neko_PHYSICS_SRC} ${Neko_EXTENSIONS_SRC} ${JSON_FILES} ${IMG_FILES})
 
 if(MSVC)
     add_compile_options(
@@ -144,39 +179,7 @@ set(REMOTERY_DIR ${EXTERNAL_DIR}/Remotery)
 add_subdirectory(${REMOTERY_DIR})
 include_directories(${REMOTERY_DIR})
 LIST(APPEND Neko_LIBRARIES Remotery)
-#data
-file(GLOB_RECURSE DATA_FILES
-		"${PROJECT_SOURCE_DIR}/data/*.jpg"
-		"${PROJECT_SOURCE_DIR}/data/*.png"
-		"${PROJECT_SOURCE_DIR}/data/*.jpeg"
-		"${PROJECT_SOURCE_DIR}/data/*.bmp"
-		"${PROJECT_SOURCE_DIR}/data/*.tga"
-		"${PROJECT_SOURCE_DIR}/data/*.gif"
-		"${PROJECT_SOURCE_DIR}/data/*.psd"
-		"${PROJECT_SOURCE_DIR}/data/*.hdr"
-		"${PROJECT_SOURCE_DIR}/data/*.pic"
-		"${PROJECT_SOURCE_DIR}/data/*.json"
-		)
 
-foreach(DATA ${DATA_FILES})
-	get_filename_component(FILE_NAME ${DATA} NAME)
-	get_filename_component(PATH_NAME ${DATA} DIRECTORY)
-	get_filename_component(EXTENSION ${DATA} EXT)
-	file(RELATIVE_PATH PATH_NAME "${PROJECT_SOURCE_DIR}/shaders/" ${PATH_NAME})
-	#MESSAGE("GLSL PATH: ${PATH_NAME} NAME: ${FILE_NAME}")
-	set(DATA_OUTPUT "${PROJECT_BINARY_DIR}/data/${PATH_NAME}/${FILE_NAME}")
-
-	add_custom_command(
-			OUTPUT ${DATA_OUTPUT}
-			COMMAND ${CMAKE_COMMAND} -E make_directory "${PROJECT_BINARY_DIR}/data/"
-			COMMAND ${CMAKE_COMMAND} -E make_directory "${PROJECT_BINARY_DIR}/data/${PATH_NAME}"
-			COMMAND ${CMAKE_COMMAND} -E copy ${DATA} "${PROJECT_BINARY_DIR}/data/${PATH_NAME}/${FILE_NAME}")
-	list(APPEND DATA_BINARY_FILES ${DATA_OUTPUT})
-endforeach(DATA)
-add_custom_target(
-		DataTarget
-		DEPENDS ${DATA_BINARY_FILES}
-)
 #Neko_COMMON
 
 include_directories(include/ extensions/include/)

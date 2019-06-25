@@ -26,144 +26,47 @@
 #include <engine/engine.h>
 #include <Remotery.h>
 #include <city_map.h>
+#include "utilities/json_utility.h"
 
 namespace neko
 {
 void CityBuilderTilemap::Init(TextureManager& textureManager)
 {
+	static const auto reverseMap =
+		[]() ->std::map<std::string, CityTileType>
+	{
+		std::map<std::string, CityTileType> reverse;
+		std::for_each(mapCityTileString.begin(), mapCityTileString.end(),
+			[&reverse](std::pair<CityTileType, std::string> pair)
+		{
+			reverse.insert({ pair.second, pair.first });
+		});
+		return reverse;
+	}();
+
+	const std::unique_ptr<json> cityTilemapJsonPtr = LoadJson("data/tilemap/CuteCityBuilder.json");
+	const auto cityTilemapJsonContent = *cityTilemapJsonPtr;
     for (int i = 0; i < int(CityTilesheetType::CAR); i++)
     {
-        Index textureIndex = textureManager.LoadTexture(cityTextureName_);
+	    const Index textureIndex = textureManager.LoadTexture(cityTilemapJsonContent["image"]);
         tilesheets_[i].texture = textureManager.GetTexture(textureIndex);
-        tilesheets_[i].texture->setRepeated(true);
+        tilesheets_[i].texture->setRepeated(false);
     }
     const Index textureIndex = textureManager.LoadTexture(carTextureName_);
     tilesheets_[unsigned(CityTilesheetType::CAR)].texture = textureManager.GetTexture(textureIndex);
     tilesheets_[unsigned(CityTilesheetType::CAR)].texture->setRepeated(true);
 
-    {
-        //GRASS TILE
-        const auto grassIndex = int(CityTileType::GRASS);
-        rectCenter_[grassIndex] = sf::Vector2f(tileSize_) / 2.0f;
-        textureRects_[grassIndex] = sf::FloatRect(
-			0.0f, 
-			0.0f, 
-			static_cast<float>(tileSize_.x), 
-			static_cast<float>(tileSize_.y));
-    }
-    {
-        //WATER
-        auto waterIndex = int(CityTileType::WATER_VERTICAL);
-        rectCenter_[waterIndex] = sf::Vector2f(tileSize_) / 2.0f;
-        textureRects_[waterIndex] = sf::FloatRect(
-            7.0f * tileSize_.x,
-			5.0f * tileSize_.y,
-			static_cast<float>(tileSize_.x),
-			static_cast<float>(tileSize_.y));
-        waterIndex = int(CityTileType::WATER_HORIZONTAL);
-        rectCenter_[waterIndex] = sf::Vector2f(tileSize_) / 2.0f;
-        textureRects_[waterIndex] = sf::FloatRect(
-            7.0f * tileSize_.x,
-            4.0f * tileSize_.y,
-			static_cast<float>(tileSize_.x),
-			static_cast<float>(tileSize_.y));
-        waterIndex = int(CityTileType::WATER_DOWN_LEFT);
-        rectCenter_[waterIndex] = sf::Vector2f(tileSize_) / 2.0f;
-        textureRects_[waterIndex] = sf::FloatRect(
-                6.0f * tileSize_.x,
-                4.0f * tileSize_.y,
-			static_cast<float>(tileSize_.x),
-			static_cast<float>(tileSize_.y));
-        waterIndex = int(CityTileType::WATER_DOWN_RIGHT);
-        rectCenter_[waterIndex] = sf::Vector2f(tileSize_) / 2.0f;
-        textureRects_[waterIndex] = sf::FloatRect(
-                5.0f * tileSize_.x,
-                4.0f * tileSize_.y,
-			static_cast<float>(tileSize_.x),
-			static_cast<float>(tileSize_.y));
-        waterIndex = int(CityTileType::WATER_UP_LEFT);
-        rectCenter_[waterIndex] = sf::Vector2f(tileSize_) / 2.0f;
-        textureRects_[waterIndex] = sf::FloatRect(
-                6.0f * tileSize_.x,
-                5.0f * tileSize_.y,
-			static_cast<float>(tileSize_.x),
-			static_cast<float>(tileSize_.y));
-        waterIndex = int(CityTileType::WATER_UP_RIGHT);
-        rectCenter_[waterIndex] = sf::Vector2f(tileSize_) / 2.0f;
-        textureRects_[waterIndex] = sf::FloatRect(
-                5.0f * tileSize_.x,
-                5.0f * tileSize_.y,
-			static_cast<float>(tileSize_.x),
-			static_cast<float>(tileSize_.y));
-    }
-    {
-        //TREES
-        const auto treesIndex = int(CityTileType::TREES);
-        rectCenter_[treesIndex] = sf::Vector2f(
-			static_cast<float>(tileSize_.x), 
-			2.0f * tileSize_.y) / 2.0f;
-        textureRects_[treesIndex] = sf::FloatRect(
-			5.0f * tileSize_.x, 
-			static_cast<float>(tileSize_.y), 
-			static_cast<float>(tileSize_.x), 
-			2.0f * tileSize_.y);
-    }
-    {
-        //ROAD
-        auto roadIndex = int(CityTileType::ROAD_LINE);
-        rectCenter_[roadIndex] = sf::Vector2f(
-			static_cast<float>(tileSize_.x), 
-			static_cast<float>(tileSize_.y)) / 2.0f;
-        textureRects_[roadIndex] = sf::FloatRect(
-			static_cast<float>(tileSize_.x), 
-			0.0f, 
-			static_cast<float>(tileSize_.x), 
-			static_cast<float>(tileSize_.y));
+	for(auto& cityTileElementJson : cityTilemapJsonContent["tile_elements"])
+	{
+		const auto typeIt = reverseMap.find(cityTileElementJson["type"].get<std::string>());
+		if(typeIt != reverseMap.end())
+		{
+			const auto typeIndex = Index(typeIt->second);
+			rectCenter_[typeIndex] = GetVectorFromJson(cityTileElementJson, "center");
+			textureRects_[typeIndex] = GetFloatRectFromJson(cityTileElementJson, "rect");
+		}
+	}
 
-        roadIndex = int(CityTileType::ROAD_BRIDGE_HORIZONTAL);
-        rectCenter_[roadIndex] = sf::Vector2f(
-			static_cast<float>(tileSize_.x), 
-			2.0f * tileSize_.y) / 2.0f;
-        textureRects_[roadIndex] = sf::FloatRect(
-			0.0f, 
-			static_cast<float>(tileSize_.y), 
-			static_cast<float>(tileSize_.x), 
-			2.0f * tileSize_.y);
-    }
-    {
-        //RAIL
-        auto railIndex = int(CityTileType::RAIL_LINE);
-        rectCenter_[railIndex] = sf::Vector2f(
-			static_cast<float>(tileSize_.x), 
-			static_cast<float>(tileSize_.y)) / 2.0f;
-        textureRects_[railIndex] = sf::FloatRect(
-			7.0f * tileSize_.x, 
-			static_cast<float>(tileSize_.y), 
-			static_cast<float>(tileSize_.x), 
-			static_cast<float>(tileSize_.y));
-
-        railIndex = int(CityTileType::RAIL_TURN);
-        rectCenter_[railIndex] = sf::Vector2f(
-			static_cast<float>(tileSize_.x), 
-			static_cast<float>(tileSize_.y)) / 2.0f;
-        textureRects_[railIndex] = sf::FloatRect(
-			6.0f * tileSize_.x, 
-			static_cast<float>(tileSize_.y), 
-			static_cast<float>(tileSize_.x), 
-			static_cast<float>(tileSize_.y));
-    }
-    {
-        //TRAIN STATION
-        auto trainIndex = int(CityTileType::TRAIN_STATION);
-        rectCenter_[trainIndex] = sf::Vector2f(
-			5.0f * tileSize_.x, 
-			3.0f * tileSize_.y) / 2.0f;
-        textureRects_[trainIndex] = sf::FloatRect(
-			0.0f, 
-			3.0f * tileSize_.y, 
-			5.0f * tileSize_.x, 
-			3.0f * tileSize_.y);
-    }
     for (int i = 0; i < int(CityTilesheetType::LENGTH); i++)
     {
         tilesheets_[i].tilemap[0].setPrimitiveType(sf::Triangles);

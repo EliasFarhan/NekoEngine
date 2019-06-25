@@ -35,10 +35,9 @@ namespace neko
 void TiledMap::Init(const std::string& tilemapPath, TextureManager& textureManager, Physics2dManager* physics2DManager)
 {
 
-    std::string sourceFolderPath = GetFileParentPath(tilemapPath);
-    std::unique_ptr<json> tileMapJsonPtr;
-    tileMapJsonPtr = LoadJson(tilemapPath);
-    json tileMapJson = *tileMapJsonPtr;
+    const std::string sourceFolderPath = GetFileParentPath(tilemapPath);
+    const std::unique_ptr<json> tileMapJsonPtr = LoadJson(tilemapPath);
+    const json tileMapJson = *tileMapJsonPtr;
 
     //TODO import the texture and fill the double buffer vertex arrays of tilesheets
     for (auto& tilesheetPathJson : tileMapJson["tilesets"])

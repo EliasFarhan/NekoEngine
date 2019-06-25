@@ -1,0 +1,79 @@
+{
+  "image": "data/tilemap/CuteCityBuilder.png",
+  "imageheight": 120,
+  "imagewidth": 160,
+  "tileheight": 20,
+  "tilewidth": 20,
+  "tile_elements": [
+    {
+      "type": "grass",
+      "center": [ 10, 10 ],
+      "rect": [ 0, 0, 20, 20 ]
+    },
+    {
+      "type": "water_vertical",
+      "center": [ 10, 10 ],
+      "rect": [ 140, 100, 20, 20 ]
+    },
+    {
+      "type": "water_horizontal",
+      "center": [ 10, 10 ],
+      "rect": [ 140, 80, 20, 20 ]
+    },
+    {
+      "type": "water_down_left",
+      "center": [ 10, 10 ],
+      "rect": [ 120, 80, 20, 20 ]
+    },
+    {
+      "type": "water_down_right",
+      "center": [ 10, 10 ],
+      "rect": [ 100, 80, 20, 20 ]
+    },
+    {
+      "type": "water_up_left",
+      "center": [ 10, 10 ],
+      "rect": [ 120, 100, 20, 20 ]
+    },
+    {
+      "type": "water_up_right",
+      "center": [ 10, 10 ],
+      "rect": [ 100, 100, 20, 20 ]
+    },
+    {
+      "type": "trees",
+      "center": [ 10, 20 ],
+      "rect": [ 100, 20, 20, 40 ]
+    },
+    {
+      "type": "road_line",
+      "center": [ 10, 10 ],
+      "rect": [ 20, 0, 20, 20 ]
+    },
+    {
+      "type": "road_bridge_horizontal",
+      "center": [ 10, 20 ],
+      "rect": [ 0, 20, 20, 40 ]
+    },
+    {
+      "type": "road_bridge_vertical",
+      "center": [ 10, 20 ],
+      "rect": [ 20, 20, 20, 40 ]
+    },
+    {
+      "type": "rail_line",
+      "center": [ 10, 10 ],
+      "rect": [ 140, 20, 20, 20 ]
+    },
+    {
+      "type": "rail_turn",
+      "center": [ 10, 10 ],
+      "rect": [ 120, 20, 20, 20 ]
+    },
+    {
+      "type": "train_station",
+      "center": [ 50, 30 ],
+      "rect": [ 0, 60, 100, 60 ]
+    }
+  ]
+}
