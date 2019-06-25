@@ -122,6 +122,24 @@ TEST_F(BehaviorTreeTest, IsBehaviorTreeCorrect) {
 			const std::vector<std::shared_ptr<neko::BehaviorTreeNode>>& sequence_children =
 				sequence->GetChildrenList();
 			EXPECT_EQ(sequence_children.size(), 3);
+			{
+				const neko::BehaviorTreeLeafCondition* condition =
+					dynamic_cast<neko::BehaviorTreeLeafCondition*>(sequence_children[0].get());
+				ASSERT_NE(condition, nullptr);
+				EXPECT_EQ(condition->GetVariable("condition"), "this.energy < 0.3");
+			}
+			{
+				const neko::BehaviorTreeLeafMoveTo* move_to =
+					dynamic_cast<neko::BehaviorTreeLeafMoveTo*>(sequence_children[1].get());
+				ASSERT_NE(move_to, nullptr);
+				EXPECT_EQ(move_to->GetVariable("to"), "energy source");
+			}
+			{
+				const neko::BehaviorTreeLeafWait* leaf_wait =
+					dynamic_cast<neko::BehaviorTreeLeafWait*>(sequence_children[2].get());
+				ASSERT_NE(leaf_wait, nullptr);
+				EXPECT_EQ(leaf_wait->GetVariable("delay"), "2.0");
+			}
 		}
 		{	// Second sequence
 			const neko::BehaviorTreeCompositeSequence* sequence =
@@ -129,7 +147,31 @@ TEST_F(BehaviorTreeTest, IsBehaviorTreeCorrect) {
 			ASSERT_NE(sequence, nullptr);
 			const std::vector<std::shared_ptr<neko::BehaviorTreeNode>>& sequence_children =
 				sequence->GetChildrenList();
-			EXPECT_EQ(sequence_children.size(), 3);
+			EXPECT_EQ(sequence_children.size(), 4);
+			{
+				const neko::BehaviorTreeLeafMoveTo* move_to =
+					dynamic_cast<neko::BehaviorTreeLeafMoveTo*>(sequence_children[0].get());
+				ASSERT_NE(move_to, nullptr);
+				EXPECT_EQ(move_to->GetVariable("to"), "a");
+			}
+			{
+				const neko::BehaviorTreeLeafWait* leaf_wait =
+					dynamic_cast<neko::BehaviorTreeLeafWait*>(sequence_children[1].get());
+				ASSERT_NE(leaf_wait, nullptr);
+				EXPECT_EQ(leaf_wait->GetVariable("delay"), "1.0");
+			}
+			{
+				const neko::BehaviorTreeLeafMoveTo* move_to =
+					dynamic_cast<neko::BehaviorTreeLeafMoveTo*>(sequence_children[2].get());
+				ASSERT_NE(move_to, nullptr);
+				EXPECT_EQ(move_to->GetVariable("to"), "b");
+			}
+			{
+				const neko::BehaviorTreeLeafWait* leaf_wait =
+					dynamic_cast<neko::BehaviorTreeLeafWait*>(sequence_children[3].get());
+				ASSERT_NE(leaf_wait, nullptr);
+				EXPECT_EQ(leaf_wait->GetVariable("delay"), "1.0");
+			}
 		}
 	}
 }
