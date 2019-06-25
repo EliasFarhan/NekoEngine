@@ -39,9 +39,18 @@ namespace neko
 		RUNNING,
 	};
 
+	// Basic type of element in a behavior tree.
+	enum BehaviorTreeElementType {
+		BTT_COMPOSITE,
+		BTT_DECORATOR,
+		BTT_LEAF,
+	};
+
 	// Object type enum this will give witch type an object is.
 	enum CompositeObjectType
 	{
+		// An error type return in case you don't find the type.
+		ERROR_UNKNOWN,
 		// Basic types these are not suppose to be in a behavior tree.
 		INTERFACE_COMPOSITE,
 		INTERFACE_DECORATOR,
@@ -50,6 +59,7 @@ namespace neko
 		COMPOSITE_SEQUENCE,
 		COMPOSITE_SELECTOR,
 		// Leaf type also suppose to be in behavior tree.
+		LEAF_CONDITION,
 		LEAF_WAIT,
 		LEAF_MOVE_TO,
 	};
@@ -65,6 +75,7 @@ namespace neko
 		{COMPOSITE_SEQUENCE,  "composite_sequence"},
 		{COMPOSITE_SELECTOR,  "composite_selector"},
 		// Leaf component that derives from leaf node.
+		{LEAF_CONDITION,      "leaf_condition"},
 		{LEAF_WAIT,           "leaf_wait"},
 		{LEAF_MOVE_TO,        "leaf_move_to"},
 	};
@@ -171,17 +182,17 @@ namespace neko
 	};
 
 	// Sequence in a behavior tree.
-	class BehaviorTreeComponentSequence : public BehaviorTreeComposite
+	class BehaviorTreeCompositeSequence : public BehaviorTreeComposite
 	{
 	public:
-		BehaviorTreeComponentSequence() = default;
-		BehaviorTreeComponentSequence(
+		BehaviorTreeCompositeSequence() = default;
+		BehaviorTreeCompositeSequence(
 			const std::vector<std::shared_ptr<BehaviorTreeNode>>& ilNodes) :
 			BehaviorTreeComposite(ilNodes) {}
-		BehaviorTreeComponentSequence(
+		BehaviorTreeCompositeSequence(
 			const std::vector<std::pair<std::string, std::string>>& ilVariables) :
 			BehaviorTreeComposite(ilVariables) {}
-		BehaviorTreeComponentSequence(
+		BehaviorTreeCompositeSequence(
 			const std::vector<std::shared_ptr<BehaviorTreeNode>>& ilNodes,
 			const std::vector<std::pair<std::string, std::string>>& ilVariables) :
 			BehaviorTreeComposite(ilNodes, ilVariables) {}
@@ -194,17 +205,17 @@ namespace neko
 	};
 
 	// Selector in a behavior tree.
-	class BehaviorTreeComponentSelector : public BehaviorTreeComposite
+	class BehaviorTreeCompositeSelector : public BehaviorTreeComposite
 	{
 	public:
-		BehaviorTreeComponentSelector() = default;
-		BehaviorTreeComponentSelector(
+		BehaviorTreeCompositeSelector() = default;
+		BehaviorTreeCompositeSelector(
 			const std::vector<std::shared_ptr<BehaviorTreeNode>>& ilNodes) :
 			BehaviorTreeComposite(ilNodes) {}
-		BehaviorTreeComponentSelector(
+		BehaviorTreeCompositeSelector(
 			const std::vector<std::pair<std::string, std::string>>& ilVariables) :
 			BehaviorTreeComposite(ilVariables) {}
-		BehaviorTreeComponentSelector(
+		BehaviorTreeCompositeSelector(
 			const std::vector<std::shared_ptr<BehaviorTreeNode>>& ilNodes,
 			const std::vector<std::pair<std::string, std::string>>& ilVariables) :
 			BehaviorTreeComposite(ilNodes, ilVariables) {}
@@ -213,6 +224,24 @@ namespace neko
 		virtual CompositeObjectType GetType() const final
 		{
 			return COMPOSITE_SELECTOR;
+		}
+	};
+
+	// Leaf Condition in a behavior tree.
+	// The leaf check if a condition dictated by
+	// SetVariable("condition", "bla == bli");.
+	class BehaviorTreeLeafCondition : public BehaviorTreeLeaf
+	{
+	public:
+		BehaviorTreeLeafCondition() = default;
+		BehaviorTreeLeafCondition(
+			const std::vector<std::pair<std::string, std::string>>& ilVariables) :
+			BehaviorTreeLeaf(ilVariables) {}
+
+		virtual BehaviorTreeFlow Execute() final;
+		virtual CompositeObjectType GetType() const final
+		{
+			return LEAF_CONDITION;
 		}
 	};
 
@@ -254,7 +283,7 @@ namespace neko
 		}
 	};
 
-	void PrintBehaviorTree(const BehaviorTreeNode* behaviorTree);
+	void LogBehaviorTree(const BehaviorTreeNode* behaviorTree);
 	std::shared_ptr<BehaviorTreeNode> ParseBehaviorTreeFromJson(
 		const json& jsonContent);
 	std::shared_ptr<BehaviorTreeNode> LoadBehaviorTreeFromJsonFile(
