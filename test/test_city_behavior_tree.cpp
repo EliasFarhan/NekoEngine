@@ -192,13 +192,26 @@ TEST_F(BehaviorTreeTest, IsBehaviorTreeExecuteCorrect) {
 	// Move to a
 	ASSERT_EQ(behaviorTreeNodePtr_->Execute(), neko::SUCCESS);
 	// Wait at a
-	while (behaviorTreeNodePtr_->Execute() != neko::SUCCESS) {
-		ASSERT_EQ(behaviorTreeNodePtr_->Execute(), neko::RUNNING);
-	}
+	neko::BehaviorTreeFlow status;
+	do 
+	{
+		status = behaviorTreeNodePtr_->Execute();
+		if (status != neko::SUCCESS) 
+		{
+			ASSERT_EQ(status, neko::RUNNING);
+		}
+	} 
+	while (status != neko::SUCCESS);
 	// Move to b
 	ASSERT_EQ(behaviorTreeNodePtr_->Execute(), neko::SUCCESS);
 	// Wait at b
-	while (behaviorTreeNodePtr_->Execute() != neko::SUCCESS) {
-		ASSERT_EQ(behaviorTreeNodePtr_->Execute(), neko::RUNNING);
-	}
+	do 
+	{
+		status = behaviorTreeNodePtr_->Execute();
+		if (status != neko::SUCCESS)
+		{
+			ASSERT_EQ(status, neko::RUNNING);
+		}
+	} 
+	while (status != neko::SUCCESS);
 }
