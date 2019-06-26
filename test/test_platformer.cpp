@@ -218,14 +218,14 @@ public:
             std::ostringstream oss;
             auto pos = transformManager.GetPosition(playerData.playerEntity);
             oss << "("<<pos.x<<", "<<pos.y<<")";
-            graphicsManager_->editor.AddInspectorInfo("PlayerPos", oss.str());
+            graphicsManager_->editor->AddInspectorInfo("PlayerPos", oss.str());
         }
         {
             std::ostringstream oss;
             auto* body = physicsManager.GetBodyAt(playerData.playerEntity);
             b2Vec2 velocity = body->GetLinearVelocity();
             oss << "("<<velocity.x<<", "<<velocity.y<<")";
-            graphicsManager_->editor.AddInspectorInfo("PlayerVel", oss.str());
+            graphicsManager_->editor->AddInspectorInfo("PlayerVel", oss.str());
         }
 #endif
 
