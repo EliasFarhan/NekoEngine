@@ -35,7 +35,8 @@ namespace neko
 		const std::vector<std::pair<std::string, std::string>>& il)
 	{
 		std::for_each(il.begin(), il.end(),
-			[this](std::pair<std::string, std::string> elem) {
+			[this](std::pair<std::string, std::string> elem) 
+		{
 			variables_.insert(elem);
 		});
 	}
@@ -123,7 +124,8 @@ namespace neko
 				{
 					values.push_back(value);
 				}
-				if (values.size() != 2) {
+				if (values.size() != 2) 
+				{
 					logDebug(
 						"Size of the leaf move to \"to\" is not equal to 2: " +
 						std::to_string(values.size()));
@@ -347,38 +349,44 @@ namespace neko
 		return {};
 	}
 
-	void LogBehaviorTree(const BehaviorTreeNode* behaviorTree)
+	void LogBehaviorTree(const std::shared_ptr<BehaviorTreeNode> behaviorTree)
 	{
 		static int indent = 0;
 		std::ostringstream oss_indent;
-		for (int i = 0; i < indent; ++i) {
+		for (int i = 0; i < indent; ++i) 
+		{
 			oss_indent << "\t";
 		}
-		if (behaviorTree == nullptr) {
+		if (!behaviorTree) 
+		{
 			logDebug(oss_indent.str() + "ERROR nullptr as a behaviorTree.");
 			return;
 		}
 		logDebug(oss_indent.str() + mapCompositeString.at(behaviorTree->GetType()));
 		const auto& mapVariables = behaviorTree->GetVariables();
-		for (const std::pair<std::string, std::string>& pair : mapVariables) {
+		for (const std::pair<std::string, std::string>& pair : mapVariables) 
+		{
 			logDebug(oss_indent.str() + pair.first + "\t\t" + pair.second);
 		}
-		switch (behaviorTree->GetType()) {
+		switch (behaviorTree->GetType()) 
+		{
 		case COMPOSITE_SEQUENCE:
 		case COMPOSITE_SELECTOR:
 		case INTERFACE_COMPOSITE:
 		{
 			logDebug(oss_indent.str() + "children : {");
 			indent++;
-			const auto* interfaceComposite =
-				dynamic_cast<const BehaviorTreeComposite*>(behaviorTree);
-			if (interfaceComposite == nullptr) {
+			const auto interfaceComposite =
+				std::dynamic_pointer_cast<const BehaviorTreeComposite>(behaviorTree);
+			if (!interfaceComposite) 
+			{
 				logDebug(oss_indent.str() + "ERROR in composite!");
 			}
 			else
 			{
-				for (const auto& child : interfaceComposite->GetChildrenList()) {
-					LogBehaviorTree(child.get());
+				for (const auto& child : interfaceComposite->GetChildrenList()) 
+				{
+					LogBehaviorTree(child);
 				}
 			}
 			indent--;
@@ -389,14 +397,16 @@ namespace neko
 		{
 			logDebug(oss_indent.str() + "decorator : {");
 			indent++;
-			const auto* childDecorator =
-				dynamic_cast<const BehaviorTreeDecorator*>(behaviorTree);
-			if (childDecorator == nullptr) {
+			const auto childDecorator =
+				std::dynamic_pointer_cast<const BehaviorTreeDecorator>(
+					behaviorTree);
+			if (!childDecorator) 
+			{
 				logDebug(oss_indent.str() + "ERROR in decorator!");
 			}
 			else
 			{
-				LogBehaviorTree(childDecorator->GetChild().get());
+				LogBehaviorTree(childDecorator->GetChild());
 			}
 			indent--;
 			logDebug(oss_indent.str() + "}");
@@ -419,7 +429,8 @@ namespace neko
 	}
 
 	std::shared_ptr<BehaviorTreeNode> ParseBehaviorTreeFromJson(
-		const json& jsonContent) {
+		const json& jsonContent) 
+	{
 		return ParseJsonObject(jsonContent);
 	}
 
