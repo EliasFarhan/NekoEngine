@@ -50,7 +50,7 @@ protected:
 							{
 								"type" : "leaf_move_to",
 								"name" : "Move to energy source",
-								"to" : "energy source"
+								"to" : "12 34"
 							},
 							{
 								"type" : "leaf_wait",
@@ -135,7 +135,7 @@ TEST_F(BehaviorTreeTest, IsBehaviorTreeCorrect) {
 				const neko::BehaviorTreeLeafMoveTo* move_to =
 					dynamic_cast<neko::BehaviorTreeLeafMoveTo*>(sequence_children[1].get());
 				ASSERT_NE(move_to, nullptr);
-				EXPECT_EQ(move_to->GetVariable("to"), "energy source");
+				EXPECT_EQ(move_to->GetVariable("to"), "12 34");
 			}
 			{
 				const neko::BehaviorTreeLeafWait* leaf_wait =
