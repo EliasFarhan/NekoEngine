@@ -66,7 +66,7 @@ protected:
 							{
 								"type" : "leaf_move_to",
 								"name" : "Move to A",
-								"to" : "a"
+								"to" : "12 34"
 							},
 							{
 								"type" : "leaf_wait",
@@ -76,7 +76,7 @@ protected:
 							{
 								"type" : "leaf_move_to",
 								"name" : "Move to B",
-								"to" : "b"
+								"to" : "23 45"
 							},								
 							{
 								"type" : "leaf_wait",
@@ -155,7 +155,7 @@ TEST_F(BehaviorTreeTest, IsBehaviorTreeCorrect) {
 				const neko::BehaviorTreeLeafMoveTo* move_to =
 					dynamic_cast<neko::BehaviorTreeLeafMoveTo*>(sequence_children[0].get());
 				ASSERT_NE(move_to, nullptr);
-				EXPECT_EQ(move_to->GetVariable("to"), "a");
+				EXPECT_EQ(move_to->GetVariable("to"), "12 34");
 			}
 			{
 				const neko::BehaviorTreeLeafWait* leaf_wait =
@@ -167,7 +167,7 @@ TEST_F(BehaviorTreeTest, IsBehaviorTreeCorrect) {
 				const neko::BehaviorTreeLeafMoveTo* move_to =
 					dynamic_cast<neko::BehaviorTreeLeafMoveTo*>(sequence_children[2].get());
 				ASSERT_NE(move_to, nullptr);
-				EXPECT_EQ(move_to->GetVariable("to"), "b");
+				EXPECT_EQ(move_to->GetVariable("to"), "23 45");
 			}
 			{
 				const neko::BehaviorTreeLeafWait* leaf_wait =
