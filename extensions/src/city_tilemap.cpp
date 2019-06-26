@@ -37,7 +37,7 @@ void CityBuilderTilemap::Init(TextureManager& textureManager)
 	{
 		std::map<std::string, CityTileType> reverse;
 		std::for_each(mapCityTileString.begin(), mapCityTileString.end(),
-			[&reverse](std::pair<CityTileType, std::string> pair)
+			[&reverse](const std::pair<CityTileType, std::string>& pair)
 		{
 			reverse.insert({ pair.second, pair.first });
 		});

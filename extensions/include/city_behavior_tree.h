@@ -121,7 +121,7 @@ namespace neko
 		{
 			return child_;
 		}
-		virtual CompositeObjectType GetType() const
+		virtual CompositeObjectType GetType() const override
 		{
 			return INTERFACE_DECORATOR;
 		}
@@ -157,7 +157,7 @@ namespace neko
 			return children_;
 		}
 		virtual BehaviorTreeFlow Execute() override { return FAILURE; }
-		virtual CompositeObjectType GetType() const
+		virtual CompositeObjectType GetType() const override
 		{
 			return INTERFACE_COMPOSITE;
 		}
@@ -177,7 +177,7 @@ namespace neko
 			BehaviorTreeNode(ilVariables) {}
 
 		virtual BehaviorTreeFlow Execute() override { return FAILURE; }
-		virtual CompositeObjectType GetType() const
+		virtual CompositeObjectType GetType() const override
 		{
 			return INTERFACE_LEAF;
 		}

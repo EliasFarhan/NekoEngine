@@ -56,16 +56,16 @@ void EntityManager::DestroyEntity(Entity entity)
 
 bool EntityManager::HasComponent(Entity entity, ComponentType componentType)
 {
-    return (maskArray_[entity - 1] & static_cast<EntityMask>(componentType)) == static_cast<EntityMask>(componentType);
+    return (maskArray_[entity - 1] & EntityMask(componentType)) == EntityMask(componentType);
 }
 
 void EntityManager::AddComponentType(Entity entity, ComponentType componentType)
 {
-    maskArray_[entity - 1] = maskArray_[entity - 1] | static_cast<EntityMask>(componentType);
+    maskArray_[entity - 1] |= EntityMask(componentType);
 }
 
 void EntityManager::RemoveComponentType(Entity entity, ComponentType componentType)
 {
-    maskArray_[entity - 1] &= ~static_cast<EntityMask>(componentType);
+    maskArray_[entity - 1] &= ~EntityMask(componentType);
 }
 }

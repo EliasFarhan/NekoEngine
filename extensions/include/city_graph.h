@@ -34,12 +34,36 @@
 namespace neko
 {
 
+using NeighborBit = std::uint16_t;
+enum class NeighborType : NeighborBit
+{
+    UP = 1 << 0,
+    DOWN = 1 << 1,
+    LEFT = 1 << 2,
+    RIGHT = 1 << 3
+};
+
+const static std::map<NeighborType, sf::Vector2i> neighborTypeMap = {
+        {NeighborType::UP, sf::Vector2i(0,-1)},
+        {NeighborType::DOWN, sf::Vector2i(0,1)},
+        {NeighborType::RIGHT, sf::Vector2i(1,0)},
+        {NeighborType::LEFT, sf::Vector2i(-1,0)},
+};
+NeighborType GetNeighborType(const sf::Vector2i& direction);
+sf::Vector2i GetDirection(NeighborType neighborType);
+
+void AddNeighborToBit(NeighborBit& neighborBit, NeighborType neighborType);
+
+void RemoveNeighborToBit(NeighborBit& neighborBit, NeighborType neighborType);
+
+bool HasBitNeighbor(const NeighborBit& neighborBit, NeighborType neighborType);
+
+const static Index maxNeighborsNmb = 4;
 struct Node
 {
-	sf::Vector2i position = sf::Vector2i(0,0);
-    std::array<sf::Vector2i, 4> neighbors;
-    std::array<Index, 4> neighborsIndex;
-    size_t neighborsSize = 0;
+	sf::Vector2i position = sf::Vector2i(-1,-1);
+	std::array<Index, maxNeighborsNmb> neighborsIndex;
+    NeighborBit neighborBitwise = 0u;
 };
 
 class TileMapGraph
@@ -52,6 +76,10 @@ public:
 
     const std::vector<sf::Vector2i> CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vector2i& endPos) const;
 private:
+
+    void AddNeighbor(Node& node, NeighborType neighborBit) const;
+    void RemoveNeighbor(Node& node, NeighborType neighborBit) const;
+    bool HasNeighbor(const Node& node, NeighborType neighborBit) const;
     std::vector<Node> nodes_;
 };
 }

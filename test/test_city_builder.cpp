@@ -146,8 +146,8 @@ public:
 private:
 	std::vector<sf::RectangleShape> rects_;
     neko::TileMapGraph graph_;
-	const sf::Vector2i tileNmb = sf::Vector2i(100, 100);
-	const size_t roadNmb_ = 1000;
+	const sf::Vector2i tileNmb = sf::Vector2i(200, 200);
+	const size_t roadNmb_ = 20'000;
 	const float outlineThickness = 1.0f;
     std::vector<sf::Vector2i> roadPositions_;
 };
