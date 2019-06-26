@@ -24,6 +24,7 @@
 
 #include <gtest/gtest.h>
 #include <engine/engine.h>
+#include <engine/log.h>
 #include <city_graph.h>
 #include <city_behavior_tree.h>
 #include <SFML/Graphics/RectangleShape.hpp>
@@ -191,5 +192,18 @@ TEST_F(BehaviorTreeTest, IsBehaviorTreeCorrect) {
 TEST_F(BehaviorTreeTest, IsBehaviorTreeExecuteCorrect) {
 	behaviorTreeNodePtr_ = neko::ParseBehaviorTreeFromJson(jsonBehaviorTree_);
 	EXPECT_TRUE(behaviorTreeNodePtr_);
-	EXPECT_EQ(behaviorTreeNodePtr_->Execute(), neko::SUCCESS);
+	// Failure to the condition
+	ASSERT_EQ(behaviorTreeNodePtr_->Execute(), neko::FAILURE);
+	// Move to a
+	ASSERT_EQ(behaviorTreeNodePtr_->Execute(), neko::SUCCESS);
+	// Wait at a
+	while (behaviorTreeNodePtr_->Execute() != neko::SUCCESS) {
+		ASSERT_EQ(behaviorTreeNodePtr_->Execute(), neko::RUNNING);
+	}
+	// Move to b
+	ASSERT_EQ(behaviorTreeNodePtr_->Execute(), neko::SUCCESS);
+	// Wait at b
+	while (behaviorTreeNodePtr_->Execute() != neko::SUCCESS) {
+		ASSERT_EQ(behaviorTreeNodePtr_->Execute(), neko::RUNNING);
+	}
 }

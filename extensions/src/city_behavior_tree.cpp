@@ -61,32 +61,36 @@ namespace neko
 
 	BehaviorTreeFlow BehaviorTreeCompositeSequence::Execute()
 	{
+		logDebug("EXECUTE BehaviorTreeCompositeSequence: " + GetVariable("name"));
 		if (currentCount_ >= children_.size()) currentCount_ = 0;
 		BehaviorTreeFlow flow = children_[currentCount_]->Execute();
-		currentCount_++;
 		if (flow == RUNNING) return RUNNING;
 		if (flow == FAILURE) return FAILURE;
+		currentCount_++;
 		return SUCCESS;
 	}
 
 	BehaviorTreeFlow BehaviorTreeCompositeSelector::Execute()
 	{
+		logDebug("EXECUTE BehaviorTreeCompositeSelector: " + GetVariable("name"));
 		if (currentCount_ >= children_.size()) currentCount_ = 0;
 		BehaviorTreeFlow flow = children_[currentCount_]->Execute();
-		currentCount_++;
 		if (flow == RUNNING) return RUNNING;
 		if (flow == SUCCESS) return SUCCESS;
+		currentCount_++;
 		return FAILURE;
 	}
 
 	BehaviorTreeFlow BehaviorTreeLeafCondition::Execute()
 	{
+		logDebug("EXECUTE BehaviorTreeLeafCondition: " + GetVariable("name"));
 		// TODO Run the condition and if not succeeded return FAILURE.
-		return SUCCESS;
+		return FAILURE;
 	}
 
 	BehaviorTreeFlow BehaviorTreeLeafWait::Execute()
 	{
+		logDebug("EXECUTE BehaviorTreeLeafWait: " + GetVariable("name"));
 		if (!started_)
 		{
 			float delay = std::stof(GetVariable("delay"));
@@ -94,19 +98,23 @@ namespace neko
 			timer_.period = delay;
 			timer_.Reset();
 			started_ = true;
+			logDebug("\treturn: RUNNING(1)");
 			return RUNNING;
 		}
 		timer_.Update(MainEngine::GetInstance()->dt.asSeconds());
 		if (timer_.IsOver())
 		{
 			started_ = false;
+			logDebug("\treturn: SUCCESS");
 			return SUCCESS;
 		}
+		logDebug("\treturn: RUNNING(2)");
 		return RUNNING;
 	}
 
 	BehaviorTreeFlow BehaviorTreeLeafMoveTo::Execute()
 	{
+		logDebug("EXECUTE BehaviorTreeLeafMoveTo: " + GetVariable("name"));
 		if (to_.x == std::numeric_limits<int>::max() &&
 			to_.y == std::numeric_limits<int>::max()) 
 		{
@@ -135,7 +143,7 @@ namespace neko
 				to_.y = static_cast<int>(values[1]);
 			}
 		}
-		// TODO move stuff and if not successs return RUNNING.
+		// TODO move stuff and if not success return RUNNING.
 		return SUCCESS;
 	}
 
