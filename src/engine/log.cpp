@@ -102,7 +102,7 @@ void DebugLogger::logLoop()
                         msgQueue_.erase(msgQueue_.begin());
                     }
                     logFile << msg << "\n";
-                    std::cout << msg << "\n";
+                    std::cout << msg << std::endl;
                     {
                         std::unique_lock<std::mutex> msgLock(msgMutex);
                         msgQueueEmpty = msgQueue_.empty();
