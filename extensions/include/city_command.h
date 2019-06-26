@@ -52,7 +52,7 @@ class CityCommandManager : public System
 	
 public:
 	void Init() override;
-	void ExecuteCommand(const std::unique_ptr<CityCommand>& command);
+	void ExecuteCommand(const std::unique_ptr<CityCommand>& command) const;
 	void Update() override;
 	void Destroy() override;
 	void AddCommand(std::unique_ptr<CityCommand> command, bool fromRenderThread = false);

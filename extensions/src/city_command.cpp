@@ -41,7 +41,7 @@ void CityCommandManager::Init()
 	engine_ = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
 }
 
-void CityCommandManager::ExecuteCommand(const std::unique_ptr<CityCommand>& command)
+void CityCommandManager::ExecuteCommand(const std::unique_ptr<CityCommand>& command) const
 {
 	switch (command->commandType)
 	{

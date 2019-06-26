@@ -23,7 +23,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-
+#include <cmath>
 #include <city_cursor.h>
 #include "engine/globals.h"
 #include "engine/engine.h"
@@ -49,14 +49,85 @@ void CityCursor::Update()
 	const auto tileSize = sf::Vector2f(engine_->GetCityMap().city.tileSize);
 	auto& rect = cursorRect_[frameIndex];
 	const auto mouseTilePos = GetMouseTilePos();
-	rect.setPosition(sf::Vector2f(mouseTilePos.x*tileSize.x, mouseTilePos.y*tileSize.y)-tileSize/2.0f);
+	rect.setPosition(sf::Vector2f(mouseTilePos.x * tileSize.x, mouseTilePos.y * tileSize.y) - tileSize / 2.0f);
 
 	switch (cursorMode)
 	{
 	case ButtonIconType::ROAD:
+	{
+		if (originPos_ == sf::Vector2i(-1, -1))
+		{
+			rect.setSize(sf::Vector2f(tileSize.x, tileSize.y));
+		}
+		else
+		{
+			const auto currentPos = GetMouseTilePos();
+			const auto deltaPos = currentPos - originPos_;
+			auto direction = sf::Vector2i(0, 0);
+			float length;
+			if (fabs(deltaPos.x) > fabs(deltaPos.y))
+			{
+				direction.x = int(copysign(1, deltaPos.x));
+				length = fabs(float(deltaPos.x));
+			}
+			else
+			{
+				direction.y = int(copysign(1, deltaPos.y));
+				length = fabs(float(deltaPos.y));
+			}
+			if (direction == sf::Vector2i(1, 0))
+			{
+				rect.setPosition(sf::Vector2f(originPos_.x * tileSize.x, originPos_.y * tileSize.y) - tileSize / 2.0f);
+				rect.setSize(sf::Vector2f((length + 1) * tileSize.x, tileSize.y));
+			}
+			else if (direction == sf::Vector2i(0, 1))
+			{
+				rect.setPosition(sf::Vector2f(originPos_.x * tileSize.x, originPos_.y * tileSize.y) - tileSize / 2.0f);
+				rect.setSize(sf::Vector2f(tileSize.x, (length + 1) * tileSize.y));
+			}
+			else if (direction == sf::Vector2i(-1, 0))
+			{
+				rect.setPosition(sf::Vector2f((originPos_.x - length) * tileSize.x, originPos_.y * tileSize.y) - tileSize / 2.0f);
+				rect.setSize(sf::Vector2f((length + 1) * tileSize.x, tileSize.y));
+			}
+			else if (direction == sf::Vector2i(0, -1))
+			{
+				rect.setPosition(sf::Vector2f(originPos_.x * tileSize.x, (originPos_.y - length) * tileSize.y) - tileSize / 2.0f);
+				rect.setSize(sf::Vector2f(tileSize.x, (length + 1) * tileSize.y));
+			}
+		}
+
+		rect.setFillColor(cursorColor[Index(cursorMode)]);
+		break;
+	}
 	case ButtonIconType::BULLDOZER:
 	{
-		rect.setSize(tileSize); 
+		if (originPos_ == sf::Vector2i(-1, -1))
+		{
+			rect.setSize(sf::Vector2f(tileSize.x, tileSize.y));
+		}
+		else
+		{
+			const auto currentPos = GetMouseTilePos();
+			const auto deltaPos = currentPos - originPos_;
+			const sf::Vector2i direction = sf::Vector2i(
+				int(copysign(1, deltaPos.x)),
+				int(copysign(1, deltaPos.y)));
+			rect.setPosition(sf::Vector2f(originPos_.x * tileSize.x, originPos_.y * tileSize.y) - tileSize / 2.0f);
+			
+			rect.setSize(sf::Vector2f(tileSize.x * float(abs(deltaPos.x) + 1), tileSize.y * float(abs(deltaPos.y) + 1))); 
+			if (direction.x == -1)
+			{
+				rect.setPosition(sf::Vector2f(currentPos.x * tileSize.x, rect.getPosition().y) - tileSize / 2.0f);
+				rect.setSize(sf::Vector2f(0, 0));
+			}
+			if (direction.y == -1)
+			{
+				rect.setPosition(sf::Vector2f(rect.getPosition().x, currentPos.x * tileSize.y) - tileSize / 2.0f);
+				rect.setSize(sf::Vector2f(0, 0));
+			}
+			
+		}
 		rect.setFillColor(cursorColor[Index(cursorMode)]);
 		break;
 	}
@@ -74,9 +145,19 @@ void CityCursor::Destroy()
 
 void CityCursor::OnEvent(sf::Event& event)
 {
-	if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
+	if (event.type == sf::Event::MouseButtonPressed)
 	{
-		originPos_ = GetMouseTilePos();
+		switch (event.mouseButton.button)
+		{
+		case sf::Mouse::Left:
+			originPos_ = GetMouseTilePos();
+			break;
+		case sf::Mouse::Right:
+			originPos_ = sf::Vector2i(-1, -1);
+			break;
+		default:
+			break;
+		}
 	}
 	else if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left)
 	{
@@ -86,19 +167,50 @@ void CityCursor::OnEvent(sf::Event& event)
 		{
 		case ButtonIconType::ROAD:
 		{
-			auto command = std::make_unique<BuildElementCommand>();
-			command->commandType = CityCommandType::CREATE_CITY_ELEMENT;
-			command->elementType = CityElementType::ROAD;
-			command->position = originPos_;
-			engine_->GetCommandManager().AddCommand(std::move(command));
+			if (originPos_ != sf::Vector2i(-1, -1))
+			{
+				const auto currentPos = GetMouseTilePos();
+				const auto deltaPos = currentPos - originPos_;
+				auto direction = sf::Vector2i(0, 0);
+				int length;
+				if (fabs(deltaPos.x) > fabs(deltaPos.y))
+				{
+					direction.x = int(copysign(1, deltaPos.x));
+					length = abs(deltaPos.x);
+				}
+				else
+				{
+					direction.y = int(copysign(1, deltaPos.y));
+					length = abs(deltaPos.y);
+				}
+				for (int i = 0; i <= length; i++)
+				{
+					auto command = std::make_unique<BuildElementCommand>();
+					command->commandType = CityCommandType::CREATE_CITY_ELEMENT;
+					command->elementType = CityElementType::ROAD;
+					command->position = originPos_ + direction * i;
+					engine_->GetCommandManager().AddCommand(std::move(command));
+				}
+				originPos_ = sf::Vector2i(-1, -1);
+
+			}
 			break;
 		}
 		case ButtonIconType::BULLDOZER:
 		{
-			auto command = std::make_unique<DestroyElementCommand>();
-			command->commandType = CityCommandType::DELETE_CITY_ELEMENT;
-			command->position = originPos_;
-			engine_->GetCommandManager().AddCommand(std::move(command));
+			const auto currentPos = GetMouseTilePos();
+			const auto deltaPos = currentPos - originPos_;
+			for (int dx = 0; dx <= deltaPos.x; dx++)
+			{
+				for (int dy = 0; dy <= deltaPos.y; dy++)
+				{
+					auto command = std::make_unique<DestroyElementCommand>();
+					command->commandType = CityCommandType::DELETE_CITY_ELEMENT;
+					command->position = originPos_ + sf::Vector2i(dx, dy);
+					engine_->GetCommandManager().AddCommand(std::move(command));
+				}
+			}
+			originPos_ = sf::Vector2i(-1, -1);
 			break;
 		}
 		default:
@@ -112,15 +224,15 @@ sf::Vector2i CityCursor::GetMouseWorldPos() const
 	const auto mousePos = engine_->GetMouseManager().GetPosition();
 	const auto view = engine_->mainView;
 
-	return  sf::Vector2i(view.getCenter() + engine_->GetCurrentZoom() * (-sf::Vector2f(engine_->config.screenSize)/2.0f + sf::Vector2f(mousePos)));
-	
+	return  sf::Vector2i(view.getCenter() + engine_->GetCurrentZoom() * (-sf::Vector2f(engine_->config.screenSize) / 2.0f + sf::Vector2f(mousePos)));
+
 }
 
 sf::Vector2i CityCursor::GetMouseTilePos() const
 {
 
 	const auto tileSize = engine_->GetCityMap().city.tileSize;
-	const auto worldMousePos = GetMouseWorldPos()+sf::Vector2i(tileSize)/2;
+	const auto worldMousePos = GetMouseWorldPos() + sf::Vector2i(tileSize) / 2;
 	return sf::Vector2i(
 		int(worldMousePos.x) / tileSize.x,
 		int(worldMousePos.y) / tileSize.y);

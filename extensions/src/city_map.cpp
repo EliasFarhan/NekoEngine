@@ -236,13 +236,19 @@ void CityBuilderMap::AddCityElement(CityElementType cityElement, const sf::Vecto
 
 void CityBuilderMap::RemoveCityElement(const sf::Vector2i& position)
 {
-	const auto elementIt = std::find_if(elements_.begin(), elements_.end(), [&position](const CityElement& element)
+	//TODO need to check each element positions taking into account the size
+	auto elementIt = std::find_if(elements_.begin(), elements_.end(), [&position](const CityElement& element)
 	{
 		return element.position == position;
 	});
-	if(elementIt != elements_.end())
+	while (elementIt != elements_.end())
 	{
 		elements_.erase(elementIt);
-	}
+		
+		elementIt = std::find_if(elements_.begin(), elements_.end(), [&position](const CityElement& element)
+		{
+			return element.position == position;
+		});
+	} ;
 }
 }

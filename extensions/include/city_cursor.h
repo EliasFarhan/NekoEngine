@@ -45,6 +45,6 @@ public:
 protected:
 	//for double buffering
 	sf::RectangleShape cursorRect_[2];
-	sf::Vector2i originPos_ {};
+	sf::Vector2i originPos_ =sf::Vector2i(-1,-1);
 };
 }
