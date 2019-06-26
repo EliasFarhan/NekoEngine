@@ -347,14 +347,14 @@ namespace neko
 		return {};
 	}
 
-	void LogBehaviorTree(const BehaviorTreeNode* behaviorTree)
+	void LogBehaviorTree(const std::shared_ptr<BehaviorTreeNode> behaviorTree)
 	{
 		static int indent = 0;
 		std::ostringstream oss_indent;
 		for (int i = 0; i < indent; ++i) {
 			oss_indent << "\t";
 		}
-		if (behaviorTree == nullptr) {
+		if (!behaviorTree) {
 			logDebug(oss_indent.str() + "ERROR nullptr as a behaviorTree.");
 			return;
 		}
@@ -370,15 +370,17 @@ namespace neko
 		{
 			logDebug(oss_indent.str() + "children : {");
 			indent++;
-			const auto* interfaceComposite =
-				dynamic_cast<const BehaviorTreeComposite*>(behaviorTree);
-			if (interfaceComposite == nullptr) {
+			const auto interfaceComposite =
+				std::dynamic_pointer_cast<const BehaviorTreeComposite>(behaviorTree);
+			if (!interfaceComposite) 
+			{
 				logDebug(oss_indent.str() + "ERROR in composite!");
 			}
 			else
 			{
-				for (const auto& child : interfaceComposite->GetChildrenList()) {
-					LogBehaviorTree(child.get());
+				for (const auto& child : interfaceComposite->GetChildrenList()) 
+				{
+					LogBehaviorTree(child);
 				}
 			}
 			indent--;
@@ -389,14 +391,16 @@ namespace neko
 		{
 			logDebug(oss_indent.str() + "decorator : {");
 			indent++;
-			const auto* childDecorator =
-				dynamic_cast<const BehaviorTreeDecorator*>(behaviorTree);
-			if (childDecorator == nullptr) {
+			const auto childDecorator =
+				std::dynamic_pointer_cast<const BehaviorTreeDecorator>(
+					behaviorTree);
+			if (!childDecorator) 
+			{
 				logDebug(oss_indent.str() + "ERROR in decorator!");
 			}
 			else
 			{
-				LogBehaviorTree(childDecorator->GetChild().get());
+				LogBehaviorTree(childDecorator->GetChild());
 			}
 			indent--;
 			logDebug(oss_indent.str() + "}");

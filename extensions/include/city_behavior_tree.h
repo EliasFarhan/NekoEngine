@@ -289,7 +289,7 @@ namespace neko
 			std::numeric_limits<int>::max() };
 	};
 
-	void LogBehaviorTree(const BehaviorTreeNode* behaviorTree);
+	void LogBehaviorTree(const std::shared_ptr<BehaviorTreeNode> behaviorTree);
 	std::shared_ptr<BehaviorTreeNode> ParseBehaviorTreeFromJson(
 		const json& jsonContent);
 	std::shared_ptr<BehaviorTreeNode> LoadBehaviorTreeFromJsonFile(
