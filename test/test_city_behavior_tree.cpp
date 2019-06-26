@@ -88,16 +88,11 @@ protected:
 					}
 				]
 			})"_json;
-		neko::BasicEngine::Init();
-	}
-
-	void Update() override
-	{
-		neko::BasicEngine::Update();
+		Init();
 	}
 
 	void TearDown() override {
-		neko::BasicEngine::Destroy();
+		Destroy();
 	}
 
 	json jsonBehaviorTree_;

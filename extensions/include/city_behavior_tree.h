@@ -27,6 +27,7 @@
 #include <memory>
 #include <map>
 #include <limits>
+#include <chrono>
 #include "utilities/time_utility.h"
 #include "utilities/json_utility.h"
 
@@ -263,7 +264,7 @@ namespace neko
 		}
 
 	private:
-		Timer timer_ = { 0.0, 0.0 };
+		std::chrono::time_point<std::chrono::system_clock> triggerTimer_;
 		bool started_ = false;
 	};
 

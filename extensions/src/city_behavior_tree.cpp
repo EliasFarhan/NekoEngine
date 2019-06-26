@@ -94,15 +94,16 @@ namespace neko
 		if (!started_)
 		{
 			float delay = std::stof(GetVariable("delay"));
-			timer_.time = 0.0f;
-			timer_.period = delay;
-			timer_.Reset();
+			std::chrono::duration durationDelay = 
+				std::chrono::milliseconds(static_cast<long long>(
+					delay * 1000.0f));
+			triggerTimer_ = std::chrono::system_clock::now() + durationDelay;
 			started_ = true;
 			logDebug("\treturn: RUNNING(1)");
 			return RUNNING;
 		}
-		timer_.Update(MainEngine::GetInstance()->dt.asSeconds());
-		if (timer_.IsOver())
+		bool isOver = triggerTimer_ < std::chrono::system_clock::now();
+		if (isOver)
 		{
 			started_ = false;
 			logDebug("\treturn: SUCCESS");
