@@ -61,7 +61,6 @@ namespace neko
 
 	BehaviorTreeFlow BehaviorTreeCompositeSequence::Execute()
 	{
-		logDebug("EXECUTE BehaviorTreeCompositeSequence: " + GetVariable("name"));
 		if (currentCount_ >= children_.size()) currentCount_ = 0;
 		BehaviorTreeFlow flow = children_[currentCount_]->Execute();
 		if (flow == RUNNING) return RUNNING;
@@ -72,7 +71,6 @@ namespace neko
 
 	BehaviorTreeFlow BehaviorTreeCompositeSelector::Execute()
 	{
-		logDebug("EXECUTE BehaviorTreeCompositeSelector: " + GetVariable("name"));
 		if (currentCount_ >= children_.size()) currentCount_ = 0;
 		BehaviorTreeFlow flow = children_[currentCount_]->Execute();
 		if (flow == RUNNING) return RUNNING;
@@ -83,39 +81,35 @@ namespace neko
 
 	BehaviorTreeFlow BehaviorTreeLeafCondition::Execute()
 	{
-		logDebug("EXECUTE BehaviorTreeLeafCondition: " + GetVariable("name"));
 		// TODO Run the condition and if not succeeded return FAILURE.
 		return FAILURE;
 	}
 
 	BehaviorTreeFlow BehaviorTreeLeafWait::Execute()
 	{
-		logDebug("EXECUTE BehaviorTreeLeafWait: " + GetVariable("name"));
 		if (!started_)
 		{
-			float delay = std::stof(GetVariable("delay"));
-			std::chrono::duration durationDelay = 
+			durationDelay_ = 
 				std::chrono::milliseconds(static_cast<long long>(
-					delay * 1000.0f));
-			triggerTimer_ = std::chrono::system_clock::now() + durationDelay;
+					std::stod(GetVariable("delay")) * 1000.0));
+			triggerTimer_ = std::chrono::system_clock::now();
 			started_ = true;
-			logDebug("\treturn: RUNNING(1)");
-			return RUNNING;
 		}
-		bool isOver = triggerTimer_ < std::chrono::system_clock::now();
-		if (isOver)
+		else
 		{
-			started_ = false;
-			logDebug("\treturn: SUCCESS");
-			return SUCCESS;
+			const auto now = std::chrono::system_clock::now();
+			const auto delta = now - triggerTimer_;
+			if (delta > durationDelay_)
+			{
+				started_ = false;
+				return SUCCESS;
+			}
 		}
-		logDebug("\treturn: RUNNING(2)");
 		return RUNNING;
 	}
 
 	BehaviorTreeFlow BehaviorTreeLeafMoveTo::Execute()
 	{
-		logDebug("EXECUTE BehaviorTreeLeafMoveTo: " + GetVariable("name"));
 		if (to_.x == std::numeric_limits<int>::max() &&
 			to_.y == std::numeric_limits<int>::max()) 
 		{

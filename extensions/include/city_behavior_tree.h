@@ -265,6 +265,7 @@ namespace neko
 
 	private:
 		std::chrono::time_point<std::chrono::system_clock> triggerTimer_;
+		std::chrono::milliseconds durationDelay_;
 		bool started_ = false;
 	};
 
