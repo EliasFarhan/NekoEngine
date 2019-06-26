@@ -55,7 +55,7 @@ namespace neko
 		{
 			return it->second;
 		}
-		return "null";
+		return "<null>";
 	}
 
 	BehaviorTreeFlow BehaviorTreeCompositeSequence::Execute()
@@ -80,6 +80,7 @@ namespace neko
 
 	BehaviorTreeFlow BehaviorTreeLeafCondition::Execute()
 	{
+		// TODO Run the condition and if not succeeded return FAILURE.
 		return SUCCESS;
 	}
 
@@ -105,6 +106,34 @@ namespace neko
 
 	BehaviorTreeFlow BehaviorTreeLeafMoveTo::Execute()
 	{
+		if (to_.x == std::numeric_limits<int>::max() &&
+			to_.y == std::numeric_limits<int>::max()) 
+		{
+			if (GetVariable("to") == "<null>")
+			{
+				logDebug("Could not find \"to\" in a leaf move to node");
+				return FAILURE;
+			}
+			else
+			{
+				std::istringstream iss(GetVariable("to"));
+				std::vector<double> values;
+				double value;
+				while (iss >> value) 
+				{
+					values.push_back(value);
+				}
+				if (values.size() != 2) {
+					logDebug(
+						"Size of the leaf move to \"to\" is not equal to 2: " +
+						std::to_string(values.size()));
+					return FAILURE;
+				}
+				to_.x = static_cast<int>(values[0]);
+				to_.y = static_cast<int>(values[1]);
+			}
+		}
+		// TODO move stuff and if not successs return RUNNING.
 		return SUCCESS;
 	}
 

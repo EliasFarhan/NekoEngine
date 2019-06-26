@@ -26,6 +26,7 @@
 #include <vector>
 #include <memory>
 #include <map>
+#include <limits>
 #include "utilities/time_utility.h"
 #include "utilities/json_utility.h"
 
@@ -267,7 +268,7 @@ namespace neko
 	};
 
 	// Leaf Move to in a behavior tree.
-	// The location can be set by the SetVariable("to", "10.0, 20");.
+	// The location can be set by the SetVariable("to", "1 20");.
 	class BehaviorTreeLeafMoveTo : public BehaviorTreeLeaf
 	{
 	public:
@@ -281,6 +282,11 @@ namespace neko
 		{
 			return LEAF_MOVE_TO;
 		}
+
+	protected:
+		sf::Vector2i to_ = { 
+			std::numeric_limits<int>::max() , 
+			std::numeric_limits<int>::max() };
 	};
 
 	void LogBehaviorTree(const BehaviorTreeNode* behaviorTree);

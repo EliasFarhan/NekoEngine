@@ -30,7 +30,7 @@
 #include <imgui.h>
 #include <Remotery.h>
 
-class BehaviorTreeTest : public ::testing::Test {
+class BehaviorTreeTest : public ::testing::Test, public neko::BasicEngine {
 protected:
 	void SetUp() override {
 		jsonBehaviorTree_ = R"(
@@ -88,17 +88,20 @@ protected:
 				]
 			}
 		)"_json;
-		basicEnginePtr_ = std::make_unique<neko::BasicEngine>();
-		basicEnginePtr_->Init();
+		neko::BasicEngine::Init();
+	}
+
+	void Update() override
+	{
+		neko::BasicEngine::Update();
 	}
 
 	void TearDown() override {
-		basicEnginePtr_->Destroy();
+		neko::BasicEngine::Destroy();
 	}
 
 	json jsonBehaviorTree_;
 	std::shared_ptr<neko::BehaviorTreeNode> behaviorTreeNodePtr_;
-	std::unique_ptr<neko::BasicEngine> basicEnginePtr_;
 };
 
 TEST_F(BehaviorTreeTest, IsInitFromJsonWorking) {
@@ -174,4 +177,10 @@ TEST_F(BehaviorTreeTest, IsBehaviorTreeCorrect) {
 			}
 		}
 	}
+}
+
+TEST_F(BehaviorTreeTest, IsBehaviorTreeExecuteCorrect) {
+	behaviorTreeNodePtr_ = neko::ParseBehaviorTreeFromJson(jsonBehaviorTree_);
+	EXPECT_TRUE(behaviorTreeNodePtr_);
+	EXPECT_EQ(behaviorTreeNodePtr_->Execute(), neko::SUCCESS);
 }
