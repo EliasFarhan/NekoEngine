@@ -64,13 +64,7 @@ struct DestroyElementCommand : CityCommand
 	sf::Vector2i position;
 };
 
-enum class NeighborType : unsigned
-{
-    UP = 1 << 0,
-    DOWN = 1 << 1,
-    LEFT = 1 << 2,
-    RIGHT = 1 << 3
-};
+
 
 struct City
 {
@@ -89,11 +83,12 @@ struct CityElement
 
 
 
-struct RoadElement
+struct RoadElement : CityElement
 {
-    sf::Vector2i position;
+    /**
+     * \brief bitwise representation of neighbors using NeighborType direction
+     */
     unsigned neighborsBitwise = 0u;
-    const sf::Vector2u size = sf::Vector2u(1,1);
 };
 
 class CityBuilderMap : public System
