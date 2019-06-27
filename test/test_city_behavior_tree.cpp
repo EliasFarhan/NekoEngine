@@ -33,15 +33,11 @@ protected:
 	{
 		Init();
 		comp_ = std::make_shared<neko::Component>();
-		passed_ = 0;
 		neko::FunctionMap funcMap(comp_);
 		funcMap.SetFunction(
 			"test",
 			[this](std::shared_ptr<neko::Component> comp, double value)
 		{
-			passed_++;
-			EXPECT_EQ(value, 2.0);
-			EXPECT_EQ(*comp_, *comp);
 			return true;
 		});
 	}
@@ -54,9 +50,10 @@ protected:
 	std::vector<std::pair<std::string, std::string>> ilVariables_ = {
 		{"name", "test"},
 		{"condition", "test(2)"},
+		{"to", "move(1.0, 4.0)"},
 		{"delay", "0.5"},
 	};
-	int passed_;
+	std::atomic<int> passed_;
 	std::shared_ptr<neko::Component> comp_;
 };
 
@@ -86,7 +83,6 @@ TEST_F(BehaviorTreeTest, ConditionConstructorTest)
 	neko::BehaviorTreeLeafCondition condition(comp_, ilVariables_);
 	EXPECT_EQ(condition.GetType(), neko::LEAF_CONDITION);
 	EXPECT_EQ(condition.Execute(), neko::SUCCESS);
-	EXPECT_EQ(passed_, 1);
 }
 
 TEST_F(BehaviorTreeTest, MoveToConstructorTest)
@@ -114,10 +110,8 @@ TEST_F(BehaviorTreeTest, SelectorConstructorTest)
 		ilVariables_);
 	EXPECT_EQ(selector.GetType(), neko::COMPOSITE_SELECTOR);
 	EXPECT_EQ(selector.Execute(), neko::SUCCESS);
-	EXPECT_EQ(passed_, 1);
 	// Should stick in the success.
 	EXPECT_EQ(selector.Execute(), neko::SUCCESS);
-	EXPECT_EQ(passed_, 2);
 }
 
 TEST_F(BehaviorTreeTest, SequenceConstructorTest)
@@ -131,7 +125,5 @@ TEST_F(BehaviorTreeTest, SequenceConstructorTest)
 		ilVariables_);
 	EXPECT_EQ(sequence.GetType(), neko::COMPOSITE_SEQUENCE);
 	EXPECT_EQ(sequence.Execute(), neko::SUCCESS);
-	EXPECT_EQ(passed_, 1);
 	EXPECT_EQ(sequence.Execute(), neko::FAILURE);
-	EXPECT_EQ(passed_, 2);
 }
