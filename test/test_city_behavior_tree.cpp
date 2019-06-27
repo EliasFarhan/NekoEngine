@@ -36,7 +36,7 @@ protected:
 		neko::FunctionMap funcMap(comp_);
 		funcMap.SetFunction(
 			"test",
-			[this](std::shared_ptr<neko::Component> comp, double value)
+			[](std::shared_ptr<neko::Component> comp, double value)
 		{
 			return true;
 		});
