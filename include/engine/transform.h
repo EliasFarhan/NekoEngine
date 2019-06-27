@@ -27,6 +27,7 @@
 #include <vector>
 #include "SFML/System/Vector2.hpp"
 #include "globals.h"
+#include <engine/entity.h>
 
 namespace neko
 {
@@ -45,9 +46,9 @@ public:
 
     void CopyAnglesFromPhysics2d(Physics2dManager& physics2dManager, size_t start = 0, size_t length = InitEntityNmb);
 
-    Index AddPosition(sf::Vector2f position);
-    Index AddScale(sf::Vector2f scale);
-    Index AddAngle(float angle);
+    Index AddPosition(sf::Vector2f position, Entity entity = INVALID_ENTITY);
+    Index AddScale(sf::Vector2f scale, Entity entity = INVALID_ENTITY);
+    Index AddAngle(float angle, Entity entity = INVALID_ENTITY);
 
     sf::Vector2f GetPosition(Index i);
 

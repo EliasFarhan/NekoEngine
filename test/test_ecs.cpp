@@ -24,31 +24,37 @@
 
 #include <gtest/gtest.h>
 #include <engine/entity.h>
+#include <engine/transform.h>
 
-TEST(Entity, AddEntity)
+TEST(Entity, EntityManager)
 {
     neko::EntityManager entityManager;
     const Index entityNmb = 1024u;
+	const neko::EntityMask componentType1 = 1 << 0;
+	const neko::EntityMask componentType2 = 1 << 1;
 
-    for (Index i = 0; i < entityNmb; i++)
+    for (Index i = 0u; i < entityNmb; i++)
     {
         auto entity = entityManager.CreateEntity();
-        EXPECT_EQ(entity, i + 1);
-        entityManager.AddComponentType(entity, 1);
-        EXPECT_TRUE(entityManager.HasComponent(entity, 1));
-        entityManager.AddComponentType(entity, 1u << 1u);
-        EXPECT_TRUE(entityManager.HasComponent(entity, 1));
-        EXPECT_TRUE(entityManager.HasComponent(entity, 1u << 1u));
-        entityManager.RemoveComponentType(entity, 1);
-        EXPECT_FALSE(entityManager.HasComponent(entity, 1));
-        EXPECT_TRUE(entityManager.HasComponent(entity, 1u << 1u));
+        EXPECT_EQ(entity, i);
+        entityManager.AddComponentType(entity, componentType1);
+        EXPECT_TRUE(entityManager.HasComponent(entity, componentType1));
+        entityManager.AddComponentType(entity, componentType2);
+        EXPECT_TRUE(entityManager.HasComponent(entity, componentType1));
+        EXPECT_TRUE(entityManager.HasComponent(entity, componentType2));
+        entityManager.RemoveComponentType(entity, componentType1);
+        EXPECT_FALSE(entityManager.HasComponent(entity, componentType1));
+        EXPECT_TRUE(entityManager.HasComponent(entity, componentType2));
     }
     EXPECT_EQ(entityManager.GetEntitiesNmb(), entityNmb);
+    EXPECT_EQ(entityManager.GetEntitiesNmb(componentType1), 0);
+    EXPECT_EQ(entityManager.GetEntitiesNmb(componentType2), entityNmb);
+	EXPECT_EQ(entityManager.FilterEntities(componentType1).size(), 0);
+	EXPECT_EQ(entityManager.FilterEntities(componentType2).size(), entityNmb);
 
     for (Index i = 0; i < entityNmb / 2; i++)
     {
-        entityManager.DestroyEntity(i * 2 + 1u);
+        entityManager.DestroyEntity(i * 2);
     }
     EXPECT_EQ(entityManager.GetEntitiesNmb(), entityNmb / 2);
 }
-

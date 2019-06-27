@@ -31,47 +31,74 @@ namespace neko
 
 Transform2dManager::Transform2dManager()
 {
-    positions_.reserve(InitEntityNmb);
-    scales_.reserve(InitEntityNmb);
-    angles_.reserve(InitEntityNmb);
+	positions_.reserve(InitEntityNmb);
+	scales_.reserve(InitEntityNmb);
+	angles_.reserve(InitEntityNmb);
 }
 
 void Transform2dManager::CopyPositionsFromPhysics2d(Physics2dManager& physics2dManager, size_t start, size_t length)
 {
-    for (auto i = start; i < start + length; i++)
-    {
-        positions_[i] = meter2pixel(physics2dManager.bodies_[i]->GetPosition());
-    }
+	for (auto i = start; i < start + length; i++)
+	{
+		positions_[i] = meter2pixel(physics2dManager.bodies_[i]->GetPosition());
+	}
 }
 
 void Transform2dManager::CopyAnglesFromPhysics2d(Physics2dManager& physics2dManager, size_t start, size_t length)
 {
-    for (auto i = start; i < start + length; i++)
-    {
-        angles_[i] = meter2pixel(glm::radians(physics2dManager.bodies_[i]->GetAngle()));
-    }
+	for (auto i = start; i < start + length; i++)
+	{
+		angles_[i] = meter2pixel(glm::radians(physics2dManager.bodies_[i]->GetAngle()));
+	}
 }
 
-Index Transform2dManager::AddPosition(sf::Vector2f position)
+Index Transform2dManager::AddPosition(sf::Vector2f position, Entity entity)
 {
-    positions_.push_back(position);
-    return Index(positions_.size());
+	if (entity == INVALID_ENTITY)
+	{
+		positions_.push_back(position);
+		return Index(positions_.size());
+	}
+	if (positions_.size() <= entity)
+	{
+		positions_.resize(size_t(entity) + 1);	
+	}
+	positions_[entity] = position;
+	return entity;
 }
 
-Index Transform2dManager::AddScale(sf::Vector2f scale)
+Index Transform2dManager::AddScale(sf::Vector2f scale, Entity entity)
 {
-    scales_.push_back(scale);
-    return Index(scales_.size());
+	if (entity == INVALID_ENTITY)
+	{
+		scales_.push_back(scale);
+		return Index(scales_.size());
+	}
+	if(scales_.size() <= entity)
+	{
+		scales_.resize(size_t(entity) + 1);
+	}
+	scales_[entity] = scale;
+	return entity;
 }
 
-Index Transform2dManager::AddAngle(float angle)
+Index Transform2dManager::AddAngle(float angle, Entity entity)
 {
-    angles_.push_back(angle);
-    return Index(angles_.size());
+	if (entity == INVALID_ENTITY)
+	{
+		angles_.push_back(angle);
+		return Index(angles_.size());
+	}
+	if(angles_.size() <= entity)
+	{
+		angles_.resize(size_t(entity) + 1);
+	}
+	angles_[entity] = angle;
+	return entity;
 }
 
 sf::Vector2f Transform2dManager::GetPosition(Index i)
 {
-    return positions_[i];
+	return positions_[i];
 }
 }
