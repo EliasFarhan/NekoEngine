@@ -34,7 +34,7 @@
 class BehaviorTreeTest : public ::testing::Test, public neko::BasicEngine {
 protected:
 	void SetUp() override {
-		jsonBehaviorTree_ = R"(
+		jsonBehaviorTree_ = R"JSON(
 			{
 				"type" : "composite_selector",
 				"name" : "Application",
@@ -46,7 +46,7 @@ protected:
 							{
 								"type" : "leaf_condition",
 								"name" : "Energy level is low",
-								"condition" : "this.energy < 0.3"
+								"condition" : "EnergyLevel(0.3)"
 							},
 							{
 								"type" : "leaf_move_to",
@@ -87,7 +87,7 @@ protected:
 						]
 					}
 				]
-			})"_json;
+			})JSON"_json;
 		Init();
 	}
 
@@ -127,7 +127,7 @@ TEST_F(BehaviorTreeTest, IsBehaviorTreeCorrect) {
 					std::dynamic_pointer_cast<neko::BehaviorTreeLeafCondition>(
 						sequence_children[0]);
 				ASSERT_TRUE(condition);
-				EXPECT_EQ(condition->GetVariable("condition"), "this.energy < 0.3");
+				EXPECT_EQ(condition->GetVariable("condition"), "EnergyLevel(0.3)");
 			}
 			{
 				std::shared_ptr<neko::BehaviorTreeLeafMoveTo> move_to =
