@@ -158,3 +158,4 @@ TEST(CityBuilder, Pathfinding)
     engine.Init();
     engine.EngineLoop();
 }
+

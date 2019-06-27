@@ -25,6 +25,7 @@
  */
 
 #include <cstdint>
+#include <limits>
 
 const size_t InitEntityNmb = 128;
 using Index = uint32_t;

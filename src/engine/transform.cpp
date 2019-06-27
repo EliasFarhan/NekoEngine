@@ -52,19 +52,22 @@ void Transform2dManager::CopyAnglesFromPhysics2d(Physics2dManager& physics2dMana
     }
 }
 
-void Transform2dManager::AddPosition(sf::Vector2f position)
+Index Transform2dManager::AddPosition(sf::Vector2f position)
 {
     positions_.push_back(position);
+    return Index(positions_.size());
 }
 
-void Transform2dManager::AddScale(sf::Vector2f scale)
+Index Transform2dManager::AddScale(sf::Vector2f scale)
 {
     scales_.push_back(scale);
+    return Index(scales_.size());
 }
 
-void Transform2dManager::AddAngle(float angle)
+Index Transform2dManager::AddAngle(float angle)
 {
     angles_.push_back(angle);
+    return Index(angles_.size());
 }
 
 sf::Vector2f Transform2dManager::GetPosition(Index i)

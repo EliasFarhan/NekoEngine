@@ -28,6 +28,7 @@
 #include <PerlinNoise.hpp>
 #include "engine/globals.h"
 #include "city_command.h"
+#include <city_graph.h>
 
 
 namespace neko
@@ -103,8 +104,11 @@ public:
 	void AddCityElement(CityElementType cityElement, const sf::Vector2i& position);
 	void RemoveCityElement(const sf::Vector2i& position);
 	City city{};
-	std::vector<EnvironmentTile> environmentTiles_;
-	std::vector<CityElement> elements_;
+private:
+    friend class CityBuilderTilemap;
+    TileMapGraph roadGraph;
+    std::vector<EnvironmentTile> environmentTiles_;
+    std::vector<CityElement> elements_;
 };
 
 }

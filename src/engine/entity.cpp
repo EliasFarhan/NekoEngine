@@ -29,43 +29,59 @@ namespace neko
 
 EntityManager::EntityManager()
 {
-    maskArray_.reserve(InitEntityNmb);
+    entityMaskArray_.reserve(InitEntityNmb);
 }
 
 EntityMask EntityManager::GetMask(Entity entity)
 {
-    return maskArray_[entity - 1];
+    return entityMaskArray_[entity - 1];
 }
 
-Entity EntityManager::CreateEntity(Entity wantedEntity)
+Entity EntityManager::CreateEntity()
 {
-    for (Entity entity = 1U; entity <= maskArray_.size(); entity++)
+    const auto entityMaskIt = std::find_if(entityMaskArray_.begin(), entityMaskArray_.end(),[](EntityMask entityMask){
+       return  entityMask == INVALID_ENTITY_MASK;
+    });
+    if(entityMaskIt == entityMaskArray_.end())
     {
-        if (maskArray_[entity - 1] == INVALID_ENTITY)
-        {
-            return entity;
-        }
+        entityMaskArray_.push_back(INVALID_ENTITY_MASK);
+        return Entity(entityMaskArray_.size());
     }
-    return INVALID_ENTITY;
+    else
+    {
+        return Entity(entityMaskIt-entityMaskArray_.begin())+1u;
+    }
 }
 
 void EntityManager::DestroyEntity(Entity entity)
 {
-    maskArray_[entity - 1] = INVALID_ENTITY;
+    entityMaskArray_[entity - 1u] = INVALID_ENTITY_MASK;
 }
 
-bool EntityManager::HasComponent(Entity entity, ComponentType componentType)
+bool EntityManager::HasComponent(Entity entity, EntityMask componentType)
 {
-    return (maskArray_[entity - 1] & EntityMask(componentType)) == EntityMask(componentType);
+    return (entityMaskArray_[entity - 1] & EntityMask(componentType)) == EntityMask(componentType);
 }
 
-void EntityManager::AddComponentType(Entity entity, ComponentType componentType)
+void EntityManager::AddComponentType(Entity entity, EntityMask componentType)
 {
-    maskArray_[entity - 1] |= EntityMask(componentType);
+    entityMaskArray_[entity - 1] |= EntityMask(componentType);
 }
 
-void EntityManager::RemoveComponentType(Entity entity, ComponentType componentType)
+void EntityManager::RemoveComponentType(Entity entity, EntityMask componentType)
 {
-    maskArray_[entity - 1] &= ~EntityMask(componentType);
+    entityMaskArray_[entity - 1] &= ~EntityMask(componentType);
+}
+
+size_t EntityManager::GetEntitiesNmb()
+{
+    return std::count_if(entityMaskArray_.begin(), entityMaskArray_.end(),[](EntityMask entityMask){
+        return entityMask != INVALID_ENTITY_MASK;
+    });
+}
+
+bool EntityManager::EntityExists(Entity entity)
+{
+    return entityMaskArray_[entity-1u] != INVALID_ENTITY_MASK;
 }
 }

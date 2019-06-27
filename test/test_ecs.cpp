@@ -1,9 +1,7 @@
-#pragma once
-
 /*
  MIT License
 
- Copyright (c) 2017 SAE Institute Switzerland AG
+ Copyright (c) 2019 SAE Institute Switzerland AG
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -24,39 +22,33 @@
  SOFTWARE.
  */
 
-#include <vector>
-#include "SFML/System/Vector2.hpp"
-#include "globals.h"
+#include <gtest/gtest.h>
+#include <engine/entity.h>
 
-namespace neko
+TEST(Entity, AddEntity)
 {
-class Physics2dManager;
+    neko::EntityManager entityManager;
+    const Index entityNmb = 1024u;
 
-/**
- * \brief manage the graphic transform of any kind of objects in a SOA fashions
- */
-class Transform2dManager
-{
-public:
-    Transform2dManager();
+    for (Index i = 0; i < entityNmb; i++)
+    {
+        auto entity = entityManager.CreateEntity();
+        EXPECT_EQ(entity, i + 1);
+        entityManager.AddComponentType(entity, 1);
+        EXPECT_TRUE(entityManager.HasComponent(entity, 1));
+        entityManager.AddComponentType(entity, 1u << 1u);
+        EXPECT_TRUE(entityManager.HasComponent(entity, 1));
+        EXPECT_TRUE(entityManager.HasComponent(entity, 1u << 1u));
+        entityManager.RemoveComponentType(entity, 1);
+        EXPECT_FALSE(entityManager.HasComponent(entity, 1));
+        EXPECT_TRUE(entityManager.HasComponent(entity, 1u << 1u));
+    }
+    EXPECT_EQ(entityManager.GetEntitiesNmb(), entityNmb);
 
-    void
-    CopyPositionsFromPhysics2d(Physics2dManager& physics2dManager, size_t start = 0, size_t length = InitEntityNmb);
-
-    void CopyAnglesFromPhysics2d(Physics2dManager& physics2dManager, size_t start = 0, size_t length = InitEntityNmb);
-
-    Index AddPosition(sf::Vector2f position);
-    Index AddScale(sf::Vector2f scale);
-    Index AddAngle(float angle);
-
-    sf::Vector2f GetPosition(Index i);
-
-private:
-    friend class SpriteManager;
-    friend class ShapeManager;
-
-    std::vector<sf::Vector2f> positions_;
-    std::vector<sf::Vector2f> scales_;
-    std::vector<float> angles_;
-};
+    for (Index i = 0; i < entityNmb / 2; i++)
+    {
+        entityManager.DestroyEntity(i * 2 + 1u);
+    }
+    EXPECT_EQ(entityManager.GetEntitiesNmb(), entityNmb / 2);
 }
+

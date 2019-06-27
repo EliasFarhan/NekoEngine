@@ -65,11 +65,7 @@ void CityBuilderMap::Init()
 		for (unsigned int x = 0; x < city.mapSize.x; x++)
 		{
 			pos.x = x;
-			CityElement element{};
-			element.position = pos;
-			element.size = sf::Vector2u(1, 1);
-			element.elementType = CityElementType::ROAD;
-			elements_.push_back(element);
+			AddCityElement(CityElementType::ROAD, pos);
 		}
 		//RAIL
 		const int trainStationX = (rand() % (city.mapSize.x / 3)) + city.mapSize.x / 3;
@@ -225,6 +221,7 @@ void CityBuilderMap::AddCityElement(CityElementType cityElement, const sf::Vecto
 			element.position = position;
 			element.size = sf::Vector2u(1, 1);
 			element.elementType = CityElementType::ROAD;
+			roadGraph.AddNode(position);
 			elements_.push_back(element);
 		}
 		break;
@@ -243,7 +240,11 @@ void CityBuilderMap::RemoveCityElement(const sf::Vector2i& position)
 	});
 	while (elementIt != elements_.end())
 	{
-		elements_.erase(elementIt);
+        if(elementIt->elementType == CityElementType::ROAD)
+        {
+            roadGraph.RemoveNode(position);
+        }
+	    elements_.erase(elementIt);
 		
 		elementIt = std::find_if(elements_.begin(), elements_.end(), [&position](const CityElement& element)
 		{

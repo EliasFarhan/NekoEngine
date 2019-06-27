@@ -33,6 +33,7 @@
 #include <SFML/Window/Event.hpp>
 #include "city_command.h"
 #include <city_cursor.h>
+#include <engine/transform.h>
 
 namespace neko
 {
@@ -56,6 +57,7 @@ public:
 	sf::View mainView;
 private:
 	EntityManager entityManager_;
+	Transform2dManager transformManager_;
 	TextureManager textureManager_;
 
 	CityCommandManager commandManager_;

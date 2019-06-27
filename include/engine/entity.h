@@ -33,6 +33,7 @@ using Entity = Index;
 using EntityMask = std::uint32_t;
 enum class ComponentType : unsigned;
 const Entity INVALID_ENTITY = 0u;
+const EntityMask INVALID_ENTITY_MASK = 0u;
 
 /**
  * \brief Used in an Entity-Component-System to store all entities and what components they have
@@ -44,16 +45,17 @@ public:
 
     EntityMask GetMask(Entity entity);
 
-    Entity CreateEntity(Entity wantedEntity = 0u);
+    Entity CreateEntity();
 
     void DestroyEntity(Entity entity);
 
-    bool HasComponent(Entity entity, ComponentType componentType);
+    bool HasComponent(Entity entity, EntityMask componentType);
+bool EntityExists(Entity entity);
+size_t GetEntitiesNmb();
+    void AddComponentType(Entity entity, EntityMask componentType);
 
-    void AddComponentType(Entity entity, ComponentType componentType);
-
-    void RemoveComponentType(Entity entity, ComponentType componentType);
+    void RemoveComponentType(Entity entity, EntityMask componentType);
 private:
-    std::vector<EntityMask> maskArray_;
+    std::vector<EntityMask> entityMaskArray_;
 };
 }

@@ -16,8 +16,11 @@ if(UNIX AND NOT APPLE)
 			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -nostdinc++")
 
 			include_directories(${LLVM_ROOT}/include/c++/v1/)
-			LIST(APPEND Neko_LIBRARIES
-					c++fs)
+			if("${CMAKE_CXX_COMPILER_VERSION}" STREQUAL "9.0.0")
+			else()
+				LIST(APPEND Neko_LIBRARIES
+						c++fs)
+			endif()
 			SET (CMAKE_AR      "${LLVM_ROOT}/bin/llvm-ar")
 			SET (CMAKE_LINKER  "${LLVM_ROOT}/bin/llvm-ld")
 			SET (CMAKE_NM      "${LLVM_ROOT}/bin/llvm-nm")
