@@ -25,193 +25,113 @@
 #include <gtest/gtest.h>
 #include <engine/engine.h>
 #include <engine/log.h>
-#include <city_graph.h>
 #include <city_behavior_tree.h>
-#include <SFML/Graphics/RectangleShape.hpp>
-#include <imgui.h>
-#include <Remotery.h>
 
 class BehaviorTreeTest : public ::testing::Test, public neko::BasicEngine {
 protected:
-	void SetUp() override {
-		jsonBehaviorTree_ = R"JSON(
-			{
-				"type" : "composite_selector",
-				"name" : "Application",
-				"children" : [
-					{
-						"type" : "composite_sequence",
-						"name" : "Keep alive",
-						"children" : [
-							{
-								"type" : "leaf_condition",
-								"name" : "Energy level is low",
-								"condition" : "EnergyLevel(0.3)"
-							},
-							{
-								"type" : "leaf_move_to",
-								"name" : "Move to energy source",
-								"to" : "12 34"
-							},
-							{
-								"type" : "leaf_wait",
-								"name" : "Wait for reload",
-								"delay" : "2.0"
-							}
-						]
-					},
-					{
-						"type" : "composite_sequence",
-						"name" : "Patrol",
-						"children" : [
-							{
-								"type" : "leaf_move_to",
-								"name" : "Move to A",
-								"to" : "12 34"
-							},
-							{
-								"type" : "leaf_wait",
-								"name" : "Wait at point A",
-								"delay" : "1.0"
-							},
-							{
-								"type" : "leaf_move_to",
-								"name" : "Move to B",
-								"to" : "23 45"
-							},								
-							{
-								"type" : "leaf_wait",
-								"name" : "Wait at point B",
-								"delay" : "1.0"
-							}
-						]
-					}
-				]
-			})JSON"_json;
+	void SetUp() override 
+	{
 		Init();
+		comp_ = std::make_shared<neko::Component>();
+		passed_ = 0;
+		neko::FunctionMap funcMap(comp_);
+		funcMap.SetFunction(
+			"test",
+			[this](std::shared_ptr<neko::Component> comp, double value)
+		{
+			passed_++;
+			EXPECT_EQ(value, 2.0);
+			EXPECT_EQ(*comp_, *comp);
+			return true;
+		});
 	}
 
-	void TearDown() override {
+	void TearDown() override 
+	{
 		Destroy();
 	}
 
-	json jsonBehaviorTree_;
-	std::shared_ptr<neko::BehaviorTreeNode> behaviorTreeNodePtr_;
+	std::vector<std::pair<std::string, std::string>> ilVariables_ = {
+		{"name", "test"},
+		{"condition", "test(2)"},
+		{"delay", "0.5"},
+	};
+	int passed_;
+	std::shared_ptr<neko::Component> comp_;
 };
 
-TEST_F(BehaviorTreeTest, IsInitFromJsonWorking) {
-	EXPECT_TRUE(neko::ParseBehaviorTreeFromJson(jsonBehaviorTree_));
+TEST_F(BehaviorTreeTest, CompositeConstructorTest)
+{
+	neko::BehaviorTreeComposite composite;
+	EXPECT_EQ(composite.GetType(), neko::INTERFACE_COMPOSITE);
+	EXPECT_EQ(composite.GetVariable("name"), "<null>");
 }
 
-TEST_F(BehaviorTreeTest, IsBehaviorTreeCorrect) {
-	behaviorTreeNodePtr_ = neko::ParseBehaviorTreeFromJson(jsonBehaviorTree_);
-	EXPECT_TRUE(behaviorTreeNodePtr_);
-	{	// Base selector
-		std::shared_ptr<neko::BehaviorTreeCompositeSelector> selector =
-			std::dynamic_pointer_cast<neko::BehaviorTreeCompositeSelector>(
-				behaviorTreeNodePtr_);
-		ASSERT_TRUE(selector);
-		const std::vector<std::shared_ptr<neko::BehaviorTreeNode>>& selector_children =
-			selector->GetChildrenList();
-		EXPECT_EQ(selector_children.size(), 2);
-		{	// First sequence
-			std::shared_ptr<neko::BehaviorTreeCompositeSequence> sequence =
-				std::dynamic_pointer_cast<neko::BehaviorTreeCompositeSequence>(
-					selector_children[0]);
-			ASSERT_TRUE(sequence);
-			const std::vector<std::shared_ptr<neko::BehaviorTreeNode>>& sequence_children =
-				sequence->GetChildrenList();
-			EXPECT_EQ(sequence_children.size(), 3);
-			{
-				std::shared_ptr<neko::BehaviorTreeLeafCondition> condition =
-					std::dynamic_pointer_cast<neko::BehaviorTreeLeafCondition>(
-						sequence_children[0]);
-				ASSERT_TRUE(condition);
-				EXPECT_EQ(condition->GetVariable("condition"), "EnergyLevel(0.3)");
-			}
-			{
-				std::shared_ptr<neko::BehaviorTreeLeafMoveTo> move_to =
-					std::dynamic_pointer_cast<neko::BehaviorTreeLeafMoveTo>(
-						sequence_children[1]);
-				ASSERT_TRUE(move_to);
-				EXPECT_EQ(move_to->GetVariable("to"), "12 34");
-			}
-			{
-				std::shared_ptr<neko::BehaviorTreeLeafWait> leaf_wait =
-					std::dynamic_pointer_cast<neko::BehaviorTreeLeafWait>(
-						sequence_children[2]);
-				ASSERT_TRUE(leaf_wait);
-				EXPECT_EQ(leaf_wait->GetVariable("delay"), "2.0");
-			}
-		}
-		{	// Second sequence
-			std::shared_ptr<neko::BehaviorTreeCompositeSequence> sequence =
-				std::dynamic_pointer_cast<neko::BehaviorTreeCompositeSequence>(
-					selector_children[1]);
-			ASSERT_TRUE(sequence);
-			const std::vector<std::shared_ptr<neko::BehaviorTreeNode>>& sequence_children =
-				sequence->GetChildrenList();
-			EXPECT_EQ(sequence_children.size(), 4);
-			{
-				std::shared_ptr<neko::BehaviorTreeLeafMoveTo> move_to =
-					std::dynamic_pointer_cast<neko::BehaviorTreeLeafMoveTo>(
-						sequence_children[0]);
-				ASSERT_TRUE(move_to);
-				EXPECT_EQ(move_to->GetVariable("to"), "12 34");
-			}
-			{
-				std::shared_ptr<neko::BehaviorTreeLeafWait> leaf_wait =
-					std::dynamic_pointer_cast<neko::BehaviorTreeLeafWait>(
-						sequence_children[1]);
-				ASSERT_TRUE(leaf_wait);
-				EXPECT_EQ(leaf_wait->GetVariable("delay"), "1.0");
-			}
-			{
-				std::shared_ptr<neko::BehaviorTreeLeafMoveTo> move_to =
-					std::dynamic_pointer_cast<neko::BehaviorTreeLeafMoveTo>(
-						sequence_children[2]);
-				ASSERT_TRUE(move_to);
-				EXPECT_EQ(move_to->GetVariable("to"), "23 45");
-			}
-			{
-				std::shared_ptr<neko::BehaviorTreeLeafWait> leaf_wait =
-					std::dynamic_pointer_cast<neko::BehaviorTreeLeafWait>(
-						sequence_children[3]);
-				ASSERT_TRUE(leaf_wait);
-				EXPECT_EQ(leaf_wait->GetVariable("delay"), "1.0");
-			}
-		}
-	}
+TEST_F(BehaviorTreeTest, DecoratorConstructorTest)
+{
+	neko::BehaviorTreeDecorator decorator{ ilVariables_ };
+	EXPECT_EQ(decorator.GetType(), neko::INTERFACE_DECORATOR);
+	EXPECT_EQ(decorator.GetVariable("name"), "test");
+	// TODO moar tests!!!
 }
 
-TEST_F(BehaviorTreeTest, IsBehaviorTreeExecuteCorrect) {
-	behaviorTreeNodePtr_ = neko::ParseBehaviorTreeFromJson(jsonBehaviorTree_);
-	EXPECT_TRUE(behaviorTreeNodePtr_);
-	// Failure to the condition
-	ASSERT_EQ(behaviorTreeNodePtr_->Execute(), neko::FAILURE);
-	// Move to a
-	ASSERT_EQ(behaviorTreeNodePtr_->Execute(), neko::SUCCESS);
-	// Wait at a
-	neko::BehaviorTreeFlow status;
-	do 
-	{
-		status = behaviorTreeNodePtr_->Execute();
-		if (status != neko::SUCCESS) 
-		{
-			ASSERT_EQ(status, neko::RUNNING);
-		}
-	} 
-	while (status != neko::SUCCESS);
-	// Move to b
-	ASSERT_EQ(behaviorTreeNodePtr_->Execute(), neko::SUCCESS);
-	// Wait at b
-	do 
-	{
-		status = behaviorTreeNodePtr_->Execute();
-		if (status != neko::SUCCESS)
-		{
-			ASSERT_EQ(status, neko::RUNNING);
-		}
-	} 
-	while (status != neko::SUCCESS);
+TEST_F(BehaviorTreeTest, LeafConstructorTest)
+{
+	neko::BehaviorTreeLeaf leaf;
+	EXPECT_EQ(leaf.GetType(), neko::INTERFACE_LEAF);
+}
+
+TEST_F(BehaviorTreeTest, ConditionConstructorTest)
+{
+	neko::BehaviorTreeLeafCondition condition(comp_, ilVariables_);
+	EXPECT_EQ(condition.GetType(), neko::LEAF_CONDITION);
+	EXPECT_EQ(condition.Execute(), neko::SUCCESS);
+	EXPECT_EQ(passed_, 1);
+}
+
+TEST_F(BehaviorTreeTest, MoveToConstructorTest)
+{
+	neko::BehaviorTreeLeafMoveTo moveTo(ilVariables_);
+	EXPECT_EQ(moveTo.GetType(), neko::LEAF_MOVE_TO);
+	// TODO moar tests!!!
+}
+
+TEST_F(BehaviorTreeTest, WaitConstructorTest)
+{
+	neko::BehaviorTreeLeafWait wait(ilVariables_);
+	EXPECT_EQ(wait.GetType(), neko::LEAF_WAIT);
+	// TODO moar tests!!!
+}
+
+TEST_F(BehaviorTreeTest, SelectorConstructorTest)
+{
+	neko::BehaviorTreeCompositeSelector selector(
+		std::vector<std::shared_ptr<neko::BehaviorTreeNode>>{
+		std::make_shared<neko::BehaviorTreeLeafCondition>(
+			neko::BehaviorTreeLeafCondition(comp_, ilVariables_)),
+			std::make_shared<neko::BehaviorTreeLeafCondition>(
+				neko::BehaviorTreeLeafCondition(comp_))},
+		ilVariables_);
+	EXPECT_EQ(selector.GetType(), neko::COMPOSITE_SELECTOR);
+	EXPECT_EQ(selector.Execute(), neko::SUCCESS);
+	EXPECT_EQ(passed_, 1);
+	// Should stick in the success.
+	EXPECT_EQ(selector.Execute(), neko::SUCCESS);
+	EXPECT_EQ(passed_, 2);
+}
+
+TEST_F(BehaviorTreeTest, SequenceConstructorTest)
+{
+	neko::BehaviorTreeCompositeSequence sequence(
+		std::vector<std::shared_ptr<neko::BehaviorTreeNode>>{
+		std::make_shared<neko::BehaviorTreeLeafCondition>(
+			neko::BehaviorTreeLeafCondition(comp_, ilVariables_)),
+			std::make_shared<neko::BehaviorTreeLeafCondition>(
+				neko::BehaviorTreeLeafCondition(comp_))},
+		ilVariables_);
+	EXPECT_EQ(sequence.GetType(), neko::COMPOSITE_SEQUENCE);
+	EXPECT_EQ(sequence.Execute(), neko::SUCCESS);
+	EXPECT_EQ(passed_, 1);
+	EXPECT_EQ(sequence.Execute(), neko::FAILURE);
+	EXPECT_EQ(passed_, 2);
 }

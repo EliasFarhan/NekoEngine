@@ -28,6 +28,7 @@
 #include <map>
 #include <limits>
 #include <chrono>
+#include "city_function_map.h"
 #include "utilities/time_utility.h"
 #include "utilities/json_utility.h"
 
@@ -39,13 +40,6 @@ namespace neko
 		SUCCESS,
 		FAILURE,
 		RUNNING,
-	};
-
-	// Basic type of element in a behavior tree.
-	enum BehaviorTreeElementType {
-		BTT_COMPOSITE,
-		BTT_DECORATOR,
-		BTT_LEAF,
 	};
 
 	// Object type enum this will give witch type an object is.
@@ -235,16 +229,25 @@ namespace neko
 	class BehaviorTreeLeafCondition : public BehaviorTreeLeaf
 	{
 	public:
-		BehaviorTreeLeafCondition() = default;
+		BehaviorTreeLeafCondition(std::shared_ptr<Component> comp) : 
+			funcMap_(comp) {}
 		BehaviorTreeLeafCondition(
+			std::shared_ptr<Component> comp,
 			const std::vector<std::pair<std::string, std::string>>& ilVariables) :
-			BehaviorTreeLeaf(ilVariables) {}
+			BehaviorTreeLeaf(ilVariables),
+			funcMap_(comp) {}
 
 		virtual BehaviorTreeFlow Execute() final;
 		virtual CompositeObjectType GetType() const final
 		{
 			return LEAF_CONDITION;
 		}
+
+	private:
+		FunctionMap funcMap_;
+		std::string condition_ = "";
+		std::string functionName_ = "";
+		std::string valueName_ = "";
 	};
 
 	// Leaf Wait in a behavior tree.
@@ -290,11 +293,5 @@ namespace neko
 			std::numeric_limits<int>::max() , 
 			std::numeric_limits<int>::max() };
 	};
-
-	void LogBehaviorTree(const std::shared_ptr<BehaviorTreeNode> behaviorTree);
-	std::shared_ptr<BehaviorTreeNode> ParseBehaviorTreeFromJson(
-		const json& jsonContent);
-	std::shared_ptr<BehaviorTreeNode> LoadBehaviorTreeFromJsonFile(
-		const std::string& jsonFile);
 
 }    // namespace neko
