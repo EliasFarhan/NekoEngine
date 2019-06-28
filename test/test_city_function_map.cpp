@@ -51,4 +51,5 @@ TEST_F(FunctionMapTest, FunctionRespondInCaseExist)
 	});
 	// Try to execute it!
 	EXPECT_TRUE(funcMap_.CallFunction("exist", 0.0));
+	EXPECT_TRUE(funcMap_.CallFunction("exist", { 0.0, 1.0, 2.0, 3.0 }));
 }
