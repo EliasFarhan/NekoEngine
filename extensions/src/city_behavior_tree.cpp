@@ -83,28 +83,46 @@ namespace neko
 		return BehaviorTreeFlow::FAILURE;
 	}
 
+	BehaviorTreeFlow BehaviorTreeDecorator::Execute()
+	{
+		std::string decorator = GetVariable("decorator");
+		if (decorator != decorator_)
+		{
+			decorator_ = decorator;
+			std::stringstream iss(decorator_);
+			std::getline(iss, functionName_, '(');
+			std::string values;
+			std::getline(iss, values, ')');
+			if (!values.empty())
+			{
+				logDebug(
+					"ERROR found value in decorator node function name: " +
+					functionName_);
+			}
+		}
+		BehaviorTreeFlow behaviorTreeFlow = child_->Execute();
+		return (funcMap_.CallFunction(
+			functionName_, 
+			{ static_cast<double>(behaviorTreeFlow) })) ?
+			BehaviorTreeFlow::SUCCESS :
+			BehaviorTreeFlow::FAILURE;
+	}
+
 	BehaviorTreeFlow BehaviorTreeLeafCondition::Execute()
 	{
 		std::string condition = GetVariable("condition");
 		if (condition != condition_)
 		{
-			functionName_ = "";
-			valueName_ = "";
 			condition_ = condition;
-			std::string function;
-			{
-				std::stringstream iss(condition_);
-				std::getline(iss, functionName_, '(');
-				std::getline(iss, valueName_, ')');
-			}
+			std::stringstream iss(condition_);
+			std::getline(iss, functionName_, '(');
+			std::getline(iss, valueName_, ')');
 		}
 		if (functionName_.empty() || valueName_.empty()) 
 		{
 			return BehaviorTreeFlow::FAILURE;
 		}
-		bool succeeded = 
-			funcMap_.CallFunction(functionName_, std::stod(valueName_));
-		return (succeeded) ? 
+		return (funcMap_.CallFunction(functionName_, std::stod(valueName_))) ?
 			BehaviorTreeFlow::SUCCESS : 
 			BehaviorTreeFlow::FAILURE;
 	}

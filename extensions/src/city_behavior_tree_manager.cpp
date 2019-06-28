@@ -155,8 +155,11 @@ namespace neko {
 				comp, 
 				jsonContent, 
 				BehaviorTreeElementType::BTT_DECORATOR);
+		assert(nodeVariables.vecNodes.size() == 1);
 		std::shared_ptr<BehaviorTreeDecorator> decorator =
 			std::make_shared<BehaviorTreeDecorator>(
+				comp,
+				nodeVariables.vecNodes[0],
 				nodeVariables.vecVariables);
 		assert(nodeVariables.vecNodes.size() == 1);
 		decorator->SetChild(nodeVariables.vecNodes[0]);

@@ -98,18 +98,28 @@ namespace neko
 	};
 
 	// Decorator in a behavior tree.
+	// This add a condition to the next tree element it takes a parameter as
+	// example: "decorator" : "Inverse()" and will return 
+	// Inverse(child.Execute());.
 	class BehaviorTreeDecorator : public BehaviorTreeNode
 	{
 	public:
-		BehaviorTreeDecorator() = default;
+		BehaviorTreeDecorator(Index comp) : funcMap_(comp) {}
 		BehaviorTreeDecorator(
+			Index comp,
+			std::shared_ptr<BehaviorTreeNode> child) :
+			funcMap_(comp),	child_(child) {}
+		BehaviorTreeDecorator(
+			Index comp,
 			const std::vector<std::pair<std::string, std::string>>& il) :
-			BehaviorTreeNode(il) {}
+			BehaviorTreeNode(il), funcMap_(comp) {}
+		BehaviorTreeDecorator(
+			Index comp,
+			std::shared_ptr<BehaviorTreeNode> child,
+			const std::vector<std::pair<std::string, std::string>>& il) :
+			BehaviorTreeNode(il), funcMap_(comp), child_(child) {}
 
-		virtual BehaviorTreeFlow Execute() override 
-		{ 
-			return BehaviorTreeFlow::FAILURE; 
-		}
+		virtual BehaviorTreeFlow Execute() override;
 		void SetChild(const std::shared_ptr<BehaviorTreeNode>& child)
 		{
 			child_ = child;
@@ -124,6 +134,9 @@ namespace neko
 		}
 
 	protected:
+		std::string decorator_ = "";
+		std::string functionName_ = "";
+		FunctionMap funcMap_;
 		std::shared_ptr<BehaviorTreeNode> child_;
 	};
 
