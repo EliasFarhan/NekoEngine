@@ -27,6 +27,10 @@
 #include <cstdint>
 #include <limits>
 
-const size_t InitEntityNmb = 128;
-using Index = uint32_t;
-const Index INDEX_INVALID = std::numeric_limits<uint32_t>::max();
+namespace neko {
+
+	const size_t InitEntityNmb = 128;
+	using Index = uint32_t;
+	const Index INDEX_INVALID = std::numeric_limits<uint32_t>::max();
+
+} // end namespace neko

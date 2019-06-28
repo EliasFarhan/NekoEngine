@@ -29,11 +29,11 @@
 TEST(Entity, EntityManager)
 {
     neko::EntityManager entityManager;
-    const Index entityNmb = 1024u;
+    const neko::Index entityNmb = 1024u;
 	const neko::EntityMask componentType1 = 1 << 0;
 	const neko::EntityMask componentType2 = 1 << 1;
 
-    for (Index i = 0u; i < entityNmb; i++)
+    for (neko::Index i = 0u; i < entityNmb; i++)
     {
         auto entity = entityManager.CreateEntity();
         EXPECT_EQ(entity, i);
@@ -52,7 +52,7 @@ TEST(Entity, EntityManager)
 	EXPECT_EQ(entityManager.FilterEntities(componentType1).size(), 0);
 	EXPECT_EQ(entityManager.FilterEntities(componentType2).size(), entityNmb);
 
-    for (Index i = 0; i < entityNmb / 2; i++)
+    for (neko::Index i = 0; i < entityNmb / 2; i++)
     {
         entityManager.DestroyEntity(i * 2);
     }

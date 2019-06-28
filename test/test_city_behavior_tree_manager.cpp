@@ -194,10 +194,10 @@ TEST_F(BehaviorTreeManagerTest, IsBehaviorTreeCorrect) {
 TEST_F(BehaviorTreeManagerTest, IsBehaviorTreeExecuteCorrect) {
 	std::shared_ptr<neko::Component> comp = 
 		std::make_shared<neko::Component>();
-	Index id = behaviorTreeManager_.ParseBehaviorTreeFromJsonIndex(
+	neko::Index id = behaviorTreeManager_.ParseBehaviorTreeFromJsonIndex(
 			comp,
 			jsonBehaviorTree_);
-	EXPECT_TRUE(id != INDEX_INVALID);
+	EXPECT_TRUE(id != neko::INDEX_INVALID);
 	neko::FunctionMap funcMap(comp);
 	bool passed = false;
 	funcMap.SetFunction(

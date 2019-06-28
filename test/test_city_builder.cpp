@@ -59,7 +59,7 @@ public:
 			rects_.push_back(rect);
 			graph_.AddNode(currentPos);
 		}
-		for(Index i = 0u; i < roadNmb_;i++)
+		for(neko::Index i = 0u; i < roadNmb_;i++)
         {
 		    const int randValue = rand()%20;
 		    if(randValue == 0)
@@ -114,7 +114,7 @@ public:
 		const sf::Vector2i tilePos = sf::Vector2i(int(mousePos.x / rectSize.x), int(mousePos.y / rectSize.y));
 		const auto path = graph_.CalculateShortestPath(sf::Vector2i(0, 0), tilePos);
 
-		for (Index i = 0; i < roadPositions_.size();i++)
+		for (neko::Index i = 0; i < roadPositions_.size();i++)
 		{
             const sf::Vector2i pos = roadPositions_[i];
             if (std::find(path.begin(), path.end(), pos) != path.end())
