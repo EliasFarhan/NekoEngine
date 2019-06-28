@@ -229,8 +229,7 @@ namespace neko
 	class BehaviorTreeLeafCondition : public BehaviorTreeLeaf
 	{
 	public:
-		BehaviorTreeLeafCondition(Index comp) : 
-			funcMap_(comp) {}
+		BehaviorTreeLeafCondition(Index comp) : funcMap_(comp) {}
 		BehaviorTreeLeafCondition(
 			Index comp,
 			const std::vector<std::pair<std::string, std::string>>& ilVariables) :
@@ -273,14 +272,15 @@ namespace neko
 	};
 
 	// Leaf Move to in a behavior tree.
-	// The location can be set by the SetVariable("to", "1 20");.
+	// The location can be set by the SetVariable("to", "MoveTo(1, 20)");.
 	class BehaviorTreeLeafMoveTo : public BehaviorTreeLeaf
 	{
 	public:
-		BehaviorTreeLeafMoveTo() = default;
+		BehaviorTreeLeafMoveTo(Index comp) : funcMap_(comp) {}
 		BehaviorTreeLeafMoveTo(
+			Index comp,
 			const std::vector<std::pair<std::string, std::string>>& ilVariables) :
-			BehaviorTreeLeaf(ilVariables) {}
+			BehaviorTreeLeaf(ilVariables), funcMap_(comp) {}
 
 		virtual BehaviorTreeFlow Execute() final;
 		virtual CompositeObjectType GetType() const final
@@ -289,6 +289,8 @@ namespace neko
 		}
 
 	protected:
+		FunctionMap funcMap_;
+		std::string functionName_ = "";
 		sf::Vector2i to_ = { 
 			std::numeric_limits<int>::max() , 
 			std::numeric_limits<int>::max() };

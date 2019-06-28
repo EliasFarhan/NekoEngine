@@ -138,26 +138,42 @@ namespace neko
 			}
 			else
 			{
-				std::istringstream iss(GetVariable("to"));
-				std::vector<double> values;
-				double value;
-				while (iss >> value) 
+				std::string valuesStr;
 				{
-					values.push_back(value);
+					std::istringstream iss(GetVariable("to"));
+					std::getline(iss, functionName_, '(');
+					std::getline(iss, valuesStr, ')');
 				}
-				if (values.size() != 2) 
 				{
-					logDebug(
-						"Size of the leaf move to \"to\" is not equal to 2: " +
-						std::to_string(values.size()));
-					return FAILURE;
+					std::istringstream iss(valuesStr);
+					std::vector<double> values;
+					std::string value = "";
+					while (std::getline(iss, value, ','))
+					{
+						if (value.empty()) 
+						{
+							continue;
+						}
+						values.push_back(std::stod(value));
+					}
+					if (values.size() != 2)
+					{
+						logDebug(
+							"Arguments of the leaf move to \"to\" <" +
+							functionName_ +
+							"> is not equal to 2 but: " +
+							std::to_string(values.size()));
+						return FAILURE;
+					}
+					to_.x = static_cast<int>(values[0]);
+					to_.y = static_cast<int>(values[1]);
 				}
-				to_.x = static_cast<int>(values[0]);
-				to_.y = static_cast<int>(values[1]);
 			}
 		}
-		// TODO move stuff and if not success return RUNNING.
-		return SUCCESS;
+		bool succeeded = funcMap_.CallFunction(
+			functionName_, 
+			{static_cast<double>(to_.x), static_cast<double>(to_.y)});
+		return (succeeded) ? SUCCESS : FAILURE;
 	}
 
 } // end namespace neko

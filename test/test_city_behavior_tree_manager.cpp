@@ -53,7 +53,7 @@ protected:
 							{
 								"type" : "leaf_move_to",
 								"name" : "Move to energy source",
-								"to" : "12 34"
+								"to" : "MoveTo(12, 34)"
 							},
 							{
 								"type" : "leaf_wait",
@@ -69,7 +69,7 @@ protected:
 							{
 								"type" : "leaf_move_to",
 								"name" : "Move to A",
-								"to" : "12 34"
+								"to" : "MoveTo(12, 34)"
 							},
 							{
 								"type" : "leaf_wait",
@@ -79,7 +79,7 @@ protected:
 							{
 								"type" : "leaf_move_to",
 								"name" : "Move to B",
-								"to" : "23 45"
+								"to" : "MoveTo(12, 34)"
 							},								
 							{
 								"type" : "leaf_wait",
@@ -141,7 +141,7 @@ TEST_F(BehaviorTreeManagerTest, IsBehaviorTreeCorrect) {
 					std::dynamic_pointer_cast<neko::BehaviorTreeLeafMoveTo>(
 						sequence_children[1]);
 				ASSERT_TRUE(move_to);
-				EXPECT_EQ(move_to->GetVariable("to"), "12 34");
+				EXPECT_EQ(move_to->GetVariable("to"), "MoveTo(12, 34)");
 			}
 			{
 				std::shared_ptr<neko::BehaviorTreeLeafWait> leaf_wait =
@@ -164,7 +164,7 @@ TEST_F(BehaviorTreeManagerTest, IsBehaviorTreeCorrect) {
 					std::dynamic_pointer_cast<neko::BehaviorTreeLeafMoveTo>(
 						sequence_children[0]);
 				ASSERT_TRUE(move_to);
-				EXPECT_EQ(move_to->GetVariable("to"), "12 34");
+				EXPECT_EQ(move_to->GetVariable("to"), "MoveTo(12, 34)");
 			}
 			{
 				std::shared_ptr<neko::BehaviorTreeLeafWait> leaf_wait =
@@ -178,7 +178,7 @@ TEST_F(BehaviorTreeManagerTest, IsBehaviorTreeCorrect) {
 					std::dynamic_pointer_cast<neko::BehaviorTreeLeafMoveTo>(
 						sequence_children[2]);
 				ASSERT_TRUE(move_to);
-				EXPECT_EQ(move_to->GetVariable("to"), "23 45");
+				EXPECT_EQ(move_to->GetVariable("to"), "MoveTo(12, 34)");
 			}
 			{
 				std::shared_ptr<neko::BehaviorTreeLeafWait> leaf_wait =
@@ -206,11 +206,20 @@ TEST_F(BehaviorTreeManagerTest, IsBehaviorTreeExecuteCorrect) {
 		passed = true;
 		return false;
 	});
+	funcMap.SetFunction(
+		"MoveTo",
+		[](neko::Index comp, const std::vector<double>& values) 
+	{
+		EXPECT_EQ(values.size(), 2);
+		EXPECT_EQ(values[0], 12.0);
+		EXPECT_EQ(values[1], 34.0);
+		return true;
+	});
 	// Failure to the condition
-	ASSERT_EQ(behaviorTreeManager_.ExecuteIndex(id), neko::FAILURE);
-	ASSERT_TRUE(passed);
+	EXPECT_EQ(behaviorTreeManager_.ExecuteIndex(id), neko::FAILURE);
+	EXPECT_TRUE(passed);
 	// Move to a
-	ASSERT_EQ(behaviorTreeManager_.ExecuteIndex(id), neko::SUCCESS);
+	EXPECT_EQ(behaviorTreeManager_.ExecuteIndex(id), neko::SUCCESS);
 	// Wait at a
 	neko::BehaviorTreeFlow status;
 	do 
@@ -218,19 +227,19 @@ TEST_F(BehaviorTreeManagerTest, IsBehaviorTreeExecuteCorrect) {
 		status = behaviorTreeManager_.ExecuteIndex(id);
 		if (status != neko::SUCCESS) 
 		{
-			ASSERT_EQ(status, neko::RUNNING);
+			EXPECT_EQ(status, neko::RUNNING);
 		}
 	} 
 	while (status != neko::SUCCESS);
 	// Move to b
-	ASSERT_EQ(behaviorTreeManager_.ExecuteIndex(id), neko::SUCCESS);
+	EXPECT_EQ(behaviorTreeManager_.ExecuteIndex(id), neko::SUCCESS);
 	// Wait at b
 	do 
 	{
 		status = behaviorTreeManager_.ExecuteIndex(id);
 		if (status != neko::SUCCESS)
 		{
-			ASSERT_EQ(status, neko::RUNNING);
+			EXPECT_EQ(status, neko::RUNNING);
 		}
 	} 
 	while (status != neko::SUCCESS);

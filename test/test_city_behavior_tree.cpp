@@ -86,7 +86,7 @@ TEST_F(BehaviorTreeTest, ConditionConstructorTest)
 
 TEST_F(BehaviorTreeTest, MoveToConstructorTest)
 {
-	neko::BehaviorTreeLeafMoveTo moveTo(ilVariables_);
+	neko::BehaviorTreeLeafMoveTo moveTo(comp_, ilVariables_);
 	EXPECT_EQ(moveTo.GetType(), neko::LEAF_MOVE_TO);
 	// TODO moar tests!!!
 }

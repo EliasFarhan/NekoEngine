@@ -193,6 +193,7 @@ namespace neko {
 		auto nodeVariables = ParseJsonVariablesNodes(comp, jsonContent);
 		std::shared_ptr<BehaviorTreeLeafMoveTo> moveTo =
 			std::make_shared<BehaviorTreeLeafMoveTo>(
+				comp,
 				nodeVariables.vecVariables);
 		return moveTo;
 	}
