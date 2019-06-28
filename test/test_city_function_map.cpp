@@ -45,7 +45,7 @@ TEST_F(FunctionMapTest, FunctionRespondInCaseExist)
 	// Register a new function (under exist).
 	funcMap_.SetFunction(
 		"exist", 
-		[](neko::Index comp, double value) ->bool 
+		[](neko::Index comp, const std::vector<double>& values)
 	{
 		return true;
 	});

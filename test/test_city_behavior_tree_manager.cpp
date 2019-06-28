@@ -201,7 +201,7 @@ TEST_F(BehaviorTreeManagerTest, IsBehaviorTreeExecuteCorrect) {
 	bool passed = false;
 	funcMap.SetFunction(
 		"EnergyLevel", 
-		[&passed](neko::Index comp, double value) -> bool
+		[&passed](neko::Index comp, const std::vector<double>& values)
 	{
 		passed = true;
 		return false;

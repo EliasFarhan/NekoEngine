@@ -28,13 +28,13 @@
 namespace neko {
 
 	std::map<
-		std::string,
-		std::function<bool(Index, double)>>
+		std::string, 
+		std::function<bool(Index, const std::vector<double>&)>>
 		FunctionMap::staticNameFunctionMap_;
 
 	void FunctionMap::SetFunction(
 		const std::string_view name,
-		std::function<bool(Index, double)> func)
+		std::function<bool(Index, const std::vector<double>&)> func)
 	{
 		staticNameFunctionMap_.insert(std::make_pair(std::string(name), func));
 	}
@@ -44,7 +44,20 @@ namespace neko {
 		auto it = staticNameFunctionMap_.find(std::string(name));
 		if (it != staticNameFunctionMap_.end())
 		{
-			return it->second(comp_, value);
+			return it->second(comp_, { value });
+		}
+		logDebug("ERROR executing : " + std::string(name));
+		return false;
+	}
+
+	bool FunctionMap::CallFunction(
+		const std::string_view name, 
+		const std::vector<double>& values)
+	{
+		auto it = staticNameFunctionMap_.find(std::string(name));
+		if (it != staticNameFunctionMap_.end())
+		{
+			return it->second(comp_, values);
 		}
 		logDebug("ERROR executing : " + std::string(name));
 		return false;

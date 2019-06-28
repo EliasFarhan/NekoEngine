@@ -35,12 +35,17 @@ namespace neko {
 		FunctionMap(Index componentId) : comp_(componentId) {}
 		void SetFunction(
 			const std::string_view name, 
-			std::function<bool(Index, double)> func);
+			std::function<bool(Index, const std::vector<double>&)> func);
 		bool CallFunction(const std::string_view name, double value);
+		bool CallFunction(
+			const std::string_view name, 
+			const std::vector<double>& vecDouble);
 
 	protected:
 		Index comp_;
-		static std::map<std::string, std::function<bool(Index, double)>>
+		static std::map<
+			std::string, 
+			std::function<bool(Index, const std::vector<double>&)>>
 			staticNameFunctionMap_;
 	};
 

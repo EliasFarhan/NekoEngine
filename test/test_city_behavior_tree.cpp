@@ -35,7 +35,7 @@ protected:
 		neko::FunctionMap funcMap(comp_);
 		funcMap.SetFunction(
 			"test",
-			[](neko::Index comp, double value)
+			[](neko::Index comp, const std::vector<double>& values)
 		{
 			EXPECT_EQ(0xdeadbeef, comp);
 			return true;
