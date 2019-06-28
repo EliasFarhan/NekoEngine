@@ -30,7 +30,15 @@
 class FunctionMapTest : public ::testing::Test, public neko::BasicEngine
 {
 protected:
-	void SetUp() override {}
+	void SetUp() override 
+	{
+		Init();
+	}
+
+	void TearDown() override
+	{
+		Destroy();
+	}
 
 	neko::FunctionMap funcMap_ = neko::FunctionMap(0xdeadbeef);
 };
@@ -47,6 +55,15 @@ TEST_F(FunctionMapTest, FunctionRespondInCaseExist)
 		"exist", 
 		[](neko::Index comp, const std::vector<double>& values)
 	{
+		EXPECT_EQ(0xdeadbeef, comp);
+		EXPECT_TRUE(values.size() == 1 || values.size() == 4);
+		EXPECT_EQ(values[0], 0.0);
+		if (values.size() == 4) 
+		{
+			EXPECT_EQ(values[1], 1.0);
+			EXPECT_EQ(values[2], 2.0);
+			EXPECT_EQ(values[3], 3.0);
+		}
 		return true;
 	});
 	// Try to execute it!
