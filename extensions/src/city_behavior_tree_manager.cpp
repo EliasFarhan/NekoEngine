@@ -30,7 +30,7 @@ namespace neko {
 
 	BehaviorTreeManager::NodeVariableDesc
 		BehaviorTreeManager::ParseJsonVariablesNodes(
-			std::shared_ptr<Component> comp,
+			Index comp,
 			const json& jsonContent,
 			BehaviorTreeElementType behaviorTreeElementType) const
 	{
@@ -96,7 +96,7 @@ namespace neko {
 
 	std::shared_ptr<BehaviorTreeNode>
 		BehaviorTreeManager::ParseJsonCompositeSequence(
-			std::shared_ptr<Component> comp,
+			Index comp,
 			const json& jsonContent) const
 	{
 		auto nodeVariables =
@@ -113,7 +113,7 @@ namespace neko {
 
 	std::shared_ptr<BehaviorTreeNode>
 		BehaviorTreeManager::ParseJsonCompositeSelector(
-			std::shared_ptr<Component> comp,
+			Index comp,
 			const json& jsonContent) const
 	{
 		auto nodeVariables =
@@ -129,7 +129,7 @@ namespace neko {
 	}
 
 	std::shared_ptr<BehaviorTreeNode> BehaviorTreeManager::ParseJsonComposite(
-		std::shared_ptr<Component> comp,
+		Index comp,
 		const json& jsonContent) const
 	{
 		logDebug("WARNING trying to parse a composite node!");
@@ -146,7 +146,7 @@ namespace neko {
 	}
 
 	std::shared_ptr<BehaviorTreeNode> BehaviorTreeManager::ParseJsonDecorator(
-		std::shared_ptr<Component> comp,
+		Index comp,
 		const json& jsonContent) const
 	{
 		logDebug("WARNING trying to parse a decorator node!");
@@ -164,7 +164,7 @@ namespace neko {
 	}
 
 	std::shared_ptr<BehaviorTreeNode> BehaviorTreeManager::ParseJsonLeafCondition(
-		std::shared_ptr<Component> comp,
+		Index comp,
 		const json& jsonContent) const
 	{
 		auto nodeVariables = ParseJsonVariablesNodes(comp, jsonContent);
@@ -176,7 +176,7 @@ namespace neko {
 	}
 
 	std::shared_ptr<BehaviorTreeNode> BehaviorTreeManager::ParseJsonLeafWait(
-		std::shared_ptr<Component> comp,
+		Index comp,
 		const json& jsonContent) const
 	{
 		auto nodeVariables = ParseJsonVariablesNodes(comp, jsonContent);
@@ -187,7 +187,7 @@ namespace neko {
 	}
 
 	std::shared_ptr<BehaviorTreeNode> BehaviorTreeManager::ParseJsonLeafMoveTo(
-		std::shared_ptr<Component> comp,
+		Index comp,
 		const json& jsonContent) const
 	{
 		auto nodeVariables = ParseJsonVariablesNodes(comp, jsonContent);
@@ -198,7 +198,7 @@ namespace neko {
 	}
 
 	std::shared_ptr<BehaviorTreeNode> BehaviorTreeManager::ParseJsonLeaf(
-		std::shared_ptr<Component> comp,
+		Index comp,
 		const json& jsonContent) const
 	{
 		logDebug("WARNING trying to parse a leaf node!");
@@ -232,7 +232,7 @@ namespace neko {
 	}
 
 	std::shared_ptr<BehaviorTreeNode> BehaviorTreeManager::ParseJsonObject(
-		std::shared_ptr<Component> comp,
+		Index comp,
 		const json& jsonContent) const
 	{
 		switch (GetTypeFromJson(jsonContent)) {
@@ -345,7 +345,7 @@ namespace neko {
 
 	std::shared_ptr<BehaviorTreeNode>
 		BehaviorTreeManager::ParseBehaviorTreeFromJson(
-			std::shared_ptr<Component> comp,
+			Index comp,
 			const json& jsonContent) const
 	{
 		return ParseJsonObject(comp, jsonContent);
@@ -353,7 +353,7 @@ namespace neko {
 
 	std::shared_ptr<BehaviorTreeNode>
 		BehaviorTreeManager::LoadBehaviorTreeFromJsonFile(
-			std::shared_ptr<Component> comp,
+			Index comp,
 			const std::string & jsonFile) const
 	{
 		std::unique_ptr<json> jsonPtr = LoadJson(jsonFile);
@@ -361,7 +361,7 @@ namespace neko {
 	}
 
 	Index BehaviorTreeManager::ParseBehaviorTreeFromJsonIndex(
-		std::shared_ptr<Component> comp,
+		Index comp,
 		const json& jsonContent)
 	{
 		auto behaviorTree = ParseBehaviorTreeFromJson(comp, jsonContent);
@@ -374,7 +374,7 @@ namespace neko {
 	}
 
 	Index BehaviorTreeManager::LoadBehaviorTreeFromJsonFileIndex(
-		std::shared_ptr<Component> comp,
+		Index comp,
 		const std::string& jsonFile)
 	{
 		vecBehaviorTree_.push_back(

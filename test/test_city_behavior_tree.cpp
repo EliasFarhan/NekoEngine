@@ -32,12 +32,12 @@ protected:
 	void SetUp() override 
 	{
 		Init();
-		comp_ = std::make_shared<neko::Component>();
 		neko::FunctionMap funcMap(comp_);
 		funcMap.SetFunction(
 			"test",
-			[](std::shared_ptr<neko::Component> comp, double value)
+			[](neko::Index comp, double value)
 		{
+			EXPECT_EQ(0xdeadbeef, comp);
 			return true;
 		});
 	}
@@ -53,8 +53,7 @@ protected:
 		{"to", "move(1.0, 4.0)"},
 		{"delay", "0.5"},
 	};
-	std::atomic<int> passed_;
-	std::shared_ptr<neko::Component> comp_;
+	neko::Index comp_ = 0xdeadbeef;
 };
 
 TEST_F(BehaviorTreeTest, CompositeConstructorTest)

@@ -36,19 +36,19 @@ namespace neko {
 		void LogBehaviorTree(
 			const std::shared_ptr<BehaviorTreeNode> behaviorTree) const;
 		std::shared_ptr<BehaviorTreeNode> ParseBehaviorTreeFromJson(
-			std::shared_ptr<Component> comp,
+			Index comp,
 			const json& jsonContent) const;
 		std::shared_ptr<BehaviorTreeNode> LoadBehaviorTreeFromJsonFile(
-			std::shared_ptr<Component> comp,
+			Index comp,
 			const std::string& jsonFile) const;
 
 	public:
 		// Index based functions
 		Index ParseBehaviorTreeFromJsonIndex(
-			std::shared_ptr<Component> comp,
+			Index comp,
 			const json& jsonContent);
 		Index LoadBehaviorTreeFromJsonFileIndex(
-			std::shared_ptr<Component> comp,
+			Index comp,
 			const std::string& jsonFile);
 		void LogBehaviorTreeIndex(Index id) const;
 		std::shared_ptr<BehaviorTreeNode> GetBehaviorTreeRootIndex(Index id);
@@ -68,36 +68,36 @@ namespace neko {
 			BTT_LEAF = 3,
 		};
 		std::shared_ptr<BehaviorTreeNode> ParseJsonObject(
-			std::shared_ptr<Component> comp,
+			Index comp,
 			const json& jsonContent) const;
 		NodeVariableDesc ParseJsonVariablesNodes(
-			std::shared_ptr<Component> comp,
+			Index comp,
 			const json& jsonContent,
 			BehaviorTreeElementType behaviorTreeElementType = 
 				BehaviorTreeElementType::BTT_LEAF) const;
 		std::shared_ptr<BehaviorTreeNode> ParseJsonCompositeSequence(
-			std::shared_ptr<Component> comp,
+			Index comp,
 			const json& jsonContent) const;
 		std::shared_ptr<BehaviorTreeNode> ParseJsonCompositeSelector(
-			std::shared_ptr<Component> comp,
+			Index comp,
 			const json& jsonContent) const;
 		std::shared_ptr<BehaviorTreeNode> ParseJsonComposite(
-			std::shared_ptr<Component> comp,
+			Index comp,
 			const json& jsonContent) const;
 		std::shared_ptr<BehaviorTreeNode> ParseJsonDecorator(
-			std::shared_ptr<Component> comp,
+			Index comp,
 			const json& jsonContent) const;
 		std::shared_ptr<BehaviorTreeNode> ParseJsonLeafCondition(
-			std::shared_ptr<Component> comp,
+			Index comp,
 			const json& jsonContent) const;
 		std::shared_ptr<BehaviorTreeNode> ParseJsonLeafWait(
-			std::shared_ptr<Component> comp,
+			Index comp,
 			const json& jsonContent) const;
 		std::shared_ptr<BehaviorTreeNode> ParseJsonLeafMoveTo(
-			std::shared_ptr<Component> comp,
+			Index comp,
 			const json& jsonContent) const;
 		std::shared_ptr<BehaviorTreeNode> ParseJsonLeaf(
-			std::shared_ptr<Component> comp,
+			Index comp,
 			const json& jsonContent) const;
 		CompositeObjectType GetTypeFromJson(const json& jsonContent) const;
 	

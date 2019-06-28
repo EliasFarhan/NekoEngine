@@ -229,10 +229,10 @@ namespace neko
 	class BehaviorTreeLeafCondition : public BehaviorTreeLeaf
 	{
 	public:
-		BehaviorTreeLeafCondition(std::shared_ptr<Component> comp) : 
+		BehaviorTreeLeafCondition(Index comp) : 
 			funcMap_(comp) {}
 		BehaviorTreeLeafCondition(
-			std::shared_ptr<Component> comp,
+			Index comp,
 			const std::vector<std::pair<std::string, std::string>>& ilVariables) :
 			BehaviorTreeLeaf(ilVariables),
 			funcMap_(comp) {}

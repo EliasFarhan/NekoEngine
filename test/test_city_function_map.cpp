@@ -32,8 +32,7 @@ class FunctionMapTest : public ::testing::Test, public neko::BasicEngine
 protected:
 	void SetUp() override {}
 
-	neko::FunctionMap funcMap_ = 
-		neko::FunctionMap(std::make_shared<neko::Component>(NULL));
+	neko::FunctionMap funcMap_ = neko::FunctionMap(0xdeadbeef);
 };
 
 TEST_F(FunctionMapTest, FunctionDoesntRespondInCaseDoesntExist)
@@ -46,7 +45,7 @@ TEST_F(FunctionMapTest, FunctionRespondInCaseExist)
 	// Register a new function (under exist).
 	funcMap_.SetFunction(
 		"exist", 
-		[](std::shared_ptr<neko::Component> comp, double value) ->bool 
+		[](neko::Index comp, double value) ->bool 
 	{
 		return true;
 	});

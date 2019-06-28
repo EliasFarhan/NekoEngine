@@ -29,12 +29,12 @@ namespace neko {
 
 	std::map<
 		std::string,
-		std::function<bool(std::shared_ptr<Component>, double)>>
+		std::function<bool(Index, double)>>
 		FunctionMap::staticNameFunctionMap_;
 
 	void FunctionMap::SetFunction(
 		const std::string_view name,
-		std::function<bool(std::shared_ptr<Component>, double)> func)
+		std::function<bool(Index, double)> func)
 	{
 		staticNameFunctionMap_.insert(std::make_pair(std::string(name), func));
 	}

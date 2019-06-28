@@ -30,22 +30,17 @@
 
 namespace neko {
 
-	// Temporary assignment.
-	using Component = Index;
-
 	class FunctionMap {
 	public:
-		FunctionMap(std::shared_ptr<Component> comp) : comp_(comp) {}
+		FunctionMap(Index componentId) : comp_(componentId) {}
 		void SetFunction(
 			const std::string_view name, 
-			std::function<bool(std::shared_ptr<Component>, double)> func);
+			std::function<bool(Index, double)> func);
 		bool CallFunction(const std::string_view name, double value);
 
 	protected:
-		std::shared_ptr<Component> comp_;
-		static std::map<
-			std::string, 
-			std::function<bool(std::shared_ptr<Component>, double)>> 
+		Index comp_;
+		static std::map<std::string, std::function<bool(Index, double)>>
 			staticNameFunctionMap_;
 	};
 

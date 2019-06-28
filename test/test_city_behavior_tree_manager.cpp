@@ -103,14 +103,14 @@ protected:
 
 TEST_F(BehaviorTreeManagerTest, IsInitFromJsonWorking) {
 	EXPECT_TRUE(behaviorTreeManager_.ParseBehaviorTreeFromJson(
-		std::make_shared<neko::Component>(), 
+		0xdeadbeef, 
 		jsonBehaviorTree_));
 }
 
 TEST_F(BehaviorTreeManagerTest, IsBehaviorTreeCorrect) {
 	auto behaviorTreeNodePtr_ = 
 		behaviorTreeManager_.ParseBehaviorTreeFromJson(
-			std::make_shared<neko::Component>(), 
+			0xdeadbeef, 
 			jsonBehaviorTree_);
 	EXPECT_TRUE(behaviorTreeNodePtr_);
 	{	// Base selector
@@ -192,8 +192,7 @@ TEST_F(BehaviorTreeManagerTest, IsBehaviorTreeCorrect) {
 }
 
 TEST_F(BehaviorTreeManagerTest, IsBehaviorTreeExecuteCorrect) {
-	std::shared_ptr<neko::Component> comp = 
-		std::make_shared<neko::Component>();
+	const neko::Index comp = 0xdeadbeef;
 	neko::Index id = behaviorTreeManager_.ParseBehaviorTreeFromJsonIndex(
 			comp,
 			jsonBehaviorTree_);
@@ -202,7 +201,7 @@ TEST_F(BehaviorTreeManagerTest, IsBehaviorTreeExecuteCorrect) {
 	bool passed = false;
 	funcMap.SetFunction(
 		"EnergyLevel", 
-		[&passed](std::shared_ptr<neko::Component> comp, double value) -> bool
+		[&passed](neko::Index comp, double value) -> bool
 	{
 		passed = true;
 		return false;
