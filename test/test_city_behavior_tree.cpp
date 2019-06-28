@@ -59,14 +59,18 @@ protected:
 TEST_F(BehaviorTreeTest, CompositeConstructorTest)
 {
 	neko::BehaviorTreeComposite composite;
-	EXPECT_EQ(composite.GetType(), neko::INTERFACE_COMPOSITE);
+	EXPECT_EQ(
+		composite.GetType(), 
+		neko::BehaviorTreeObjectType::INTERFACE_COMPOSITE);
 	EXPECT_EQ(composite.GetVariable("name"), "<null>");
 }
 
 TEST_F(BehaviorTreeTest, DecoratorConstructorTest)
 {
 	neko::BehaviorTreeDecorator decorator{ ilVariables_ };
-	EXPECT_EQ(decorator.GetType(), neko::INTERFACE_DECORATOR);
+	EXPECT_EQ(
+		decorator.GetType(), 
+		neko::BehaviorTreeObjectType::INTERFACE_DECORATOR);
 	EXPECT_EQ(decorator.GetVariable("name"), "test");
 	// TODO moar tests!!!
 }
@@ -74,27 +78,35 @@ TEST_F(BehaviorTreeTest, DecoratorConstructorTest)
 TEST_F(BehaviorTreeTest, LeafConstructorTest)
 {
 	neko::BehaviorTreeLeaf leaf;
-	EXPECT_EQ(leaf.GetType(), neko::INTERFACE_LEAF);
+	EXPECT_EQ(
+		leaf.GetType(), 
+		neko::BehaviorTreeObjectType::INTERFACE_LEAF);
 }
 
 TEST_F(BehaviorTreeTest, ConditionConstructorTest)
 {
 	neko::BehaviorTreeLeafCondition condition(comp_, ilVariables_);
-	EXPECT_EQ(condition.GetType(), neko::LEAF_CONDITION);
-	EXPECT_EQ(condition.Execute(), neko::SUCCESS);
+	EXPECT_EQ(
+		condition.GetType(), 
+		neko::BehaviorTreeObjectType::LEAF_CONDITION);
+	EXPECT_EQ(condition.Execute(), neko::BehaviorTreeFlow::SUCCESS);
 }
 
 TEST_F(BehaviorTreeTest, MoveToConstructorTest)
 {
 	neko::BehaviorTreeLeafMoveTo moveTo(comp_, ilVariables_);
-	EXPECT_EQ(moveTo.GetType(), neko::LEAF_MOVE_TO);
+	EXPECT_EQ(
+		moveTo.GetType(), 
+		neko::BehaviorTreeObjectType::LEAF_MOVE_TO);
 	// TODO moar tests!!!
 }
 
 TEST_F(BehaviorTreeTest, WaitConstructorTest)
 {
 	neko::BehaviorTreeLeafWait wait(ilVariables_);
-	EXPECT_EQ(wait.GetType(), neko::LEAF_WAIT);
+	EXPECT_EQ(
+		wait.GetType(), 
+		neko::BehaviorTreeObjectType::LEAF_WAIT);
 	// TODO moar tests!!!
 }
 
@@ -107,10 +119,12 @@ TEST_F(BehaviorTreeTest, SelectorConstructorTest)
 			std::make_shared<neko::BehaviorTreeLeafCondition>(
 				neko::BehaviorTreeLeafCondition(comp_))},
 		ilVariables_);
-	EXPECT_EQ(selector.GetType(), neko::COMPOSITE_SELECTOR);
-	EXPECT_EQ(selector.Execute(), neko::SUCCESS);
+	EXPECT_EQ(
+		selector.GetType(), 
+		neko::BehaviorTreeObjectType::COMPOSITE_SELECTOR);
+	EXPECT_EQ(selector.Execute(), neko::BehaviorTreeFlow::SUCCESS);
 	// Should stick in the success.
-	EXPECT_EQ(selector.Execute(), neko::SUCCESS);
+	EXPECT_EQ(selector.Execute(), neko::BehaviorTreeFlow::SUCCESS);
 }
 
 TEST_F(BehaviorTreeTest, SequenceConstructorTest)
@@ -122,7 +136,7 @@ TEST_F(BehaviorTreeTest, SequenceConstructorTest)
 			std::make_shared<neko::BehaviorTreeLeafCondition>(
 				neko::BehaviorTreeLeafCondition(comp_))},
 		ilVariables_);
-	EXPECT_EQ(sequence.GetType(), neko::COMPOSITE_SEQUENCE);
-	EXPECT_EQ(sequence.Execute(), neko::SUCCESS);
-	EXPECT_EQ(sequence.Execute(), neko::FAILURE);
+	EXPECT_EQ(sequence.GetType(), neko::BehaviorTreeObjectType::COMPOSITE_SEQUENCE);
+	EXPECT_EQ(sequence.Execute(), neko::BehaviorTreeFlow::SUCCESS);
+	EXPECT_EQ(sequence.Execute(), neko::BehaviorTreeFlow::FAILURE);
 }

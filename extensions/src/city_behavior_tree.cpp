@@ -63,20 +63,24 @@ namespace neko
 	{
 		if (currentCount_ >= children_.size()) currentCount_ = 0;
 		BehaviorTreeFlow flow = children_[currentCount_]->Execute();
-		if (flow == RUNNING) return RUNNING;
-		if (flow == FAILURE) return FAILURE;
+		if (flow == BehaviorTreeFlow::RUNNING) 
+			return BehaviorTreeFlow::RUNNING;
+		if (flow == BehaviorTreeFlow::FAILURE) 
+			return BehaviorTreeFlow::FAILURE;
 		currentCount_++;
-		return SUCCESS;
+		return BehaviorTreeFlow::SUCCESS;
 	}
 
 	BehaviorTreeFlow BehaviorTreeCompositeSelector::Execute()
 	{
 		if (currentCount_ >= children_.size()) currentCount_ = 0;
 		BehaviorTreeFlow flow = children_[currentCount_]->Execute();
-		if (flow == RUNNING) return RUNNING;
-		if (flow == SUCCESS) return SUCCESS;
+		if (flow == BehaviorTreeFlow::RUNNING) 
+			return BehaviorTreeFlow::RUNNING;
+		if (flow == BehaviorTreeFlow::SUCCESS) 
+			return BehaviorTreeFlow::SUCCESS;
 		currentCount_++;
-		return FAILURE;
+		return BehaviorTreeFlow::FAILURE;
 	}
 
 	BehaviorTreeFlow BehaviorTreeLeafCondition::Execute()
@@ -96,11 +100,13 @@ namespace neko
 		}
 		if (functionName_.empty() || valueName_.empty()) 
 		{
-			return FAILURE;
+			return BehaviorTreeFlow::FAILURE;
 		}
 		bool succeeded = 
 			funcMap_.CallFunction(functionName_, std::stod(valueName_));
-		return (succeeded) ? SUCCESS : FAILURE;
+		return (succeeded) ? 
+			BehaviorTreeFlow::SUCCESS : 
+			BehaviorTreeFlow::FAILURE;
 	}
 
 	BehaviorTreeFlow BehaviorTreeLeafWait::Execute()
@@ -120,10 +126,10 @@ namespace neko
 			if (delta > durationDelay_)
 			{
 				started_ = false;
-				return SUCCESS;
+				return BehaviorTreeFlow::SUCCESS;
 			}
 		}
-		return RUNNING;
+		return BehaviorTreeFlow::RUNNING;
 	}
 
 	BehaviorTreeFlow BehaviorTreeLeafMoveTo::Execute()
@@ -134,7 +140,7 @@ namespace neko
 			if (GetVariable("to") == "<null>")
 			{
 				logDebug("Could not find \"to\" in a leaf move to node");
-				return FAILURE;
+				return BehaviorTreeFlow::FAILURE;
 			}
 			else
 			{
@@ -163,7 +169,7 @@ namespace neko
 							functionName_ +
 							"> is not equal to 2 but: " +
 							std::to_string(values.size()));
-						return FAILURE;
+						return BehaviorTreeFlow::FAILURE;
 					}
 					to_.x = static_cast<int>(values[0]);
 					to_.y = static_cast<int>(values[1]);
@@ -173,7 +179,9 @@ namespace neko
 		bool succeeded = funcMap_.CallFunction(
 			functionName_, 
 			{static_cast<double>(to_.x), static_cast<double>(to_.y)});
-		return (succeeded) ? SUCCESS : FAILURE;
+		return (succeeded) ? 
+			BehaviorTreeFlow::SUCCESS : 
+			BehaviorTreeFlow::FAILURE;
 	}
 
 } // end namespace neko

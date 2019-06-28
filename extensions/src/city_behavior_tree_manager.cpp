@@ -210,15 +210,15 @@ namespace neko {
 		return leaf;
 	}
 
-	CompositeObjectType BehaviorTreeManager::GetTypeFromJson(
+	BehaviorTreeObjectType BehaviorTreeManager::GetTypeFromJson(
 		const json& jsonContent) const
 	{
-		static const std::map<std::string, CompositeObjectType> reverseMap =
-			[]() ->std::map<std::string, CompositeObjectType>
+		static const std::map<std::string, BehaviorTreeObjectType> reverseMap =
+			[]() ->std::map<std::string, BehaviorTreeObjectType>
 		{
-			std::map<std::string, CompositeObjectType> reverse;
+			std::map<std::string, BehaviorTreeObjectType> reverse;
 			std::for_each(mapCompositeString.begin(), mapCompositeString.end(),
-				[&reverse](std::pair<CompositeObjectType, std::string> pair)
+				[&reverse](std::pair<BehaviorTreeObjectType, std::string> pair)
 			{
 				reverse.insert({ pair.second, pair.first });
 			});
@@ -227,7 +227,7 @@ namespace neko {
 		assert(reverseMap.size() == mapCompositeString.size());
 		auto it = reverseMap.find(jsonContent["type"]);
 		if (it == reverseMap.end()) {
-			return ERROR_UNKNOWN;
+			return BehaviorTreeObjectType::ERROR_UNKNOWN;
 		}
 		return it->second;
 	}
@@ -237,21 +237,21 @@ namespace neko {
 		const json& jsonContent) const
 	{
 		switch (GetTypeFromJson(jsonContent)) {
-		case COMPOSITE_SEQUENCE:
+		case BehaviorTreeObjectType::COMPOSITE_SEQUENCE:
 			return ParseJsonCompositeSequence(comp, jsonContent);
-		case COMPOSITE_SELECTOR:
+		case BehaviorTreeObjectType::COMPOSITE_SELECTOR:
 			return ParseJsonCompositeSelector(comp, jsonContent);
-		case INTERFACE_COMPOSITE:
+		case BehaviorTreeObjectType::INTERFACE_COMPOSITE:
 			return ParseJsonComposite(comp, jsonContent);
-		case INTERFACE_DECORATOR:
+		case BehaviorTreeObjectType::INTERFACE_DECORATOR:
 			return ParseJsonDecorator(comp, jsonContent);
-		case LEAF_CONDITION:
+		case BehaviorTreeObjectType::LEAF_CONDITION:
 			return ParseJsonLeafCondition(comp, jsonContent);
-		case LEAF_WAIT:
+		case BehaviorTreeObjectType::LEAF_WAIT:
 			return ParseJsonLeafWait(comp, jsonContent);
-		case LEAF_MOVE_TO:
+		case BehaviorTreeObjectType::LEAF_MOVE_TO:
 			return ParseJsonLeafMoveTo(comp, jsonContent);
-		case INTERFACE_LEAF:
+		case BehaviorTreeObjectType::INTERFACE_LEAF:
 			return ParseJsonLeaf(comp, jsonContent);
 		default:
 		{
@@ -286,9 +286,9 @@ namespace neko {
 		}
 		switch (behaviorTree->GetType())
 		{
-		case COMPOSITE_SEQUENCE:
-		case COMPOSITE_SELECTOR:
-		case INTERFACE_COMPOSITE:
+		case BehaviorTreeObjectType::COMPOSITE_SEQUENCE:
+		case BehaviorTreeObjectType::COMPOSITE_SELECTOR:
+		case BehaviorTreeObjectType::INTERFACE_COMPOSITE:
 		{
 			logDebug(oss_indent.str() + "children : {");
 			indent++;
@@ -309,7 +309,7 @@ namespace neko {
 			logDebug(oss_indent.str() + "}");
 			break;
 		}
-		case INTERFACE_DECORATOR:
+		case BehaviorTreeObjectType::INTERFACE_DECORATOR:
 		{
 			logDebug(oss_indent.str() + "decorator : {");
 			indent++;
@@ -328,10 +328,10 @@ namespace neko {
 			logDebug(oss_indent.str() + "}");
 			break;
 		}
-		case LEAF_CONDITION:
-		case LEAF_WAIT:
-		case LEAF_MOVE_TO:
-		case INTERFACE_LEAF:
+		case BehaviorTreeObjectType::LEAF_CONDITION:
+		case BehaviorTreeObjectType::LEAF_WAIT:
+		case BehaviorTreeObjectType::LEAF_MOVE_TO:
+		case BehaviorTreeObjectType::INTERFACE_LEAF:
 		{
 			logDebug(oss_indent.str() + "leaf {}");
 			break;

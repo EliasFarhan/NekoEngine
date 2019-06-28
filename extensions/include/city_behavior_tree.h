@@ -35,45 +35,45 @@
 namespace neko
 {
 
-	enum BehaviorTreeFlow
+	enum class BehaviorTreeFlow : uint32_t
 	{
-		SUCCESS,
-		FAILURE,
-		RUNNING,
+		SUCCESS = 0,
+		FAILURE = 1,
+		RUNNING = 2,
 	};
 
 	// Object type enum this will give witch type an object is.
-	enum CompositeObjectType
+	enum class BehaviorTreeObjectType : uint32_t
 	{
 		// An error type return in case you don't find the type.
-		ERROR_UNKNOWN,
+		ERROR_UNKNOWN = 0,
 		// Basic types these are not suppose to be in a behavior tree.
-		INTERFACE_COMPOSITE,
-		INTERFACE_DECORATOR,
-		INTERFACE_LEAF,
+		INTERFACE_COMPOSITE = 1,
+		INTERFACE_DECORATOR = 2,
+		INTERFACE_LEAF = 3,
 		// Composite type these are suppose to be in a behavior tree.
-		COMPOSITE_SEQUENCE,
-		COMPOSITE_SELECTOR,
+		COMPOSITE_SEQUENCE = 4,
+		COMPOSITE_SELECTOR = 5,
 		// Leaf type also suppose to be in behavior tree.
-		LEAF_CONDITION,
-		LEAF_WAIT,
-		LEAF_MOVE_TO,
+		LEAF_CONDITION = 6,
+		LEAF_WAIT = 7,
+		LEAF_MOVE_TO = 8,
 	};
 
 	// Object type list used to parse the behavior tree in json format.
-	const static std::map<CompositeObjectType, std::string> mapCompositeString = 
+	const static std::map<BehaviorTreeObjectType, std::string> mapCompositeString = 
 	{
-		{INTERFACE_COMPOSITE, "interface_composite"},
-		{INTERFACE_DECORATOR, "interface_decorator"},
-		{INTERFACE_LEAF,      "interface_leaf"},
+		{BehaviorTreeObjectType::INTERFACE_COMPOSITE, "interface_composite"},
+		{BehaviorTreeObjectType::INTERFACE_DECORATOR, "interface_decorator"},
+		{BehaviorTreeObjectType::INTERFACE_LEAF,      "interface_leaf"},
 		// Composite are connected to more than one sub element derives from
 		// Composite.
-		{COMPOSITE_SEQUENCE,  "composite_sequence"},
-		{COMPOSITE_SELECTOR,  "composite_selector"},
+		{BehaviorTreeObjectType::COMPOSITE_SEQUENCE,  "composite_sequence"},
+		{BehaviorTreeObjectType::COMPOSITE_SELECTOR,  "composite_selector"},
 		// Leaf component that derives from leaf node.
-		{LEAF_CONDITION,      "leaf_condition"},
-		{LEAF_WAIT,           "leaf_wait"},
-		{LEAF_MOVE_TO,        "leaf_move_to"},
+		{BehaviorTreeObjectType::LEAF_CONDITION,      "leaf_condition"},
+		{BehaviorTreeObjectType::LEAF_WAIT,           "leaf_wait"},
+		{BehaviorTreeObjectType::LEAF_MOVE_TO,        "leaf_move_to"},
 	};
 
 	// Global interface for a node in a behavior tree.
@@ -85,7 +85,7 @@ namespace neko
 			const std::vector<std::pair<std::string, std::string>>& il);
 
 		virtual BehaviorTreeFlow Execute() = 0;
-		virtual CompositeObjectType GetType() const = 0;
+		virtual BehaviorTreeObjectType GetType() const = 0;
 		void SetVariable(const std::string& variable, const std::string& value);
 		const std::string GetVariable(const std::string& name) const;
 		const std::map<std::string, std::string>& GetVariables() const 
@@ -106,7 +106,10 @@ namespace neko
 			const std::vector<std::pair<std::string, std::string>>& il) :
 			BehaviorTreeNode(il) {}
 
-		virtual BehaviorTreeFlow Execute() override { return FAILURE; }
+		virtual BehaviorTreeFlow Execute() override 
+		{ 
+			return BehaviorTreeFlow::FAILURE; 
+		}
 		void SetChild(const std::shared_ptr<BehaviorTreeNode>& child)
 		{
 			child_ = child;
@@ -115,9 +118,9 @@ namespace neko
 		{
 			return child_;
 		}
-		virtual CompositeObjectType GetType() const override
+		virtual BehaviorTreeObjectType GetType() const override
 		{
-			return INTERFACE_DECORATOR;
+			return BehaviorTreeObjectType::INTERFACE_DECORATOR;
 		}
 
 	protected:
@@ -150,10 +153,13 @@ namespace neko
 		{
 			return children_;
 		}
-		virtual BehaviorTreeFlow Execute() override { return FAILURE; }
-		virtual CompositeObjectType GetType() const override
+		virtual BehaviorTreeFlow Execute() override 
+		{ 
+			return BehaviorTreeFlow::FAILURE; 
+		}
+		virtual BehaviorTreeObjectType GetType() const override
 		{
-			return INTERFACE_COMPOSITE;
+			return BehaviorTreeObjectType::INTERFACE_COMPOSITE;
 		}
 
 	protected:
@@ -170,10 +176,13 @@ namespace neko
 			const std::vector<std::pair<std::string, std::string>>& ilVariables) :
 			BehaviorTreeNode(ilVariables) {}
 
-		virtual BehaviorTreeFlow Execute() override { return FAILURE; }
-		virtual CompositeObjectType GetType() const override
+		virtual BehaviorTreeFlow Execute() override 
+		{ 
+			return BehaviorTreeFlow::FAILURE; 
+		}
+		virtual BehaviorTreeObjectType GetType() const override
 		{
-			return INTERFACE_LEAF;
+			return BehaviorTreeObjectType::INTERFACE_LEAF;
 		}
 	};
 
@@ -194,9 +203,9 @@ namespace neko
 			BehaviorTreeComposite(ilNodes, ilVariables) {}
 
 		virtual BehaviorTreeFlow Execute() final;
-		virtual CompositeObjectType GetType() const final
+		virtual BehaviorTreeObjectType GetType() const final
 		{
-			return COMPOSITE_SEQUENCE;
+			return BehaviorTreeObjectType::COMPOSITE_SEQUENCE;
 		}
 	};
 
@@ -217,9 +226,9 @@ namespace neko
 			BehaviorTreeComposite(ilNodes, ilVariables) {}
 
 		virtual BehaviorTreeFlow Execute() final;
-		virtual CompositeObjectType GetType() const final
+		virtual BehaviorTreeObjectType GetType() const final
 		{
-			return COMPOSITE_SELECTOR;
+			return BehaviorTreeObjectType::COMPOSITE_SELECTOR;
 		}
 	};
 
@@ -237,9 +246,9 @@ namespace neko
 			funcMap_(comp) {}
 
 		virtual BehaviorTreeFlow Execute() final;
-		virtual CompositeObjectType GetType() const final
+		virtual BehaviorTreeObjectType GetType() const final
 		{
-			return LEAF_CONDITION;
+			return BehaviorTreeObjectType::LEAF_CONDITION;
 		}
 
 	private:
@@ -260,9 +269,9 @@ namespace neko
 			BehaviorTreeLeaf(ilVariables) {}
 
 		virtual BehaviorTreeFlow Execute() final;
-		virtual CompositeObjectType GetType() const final
+		virtual BehaviorTreeObjectType GetType() const final
 		{
-			return LEAF_WAIT;
+			return BehaviorTreeObjectType::LEAF_WAIT;
 		}
 
 	private:
@@ -283,9 +292,9 @@ namespace neko
 			BehaviorTreeLeaf(ilVariables), funcMap_(comp) {}
 
 		virtual BehaviorTreeFlow Execute() final;
-		virtual CompositeObjectType GetType() const final
+		virtual BehaviorTreeObjectType GetType() const final
 		{
-			return LEAF_MOVE_TO;
+			return BehaviorTreeObjectType::LEAF_MOVE_TO;
 		}
 
 	protected:

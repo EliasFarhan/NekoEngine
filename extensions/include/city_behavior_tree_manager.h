@@ -99,7 +99,7 @@ namespace neko {
 		std::shared_ptr<BehaviorTreeNode> ParseJsonLeaf(
 			Index comp,
 			const json& jsonContent) const;
-		CompositeObjectType GetTypeFromJson(const json& jsonContent) const;
+		BehaviorTreeObjectType GetTypeFromJson(const json& jsonContent) const;
 	
 	private:
 		std::vector<std::shared_ptr<BehaviorTreeNode>> vecBehaviorTree_;
