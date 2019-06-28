@@ -194,11 +194,41 @@ namespace neko
 				}
 			}
 		}
-		bool succeeded = funcMap_.CallFunction(
-			functionName_, 
-			{static_cast<double>(to_.x), static_cast<double>(to_.y)});
-		return (succeeded) ? 
+		return (funcMap_.CallFunction(
+			functionName_,
+			{ static_cast<double>(to_.x), static_cast<double>(to_.y) })) ?
 			BehaviorTreeFlow::SUCCESS : 
+			BehaviorTreeFlow::FAILURE;
+	}
+
+	BehaviorTreeFlow BehaviorTreeLeafFunctional::Execute()
+	{
+		std::string functional = GetVariable("functional");
+		std::vector<double> values;
+		if (functional != functional_) 
+		{
+			functional_ = functional;
+			std::string valuesStr;
+			{
+				std::istringstream iss(functional_);
+				std::getline(iss, functionName_, '(');
+				std::getline(iss, valuesStr, ')');
+			}
+			{
+				std::istringstream iss(valuesStr);
+				std::string value = "";
+				while (std::getline(iss, value, ','))
+				{
+					if (value.empty())
+					{
+						continue;
+					}
+					values.push_back(std::stod(value));
+				}
+			}
+		}
+		return (funcMap_.CallFunction(functionName_, values)) ?
+			BehaviorTreeFlow::SUCCESS :
 			BehaviorTreeFlow::FAILURE;
 	}
 

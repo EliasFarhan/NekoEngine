@@ -96,6 +96,9 @@ namespace neko {
 		std::shared_ptr<BehaviorTreeNode> ParseJsonLeafMoveTo(
 			Index comp,
 			const json& jsonContent) const;
+		std::shared_ptr<BehaviorTreeNode> ParseJsonLeafFunctional(
+			Index comp,
+			const json& jsonContent) const;
 		std::shared_ptr<BehaviorTreeNode> ParseJsonLeaf(
 			Index comp,
 			const json& jsonContent) const;

@@ -64,6 +64,18 @@ protected:
 			EXPECT_EQ(values[1], 2.0);
 			return true;
 		});
+		funcMap.SetFunction(
+			"functional",
+			[](neko::Index comp, const std::vector<double>& values)
+		{
+			EXPECT_EQ(0xdeadbeef, comp);
+			EXPECT_EQ(values.size(), 4);
+			EXPECT_EQ(values[0], 0.0);
+			EXPECT_EQ(values[1], 1.0);
+			EXPECT_EQ(values[2], 2.0);
+			EXPECT_EQ(values[3], 3.0);
+			return true;
+		});
 	}
 
 	void TearDown() override 
@@ -77,6 +89,7 @@ protected:
 		{"to", "move(1.0, 2.0)"},
 		{"delay", "0.5"},
 		{"decorator", "decorator()"},
+		{"functional", "functional(0.0, 1.0, 2.0, 3.0)"},
 	};
 	neko::Index comp_ = 0xdeadbeef;
 };
@@ -128,6 +141,15 @@ TEST_F(BehaviorTreeTest, MoveToConstructorTest)
 		moveTo.GetType(), 
 		neko::BehaviorTreeObjectType::LEAF_MOVE_TO);
 	EXPECT_EQ(moveTo.Execute(), neko::BehaviorTreeFlow::SUCCESS);
+}
+
+TEST_F(BehaviorTreeTest, FunctionalConstructorTest)
+{
+	neko::BehaviorTreeLeafFunctional functional(comp_, ilVariables_);
+	EXPECT_EQ(
+		functional.GetType(),
+		neko::BehaviorTreeObjectType::LEAF_FUNCTIONAL);
+	EXPECT_EQ(functional.Execute(), neko::BehaviorTreeFlow::SUCCESS);
 }
 
 TEST_F(BehaviorTreeTest, WaitConstructorTest)

@@ -58,6 +58,7 @@ namespace neko
 		LEAF_CONDITION = 6,
 		LEAF_WAIT = 7,
 		LEAF_MOVE_TO = 8,
+		LEAF_FUNCTIONAL = 9,
 	};
 
 	// Object type list used to parse the behavior tree in json format.
@@ -74,6 +75,7 @@ namespace neko
 		{BehaviorTreeObjectType::LEAF_CONDITION,      "leaf_condition"},
 		{BehaviorTreeObjectType::LEAF_WAIT,           "leaf_wait"},
 		{BehaviorTreeObjectType::LEAF_MOVE_TO,        "leaf_move_to"},
+		{BehaviorTreeObjectType::LEAF_FUNCTIONAL,     "leaf_functional"},
 	};
 
 	// Global interface for a node in a behavior tree.
@@ -316,6 +318,30 @@ namespace neko
 		sf::Vector2i to_ = { 
 			std::numeric_limits<int>::max() , 
 			std::numeric_limits<int>::max() };
+	};
+
+	// This is an approach to change all function node by a unique one!
+	// example: "functional" : "Function(1.0, 2.0, 3.0)".
+	class BehaviorTreeLeafFunctional : public BehaviorTreeLeaf
+	{
+	public:
+		BehaviorTreeLeafFunctional(Index comp) : funcMap_(comp) {}
+		BehaviorTreeLeafFunctional(
+			Index comp,
+			const std::vector<std::pair<std::string, std::string>>& ilVariables) :
+			BehaviorTreeLeaf(ilVariables), funcMap_(comp) {}
+
+		virtual BehaviorTreeFlow Execute() final;
+		virtual BehaviorTreeObjectType GetType() const final
+		{
+			return BehaviorTreeObjectType::LEAF_FUNCTIONAL;
+		}
+
+	protected:
+		FunctionMap funcMap_;
+		std::string functional_ = "";
+		std::string functionName_ = "";
+		std::vector<double> values_;
 	};
 
 }    // namespace neko

@@ -201,6 +201,18 @@ namespace neko {
 		return moveTo;
 	}
 
+	std::shared_ptr<BehaviorTreeNode> BehaviorTreeManager::ParseJsonLeafFunctional(
+		Index comp,
+		const json& jsonContent) const 
+	{
+		auto nodeVariables = ParseJsonVariablesNodes(comp, jsonContent);
+		std::shared_ptr<BehaviorTreeLeafFunctional> functional =
+			std::make_shared<BehaviorTreeLeafFunctional>(
+				comp,
+				nodeVariables.vecVariables);
+		return functional;
+	}
+
 	std::shared_ptr<BehaviorTreeNode> BehaviorTreeManager::ParseJsonLeaf(
 		Index comp,
 		const json& jsonContent) const
@@ -254,6 +266,8 @@ namespace neko {
 			return ParseJsonLeafWait(comp, jsonContent);
 		case BehaviorTreeObjectType::LEAF_MOVE_TO:
 			return ParseJsonLeafMoveTo(comp, jsonContent);
+		case BehaviorTreeObjectType::LEAF_FUNCTIONAL:
+			return ParseJsonLeafFunctional(comp, jsonContent);
 		case BehaviorTreeObjectType::INTERFACE_LEAF:
 			return ParseJsonLeaf(comp, jsonContent);
 		default:
@@ -334,6 +348,7 @@ namespace neko {
 		case BehaviorTreeObjectType::LEAF_CONDITION:
 		case BehaviorTreeObjectType::LEAF_WAIT:
 		case BehaviorTreeObjectType::LEAF_MOVE_TO:
+		case BehaviorTreeObjectType::LEAF_FUNCTIONAL:
 		case BehaviorTreeObjectType::INTERFACE_LEAF:
 		{
 			logDebug(oss_indent.str() + "leaf {}");
