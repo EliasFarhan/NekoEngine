@@ -106,16 +106,18 @@ protected:
 
 TEST_F(BehaviorTreeManagerTest, IsInitFromJsonWorking) 
 {
+	const neko::Index comp = 0xdeadbeef;
 	EXPECT_TRUE(behaviorTreeManager_.ParseBehaviorTreeFromJson(
-		0xdeadbeef, 
+		comp, 
 		jsonBehaviorTree_));
 }
 
 TEST_F(BehaviorTreeManagerTest, IsBehaviorTreeCorrect) 
 {
+	const neko::Index comp = 0xdeadbeef;
 	auto behaviorTreeNodePtr_ = 
 		behaviorTreeManager_.ParseBehaviorTreeFromJson(
-			0xdeadbeef, 
+			comp, 
 			jsonBehaviorTree_);
 	EXPECT_TRUE(behaviorTreeNodePtr_);
 	{	// Base selector
@@ -208,12 +210,13 @@ TEST_F(BehaviorTreeManagerTest, IsBehaviorTreeExecuteCorrect)
 			jsonBehaviorTree_);
 	EXPECT_TRUE(id != neko::INDEX_INVALID);
 	neko::FunctionMap funcMap(comp);
-	bool passed = false;
 	funcMap.SetFunction(
 		"EnergyLevel", 
-		[&passed](neko::Index comp, const std::vector<double>& values)
+		[](neko::Index comp, const std::vector<double>& values)
 	{
-		passed = true;
+		EXPECT_EQ(0xdeadbeef, comp);
+		EXPECT_EQ(values.size(), 1);
+		EXPECT_EQ(values[0], 0.3);
 		return false;
 	});
 	funcMap.SetFunction(
@@ -229,7 +232,6 @@ TEST_F(BehaviorTreeManagerTest, IsBehaviorTreeExecuteCorrect)
 	EXPECT_EQ(
 		behaviorTreeManager_.ExecuteIndex(id), 
 		neko::BehaviorTreeFlow::FAILURE);
-	EXPECT_TRUE(passed);
 	// Move to a
 	EXPECT_EQ(
 		behaviorTreeManager_.ExecuteIndex(id), 

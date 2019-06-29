@@ -33,50 +33,6 @@ protected:
 	void SetUp() override 
 	{
 		Init();
-		neko::FunctionMap funcMap(comp_);
-		funcMap.SetFunction(
-			"test",
-			[](neko::Index comp, const std::vector<double>& values)
-		{
-			EXPECT_EQ(0xdeadbeef, comp);
-			return true;
-		});
-		funcMap.SetFunction(
-			"decorator",
-			[](neko::Index comp, const std::vector<double>& values)
-		{
-			EXPECT_EQ(0xdeadbeef, comp);
-			EXPECT_EQ(values.size(), 1);
-			// Basically return what was send.
-			if (values[0] == 
-				static_cast<double>(neko::BehaviorTreeFlow::SUCCESS))
-			{
-				return true;
-			}
-			return false;
-		});
-		funcMap.SetFunction(
-			"move",
-			[](neko::Index comp, const std::vector<double>& values)
-		{
-			EXPECT_EQ(0xdeadbeef, comp);
-			EXPECT_EQ(values.size(), 2);
-			EXPECT_EQ(values[0], 1.0);
-			EXPECT_EQ(values[1], 2.0);
-			return true;
-		});
-		funcMap.SetFunction(
-			"functional",
-			[](neko::Index comp, const std::vector<double>& values)
-		{
-			EXPECT_EQ(0xdeadbeef, comp);
-			EXPECT_EQ(values.size(), 4);
-			EXPECT_EQ(values[0], 0.0);
-			EXPECT_EQ(values[1], 1.0);
-			EXPECT_EQ(values[2], 2.0);
-			EXPECT_EQ(values[3], 3.0);
-			return true;
-		});
 	}
 
 	void TearDown() override 
@@ -93,7 +49,8 @@ protected:
 		{"decorator", "decorator()"},
 		{"functional", "functional(0.0, 1.0, 2.0, 3.0)"},
 	};
-	neko::Index comp_ = 0xdeadbeef;
+	const neko::Index comp_ = 0xdeadbeef;
+	neko::FunctionMap funcMap_ = neko::FunctionMap(comp_);
 };
 
 TEST_F(BehaviorTreeTest, CompositeConstructorTest)
@@ -107,6 +64,30 @@ TEST_F(BehaviorTreeTest, CompositeConstructorTest)
 
 TEST_F(BehaviorTreeTest, DecoratorConstructorTest)
 {
+	// Decorator function (will return the condition operator response).
+	funcMap_.SetFunction(
+		"decorator",
+		[](neko::Index comp, const std::vector<double>& values)
+	{
+		EXPECT_EQ(0xdeadbeef, comp);
+		EXPECT_EQ(values.size(), 1);
+		// Basically return what was send.
+		if (values[0] ==
+			static_cast<double>(neko::BehaviorTreeFlow::SUCCESS))
+		{
+			return true;
+		}
+		return false;
+	});
+	// Condition function (will return true).
+	funcMap_.SetFunction(
+		"test",
+		[](neko::Index comp, const std::vector<double>& values)
+	{
+		EXPECT_EQ(0xdeadbeef, comp);
+		EXPECT_EQ(values.size(), 1);
+		return true;
+	});
 	neko::BehaviorTreeDecorator decorator(
 		comp_, 
 		std::make_shared<neko::BehaviorTreeLeafCondition>(
@@ -129,6 +110,14 @@ TEST_F(BehaviorTreeTest, LeafConstructorTest)
 
 TEST_F(BehaviorTreeTest, ConditionConstructorTest)
 {
+	funcMap_.SetFunction(
+		"test",
+		[](neko::Index comp, const std::vector<double>& values)
+	{
+		EXPECT_EQ(0xdeadbeef, comp);
+		EXPECT_EQ(values.size(), 1);
+		return true;
+	});
 	neko::BehaviorTreeLeafCondition condition(comp_, ilVariables_);
 	EXPECT_EQ(
 		condition.GetType(), 
@@ -138,6 +127,16 @@ TEST_F(BehaviorTreeTest, ConditionConstructorTest)
 
 TEST_F(BehaviorTreeTest, MoveToConstructorTest)
 {
+	funcMap_.SetFunction(
+		"move",
+		[](neko::Index comp, const std::vector<double>& values)
+	{
+		EXPECT_EQ(0xdeadbeef, comp);
+		EXPECT_EQ(values.size(), 2);
+		EXPECT_EQ(values[0], 1.0);
+		EXPECT_EQ(values[1], 2.0);
+		return true;
+	});
 	neko::BehaviorTreeLeafMoveTo moveTo(comp_, ilVariables_);
 	EXPECT_EQ(
 		moveTo.GetType(), 
@@ -147,6 +146,18 @@ TEST_F(BehaviorTreeTest, MoveToConstructorTest)
 
 TEST_F(BehaviorTreeTest, FunctionalConstructorTest)
 {
+	funcMap_.SetFunction(
+		"functional",
+		[](neko::Index comp, const std::vector<double>& values)
+	{
+		EXPECT_EQ(0xdeadbeef, comp);
+		EXPECT_EQ(values.size(), 4);
+		EXPECT_EQ(values[0], 0.0);
+		EXPECT_EQ(values[1], 1.0);
+		EXPECT_EQ(values[2], 2.0);
+		EXPECT_EQ(values[3], 3.0);
+		return true;
+	});
 	neko::BehaviorTreeLeafFunctional functional(comp_, ilVariables_);
 	EXPECT_EQ(
 		functional.GetType(),
