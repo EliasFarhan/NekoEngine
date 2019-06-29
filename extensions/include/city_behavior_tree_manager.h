@@ -30,7 +30,8 @@
 
 namespace neko {
 
-	class BehaviorTreeManager {
+	class BehaviorTreeManager 
+	{
 	public:
 		// These will probably be removed or turned private.
 		void LogBehaviorTree(

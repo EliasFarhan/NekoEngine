@@ -32,8 +32,7 @@
 #include "utilities/time_utility.h"
 #include "utilities/json_utility.h"
 
-namespace neko
-{
+namespace neko {
 
 	enum class BehaviorTreeFlow : uint32_t
 	{

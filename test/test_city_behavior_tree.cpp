@@ -27,7 +27,8 @@
 #include <engine/log.h>
 #include <city_behavior_tree.h>
 
-class BehaviorTreeTest : public ::testing::Test, public neko::BasicEngine {
+class BehaviorTreeTest : public ::testing::Test, public neko::BasicEngine 
+{
 protected:
 	void SetUp() override 
 	{
@@ -83,7 +84,8 @@ protected:
 		Destroy();
 	}
 
-	std::vector<std::pair<std::string, std::string>> ilVariables_ = {
+	std::vector<std::pair<std::string, std::string>> ilVariables_ = 
+	{
 		{"name", "test"},
 		{"condition", "test(2)"},
 		{"to", "move(1.0, 2.0)"},
@@ -198,8 +200,8 @@ TEST_F(BehaviorTreeTest, SequenceConstructorTest)
 {
 	neko::BehaviorTreeCompositeSequence sequence(
 		std::vector<std::shared_ptr<neko::BehaviorTreeNode>>{
-		std::make_shared<neko::BehaviorTreeLeafCondition>(
-			neko::BehaviorTreeLeafCondition(comp_, ilVariables_)),
+			std::make_shared<neko::BehaviorTreeLeafCondition>(
+				neko::BehaviorTreeLeafCondition(comp_, ilVariables_)),
 			std::make_shared<neko::BehaviorTreeLeafCondition>(
 				neko::BehaviorTreeLeafCondition(comp_))},
 		ilVariables_);

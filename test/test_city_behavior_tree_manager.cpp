@@ -33,9 +33,11 @@
 #include <imgui.h>
 #include <Remotery.h>
 
-class BehaviorTreeManagerTest : public ::testing::Test, public neko::BasicEngine {
+class BehaviorTreeManagerTest : public ::testing::Test, public neko::BasicEngine 
+{
 protected:
-	void SetUp() override {
+	void SetUp() override 
+	{
 		jsonBehaviorTree_ = R"JSON(
 			{
 				"type" : "composite_selector",
@@ -93,7 +95,8 @@ protected:
 		Init();
 	}
 
-	void TearDown() override {
+	void TearDown() override 
+	{
 		Destroy();
 	}
 
@@ -101,13 +104,15 @@ protected:
 	neko::BehaviorTreeManager behaviorTreeManager_;
 };
 
-TEST_F(BehaviorTreeManagerTest, IsInitFromJsonWorking) {
+TEST_F(BehaviorTreeManagerTest, IsInitFromJsonWorking) 
+{
 	EXPECT_TRUE(behaviorTreeManager_.ParseBehaviorTreeFromJson(
 		0xdeadbeef, 
 		jsonBehaviorTree_));
 }
 
-TEST_F(BehaviorTreeManagerTest, IsBehaviorTreeCorrect) {
+TEST_F(BehaviorTreeManagerTest, IsBehaviorTreeCorrect) 
+{
 	auto behaviorTreeNodePtr_ = 
 		behaviorTreeManager_.ParseBehaviorTreeFromJson(
 			0xdeadbeef, 
@@ -195,7 +200,8 @@ TEST_F(BehaviorTreeManagerTest, IsBehaviorTreeCorrect) {
 	}
 }
 
-TEST_F(BehaviorTreeManagerTest, IsBehaviorTreeExecuteCorrect) {
+TEST_F(BehaviorTreeManagerTest, IsBehaviorTreeExecuteCorrect) 
+{
 	const neko::Index comp = 0xdeadbeef;
 	neko::Index id = behaviorTreeManager_.ParseBehaviorTreeFromJsonIndex(
 			comp,
