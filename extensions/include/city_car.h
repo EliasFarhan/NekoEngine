@@ -23,39 +23,31 @@
  SOFTWARE.
  */
 
-#include <queue>
-#include <memory>
+
+#include "engine/entity.h"
+#include <SFML/System/Vector2.hpp>
 #include "engine/system.h"
 
 namespace neko
 {
-class CityBuilderEngine;
-enum class CityCommandType
+
+enum class CarType : Index;
+
+struct CityCar : Component
 {
-	CHANGE_CURSOR_MODE,
-	CREATE_CITY_ELEMENT,
-	DELETE_CITY_ELEMENT,
-	NONE
+	CarType carType;
+	std::vector<sf::Vector2i> currentPath;
 };
 
-struct CityCommand
+class CityCarManager : public System
 {
-	CityCommand() = default;
-	virtual ~CityCommand() = default;
-	CityCommandType commandType = CityCommandType::NONE;
-};
-
-class CityCommandManager : public System
-{
-	
 public:
 	void Init() override;
-	void ExecuteCommand(const std::unique_ptr<CityCommand>& command) const;
 	void Update() override;
 	void Destroy() override;
-	void AddCommand(std::unique_ptr<CityCommand> command, bool fromRenderThread = false);
-protected:
-	std::queue<std::unique_ptr<CityCommand>>commandQueue_[2];
-	CityBuilderEngine* engine_ = nullptr;
+
+	Entity AddCar(Entity entity, CarType carType);
+private:
+	std::vector<CityCar> cars_;
 };
 }

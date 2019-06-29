@@ -39,7 +39,7 @@ class CityBuilderMap;
 
 enum class CityTileType : Index
 {
-	
+
 	GRASS = 0,
 	ROAD_LINE = 1,
 	ROAD_TURN,
@@ -86,16 +86,37 @@ const static std::map<CityTileType, std::string> mapCityTileString =
 	{CityTileType::RAIL_TURN, "rail_turn"},
 	{CityTileType::TREES, "trees"},
 	{CityTileType::TRAIN_STATION, "train_station"},
-	
+
 };
+enum class CarType : Index
+{
+	BUS = Index(CityTileType::LENGTH),
+	TRUCK,
+	BIG_CAR,
+	LONG_CAR,
+	AVG_CAR,
+	SMALL_CAR,
+	LENGTH
+};
+
+const static std::map<CarType, std::string> mapCarTypeString =
+{
+	{CarType::BUS, "bus"},
+	{CarType::TRUCK, "truck"},
+	{CarType::BIG_CAR, "big_car"},
+	{CarType::LONG_CAR, "long_car"},
+	{CarType::AVG_CAR, "avg_car"},
+	{CarType::SMALL_CAR, "small_car"}
+};
+
 
 enum class CityTilesheetType : unsigned
 {
-    ENVIRONMENT = 0u,
-    TRANSPORT,
-    CITY,
-    CAR,
-    LENGTH
+	ENVIRONMENT = 0u,
+	TRANSPORT,
+	CITY,
+	CAR,
+	LENGTH
 
 };
 
@@ -111,19 +132,21 @@ public:
 	void Init(TextureManager& textureManager);
 
 	void UpdateTilemap(CityBuilderMap& cityBuilderMap, sf::View mainView,
-                       CityTilesheetType updatedCityTileType = CityTilesheetType::LENGTH);
+		CityTilesheetType updatedCityTileType = CityTilesheetType::LENGTH);
 	void PushCommand(GraphicsManager* graphicsManager) override;
 protected:
-	void AddNewTile(const sf::Vector2f position, const sf::Vector2f size, const sf::FloatRect rect,
-                    const sf::Vector2f center, CityTilesheetType updatedCityTileType, bool flipX=false,
-                    bool flipY=false, bool rotate90=false, bool culling=true);
+	void AddNewCityTile(const sf::Vector2f position, const sf::Vector2f size, const sf::FloatRect rect,
+		const sf::Vector2f center, CityTilesheetType updatedCityTileType, bool flipX = false,
+		bool flipY = false, bool rotate90 = false, bool culling = true);
+	void AddCar(const sf::Vector2f position, const sf::Vector2f size, const sf::FloatRect rect,
+		const sf::Vector2f center, bool flipX = false, bool culling = true);
 	/**
 	 * \brief use for tile culling
 	 */
 	sf::FloatRect windowView_{};
-	std::array<Tilesheet, unsigned(CityTilesheetType::LENGTH)> tilesheets_;
-    std::array<sf::FloatRect, size_t(CityTileType::LENGTH)> textureRects_;
-    std::array<sf::Vector2f, size_t(CityTileType::LENGTH)> rectCenter_;
+	std::array<Tilesheet, size_t(CityTilesheetType::LENGTH)> tilesheets_;
+	std::array<sf::FloatRect, size_t(CarType::LENGTH)> textureRects_;
+	std::array<sf::Vector2f, size_t(CarType::LENGTH)> rectCenter_;
 	const std::string cityTextureName_ = "data/tilemap/CuteCityBuilder.png";
 	const std::string carTextureName_ = "data/tilemap/car.png";
 	const sf::Vector2i tileSize_ = sf::Vector2i(20, 20);

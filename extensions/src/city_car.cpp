@@ -1,8 +1,7 @@
-#pragma once
 /*
  MIT License
 
- Copyright (c) 2017 SAE Institute Switzerland AG
+ Copyright (c) 2019 SAE Institute Switzerland AG
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -22,40 +21,30 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-
-#include <queue>
-#include <memory>
-#include "engine/system.h"
+#include <city_car.h>
 
 namespace neko
 {
-class CityBuilderEngine;
-enum class CityCommandType
+void CityCarManager::Init()
 {
-	CHANGE_CURSOR_MODE,
-	CREATE_CITY_ELEMENT,
-	DELETE_CITY_ELEMENT,
-	NONE
-};
+}
 
-struct CityCommand
+void CityCarManager::Update()
 {
-	CityCommand() = default;
-	virtual ~CityCommand() = default;
-	CityCommandType commandType = CityCommandType::NONE;
-};
+}
 
-class CityCommandManager : public System
+void CityCarManager::Destroy()
 {
-	
-public:
-	void Init() override;
-	void ExecuteCommand(const std::unique_ptr<CityCommand>& command) const;
-	void Update() override;
-	void Destroy() override;
-	void AddCommand(std::unique_ptr<CityCommand> command, bool fromRenderThread = false);
-protected:
-	std::queue<std::unique_ptr<CityCommand>>commandQueue_[2];
-	CityBuilderEngine* engine_ = nullptr;
-};
+}
+
+Entity CityCarManager::AddCar(Entity entity, CarType carType)
+{
+	if(cars_.size() <= entity)
+	{
+		cars_.resize(size_t(entity) + 1u);
+	}
+	cars_[entity].carType = carType;
+	cars_[entity].currentPath.clear();
+	return entity;
+}
 }

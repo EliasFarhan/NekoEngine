@@ -38,7 +38,7 @@ using Entity = Index;
  */
 using EntityMask = std::uint32_t;
 enum class ComponentType : unsigned;
-const Entity INVALID_ENTITY = std::numeric_limits<uint32_t>::max();;
+const Entity INVALID_ENTITY = std::numeric_limits<Index>::max();
 const EntityMask INVALID_ENTITY_MASK = 0u;
 
 /**
@@ -68,5 +68,10 @@ public:
 	void RemoveComponentType(Entity entity, EntityMask componentType);
 private:
 	std::vector<EntityMask> entityMaskArray_;
+};
+
+struct Component
+{
+	Entity entity = INVALID_ENTITY;
 };
 }
