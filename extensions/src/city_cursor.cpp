@@ -53,7 +53,7 @@ void CityCursor::Update()
     {
         case ButtonIconType::ROAD:
         {
-            if (originPos_ == sf::Vector2i(-1, -1))
+            if (originPos_ == INVALID_TILE_POS)
             {
                 rect.setSize(sf::Vector2f(tileSize.x, tileSize.y));
             }
@@ -104,7 +104,7 @@ void CityCursor::Update()
         }
         case ButtonIconType::BULLDOZER:
         {
-            if (originPos_ == sf::Vector2i(-1, -1))
+            if (originPos_ == INVALID_TILE_POS)
             {
                 rect.setSize(sf::Vector2f(tileSize.x, tileSize.y));
             }
@@ -156,7 +156,7 @@ void CityCursor::OnEvent(sf::Event& event)
                 originPos_ = GetMouseTilePos();
                 break;
             case sf::Mouse::Right:
-                originPos_ = sf::Vector2i(-1, -1);
+                originPos_ = INVALID_TILE_POS;
                 break;
             default:
                 break;
@@ -170,7 +170,7 @@ void CityCursor::OnEvent(sf::Event& event)
         {
             case ButtonIconType::ROAD:
             {
-                if (originPos_ == sf::Vector2i(-1, -1)) break;
+                if (originPos_ == INVALID_TILE_POS) break;
 
                 const auto currentPos = GetMouseTilePos();
                 const auto deltaPos = currentPos - originPos_;
@@ -194,14 +194,14 @@ void CityCursor::OnEvent(sf::Event& event)
                     command->position = originPos_ + direction * i;
                     engine_->GetCommandManager().AddCommand(std::move(command));
                 }
-                originPos_ = sf::Vector2i(-1, -1);
+                originPos_ = INVALID_TILE_POS;
 
 
                 break;
             }
             case ButtonIconType::BULLDOZER:
             {
-                if (originPos_ == sf::Vector2i(-1, -1)) break;
+                if (originPos_ == INVALID_TILE_POS) break;
                 const auto currentPos = GetMouseTilePos();
                 const auto deltaPos = currentPos - originPos_;
                 for (int dx = 0; dx <= deltaPos.x; dx++)
@@ -214,7 +214,7 @@ void CityCursor::OnEvent(sf::Event& event)
                         engine_->GetCommandManager().AddCommand(std::move(command));
                     }
                 }
-                originPos_ = sf::Vector2i(-1, -1);
+				originPos_ = INVALID_TILE_POS;
                 break;
             }
             default:

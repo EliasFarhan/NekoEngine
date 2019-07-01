@@ -40,13 +40,14 @@ void CityBuilderEngine::Init()
 
 	cursor_.Init();
 	commandManager_.Init();
+	cityCarManager_.Init();
 }
 
 void CityBuilderEngine::Update()
 {
 	MainEngine::Update();
 
-	
+	cityCarManager_.Update();
 	commandManager_.Update();
 	if (mouseManager_.IsButtonPressed(sf::Mouse::Button::Middle))
 	{
@@ -54,11 +55,12 @@ void CityBuilderEngine::Update()
 		mainView.setCenter(mainView.getCenter() - currentZoom_ * delta);
 
 	}
-	environmentTilemap_.UpdateTilemap(cityBuilderMap_, mainView, CityTilesheetType::LENGTH);
+	environmentTilemap_.UpdateTilemap(cityBuilderMap_, cityCarManager_, transformManager_, mainView, CityTilesheetType::LENGTH);
 	environmentTilemap_.PushCommand(graphicsManager_.get());
 	cursor_.Update();
 	graphicsManager_->SetView(mainView);
 	graphicsManager_->editor->AddInspectorInfo("FPS", std::to_string(1.0f / dt.asSeconds()));
+	graphicsManager_->editor->AddInspectorInfo("Cars", std::to_string(cityCarManager_.CountCar()));
 }
 
 void CityBuilderEngine::OnEvent(sf::Event& event)
@@ -110,5 +112,20 @@ float CityBuilderEngine::GetCurrentZoom() const
 CityBuilderMap& CityBuilderEngine::GetCityMap()
 {
 	return cityBuilderMap_;
+}
+
+EntityManager& CityBuilderEngine::GetEntityManager()
+{
+	return entityManager_;
+}
+
+Transform2dManager& CityBuilderEngine::GetTransformManager()
+{
+	return transformManager_;
+}
+
+CityCarManager& CityBuilderEngine::GetCarManager()
+{
+	return cityCarManager_;
 }
 }

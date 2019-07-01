@@ -61,7 +61,7 @@ bool HasBitNeighbor(const NeighborBit& neighborBit, NeighborType neighborType);
 const static Index maxNeighborsNmb = 4;
 struct Node
 {
-	sf::Vector2i position = sf::Vector2i(-1,-1);
+	sf::Vector2i position = INVALID_TILE_POS;
 	std::array<Index, maxNeighborsNmb> neighborsIndex;
     NeighborBit neighborBitwise = 0u;
 };

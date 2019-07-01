@@ -103,10 +103,11 @@ public:
 	sf::Vector2i Index2Position(size_t index) const;
 	void AddCityElement(CityElementType cityElement, const sf::Vector2i& position);
 	void RemoveCityElement(const sf::Vector2i& position);
+	TileMapGraph& GetRoadGraph();
 	City city{};
 private:
     friend class CityBuilderTilemap;
-    TileMapGraph roadGraph;
+    TileMapGraph roadGraph_;
     std::vector<EnvironmentTile> environmentTiles_;
     std::vector<CityElement> elements_;
 };

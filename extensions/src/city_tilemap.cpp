@@ -27,6 +27,8 @@
 #include <Remotery.h>
 #include <city_map.h>
 #include "utilities/json_utility.h"
+#include "city_car.h"
+#include <engine/transform.h>
 
 namespace neko
 {
@@ -57,16 +59,19 @@ void CityBuilderTilemap::Init(TextureManager& textureManager)
 
 	const std::unique_ptr<json> cityTilemapJsonPtr = LoadJson("data/tilemap/CuteCityBuilder.json");
 	const auto cityTilemapJsonContent = *cityTilemapJsonPtr;
+	//City texture
 	for (int i = 0; i < int(CityTilesheetType::CAR); i++)
 	{
 		const Index textureIndex = textureManager.LoadTexture(cityTilemapJsonContent["image"]);
 		tilesheets_[i].texture = textureManager.GetTexture(textureIndex);
 		tilesheets_[i].texture->setRepeated(false);
 	}
-	const Index textureIndex = textureManager.LoadTexture(carTextureName_);
-	tilesheets_[unsigned(CityTilesheetType::CAR)].texture = textureManager.GetTexture(textureIndex);
-	tilesheets_[unsigned(CityTilesheetType::CAR)].texture->setRepeated(true);
-
+	//Car texture
+	{
+		const Index textureIndex = textureManager.LoadTexture(carTextureName_);
+		tilesheets_[Index(CityTilesheetType::CAR)].texture = textureManager.GetTexture(textureIndex);
+		tilesheets_[Index(CityTilesheetType::CAR)].texture->setRepeated(false);
+	}
 	for (auto& cityTileElementJson : cityTilemapJsonContent["tile_elements"])
 	{
 		const auto typeIt = reverseCityMap.find(cityTileElementJson["type"].get<std::string>());
@@ -79,10 +84,10 @@ void CityBuilderTilemap::Init(TextureManager& textureManager)
 	}
 	const auto cityCarJsonPtr = LoadJson("data/tilemap/car.json");
 	const auto cityCarJsonContent = *cityCarJsonPtr;
-	for(auto& carElementJson : cityCarJsonContent["elements"])
+	for (auto& carElementJson : cityCarJsonContent["elements"])
 	{
 		const auto typeIt = reverseCarMap.find(carElementJson["type"].get<std::string>());
-		if(typeIt != reverseCarMap.end())
+		if (typeIt != reverseCarMap.end())
 		{
 			const auto typeIndex = Index(typeIt->second);
 			rectCenter_[typeIndex] = GetVectorFromJson(carElementJson, "center");
@@ -98,8 +103,11 @@ void CityBuilderTilemap::Init(TextureManager& textureManager)
 
 }
 
-void CityBuilderTilemap::UpdateTilemap(CityBuilderMap& cityBuilderMap, sf::View mainView,
-	CityTilesheetType updatedCityTileType)
+void CityBuilderTilemap::UpdateTilemap(
+	CityBuilderMap& cityBuilderMap,
+	CityCarManager& cityCarManager,
+	Transform2dManager& transformManager,
+	sf::View mainView, CityTilesheetType updatedCityTileType)
 {
 	const Index frameIndex = MainEngine::GetInstance()->frameIndex % 2;
 	//Manage window view
@@ -108,14 +116,14 @@ void CityBuilderTilemap::UpdateTilemap(CityBuilderMap& cityBuilderMap, sf::View 
 	if (updatedCityTileType == CityTilesheetType::LENGTH)
 	{
 		rmt_ScopedCPUSample(UpdateTilemap, 0);
-		for (unsigned i = 0u; i < unsigned(CityTilesheetType::LENGTH); i++)
+		for (Index i = 0u; i < Index(CityTilesheetType::LENGTH); i++)
 		{
-			UpdateTilemap(cityBuilderMap, mainView, CityTilesheetType(i));
+			UpdateTilemap(cityBuilderMap, cityCarManager, transformManager , mainView, CityTilesheetType(i));
 		}
 		return;
 	}
 	rmt_ScopedCPUSample(UpdateIndividualTilemap, 0);
-	tilesheets_[unsigned(updatedCityTileType)].tilemap[frameIndex].clear();
+	tilesheets_[Index(updatedCityTileType)].tilemap[frameIndex].clear();
 
 	switch (updatedCityTileType)
 	{
@@ -396,7 +404,7 @@ void CityBuilderTilemap::UpdateTilemap(CityBuilderMap& cityBuilderMap, sf::View 
 
 				AddNewCityTile(position, size, rect, center, updatedCityTileType, true, true, false, true);
 			}
-			
+
 		}
 
 		//RAILS
@@ -469,7 +477,7 @@ void CityBuilderTilemap::UpdateTilemap(CityBuilderMap& cityBuilderMap, sf::View 
 			//UP RIGHT
 			else if (directions[0] && directions[3])
 			{
-				const int railIndex = int(CityTileType::RAIL_TURN);
+				const Index railIndex = Index(CityTileType::RAIL_TURN);
 				const auto rect = textureRects_[railIndex];
 				const auto center = rectCenter_[railIndex];
 				const auto size = sf::Vector2f(tileSize_);
@@ -568,6 +576,17 @@ void CityBuilderTilemap::UpdateTilemap(CityBuilderMap& cityBuilderMap, sf::View 
 		}
 		break;
 	}
+	case CityTilesheetType::CAR:
+	{
+		for(auto& car : cityCarManager.GetCarsVector())
+		{
+			const auto rect = textureRects_[Index(car.carType)];
+			const auto center = rectCenter_[Index(car.carType)];
+			const auto position = transformManager.GetPosition(car.entity);
+			AddCar(position, car.spriteSize, rect, center,false, false);
+		}
+		break;
+	}
 	default:
 		break;
 	}
@@ -578,14 +597,15 @@ void CityBuilderTilemap::PushCommand(GraphicsManager* graphicsManager)
 {
 	rmt_ScopedCPUSample(PushCityTilemapCommands, 0);
 	const Index frameIndex = MainEngine::GetInstance()->frameIndex % 2;
-	graphicsManager->Draw(&tilesheets_[unsigned(CityTilesheetType::ENVIRONMENT)].tilemap[frameIndex],
+	graphicsManager->Draw(&tilesheets_[Index(CityTilesheetType::ENVIRONMENT)].tilemap[frameIndex],
 		tilesheets_[unsigned(CityTilesheetType::ENVIRONMENT)].texture.get());
-	graphicsManager->Draw(&tilesheets_[unsigned(CityTilesheetType::TRANSPORT)].tilemap[frameIndex],
+	graphicsManager->Draw(&tilesheets_[Index(CityTilesheetType::TRANSPORT)].tilemap[frameIndex],
 		tilesheets_[unsigned(CityTilesheetType::TRANSPORT)].texture.get());
-	graphicsManager->Draw(&tilesheets_[unsigned(CityTilesheetType::CAR)].tilemap[frameIndex],
+	graphicsManager->Draw(&tilesheets_[Index(CityTilesheetType::CAR)].tilemap[frameIndex],
 		tilesheets_[unsigned(CityTilesheetType::CAR)].texture.get());
-	graphicsManager->Draw(&tilesheets_[unsigned(CityTilesheetType::CITY)].tilemap[frameIndex],
+	graphicsManager->Draw(&tilesheets_[Index(CityTilesheetType::CITY)].tilemap[frameIndex],
 		tilesheets_[unsigned(CityTilesheetType::CITY)].texture.get());
+
 
 }
 
@@ -666,7 +686,7 @@ void CityBuilderTilemap::AddCar(const sf::Vector2f position, const sf::Vector2f 
 	if (culling)
 	{
 		const sf::FloatRect tileRect = sf::FloatRect((position - center), size);
-
+		
 		if (!windowView_.intersects(tileRect))
 			return;
 	}
@@ -677,5 +697,27 @@ void CityBuilderTilemap::AddCar(const sf::Vector2f position, const sf::Vector2f 
 	quad[3].position = position - center;
 	quad[4].position = position + center;
 	quad[5].position = position - sf::Vector2f(-center.x, center.y);
+	quad[0].texCoords = sf::Vector2f(
+		flipX ? rect.left + rect.width : rect.left,
+		 rect.top);
+	quad[1].texCoords = sf::Vector2f(
+		flipX ? rect.left + rect.width : rect.left,
+		rect.top + rect.height);
+	quad[2].texCoords = sf::Vector2f(
+		flipX ? rect.left : rect.left + rect.width,
+		 rect.top + rect.height);
+	quad[3].texCoords = sf::Vector2f(
+		flipX ? rect.left + rect.width : rect.left,
+		 rect.top);
+	quad[4].texCoords = sf::Vector2f(
+		flipX ? rect.left : rect.left + rect.width,
+		 rect.top + rect.height);
+	quad[5].texCoords = sf::Vector2f(
+		flipX ? rect.left : rect.left + rect.width,
+		 rect.top);
+	for (auto& v : quad)
+	{
+		tilesheets_[Index(CityTilesheetType::CAR)].tilemap[frameIndex].append(v);
+	}
 }
 }

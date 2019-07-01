@@ -44,7 +44,7 @@ void CityEditor::Update()
 	const auto dt = engine_->dt;
 	const Index frameIndex = (engine_->frameIndex - 1) % 2; //Render frame is always the previous one
 	ImGui::SFML::Update(*renderWindow_, dt);
-#ifdef __neko_dbg__
+
 	ImGui::Begin("Inspector");
 	//Draw inspector data
 	for (auto& inspectorData : inspectorValues_[frameIndex])
@@ -52,7 +52,7 @@ void CityEditor::Update()
 		ImGui::LabelText(inspectorData.first.c_str(), inspectorData.second.c_str());
 	}
 	ImGui::End();
-#endif
+
 
 	ImGui::Begin("Gameplay");
 	for (Index i = 0; i < Index(ButtonIconType::LENGTH); i++)

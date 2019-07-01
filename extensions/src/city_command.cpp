@@ -61,7 +61,8 @@ void CityCommandManager::ExecuteCommand(const std::unique_ptr<CityCommand>& comm
 	{
 		auto* buildCommand = dynamic_cast<DestroyElementCommand*>(command.get());
 		engine_->GetCityMap().RemoveCityElement(buildCommand->position);
-			break;
+		engine_->GetCarManager().RescheduleCarPathfinding(buildCommand->position);
+		break;
 	}
 	default:
 		break;

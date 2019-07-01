@@ -36,6 +36,8 @@ namespace neko
 
 class TextureManager;
 class CityBuilderMap;
+class CityCarManager;
+class Transform2dManager;
 
 enum class CityTileType : Index
 {
@@ -131,8 +133,8 @@ class CityBuilderTilemap : public neko::Tilemap
 public:
 	void Init(TextureManager& textureManager);
 
-	void UpdateTilemap(CityBuilderMap& cityBuilderMap, sf::View mainView,
-		CityTilesheetType updatedCityTileType = CityTilesheetType::LENGTH);
+	void UpdateTilemap(CityBuilderMap& cityBuilderMap, CityCarManager& cityCarManager,
+	                   Transform2dManager& transformManager, sf::View mainView, CityTilesheetType updatedCityTileType = CityTilesheetType::LENGTH);
 	void PushCommand(GraphicsManager* graphicsManager) override;
 protected:
 	void AddNewCityTile(const sf::Vector2f position, const sf::Vector2f size, const sf::FloatRect rect,

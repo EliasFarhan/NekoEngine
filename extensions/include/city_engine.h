@@ -34,9 +34,19 @@
 #include "city_command.h"
 #include <city_cursor.h>
 #include <engine/transform.h>
+#include "city_car.h"
 
 namespace neko
 {
+
+enum class CityComponentType : EntityMask
+{
+	TRANSFORM = 1<<0,
+	CAR = 1<<1,
+	BUILDING = 1<<2,
+};
+
+
 class CityBuilderEngine : public neko::MainEngine
 {
 public:
@@ -53,6 +63,9 @@ public:
 	CityCursor& GetCursor();
 	float GetCurrentZoom() const;
 	CityBuilderMap& GetCityMap();
+	EntityManager& GetEntityManager();
+	Transform2dManager& GetTransformManager();
+	CityCarManager& GetCarManager();
 
 	sf::View mainView;
 private:
@@ -63,6 +76,7 @@ private:
 	CityCommandManager commandManager_;
 	CityBuilderTilemap environmentTilemap_;
 	CityBuilderMap cityBuilderMap_;
+	CityCarManager cityCarManager_;
 	CityCursor cursor_;
 	const float scrollDelta_ = 0.1f;
 	float currentZoom_ = 1.0f;

@@ -101,4 +101,9 @@ sf::Vector2f Transform2dManager::GetPosition(Index i)
 {
 	return positions_[i];
 }
+
+void Transform2dManager::SetPosition(const sf::Vector2f& position, Index i)
+{
+	positions_[i] = position;
+}
 }

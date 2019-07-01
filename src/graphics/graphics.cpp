@@ -28,7 +28,6 @@
 #include <sstream>
 #include <Remotery.h>
 #include "engine/globals.h"
-#include <cstdio>
 
 namespace neko
 {

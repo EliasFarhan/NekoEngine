@@ -221,7 +221,7 @@ void CityBuilderMap::AddCityElement(CityElementType cityElement, const sf::Vecto
 			element.position = position;
 			element.size = sf::Vector2u(1, 1);
 			element.elementType = CityElementType::ROAD;
-			roadGraph.AddNode(position);
+			roadGraph_.AddNode(position);
 			elements_.push_back(element);
 		}
 		break;
@@ -242,7 +242,7 @@ void CityBuilderMap::RemoveCityElement(const sf::Vector2i& position)
 	{
         if(elementIt->elementType == CityElementType::ROAD)
         {
-            roadGraph.RemoveNode(position);
+            roadGraph_.RemoveNode(position);
         }
 	    elements_.erase(elementIt);
 		
@@ -251,5 +251,10 @@ void CityBuilderMap::RemoveCityElement(const sf::Vector2i& position)
 			return element.position == position;
 		});
 	} ;
+}
+
+TileMapGraph& CityBuilderMap::GetRoadGraph()
+{
+	return roadGraph_;
 }
 }
