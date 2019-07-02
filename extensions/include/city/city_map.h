@@ -103,6 +103,7 @@ public:
 	sf::Vector2i Index2Position(size_t index) const;
 	void AddCityElement(CityElementType cityElement, const sf::Vector2i& position);
 	void RemoveCityElement(const sf::Vector2i& position);
+	CityElement* GetCityElementAt(sf::Vector2i position);
 	TileMapGraph& GetRoadGraph();
 	City city{};
 private:

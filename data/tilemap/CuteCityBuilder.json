@@ -89,6 +89,31 @@
       "type": "train_station",
       "center": [ 50, 30 ],
       "rect": [ 0, 60, 100, 60 ]
+    },
+    {
+      "type": "school",
+      "center": [50,50],
+      "rect": [300,0,100,100]
+    },
+    {
+      "type": "house1",
+      "center": [10,10],
+      "rect": [140,60,20,20]
+    },
+    {
+      "type": "house2",
+      "center": [10,20],
+      "rect": [380,0,20,40]
+    },
+    {
+      "type": "house3",
+      "center": [10,10],
+      "rect": [400,0,20,20]
+    },
+    {
+      "type": "house4",
+      "center": [10,10],
+      "rect": [400,20,20,20]
     }
   ]
 }

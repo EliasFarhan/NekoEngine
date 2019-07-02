@@ -33,6 +33,9 @@ const static sf::Color cursorColor[size_t(ButtonIconType::LENGTH)] =
         {
                 sf::Color(0, 0, 255, 100),
                 sf::Color(255, 0, 0, 100),
+                sf::Color(0, 255, 0, 100),
+                sf::Color(0, 0, 255, 100),
+                sf::Color(0, 255, 255, 100)
         };
 
 void CityCursor::Init()
@@ -55,7 +58,7 @@ void CityCursor::Update()
         {
             if (originPos_ == INVALID_TILE_POS)
             {
-                rect.setSize(sf::Vector2f(tileSize.x, tileSize.y));
+                rect.setSize(sf::Vector2f(tileSize));
             }
             else
             {
@@ -103,6 +106,7 @@ void CityCursor::Update()
             break;
         }
         case ButtonIconType::BULLDOZER:
+        case ButtonIconType::RESIDENTIAL:
         {
             if (originPos_ == INVALID_TILE_POS)
             {
@@ -121,13 +125,11 @@ void CityCursor::Update()
                         sf::Vector2f(tileSize.x * float(abs(deltaPos.x) + 1), tileSize.y * float(abs(deltaPos.y) + 1)));
                 if (direction.x == -1)
                 {
-                    rect.setPosition(sf::Vector2f(currentPos.x * tileSize.x, rect.getPosition().y) - tileSize / 2.0f);
-                    rect.setSize(sf::Vector2f(0, 0));
+                    rect.setPosition(sf::Vector2f(currentPos.x * tileSize.x - tileSize.x / 2.0f, rect.getPosition().y));
                 }
                 if (direction.y == -1)
                 {
-                    rect.setPosition(sf::Vector2f(rect.getPosition().x, currentPos.x * tileSize.y) - tileSize / 2.0f);
-                    rect.setSize(sf::Vector2f(0, 0));
+                    rect.setPosition(sf::Vector2f(rect.getPosition().x, currentPos.y * tileSize.y - tileSize.y / 2.0f));
                 }
 
             }
@@ -200,21 +202,43 @@ void CityCursor::OnEvent(sf::Event& event)
                 break;
             }
             case ButtonIconType::BULLDOZER:
+            case ButtonIconType::RESIDENTIAL:
             {
                 if (originPos_ == INVALID_TILE_POS) break;
                 const auto currentPos = GetMouseTilePos();
                 const auto deltaPos = currentPos - originPos_;
-                for (int dx = 0; dx <= deltaPos.x; dx++)
+                const auto direction = sf::Vector2i(
+                        int(copysign(1, deltaPos.x)),
+                        int(copysign(1, deltaPos.y)));
+                for (int dx = 0; dx <= abs(deltaPos.x); dx++)
                 {
-                    for (int dy = 0; dy <= deltaPos.y; dy++)
+                    for (int dy = 0; dy <= abs(deltaPos.y); dy++)
                     {
-                        auto command = std::make_unique<DestroyElementCommand>();
-                        command->commandType = CityCommandType::DELETE_CITY_ELEMENT;
-                        command->position = originPos_ + sf::Vector2i(dx, dy);
-                        engine_->GetCommandManager().AddCommand(std::move(command));
+                        switch (cursorMode)
+                        {
+                            case ButtonIconType::BULLDOZER:
+                            {
+                                auto command = std::make_unique<DestroyElementCommand>();
+                                command->commandType = CityCommandType::DELETE_CITY_ELEMENT;
+                                command->position = originPos_ + sf::Vector2i(dx * direction.x, dy * direction.y);
+                                engine_->GetCommandManager().AddCommand(std::move(command));
+                                break;
+                            }
+                            case ButtonIconType::RESIDENTIAL:
+                            {
+                                auto command = std::make_unique<AddZoneCommand>();
+                                command->commandType = CityCommandType::ADD_CITY_ZONE;
+                                command->zoneType = ZoneType::RESIDENTIAL;
+                                command->position = originPos_ + sf::Vector2i(dx * direction.x, dy * direction.y);
+                                engine_->GetCommandManager().AddCommand(std::move(command));
+                                break;
+                            }
+                            default:
+                                break;
+                        }
                     }
                 }
-				originPos_ = INVALID_TILE_POS;
+                originPos_ = INVALID_TILE_POS;
                 break;
             }
             default:

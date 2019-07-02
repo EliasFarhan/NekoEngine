@@ -69,9 +69,15 @@ void CityBuilderEngine::Update()
         tilemapUpdateTasks[i].precede(pushCommandTask);
     }
 
+	auto zoneUpdateTask = taskflow.emplace([&](){ cityZoneManager_.UpdateZoneTilemap(cityBuilderMap_, mainView);});
+	commandUpdateTask.precede(zoneUpdateTask);
+	auto pushZoneCommandTask = taskflow.emplace([&](){cityZoneManager_.PushCommand(graphicsManager_.get());});
+	zoneUpdateTask.precede(pushZoneCommandTask);
+	pushCommandTask.precede(pushZoneCommandTask);
 
 	auto cursorUpdateTask = taskflow.emplace([&](){cursor_.Update();});
 	pushCommandTask.precede(cursorUpdateTask);
+
 	auto mainViewUpdateTask = taskflow.emplace([&](){
         if (mouseManager_.IsButtonPressed(sf::Mouse::Button::Middle))
         {
@@ -158,5 +164,10 @@ Transform2dManager& CityBuilderEngine::GetTransformManager()
 CityCarManager& CityBuilderEngine::GetCarManager()
 {
 	return cityCarManager_;
+}
+
+CityZoneManager& CityBuilderEngine::GetZoneManager()
+{
+    return cityZoneManager_;
 }
 }

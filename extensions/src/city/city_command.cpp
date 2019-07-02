@@ -23,6 +23,7 @@
  */
 
 #include <city/city_command.h>
+#include <city/city_zone.h>
 #include "engine/globals.h"
 #include "engine/engine.h"
 #include "city/city_engine.h"
@@ -32,52 +33,58 @@ namespace neko
 {
 void CityCommandManager::AddCommand(std::unique_ptr<CityCommand> command, bool fromRenderThread)
 {
-	const Index frameIndex = (MainEngine::GetInstance()->frameIndex - (fromRenderThread ? 1 : 0)) % 2;
-	commandQueue_[frameIndex].push(std::move(command));
+    const Index frameIndex = (MainEngine::GetInstance()->frameIndex - (fromRenderThread ? 1 : 0)) % 2;
+    commandQueue_[frameIndex].push(std::move(command));
 }
 
 void CityCommandManager::Init()
 {
-	engine_ = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+    engine_ = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
 }
 
 void CityCommandManager::ExecuteCommand(const std::unique_ptr<CityCommand>& command) const
 {
-	switch (command->commandType)
-	{
-	case CityCommandType::CHANGE_CURSOR_MODE:
-	{
-		auto* cursorCommand = dynamic_cast<ChangeModeCommand*>(command.get());
-		engine_->GetCursor().cursorMode = cursorCommand->newCursorMode;
-		break;
-	}
-	case CityCommandType::CREATE_CITY_ELEMENT:
-	{
-		auto* buildCommand = dynamic_cast<BuildElementCommand*>(command.get());
-		engine_->GetCityMap().AddCityElement(buildCommand->elementType, buildCommand->position);
-		break;
-	}
-	case CityCommandType::DELETE_CITY_ELEMENT:
-	{
-		auto* buildCommand = dynamic_cast<DestroyElementCommand*>(command.get());
-		engine_->GetCityMap().RemoveCityElement(buildCommand->position);
-		engine_->GetCarManager().RescheduleCarPathfinding(buildCommand->position);
-		break;
-	}
-	default:
-		break;
-	}
+    switch (command->commandType)
+    {
+        case CityCommandType::CHANGE_CURSOR_MODE:
+        {
+            auto* cursorCommand = dynamic_cast<ChangeModeCommand*>(command.get());
+            engine_->GetCursor().cursorMode = cursorCommand->newCursorMode;
+            break;
+        }
+        case CityCommandType::CREATE_CITY_ELEMENT:
+        {
+            auto* buildCommand = dynamic_cast<BuildElementCommand*>(command.get());
+            engine_->GetCityMap().AddCityElement(buildCommand->elementType, buildCommand->position);
+            break;
+        }
+        case CityCommandType::DELETE_CITY_ELEMENT:
+        {
+            auto* buildCommand = dynamic_cast<DestroyElementCommand*>(command.get());
+            engine_->GetCityMap().RemoveCityElement(buildCommand->position);
+            engine_->GetCarManager().RescheduleCarPathfinding(buildCommand->position);
+            break;
+        }
+        case CityCommandType::ADD_CITY_ZONE:
+        {
+            auto* zoneCommand = dynamic_cast<AddZoneCommand*>(command.get());
+            engine_->GetZoneManager().AddZone(zoneCommand->position, zoneCommand->zoneType, engine_->GetCityMap());
+            break;
+        }
+        default:
+            break;
+    }
 }
 
 void CityCommandManager::Update()
 {
-	const Index frameIndex = (MainEngine::GetInstance()->frameIndex) % 2;
-	while (!commandQueue_[frameIndex].empty())
-	{
-		auto command = std::move(commandQueue_[frameIndex].front());
-		commandQueue_[frameIndex].pop();
-		ExecuteCommand(command);
-	}
+    const Index frameIndex = (MainEngine::GetInstance()->frameIndex) % 2;
+    while (!commandQueue_[frameIndex].empty())
+    {
+        auto command = std::move(commandQueue_[frameIndex].front());
+        commandQueue_[frameIndex].pop();
+        ExecuteCommand(command);
+    }
 }
 
 void CityCommandManager::Destroy()

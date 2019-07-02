@@ -36,52 +36,63 @@
 #include <engine/transform.h>
 #include <core/executor.hpp>
 #include "city_car.h"
+#include "city_zone.h"
 
 namespace neko
 {
 
 enum class CityComponentType : EntityMask
 {
-	TRANSFORM = 1<<0,
-	CAR = 1<<1,
-	BUILDING = 1<<2,
+    TRANSFORM = 1 << 0,
+    CAR = 1 << 1,
+    BUILDING = 1 << 2,
 };
 
 
 class CityBuilderEngine : public neko::MainEngine
 {
 public:
-	void Init() override;
+    void Init() override;
 
-	void Update() override;
+    void Update() override;
 
-	void OnEvent(sf::Event& event) override;
+    void OnEvent(sf::Event& event) override;
 
-	void Destroy() override;
+    void Destroy() override;
 
-	TextureManager& GetTextureManager();
-	CityCommandManager& GetCommandManager();
-	CityCursor& GetCursor();
-	float GetCurrentZoom() const;
-	CityBuilderMap& GetCityMap();
-	EntityManager& GetEntityManager();
-	Transform2dManager& GetTransformManager();
-	CityCarManager& GetCarManager();
+    TextureManager& GetTextureManager();
 
-	sf::View mainView;
+    CityCommandManager& GetCommandManager();
+
+    CityCursor& GetCursor();
+
+    float GetCurrentZoom() const;
+
+    CityBuilderMap& GetCityMap();
+
+    EntityManager& GetEntityManager();
+
+    Transform2dManager& GetTransformManager();
+
+    CityCarManager& GetCarManager();
+
+    CityZoneManager& GetZoneManager();
+
+    sf::View mainView;
 private:
 
-    tf::Executor executor_{std::thread::hardware_concurrency()-2};
-	EntityManager entityManager_;
-	Transform2dManager transformManager_;
-	TextureManager textureManager_;
+    tf::Executor executor_{std::thread::hardware_concurrency() - 2};
+    EntityManager entityManager_;
+    Transform2dManager transformManager_;
+    TextureManager textureManager_;
 
-	CityCommandManager commandManager_;
-	CityBuilderTilemap environmentTilemap_;
-	CityBuilderMap cityBuilderMap_;
-	CityCarManager cityCarManager_;
-	CityCursor cursor_;
-	const float scrollDelta_ = 0.1f;
-	float currentZoom_ = 1.0f;
+    CityCommandManager commandManager_;
+    CityBuilderTilemap environmentTilemap_;
+    CityBuilderMap cityBuilderMap_;
+    CityCarManager cityCarManager_;
+    CityCursor cursor_;
+    CityZoneManager cityZoneManager_;
+    const float scrollDelta_ = 0.1f;
+    float currentZoom_ = 1.0f;
 };
 }
