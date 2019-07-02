@@ -26,6 +26,7 @@
 #include "city/city_editor.h"
 
 #include <engine/log.h>
+#include <Remotery.h>
 namespace neko
 {
 void CityBuilderEngine::Init()
@@ -46,20 +47,17 @@ void CityBuilderEngine::Init()
 void CityBuilderEngine::Update()
 {
 	MainEngine::Update();
+    rmt_ScopedCPUSample(CityBuilderUpdate, 0);
     tf::Taskflow taskflow;
     auto carsUpdateTask = taskflow.emplace([&](){cityCarManager_.Update();});
 
 	auto commandUpdateTask = taskflow.emplace([&](){commandManager_.Update();});
 
-
 	std::array<tf::Task, int(CityTilesheetType::LENGTH)> tilemapUpdateTasks;
-
     auto pushCommandTask = taskflow.emplace([&](){environmentTilemap_.PushCommand(graphicsManager_.get());});
 	for(int i = 0; i < int(CityTilesheetType::LENGTH);i++)
     {
-        logDebug("Adding update tilemap task: "+std::to_string(i));
         tilemapUpdateTasks[i] = taskflow.emplace(std::bind([&](CityTilesheetType cityTilesheetType){
-            logDebug("Update Tilemap: "+std::to_string(int(cityTilesheetType)));
             environmentTilemap_.UpdateTilemap(cityBuilderMap_, cityCarManager_, transformManager_, mainView, cityTilesheetType);
         }, CityTilesheetType(i)));
 
@@ -79,7 +77,6 @@ void CityBuilderEngine::Update()
         {
             const auto delta = sf::Vector2f(mouseManager_.GetMouseDelta());
             mainView.setCenter(mainView.getCenter() - currentZoom_ * delta);
-
         }
         graphicsManager_->SetView(mainView);
 	});
@@ -102,11 +99,13 @@ void CityBuilderEngine::OnEvent(sf::Event& event)
 	if (event.type == sf::Event::MouseWheelScrolled)
 	{
 		const float wheelDelta = event.mouseWheelScroll.delta;
+#ifdef __neko_dbg__
 		{
 			std::ostringstream oss;
 			oss << "Mouse Wheel Delta: " << wheelDelta;
 			logDebug(oss.str());
 		}
+#endif
 		const auto size = mainView.getSize();
 		currentZoom_ -= wheelDelta * scrollDelta_ * currentZoom_;
 

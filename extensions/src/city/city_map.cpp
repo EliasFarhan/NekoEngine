@@ -88,18 +88,22 @@ void CityBuilderMap::Init()
 			}
 			if (x > trainStationX && x < trainStationX + 4)
 			{
+#ifdef __neko_dbg__
 				{
 					std::ostringstream oss;
 					oss << "No Rail: (" << pos.x << ", " << pos.y << ")";
 					logDebug(oss.str());
 				}
+#endif
 				continue;
 			}
+#ifdef __neko_dbg__
 			{
 				std::ostringstream oss;
 				oss << "Rail: (" << pos.x << ", " << pos.y << ")";
 				logDebug(oss.str());
 			}
+#endif
 			//Down track
 			CityElement element{};
 			if (x < railDownX)
