@@ -24,16 +24,17 @@
  SOFTWARE.
  */
 
-
+#include <thread>
 #include <engine/engine.h>
-#include <city_tilemap.h>
-#include <city_map.h>
+#include <city/city_tilemap.h>
+#include <city/city_map.h>
 #include "engine/input.h"
 
 #include <SFML/Window/Event.hpp>
 #include "city_command.h"
-#include <city_cursor.h>
+#include <city/city_cursor.h>
 #include <engine/transform.h>
+#include <core/executor.hpp>
 #include "city_car.h"
 
 namespace neko
@@ -69,6 +70,8 @@ public:
 
 	sf::View mainView;
 private:
+
+    tf::Executor executor_{std::thread::hardware_concurrency()-2};
 	EntityManager entityManager_;
 	Transform2dManager transformManager_;
 	TextureManager textureManager_;

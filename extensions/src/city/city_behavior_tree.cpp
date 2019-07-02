@@ -25,7 +25,7 @@
 #include <algorithm>
 #include <sstream>
 #include <iostream>
-#include <city_behavior_tree.h>
+#include <city/city_behavior_tree.h>
 #include "engine/engine.h"
 #include "engine/log.h"
 
@@ -103,7 +103,7 @@ namespace neko {
 		BehaviorTreeFlow behaviorTreeFlow = child_->Execute();
 		return (funcMap_.CallFunction(
 			functionName_, 
-			{ static_cast<double>(behaviorTreeFlow) })) ?
+			double(behaviorTreeFlow) )) ?
 			BehaviorTreeFlow::SUCCESS :
 			BehaviorTreeFlow::FAILURE;
 	}

@@ -23,7 +23,7 @@
  */
 
 #include <sstream>
-#include <city_behavior_tree_manager.h>
+#include <city/city_behavior_tree_manager.h>
 #include <engine/log.h>
 
 namespace neko {
@@ -39,7 +39,7 @@ namespace neko {
 		{
 			if (element.value().is_null())
 			{
-				logDebug("ERROR in parsing json value: " + element.value());
+				logDebug("ERROR in parsing json value: " + element.value().get<std::string>());
 				return {};
 			}
 			if (element.value().is_boolean())
@@ -63,7 +63,7 @@ namespace neko {
 				}
 				else
 				{
-					logDebug("ERROR in parsing json value: " + element.value());
+					logDebug("ERROR in parsing json value: " + element.value().get<std::string>());
 					return {};
 				}
 			}
@@ -80,7 +80,7 @@ namespace neko {
 				}
 				else
 				{
-					logDebug("ERROR in parsing json value: " + element.value());
+					logDebug("ERROR in parsing json value: " + element.value().get<std::string>());
 					return {};
 				}
 			}
@@ -388,7 +388,7 @@ namespace neko {
 			vecBehaviorTree_.push_back(behaviorTree);
 			return vecBehaviorTree_.size() - 1;
 		}
-		logDebug("ERROR could not parse the file: " + jsonContent);
+		logDebug("ERROR could not parse the file: " + jsonContent.get<std::string>());
 		return INDEX_INVALID;
 	}
 

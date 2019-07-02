@@ -22,11 +22,11 @@
  SOFTWARE.
  */
 
-#include <city_command.h>
+#include <city/city_command.h>
 #include "engine/globals.h"
 #include "engine/engine.h"
-#include "city_engine.h"
-#include "city_editor.h"
+#include "city/city_engine.h"
+#include "city/city_editor.h"
 
 namespace neko
 {

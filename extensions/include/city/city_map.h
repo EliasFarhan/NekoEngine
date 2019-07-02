@@ -28,7 +28,7 @@
 #include <PerlinNoise.hpp>
 #include "engine/globals.h"
 #include "city_command.h"
-#include <city_graph.h>
+#include <city/city_graph.h>
 
 
 namespace neko

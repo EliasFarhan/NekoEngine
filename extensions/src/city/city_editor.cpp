@@ -22,11 +22,11 @@
  SOFTWARE.
  */
 
-#include <city_editor.h>
+#include <city/city_editor.h>
 #include <imgui-SFML.h>
 #include <imgui.h>
 #include "engine/engine.h"
-#include <city_engine.h>
+#include <city/city_engine.h>
 
 namespace neko
 {
@@ -49,7 +49,7 @@ void CityEditor::Update()
 	//Draw inspector data
 	for (auto& inspectorData : inspectorValues_[frameIndex])
 	{
-		ImGui::LabelText(inspectorData.first.c_str(), inspectorData.second.c_str());
+		ImGui::LabelText(inspectorData.first.c_str(), "%s", inspectorData.second.c_str());
 	}
 	ImGui::End();
 

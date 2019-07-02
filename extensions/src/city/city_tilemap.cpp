@@ -21,13 +21,13 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-#include <city_tilemap.h>
+#include <city/city_tilemap.h>
 #include <graphics/texture.h>
 #include <engine/engine.h>
 #include <Remotery.h>
-#include <city_map.h>
+#include <city/city_map.h>
 #include "utilities/json_utility.h"
-#include "city_car.h"
+#include "city/city_car.h"
 #include <engine/transform.h>
 
 namespace neko
@@ -138,8 +138,8 @@ void CityBuilderTilemap::UpdateTilemap(
 			{
 
 				const auto position = sf::Vector2f(
-					static_cast<float>(x * tileSize_.x),
-					static_cast<float>(y * tileSize_.y));
+					float(x * tileSize_.x),
+					float(y * tileSize_.y));
 				auto& rect = textureRects_[grassIndex];
 				auto& center = rectCenter_[grassIndex];
 				AddNewCityTile(position, sf::Vector2f(tileSize_), rect, center, updatedCityTileType);

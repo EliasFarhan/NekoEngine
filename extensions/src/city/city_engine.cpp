@@ -22,8 +22,8 @@
  SOFTWARE.
  */
 #include <sstream>
-#include <city_engine.h>
-#include "city_editor.h"
+#include <city/city_engine.h>
+#include "city/city_editor.h"
 
 #include <engine/log.h>
 namespace neko
@@ -46,21 +46,53 @@ void CityBuilderEngine::Init()
 void CityBuilderEngine::Update()
 {
 	MainEngine::Update();
+    tf::Taskflow taskflow;
+    auto carsUpdateTask = taskflow.emplace([&](){cityCarManager_.Update();});
 
-	cityCarManager_.Update();
-	commandManager_.Update();
-	if (mouseManager_.IsButtonPressed(sf::Mouse::Button::Middle))
-	{
-		const auto delta = sf::Vector2f(mouseManager_.GetMouseDelta());
-		mainView.setCenter(mainView.getCenter() - currentZoom_ * delta);
+	auto commandUpdateTask = taskflow.emplace([&](){commandManager_.Update();});
 
-	}
-	environmentTilemap_.UpdateTilemap(cityBuilderMap_, cityCarManager_, transformManager_, mainView, CityTilesheetType::LENGTH);
-	environmentTilemap_.PushCommand(graphicsManager_.get());
-	cursor_.Update();
-	graphicsManager_->SetView(mainView);
-	graphicsManager_->editor->AddInspectorInfo("FPS", std::to_string(1.0f / dt.asSeconds()));
-	graphicsManager_->editor->AddInspectorInfo("Cars", std::to_string(cityCarManager_.CountCar()));
+
+	std::array<tf::Task, int(CityTilesheetType::LENGTH)> tilemapUpdateTasks;
+
+    auto pushCommandTask = taskflow.emplace([&](){environmentTilemap_.PushCommand(graphicsManager_.get());});
+	for(int i = 0; i < int(CityTilesheetType::LENGTH);i++)
+    {
+        logDebug("Adding update tilemap task: "+std::to_string(i));
+        tilemapUpdateTasks[i] = taskflow.emplace(std::bind([&](CityTilesheetType cityTilesheetType){
+            logDebug("Update Tilemap: "+std::to_string(int(cityTilesheetType)));
+            environmentTilemap_.UpdateTilemap(cityBuilderMap_, cityCarManager_, transformManager_, mainView, cityTilesheetType);
+        }, CityTilesheetType(i)));
+
+        if(CityTilesheetType(i) == CityTilesheetType::CAR)
+        {
+            carsUpdateTask.precede(tilemapUpdateTasks[i]);
+        }
+        commandUpdateTask.precede(tilemapUpdateTasks[i]);
+        tilemapUpdateTasks[i].precede(pushCommandTask);
+    }
+
+
+	auto cursorUpdateTask = taskflow.emplace([&](){cursor_.Update();});
+	pushCommandTask.precede(cursorUpdateTask);
+	auto mainViewUpdateTask = taskflow.emplace([&](){
+        if (mouseManager_.IsButtonPressed(sf::Mouse::Button::Middle))
+        {
+            const auto delta = sf::Vector2f(mouseManager_.GetMouseDelta());
+            mainView.setCenter(mainView.getCenter() - currentZoom_ * delta);
+
+        }
+        graphicsManager_->SetView(mainView);
+	});
+
+	auto editorUpdateTask = taskflow.emplace([&](){
+        graphicsManager_->editor->AddInspectorInfo("FPS", std::to_string(1.0f / dt.asSeconds()));
+        graphicsManager_->editor->AddInspectorInfo("Cars", std::to_string(cityCarManager_.CountCar()));
+	});
+	carsUpdateTask.precede(editorUpdateTask);
+
+
+	executor_.run(taskflow);
+	executor_.wait_for_all();
 }
 
 void CityBuilderEngine::OnEvent(sf::Event& event)

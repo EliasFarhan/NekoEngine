@@ -48,7 +48,7 @@ void Editor::Update()
 	//Draw inspector data
 	for (auto& inspectorData : inspectorValues_[frameIndex])
 	{
-		ImGui::LabelText(inspectorData.first.c_str(), inspectorData.second.c_str());
+		ImGui::LabelText(inspectorData.first.c_str(), "%s", inspectorData.second.c_str());
 	}
 	ImGui::End();
 	inspectorValues_[frameIndex].clear();

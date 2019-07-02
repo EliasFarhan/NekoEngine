@@ -25,7 +25,7 @@
 #include <gtest/gtest.h>
 #include <engine/engine.h>
 #include <engine/log.h>
-#include <city_behavior_tree.h>
+#include <city/city_behavior_tree.h>
 
 class BehaviorTreeTest : public ::testing::Test, public neko::BasicEngine 
 {

@@ -22,7 +22,7 @@
  SOFTWARE.
  */
 
-#include <city_function_map.h>
+#include <city/city_function_map.h>
 #include <engine/log.h>
 
 namespace neko {

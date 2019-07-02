@@ -23,7 +23,7 @@
  */
 #include <gtest/gtest.h>
 #include <engine/engine.h>
-#include <city_graph.h>
+#include <city/city_graph.h>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <imgui.h>
 #include <Remotery.h>
@@ -136,7 +136,7 @@ public:
 
 		ImGui::Begin("Inspector");
 		ImGui::LabelText("FPS", "%f", 1.0f/dt.asSeconds());
-		ImGui::LabelText("Path Length", "%d", path.size());
+		ImGui::LabelText("Path Length", "%d", int(path.size()));
 		ImGui::End();
 	}
 	void Destroy() override

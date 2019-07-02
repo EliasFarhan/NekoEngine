@@ -176,7 +176,9 @@ include_directories(${GLM_DIR})
 #Utility
 set(UTILITIES_DIR ${EXTERNAL_DIR}/utilities/)
 include_directories(${UTILITIES_DIR})
-
+#taskflow
+set(TASKFLOW_DIR ${EXTERNAL_DIR}/taskflow-2.2)
+include_directories(${TASKFLOW_DIR})
 #Remotery
 set(REMOTERY_DIR ${EXTERNAL_DIR}/Remotery)
 add_subdirectory(${REMOTERY_DIR})
