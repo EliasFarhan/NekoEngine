@@ -23,8 +23,53 @@
  */
 
 #include <city/city_building.h>
+#include <engine/engine.h>
 
 namespace neko
 {
 
+void CityBuildingManager::Update(const CityZoneManager& zoneManager, CityBuilderMap& cityMap)
+{
+    auto* engine = MainEngine::GetInstance();
+    spawnTimer_.Update(engine->dt.asSeconds());
+    if (spawnTimer_.IsOver())
+    {
+        //Add residential building
+        {
+            const auto& zones = zoneManager.GetZoneVector();
+            std::vector<Zone> residentialZones;
+            residentialZones.reserve(zones.size());
+            std::copy_if(zones.begin(), zones.end(), std::back_inserter(residentialZones), [&](const Zone& zone)
+            {
+                const auto buildingAtPos = std::find_if(buildings_.begin(), buildings_.end(),[&zone](const Building& building){
+                    return building.position == zone.position;
+                });
+                return zone.zoneType == ZoneType::RESIDENTIAL && buildingAtPos == buildings_.end();
+            });
+            if (!residentialZones.empty())
+            {
+                auto& newHousePlace = residentialZones[rand() % residentialZones.size()];
+                AddBuilding({newHousePlace.position, sf::Vector2i(1, 1), CityTileType(
+                        (rand() % (Index(CityTileType::HOUSE4) - Index(CityTileType::HOUSE1))) +
+                        Index(CityTileType::HOUSE1))}, zoneManager, cityMap);
+            }
+        }
+        spawnTimer_.Reset();
+    }
+
+}
+
+void
+CityBuildingManager::AddBuilding(Building building, const CityZoneManager& zoneManager, CityBuilderMap& cityMap)
+{
+    cityMap.RemoveCityElement(building.position);
+    buildings_.push_back(building);
+    std::sort(buildings_.begin(), buildings_.end(), [](const Building& b1, const Building& b2){return (b1.position.y < b2.position.y);});
+}
+
+
+const std::vector<Building>& CityBuildingManager::GetBuildingsVector() const
+{
+    return buildings_;
+}
 }

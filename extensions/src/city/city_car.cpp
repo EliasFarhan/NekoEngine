@@ -163,7 +163,7 @@ Entity CityCarManager::AddCar(Entity entity, CarType carType, sf::Vector2i posit
 	return entity;
 }
 
-std::vector<CityCar>& CityCarManager::GetCarsVector()
+const std::vector<CityCar>& CityCarManager::GetCarsVector() const
 {
 	return cars_;
 }

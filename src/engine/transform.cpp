@@ -97,7 +97,7 @@ Index Transform2dManager::AddAngle(float angle, Entity entity)
 	return entity;
 }
 
-sf::Vector2f Transform2dManager::GetPosition(Index i)
+sf::Vector2f Transform2dManager::GetPosition(Index i) const
 {
 	return positions_[i];
 }

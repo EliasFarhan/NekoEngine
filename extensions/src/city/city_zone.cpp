@@ -25,12 +25,14 @@
 #include <city/city_zone.h>
 #include <engine/engine.h>
 #include <city/city_map.h>
+#include <city/city_building.h>
 
 namespace neko
 {
 
 
-void CityZoneManager::UpdateZoneTilemap(CityBuilderMap& cityMap, sf::View mainView)
+void CityZoneManager::UpdateZoneTilemap(const CityBuilderMap& cityMap, const CityBuildingManager& cityBuildingMap,
+                                        sf::View mainView)
 {
     const auto frameIndex = MainEngine::GetInstance()->frameIndex % 2;
     const auto windowView_ = sf::FloatRect((mainView.getCenter() - mainView.getSize() / 2.0f), mainView.getSize());
@@ -41,6 +43,11 @@ void CityZoneManager::UpdateZoneTilemap(CityBuilderMap& cityMap, sf::View mainVi
     {
 
         //TODO culling with mainView
+        auto buildingIt = std::find_if(cityBuildingMap.GetBuildingsVector().begin(), cityBuildingMap.GetBuildingsVector().end(),[&zone](const Building& building){
+           return zone.position ==  building.position;
+        });
+        if(buildingIt != cityBuildingMap.GetBuildingsVector().end())
+            continue;
         const auto zoneSize = sf::Vector2f(tileSize);
         const auto worldPos = sf::Vector2f(zone.position.x * tileSize.x, zone.position.y * tileSize.y);
         const sf::FloatRect tileRect = sf::FloatRect((worldPos - zoneSize/2.0f), zoneSize);
@@ -99,6 +106,17 @@ void CityZoneManager::AddZone(sf::Vector2i position, ZoneType zoneType, CityBuil
 
 void CityZoneManager::RemoveZone(sf::Vector2i position)
 {
+    auto existingZone = std::find_if(zones_.begin(), zones_.end(), [&position](const Zone& zone){
+        return zone.position == position;
+    });
+    if(existingZone != zones_.end())
+    {
+        zones_.erase(existingZone);
+    }
+}
 
+const std::vector<Zone>& CityZoneManager::GetZoneVector() const
+{
+    return zones_;
 }
 }

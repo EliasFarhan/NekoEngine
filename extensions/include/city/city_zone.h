@@ -28,13 +28,13 @@
 #include <SFML/Graphics/View.hpp>
 #include <engine/globals.h>
 #include <city/city_command.h>
-#include "city_graph.h"
+#include <city/city_graph.h>
 
 namespace neko
 {
 class GraphicsManager;
 class CityBuilderMap;
-
+class CityBuildingManager;
 
 const Index ZONE_RADIUS = 4;
 enum class ZoneType
@@ -68,7 +68,8 @@ struct Zone
 class CityZoneManager
 {
 public:
-    void UpdateZoneTilemap(CityBuilderMap& cityMap, sf::View mainView);
+    void
+    UpdateZoneTilemap(const CityBuilderMap& cityMap, const CityBuildingManager& cityBuildingMap, sf::View mainView);
 
     void PushCommand(GraphicsManager* graphicsManager);
 
@@ -76,6 +77,7 @@ public:
 
     void RemoveZone(sf::Vector2i position);
 
+    const std::vector<Zone>& GetZoneVector() const;
 private:
     std::vector<Zone> zones_;
     sf::VertexArray zoneVertexArray_[2];

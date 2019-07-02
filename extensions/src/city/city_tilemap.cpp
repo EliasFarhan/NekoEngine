@@ -29,6 +29,7 @@
 #include "utilities/json_utility.h"
 #include "city/city_car.h"
 #include <engine/transform.h>
+#include <city/city_building.h>
 
 namespace neko
 {
@@ -103,11 +104,10 @@ void CityBuilderTilemap::Init(TextureManager& textureManager)
 
 }
 
-void CityBuilderTilemap::UpdateTilemap(
-	CityBuilderMap& cityBuilderMap,
-	CityCarManager& cityCarManager,
-	Transform2dManager& transformManager,
-	sf::View mainView, CityTilesheetType updatedCityTileType)
+void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, const CityCarManager& cityCarManager,
+                                       const CityBuildingManager& buildingManager,
+                                       const Transform2dManager& transformManager,
+                                       sf::View mainView, CityTilesheetType updatedCityTileType)
 {
 	const Index frameIndex = MainEngine::GetInstance()->frameIndex % 2;
 	//Manage window view
@@ -118,7 +118,8 @@ void CityBuilderTilemap::UpdateTilemap(
 		rmt_ScopedCPUSample(UpdateTilemap, 0);
 		for (Index i = 0u; i < Index(CityTilesheetType::LENGTH); i++)
 		{
-			UpdateTilemap(cityBuilderMap, cityCarManager, transformManager , mainView, CityTilesheetType(i));
+            UpdateTilemap(cityBuilderMap, cityCarManager, buildingManager, transformManager, mainView,
+                          CityTilesheetType(i));
 		}
 		return;
 	}
@@ -239,7 +240,7 @@ void CityBuilderTilemap::UpdateTilemap(
 		//ROAD
 		std::vector<CityElement> roads;
 		std::copy_if(cityBuilderMap.elements_.begin(), cityBuilderMap.elements_.end(), std::back_inserter(roads),
-			[](CityElement& elem)
+			[](const CityElement& elem)
 		{
 			return elem.elementType == CityElementType::ROAD;
 		});
@@ -411,7 +412,7 @@ void CityBuilderTilemap::UpdateTilemap(
 
 		std::vector<CityElement> rails;
 		std::copy_if(cityBuilderMap.elements_.begin(), cityBuilderMap.elements_.end(), std::back_inserter(rails),
-			[](CityElement& elem)
+			[](const CityElement& elem)
 		{
 			return elem.elementType == CityElementType::RAIL;
 		});
@@ -530,15 +531,14 @@ void CityBuilderTilemap::UpdateTilemap(
 
 	case CityTilesheetType::CITY:
 	{
-		//TREES
-		const int treesIndex = int(CityTileType::TREES);
-
 		for (auto& element : cityBuilderMap.elements_)
 		{
 			switch (element.elementType)
 			{
 			case CityElementType::TREES:
 			{
+                //TREES
+                const int treesIndex = int(CityTileType::TREES);
 				if (cityBuilderMap.environmentTiles_[cityBuilderMap.Position2Index(element.position)] ==
 					EnvironmentTile::WATER)
 				{
@@ -558,6 +558,7 @@ void CityBuilderTilemap::UpdateTilemap(
 			}
 			case CityElementType::TRAIN_STATION:
 			{
+			    //TRAIN STATION
 				const int trainStationIndex = int(CityTileType::TRAIN_STATION);
 				const auto position = sf::Vector2f(
 					static_cast<float>(element.position.x * tileSize_.x),
@@ -565,8 +566,8 @@ void CityBuilderTilemap::UpdateTilemap(
 				const auto rect = textureRects_[trainStationIndex];
 				const auto center = rectCenter_[trainStationIndex];
 				const auto size = sf::Vector2f(
-					static_cast<float>(element.size.x * tileSize_.x),
-					static_cast<float>(element.size.y * tileSize_.y));
+					float(element.size.x * tileSize_.x),
+					float(element.size.y * tileSize_.y));
 				AddNewCityTile(position, size, rect, center, updatedCityTileType);
 				break;
 			}
@@ -574,11 +575,19 @@ void CityBuilderTilemap::UpdateTilemap(
 				break;
 			}
 		}
+
+		for(const auto& building : buildingManager.GetBuildingsVector())
+        {
+		    const Index buildingIndex = Index(building.buildingType);
+		    const auto position = sf::Vector2f(float(building.position.x*tileSize_.x), float(building.position.y*tileSize_.y));
+		    const auto size = rectCenter_[buildingIndex]*2.0f;
+		    AddNewCityTile(position, size, textureRects_[buildingIndex], rectCenter_[buildingIndex], updatedCityTileType);
+        }
 		break;
 	}
 	case CityTilesheetType::CAR:
 	{
-		for(auto& car : cityCarManager.GetCarsVector())
+		for(const auto& car : cityCarManager.GetCarsVector())
 		{
 			const auto rect = textureRects_[Index(car.carType)];
 			const auto center = rectCenter_[Index(car.carType)];

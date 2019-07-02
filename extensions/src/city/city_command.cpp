@@ -55,6 +55,7 @@ void CityCommandManager::ExecuteCommand(const std::unique_ptr<CityCommand>& comm
         case CityCommandType::CREATE_CITY_ELEMENT:
         {
             auto* buildCommand = dynamic_cast<BuildElementCommand*>(command.get());
+            engine_->GetZoneManager().RemoveZone(buildCommand->position);
             engine_->GetCityMap().AddCityElement(buildCommand->elementType, buildCommand->position);
             break;
         }

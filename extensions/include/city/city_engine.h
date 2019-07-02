@@ -31,12 +31,13 @@
 #include "engine/input.h"
 
 #include <SFML/Window/Event.hpp>
-#include "city_command.h"
+#include "city/city_command.h"
 #include <city/city_cursor.h>
 #include <engine/transform.h>
 #include <core/executor.hpp>
-#include "city_car.h"
-#include "city_zone.h"
+#include "city/city_car.h"
+#include "city/city_zone.h"
+#include <city/city_building.h>
 
 namespace neko
 {
@@ -92,6 +93,7 @@ private:
     CityCarManager cityCarManager_;
     CityCursor cursor_;
     CityZoneManager cityZoneManager_;
+    CityBuildingManager cityBuildingManager_;
     const float scrollDelta_ = 0.1f;
     float currentZoom_ = 1.0f;
 };

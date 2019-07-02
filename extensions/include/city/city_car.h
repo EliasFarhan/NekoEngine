@@ -65,7 +65,7 @@ public:
 	Entity SpawnCar(sf::Vector2i position, CarType carType);
 
 	Entity AddCar(Entity entity, CarType carType, sf::Vector2i position = INVALID_TILE_POS);
-	std::vector<CityCar>& GetCarsVector();
+	const std::vector<CityCar>& GetCarsVector() const;
 	void RescheduleCarPathfinding(const sf::Vector2i& removedPosition);
 	size_t CountCar() const;
 private:
