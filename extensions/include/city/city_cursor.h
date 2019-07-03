@@ -25,7 +25,7 @@
  */
 #include <SFML/Graphics/RectangleShape.hpp>
 #include "engine/system.h"
-#include "city_editor.h"
+#include "City/city_editor.h"
 
 namespace neko
 {

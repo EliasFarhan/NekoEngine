@@ -22,11 +22,12 @@
  SOFTWARE.
  */
 #include <sstream>
-#include <city/city_engine.h>
-#include "city/city_editor.h"
+#include <City/city_engine.h>
+#include <City/city_editor.h>
 
 #include <engine/log.h>
 #include <Remotery.h>
+
 namespace neko
 {
 void CityBuilderEngine::Init()
@@ -48,12 +49,14 @@ void CityBuilderEngine::Update()
 {
 	MainEngine::Update();
     rmt_ScopedCPUSample(CityBuilderUpdate, 0);
+	const float dt = MainEngine::GetInstance()->dt.asSeconds();
     tf::Taskflow taskflow;
     auto carsUpdateTask = taskflow.emplace([&](){cityCarManager_.Update();});
 
 	auto commandUpdateTask = taskflow.emplace([&](){commandManager_.Update();});
 
-    auto buildingUpdateTask = taskflow.emplace([&](){ cityBuildingManager_.Update(cityZoneManager_, cityBuilderMap_, 0);});
+    auto buildingUpdateTask = taskflow.emplace([&](){ cityBuildingManager_.
+		Update(cityZoneManager_, cityBuilderMap_, dt);});
 	commandUpdateTask.precede(buildingUpdateTask);
     std::array<tf::Task, int(CityTilesheetType::LENGTH)> tilemapUpdateTasks;
     auto pushCommandTask = taskflow.emplace([&](){environmentTilemap_.PushCommand(graphicsManager_.get());});
@@ -101,7 +104,7 @@ void CityBuilderEngine::Update()
 	mainViewUpdateTask.precede(zoneUpdateTask);
 
 	auto editorUpdateTask = taskflow.emplace([&](){
-        graphicsManager_->editor->AddInspectorInfo("FPS", std::to_string(1.0f / dt.asSeconds()));
+        graphicsManager_->editor->AddInspectorInfo("FPS", std::to_string(1.0f / dt));
         graphicsManager_->editor->AddInspectorInfo("Cars", std::to_string(cityCarManager_.CountCar()));
 	});
 	carsUpdateTask.precede(editorUpdateTask);

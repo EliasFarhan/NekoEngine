@@ -21,15 +21,15 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-#include <city/city_tilemap.h>
+#include <City/city_tilemap.h>
 #include <graphics/texture.h>
 #include <engine/engine.h>
 #include <Remotery.h>
-#include <city/city_map.h>
+#include <City/city_map.h>
 #include "utilities/json_utility.h"
-#include "city/city_car.h"
+#include "City/city_car.h"
 #include <engine/transform.h>
-#include <city/city_building.h>
+#include <City/city_building.h>
 
 namespace neko
 {

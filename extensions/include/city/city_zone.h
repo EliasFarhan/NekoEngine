@@ -27,8 +27,8 @@
 #include <SFML/Graphics/VertexArray.hpp>
 #include <SFML/Graphics/View.hpp>
 #include <engine/globals.h>
-#include <city/city_command.h>
-#include <city/city_graph.h>
+#include <City/city_command.h>
+#include <City/city_graph.h>
 
 namespace neko
 {

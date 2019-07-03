@@ -25,9 +25,9 @@
 
 #include <vector>
 #include <utilities/time_utility.h>
-#include "city_map.h"
-#include "city_tilemap.h"
-#include "city_zone.h"
+#include "City/city_map.h"
+#include "City/city_tilemap.h"
+#include "City/city_zone.h"
 
 namespace neko
 {

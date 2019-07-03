@@ -22,7 +22,7 @@
  SOFTWARE.
  */
 
-#include <city/city_graph.h>
+#include <City/city_graph.h>
 #include <unordered_map>
 #include <queue>
 #include <sstream>
@@ -103,7 +103,7 @@ void TileMapGraph::RemoveNode(sf::Vector2i pos)
 	//Cannot remove a node that does not exist
 	if (nodeIt == nodes_.end())
 		return;
-	const Index nodeIndex = nodeIt - nodes_.begin();
+	const Index nodeIndex = Index(nodeIt - nodes_.begin());
 	nodes_.erase(nodeIt);
 	for (auto& otherNode : nodes_)
 	{

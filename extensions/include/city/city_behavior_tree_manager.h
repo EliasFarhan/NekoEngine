@@ -25,8 +25,8 @@
 
 #include <memory>
 #include <vector>
-#include "city_function_map.h"
-#include "city_behavior_tree.h"
+#include "City/city_function_map.h"
+#include "City/city_behavior_tree.h"
 
 namespace neko {
 

@@ -25,7 +25,7 @@
  */
 
 #include <engine/editor.h>
-#include "city_command.h"
+#include "City/city_command.h"
 #include "engine/globals.h"
 
 namespace neko

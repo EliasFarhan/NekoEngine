@@ -25,7 +25,7 @@
 #include <algorithm>
 #include <sstream>
 #include <iostream>
-#include <city/city_behavior_tree.h>
+#include <City/city_behavior_tree.h>
 #include "engine/engine.h"
 #include "engine/log.h"
 

@@ -26,18 +26,18 @@
 
 #include <thread>
 #include <engine/engine.h>
-#include <city/city_tilemap.h>
-#include <city/city_map.h>
+#include <City/city_tilemap.h>
+#include <City/city_map.h>
 #include "engine/input.h"
 
 #include <SFML/Window/Event.hpp>
-#include "city/city_command.h"
-#include <city/city_cursor.h>
+#include "City/city_command.h"
+#include <City/city_cursor.h>
 #include <engine/transform.h>
 #include <core/executor.hpp>
-#include "city/city_car.h"
-#include "city/city_zone.h"
-#include <city/city_building.h>
+#include "City/city_car.h"
+#include "City/city_zone.h"
+#include <City/city_building.h>
 
 namespace neko
 {

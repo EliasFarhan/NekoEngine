@@ -51,6 +51,7 @@ if (APPLE)
 	endif()
 
 	include_directories(${Boost_INCLUDE_DIRS})
+	LIST(APPEND Neko_LIBRARIES ${Boost_LIBRARIES})
 endif(APPLE)
 
 if (UNIX)
@@ -102,6 +103,21 @@ file(GLOB_RECURSE Neko_GRAPHICS_SRC src/graphics/*.cpp include/graphics/*.h)
 file(GLOB_RECURSE Neko_UTILITY_SRC src/utilities/*.cpp include/utilities/*.h)
 file(GLOB_RECURSE Neko_PHYSICS_SRC src/physics/*.cpp include/physics/*.h)
 file(GLOB_RECURSE Neko_EXTENSIONS_SRC extensions/src/*.cpp extensions/include/*.h)
+
+file(GLOB EXTENSIONS_FOLDERS extensions/src/* extensions/include/*)
+foreach(EXTENSION_FOLDER ${EXTENSIONS_FOLDERS})
+if(IS_DIRECTORY ${EXTENSION_FOLDER})
+get_filename_component(EXTENSION_DIR ${EXTENSION_FOLDER} NAME)
+file(GLOB_RECURSE  EXTENSION_FILES ${EXTENSION_FOLDER}/*.h ${EXTENSION_FOLDER}/*.cpp)
+source_group("Extensions\\${EXTENSION_DIR}"            FILES ${EXTENSION_FILES})
+if(NOT TARGET ${EXTENSION_DIR})
+add_library(${EXTENSION_DIR} STATIC ${EXTENSION_FILES})
+else()
+target_sources(${EXTENSION_DIR} PUBLIC ${EXTENSION_FILES})
+endif()
+endif()
+endforeach()
+
 include_directories(include ${CMAKE_SOURCE_DIR}/include)
 set_property(GLOBAL PROPERTY USE_FOLDERS On)
 SET_SOURCE_FILES_PROPERTIES( ${Neko_SRC} PROPERTIES
@@ -111,11 +127,10 @@ source_group("Graphics"            FILES ${Neko_GRAPHICS_SRC})
 source_group("Engine"            FILES ${Neko_ENGINE_SRC})
 source_group("Utility"            FILES ${Neko_UTILITY_SRC})
 source_group("Physics"            FILES ${Neko_PHYSICS_SRC})
-source_group("Extensions"            FILES ${Neko_EXTENSIONS_SRC})
 source_group("Data\\Json"            FILES ${JSON_FILES})
 source_group("Data\\Img"            FILES ${IMG_FILES})
 
-List(APPEND Neko_SRC ${Neko_ENGINE_SRC} ${Neko_GRAPHICS_SRC} ${Neko_UTILITY_SRC} ${Neko_PHYSICS_SRC} ${Neko_EXTENSIONS_SRC} ${JSON_FILES} ${IMG_FILES})
+List(APPEND Neko_SRC ${Neko_ENGINE_SRC} ${Neko_GRAPHICS_SRC} ${Neko_UTILITY_SRC} ${Neko_PHYSICS_SRC} ${JSON_FILES} ${IMG_FILES})
 
 if(MSVC)
     add_compile_options(
@@ -189,7 +204,7 @@ LIST(APPEND Neko_LIBRARIES Remotery)
 
 include_directories(include/ extensions/include/)
 
-add_library(Neko_COMMON STATIC ${Neko_SRC} src/engine/editor.cpp)
+add_library(Neko_COMMON STATIC ${Neko_SRC})
 target_link_libraries(Neko_COMMON PUBLIC ${Neko_LIBRARIES})
 add_dependencies(Neko_COMMON DataTarget)
 set_property(TARGET Neko_COMMON PROPERTY CXX_STANDARD 17)
@@ -205,24 +220,12 @@ else()
 	target_link_libraries(Neko_TEST gtest gtest_main Neko_COMMON)
 endif(APPLE)
 
-#Neko COURSES
-SET(Neko_COURSE_DIR ${CMAKE_SOURCE_DIR}/main)
-file(GLOB COURSE_FILES ${Neko_COURSE_DIR}/*.cpp )
-foreach(course_file ${COURSE_FILES} )
-    # I used a simple string replace, to cut off .cpp.
-    file(RELATIVE_PATH course_relative_path ${Neko_COURSE_DIR} ${course_file} )
-    string( REPLACE ".cpp" "" course_name ${course_relative_path} )
+#City Builder
+add_executable(CityBuilder ${CMAKE_SOURCE_DIR}/main/CityBuilder.cpp)
+target_link_libraries(CityBuilder PUBLIC Neko_COMMON City)
+set_property(TARGET CityBuilder PROPERTY CXX_STANDARD 17)
+set_target_properties (CityBuilder PROPERTIES FOLDER Main)
 
-    add_executable(${course_name} ${Neko_COURSE_DIR}/${course_relative_path} ${SHADERS_SRC})
-    # Make sure YourLib is linked to each app
-	if (APPLE)
-		target_link_libraries(${course_name} PUBLIC ${Boost_LIBRARIES} Neko_COMMON)
-	else()
-    	target_link_libraries(${course_name} PUBLIC Neko_COMMON)
-	endif(APPLE)
-	set_property(TARGET ${course_name} PROPERTY CXX_STANDARD 17)
-	set_target_properties (${course_name} PROPERTIES FOLDER Main)
-endforeach()
 
 if(MSVC)
 if(NOT CMAKE_CL_64)

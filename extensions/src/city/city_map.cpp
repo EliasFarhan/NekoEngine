@@ -1,4 +1,4 @@
-#include <city/city_map.h>
+#include <City/city_map.h>
 #include <PerlinNoise.hpp>
 #include "engine/log.h"
 #include <sstream>
@@ -196,7 +196,7 @@ void CityBuilderMap::Destroy()
 
 size_t CityBuilderMap::Position2Index(sf::Vector2i pos) const
 {
-    return size_t(pos.x + pos.y * city.mapSize.x);
+    return size_t(pos.x + size_t(pos.y) * city.mapSize.x);
 }
 
 sf::Vector2i CityBuilderMap::Index2Position(size_t index) const
