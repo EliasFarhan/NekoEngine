@@ -23,7 +23,7 @@
  */
 #include <gtest/gtest.h>
 #include <engine/engine.h>
-#include <city/city_graph.h>
+#include <City/city_graph.h>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <imgui.h>
 #include <Remotery.h>

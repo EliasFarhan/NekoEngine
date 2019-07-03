@@ -25,10 +25,10 @@
 #include <gtest/gtest.h>
 #include <engine/engine.h>
 #include <engine/log.h>
-#include <city/city_graph.h>
-#include <city/city_function_map.h>
-#include <city/city_behavior_tree.h>
-#include <city/city_behavior_tree_manager.h>
+#include <City/city_graph.h>
+#include <City/city_function_map.h>
+#include <City/city_behavior_tree.h>
+#include <City/city_behavior_tree_manager.h>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <imgui.h>
 #include <Remotery.h>

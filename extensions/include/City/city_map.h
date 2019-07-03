@@ -104,6 +104,7 @@ public:
 	void AddCityElement(CityElementType cityElement, const sf::Vector2i& position);
 	void RemoveCityElement(const sf::Vector2i& position);
 	CityElement* GetCityElementAt(sf::Vector2i position);
+	bool IsGrass(sf::Vector2i position);
 	TileMapGraph& GetRoadGraph();
 	City city{};
 private:

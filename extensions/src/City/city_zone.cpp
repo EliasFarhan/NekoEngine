@@ -59,6 +59,7 @@ void CityZoneManager::UpdateZoneTilemap(const CityBuilderMap& cityMap, const Cit
         });
         if(buildingIt != cityBuildingMap.GetBuildingsVector().end())
             continue;
+
         //culling with mainView
         const auto zoneSize = sf::Vector2f(tileSize);
         const auto worldPos = sf::Vector2f(
@@ -101,6 +102,9 @@ void CityZoneManager::AddZone(sf::Vector2i position, ZoneType zoneType, CityBuil
         existingZone->zoneType = zoneType;
         return;
     }
+    //No zone on water
+    if(!cityMap.IsGrass(position))
+        return;
     //No zone when there is already a building
     auto* cityElement = cityMap.GetCityElementAt(position);
     if(cityElement != nullptr && cityElement->elementType != CityElementType::TREES)

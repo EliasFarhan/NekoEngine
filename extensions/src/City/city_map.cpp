@@ -281,4 +281,9 @@ CityElement* CityBuilderMap::GetCityElementAt(sf::Vector2i position)
     else
         return &*result;
 }
+
+bool CityBuilderMap::IsGrass(sf::Vector2i position)
+{
+    return environmentTiles_[Position2Index(position)] == EnvironmentTile::GRASS;
+}
 }

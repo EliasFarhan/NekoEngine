@@ -25,7 +25,7 @@
 #include <gtest/gtest.h>
 #include <engine/engine.h>
 #include <engine/log.h>
-#include <city/city_function_map.h>
+#include <City/city_function_map.h>
 
 class FunctionMapTest : public ::testing::Test, public neko::BasicEngine
 {
