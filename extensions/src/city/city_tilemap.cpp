@@ -538,19 +538,19 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 			case CityElementType::TREES:
 			{
                 //TREES
-                const int treesIndex = int(CityTileType::TREES);
+                const auto treesIndex = Index(CityTileType::TREES);
 				if (cityBuilderMap.environmentTiles_[cityBuilderMap.Position2Index(element.position)] ==
 					EnvironmentTile::WATER)
 				{
 					continue;
 				}
 				const auto position = sf::Vector2f(
-					static_cast<float>(element.position.x * tileSize_.x),
-					static_cast<float>(element.position.y * tileSize_.y));
+					float(element.position.x * tileSize_.x),
+					float(element.position.y * tileSize_.y));
 				const auto rect = textureRects_[treesIndex];
 				const auto center = rectCenter_[treesIndex];
 				const auto size = sf::Vector2f(
-					static_cast<float>(tileSize_.x),
+					float(tileSize_.x),
 					2.0f * tileSize_.y);
 
 				AddNewCityTile(position, size, rect, center, updatedCityTileType);
@@ -559,10 +559,10 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 			case CityElementType::TRAIN_STATION:
 			{
 			    //TRAIN STATION
-				const int trainStationIndex = int(CityTileType::TRAIN_STATION);
+				const auto trainStationIndex = Index(CityTileType::TRAIN_STATION);
 				const auto position = sf::Vector2f(
-					static_cast<float>(element.position.x * tileSize_.x),
-					static_cast<float>(element.position.y * tileSize_.y));
+					float(element.position.x * tileSize_.x),
+					float(element.position.y * tileSize_.y));
 				const auto rect = textureRects_[trainStationIndex];
 				const auto center = rectCenter_[trainStationIndex];
 				const auto size = sf::Vector2f(
@@ -578,7 +578,7 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 
 		for(const auto& building : buildingManager.GetBuildingsVector())
         {
-		    const Index buildingIndex = Index(building.buildingType);
+		    const auto buildingIndex = Index(building.buildingType);
 		    const auto position = sf::Vector2f(float(building.position.x*tileSize_.x), float(building.position.y*tileSize_.y));
 		    const auto size = rectCenter_[buildingIndex]*2.0f;
 		    AddNewCityTile(position, size, textureRects_[buildingIndex], rectCenter_[buildingIndex], updatedCityTileType);
@@ -624,21 +624,22 @@ void CityBuilderTilemap::AddNewCityTile(const sf::Vector2f position, const sf::V
 {
 	const Index frameIndex = MainEngine::GetInstance()->frameIndex % 2;
 	sf::Vector2f sizeOffset = (size - sf::Vector2f(tileSize_)) / 2.0f;
-	sizeOffset.x = -sizeOffset.x;
+    sizeOffset.y = -sizeOffset.y;
 	if (culling)
 	{
-		const sf::FloatRect tileRect = sf::FloatRect((position - center - sizeOffset), size);
+		const sf::FloatRect tileRect = sf::FloatRect((position - center + sizeOffset), size);
 
 		if (!windowView_.intersects(tileRect))
 			return;
 	}
+	const auto centerPos = position+sizeOffset;
 	sf::Vertex quad[6];
-	quad[0].position = position - center - sizeOffset;
-	quad[1].position = position - sf::Vector2f(center.x, -center.y) - sizeOffset;
-	quad[2].position = position + center - sizeOffset;
-	quad[3].position = position - center - sizeOffset;
-	quad[4].position = position + center - sizeOffset;
-	quad[5].position = position - sf::Vector2f(-center.x, center.y) - sizeOffset;
+	quad[0].position = centerPos - center;
+	quad[1].position = centerPos - sf::Vector2f(center.x, -center.y);
+	quad[2].position = centerPos + center;
+	quad[3].position = centerPos - center;
+	quad[4].position = centerPos + center;
+	quad[5].position = centerPos - sf::Vector2f(-center.x, center.y);
 
 	if (rotate90)
 	{

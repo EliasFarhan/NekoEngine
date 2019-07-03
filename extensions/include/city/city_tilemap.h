@@ -57,7 +57,7 @@ enum class CityTileType : Index
 	CHURCH,
 	TREES,
 	TRAIN_STATION,
-	BUILDING,
+	OFFICE1,
 	WATER_DOWN_RIGHT,
 	WATER_DOWN_LEFT,
 	WATER_HORIZONTAL,
@@ -98,6 +98,7 @@ const static std::map<CityTileType, std::string> mapCityTileString =
 	{CityTileType::HOUSE2, "house2"},
 	{CityTileType::HOUSE3, "house3"},
 	{CityTileType::HOUSE4, "house4"},
+    {CityTileType::OFFICE1, "office1"}
 
 
 };
@@ -149,6 +150,18 @@ public:
                        sf::View mainView, CityTilesheetType updatedCityTileType = CityTilesheetType::LENGTH);
 	void PushCommand(GraphicsManager* graphicsManager) override;
 protected:
+    /**
+     *
+     * @param position : bottom-left!!!
+     * @param size
+     * @param rect
+     * @param center
+     * @param updatedCityTileType
+     * @param flipX
+     * @param flipY
+     * @param rotate90
+     * @param culling
+     */
 	void AddNewCityTile(const sf::Vector2f position, const sf::Vector2f size, const sf::FloatRect rect,
 		const sf::Vector2f center, CityTilesheetType updatedCityTileType, bool flipX = false,
 		bool flipY = false, bool rotate90 = false, bool culling = true);

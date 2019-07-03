@@ -57,6 +57,10 @@ void CityCommandManager::ExecuteCommand(const std::unique_ptr<CityCommand>& comm
             auto* buildCommand = dynamic_cast<BuildElementCommand*>(command.get());
             engine_->GetZoneManager().RemoveZone(buildCommand->position);
             engine_->GetCityMap().AddCityElement(buildCommand->elementType, buildCommand->position);
+            if(buildCommand->elementType == CityElementType::ROAD)
+            {
+                engine_->GetBuildingManager().RemoveBuilding(buildCommand->position);
+            }
             break;
         }
         case CityCommandType::DELETE_CITY_ELEMENT:
@@ -64,6 +68,8 @@ void CityCommandManager::ExecuteCommand(const std::unique_ptr<CityCommand>& comm
             auto* buildCommand = dynamic_cast<DestroyElementCommand*>(command.get());
             engine_->GetCityMap().RemoveCityElement(buildCommand->position);
             engine_->GetCarManager().RescheduleCarPathfinding(buildCommand->position);
+            engine_->GetZoneManager().RemoveZone(buildCommand->position);
+            engine_->GetBuildingManager().RemoveBuilding(buildCommand->position);
             break;
         }
         case CityCommandType::ADD_CITY_ZONE:

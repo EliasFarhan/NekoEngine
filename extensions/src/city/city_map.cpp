@@ -73,7 +73,7 @@ void CityBuilderMap::Init()
         const int railDownX = city.mapSize.x - ((rand() % (city.mapSize.x / 6)) + city.mapSize.x / 6);
         pos.x = 0;
         pos.y -= 2;
-        for (int x = 0; x < static_cast<int>(city.mapSize.x); x++)
+        for (int x = 0; x < int(city.mapSize.x); x++)
         {
             pos.x = x;
 
@@ -81,7 +81,7 @@ void CityBuilderMap::Init()
             {
                 //Add the train station
                 CityElement trainStation{};
-                trainStation.position = pos + sf::Vector2i(0, 1);
+                trainStation.position = pos+sf::Vector2i(0,1);//bottom left
                 trainStation.size = sf::Vector2u(5, 3);
                 trainStation.elementType = CityElementType::TRAIN_STATION;
                 elements_.push_back(trainStation);
@@ -162,7 +162,7 @@ void CityBuilderMap::Init()
                 {
                     for (unsigned int dx = 0; dx < elem.size.x; dx++)
                     {
-                        for (int dy = 0; dy < static_cast<int>(elem.size.y); dy++)
+                        for (int dy = 0; dy < int(elem.size.y); dy++)
                         {
                             if (elem.position + sf::Vector2i(dx, -dy) == pos)
                                 return true;
@@ -270,7 +270,7 @@ CityElement* CityBuilderMap::GetCityElementAt(sf::Vector2i position)
         {
             for (int dy = 0; dy < cityElement.size.y; dy++)
             {
-                if (position == cityElement.position + sf::Vector2i(dx, dy))
+                if (position == cityElement.position + sf::Vector2i(dx, -dy))
                     return true;
             }
         }

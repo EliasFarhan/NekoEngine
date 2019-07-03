@@ -107,6 +107,7 @@ void CityCursor::Update()
         }
         case ButtonIconType::BULLDOZER:
         case ButtonIconType::RESIDENTIAL:
+        case ButtonIconType::COMMERCIAL:
         {
             if (originPos_ == INVALID_TILE_POS)
             {
@@ -203,6 +204,7 @@ void CityCursor::OnEvent(sf::Event& event)
             }
             case ButtonIconType::BULLDOZER:
             case ButtonIconType::RESIDENTIAL:
+            case ButtonIconType::COMMERCIAL:
             {
                 if (originPos_ == INVALID_TILE_POS) break;
                 const auto currentPos = GetMouseTilePos();
@@ -229,6 +231,15 @@ void CityCursor::OnEvent(sf::Event& event)
                                 auto command = std::make_unique<AddZoneCommand>();
                                 command->commandType = CityCommandType::ADD_CITY_ZONE;
                                 command->zoneType = ZoneType::RESIDENTIAL;
+                                command->position = originPos_ + sf::Vector2i(dx * direction.x, dy * direction.y);
+                                engine_->GetCommandManager().AddCommand(std::move(command));
+                                break;
+                            }
+                            case ButtonIconType::COMMERCIAL:
+                            {
+                                auto command = std::make_unique<AddZoneCommand>();
+                                command->commandType = CityCommandType::ADD_CITY_ZONE;
+                                command->zoneType = ZoneType::COMMERCIAL;
                                 command->position = originPos_ + sf::Vector2i(dx * direction.x, dy * direction.y);
                                 engine_->GetCommandManager().AddCommand(std::move(command));
                                 break;

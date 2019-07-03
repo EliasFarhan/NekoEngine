@@ -80,6 +80,9 @@ public:
     CityZoneManager& GetZoneManager();
 
     sf::View mainView;
+
+    CityBuildingManager& GetBuildingManager();
+
 private:
 
     tf::Executor executor_{std::thread::hardware_concurrency() - 2};

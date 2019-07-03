@@ -42,12 +42,24 @@ void CityZoneManager::UpdateZoneTilemap(const CityBuilderMap& cityMap, const Cit
     for (auto& zone: zones_)
     {
 
-        //TODO culling with mainView
-        auto buildingIt = std::find_if(cityBuildingMap.GetBuildingsVector().begin(), cityBuildingMap.GetBuildingsVector().end(),[&zone](const Building& building){
-           return zone.position ==  building.position;
+        //Checking if there is other zone buildings
+        auto buildingIt = std::find_if(cityBuildingMap.GetBuildingsVector().begin(), cityBuildingMap.GetBuildingsVector().end(),[&zone](const Building& building)
+        {
+            for(int dx = 0; dx < building.size.x;dx++)
+            {
+                for(int dy = 0; dy < building.size.y;dy++)
+                {
+                    if(zone.position == building.position+sf::Vector2i(dx,dy))
+                    {
+                        return true;
+                    }
+                }
+            }
+           return false;
         });
         if(buildingIt != cityBuildingMap.GetBuildingsVector().end())
             continue;
+        //culling with mainView
         const auto zoneSize = sf::Vector2f(tileSize);
         const auto worldPos = sf::Vector2f(zone.position.x * tileSize.x, zone.position.y * tileSize.y);
         const sf::FloatRect tileRect = sf::FloatRect((worldPos - zoneSize/2.0f), zoneSize);

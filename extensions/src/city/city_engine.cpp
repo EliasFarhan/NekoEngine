@@ -53,7 +53,7 @@ void CityBuilderEngine::Update()
 
 	auto commandUpdateTask = taskflow.emplace([&](){commandManager_.Update();});
 
-    auto buildingUpdateTask = taskflow.emplace([&](){ cityBuildingManager_.Update(cityZoneManager_, cityBuilderMap_);});
+    auto buildingUpdateTask = taskflow.emplace([&](){ cityBuildingManager_.Update(cityZoneManager_, cityBuilderMap_, 0);});
 	commandUpdateTask.precede(buildingUpdateTask);
     std::array<tf::Task, int(CityTilesheetType::LENGTH)> tilemapUpdateTasks;
     auto pushCommandTask = taskflow.emplace([&](){environmentTilemap_.PushCommand(graphicsManager_.get());});
@@ -182,5 +182,10 @@ CityCarManager& CityBuilderEngine::GetCarManager()
 CityZoneManager& CityBuilderEngine::GetZoneManager()
 {
     return cityZoneManager_;
+}
+
+CityBuildingManager& CityBuilderEngine::GetBuildingManager()
+{
+    return cityBuildingManager_;
 }
 }
