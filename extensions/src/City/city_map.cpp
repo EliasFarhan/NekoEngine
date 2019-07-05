@@ -266,9 +266,9 @@ CityElement* CityBuilderMap::GetCityElementAt(sf::Vector2i position)
 {
     const auto result = std::find_if(elements_.begin(), elements_.end(), [&position](const CityElement& cityElement)
     {
-        for (int dx = 0; dx < cityElement.size.x; dx++)
+        for (int dx = 0; dx < static_cast<int>(cityElement.size.x); dx++)
         {
-            for (int dy = 0; dy < cityElement.size.y; dy++)
+            for (int dy = 0; dy < static_cast<int>(cityElement.size.y); dy++)
             {
                 if (position == cityElement.position + sf::Vector2i(dx, -dy))
                     return true;
