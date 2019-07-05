@@ -33,8 +33,8 @@ namespace neko
 {
 SpriteManager::SpriteManager()
 {
-    sprites_[0].reserve(InitEntityNmb);
-    sprites_[1].reserve(InitEntityNmb);
+    sprites_[0].reserve(INIT_ENTITY_NMB);
+    sprites_[1].reserve(INIT_ENTITY_NMB);
 }
 
 Index SpriteManager::AddSprite(const std::shared_ptr<sf::Texture> texture)

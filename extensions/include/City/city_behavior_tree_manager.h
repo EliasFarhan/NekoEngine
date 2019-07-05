@@ -44,6 +44,7 @@ namespace neko {
 			const std::string& jsonFile) const;
 
 	public:
+		BehaviorTreeManager();
 		// Index based functions
 		Index ParseBehaviorTreeFromJsonIndex(
 			Index comp,

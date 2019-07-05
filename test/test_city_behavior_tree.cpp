@@ -49,7 +49,7 @@ protected:
 		{"decorator", "decorator()"},
 		{"functional", "functional(0.0, 1.0, 2.0, 3.0)"},
 	};
-	const neko::Index comp_ = 0xdeadbeef;
+	const neko::Index comp_ = 0xbeef;
 	neko::FunctionMap funcMap_ = neko::FunctionMap(comp_);
 };
 
@@ -69,7 +69,7 @@ TEST_F(BehaviorTreeTest, DecoratorConstructorTest)
 		"decorator",
 		[](neko::Index comp, const std::vector<double>& values)
 	{
-		EXPECT_EQ(0xdeadbeef, comp);
+		EXPECT_EQ(0xbeef, comp);
 		EXPECT_EQ(values.size(), 1);
 		// Basically return what was send.
 		if (values[0] ==
@@ -84,7 +84,7 @@ TEST_F(BehaviorTreeTest, DecoratorConstructorTest)
 		"test",
 		[](neko::Index comp, const std::vector<double>& values)
 	{
-		EXPECT_EQ(0xdeadbeef, comp);
+		EXPECT_EQ(0xbeef, comp);
 		EXPECT_EQ(values.size(), 1);
 		return true;
 	});
@@ -114,7 +114,7 @@ TEST_F(BehaviorTreeTest, ConditionConstructorTest)
 		"test",
 		[](neko::Index comp, const std::vector<double>& values)
 	{
-		EXPECT_EQ(0xdeadbeef, comp);
+		EXPECT_EQ(0xbeef, comp);
 		EXPECT_EQ(values.size(), 1);
 		return true;
 	});
@@ -131,7 +131,7 @@ TEST_F(BehaviorTreeTest, MoveToConstructorTest)
 		"move",
 		[](neko::Index comp, const std::vector<double>& values)
 	{
-		EXPECT_EQ(0xdeadbeef, comp);
+		EXPECT_EQ(0xbeef, comp);
 		EXPECT_EQ(values.size(), 2);
 		EXPECT_EQ(values[0], 1.0);
 		EXPECT_EQ(values[1], 2.0);
@@ -150,7 +150,7 @@ TEST_F(BehaviorTreeTest, FunctionalConstructorTest)
 		"functional",
 		[](neko::Index comp, const std::vector<double>& values)
 	{
-		EXPECT_EQ(0xdeadbeef, comp);
+		EXPECT_EQ(0xbeef, comp);
 		EXPECT_EQ(values.size(), 4);
 		EXPECT_EQ(values[0], 0.0);
 		EXPECT_EQ(values[1], 1.0);

@@ -30,7 +30,7 @@ namespace neko
 
 EntityManager::EntityManager()
 {
-    entityMaskArray_.reserve(InitEntityNmb);
+    entityMaskArray_.reserve(INIT_ENTITY_NMB);
 }
 
 EntityMask EntityManager::GetMask(Entity entity)

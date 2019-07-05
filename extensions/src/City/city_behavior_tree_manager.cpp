@@ -379,14 +379,25 @@ namespace neko {
 		return ParseJsonObject(comp, *jsonPtr);
 	}
 
+	BehaviorTreeManager::BehaviorTreeManager()
+	{
+		vecBehaviorTree_.resize(INIT_ENTITY_NMB);
+	}
+
 	Index BehaviorTreeManager::ParseBehaviorTreeFromJsonIndex(
 		Index comp,
 		const json& jsonContent)
 	{
 		auto behaviorTree = ParseBehaviorTreeFromJson(comp, jsonContent);
+		size_t futureSize = vecBehaviorTree_.capacity();
+		while (futureSize <= comp)
+		{
+			futureSize *= 2;
+		}
+		vecBehaviorTree_.resize(futureSize);
 		if (behaviorTree) {
-			vecBehaviorTree_.push_back(behaviorTree);
-			return vecBehaviorTree_.size() - 1;
+			vecBehaviorTree_.at(comp) = behaviorTree;
+			return comp;
 		}
 		logDebug("ERROR could not parse the file: " + jsonContent.get<std::string>());
 		return INDEX_INVALID;
@@ -396,9 +407,21 @@ namespace neko {
 		Index comp,
 		const std::string& jsonFile)
 	{
-		vecBehaviorTree_.push_back(
-			LoadBehaviorTreeFromJsonFile(comp, jsonFile));
-		return vecBehaviorTree_.size() - 1;
+		size_t futureSize = vecBehaviorTree_.capacity();
+		while (futureSize <= comp)
+		{
+			futureSize *= 2;
+		}
+		vecBehaviorTree_.resize(futureSize);
+		auto behaviorTree =
+			LoadBehaviorTreeFromJsonFile(comp, jsonFile);
+		if (behaviorTree)
+		{
+			vecBehaviorTree_.at(comp) = behaviorTree;
+			return comp;
+		}
+		logDebug("ERROR could not parse the file: " + jsonFile);
+		return INDEX_INVALID;
 	}
 
 	void BehaviorTreeManager::LogBehaviorTreeIndex(Index id) const
