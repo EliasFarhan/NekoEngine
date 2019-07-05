@@ -43,7 +43,6 @@ namespace neko {
 			Index comp,
 			const std::string& jsonFile) const;
 
-	public:
 		// Index based functions
 		Index ParseBehaviorTreeFromJsonIndex(
 			Index comp,

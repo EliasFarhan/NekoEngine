@@ -59,10 +59,12 @@ Index Transform2dManager::AddPosition(sf::Vector2f position, Entity entity)
 		positions_.push_back(position);
 		return Index(positions_.size());
 	}
-	if (positions_.size() <= entity)
+	size_t futureSize = positions_.size();
+	while (futureSize <= entity)
 	{
-		positions_.resize(size_t(entity) + 1);	
+		futureSize *= 2;	
 	}
+	positions_.resize(futureSize);
 	positions_[entity] = position;
 	return entity;
 }

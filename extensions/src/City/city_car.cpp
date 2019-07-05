@@ -43,7 +43,7 @@ void CityCarManager::Update()
 {
 	rmt_ScopedCPUSample(UpdateCars, 0);
 	const auto dt = MainEngine::GetInstance()->dt.asSeconds();
-
+	/*
 	{
 		const auto position = roadGraphPtr_->GetNodesVector()[rand() % roadGraphPtr_->GetNodesVector().size()].position;
 		const auto carType = CarType((rand() % (Index(CarType::LENGTH) - Index(CarType::BUS))) + Index(CarType::BUS));
@@ -126,7 +126,7 @@ void CityCarManager::Update()
 			}
 		}
 
-	}
+	}*/
 
 }
 

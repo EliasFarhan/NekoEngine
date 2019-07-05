@@ -47,6 +47,7 @@ enum class CityComponentType : EntityMask
     TRANSFORM = 1 << 0,
     CAR = 1 << 1,
     BUILDING = 1 << 2,
+	BEHAVIOR_TREE = 1 << 3
 };
 
 
