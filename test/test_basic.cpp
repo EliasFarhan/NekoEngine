@@ -98,7 +98,7 @@ public:
         std::uniform_real_distribution<float> randomScale(0.01f, 0.1f); // generates random floats between 0.0 and 1.0
         std::default_random_engine generator;
         std::uniform_real_distribution<float> randomAngle(0.0f, 360.0f); // generates random floats between 0.0 and 1.0
-        for (auto i = 0u; i < neko::InitEntityNmb; i++)
+        for (auto i = 0u; i < neko::INIT_ENTITY_NMB; i++)
         {
 
             spriteManager.AddSprite(texture);

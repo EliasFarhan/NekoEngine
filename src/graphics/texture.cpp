@@ -47,8 +47,8 @@ static std::set<std::string_view> imgExtensionSet
 
 TextureManager::TextureManager()
 {
-    texturePaths_.reserve(InitEntityNmb);
-    textures_.reserve(InitEntityNmb);
+    texturePaths_.reserve(INIT_ENTITY_NMB);
+    textures_.reserve(INIT_ENTITY_NMB);
 }
 
 bool TextureManager::HasValidExtension(const std::string& filename)

@@ -106,7 +106,7 @@ protected:
 
 TEST_F(BehaviorTreeManagerTest, IsInitFromJsonWorking) 
 {
-	const neko::Index comp = 0xdeadbeef;
+	const neko::Index comp = 0xbeef;
 	EXPECT_TRUE(behaviorTreeManager_.ParseBehaviorTreeFromJson(
 		comp, 
 		jsonBehaviorTree_));
@@ -114,7 +114,7 @@ TEST_F(BehaviorTreeManagerTest, IsInitFromJsonWorking)
 
 TEST_F(BehaviorTreeManagerTest, IsBehaviorTreeCorrect) 
 {
-	const neko::Index comp = 0xdeadbeef;
+	const neko::Index comp = 0xbeef;
 	auto behaviorTreeNodePtr_ = 
 		behaviorTreeManager_.ParseBehaviorTreeFromJson(
 			comp, 
@@ -204,7 +204,7 @@ TEST_F(BehaviorTreeManagerTest, IsBehaviorTreeCorrect)
 
 TEST_F(BehaviorTreeManagerTest, IsBehaviorTreeExecuteCorrect) 
 {
-	const neko::Index comp = 0xdeadbeef;
+	const neko::Index comp = 0xbeef;
 	neko::Index id = behaviorTreeManager_.ParseBehaviorTreeFromJsonIndex(
 			comp,
 			jsonBehaviorTree_);
@@ -214,7 +214,7 @@ TEST_F(BehaviorTreeManagerTest, IsBehaviorTreeExecuteCorrect)
 		"EnergyLevel", 
 		[](neko::Index comp, const std::vector<double>& values)
 	{
-		EXPECT_EQ(0xdeadbeef, comp);
+		EXPECT_EQ(0xbeef, comp);
 		EXPECT_EQ(values.size(), 1);
 		EXPECT_EQ(values[0], 0.3);
 		return false;

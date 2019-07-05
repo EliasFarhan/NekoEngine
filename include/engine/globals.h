@@ -30,7 +30,7 @@
 
 namespace neko {
 
-	const size_t InitEntityNmb = 128;
+	const size_t INIT_ENTITY_NMB = 128;
 	using Index = uint32_t;
 	const Index INDEX_INVALID = std::numeric_limits<uint32_t>::max();
 	const sf::Vector2i INVALID_TILE_POS = sf::Vector2i(-1, -1);

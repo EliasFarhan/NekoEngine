@@ -49,18 +49,18 @@ public:
 
     sf::Sprite* GetSpriteAt(unsigned int spriteIndex);
 
-    void CopyTransformPosition(Transform2dManager& transformManager, size_t start = 0, size_t length = InitEntityNmb);
+    void CopyTransformPosition(Transform2dManager& transformManager, size_t start = 0, size_t length = INIT_ENTITY_NMB);
 
-    void CopyTransformScales(Transform2dManager& transformManager, size_t start = 0, size_t length = InitEntityNmb);
+    void CopyTransformScales(Transform2dManager& transformManager, size_t start = 0, size_t length = INIT_ENTITY_NMB);
 
-    void CopyTransformAngles(Transform2dManager& transformManager, size_t start = 0, size_t length = InitEntityNmb);
+    void CopyTransformAngles(Transform2dManager& transformManager, size_t start = 0, size_t length = INIT_ENTITY_NMB);
 /**
  * \brief push basic graphic command to the render thread to be processed next frame
  * @param graphicsManager
  * @param start
  * @param length
  */
-    void PushCommands(GraphicsManager* graphicsManager, size_t start = 0, size_t length = InitEntityNmb);
+    void PushCommands(GraphicsManager* graphicsManager, size_t start = 0, size_t length = INIT_ENTITY_NMB);
 
 private:
     /**

@@ -40,7 +40,7 @@ void Physics2dManager::Init()
 	pixelPerMeter = config_->pixelPerMeter;
 	world_ = std::make_unique<b2World>(config_->gravity);
 	world_->SetContactListener(&collisionListener_);
-	colliders_.reserve(InitEntityNmb);
+	colliders_.reserve(INIT_ENTITY_NMB);
 }
 
 void Physics2dManager::Update()

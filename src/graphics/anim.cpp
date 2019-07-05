@@ -136,7 +136,7 @@ void SpriteAnimator::Update(sf::Sprite* sprite, float dt)
 
 AnimatorManager::AnimatorManager()
 {
-    animators_.reserve(InitEntityNmb);
+    animators_.reserve(INIT_ENTITY_NMB);
 }
 
 SpriteAnimator& AnimatorManager::CreateSpriteAnimator()

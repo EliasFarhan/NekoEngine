@@ -30,8 +30,8 @@ namespace neko
 {
 ShapeManager::ShapeManager()
 {
-    convexShape_[0].reserve(InitEntityNmb);
-    convexShape_[1].reserve(InitEntityNmb);
+    convexShape_[0].reserve(INIT_ENTITY_NMB);
+    convexShape_[1].reserve(INIT_ENTITY_NMB);
 }
 
 

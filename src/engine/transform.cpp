@@ -31,9 +31,9 @@ namespace neko
 
 Transform2dManager::Transform2dManager()
 {
-	positions_.reserve(InitEntityNmb);
-	scales_.reserve(InitEntityNmb);
-	angles_.reserve(InitEntityNmb);
+	positions_.reserve(INIT_ENTITY_NMB);
+	scales_.reserve(INIT_ENTITY_NMB);
+	angles_.reserve(INIT_ENTITY_NMB);
 }
 
 void Transform2dManager::CopyPositionsFromPhysics2d(Physics2dManager& physics2dManager, size_t start, size_t length)
