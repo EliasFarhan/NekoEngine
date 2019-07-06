@@ -107,5 +107,6 @@ private:
 	BehaviorTreeManager behaviorTreeManager_;
     const float scrollDelta_ = 0.1f;
     float currentZoom_ = 1.0f;
+	Index musicInd_ = INDEX_INVALID;
 };
 }

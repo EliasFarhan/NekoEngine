@@ -146,6 +146,15 @@ namespace neko {
 		return true;
 	}
 
+	void Sound::SetLoop(Index ind, bool loop)
+	{
+		auto it = musicMap_.find(ind);
+		if (it != musicMap_.end())
+		{
+			it->second->setLoop(loop);
+		}
+	}
+
 	Index Sound::GetNextIndex()
 	{
 		static Index index = 0;
