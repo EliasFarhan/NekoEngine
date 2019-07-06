@@ -74,7 +74,7 @@ void CityCommandManager::ExecuteCommand(const std::shared_ptr<CityCommand>& comm
         case CityCommandType::CHANGE_CURSOR_MODE:
         {
             auto* cursorCommand = dynamic_cast<ChangeModeCommand*>(command.get());
-            engine_->GetCursor().cursorMode = cursorCommand->newCursorMode;
+			engine_->GetCursor().SetCursorMode(cursorCommand->newCursorMode);
 			Sound::PlaySound(soundSelect_);
             break;
         }
