@@ -77,7 +77,11 @@ file(GLOB_RECURSE IMG_FILES
 		"${PROJECT_SOURCE_DIR}/data/*.hdr"
 		"${PROJECT_SOURCE_DIR}/data/*.pic"
 		)
-LIST(APPEND DATA_FILES ${IMG_FILES} ${JSON_FILES})
+file(GLOB_RECURSE SND_FILES
+		"${PROJECT_SOURCE_DIR}/data/*.wav"
+		"${PROJECT_SOURCE_DIR}/data/*.ogg"
+		)
+LIST(APPEND DATA_FILES ${IMG_FILES} ${SND_FILES} ${JSON_FILES})
 foreach(DATA ${DATA_FILES})
 	get_filename_component(FILE_NAME ${DATA} NAME)
 	get_filename_component(PATH_NAME ${DATA} DIRECTORY)
@@ -102,23 +106,32 @@ file(GLOB_RECURSE Neko_ENGINE_SRC src/engine/*.cpp include/engine/*.h)
 file(GLOB_RECURSE Neko_GRAPHICS_SRC src/graphics/*.cpp include/graphics/*.h)
 file(GLOB_RECURSE Neko_UTILITY_SRC src/utilities/*.cpp include/utilities/*.h)
 file(GLOB_RECURSE Neko_PHYSICS_SRC src/physics/*.cpp include/physics/*.h)
+file(GLOB_RECURSE Neko_SOUND_SRC src/sound/*.cpp include/sound/*.h)
 file(GLOB_RECURSE Neko_EXTENSIONS_SRC extensions/src/*.cpp extensions/include/*.h)
-
-
 
 include_directories(include ${CMAKE_SOURCE_DIR}/include)
 set_property(GLOBAL PROPERTY USE_FOLDERS On)
 SET_SOURCE_FILES_PROPERTIES( ${Neko_SRC} PROPERTIES
                 FOLDER "${CMAKE_SOURCE_DIR}/src" )
 
-source_group("Graphics"            FILES ${Neko_GRAPHICS_SRC})
-source_group("Engine"            FILES ${Neko_ENGINE_SRC})
-source_group("Utility"            FILES ${Neko_UTILITY_SRC})
-source_group("Physics"            FILES ${Neko_PHYSICS_SRC})
-source_group("Data\\Json"            FILES ${JSON_FILES})
+source_group("Graphics"				FILES ${Neko_GRAPHICS_SRC})
+source_group("Engine"				FILES ${Neko_ENGINE_SRC})
+source_group("Utility"				FILES ${Neko_UTILITY_SRC})
+source_group("Physics"				FILES ${Neko_PHYSICS_SRC})
+source_group("Sound"				FILES ${Neko_SOUND_SRC})
+source_group("Data\\Json"           FILES ${JSON_FILES})
 source_group("Data\\Img"            FILES ${IMG_FILES})
+source_group("Data\\Snd"			FILES ${SND_FILES})
 
-List(APPEND Neko_SRC ${Neko_ENGINE_SRC} ${Neko_GRAPHICS_SRC} ${Neko_UTILITY_SRC} ${Neko_PHYSICS_SRC} ${JSON_FILES} ${IMG_FILES})
+List(APPEND Neko_SRC 
+	${Neko_ENGINE_SRC} 
+	${Neko_GRAPHICS_SRC} 
+	${Neko_UTILITY_SRC} 
+	${Neko_PHYSICS_SRC}
+	${Neko_SOUND_SRC}
+	${JSON_FILES} 
+	${IMG_FILES}
+	${SND_FILES})
 
 if(MSVC)
     add_compile_options(
