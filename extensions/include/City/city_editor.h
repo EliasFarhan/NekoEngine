@@ -37,7 +37,6 @@ enum class ButtonIconType : Index
 	BULLDOZER,
 	RESIDENTIAL,
 	COMMERCIAL,
-	INDUSTRIAL,
 	LENGTH,
 	NONE
 };
@@ -52,8 +51,7 @@ const static std::string buttonIconTexture[Index(ButtonIconType::LENGTH)] =
 	"data/sprites/icons/icons8-road-48.png",
 	"data/sprites/icons/icons8-bulldozer-48.png",
 	"data/sprites/icons/cottage.png",
-	"data/sprites/icons/link-company-parent.png",
-	"data/sprites/icons/manufacturing.png"
+	"data/sprites/icons/link-company-parent.png"
 };
 
 class CityEditor : public Editor
