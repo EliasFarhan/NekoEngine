@@ -54,6 +54,6 @@ public:
 private:
 };
 
-void Sleep(const uint32_t ms);
+void SleepMs(const uint32_t ms);
 
 }

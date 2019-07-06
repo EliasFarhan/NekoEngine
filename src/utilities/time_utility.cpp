@@ -69,7 +69,7 @@ float Timer::GetTimeFromStart() const
     return period - time;
 }
 
-void Sleep(const uint32_t ms)
+void SleepMs(const uint32_t ms)
 {
 	std::this_thread::sleep_for(std::chrono::milliseconds(ms));
 } 

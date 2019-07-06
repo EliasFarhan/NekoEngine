@@ -54,7 +54,7 @@ TEST_F(SoundTest, LoadAndPlayMusic)
 	neko::Index index = neko::Sound::LoadMusic("data/test.ogg");
 	EXPECT_NE(index, neko::INDEX_INVALID);
 	EXPECT_TRUE(neko::Sound::PlayMusic(index));
-	neko::Sleep(1000);
+	neko::SleepMs(1000);
 	EXPECT_TRUE(neko::Sound::RemoveMusic(index));
 }
 
@@ -81,6 +81,6 @@ TEST_F(SoundTest, LoadASoundAndPlaySound)
 	neko::Index soundIndex = neko::Sound::CreateSoundFromBuffer(index);
 	EXPECT_NE(soundIndex, neko::INDEX_INVALID);
 	EXPECT_TRUE(neko::Sound::PlaySound(soundIndex));
-	neko::Sleep(1000);
+	neko::SleepMs(1000);
 	EXPECT_TRUE(neko::Sound::RemoveSoundBuffer(index));
 }
