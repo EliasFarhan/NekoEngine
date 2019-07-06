@@ -97,8 +97,28 @@
     },
     {
       "type": "office1",
-      "center": [10,20],
-      "rect": [120,40,20,40]
+      "center": [ 10, 20 ],
+      "rect": [ 120, 40, 20, 40 ]
+    },
+    {
+      "type": "office2",
+      "center": [ 30, 50 ],
+      "rect": [ 0, 120, 60, 100 ]
+    },
+    {
+      "type": "office3",
+      "center": [ 30, 50 ],
+      "rect": [ 60, 120, 60, 100 ]
+    },
+    {
+      "type": "office4",
+      "center": [ 30, 50 ],
+      "rect": [ 120, 120, 60, 100 ]
+    },
+    {
+      "type": "office5",
+      "center": [30,50],
+      "rect": [180,120,60,100]
     },
     {
       "type": "house1",

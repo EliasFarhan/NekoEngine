@@ -138,7 +138,7 @@ void CityBuilderEngine::Update(float dt)
 
 	auto zoneUpdateTask = taskflow.emplace([&]() {
 		cityZoneManager_.UpdateZoneTilemap(cityBuilderMap_,
-			cityBuildingManager_, mainView); });
+		                                   cityBuildingManager_, mainView); });
 	buildingUpdateTask.precede(zoneUpdateTask);
 	commandUpdateTask.precede(zoneUpdateTask);
 	auto pushZoneCommandTask = taskflow.emplace([&]() {cityZoneManager_.PushCommand(graphicsManager_.get()); });

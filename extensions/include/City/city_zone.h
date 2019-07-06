@@ -69,13 +69,15 @@ class CityZoneManager
 {
 public:
     void
-    UpdateZoneTilemap(const CityBuilderMap& cityMap, const CityBuildingManager& cityBuildingMap, sf::View mainView);
+    UpdateZoneTilemap(const CityBuilderMap& cityMap, CityBuildingManager& cityBuildingMap, sf::View mainView);
 
     void PushCommand(GraphicsManager* graphicsManager);
 
     void AddZone(sf::Vector2i position, ZoneType zoneType, CityBuilderMap& cityMap);
 
     void RemoveZone(sf::Vector2i position);
+
+    const Zone* GetZoneAt(sf::Vector2i position) const;
 
     const std::vector<Zone>& GetZoneVector() const;
 private:

@@ -24,6 +24,7 @@
 
 #include <City/city_building.h>
 #include <engine/engine.h>
+#include <City/city_zone.h>
 
 namespace neko
 {
@@ -68,20 +69,60 @@ void CityBuildingManager::Update(const CityZoneManager& zoneManager, CityBuilder
 			commercialZones.reserve(zones.size());
 			std::copy_if(zones.begin(), zones.end(), std::back_inserter(commercialZones), [&](const Zone& zone)
 			{
-				const auto buildingAtPos = std::find_if(buildings_.begin(), buildings_.end(), [&zone](const Building& building) {
-					return building.position == zone.position;
-				});
-				return zone.zoneType == ZoneType::COMMERCIAL && buildingAtPos == buildings_.end();
+				const auto buildingAtPos = GetBuildingAt(zone.position);
+				return zone.zoneType == ZoneType::COMMERCIAL && buildingAtPos == nullptr;
 			});
 			if (!commercialZones.empty())
 			{
-				auto& newHousePlace = commercialZones[rand() % commercialZones.size()];
-				AddBuilding({
-					newHousePlace.position,
-					sf::Vector2i(1, 1),
-					CityTileType::OFFICE1,
-				(rand() % (20u - 10u)) + 10u
-					}, zoneManager, cityMap);
+				auto& newWorkPlace = commercialZones[rand() % commercialZones.size()];
+				bool buildBig = true;
+				for(int dx = 0; dx < 3;dx++)
+				{
+					for(int dy = 0; dy < 3; dy++)
+					{
+						const sf::Vector2i newPos = newWorkPlace.position + sf::Vector2i(dx, -dy);
+						const auto* building = GetBuildingAt(newPos);
+						if(building != nullptr && building->size != sf::Vector2i(1,1))
+						{
+							buildBig = false;
+							break;
+						}
+						const auto* zone = zoneManager.GetZoneAt(newPos);
+						if (zone == nullptr || zone->zoneType != newWorkPlace.zoneType)
+						{
+							buildBig = false;
+							break;
+						}
+					}
+					if (!buildBig)
+						break;
+				}
+				if (buildBig)
+				{
+					for (int dx = 0; dx < 3; dx++)
+					{
+						for (int dy = 0; dy < 3; dy++)
+						{
+							const sf::Vector2i newPos = newWorkPlace.position + sf::Vector2i(dx, -dy);
+							RemoveBuilding(newPos);
+						}
+					}
+					AddBuilding({
+						newWorkPlace.position,
+						sf::Vector2i(3, 3),
+						CityTileType((rand()%(Index(CityTileType::OFFICE5)-Index(CityTileType::OFFICE2)))+Index(CityTileType::OFFICE2)),
+					(rand() % (20u - 10u)) + 10u
+						}, zoneManager, cityMap);
+				}
+				else
+				{
+					AddBuilding({
+						newWorkPlace.position,
+						sf::Vector2i(1, 1),
+						CityTileType::OFFICE1,
+					(rand() % (20u - 10u)) + 10u
+						}, zoneManager, cityMap);
+				}
 			}
 		}
 		spawnTimer_.Reset();
@@ -173,7 +214,16 @@ Building* CityBuildingManager::GetBuildingAt(sf::Vector2i position)
 {
 	const auto result = std::find_if(buildings_.begin(), buildings_.end(), [&position](const Building& building)
 	{
-		return building.position == position;
+		for(int dx = 0; dx < building.size.x;dx++)
+		{
+			for(int dy = 0; dy < building.size.y;dy++)
+			{
+				const sf::Vector2i newPos = building.position + sf::Vector2i(dx, -dy);
+				if (newPos == position)
+					return true;
+			}
+		}
+		return false;
 	});
 	if (result == buildings_.end())
 	{

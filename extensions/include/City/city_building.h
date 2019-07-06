@@ -48,7 +48,7 @@ public:
     void AddBuilding(Building building, const CityZoneManager& zoneManager, CityBuilderMap& cityMap);
     void RemoveBuilding(sf::Vector2i position);
 	sf::Vector2i FindBuilding(ZoneType zoneType);
-	Building* GetBuildingAt(sf::Vector2i position);
+    Building* GetBuildingAt(sf::Vector2i position);
     const std::vector<Building>& GetBuildingsVector() const;
 private:
     std::vector<Building> buildings_;

@@ -58,6 +58,10 @@ enum class CityTileType : Index
 	TREES,
 	TRAIN_STATION,
 	OFFICE1,
+	OFFICE2,
+	OFFICE3,
+	OFFICE4,
+	OFFICE5,
 	WATER_DOWN_RIGHT,
 	WATER_DOWN_LEFT,
 	WATER_HORIZONTAL,
@@ -98,7 +102,11 @@ const static std::map<CityTileType, std::string> mapCityTileString =
 	{CityTileType::HOUSE2, "house2"},
 	{CityTileType::HOUSE3, "house3"},
 	{CityTileType::HOUSE4, "house4"},
-    {CityTileType::OFFICE1, "office1"}
+    {CityTileType::OFFICE1, "office1"},
+    {CityTileType::OFFICE2, "office2"},
+    {CityTileType::OFFICE3, "office3"},
+    {CityTileType::OFFICE4, "office4"},
+    {CityTileType::OFFICE5, "office5"}
 
 
 };

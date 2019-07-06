@@ -31,7 +31,7 @@ namespace neko
 {
 
 
-void CityZoneManager::UpdateZoneTilemap(const CityBuilderMap& cityMap, const CityBuildingManager& cityBuildingMap,
+void CityZoneManager::UpdateZoneTilemap(const CityBuilderMap& cityMap, CityBuildingManager& cityBuildingMap,
                                         sf::View mainView)
 {
     const auto frameIndex = MainEngine::GetInstance()->frameIndex % 2;
@@ -43,21 +43,8 @@ void CityZoneManager::UpdateZoneTilemap(const CityBuilderMap& cityMap, const Cit
     {
 
         //Checking if there is other zone buildings
-        auto buildingIt = std::find_if(cityBuildingMap.GetBuildingsVector().begin(), cityBuildingMap.GetBuildingsVector().end(),[&zone](const Building& building)
-        {
-            for(int dx = 0; dx < building.size.x;dx++)
-            {
-                for(int dy = 0; dy < building.size.y;dy++)
-                {
-                    if(zone.position == building.position+sf::Vector2i(dx,dy))
-                    {
-                        return true;
-                    }
-                }
-            }
-           return false;
-        });
-        if(buildingIt != cityBuildingMap.GetBuildingsVector().end())
+		const auto* buildingAtPos = cityBuildingMap.GetBuildingAt(zone.position);
+        if(buildingAtPos != nullptr)
             continue;
 
         //culling with mainView
@@ -128,13 +115,23 @@ void CityZoneManager::AddZone(sf::Vector2i position, ZoneType zoneType, CityBuil
 
 void CityZoneManager::RemoveZone(sf::Vector2i position)
 {
-    auto existingZone = std::find_if(zones_.begin(), zones_.end(), [&position](const Zone& zone){
+	const auto existingZone = std::find_if(zones_.begin(), zones_.end(), [&position](const Zone& zone){
         return zone.position == position;
     });
     if(existingZone != zones_.end())
     {
         zones_.erase(existingZone);
     }
+}
+
+const Zone* CityZoneManager::GetZoneAt(sf::Vector2i position) const 
+{
+	const auto existingZone = std::find_if(zones_.begin(), zones_.end(), [&position](const Zone& zone) {
+		return zone.position == position;
+	});
+	if (existingZone == zones_.end())
+		return nullptr;
+	return &*existingZone;
 }
 
 const std::vector<Zone>& CityZoneManager::GetZoneVector() const
