@@ -106,7 +106,6 @@ void CityPeopleManager::Init()
 				car->entity = INVALID_ENTITY;
 				engine->GetEntityManager().DestroyEntity(personPtr->carEntity);
 				personPtr->carEntity = INVALID_ENTITY;
-				personPtr->position = personPtr->housePos;
 				return true;
 			}
 			car->position = car->currentPath[car->currentIndex];
