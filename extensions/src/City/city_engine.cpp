@@ -27,6 +27,7 @@
 
 #include <engine/log.h>
 #include <Remotery.h>
+#include "City/city_function_map.h"
 
 namespace neko
 {
@@ -43,6 +44,30 @@ void CityBuilderEngine::Init()
 	cursor_.Init();
 	commandManager_.Init();
 	cityCarManager_.Init();
+
+	FunctionMap functionMap(INVALID_ENTITY);//wtf fred?!?
+	functionMap.SetFunction("FindHouse", [&](Index entity, const std::vector<double>&) -> bool
+	{
+		logDebug("Find House");
+		return rand()%10 != 1;//might or might not find a house
+	});
+	functionMap.SetFunction("FindWork", [&](Index entity, const std::vector<double>&) -> bool
+	{
+		logDebug("Find Work");
+		return rand()%10 != 1;//might or might not find a house
+	});
+	functionMap.SetFunction("CheckHomeAndWork", [&](Index entity, const std::vector<double>&) -> bool
+	{
+		logDebug("CheckHomeAndWork");
+		return rand()%10 != 1;//might or might not find a house
+	});
+	functionMap.SetFunction("CheckHomeAndWork", [&](Index entity, const std::vector<double>&) -> bool
+	{
+		logDebug("Kill Myself");
+		return rand()%10 != 1;//might or might not find a house
+	});
+	
+	
 }
 
 void CityBuilderEngine::Update()
@@ -52,6 +77,15 @@ void CityBuilderEngine::Update()
 	const float dt = MainEngine::GetInstance()->dt.asSeconds();
     tf::Taskflow taskflow;
     auto carsUpdateTask = taskflow.emplace([&](){cityCarManager_.Update();});
+
+	auto btUpdateTask = taskflow.emplace([&]()
+	{
+		auto btEntities = entityManager_.FilterEntities(EntityMask(CityComponentType::BEHAVIOR_TREE));
+		for(auto entity : btEntities)
+		{
+			behaviorTreeManager_.ExecuteIndex(entity);
+		}
+	});
 
 	auto commandUpdateTask = taskflow.emplace([&](){commandManager_.Update();});
 

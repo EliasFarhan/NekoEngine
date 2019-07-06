@@ -49,9 +49,16 @@ void CityBuildingManager::Update(const CityZoneManager& zoneManager, CityBuilder
 			if (!residentialZones.empty())
 			{
 				auto& newHousePlace = residentialZones[rand() % residentialZones.size()];
-				AddBuilding({ newHousePlace.position, sf::Vector2i(1, 1), CityTileType(
+				AddBuilding({
+					newHousePlace.position,
+					sf::Vector2i(1, 1),
+					CityTileType(
 						(rand() % (Index(CityTileType::HOUSE4) - Index(CityTileType::HOUSE1))) +
-						Index(CityTileType::HOUSE1)) }, zoneManager, cityMap);
+						Index(CityTileType::HOUSE1)),
+					(rand() % (10 - 5)) + 5
+					},
+					zoneManager,
+					cityMap);
 			}
 		}
 		//Add commercial building
@@ -69,7 +76,12 @@ void CityBuildingManager::Update(const CityZoneManager& zoneManager, CityBuilder
 			if (!commercialZones.empty())
 			{
 				auto& newHousePlace = commercialZones[rand() % commercialZones.size()];
-				AddBuilding({ newHousePlace.position, sf::Vector2i(1, 1), CityTileType::OFFICE1 }, zoneManager, cityMap);
+				AddBuilding({
+					newHousePlace.position,
+					sf::Vector2i(1, 1),
+					CityTileType::OFFICE1,
+				(rand() % (20 - 10)) + 10
+					}, zoneManager, cityMap);
 			}
 		}
 		spawnTimer_.Reset();
@@ -111,5 +123,56 @@ void CityBuildingManager::RemoveBuilding(sf::Vector2i position)
 	{
 		buildings_.erase(buildingIt);
 	}
+}
+
+sf::Vector2i CityBuildingManager::FindHouse(ZoneType zoneType)
+{
+	switch (zoneType)
+	{
+	case ZoneType::RESIDENTIAL:
+	{
+		const auto result = std::find_if(buildings_.begin(), buildings_.end(), [](const Building& building)
+		{
+			if (building.buildingType != CityTileType::HOUSE1 && 
+				building.buildingType != CityTileType::HOUSE2 && 
+				building.buildingType != CityTileType::HOUSE3 && 
+				building.buildingType != CityTileType::HOUSE4)
+				return false;
+
+			return building.occupancy < building.capacity;
+		});
+		if (result != buildings_.end())
+		{
+			return result->position;
+		}
+		break;
+	}
+	case ZoneType::COMMERCIAL:
+		const auto result = std::find_if(buildings_.begin(), buildings_.end(), [](const Building& building)
+		{
+			if (building.buildingType != CityTileType::OFFICE1)
+				return false;
+			return building.occupancy < building.capacity;
+		});
+		break;
+	case ZoneType::INDUSTRY:
+		break;
+	default:
+		break;
+	}
+	return INVALID_TILE_POS;
+}
+
+Building* CityBuildingManager::GetBuildingAt(sf::Vector2i position)
+{
+	const auto result = std::find_if(buildings_.begin(), buildings_.end(), [&position](const Building& building)
+	{
+		return building.position == position;
+	});
+	if(result == buildings_.end())
+	{
+		return nullptr;
+	}
+	return &*result;
 }
 }

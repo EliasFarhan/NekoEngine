@@ -38,6 +38,7 @@
 #include "City/city_car.h"
 #include "City/city_zone.h"
 #include <City/city_building.h>
+#include "city_behavior_tree_manager.h"
 
 namespace neko
 {
@@ -98,6 +99,7 @@ private:
     CityCursor cursor_;
     CityZoneManager cityZoneManager_;
     CityBuildingManager cityBuildingManager_;
+	BehaviorTreeManager behaviorTreeManager_;
     const float scrollDelta_ = 0.1f;
     float currentZoom_ = 1.0f;
 };
