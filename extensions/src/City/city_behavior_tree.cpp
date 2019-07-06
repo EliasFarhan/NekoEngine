@@ -198,7 +198,7 @@ namespace neko {
 			functionName_,
 			{ static_cast<double>(to_.x), static_cast<double>(to_.y) })) ?
 			BehaviorTreeFlow::SUCCESS : 
-			BehaviorTreeFlow::FAILURE;
+			BehaviorTreeFlow::RUNNING;
 	}
 
 	BehaviorTreeFlow BehaviorTreeLeafFunctional::Execute()
