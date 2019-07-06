@@ -60,9 +60,9 @@ void CityBuilderEngine::Init()
 void CityBuilderEngine::Update(float dt)
 {
 	MainEngine::Update(dt);
-    rmt_ScopedCPUSample(CityBuilderUpdate, 0);
-    tf::Taskflow taskflow;
-    auto carsUpdateTask = taskflow.emplace([&](){cityCarManager_.Update(dt);});
+	rmt_ScopedCPUSample(CityBuilderUpdate, 0);
+	tf::Taskflow taskflow;
+	auto carsUpdateTask = taskflow.emplace([&]() {cityCarManager_.Update(dt); });
 
 	auto peopleUpdateTask = taskflow.emplace([&]()
 	{
@@ -71,68 +71,89 @@ void CityBuilderEngine::Update(float dt)
 	auto btUpdateTask = taskflow.emplace([&]()
 	{
 		auto btEntities = entityManager_.FilterEntities(EntityMask(CityComponentType::BEHAVIOR_TREE));
-		for(auto entity : btEntities)
+		for (auto entity : btEntities)
 		{
 			behaviorTreeManager_.ExecuteIndex(entity);
 		}
 	});
 	peopleUpdateTask.precede(btUpdateTask);
 
-	auto commandUpdateTask = taskflow.emplace([&](){commandManager_.Update(dt);});
+	auto commandUpdateTask = taskflow.emplace([&]() {commandManager_.Update(dt); });
 
-    auto buildingUpdateTask = taskflow.emplace([&](){ cityBuildingManager_.
-		Update(cityZoneManager_, cityBuilderMap_, dt);});
+	auto buildingUpdateTask = taskflow.emplace([&]() { cityBuildingManager_.
+		Update(cityZoneManager_, cityBuilderMap_, dt); });
 	commandUpdateTask.precede(buildingUpdateTask);
-    std::array<tf::Task, int(CityTilesheetType::LENGTH)> tilemapUpdateTasks;
-    auto pushCommandTask = taskflow.emplace([&](){environmentTilemap_.PushCommand(graphicsManager_.get());});
-    auto mainViewUpdateTask = taskflow.emplace([&](){
-        if (mouseManager_.IsButtonPressed(sf::Mouse::Button::Middle))
-        {
-            const auto delta = sf::Vector2f(mouseManager_.GetMouseDelta());
-            mainView.setCenter(mainView.getCenter() - currentZoom_ * delta);
-        }
-        graphicsManager_->SetView(mainView);
-    });
-	for(int i = 0; i < int(CityTilesheetType::LENGTH);i++)
-    {
-        tilemapUpdateTasks[i] = taskflow.emplace(std::bind([&](CityTilesheetType cityTilesheetType){
-            environmentTilemap_.UpdateTilemap(cityBuilderMap_, cityCarManager_, cityBuildingManager_, transformManager_,
-                                              mainView, cityTilesheetType);
-        }, CityTilesheetType(i)));
+	std::array<tf::Task, int(CityTilesheetType::LENGTH)> tilemapUpdateTasks;
+	auto pushCommandTask = taskflow.emplace([&]() {environmentTilemap_.PushCommand(graphicsManager_.get()); });
+	auto mainViewUpdateTask = taskflow.emplace([&]() {
+		if (mouseManager_.IsButtonPressed(sf::Mouse::Button::Middle))
+		{
+			const auto delta = sf::Vector2f(mouseManager_.GetMouseDelta());
+			mainView.setCenter(mainView.getCenter() - currentZoom_ * delta);
+		}
+		{
+			const float keyboardMoveSpeed = 5.0f;
+			sf::Vector2f move = sf::Vector2f();
+			if (keyboardManager_.IsKeyHeld(sf::Keyboard::Left))
+			{
+				move.x -= 1;
+			}
+			if (keyboardManager_.IsKeyHeld(sf::Keyboard::Right))
+			{
+				move.x += 1;
+			}
+			if (keyboardManager_.IsKeyHeld(sf::Keyboard::Up))
+			{
+				move.y -= 1;
+			}
+			if (keyboardManager_.IsKeyHeld(sf::Keyboard::Down))
+			{
+				move.y += 1;
+			}
+			mainView.setCenter(mainView.getCenter() + currentZoom_ * move * keyboardMoveSpeed );
+		}
+		graphicsManager_->SetView(mainView);
+	});
+	for (int i = 0; i < int(CityTilesheetType::LENGTH); i++)
+	{
+		tilemapUpdateTasks[i] = taskflow.emplace(std::bind([&](CityTilesheetType cityTilesheetType) {
+			environmentTilemap_.UpdateTilemap(cityBuilderMap_, cityCarManager_, cityBuildingManager_, transformManager_,
+				mainView, cityTilesheetType);
+		}, CityTilesheetType(i)));
 
-        if(CityTilesheetType(i) == CityTilesheetType::CAR)
-        {
-            carsUpdateTask.precede(tilemapUpdateTasks[i]);
+		if (CityTilesheetType(i) == CityTilesheetType::CAR)
+		{
+			carsUpdateTask.precede(tilemapUpdateTasks[i]);
 			btUpdateTask.precede(tilemapUpdateTasks[i]);
-        }
-        if(CityTilesheetType(i) == CityTilesheetType::CITY)
-        {
-            buildingUpdateTask.precede(tilemapUpdateTasks[i]);
-        }
-        commandUpdateTask.precede(tilemapUpdateTasks[i]);
-        tilemapUpdateTasks[i].precede(pushCommandTask);
-        mainViewUpdateTask.precede(tilemapUpdateTasks[i]);
-    }
+		}
+		if (CityTilesheetType(i) == CityTilesheetType::CITY)
+		{
+			buildingUpdateTask.precede(tilemapUpdateTasks[i]);
+		}
+		commandUpdateTask.precede(tilemapUpdateTasks[i]);
+		tilemapUpdateTasks[i].precede(pushCommandTask);
+		mainViewUpdateTask.precede(tilemapUpdateTasks[i]);
+	}
 
-	auto zoneUpdateTask = taskflow.emplace([&](){
-        cityZoneManager_.UpdateZoneTilemap(cityBuilderMap_,
-                                           cityBuildingManager_, mainView);});
+	auto zoneUpdateTask = taskflow.emplace([&]() {
+		cityZoneManager_.UpdateZoneTilemap(cityBuilderMap_,
+			cityBuildingManager_, mainView); });
 	buildingUpdateTask.precede(zoneUpdateTask);
 	commandUpdateTask.precede(zoneUpdateTask);
-	auto pushZoneCommandTask = taskflow.emplace([&](){cityZoneManager_.PushCommand(graphicsManager_.get());});
+	auto pushZoneCommandTask = taskflow.emplace([&]() {cityZoneManager_.PushCommand(graphicsManager_.get()); });
 	zoneUpdateTask.precede(pushZoneCommandTask);
 	pushCommandTask.precede(pushZoneCommandTask);
 
-	auto cursorUpdateTask = taskflow.emplace([&](){cursor_.Update(dt);});
+	auto cursorUpdateTask = taskflow.emplace([&]() {cursor_.Update(dt); });
 	pushCommandTask.precede(cursorUpdateTask);
 
 
 	mainViewUpdateTask.precede(zoneUpdateTask);
 
-	auto editorUpdateTask = taskflow.emplace([&](){
-        graphicsManager_->editor->AddInspectorInfo("FPS", std::to_string(1.0f / dt));
-        graphicsManager_->editor->AddInspectorInfo("Cars", std::to_string(cityCarManager_.CountCar()));
-        graphicsManager_->editor->AddInspectorInfo("People", std::to_string(cityPeopleManager_.GetPeopleCount()));
+	auto editorUpdateTask = taskflow.emplace([&]() {
+		graphicsManager_->editor->AddInspectorInfo("FPS", std::to_string(1.0f / dt));
+		graphicsManager_->editor->AddInspectorInfo("Cars", std::to_string(cityCarManager_.CountCar()));
+		graphicsManager_->editor->AddInspectorInfo("People", std::to_string(cityPeopleManager_.GetPeopleCount()));
 	});
 	carsUpdateTask.precede(editorUpdateTask);
 	btUpdateTask.precede(editorUpdateTask);
@@ -154,13 +175,13 @@ void CityBuilderEngine::OnEvent(sf::Event& event)
 			std::ostringstream oss;
 			oss << "Mouse Wheel Delta: " << wheelDelta;
 			logDebug(oss.str());
-		}
+	}
 #endif
 		const auto size = mainView.getSize();
 		currentZoom_ -= wheelDelta * scrollDelta_ * currentZoom_;
 
 		mainView.setSize(size - wheelDelta * scrollDelta_ * size);
-	}
+}
 }
 
 void CityBuilderEngine::Destroy()
@@ -213,7 +234,7 @@ CityCarManager& CityBuilderEngine::GetCarManager()
 
 CityZoneManager& CityBuilderEngine::GetZoneManager()
 {
-    return cityZoneManager_;
+	return cityZoneManager_;
 }
 
 CityPeopleManager& CityBuilderEngine::GetPeopleManager()
@@ -223,7 +244,7 @@ CityPeopleManager& CityBuilderEngine::GetPeopleManager()
 
 CityBuildingManager& CityBuilderEngine::GetBuildingManager()
 {
-    return cityBuildingManager_;
+	return cityBuildingManager_;
 }
 
 BehaviorTreeManager& CityBuilderEngine::GetBehaviorTreeManager()

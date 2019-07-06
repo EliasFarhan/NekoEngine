@@ -206,6 +206,10 @@ sf::Vector2i CityBuilderMap::Index2Position(size_t index) const
 
 void CityBuilderMap::AddCityElement(CityElementType cityElement, const sf::Vector2i& position)
 {
+	if(position.x < 0 || position.y < 0 || position.x >= city.mapSize.x || position.y >= city.mapSize.y)
+	{
+		return;
+	}
 	switch (cityElement)
 	{
 	case CityElementType::ROAD:

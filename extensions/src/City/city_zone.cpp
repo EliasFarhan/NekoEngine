@@ -93,6 +93,10 @@ void CityZoneManager::PushCommand(GraphicsManager* graphicsManager)
 
 void CityZoneManager::AddZone(sf::Vector2i position, ZoneType zoneType, CityBuilderMap& cityMap)
 {
+	if(position.x < 0 || position.y < 0 || position.x >= cityMap.city.mapSize.x || position.y >= cityMap.city.mapSize.y)
+	{
+		return;
+	}
     auto existingZone = std::find_if(zones_.begin(), zones_.end(), [&position](const Zone& zone){
         return zone.position == position;
     });

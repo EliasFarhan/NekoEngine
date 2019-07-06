@@ -595,7 +595,9 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 			const auto rect = textureRects_[Index(car.carType)];
 			const auto center = rectCenter_[Index(car.carType)];
 			const auto position = transformManager.GetPosition(car.entity);
-			AddCar(position, car.spriteSize, rect, center,false, false);
+			auto deltaPos = car.currentPath[car.currentIndex + 1] - car.currentPath[car.currentIndex];
+
+			AddCar(position, car.spriteSize, rect, center,deltaPos.x > 0 ?false:true, false);
 		}
 		break;
 	}
