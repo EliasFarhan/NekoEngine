@@ -24,6 +24,7 @@
  SOFTWARE.
  */
 
+#include <cstdint>
 
 namespace neko
 {
@@ -52,4 +53,7 @@ public:
     float period = 0.0f;
 private:
 };
+
+void Sleep(const uint32_t ms);
+
 }
