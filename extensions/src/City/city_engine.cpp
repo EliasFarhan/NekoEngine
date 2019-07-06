@@ -46,7 +46,7 @@ void CityBuilderEngine::Init()
 	cityCarManager_.Init();
 	cityPeopleManager_.Init();
 
-	FunctionMap functionMap(INVALID_ENTITY);//wtf fred?!?
+	FunctionMap functionMap;
 	functionMap.SetFunction("FindHouse", [&](Index entity, const std::vector<double>&) -> bool
 	{
 		logDebug("Find House "+std::to_string(entity));
