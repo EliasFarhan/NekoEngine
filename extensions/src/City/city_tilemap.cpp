@@ -589,6 +589,9 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 	{
 		for(const auto& car : cityCarManager.GetCarsVector())
 		{
+			if (car.entity == INVALID_ENTITY)
+				continue;
+			
 			const auto rect = textureRects_[Index(car.carType)];
 			const auto center = rectCenter_[Index(car.carType)];
 			const auto position = transformManager.GetPosition(car.entity);

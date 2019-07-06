@@ -60,7 +60,7 @@ class CityEditor : public Editor
 {
 public:
 	void Init() override;
-	void Update() override;
+	void Update(float dt) override;
 	void Destroy() override;
 private:
 	CityBuilderEngine* engine_ = nullptr;

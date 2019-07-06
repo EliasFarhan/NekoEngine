@@ -154,7 +154,7 @@ void GraphicsManager::RenderLoop()
 					command->Draw(renderWindow_);
 				}
 			}
-            editor->Update();
+            editor->Update(engine->clockDeltatime.asSeconds());
             renderWindow_->display();
             renderWindow_->setActive(false);
         }

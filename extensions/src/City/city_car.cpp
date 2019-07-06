@@ -39,10 +39,9 @@ void CityCarManager::Init()
 	roadGraphPtr_ = &cityMap_->GetRoadGraph();
 }
 
-void CityCarManager::Update()
+void CityCarManager::Update(float dt)
 {
 	rmt_ScopedCPUSample(UpdateCars, 0);
-	const auto dt = MainEngine::GetInstance()->dt.asSeconds();
 	/*
 	{
 		const auto position = roadGraphPtr_->GetNodesVector()[rand() % roadGraphPtr_->GetNodesVector().size()].position;
@@ -200,5 +199,12 @@ size_t CityCarManager::CountCar() const
 		}
 	}
 	return count;
+}
+
+CityCar* CityCarManager::GetCar(Index carEntity)
+{
+	if (carEntity >= cars_.size())
+		return nullptr;
+	return &cars_[carEntity];
 }
 }

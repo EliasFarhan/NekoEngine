@@ -35,7 +35,7 @@ class CityCursor : public System
 {
 public:
 	void Init() override;
-	void Update() override;
+	void Update(float dt) override;
 	void Destroy() override;
 	void OnEvent(sf::Event& event);
 	sf::Vector2i GetMouseWorldPos() const;

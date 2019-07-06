@@ -37,12 +37,11 @@ void Editor::Init()
 
 }
 
-void Editor::Update()
+void Editor::Update(float dt)
 {
 	const auto* engine = MainEngine::GetInstance();
-	const auto dt = engine->dt;
 	const Index frameIndex = (engine->frameIndex - 1) % 2; //Render frame is always the previous one
-	ImGui::SFML::Update(*renderWindow_, dt);
+	ImGui::SFML::Update(*renderWindow_, engine->clockDeltatime);
 
 	ImGui::Begin("Inspector");
 	//Draw inspector data

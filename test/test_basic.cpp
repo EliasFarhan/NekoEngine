@@ -59,9 +59,9 @@ public:
 
     }
 
-    void Update() override
+    void Update(float dt) override
     {
-        MainEngine::Update();
+        MainEngine::Update(dt);
         graphicsManager_->Draw(sprite);
 
     }
@@ -112,9 +112,9 @@ public:
 
     }
 
-    void Update() override
+    void Update(float dt) override
     {
-        MainEngine::Update();
+        MainEngine::Update(dt);
         spriteManager.CopyTransformPosition(transformManager);
         spriteManager.CopyTransformScales(transformManager);
         spriteManager.CopyTransformAngles(transformManager);
@@ -201,9 +201,9 @@ public:
 
     }
 
-    void Update() override
+    void Update(float dt) override
     {
-        MainEngine::Update();
+        MainEngine::Update(dt);
         if (keyboardManager_.IsKeyDown(sf::Keyboard::Up))
         {
             auto* animator = animatorManager.GetAnimatorAt(0);
@@ -219,7 +219,7 @@ public:
             auto* animator = animatorManager.GetAnimatorAt(0);
             animator->PlayAnim("walk");
         }
-        animatorManager.Update(spriteManager, dt.asSeconds());
+        animatorManager.Update(spriteManager, dt);
         spriteManager.CopyTransformPosition(transformManager, 0, 1);
         spriteManager.PushCommands(graphicsManager_.get(), 0, 1);
     }
@@ -254,9 +254,9 @@ public:
         tiledMap.Init("data/tilemap/platformer.json", textureManager);
     }
 
-    void Update() override
+    void Update(float dt) override
     {
-        MainEngine::Update();
+        MainEngine::Update(dt);
         tiledMap.PushCommand(graphicsManager_.get());
     }
 

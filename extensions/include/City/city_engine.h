@@ -46,10 +46,11 @@ namespace neko
 
 enum class CityComponentType : EntityMask
 {
-    TRANSFORM = 1 << 0,
-    CAR = 1 << 1,
-    BUILDING = 1 << 2,
-	BEHAVIOR_TREE = 1 << 3
+	TRANSFORM = 1 << 0,
+	CAR = 1 << 1,
+	BUILDING = 1 << 2,
+	BEHAVIOR_TREE = 1 << 3,
+	PERSON = 1 << 4,
 };
 
 
@@ -58,7 +59,7 @@ class CityBuilderEngine : public neko::MainEngine
 public:
     void Init() override;
 
-    void Update() override;
+    void Update(float dt) override;
 
     void OnEvent(sf::Event& event) override;
 
@@ -81,6 +82,7 @@ public:
     CityCarManager& GetCarManager();
 
     CityZoneManager& GetZoneManager();
+    CityPeopleManager& GetPeopleManager();
 
     sf::View mainView;
 

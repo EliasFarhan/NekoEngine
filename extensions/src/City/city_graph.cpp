@@ -144,7 +144,8 @@ TileMapGraph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vect
 {
 	rmt_ScopedCPUSample(GeneratePath, 0);
 	auto path = std::vector<sf::Vector2i>();
-
+	if (startPos == INVALID_TILE_POS || endPos == INVALID_TILE_POS)
+		return path;
 	const auto startNodeIt = std::find_if(nodes_.begin(), nodes_.end(), [&startPos](const Node& node)
 	{
 		return node.position == startPos;
@@ -252,6 +253,22 @@ TileMapGraph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vect
 #endif
 	}
 	return path;
+}
+
+Node* TileMapGraph::GetClosestNode(sf::Vector2i position)
+{
+	Node* closestNode = nullptr;
+	float closestDistance = -1.0f;
+	for(auto& node: nodes_)
+	{
+		const float currentDistance = distance(node.position, position);
+		if(closestNode == nullptr || currentDistance < closestDistance)
+		{
+			closestNode = &node;
+			closestDistance = currentDistance;
+		}
+	}
+	return closestNode;
 }
 
 bool TileMapGraph::ContainNode(sf::Vector2i pos) const

@@ -106,9 +106,9 @@ public:
 
         }
 	}
-	void Update() override
+	void Update(float dt) override
 	{
-		BasicEngine::Update();
+		BasicEngine::Update(dt);
 		const auto mousePos = mouseManager_.GetPosition();
 		const auto rectSize = sf::Vector2f(float(config.screenSize.x / tileNmb.x), float(config.screenSize.y / tileNmb.y));
 		const sf::Vector2i tilePos = sf::Vector2i(int(mousePos.x / rectSize.x), int(mousePos.y / rectSize.y));
@@ -135,7 +135,7 @@ public:
 		}
 
 		ImGui::Begin("Inspector");
-		ImGui::LabelText("FPS", "%f", 1.0f/dt.asSeconds());
+		ImGui::LabelText("FPS", "%f", 1.0f/dt);
 		ImGui::LabelText("Path Length", "%d", int(path.size()));
 		ImGui::End();
 	}

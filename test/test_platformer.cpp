@@ -166,14 +166,14 @@ public:
 
 	
 
-	void Update() override
+	void Update(float dt) override
 	{
 
-		MainEngine::Update();
-		physicsTimer.Update(dt.asSeconds());
+		MainEngine::Update(dt);
+		physicsTimer.Update(dt);
 		if(physicsTimer.IsOver())
 		{
-			physicsManager.Update();
+			physicsManager.Update(dt);
 			physicsTimer.time += physicsTimer.period;
 		}
 		//Player management

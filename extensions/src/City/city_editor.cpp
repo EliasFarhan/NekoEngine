@@ -39,11 +39,10 @@ void CityEditor::Init()
 	}
 }
 
-void CityEditor::Update()
+void CityEditor::Update(float dt)
 {
-	const auto dt = engine_->dt;
 	const Index frameIndex = (engine_->frameIndex - 1) % 2; //Render frame is always the previous one
-	ImGui::SFML::Update(*renderWindow_, dt);
+	ImGui::SFML::Update(*renderWindow_, engine_->clockDeltatime);
 
 	ImGui::Begin("Inspector");
 	//Draw inspector data

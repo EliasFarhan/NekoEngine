@@ -125,7 +125,7 @@ void CityBuildingManager::RemoveBuilding(sf::Vector2i position)
 	}
 }
 
-sf::Vector2i CityBuildingManager::FindHouse(ZoneType zoneType)
+sf::Vector2i CityBuildingManager::FindBuilding(ZoneType zoneType)
 {
 	switch (zoneType)
 	{
@@ -155,6 +155,10 @@ sf::Vector2i CityBuildingManager::FindHouse(ZoneType zoneType)
 				return false;
 			return building.occupancy < building.capacity;
 		});
+		if (result != buildings_.end())
+		{
+			return result->position;
+		}
 	}
 	break;
 	case ZoneType::INDUSTRY:

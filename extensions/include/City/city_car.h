@@ -49,7 +49,7 @@ struct CityCar : Component
 	CarType carType;
 	std::vector<sf::Vector2i> currentPath;
 	Index currentIndex = 0;
-	Timer movingTimer = Timer(0.0f, 0.5f);//2 tiles per second
+	Timer movingTimer = Timer(0.0f, 0.1f);//2 tiles per second
 	CarState carState = CarState::ARRIVED;
 	sf::Vector2i position = INVALID_TILE_POS;
 	const sf::Vector2f spriteSize = sf::Vector2f(32.0f, 16.0f);
@@ -59,7 +59,7 @@ class CityCarManager : public System
 {
 public:
 	void Init() override;
-	void Update() override;
+	void Update(float dt) override;
 	void Destroy() override;
 
 	Entity SpawnCar(sf::Vector2i position, CarType carType);
@@ -68,6 +68,7 @@ public:
 	const std::vector<CityCar>& GetCarsVector() const;
 	void RescheduleCarPathfinding(const sf::Vector2i& removedPosition);
 	size_t CountCar() const;
+	CityCar* GetCar(Index carEntity);
 private:
 	std::vector<CityCar> cars_;
 	EntityManager* entityManagerPtr_ = nullptr;

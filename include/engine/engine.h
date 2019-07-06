@@ -67,7 +67,7 @@ public:
     virtual ~BasicEngine();
     void Init() override;
 
-    void Update() override;
+    void Update(float dt) override;
 
     void Destroy() override;
 
@@ -80,7 +80,7 @@ public:
     bool isRunning = false;
     std::unique_ptr<sf::RenderWindow> renderWindow = nullptr;
 	MouseManager& GetMouseManager();
-    sf::Time dt;
+    sf::Time clockDeltatime;
 protected:
     sf::Clock engineClock_;
     Remotery* rmt_ = nullptr;
@@ -101,7 +101,7 @@ public:
 
     void Init() override;
 
-    void Update() override;
+    void Update(float dt) override;
 
     void Destroy() override;
     /**

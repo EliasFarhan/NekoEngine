@@ -21,7 +21,6 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-#include <sstream>
 #include <City/city_engine.h>
 #include <City/city_editor.h>
 
@@ -45,60 +44,23 @@ void CityBuilderEngine::Init()
 	commandManager_.Init();
 	cityCarManager_.Init();
 
-	FunctionMap functionMap;
-	functionMap.SetFunction("FindHouse", [&](Index entity, const std::vector<double>&) -> bool
-	{
-		logDebug("Find House "+std::to_string(entity));
-		return true;//might or might not find a house
-	});
-	functionMap.SetFunction("FindWork", [&](Index entity, const std::vector<double>&) -> bool
-	{
-		logDebug("Find Work " + std::to_string(entity));
-		return true;//might or might not find a house
-	});
-	functionMap.SetFunction("CheckHomeAndWork", [&](Index entity, const std::vector<double>&) -> bool
-	{
-		logDebug("CheckHomeAndWork " + std::to_string(entity));
-		return true;//might or might not find a house
-	});
-	functionMap.SetFunction("KillMyself", [&](Index entity, const std::vector<double>&) -> bool
-	{
-		logDebug("Kill Myself " + std::to_string(entity));
-		return true;//might or might not find a house
-	});
-	functionMap.SetFunction("GotoHouse", [&](Index entity, const std::vector<double>&) -> bool
-	{
-
-		logDebug("Move To House " + std::to_string(entity));
-		return true;//return false means still running
-	});
-	functionMap.SetFunction("GotoWork", [&](Index entity, const std::vector<double>&) -> bool
-	{
-		logDebug("Move To Work " + std::to_string(entity));
-		return true;//return false means still running
-	});
-	functionMap.SetFunction("MoveOut", [&](Index entity, const std::vector<double>&) -> bool
-	{
-		logDebug("Move Out " + std::to_string(entity));
-		return true;//return false means still running
-	});
+	
 
 
 	cityPeopleManager_.Init();
 	
 }
 
-void CityBuilderEngine::Update()
+void CityBuilderEngine::Update(float dt)
 {
-	MainEngine::Update();
+	MainEngine::Update(dt);
     rmt_ScopedCPUSample(CityBuilderUpdate, 0);
-	const float dt = MainEngine::GetInstance()->dt.asSeconds();
     tf::Taskflow taskflow;
-    auto carsUpdateTask = taskflow.emplace([&](){cityCarManager_.Update();});
+    auto carsUpdateTask = taskflow.emplace([&](){cityCarManager_.Update(dt);});
 
 	auto peopleUpdateTask = taskflow.emplace([&]()
 	{
-		cityPeopleManager_.Update();
+		cityPeopleManager_.Update(dt);
 	});
 	auto btUpdateTask = taskflow.emplace([&]()
 	{
@@ -108,9 +70,9 @@ void CityBuilderEngine::Update()
 			behaviorTreeManager_.ExecuteIndex(entity);
 		}
 	});
-	btUpdateTask.precede(peopleUpdateTask);
+	peopleUpdateTask.precede(btUpdateTask);
 
-	auto commandUpdateTask = taskflow.emplace([&](){commandManager_.Update();});
+	auto commandUpdateTask = taskflow.emplace([&](){commandManager_.Update(dt);});
 
     auto buildingUpdateTask = taskflow.emplace([&](){ cityBuildingManager_.
 		Update(cityZoneManager_, cityBuilderMap_, dt);});
@@ -135,6 +97,7 @@ void CityBuilderEngine::Update()
         if(CityTilesheetType(i) == CityTilesheetType::CAR)
         {
             carsUpdateTask.precede(tilemapUpdateTasks[i]);
+			btUpdateTask.precede(tilemapUpdateTasks[i]);
         }
         if(CityTilesheetType(i) == CityTilesheetType::CITY)
         {
@@ -154,7 +117,7 @@ void CityBuilderEngine::Update()
 	zoneUpdateTask.precede(pushZoneCommandTask);
 	pushCommandTask.precede(pushZoneCommandTask);
 
-	auto cursorUpdateTask = taskflow.emplace([&](){cursor_.Update();});
+	auto cursorUpdateTask = taskflow.emplace([&](){cursor_.Update(dt);});
 	pushCommandTask.precede(cursorUpdateTask);
 
 
@@ -163,8 +126,10 @@ void CityBuilderEngine::Update()
 	auto editorUpdateTask = taskflow.emplace([&](){
         graphicsManager_->editor->AddInspectorInfo("FPS", std::to_string(1.0f / dt));
         graphicsManager_->editor->AddInspectorInfo("Cars", std::to_string(cityCarManager_.CountCar()));
+        graphicsManager_->editor->AddInspectorInfo("People", std::to_string(cityPeopleManager_.GetPeopleCount()));
 	});
 	carsUpdateTask.precede(editorUpdateTask);
+	btUpdateTask.precede(editorUpdateTask);
 
 
 	executor_.run(taskflow);
@@ -242,6 +207,11 @@ CityCarManager& CityBuilderEngine::GetCarManager()
 CityZoneManager& CityBuilderEngine::GetZoneManager()
 {
     return cityZoneManager_;
+}
+
+CityPeopleManager& CityBuilderEngine::GetPeopleManager()
+{
+	return cityPeopleManager_;
 }
 
 CityBuildingManager& CityBuilderEngine::GetBuildingManager()

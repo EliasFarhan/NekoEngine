@@ -57,7 +57,7 @@ BasicEngine::~BasicEngine()
     rmt_DestroyGlobalInstance(rmt_);
 }
 
-void BasicEngine::Update()
+void BasicEngine::Update(float dt)
 {
 
 }
@@ -92,7 +92,7 @@ void BasicEngine::EngineLoop()
     {
 
         rmt_ScopedCPUSample(EngineLoop, 0);
-        dt = engineClock_.restart();
+        clockDeltatime = engineClock_.restart();
 
         keyboardManager_.ClearKeys();
         mouseManager_.ClearFrameData();
@@ -106,8 +106,8 @@ void BasicEngine::EngineLoop()
         {
             rmt_ScopedCPUSample(Draw, 0);
             renderWindow->clear(config.bgColor);
-            ImGui::SFML::Update(*renderWindow, dt);
-            Update();
+            ImGui::SFML::Update(*renderWindow, clockDeltatime);
+            Update(clockDeltatime.asSeconds());
             ImGui::SFML::Render(*renderWindow);
             renderWindow->display();
         }
@@ -172,7 +172,7 @@ void MainEngine::EngineLoop()
 
 
         rmt_ScopedCPUSample(EngineLoop, 0);
-        dt = engineClock_.restart();
+        clockDeltatime = engineClock_.restart();
         if (frameIndex > 0)
         {
             rmt_ScopedCPUSample(WaitForGraphics, 0);
@@ -195,7 +195,7 @@ void MainEngine::EngineLoop()
             OnEvent(event);
             ImGui::SFML::ProcessEvent(event);
         }
-        Update();
+        Update(clockDeltatime.asSeconds());
 
         if (frameIndex > 0)
         {
@@ -237,7 +237,7 @@ void MainEngine::Init()
 
 }
 
-void MainEngine::Update()
+void MainEngine::Update(float dt)
 {
 
 }

@@ -31,9 +31,9 @@ namespace neko
 
 Transform2dManager::Transform2dManager()
 {
-	positions_.reserve(INIT_ENTITY_NMB);
-	scales_.reserve(INIT_ENTITY_NMB);
-	angles_.reserve(INIT_ENTITY_NMB);
+	positions_.resize(INIT_ENTITY_NMB);
+	scales_.resize(INIT_ENTITY_NMB);
+	angles_.resize(INIT_ENTITY_NMB);
 }
 
 void Transform2dManager::CopyPositionsFromPhysics2d(Physics2dManager& physics2dManager, size_t start, size_t length)
@@ -59,12 +59,16 @@ Index Transform2dManager::AddPosition(sf::Vector2f position, Entity entity)
 		positions_.push_back(position);
 		return Index(positions_.size());
 	}
+	
 	size_t futureSize = positions_.size();
-	while (futureSize <= entity)
+	if (futureSize <= entity)
 	{
-		futureSize *= 2;	
+		while (futureSize <= entity)
+		{
+			futureSize *= 2;
+		}
+		positions_.resize(futureSize);
 	}
-	positions_.resize(futureSize);
 	positions_[entity] = position;
 	return entity;
 }

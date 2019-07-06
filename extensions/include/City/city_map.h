@@ -69,7 +69,7 @@ struct DestroyElementCommand : CityCommand
 
 struct City
 {
-	sf::Vector2u mapSize = sf::Vector2u(512,256);
+	sf::Vector2u mapSize = sf::Vector2u(128,64);
 	float forestRatio = 0.5f;
 	float perlinFreq = 20.0f;
 	sf::Vector2u tileSize = sf::Vector2u(20, 20);
@@ -96,7 +96,7 @@ class CityBuilderMap : public System
 {
 public:
 	void Init() override;
-	void Update() override;
+	void Update(float dt) override;
 	void Destroy() override;
 
 	size_t Position2Index(sf::Vector2i pos) const;
@@ -106,6 +106,7 @@ public:
 	CityElement* GetCityElementAt(sf::Vector2i position);
 	bool IsGrass(sf::Vector2i position);
 	TileMapGraph& GetRoadGraph();
+	std::vector<sf::Vector2i> GetRoadEnds() const;
 	City city{};
 private:
     friend class CityBuilderTilemap;

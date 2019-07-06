@@ -61,6 +61,8 @@ void EntityManager::DestroyEntity(Entity entity)
 
 bool EntityManager::HasComponent(Entity entity, EntityMask componentType)
 {
+	if (entity >= entityMaskArray_.size())
+		return false;
     return (entityMaskArray_[entity] & EntityMask(componentType)) == EntityMask(componentType);
 }
 

@@ -43,7 +43,7 @@ void CityCursor::Init()
     engine_ = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
 }
 
-void CityCursor::Update()
+void CityCursor::Update(float dt)
 {
     const Index frameIndex = MainEngine::GetInstance()->frameIndex % 2;
 

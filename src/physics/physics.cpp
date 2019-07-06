@@ -43,7 +43,7 @@ void Physics2dManager::Init()
 	colliders_.reserve(INIT_ENTITY_NMB);
 }
 
-void Physics2dManager::Update()
+void Physics2dManager::Update(float dt)
 {
 	world_->Step(config_->physicsTimeStep, config_->velocityIterations, config_->positionIterations);
 }

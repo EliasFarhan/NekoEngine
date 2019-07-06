@@ -390,11 +390,14 @@ namespace neko {
 	{
 		auto behaviorTree = ParseBehaviorTreeFromJson(comp, jsonContent);
 		size_t futureSize = vecBehaviorTree_.capacity();
-		while (futureSize <= comp)
+		if (futureSize <= comp)
 		{
-			futureSize *= 2;
+			while (futureSize <= comp)
+			{
+				futureSize *= 2;
+			}
+			vecBehaviorTree_.resize(futureSize);
 		}
-		vecBehaviorTree_.resize(futureSize);
 		if (behaviorTree) {
 			vecBehaviorTree_.at(comp) = behaviorTree;
 			return comp;

@@ -83,7 +83,7 @@ void CityCommandManager::ExecuteCommand(const std::unique_ptr<CityCommand>& comm
     }
 }
 
-void CityCommandManager::Update()
+void CityCommandManager::Update(float dt)
 {
     const Index frameIndex = (MainEngine::GetInstance()->frameIndex) % 2;
     while (!commandQueue_[frameIndex].empty())
