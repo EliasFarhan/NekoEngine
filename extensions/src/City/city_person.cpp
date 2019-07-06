@@ -21,9 +21,9 @@ void CityPeopleManager::Init()
 						"functional" : "FindHouse()"
 					},
 					{
-						"type" : "leaf_functional",
+						"type" : "leaf_move_to",
 						"name" : "Goto house",
-						"functional" : "GotoHouse()"
+						"functional" : "GotoHouse(-1,-1)"
 					},
 					{
 						"type" : "leaf_wait",
@@ -43,9 +43,9 @@ void CityPeopleManager::Init()
 						"functional" : "FindWork()"
 					},
 					{
-						"type" : "leaf_functional",
+						"type" : "leaf_move_to",
 						"name" : "Goto house",
-						"functional" : "GotoWork()"
+						"functional" : "GotoWork(-1,-1)"
 					},
 					{
 						"type" : "leaf_wait",
@@ -65,9 +65,9 @@ void CityPeopleManager::Init()
 						"condition" : "CheckHomeAndWork(0)"
 					},
 					{
-						"type" : "leaf_functional",
+						"type" : "leaf_move_to",
 						"name" : "Goto exit!",
-						"functional" : "MoveOut()"
+						"functional" : "MoveOut(-1,-1)"
 					},
 					{
 						"type" : "leaf_functional",
