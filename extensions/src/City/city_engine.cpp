@@ -44,6 +44,7 @@ void CityBuilderEngine::Init()
 	cursor_.Init();
 	commandManager_.Init();
 	cityCarManager_.Init();
+	cityPeopleManager_.Init();
 
 	FunctionMap functionMap(INVALID_ENTITY);//wtf fred?!?
 	functionMap.SetFunction("FindHouse", [&](Index entity, const std::vector<double>&) -> bool
@@ -78,6 +79,10 @@ void CityBuilderEngine::Update()
     tf::Taskflow taskflow;
     auto carsUpdateTask = taskflow.emplace([&](){cityCarManager_.Update();});
 
+	auto peopleUpdateTask = taskflow.emplace([&]()
+	{
+		cityPeopleManager_.Update();
+	});
 	auto btUpdateTask = taskflow.emplace([&]()
 	{
 		auto btEntities = entityManager_.FilterEntities(EntityMask(CityComponentType::BEHAVIOR_TREE));
@@ -86,6 +91,7 @@ void CityBuilderEngine::Update()
 			behaviorTreeManager_.ExecuteIndex(entity);
 		}
 	});
+	btUpdateTask.precede(peopleUpdateTask);
 
 	auto commandUpdateTask = taskflow.emplace([&](){commandManager_.Update();});
 
@@ -224,5 +230,10 @@ CityZoneManager& CityBuilderEngine::GetZoneManager()
 CityBuildingManager& CityBuilderEngine::GetBuildingManager()
 {
     return cityBuildingManager_;
+}
+
+BehaviorTreeManager& CityBuilderEngine::GetBehaviorTreeManager()
+{
+	return behaviorTreeManager_;
 }
 }

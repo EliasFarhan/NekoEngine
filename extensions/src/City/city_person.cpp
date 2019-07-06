@@ -1,9 +1,11 @@
 #include <City/city_person.h>
+#include "City/city_engine.h"
 
 namespace neko
 {
 void CityPeopleManager::Init()
 {
+
 	personBehaviorTree_ = R"JSON(
 	{
 		"type" : "composite_selector",
@@ -82,6 +84,20 @@ void CityPeopleManager::Init()
 
 void CityPeopleManager::Update()
 {
+	auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+
+	spawningTimer.Update(engine->dt.asSeconds());
+	if(spawningTimer.IsOver())
+	{
+		auto& entityManager = engine->GetEntityManager();
+		auto& btManager = engine->GetBehaviorTreeManager();
+		const Entity person = entityManager.CreateEntity();
+
+		auto index = btManager.ParseBehaviorTreeFromJsonIndex(person, personBehaviorTree_);
+		assert(index == person);
+		entityManager.AddComponentType(person, EntityMask(CityComponentType::BEHAVIOR_TREE));
+		spawningTimer.Reset();
+	}
 }
 
 void CityPeopleManager::Destroy()

@@ -39,6 +39,7 @@
 #include "City/city_zone.h"
 #include <City/city_building.h>
 #include "city_behavior_tree_manager.h"
+#include "city_person.h"
 
 namespace neko
 {
@@ -84,6 +85,7 @@ public:
     sf::View mainView;
 
     CityBuildingManager& GetBuildingManager();
+	BehaviorTreeManager& GetBehaviorTreeManager();
 
 private:
 
@@ -92,6 +94,7 @@ private:
     Transform2dManager transformManager_;
     TextureManager textureManager_;
 
+	CityPeopleManager cityPeopleManager_;
     CityCommandManager commandManager_;
     CityBuilderTilemap environmentTilemap_;
     CityBuilderMap cityBuilderMap_;
