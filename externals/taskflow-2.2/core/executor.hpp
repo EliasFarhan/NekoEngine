@@ -308,7 +308,7 @@ inline void Executor::_spawn(unsigned N) {
 inline unsigned Executor::_find_victim(unsigned thief) {
   
   unsigned l = 0;
-  unsigned r = _workers.size() - 1;
+  unsigned r = unsigned(_workers.size()) - 1u;
   unsigned vtm = std::uniform_int_distribution<unsigned>{l, r}(
     _workers[thief].rdgen
   );
@@ -334,7 +334,7 @@ inline unsigned Executor::_find_victim(unsigned thief) {
     }
   }*/
 
-  return _workers.size();
+  return unsigned(_workers.size());
 }
 
 // Function: _explore_task

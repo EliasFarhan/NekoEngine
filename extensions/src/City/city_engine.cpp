@@ -44,7 +44,6 @@ void CityBuilderEngine::Init()
 	cursor_.Init();
 	commandManager_.Init();
 	cityCarManager_.Init();
-	cityPeopleManager_.Init();
 
 	FunctionMap functionMap;
 	functionMap.SetFunction("FindHouse", [&](Index entity, const std::vector<double>&) -> bool
@@ -62,23 +61,25 @@ void CityBuilderEngine::Init()
 		logDebug("CheckHomeAndWork " + std::to_string(entity));
 		return rand()%10 != 1;//might or might not find a house
 	});
-	functionMap.SetFunction("CheckHomeAndWork", [&](Index entity, const std::vector<double>&) -> bool
+	functionMap.SetFunction("KillMyself", [&](Index entity, const std::vector<double>&) -> bool
 	{
 		logDebug("Kill Myself " + std::to_string(entity));
 		return rand()%10 != 1;//might or might not find a house
 	});
-	functionMap.SetFunction("GoToHouse", [&](Index entity, const std::vector<double>&) -> bool
+	functionMap.SetFunction("GotoHouse", [&](Index entity, const std::vector<double>&) -> bool
 	{
 
 		logDebug("Move To House " + std::to_string(entity));
 		return rand() % 10 == 1;//return false means still running
 	});
-	functionMap.SetFunction("GoToWork", [&](Index entity, const std::vector<double>&) -> bool
+	functionMap.SetFunction("GotoWork", [&](Index entity, const std::vector<double>&) -> bool
 	{
 		logDebug("Move To Work " + std::to_string(entity));
 		return rand() % 10 == 1;//return false means still running
 	});
-	
+
+
+	cityPeopleManager_.Init();
 	
 }
 

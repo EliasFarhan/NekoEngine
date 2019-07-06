@@ -80,24 +80,21 @@ void CityPeopleManager::Init()
 			}
 		]
 	})JSON"_json;
+
+	auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+	auto& entityManager = engine->GetEntityManager();
+	auto& btManager = engine->GetBehaviorTreeManager();
+	const Entity person = entityManager.CreateEntity();
+
+	auto index = btManager.ParseBehaviorTreeFromJsonIndex(person, personBehaviorTree_);
+	assert(index == person);
+	entityManager.AddComponentType(person, EntityMask(CityComponentType::BEHAVIOR_TREE));
 }
 
 void CityPeopleManager::Update()
 {
-	auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+	
 
-	spawningTimer_.Update(engine->dt.asSeconds());
-	if(spawningTimer_.IsOver())
-	{
-		auto& entityManager = engine->GetEntityManager();
-		auto& btManager = engine->GetBehaviorTreeManager();
-		const Entity person = entityManager.CreateEntity();
-
-		auto index = btManager.ParseBehaviorTreeFromJsonIndex(person, personBehaviorTree_);
-		assert(index == person);
-		entityManager.AddComponentType(person, EntityMask(CityComponentType::BEHAVIOR_TREE));
-		spawningTimer_.Reset();
-	}
 }
 
 void CityPeopleManager::Destroy()
