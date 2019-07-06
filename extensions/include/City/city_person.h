@@ -17,6 +17,6 @@ public:
 protected:
 	json personBehaviorTree_;
 	std::vector<Entity> people_;
-	Timer spawningTimer = Timer(0.1f, 0.1f);
+	Timer spawningTimer_ = Timer(0.1f, 0.1f);
 };
 }

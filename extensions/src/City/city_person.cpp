@@ -86,8 +86,8 @@ void CityPeopleManager::Update()
 {
 	auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
 
-	spawningTimer.Update(engine->dt.asSeconds());
-	if(spawningTimer.IsOver())
+	spawningTimer_.Update(engine->dt.asSeconds());
+	if(spawningTimer_.IsOver())
 	{
 		auto& entityManager = engine->GetEntityManager();
 		auto& btManager = engine->GetBehaviorTreeManager();
@@ -96,7 +96,7 @@ void CityPeopleManager::Update()
 		auto index = btManager.ParseBehaviorTreeFromJsonIndex(person, personBehaviorTree_);
 		assert(index == person);
 		entityManager.AddComponentType(person, EntityMask(CityComponentType::BEHAVIOR_TREE));
-		spawningTimer.Reset();
+		spawningTimer_.Reset();
 	}
 }
 
