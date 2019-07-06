@@ -55,7 +55,7 @@ void CityBuildingManager::Update(const CityZoneManager& zoneManager, CityBuilder
 					CityTileType(
 						(rand() % (Index(CityTileType::HOUSE4) - Index(CityTileType::HOUSE1))) +
 						Index(CityTileType::HOUSE1)),
-					(rand() % (10 - 5)) + 5
+					(rand() % (10u - 5u)) + 5u
 					},
 					zoneManager,
 					cityMap);
@@ -80,7 +80,7 @@ void CityBuildingManager::Update(const CityZoneManager& zoneManager, CityBuilder
 					newHousePlace.position,
 					sf::Vector2i(1, 1),
 					CityTileType::OFFICE1,
-				(rand() % (20 - 10)) + 10
+				(rand() % (20u - 10u)) + 10u
 					}, zoneManager, cityMap);
 			}
 		}
@@ -133,9 +133,9 @@ sf::Vector2i CityBuildingManager::FindHouse(ZoneType zoneType)
 	{
 		const auto result = std::find_if(buildings_.begin(), buildings_.end(), [](const Building& building)
 		{
-			if (building.buildingType != CityTileType::HOUSE1 && 
-				building.buildingType != CityTileType::HOUSE2 && 
-				building.buildingType != CityTileType::HOUSE3 && 
+			if (building.buildingType != CityTileType::HOUSE1 &&
+				building.buildingType != CityTileType::HOUSE2 &&
+				building.buildingType != CityTileType::HOUSE3 &&
 				building.buildingType != CityTileType::HOUSE4)
 				return false;
 
@@ -148,13 +148,15 @@ sf::Vector2i CityBuildingManager::FindHouse(ZoneType zoneType)
 		break;
 	}
 	case ZoneType::COMMERCIAL:
+	{
 		const auto result = std::find_if(buildings_.begin(), buildings_.end(), [](const Building& building)
 		{
 			if (building.buildingType != CityTileType::OFFICE1)
 				return false;
 			return building.occupancy < building.capacity;
 		});
-		break;
+	}
+	break;
 	case ZoneType::INDUSTRY:
 		break;
 	default:
@@ -169,7 +171,7 @@ Building* CityBuildingManager::GetBuildingAt(sf::Vector2i position)
 	{
 		return building.position == position;
 	});
-	if(result == buildings_.end())
+	if (result == buildings_.end())
 	{
 		return nullptr;
 	}
