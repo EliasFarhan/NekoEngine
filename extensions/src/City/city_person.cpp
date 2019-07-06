@@ -25,7 +25,7 @@ void CityPeopleManager::Init()
 					{
 						"type" : "leaf_move_to",
 						"name" : "Goto house",
-						"functional" : "GotoHouse(-1,-1)"
+						"to" : "GotoHouse(-1,-1)"
 					},
 					{
 						"type" : "leaf_wait",
@@ -47,7 +47,7 @@ void CityPeopleManager::Init()
 					{
 						"type" : "leaf_move_to",
 						"name" : "Goto house",
-						"functional" : "GotoWork(-1,-1)"
+						"to" : "GotoWork(-1,-1)"
 					},
 					{
 						"type" : "leaf_wait",
@@ -69,7 +69,7 @@ void CityPeopleManager::Init()
 					{
 						"type" : "leaf_move_to",
 						"name" : "Goto exit!",
-						"functional" : "MoveOut(-1,-1)"
+						"to" : "MoveOut(-1,-1)"
 					},
 					{
 						"type" : "leaf_functional",
