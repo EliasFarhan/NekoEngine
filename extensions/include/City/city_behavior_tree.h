@@ -248,7 +248,7 @@ namespace neko {
 
 	// Leaf Condition in a behavior tree.
 	// The leaf check if a condition dictated by
-	// SetVariable("condition", "bla == bli");.
+	// SetVariable("condition", "IsRunning(0.4)");.
 	class BehaviorTreeLeafCondition : public BehaviorTreeLeaf
 	{
 	public:
@@ -321,6 +321,8 @@ namespace neko {
 
 	// This is an approach to change all function node by a unique one!
 	// example: "functional" : "Function(1.0, 2.0, 3.0)".
+	// Functional is suppose to be called once so return only failure or
+	// success.
 	class BehaviorTreeLeafFunctional : public BehaviorTreeLeaf
 	{
 	public:
