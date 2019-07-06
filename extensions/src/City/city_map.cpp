@@ -1,16 +1,20 @@
 #include <City/city_map.h>
 #include <PerlinNoise.hpp>
 #include "engine/log.h"
+#include <engine/engine.h>
+#include <City/city_engine.h>
 #include <sstream>
 #include <cstring>
 #include <iterator>
 
 namespace neko
 {
+class MainEngine;
+
 void CityBuilderMap::Init()
 {
 	//River
-	environmentTiles_.resize(city.mapSize.x * city.mapSize.y, EnvironmentTile::GRASS);
+	environmentTiles_.resize(size_t(city.mapSize.x) * city.mapSize.y, EnvironmentTile::GRASS);
 	{
 		sf::Vector2i pos = sf::Vector2i((rand() % (city.mapSize.x / 3)) + city.mapSize.x / 3, 0);
 		int previousX = 0;
@@ -84,6 +88,8 @@ void CityBuilderMap::Init()
 				trainStation.position = pos + sf::Vector2i(0, 1);//bottom left
 				trainStation.size = sf::Vector2u(5, 3);
 				trainStation.elementType = CityElementType::TRAIN_STATION;
+				auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+				engine->mainView.setCenter(sf::Vector2f(float(trainStation.position.x)*city.tileSize.x, float(trainStation.position.y)*city.tileSize.y));
 				elements_.push_back(trainStation);
 			}
 			if (x > trainStationX && x < trainStationX + 4)
@@ -206,7 +212,7 @@ sf::Vector2i CityBuilderMap::Index2Position(size_t index) const
 
 void CityBuilderMap::AddCityElement(CityElementType cityElement, const sf::Vector2i& position)
 {
-	if(position.x < 0 || position.y < 0 || position.x >= city.mapSize.x || position.y >= city.mapSize.y)
+	if(position.x < 0 || position.y < 0 || position.x >= int(city.mapSize.x) || position.y >= int(city.mapSize.y))
 	{
 		return;
 	}

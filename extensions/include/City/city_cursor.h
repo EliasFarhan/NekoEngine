@@ -38,11 +38,13 @@ public:
 	void Update(float dt) override;
 	void Destroy() override;
 	void OnEvent(sf::Event& event);
+	void SetCursorMode(ButtonIconType cursorMode);
 	sf::Vector2i GetMouseWorldPos() const;
 	sf::Vector2i GetMouseTilePos() const;
-	ButtonIconType cursorMode = ButtonIconType::NONE;
 	CityBuilderEngine* engine_;
 protected:
+
+	ButtonIconType cursorMode_ = ButtonIconType::NONE;
 	//for double buffering
 	sf::RectangleShape cursorRect_[2];
 	sf::Vector2i originPos_ =sf::Vector2i(-1,-1);

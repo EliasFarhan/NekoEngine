@@ -51,7 +51,7 @@ void CityCursor::Update(float dt)
 	const auto mouseTilePos = GetMouseTilePos();
 	rect.setPosition(sf::Vector2f(mouseTilePos.x * tileSize.x, mouseTilePos.y * tileSize.y) - tileSize / 2.0f);
 
-	switch (cursorMode)
+	switch (cursorMode_)
 	{
 	case ButtonIconType::ROAD:
 	{
@@ -101,7 +101,7 @@ void CityCursor::Update(float dt)
 			}
 		}
 
-		rect.setFillColor(cursorColor[Index(cursorMode)]);
+		rect.setFillColor(cursorColor[Index(cursorMode_)]);
 		break;
 	}
 	case ButtonIconType::BULLDOZER:
@@ -133,7 +133,7 @@ void CityCursor::Update(float dt)
 			}
 
 		}
-		rect.setFillColor(cursorColor[Index(cursorMode)]);
+		rect.setFillColor(cursorColor[Index(cursorMode_)]);
 		break;
 	}
 	default:
@@ -168,19 +168,19 @@ void CityCursor::OnEvent(sf::Event& event)
 	{
 
 		//Create tile road or destroy it
-		switch (cursorMode)
+		switch (cursorMode_)
 		{
 		case ButtonIconType::ROAD:
 		{
 			auto& cityMap = engine_->GetCityMap();
 			if (originPos_ == INVALID_TILE_POS) break;
-			if (originPos_.x < 0 || originPos_.y < 0 || originPos_.x >= cityMap.city.mapSize.x || originPos_.y >= cityMap.city.mapSize.y)
+			if (originPos_.x < 0 || originPos_.y < 0 || originPos_.x >= int(cityMap.city.mapSize.x) || originPos_.y >= int(cityMap.city.mapSize.y))
 			{
 				originPos_ = INVALID_TILE_POS;
 				return;
 			}
 			const auto currentPos = GetMouseTilePos();
-			if (currentPos.x < 0 || currentPos.y < 0 || currentPos.x >= cityMap.city.mapSize.x || currentPos.y >= cityMap.city.mapSize.y)
+			if (currentPos.x < 0 || currentPos.y < 0 || currentPos.x >= int(cityMap.city.mapSize.x) || currentPos.y >= int(cityMap.city.mapSize.y))
 			{
 				originPos_ = INVALID_TILE_POS;
 				return;
@@ -236,7 +236,7 @@ void CityCursor::OnEvent(sf::Event& event)
 			{
 				for (int dy = 0; dy <= abs(deltaPos.y); dy++)
 				{
-					switch (cursorMode)
+					switch (cursorMode_)
 					{
 					case ButtonIconType::BULLDOZER:
 					{
@@ -276,6 +276,13 @@ void CityCursor::OnEvent(sf::Event& event)
 			break;
 		}
 	}
+}
+
+void CityCursor::SetCursorMode(ButtonIconType cursorMode)
+{
+	originPos_ = INVALID_TILE_POS;
+	this->cursorMode_ = cursorMode;
+	
 }
 
 sf::Vector2i CityCursor::GetMouseWorldPos() const

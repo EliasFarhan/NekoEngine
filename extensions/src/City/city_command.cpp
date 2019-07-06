@@ -34,8 +34,24 @@ namespace neko
 {
 void CityCommandManager::AddCommand(std::unique_ptr<CityCommand> command, bool fromRenderThread)
 {
-    const Index frameIndex = (MainEngine::GetInstance()->frameIndex - (fromRenderThread ? 1 : 0)) % 2;
-    commandQueue_[frameIndex].push(std::move(command));
+	const Index frameIndex = (MainEngine::GetInstance()->frameIndex - (fromRenderThread ? 1 : 0)) % 2;
+	if (command->commandType == CityCommandType::CHANGE_CURSOR_MODE)
+	{
+		commandQueue_[frameIndex].insert(commandQueue_[frameIndex].begin(), std::move(command));
+		for(auto i = 0u; i < commandQueue_[frameIndex].size();i++)
+		{
+			if(commandQueue_[frameIndex][i]->commandType == CityCommandType::CREATE_CITY_ELEMENT)
+			{
+				commandQueue_[frameIndex].erase(commandQueue_[frameIndex].begin() + i);
+				i--;
+			}
+		}
+	}
+	else
+	{
+		commandQueue_[(frameIndex+1)%2].push_back(std::move(command));
+	}
+
 }
 
 void CityCommandManager::Init()
@@ -51,7 +67,7 @@ void CityCommandManager::Init()
 	soundSelect_ = Sound::CreateSoundFromBuffer(soundBufferSelect_);
 }
 
-void CityCommandManager::ExecuteCommand(const std::unique_ptr<CityCommand>& command) const
+void CityCommandManager::ExecuteCommand(const std::shared_ptr<CityCommand>& command) const
 {
     switch (command->commandType)
     {
@@ -98,13 +114,14 @@ void CityCommandManager::ExecuteCommand(const std::unique_ptr<CityCommand>& comm
 
 void CityCommandManager::Update(float dt)
 {
-    const Index frameIndex = (MainEngine::GetInstance()->frameIndex) % 2;
-    while (!commandQueue_[frameIndex].empty())
-    {
-        auto command = std::move(commandQueue_[frameIndex].front());
-        commandQueue_[frameIndex].pop();
-        ExecuteCommand(command);
-    }
+	const Index frameIndex = (MainEngine::GetInstance()->frameIndex) % 2;
+	const auto commandNmb = commandQueue_[frameIndex].size();
+	for (auto i = 0u; i < commandNmb; i++)
+	{
+		auto command = commandQueue_[frameIndex][i];
+		ExecuteCommand(command);
+	}
+	commandQueue_[frameIndex].clear();
 }
 
 void CityCommandManager::Destroy()

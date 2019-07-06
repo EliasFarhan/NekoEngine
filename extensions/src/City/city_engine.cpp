@@ -35,9 +35,10 @@ void CityBuilderEngine::Init()
 {
 	config.vSync = true;
 	MainEngine::Init();
+
+	mainView = renderWindow->getView();
 	cityBuilderMap_.Init();
 	environmentTilemap_.Init(textureManager_);
-	mainView = renderWindow->getView();
 	graphicsManager_->editor = std::make_unique<CityEditor>();
 	graphicsManager_->editor->Init();
 
@@ -137,7 +138,7 @@ void CityBuilderEngine::Update(float dt)
 
 	auto zoneUpdateTask = taskflow.emplace([&]() {
 		cityZoneManager_.UpdateZoneTilemap(cityBuilderMap_,
-			cityBuildingManager_, mainView); });
+		                                   cityBuildingManager_, mainView); });
 	buildingUpdateTask.precede(zoneUpdateTask);
 	commandUpdateTask.precede(zoneUpdateTask);
 	auto pushZoneCommandTask = taskflow.emplace([&]() {cityZoneManager_.PushCommand(graphicsManager_.get()); });
