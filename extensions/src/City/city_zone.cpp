@@ -93,7 +93,7 @@ void CityZoneManager::PushCommand(GraphicsManager* graphicsManager)
 
 void CityZoneManager::AddZone(sf::Vector2i position, ZoneType zoneType, CityBuilderMap& cityMap)
 {
-	if(position.x < 0 || position.y < 0 || position.x >= cityMap.city.mapSize.x || position.y >= cityMap.city.mapSize.y)
+	if(position.x < 0 || position.y < 0 || position.x >= int(cityMap.city.mapSize.x) || position.y >= int(cityMap.city.mapSize.y))
 	{
 		return;
 	}

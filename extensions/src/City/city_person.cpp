@@ -378,11 +378,11 @@ Person* CityPeopleManager::GetPersonAt(Entity entity)
 Index CityPeopleManager::GetPeopleCount()
 {
 	auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
-	return std::count_if(people_.begin(), people_.end(), [&engine](const Person& person)
+	return Index(std::count_if(people_.begin(), people_.end(), [&engine](const Person& person)
 	{
 		return engine->GetEntityManager().HasComponent(person.personEntity, EntityMask(CityComponentType::PERSON)) && 
 			person.housePos != INVALID_TILE_POS;
-	});
+	}));
 }
 
 void CityPeopleManager::DestroyPerson(Entity entity)

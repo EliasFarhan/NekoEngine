@@ -52,12 +52,12 @@ class CityCommandManager : public System
 	
 public:
 	void Init() override;
-	void ExecuteCommand(const std::unique_ptr<CityCommand>& command) const;
+	void ExecuteCommand(const std::shared_ptr<CityCommand>& command) const;
 	void Update(float dt) override;
 	void Destroy() override;
 	void AddCommand(std::unique_ptr<CityCommand> command, bool fromRenderThread = false);
 protected:
-	std::queue<std::unique_ptr<CityCommand>>commandQueue_[2];
+	std::vector<std::shared_ptr<CityCommand>>commandQueue_[2];
 	CityBuilderEngine* engine_ = nullptr;
 };
 }

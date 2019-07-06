@@ -34,19 +34,16 @@ void CityBuilderEngine::Init()
 {
 	config.vSync = true;
 	MainEngine::Init();
+
+	mainView = renderWindow->getView();
 	cityBuilderMap_.Init();
 	environmentTilemap_.Init(textureManager_);
-	mainView = renderWindow->getView();
 	graphicsManager_->editor = std::make_unique<CityEditor>();
 	graphicsManager_->editor->Init();
 
 	cursor_.Init();
 	commandManager_.Init();
 	cityCarManager_.Init();
-
-
-
-
 	cityPeopleManager_.Init();
 
 }
