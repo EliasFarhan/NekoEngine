@@ -15,7 +15,34 @@ void CityPeopleManager::Init()
 			{"name" , "House loop" },
 			{"children", 
 			{
-
+				{
+					{"type" , "leaf_functional"},
+					{"name" , "Search house"},
+					{"functional" ,"FindHouse()"}
+				},
+				{
+					{"type" , "composite_sequence"},
+					{"name" , "Find House loop" },
+					{"children",
+					{
+						{"type" , "leaf_condition"},
+						{"name" , "Find house"},
+						{"condition" ,"House(-1,-1)"}
+					},
+					{
+					}
+					}
+				},
+				{
+					{"type" , "leaf_move_to"},
+					{"name" , "Move to energy source"},
+					{"to" , "MoveTo(12, 34)"}
+				},
+				{
+					{"type" , "leaf_wait"},
+					{"name" , "Wait for reload"},
+					{"delay" , "2.0"}
+				}
 			}
 			}
 		},
