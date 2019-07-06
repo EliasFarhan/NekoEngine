@@ -25,6 +25,7 @@
 #include <City/city_editor.h>
 
 #include <engine/log.h>
+#include <sound/sound.h>
 #include <Remotery.h>
 #include "City/city_function_map.h"
 
@@ -44,8 +45,17 @@ void CityBuilderEngine::Init()
 	cursor_.Init();
 	commandManager_.Init();
 	cityCarManager_.Init();
-	cityPeopleManager_.Init();
 
+	cityPeopleManager_.Init();
+	musicInd_ = Sound::LoadMusic("data/Meydn01.ogg");
+	if (!Sound::PlayMusic(musicInd_))
+	{
+		logDebug("Could not load music...");
+	}
+	else
+	{
+		Sound::SetLoop(musicInd_, true);
+	}
 }
 
 void CityBuilderEngine::Update(float dt)
@@ -177,6 +187,7 @@ void CityBuilderEngine::OnEvent(sf::Event& event)
 
 void CityBuilderEngine::Destroy()
 {
+	Sound::RemoveMusic(musicInd_);
 	cursor_.Destroy();
 	commandManager_.Destroy();
 	MainEngine::Destroy();

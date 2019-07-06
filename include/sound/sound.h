@@ -50,6 +50,7 @@ namespace neko {
 		static bool PlayMusic(Index ind);
 		static bool StopMusic(Index ind);
 		static bool RemoveMusic(Index ind);
+		static void SetLoop(Index ind, bool loop);
 
 	protected:
 		static Index GetNextIndex();
