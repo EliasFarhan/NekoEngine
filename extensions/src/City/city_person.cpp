@@ -31,14 +31,7 @@ void CityPeopleManager::Init()
 						"type" : "leaf_wait",
 						"name" : "Sleep in house",
 						"delay" : "5.0"
-					}
-				]
-			},
-			{
-				"type" : "composite_sequence",
-				"name" : "Work loop",
-				"children" : 
-				[
+					},
 					{
 						"type" : "leaf_functional",
 						"name" : "Search work",
