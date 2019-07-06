@@ -49,23 +49,34 @@ void CityBuilderEngine::Init()
 	FunctionMap functionMap(INVALID_ENTITY);//wtf fred?!?
 	functionMap.SetFunction("FindHouse", [&](Index entity, const std::vector<double>&) -> bool
 	{
-		logDebug("Find House");
+		logDebug("Find House "+std::to_string(entity));
 		return rand()%10 != 1;//might or might not find a house
 	});
 	functionMap.SetFunction("FindWork", [&](Index entity, const std::vector<double>&) -> bool
 	{
-		logDebug("Find Work");
+		logDebug("Find Work " + std::to_string(entity));
 		return rand()%10 != 1;//might or might not find a house
 	});
 	functionMap.SetFunction("CheckHomeAndWork", [&](Index entity, const std::vector<double>&) -> bool
 	{
-		logDebug("CheckHomeAndWork");
+		logDebug("CheckHomeAndWork " + std::to_string(entity));
 		return rand()%10 != 1;//might or might not find a house
 	});
 	functionMap.SetFunction("CheckHomeAndWork", [&](Index entity, const std::vector<double>&) -> bool
 	{
-		logDebug("Kill Myself");
+		logDebug("Kill Myself " + std::to_string(entity));
 		return rand()%10 != 1;//might or might not find a house
+	});
+	functionMap.SetFunction("GoToHouse", [&](Index entity, const std::vector<double>&) -> bool
+	{
+
+		logDebug("Move To House " + std::to_string(entity));
+		return rand() % 10 == 1;//return false means still running
+	});
+	functionMap.SetFunction("GoToWork", [&](Index entity, const std::vector<double>&) -> bool
+	{
+		logDebug("Move To Work " + std::to_string(entity));
+		return rand() % 10 == 1;//return false means still running
 	});
 	
 	
