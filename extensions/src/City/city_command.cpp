@@ -28,6 +28,7 @@
 #include "engine/engine.h"
 #include "City/city_engine.h"
 #include "City/city_editor.h"
+#include "sound/sound.h"
 
 namespace neko
 {
@@ -40,6 +41,14 @@ void CityCommandManager::AddCommand(std::unique_ptr<CityCommand> command, bool f
 void CityCommandManager::Init()
 {
     engine_ = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+	soundBufferErase_ = Sound::LoadSoundBuffer("data/Swip.wav");
+	soundBufferBuild_ = Sound::LoadSoundBuffer("data/Truip.wav");
+	soundBufferRoad_ = Sound::LoadSoundBuffer("data/Buip.wav");
+	soundBufferSelect_ = Sound::LoadSoundBuffer("data/Wiz.wav");
+	soundErase_ = Sound::CreateSoundFromBuffer(soundBufferErase_);
+	soundBuild_ = Sound::CreateSoundFromBuffer(soundBufferBuild_);
+	soundRoad_ = Sound::CreateSoundFromBuffer(soundBufferRoad_);
+	soundSelect_ = Sound::CreateSoundFromBuffer(soundBufferSelect_);
 }
 
 void CityCommandManager::ExecuteCommand(const std::unique_ptr<CityCommand>& command) const
@@ -50,6 +59,7 @@ void CityCommandManager::ExecuteCommand(const std::unique_ptr<CityCommand>& comm
         {
             auto* cursorCommand = dynamic_cast<ChangeModeCommand*>(command.get());
             engine_->GetCursor().cursorMode = cursorCommand->newCursorMode;
+			Sound::PlaySound(soundSelect_);
             break;
         }
         case CityCommandType::CREATE_CITY_ELEMENT:
@@ -61,6 +71,7 @@ void CityCommandManager::ExecuteCommand(const std::unique_ptr<CityCommand>& comm
             {
                 engine_->GetBuildingManager().RemoveBuilding(buildCommand->position);
             }
+			Sound::PlaySound(soundRoad_);
             break;
         }
         case CityCommandType::DELETE_CITY_ELEMENT:
@@ -70,13 +81,15 @@ void CityCommandManager::ExecuteCommand(const std::unique_ptr<CityCommand>& comm
             engine_->GetCarManager().RescheduleCarPathfinding(buildCommand->position);
             engine_->GetZoneManager().RemoveZone(buildCommand->position);
             engine_->GetBuildingManager().RemoveBuilding(buildCommand->position);
+			Sound::PlaySound(soundErase_);
             break;
         }
         case CityCommandType::ADD_CITY_ZONE:
         {
             auto* zoneCommand = dynamic_cast<AddZoneCommand*>(command.get());
             engine_->GetZoneManager().AddZone(zoneCommand->position, zoneCommand->zoneType, engine_->GetCityMap());
-            break;
+			Sound::PlaySound(soundBuild_);
+			break;
         }
         default:
             break;
@@ -96,5 +109,9 @@ void CityCommandManager::Update(float dt)
 
 void CityCommandManager::Destroy()
 {
+	Sound::RemoveSoundBuffer(soundBufferErase_);
+	Sound::RemoveSoundBuffer(soundBufferBuild_);
+	Sound::RemoveSoundBuffer(soundBufferRoad_);
+	Sound::RemoveSoundBuffer(soundBufferSelect_);
 }
 }

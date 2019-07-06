@@ -26,6 +26,7 @@
 #include <queue>
 #include <memory>
 #include "engine/system.h"
+#include "engine/globals.h"
 
 namespace neko
 {
@@ -56,8 +57,17 @@ public:
 	void Update(float dt) override;
 	void Destroy() override;
 	void AddCommand(std::unique_ptr<CityCommand> command, bool fromRenderThread = false);
+
 protected:
 	std::queue<std::unique_ptr<CityCommand>>commandQueue_[2];
 	CityBuilderEngine* engine_ = nullptr;
+	Index soundErase_ = INDEX_INVALID;
+	Index soundBuild_ = INDEX_INVALID;
+	Index soundRoad_ = INDEX_INVALID;
+	Index soundSelect_ = INDEX_INVALID;
+	Index soundBufferErase_ = INDEX_INVALID;
+	Index soundBufferBuild_ = INDEX_INVALID;
+	Index soundBufferRoad_ = INDEX_INVALID;
+	Index soundBufferSelect_ = INDEX_INVALID;
 };
 }

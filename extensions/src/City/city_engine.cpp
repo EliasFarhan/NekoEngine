@@ -86,7 +86,7 @@ void CityBuilderEngine::Update(float dt)
 	std::array<tf::Task, int(CityTilesheetType::LENGTH)> tilemapUpdateTasks;
 	auto pushCommandTask = taskflow.emplace([&]() {environmentTilemap_.PushCommand(graphicsManager_.get()); });
 	auto mainViewUpdateTask = taskflow.emplace([&]() {
-		if (mouseManager_.IsButtonPressed(sf::Mouse::Button::Middle))
+		if (mouseManager_.IsButtonPressed(sf::Mouse::Button::Right))
 		{
 			const auto delta = sf::Vector2f(mouseManager_.GetMouseDelta());
 			mainView.setCenter(mainView.getCenter() - currentZoom_ * delta);
@@ -175,13 +175,13 @@ void CityBuilderEngine::OnEvent(sf::Event& event)
 			std::ostringstream oss;
 			oss << "Mouse Wheel Delta: " << wheelDelta;
 			logDebug(oss.str());
-	}
+		}
 #endif
 		const auto size = mainView.getSize();
 		currentZoom_ -= wheelDelta * scrollDelta_ * currentZoom_;
 
 		mainView.setSize(size - wheelDelta * scrollDelta_ * size);
-}
+	}
 }
 
 void CityBuilderEngine::Destroy()
