@@ -80,11 +80,14 @@ void CityCommandManager::ExecuteCommand(const std::shared_ptr<CityCommand>& comm
         }
         case CityCommandType::CREATE_CITY_ELEMENT:
         {
+				if(engine_->GetCityMoney() < roadCost)
+					break;
             auto* buildCommand = dynamic_cast<BuildElementCommand*>(command.get());
             engine_->GetZoneManager().RemoveZone(buildCommand->position);
             engine_->GetCityMap().AddCityElement(buildCommand->elementType, buildCommand->position);
             if(buildCommand->elementType == CityElementType::ROAD)
             {
+				engine_->ChangeCityMoney(-roadCost);
                 engine_->GetBuildingManager().RemoveBuilding(buildCommand->position);
             }
 			Sound::PlaySound(soundRoad_);
@@ -106,6 +109,12 @@ void CityCommandManager::ExecuteCommand(const std::shared_ptr<CityCommand>& comm
             engine_->GetZoneManager().AddZone(zoneCommand->position, zoneCommand->zoneType, engine_->GetCityMap());
 			Sound::PlaySound(soundBuild_);
 			break;
+        }
+		case CityCommandType::CHANGE_TAX:
+        {
+			auto* taxCommand = dynamic_cast<ChangeTaxCommand*>(command.get());
+			engine_->houseTax = taxCommand->houseTax;
+			engine_->workTax = taxCommand->workTax;
         }
         default:
             break;

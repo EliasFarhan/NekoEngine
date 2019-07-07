@@ -57,7 +57,7 @@ void CityEditor::Update(float dt)
 	for (Index i = 0; i < Index(ButtonIconType::LENGTH); i++)
 	{
 		const auto buttonTexture = engine_->GetTextureManager().GetTexture(buttonUiIndex[i]);
-		if(ImGui::ImageButton(*buttonTexture))
+		if (ImGui::ImageButton(*buttonTexture))
 		{
 			std::fill(std::begin(buttonSelected), std::end(buttonSelected), false);
 			buttonSelected[i] = true;
@@ -65,6 +65,21 @@ void CityEditor::Update(float dt)
 			auto newCommand = std::make_unique<ChangeModeCommand>();
 			newCommand->newCursorMode = ButtonIconType(i);
 			newCommand->commandType = CityCommandType::CHANGE_CURSOR_MODE;
+			engine_->GetCommandManager().AddCommand(std::move(newCommand), true);
+		}
+	}
+	//Tax management
+	{
+		int newWorkTax = int(100.0f * engine_->workTax);
+		ImGui::SliderInt("Work Tax", &newWorkTax, 0, 50, "%d%");
+		int newHouseTax = int(100.0f * engine_->houseTax);
+		ImGui::SliderInt("House Tax", &newHouseTax, 0, 50, "%d%");
+		if (newWorkTax != int(100.0f * engine_->workTax) || newHouseTax != int(100.0f * engine_->houseTax))
+		{
+			auto newCommand = std::make_unique<ChangeTaxCommand>();
+			newCommand->workTax = float(newWorkTax) / 100.0f;
+			newCommand->houseTax = float(newHouseTax) / 100.0f;
+			newCommand->commandType = CityCommandType::CHANGE_TAX;
 			engine_->GetCommandManager().AddCommand(std::move(newCommand), true);
 		}
 	}

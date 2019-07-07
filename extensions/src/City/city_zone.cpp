@@ -26,6 +26,7 @@
 #include <engine/engine.h>
 #include <City/city_map.h>
 #include <City/city_building.h>
+#include <City/city_engine.h>
 
 namespace neko
 {
@@ -80,6 +81,9 @@ void CityZoneManager::PushCommand(GraphicsManager* graphicsManager)
 
 void CityZoneManager::AddZone(sf::Vector2i position, ZoneType zoneType, CityBuilderMap& cityMap)
 {
+	auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+	if(engine->GetCityMoney() < zoneCost)
+		return;
 	if(position.x < 0 || position.y < 0 || position.x >= int(cityMap.city.mapSize.x) || position.y >= int(cityMap.city.mapSize.y))
 	{
 		return;
@@ -90,6 +94,7 @@ void CityZoneManager::AddZone(sf::Vector2i position, ZoneType zoneType, CityBuil
     //Just changing the existing zone
     if(existingZone != zones_.end())
     {
+		engine->ChangeCityMoney(-zoneCost);
         existingZone->zoneType = zoneType;
         return;
     }
@@ -107,6 +112,7 @@ void CityZoneManager::AddZone(sf::Vector2i position, ZoneType zoneType, CityBuil
         if((deltaPos.x == 0 && abs(deltaPos.y) <= ZONE_RADIUS) ||
                 (deltaPos.y == 0 && abs(deltaPos.x) <= ZONE_RADIUS))
         {
+			engine->ChangeCityMoney(-zoneCost);
             zones_.push_back( {position, zoneType});
             break;
         }

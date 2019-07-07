@@ -49,6 +49,11 @@ void CityPeopleManager::Init()
 						"type" : "leaf_wait",
 						"name" : "Sleep in work",
 						"delay" : "5.0"
+					},
+					{
+						"type" : "leaf_functional",
+						"name" : "Increase day",
+						"functional" : "IncreaseDayCount()"
 					}
 				]
 			},
@@ -306,6 +311,20 @@ void CityPeopleManager::Init()
 		logDebug("Kill Myself " + std::to_string(entity));
 		DestroyPerson(entity);
 		return true;//might or might not find a house
+	});
+	functionMap.SetFunction("IncreaseDayCount", [&](Index entity, const std::vector<double>&)->bool
+	{
+		auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+		auto* person = GetPersonAt(entity);
+		if( person != nullptr)
+		{
+			person->dayCount++;
+			person->salary = personBaseSalary * powf(1.1f, person->dayCount);
+			const int houseTaxValue = person->salary * engine->houseTax;
+			person->money += person->salary - houseTaxValue;
+			engine->ChangeCityMoney(houseTaxValue);
+		}
+		return true;
 	});
 	functionMap.SetFunction("GotoHouse", moveToFunc);
 	functionMap.SetFunction("GotoWork", moveToFunc);

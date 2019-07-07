@@ -31,6 +31,7 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <Box2D/Common/b2Math.h>
 #include "input.h"
+#include <SFML/Window/WindowStyle.hpp>
 
 
 struct Remotery;
@@ -53,6 +54,7 @@ struct Configuration
     sf::Color bgColor = sf::Color::Black;
     bool vSync = true;
     unsigned int framerateLimit = 0u;
+    int windowStyle = sf::Style::Default;
 };
 
 /**

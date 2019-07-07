@@ -34,6 +34,7 @@ namespace neko
 void CityBuilderEngine::Init()
 {
 	config.vSync = true;
+	config.windowStyle = sf::Style::Titlebar | sf::Style::Close;
 	MainEngine::Init();
 
 	mainView = renderWindow->getView();
@@ -153,7 +154,7 @@ void CityBuilderEngine::Update(float dt)
 
 	auto editorUpdateTask = taskflow.emplace([&]() {
 		graphicsManager_->editor->AddInspectorInfo("FPS", std::to_string(1.0f / dt));
-		graphicsManager_->editor->AddInspectorInfo("Cars", std::to_string(cityCarManager_.CountCar()));
+		graphicsManager_->editor->AddInspectorInfo("Budget", std::to_string(cityMoney_)+"$");
 		graphicsManager_->editor->AddInspectorInfo("People", std::to_string(cityPeopleManager_.GetPeopleCount()));
 	});
 	carsUpdateTask.precede(editorUpdateTask);
@@ -251,5 +252,15 @@ CityBuildingManager& CityBuilderEngine::GetBuildingManager()
 BehaviorTreeManager& CityBuilderEngine::GetBehaviorTreeManager()
 {
 	return behaviorTreeManager_;
+}
+
+int CityBuilderEngine::GetCityMoney() const
+{
+	return cityMoney_;
+}
+
+void CityBuilderEngine::ChangeCityMoney(int delta)
+{
+	cityMoney_ += delta;
 }
 }

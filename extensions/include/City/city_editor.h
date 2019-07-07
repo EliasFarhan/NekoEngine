@@ -45,6 +45,11 @@ struct ChangeModeCommand : public CityCommand
 {
 	ButtonIconType newCursorMode = ButtonIconType::NONE;
 };
+struct ChangeTaxCommand : public CityCommand
+{
+	float workTax = 0.0f;
+	float houseTax = 0.0f;
+};
 
 const static std::string buttonIconTexture[Index(ButtonIconType::LENGTH)] =
 {

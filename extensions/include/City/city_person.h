@@ -7,6 +7,7 @@
 namespace neko
 {
 
+const int INIT_PERSON_MONEY = 100;
 struct Person
 {
 	sf::Vector2i position = INVALID_TILE_POS;
@@ -14,7 +15,9 @@ struct Person
 	Entity carEntity = INVALID_ENTITY;
 	sf::Vector2i housePos = INVALID_TILE_POS;
 	sf::Vector2i workPos = INVALID_TILE_POS;
-
+	unsigned dayCount = 0;
+	int money = INIT_PERSON_MONEY;
+	int salary = 0;
 };
 
 class CityPeopleManager : public System

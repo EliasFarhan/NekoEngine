@@ -64,8 +64,8 @@ void BasicEngine::Update(float dt)
 
 void BasicEngine::Init()
 {
-    renderWindow = std::make_unique<sf::RenderWindow>(sf::VideoMode(config.screenSize.x, config.screenSize.y),
-                                                      "Neko Engine");
+    renderWindow = std::make_unique<sf::RenderWindow>(
+		sf::VideoMode(config.screenSize.x, config.screenSize.y), "Neko Engine", config.windowStyle);
     if (config.vSync)
     {
         renderWindow->setVerticalSyncEnabled(config.vSync);

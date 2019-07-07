@@ -53,6 +53,10 @@ enum class CityComponentType : EntityMask
 	PERSON = 1 << 4,
 };
 
+const int roadCost = 100;
+const int zoneCost = 1000;
+const int personBaseSalary = 100;
+const int baseCityBudget = 1'000'000;
 
 class CityBuilderEngine : public neko::MainEngine
 {
@@ -85,9 +89,14 @@ public:
     CityPeopleManager& GetPeopleManager();
 
     sf::View mainView;
+    float workTax = 0.125;
+    float houseTax = 0.125;
 
     CityBuildingManager& GetBuildingManager();
 	BehaviorTreeManager& GetBehaviorTreeManager();
+
+	int GetCityMoney() const;
+	void ChangeCityMoney(int delta);
 
 private:
 
@@ -105,8 +114,11 @@ private:
     CityZoneManager cityZoneManager_;
     CityBuildingManager cityBuildingManager_;
 	BehaviorTreeManager behaviorTreeManager_;
+
     const float scrollDelta_ = 0.1f;
     float currentZoom_ = 1.0f;
 	Index musicInd_ = INDEX_INVALID;
+
+	int cityMoney_ = baseCityBudget;
 };
 }

@@ -65,6 +65,7 @@ struct Zone
     ZoneType zoneType = ZoneType::NONE;
 };
 
+
 class CityZoneManager
 {
 public:

@@ -24,6 +24,7 @@
 
 #include <City/city_building.h>
 #include <engine/engine.h>
+#include <City/city_engine.h>
 #include <City/city_zone.h>
 
 namespace neko
@@ -35,6 +36,7 @@ void CityBuildingManager::Update(const CityZoneManager& zoneManager, CityBuilder
 	spawnTimer_.Update(dt);
 	if (spawnTimer_.IsOver())
 	{
+		
 		//Add residential building
 		{
 			const auto& zones = zoneManager.GetZoneVector();
@@ -110,8 +112,8 @@ void CityBuildingManager::Update(const CityZoneManager& zoneManager, CityBuilder
 					AddBuilding({
 						newWorkPlace.position,
 						sf::Vector2i(3, 3),
-						CityTileType((rand()%(Index(CityTileType::OFFICE5)-Index(CityTileType::OFFICE2)))+Index(CityTileType::OFFICE2)),
-					(rand() % (20u - 10u)) + 10u
+						CityTileType((rand() % (Index(CityTileType::OFFICE5) - Index(CityTileType::OFFICE2))) + Index(CityTileType::OFFICE2)),
+					((rand() % (60u - 40u)) + 40u)
 						}, zoneManager, cityMap);
 				}
 				else
@@ -133,7 +135,14 @@ void CityBuildingManager::Update(const CityZoneManager& zoneManager, CityBuilder
 void
 CityBuildingManager::AddBuilding(Building building, const CityZoneManager& zoneManager, CityBuilderMap& cityMap)
 {
-	cityMap.RemoveCityElement(building.position);
+	for(int dx = 0; dx < building.size.x;dx++)
+	{
+		for(int dy = 0; dy < building.size.y;dy++)
+		{
+			sf::Vector2i newPos = building.position + sf::Vector2i(dx, -dy);
+			cityMap.RemoveCityElement(newPos);
+		}
+	}
 	buildings_.push_back(building);
 	std::sort(buildings_.begin(), buildings_.end(), [](const Building& b1, const Building& b2) {return (b1.position.y < b2.position.y); });
 }
@@ -190,11 +199,16 @@ sf::Vector2i CityBuildingManager::FindBuilding(ZoneType zoneType)
 	}
 	case ZoneType::COMMERCIAL:
 	{
-		const auto result = std::find_if(buildings_.begin(), buildings_.end(), [](const Building& building)
+		auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+		const auto result = std::find_if(buildings_.begin(), buildings_.end(), [&engine](const Building& building)
 		{
-			if (building.buildingType != CityTileType::OFFICE1)
+			if (building.buildingType != CityTileType::OFFICE1 &&
+				building.buildingType != CityTileType::OFFICE2 &&
+				building.buildingType != CityTileType::OFFICE3 &&
+				building.buildingType != CityTileType::OFFICE4 &&
+				building.buildingType != CityTileType::OFFICE5)
 				return false;
-			return building.occupancy < building.capacity;
+			return building.occupancy < building.capacity - unsigned(float(building.capacity)*engine->workTax);
 		});
 		if (result != buildings_.end())
 		{

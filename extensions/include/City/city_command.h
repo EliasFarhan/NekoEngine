@@ -38,7 +38,8 @@ enum class CityCommandType
 	DELETE_CITY_ELEMENT,
 	ADD_CITY_ZONE,
 	REMOVE_CITY_ZONE,
-	NONE
+	CHANGE_TAX,
+	NONE,
 };
 
 struct CityCommand
