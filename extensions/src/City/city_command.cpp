@@ -61,10 +61,12 @@ void CityCommandManager::Init()
 	soundBufferBuild_ = Sound::LoadSoundBuffer("data/Truip.wav");
 	soundBufferRoad_ = Sound::LoadSoundBuffer("data/Buip.wav");
 	soundBufferSelect_ = Sound::LoadSoundBuffer("data/Wiz.wav");
+	soundBufferOut_ = Sound::LoadSoundBuffer("data/Out.wav");
 	soundErase_ = Sound::CreateSoundFromBuffer(soundBufferErase_);
 	soundBuild_ = Sound::CreateSoundFromBuffer(soundBufferBuild_);
 	soundRoad_ = Sound::CreateSoundFromBuffer(soundBufferRoad_);
 	soundSelect_ = Sound::CreateSoundFromBuffer(soundBufferSelect_);
+	soundOut_ = Sound::CreateSoundFromBuffer(soundBufferOut_);
 }
 
 void CityCommandManager::ExecuteCommand(const std::shared_ptr<CityCommand>& command) const

@@ -34,12 +34,12 @@ class CityBuilderEngine;
 enum class CityCommandType
 {
 	CHANGE_CURSOR_MODE,
+	CHANGE_TAX,
 	CREATE_CITY_ELEMENT,
 	DELETE_CITY_ELEMENT,
 	ADD_CITY_ZONE,
 	REMOVE_CITY_ZONE,
-	CHANGE_TAX,
-	NONE,
+	NONE
 };
 
 struct CityCommand
@@ -66,9 +66,11 @@ protected:
 	Index soundBuild_ = INDEX_INVALID;
 	Index soundRoad_ = INDEX_INVALID;
 	Index soundSelect_ = INDEX_INVALID;
+	Index soundBufferOut_ = INDEX_INVALID;
 	Index soundBufferErase_ = INDEX_INVALID;
 	Index soundBufferBuild_ = INDEX_INVALID;
 	Index soundBufferRoad_ = INDEX_INVALID;
 	Index soundBufferSelect_ = INDEX_INVALID;
+	Index soundOut_ = INDEX_INVALID;
 };
 }
