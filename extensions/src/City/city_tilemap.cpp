@@ -618,7 +618,9 @@ void CityBuilderTilemap::PushCommand(GraphicsManager* graphicsManager)
 		auto& city = engine->GetCityMap().city;
 		auto& rect = bgRect[frameIndex];
 		rect.setPosition(sf::Vector2f(0, 0));
-		rect.setSize(sf::Vector2f(tileSize_.x * city.mapSize.x - tileSize_.x / 2, tileSize_.y * city.mapSize.y - tileSize_.y / 2));
+		rect.setSize(sf::Vector2f(
+			float(tileSize_.x * city.mapSize.x - tileSize_.x / 2),
+			float(tileSize_.y * city.mapSize.y - tileSize_.y / 2)));
 		rect.setFillColor(sf::Color(191, 206, 30));
 		graphicsManager->Draw(rect);
 	}

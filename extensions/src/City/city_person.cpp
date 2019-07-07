@@ -105,7 +105,7 @@ void CityPeopleManager::Init()
 		{
 			personPtr->position = car->position;
 			car->currentIndex++;
-			if (car->currentIndex == car->currentPath.size() - 1)
+			if (car->currentIndex >= car->currentPath.size() - 1)
 			{
 				car->carState = CarState::ARRIVED;
 				car->entity = INVALID_ENTITY;

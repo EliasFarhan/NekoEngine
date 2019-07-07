@@ -241,7 +241,14 @@ TileMapGraph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vect
 		while (parentPos != startPos)
 		{
 			path.push_back(parentPos);
-			parentPos = parentMap[parentPos];
+			if(parentMap.find(parentPos) != parentMap.end())
+			{
+				parentPos = parentMap[parentPos];
+			}
+			else
+			{
+				return std::vector<sf::Vector2i>();
+			}
 		}
 		path.push_back(startPos);
 		std::reverse(path.begin(), path.end());
