@@ -61,7 +61,7 @@ namespace neko {
 	};
 
 	// Object type list used to parse the behavior tree in json format.
-	const static std::map<BehaviorTreeObjectType, std::string> mapCompositeString = 
+	const static std::map<BehaviorTreeObjectType, std::string> mapCompositeString =
 	{
 		{BehaviorTreeObjectType::INTERFACE_COMPOSITE, "interface_composite"},
 		{BehaviorTreeObjectType::INTERFACE_DECORATOR, "interface_decorator"},
