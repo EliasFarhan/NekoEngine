@@ -30,6 +30,7 @@
 #include <graphics/tilemap.h>
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/View.hpp>
+#include "SFML/Graphics/RectangleShape.hpp"
 
 namespace neko
 {
@@ -179,6 +180,7 @@ protected:
 	 * \brief use for tile culling
 	 */
 	sf::FloatRect windowView_{};
+	sf::RectangleShape bgRect[2];
 	std::array<Tilesheet, size_t(CityTilesheetType::LENGTH)> tilesheets_;
 	std::array<sf::FloatRect, size_t(CarType::LENGTH)> textureRects_;
 	std::array<sf::Vector2f, size_t(CarType::LENGTH)> rectCenter_;

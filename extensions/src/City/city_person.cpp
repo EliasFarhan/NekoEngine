@@ -319,8 +319,8 @@ void CityPeopleManager::Init()
 		if( person != nullptr)
 		{
 			person->dayCount++;
-			person->salary = personBaseSalary * powf(1.1f, person->dayCount);
-			const int houseTaxValue = person->salary * engine->houseTax;
+			person->salary = int(float(personBaseSalary) * powf(1.1f, float(person->dayCount)));
+			const int houseTaxValue = int(float(person->salary) * engine->houseTax);
 			person->money += person->salary - houseTaxValue;
 			engine->ChangeCityMoney(houseTaxValue);
 		}

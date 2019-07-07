@@ -30,6 +30,7 @@
 #include "City/city_car.h"
 #include <engine/transform.h>
 #include <City/city_building.h>
+#include <City/city_engine.h>
 
 namespace neko
 {
@@ -105,9 +106,9 @@ void CityBuilderTilemap::Init(TextureManager& textureManager)
 }
 
 void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, const CityCarManager& cityCarManager,
-                                       const CityBuildingManager& buildingManager,
-                                       const Transform2dManager& transformManager,
-                                       sf::View mainView, CityTilesheetType updatedCityTileType)
+	const CityBuildingManager& buildingManager,
+	const Transform2dManager& transformManager,
+	sf::View mainView, CityTilesheetType updatedCityTileType)
 {
 	const Index frameIndex = MainEngine::GetInstance()->frameIndex % 2;
 	//Manage window view
@@ -118,8 +119,8 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 		rmt_ScopedCPUSample(UpdateTilemap, 0);
 		for (Index i = 0u; i < Index(CityTilesheetType::LENGTH); i++)
 		{
-            UpdateTilemap(cityBuilderMap, cityCarManager, buildingManager, transformManager, mainView,
-                          CityTilesheetType(i));
+			UpdateTilemap(cityBuilderMap, cityCarManager, buildingManager, transformManager, mainView,
+				CityTilesheetType(i));
 		}
 		return;
 	}
@@ -537,8 +538,8 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 			{
 			case CityElementType::TREES:
 			{
-                //TREES
-                const auto treesIndex = Index(CityTileType::TREES);
+				//TREES
+				const auto treesIndex = Index(CityTileType::TREES);
 				if (cityBuilderMap.environmentTiles_[cityBuilderMap.Position2Index(element.position)] ==
 					EnvironmentTile::WATER)
 				{
@@ -558,7 +559,7 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 			}
 			case CityElementType::TRAIN_STATION:
 			{
-			    //TRAIN STATION
+				//TRAIN STATION
 				const auto trainStationIndex = Index(CityTileType::TRAIN_STATION);
 				const auto position = sf::Vector2f(
 					float(element.position.x * tileSize_.x),
@@ -576,28 +577,28 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 			}
 		}
 
-		for(const auto& building : buildingManager.GetBuildingsVector())
-        {
-		    const auto buildingIndex = Index(building.buildingType);
-		    const auto position = sf::Vector2f(float(building.position.x*tileSize_.x), float(building.position.y*tileSize_.y));
-		    const auto size = rectCenter_[buildingIndex]*2.0f;
-		    AddNewCityTile(position, size, textureRects_[buildingIndex], rectCenter_[buildingIndex], updatedCityTileType);
-        }
+		for (const auto& building : buildingManager.GetBuildingsVector())
+		{
+			const auto buildingIndex = Index(building.buildingType);
+			const auto position = sf::Vector2f(float(building.position.x * tileSize_.x), float(building.position.y * tileSize_.y));
+			const auto size = rectCenter_[buildingIndex] * 2.0f;
+			AddNewCityTile(position, size, textureRects_[buildingIndex], rectCenter_[buildingIndex], updatedCityTileType);
+		}
 		break;
 	}
 	case CityTilesheetType::CAR:
 	{
-		for(const auto& car : cityCarManager.GetCarsVector())
+		for (const auto& car : cityCarManager.GetCarsVector())
 		{
 			if (car.entity == INVALID_ENTITY)
 				continue;
-			
+
 			const auto rect = textureRects_[Index(car.carType)];
 			const auto center = rectCenter_[Index(car.carType)];
 			const auto position = transformManager.GetPosition(car.entity);
 			auto deltaPos = car.currentPath[car.currentIndex + 1] - car.currentPath[car.currentIndex];
 
-			AddCar(position, car.spriteSize, rect, center,deltaPos.x > 0 ?false:true, false);
+			AddCar(position, car.spriteSize, rect, center, deltaPos.x > 0 ? false : true, false);
 		}
 		break;
 	}
@@ -611,6 +612,17 @@ void CityBuilderTilemap::PushCommand(GraphicsManager* graphicsManager)
 {
 	rmt_ScopedCPUSample(PushCityTilemapCommands, 0);
 	const Index frameIndex = MainEngine::GetInstance()->frameIndex % 2;
+
+	{
+		auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+		auto& city = engine->GetCityMap().city;
+		auto& rect = bgRect[frameIndex];
+		rect.setPosition(sf::Vector2f(0, 0));
+		rect.setSize(sf::Vector2f(tileSize_.x * city.mapSize.x - tileSize_.x / 2, tileSize_.y * city.mapSize.y - tileSize_.y / 2));
+		rect.setFillColor(sf::Color(191, 206, 30));
+		graphicsManager->Draw(rect);
+	}
+
 	graphicsManager->Draw(&tilesheets_[Index(CityTilesheetType::ENVIRONMENT)].tilemap[frameIndex],
 		tilesheets_[unsigned(CityTilesheetType::ENVIRONMENT)].texture.get());
 	graphicsManager->Draw(&tilesheets_[Index(CityTilesheetType::TRANSPORT)].tilemap[frameIndex],
@@ -629,7 +641,7 @@ void CityBuilderTilemap::AddNewCityTile(const sf::Vector2f position, const sf::V
 {
 	const Index frameIndex = MainEngine::GetInstance()->frameIndex % 2;
 	sf::Vector2f sizeOffset = (size - sf::Vector2f(tileSize_)) / 2.0f;
-    sizeOffset.y = -sizeOffset.y;
+	sizeOffset.y = -sizeOffset.y;
 	if (culling)
 	{
 		const sf::FloatRect tileRect = sf::FloatRect((position - center + sizeOffset), size);
@@ -637,7 +649,7 @@ void CityBuilderTilemap::AddNewCityTile(const sf::Vector2f position, const sf::V
 		if (!windowView_.intersects(tileRect))
 			return;
 	}
-	const auto centerPos = position+sizeOffset;
+	const auto centerPos = position + sizeOffset;
 	sf::Vertex quad[6];
 	quad[0].position = centerPos - center;
 	quad[1].position = centerPos - sf::Vector2f(center.x, -center.y);
@@ -701,7 +713,7 @@ void CityBuilderTilemap::AddCar(const sf::Vector2f position, const sf::Vector2f 
 	if (culling)
 	{
 		const sf::FloatRect tileRect = sf::FloatRect((position - center), size);
-		
+
 		if (!windowView_.intersects(tileRect))
 			return;
 	}
@@ -714,22 +726,22 @@ void CityBuilderTilemap::AddCar(const sf::Vector2f position, const sf::Vector2f 
 	quad[5].position = position - sf::Vector2f(-center.x, center.y);
 	quad[0].texCoords = sf::Vector2f(
 		flipX ? rect.left + rect.width : rect.left,
-		 rect.top);
+		rect.top);
 	quad[1].texCoords = sf::Vector2f(
 		flipX ? rect.left + rect.width : rect.left,
 		rect.top + rect.height);
 	quad[2].texCoords = sf::Vector2f(
 		flipX ? rect.left : rect.left + rect.width,
-		 rect.top + rect.height);
+		rect.top + rect.height);
 	quad[3].texCoords = sf::Vector2f(
 		flipX ? rect.left + rect.width : rect.left,
-		 rect.top);
+		rect.top);
 	quad[4].texCoords = sf::Vector2f(
 		flipX ? rect.left : rect.left + rect.width,
-		 rect.top + rect.height);
+		rect.top + rect.height);
 	quad[5].texCoords = sf::Vector2f(
 		flipX ? rect.left : rect.left + rect.width,
-		 rect.top);
+		rect.top);
 	for (auto& v : quad)
 	{
 		tilesheets_[Index(CityTilesheetType::CAR)].tilemap[frameIndex].append(v);
