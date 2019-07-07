@@ -124,7 +124,20 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 		}
 		return;
 	}
-	rmt_ScopedCPUSample(UpdateIndividualTilemap, 0);
+	switch (updatedCityTileType)
+	{
+	case CityTilesheetType::ENVIRONMENT:
+		rmt_BeginCPUSample(UpdateEnvironmentTilemap, 0);
+		break;
+	case CityTilesheetType::TRANSPORT:
+		rmt_BeginCPUSample(UpdateTransportTilemap, 0);
+		break;
+	case CityTilesheetType::CITY:
+		rmt_BeginCPUSample(UpdateCityTilemap, 0); break;
+	case CityTilesheetType::CAR:
+		rmt_BeginCPUSample(UpdateCarTilemap, 0); break;
+	default: break;
+	}
 	tilesheets_[Index(updatedCityTileType)].tilemap[frameIndex].clear();
 
 	switch (updatedCityTileType)
@@ -162,6 +175,12 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 				{
 					continue;
 				}
+				const sf::FloatRect tileRect = sf::FloatRect(sf::Vector2f(
+					float(tmpPos.x*tileSize_.x - tileSize_.x / 2),
+					float(tmpPos.y*tileSize_.y - tileSize_.y / 2)), sf::Vector2f(tileSize_));
+
+				if (!windowView_.intersects(tileRect))
+					continue;
 				//UP
 				{
 					const sf::Vector2i upPos = tmpPos + sf::Vector2i(0, -1);
@@ -239,21 +258,30 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 	case CityTilesheetType::TRANSPORT:
 	{
 		//ROAD
-		std::vector<CityElement> roads;
-		std::copy_if(cityBuilderMap.elements_.begin(), cityBuilderMap.elements_.end(), std::back_inserter(roads),
-			[](const CityElement& elem)
+		std::vector<const CityElement*> roads;
+		for (const auto& cityElement : cityBuilderMap.elements_)
 		{
-			return elem.elementType == CityElementType::ROAD;
-		});
-		for (auto& road : roads)
+			if (cityElement.elementType != CityElementType::ROAD) continue;
+
+			const sf::FloatRect tileRect = sf::FloatRect(sf::Vector2f(
+				float(cityElement.position.x*tileSize_.x - tileSize_.x / 2),
+				float(cityElement.position.y*tileSize_.y - tileSize_.y / 2)),
+				2.0f*sf::Vector2f(tileSize_));
+			if (!windowView_.intersects(tileRect))
+				continue;
+			roads.push_back(&cityElement);
+
+		}
+		for (const auto& roadPtr : roads)
 		{
+			const auto& road = *roadPtr;
 			bool directions[] = { 0, 0, 0, 0 };//UP, DOWN, LEFT, RIGHT
 
 			if (road.position.y == 0)
 			{
 				directions[0] = true;
 			}
-			if (road.position.y == cityBuilderMap.city.mapSize.y - 1)
+			if (road.position.y == int(cityBuilderMap.city.mapSize.y - 1))
 			{
 				directions[1] = true;
 			}
@@ -261,13 +289,22 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 			{
 				directions[2] = true;
 			}
-			if (road.position.x == cityBuilderMap.city.mapSize.x - 1)
+			if (road.position.x == int(cityBuilderMap.city.mapSize.x - 1))
 			{
 				directions[3] = true;
 			}
+			const bool isWater = cityBuilderMap.environmentTiles_[cityBuilderMap.Position2Index(road.position)] ==
+				EnvironmentTile::WATER;
+			const sf::FloatRect tileRect = sf::FloatRect(sf::Vector2f(
+				float(road.position.x*tileSize_.x - tileSize_.x / 2),
+				float(road.position.y*tileSize_.y - tileSize_.y / 2)),
+				2.0f*sf::Vector2f(tileSize_));
 
-			for (auto& otherRoad : roads)
+			if (!windowView_.intersects(tileRect))
+				continue;
+			for (const auto* otherRoadPtr : roads)
 			{
+				const auto& otherRoad = *otherRoadPtr;
 				if (otherRoad.position == road.position)
 				{
 					continue;
@@ -294,8 +331,7 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 				static_cast<float>(road.position.x * tileSize_.x),
 				static_cast<float>(road.position.y * tileSize_.y));
 			Index roadIndex = 0;
-			bool isWater = cityBuilderMap.environmentTiles_[cityBuilderMap.Position2Index(road.position)] ==
-				EnvironmentTile::WATER;
+
 			if ((directions[0] && directions[1] && !directions[2] && !directions[3]) or
 				(directions[0] && !directions[1] && !directions[2] && !directions[3]) or
 				(!directions[0] && directions[1] && !directions[2] && !directions[3]))
@@ -411,21 +447,32 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 
 		//RAILS
 
-		std::vector<CityElement> rails;
-		std::copy_if(cityBuilderMap.elements_.begin(), cityBuilderMap.elements_.end(), std::back_inserter(rails),
-			[](const CityElement& elem)
+		std::vector<const CityElement*> rails;
+		rails.reserve(cityBuilderMap.elements_.size());
+		for (const auto& cityElement : cityBuilderMap.elements_)
 		{
-			return elem.elementType == CityElementType::RAIL;
-		});
-		for (auto& rail : rails)
+			if (cityElement.elementType != CityElementType::RAIL) 
+				continue;
+
+			const sf::FloatRect tileRect = sf::FloatRect(sf::Vector2f(
+				float(cityElement.position.x*tileSize_.x - tileSize_.x / 2),
+				float(cityElement.position.y*tileSize_.y - tileSize_.y / 2)),
+				2.0f*sf::Vector2f(tileSize_));
+			if (!windowView_.intersects(tileRect))
+				continue;
+			rails.push_back(&cityElement);
+
+		}
+		for (auto* railPtr : rails)
 		{
+			const auto& rail = *railPtr;
 			bool directions[] = { 0, 0, 0, 0 };//UP, DOWN, LEFT, RIGHT
 
 			if (rail.position.y == 0)
 			{
 				directions[0] = true;
 			}
-			if (rail.position.y == cityBuilderMap.city.mapSize.y - 1)
+			if (rail.position.y == int(cityBuilderMap.city.mapSize.y - 1))
 			{
 				directions[1] = true;
 			}
@@ -433,18 +480,24 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 			{
 				directions[2] = true;
 			}
-			if (rail.position.x == cityBuilderMap.city.mapSize.x - 1)
+			if (rail.position.x == int(cityBuilderMap.city.mapSize.x - 1))
 			{
 				directions[3] = true;
 			}
+			const sf::FloatRect tileRect = sf::FloatRect(sf::Vector2f(float(rail.position.x*tileSize_.x - tileSize_.x / 2), float(rail.position.y*tileSize_.y - tileSize_.y / 2)),
+				sf::Vector2f(tileSize_));
 
-			for (auto& otherRoad : rails)
+			if (!windowView_.intersects(tileRect))
+				continue;
+
+			for (auto* otherRailPtr : rails)
 			{
-				if (otherRoad.position == rail.position)
+				auto& otherRail = *otherRailPtr;
+				if (otherRail.position == rail.position)
 				{
 					continue;
 				}
-				const sf::Vector2i deltaPos = otherRoad.position - rail.position;
+				const sf::Vector2i deltaPos = otherRail.position - rail.position;
 				if (deltaPos == sf::Vector2i(0, -1))
 				{
 					directions[0] = true;
@@ -605,7 +658,7 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 	default:
 		break;
 	}
-
+	rmt_EndCPUSample();
 }
 
 void CityBuilderTilemap::PushCommand(GraphicsManager* graphicsManager)
