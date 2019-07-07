@@ -38,9 +38,9 @@ void CityCommandManager::AddCommand(std::unique_ptr<CityCommand> command, bool f
 	if (command->commandType == CityCommandType::CHANGE_CURSOR_MODE)
 	{
 		commandQueue_[frameIndex].insert(commandQueue_[frameIndex].begin(), std::move(command));
-		for(auto i = 0u; i < commandQueue_[frameIndex].size();i++)
+		for (auto i = 0u; i < commandQueue_[frameIndex].size(); i++)
 		{
-			if(commandQueue_[frameIndex][i]->commandType == CityCommandType::CREATE_CITY_ELEMENT)
+			if (commandQueue_[frameIndex][i]->commandType == CityCommandType::CREATE_CITY_ELEMENT)
 			{
 				commandQueue_[frameIndex].erase(commandQueue_[frameIndex].begin() + i);
 				i--;
@@ -49,14 +49,14 @@ void CityCommandManager::AddCommand(std::unique_ptr<CityCommand> command, bool f
 	}
 	else
 	{
-		commandQueue_[(frameIndex+1)%2].push_back(std::move(command));
+		commandQueue_[(frameIndex + 1) % 2].push_back(std::move(command));
 	}
 
 }
 
 void CityCommandManager::Init()
 {
-    engine_ = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+	engine_ = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
 	soundBufferErase_ = Sound::LoadSoundBuffer("data/Swip.wav");
 	soundBufferBuild_ = Sound::LoadSoundBuffer("data/Truip.wav");
 	soundBufferRoad_ = Sound::LoadSoundBuffer("data/Buip.wav");
@@ -71,56 +71,63 @@ void CityCommandManager::Init()
 
 void CityCommandManager::ExecuteCommand(const std::shared_ptr<CityCommand>& command) const
 {
-    switch (command->commandType)
-    {
-        case CityCommandType::CHANGE_CURSOR_MODE:
-        {
-            auto* cursorCommand = dynamic_cast<ChangeModeCommand*>(command.get());
-			engine_->GetCursor().SetCursorMode(cursorCommand->newCursorMode);
-			Sound::PlaySound(soundSelect_);
-            break;
-        }
-        case CityCommandType::CREATE_CITY_ELEMENT:
-        {
-				if(engine_->GetCityMoney() < roadCost)
-					break;
-            auto* buildCommand = dynamic_cast<BuildElementCommand*>(command.get());
-            engine_->GetZoneManager().RemoveZone(buildCommand->position);
-            engine_->GetCityMap().AddCityElement(buildCommand->elementType, buildCommand->position);
-            if(buildCommand->elementType == CityElementType::ROAD)
-            {
-				engine_->ChangeCityMoney(-roadCost);
-                engine_->GetBuildingManager().RemoveBuilding(buildCommand->position);
-            }
-			Sound::PlaySound(soundRoad_);
-            break;
-        }
-        case CityCommandType::DELETE_CITY_ELEMENT:
-        {
-            auto* buildCommand = dynamic_cast<DestroyElementCommand*>(command.get());
-            engine_->GetCityMap().RemoveCityElement(buildCommand->position);
-            engine_->GetCarManager().RescheduleCarPathfinding(buildCommand->position);
-            engine_->GetZoneManager().RemoveZone(buildCommand->position);
-            engine_->GetBuildingManager().RemoveBuilding(buildCommand->position);
-			Sound::PlaySound(soundErase_);
-            break;
-        }
-        case CityCommandType::ADD_CITY_ZONE:
-        {
-            auto* zoneCommand = dynamic_cast<AddZoneCommand*>(command.get());
-            engine_->GetZoneManager().AddZone(zoneCommand->position, zoneCommand->zoneType, engine_->GetCityMap());
-			Sound::PlaySound(soundBuild_);
+	switch (command->commandType)
+	{
+	case CityCommandType::CHANGE_CURSOR_MODE:
+	{
+		auto* cursorCommand = dynamic_cast<ChangeModeCommand*>(command.get());
+		engine_->GetCursor().SetCursorMode(cursorCommand->newCursorMode);
+		Sound::PlaySound(soundSelect_);
+		break;
+	}
+	case CityCommandType::CREATE_CITY_ELEMENT:
+	{
+		if (engine_->GetCityMoney() < roadCost)
+		{
+			Sound::PlaySound(soundOut_);
 			break;
-        }
-		case CityCommandType::CHANGE_TAX:
-        {
-			auto* taxCommand = dynamic_cast<ChangeTaxCommand*>(command.get());
-			engine_->houseTax = taxCommand->houseTax;
-			engine_->workTax = taxCommand->workTax;
-        }
-        default:
-            break;
-    }
+		}
+		auto* buildCommand = dynamic_cast<BuildElementCommand*>(command.get());
+		engine_->GetZoneManager().RemoveZone(buildCommand->position);
+		engine_->GetCityMap().AddCityElement(buildCommand->elementType, buildCommand->position);
+		if (buildCommand->elementType == CityElementType::ROAD)
+		{
+			engine_->ChangeCityMoney(-roadCost);
+			engine_->GetBuildingManager().RemoveBuilding(buildCommand->position);
+		}
+		Sound::PlaySound(soundRoad_);
+		break;
+	}
+	case CityCommandType::DELETE_CITY_ELEMENT:
+	{
+		auto* buildCommand = dynamic_cast<DestroyElementCommand*>(command.get());
+		engine_->GetCityMap().RemoveCityElement(buildCommand->position);
+		engine_->GetCarManager().RescheduleCarPathfinding(buildCommand->position);
+		engine_->GetZoneManager().RemoveZone(buildCommand->position);
+		engine_->GetBuildingManager().RemoveBuilding(buildCommand->position);
+		Sound::PlaySound(soundErase_);
+		break;
+	}
+	case CityCommandType::ADD_CITY_ZONE:
+	{
+		auto* zoneCommand = dynamic_cast<AddZoneCommand*>(command.get());
+		if (engine_->GetCityMoney() < zoneCost)
+		{
+			Sound::PlaySound(soundOut_);
+		}
+		engine_->GetZoneManager().AddZone(zoneCommand->position, zoneCommand->zoneType, engine_->GetCityMap());
+		Sound::PlaySound(soundBuild_);
+		break;
+	}
+	case CityCommandType::CHANGE_TAX:
+	{
+		auto* taxCommand = dynamic_cast<ChangeTaxCommand*>(command.get());
+		engine_->houseTax = taxCommand->houseTax;
+		engine_->workTax = taxCommand->workTax;
+	}
+	default:
+		break;
+	}
 }
 
 void CityCommandManager::Update(float dt)

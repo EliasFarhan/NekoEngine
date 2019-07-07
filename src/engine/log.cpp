@@ -122,7 +122,9 @@ void initLog()
 
 void logDebug(std::string msg)
 {
+#ifdef __neko_dbg__
     debugLogger->write(msg);
+#endif
 }
 
 void destroyLog()

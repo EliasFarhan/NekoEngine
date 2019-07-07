@@ -69,7 +69,7 @@ struct DestroyElementCommand : CityCommand
 
 struct City
 {
-	sf::Vector2u mapSize = sf::Vector2u(128,64);
+	sf::Vector2u mapSize = sf::Vector2u(512,256);
 	float forestRatio = 0.5f;
 	float perlinFreq = 20.0f;
 	sf::Vector2u tileSize = sf::Vector2u(20, 20);
