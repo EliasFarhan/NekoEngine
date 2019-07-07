@@ -484,7 +484,9 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 			{
 				directions[3] = true;
 			}
-			const sf::FloatRect tileRect = sf::FloatRect(sf::Vector2f(float(rail.position.x*tileSize_.x - tileSize_.x / 2), float(rail.position.y*tileSize_.y - tileSize_.y / 2)),
+			const sf::FloatRect tileRect = sf::FloatRect(sf::Vector2f(
+				float(rail.position.x*tileSize_.x - tileSize_.x / 2), 
+				float(rail.position.y*tileSize_.y - tileSize_.y / 2)),
 				sf::Vector2f(tileSize_));
 
 			if (!windowView_.intersects(tileRect))
