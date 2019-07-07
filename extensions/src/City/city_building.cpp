@@ -36,7 +36,7 @@ void CityBuildingManager::Update(const CityZoneManager& zoneManager, CityBuilder
 	spawnTimer_.Update(dt);
 	if (spawnTimer_.IsOver())
 	{
-		
+
 		//Add residential building
 		{
 			const auto& zones = zoneManager.GetZoneVector();
@@ -78,13 +78,13 @@ void CityBuildingManager::Update(const CityZoneManager& zoneManager, CityBuilder
 			{
 				auto& newWorkPlace = commercialZones[rand() % commercialZones.size()];
 				bool buildBig = true;
-				for(int dx = 0; dx < 3;dx++)
+				for (int dx = 0; dx < 3; dx++)
 				{
-					for(int dy = 0; dy < 3; dy++)
+					for (int dy = 0; dy < 3; dy++)
 					{
 						const sf::Vector2i newPos = newWorkPlace.position + sf::Vector2i(dx, -dy);
 						const auto* building = GetBuildingAt(newPos);
-						if(building != nullptr && building->size != sf::Vector2i(1,1))
+						if (building != nullptr && building->size != sf::Vector2i(1, 1))
 						{
 							buildBig = false;
 							break;
@@ -135,9 +135,9 @@ void CityBuildingManager::Update(const CityZoneManager& zoneManager, CityBuilder
 void
 CityBuildingManager::AddBuilding(Building building, const CityZoneManager& zoneManager, CityBuilderMap& cityMap)
 {
-	for(int dx = 0; dx < building.size.x;dx++)
+	for (int dx = 0; dx < building.size.x; dx++)
 	{
-		for(int dy = 0; dy < building.size.y;dy++)
+		for (int dy = 0; dy < building.size.y; dy++)
 		{
 			sf::Vector2i newPos = building.position + sf::Vector2i(dx, -dy);
 			cityMap.RemoveCityElement(newPos);
@@ -181,39 +181,46 @@ sf::Vector2i CityBuildingManager::FindBuilding(ZoneType zoneType)
 	{
 	case ZoneType::RESIDENTIAL:
 	{
-		const auto result = std::find_if(buildings_.begin(), buildings_.end(), [](const Building& building)
+		std::vector<Building*> houseBuildings;
+		houseBuildings.reserve(buildings_.size());
+		for (auto& building : buildings_)
 		{
 			if (building.buildingType != CityTileType::HOUSE1 &&
 				building.buildingType != CityTileType::HOUSE2 &&
 				building.buildingType != CityTileType::HOUSE3 &&
 				building.buildingType != CityTileType::HOUSE4)
-				return false;
-
-			return building.occupancy < building.capacity;
-		});
-		if (result != buildings_.end())
-		{
-			return result->position;
+				continue;
+			if (building.occupancy < building.capacity)
+			{
+				houseBuildings.push_back(&building);
+			}
 		}
+		if (houseBuildings.empty())
+			return INVALID_TILE_POS;
+		return houseBuildings[rand() % houseBuildings.size()]->position;
 		break;
 	}
 	case ZoneType::COMMERCIAL:
 	{
 		auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
-		const auto result = std::find_if(buildings_.begin(), buildings_.end(), [&engine](const Building& building)
+		std::vector<Building*> workBuildings;
+		workBuildings.reserve(buildings_.size());
+		for (auto& building : buildings_)
 		{
 			if (building.buildingType != CityTileType::OFFICE1 &&
 				building.buildingType != CityTileType::OFFICE2 &&
 				building.buildingType != CityTileType::OFFICE3 &&
 				building.buildingType != CityTileType::OFFICE4 &&
 				building.buildingType != CityTileType::OFFICE5)
-				return false;
-			return building.occupancy < building.capacity - unsigned(float(building.capacity)*engine->workTax);
-		});
-		if (result != buildings_.end())
-		{
-			return result->position;
+				continue;
+			if (building.occupancy < building.capacity - unsigned(float(building.capacity)*engine->workTax))
+			{
+				workBuildings.push_back(&building);
+			}
 		}
+		if (workBuildings.empty())
+			return INVALID_TILE_POS;
+		return workBuildings[rand() % workBuildings.size()]->position;
 	}
 	break;
 	case ZoneType::INDUSTRY:
@@ -228,9 +235,9 @@ Building* CityBuildingManager::GetBuildingAt(sf::Vector2i position)
 {
 	const auto result = std::find_if(buildings_.begin(), buildings_.end(), [&position](const Building& building)
 	{
-		for(int dx = 0; dx < building.size.x;dx++)
+		for (int dx = 0; dx < building.size.x; dx++)
 		{
-			for(int dy = 0; dy < building.size.y;dy++)
+			for (int dy = 0; dy < building.size.y; dy++)
 			{
 				const sf::Vector2i newPos = building.position + sf::Vector2i(dx, -dy);
 				if (newPos == position)

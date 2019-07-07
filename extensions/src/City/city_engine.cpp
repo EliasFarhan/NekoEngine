@@ -254,7 +254,7 @@ BehaviorTreeManager& CityBuilderEngine::GetBehaviorTreeManager()
 	return behaviorTreeManager_;
 }
 
-int CityBuilderEngine::GetCityMoney() const
+long long CityBuilderEngine::GetCityMoney() const
 {
 	return cityMoney_;
 }

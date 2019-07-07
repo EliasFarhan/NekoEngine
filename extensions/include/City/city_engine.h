@@ -95,7 +95,7 @@ public:
     CityBuildingManager& GetBuildingManager();
 	BehaviorTreeManager& GetBehaviorTreeManager();
 
-	int GetCityMoney() const;
+    long long GetCityMoney() const;
 	void ChangeCityMoney(int delta);
 
 private:
@@ -119,6 +119,6 @@ private:
     float currentZoom_ = 1.0f;
 	Index musicInd_ = INDEX_INVALID;
 
-	int cityMoney_ = baseCityBudget;
+	long long cityMoney_ = baseCityBudget;
 };
 }
