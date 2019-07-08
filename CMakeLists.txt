@@ -174,7 +174,11 @@ add_subdirectory(${SFML_IMGUI})
 include_directories(${IMGUI_ROOT} ${SFML_IMGUI})
 LIST(APPEND Neko_LIBRARIES
 	ImGui-SFML)
-
+#Spine sfml
+set(SPINE_SFML_DIR ${EXTERNAL_DIR}/spine-3.6/)
+add_subdirectory(${SPINE_SFML_DIR})
+include_directories(${SPINE_SFML_DIR}/spine-sfml/src ${SPINE_SFML_DIR}/spine-c/src)
+LIST(APPEND Neko_LIBRARIES spine-c spine-sfml)
 #BOX2D
 set(BOX2D_DIR ${EXTERNAL_DIR}/Box2D-2.3.1)
 set(BOX2D_BUILD_EXAMPLES OFF CACHE INTERNAL "")
