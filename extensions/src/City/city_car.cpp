@@ -25,6 +25,7 @@
 #include "engine/engine.h"
 #include "City/city_engine.h"
 #include <City/city_map.h>
+#include <utilities/vector_utility.h>
 #include <Remotery.h>
 
 namespace neko
@@ -148,10 +149,7 @@ Entity CityCarManager::SpawnCar(sf::Vector2i position, CarType carType)
 
 Entity CityCarManager::AddCar(Entity entity, CarType carType, sf::Vector2i position)
 {
-	if (cars_.size() <= entity)
-	{
-		cars_.resize(size_t(entity) + 1u);
-	}
+	ResizeIfNecessary(cars_, entity);
 	cars_[entity].carType = carType;
 	cars_[entity].currentPath.clear();
 	if (position == INVALID_TILE_POS)

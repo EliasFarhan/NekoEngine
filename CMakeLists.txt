@@ -67,7 +67,10 @@ set(EXTERNAL_DIR ${CMAKE_SOURCE_DIR}/externals)
 
 #data
 
-file(GLOB_RECURSE JSON_FILES "${PROJECT_SOURCE_DIR}/data/*.json")
+file(GLOB_RECURSE TEXT_FILES 
+"${PROJECT_SOURCE_DIR}/data/*.json" 
+"${PROJECT_SOURCE_DIR}/data/*.txt"
+)
 file(GLOB_RECURSE IMG_FILES
 		"${PROJECT_SOURCE_DIR}/data/*.jpg"
 		"${PROJECT_SOURCE_DIR}/data/*.png"
@@ -83,7 +86,7 @@ file(GLOB_RECURSE SND_FILES
 		"${PROJECT_SOURCE_DIR}/data/*.wav"
 		"${PROJECT_SOURCE_DIR}/data/*.ogg"
 		)
-LIST(APPEND DATA_FILES ${IMG_FILES} ${SND_FILES} ${JSON_FILES})
+LIST(APPEND DATA_FILES ${IMG_FILES} ${SND_FILES} ${TEXT_FILES})
 foreach(DATA ${DATA_FILES})
 	get_filename_component(FILE_NAME ${DATA} NAME)
 	get_filename_component(PATH_NAME ${DATA} DIRECTORY)
@@ -103,6 +106,9 @@ add_custom_target(
 		DataTarget
 		DEPENDS ${DATA_BINARY_FILES}
 )
+
+set_target_properties (DataTarget PROPERTIES FOLDER Neko)
+
 #source files
 file(GLOB_RECURSE Neko_ENGINE_SRC src/engine/*.cpp include/engine/*.h)
 file(GLOB_RECURSE Neko_GRAPHICS_SRC src/graphics/*.cpp include/graphics/*.h)
@@ -121,7 +127,7 @@ source_group("Engine"				FILES ${Neko_ENGINE_SRC})
 source_group("Utility"				FILES ${Neko_UTILITY_SRC})
 source_group("Physics"				FILES ${Neko_PHYSICS_SRC})
 source_group("Sound"				FILES ${Neko_SOUND_SRC})
-source_group("Data\\Json"           FILES ${JSON_FILES})
+source_group("Data\\Text"           FILES ${TEXT_FILES})
 source_group("Data\\Img"            FILES ${IMG_FILES})
 source_group("Data\\Snd"			FILES ${SND_FILES})
 
@@ -131,7 +137,7 @@ List(APPEND Neko_SRC
 	${Neko_UTILITY_SRC} 
 	${Neko_PHYSICS_SRC}
 	${Neko_SOUND_SRC}
-	${JSON_FILES} 
+	${TEXT_FILES} 
 	${IMG_FILES}
 	${SND_FILES})
 
@@ -155,7 +161,7 @@ include_directories(${SFML_DIR}/include ${SFML_DIR}/src)
 
 LIST(APPEND Neko_LIBRARIES
 		sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
-
+		
 #Google Test
 enable_testing()
 set(GOOGLE_TEST_DIR ${EXTERNAL_DIR}/googletest-1.8.1)
@@ -165,7 +171,8 @@ add_subdirectory(${GOOGLE_TEST_DIR})
 include_directories(${GOOGLE_TEST_DIR}/include)
 
 set_target_properties (gtest gtest_main PROPERTIES
-		FOLDER GTest)
+		FOLDER Externals\\GTest)
+		
 #SFML Imgui
 set(SFML_IMGUI ${EXTERNAL_DIR}/imgui-sfml-2.0.1/)
 set(IMGUI_ROOT ${EXTERNAL_DIR}/imgui-1.70/ CACHE INTERNAL "")
@@ -176,7 +183,15 @@ add_subdirectory(${SFML_IMGUI})
 include_directories(${IMGUI_ROOT} ${SFML_IMGUI})
 LIST(APPEND Neko_LIBRARIES
 	ImGui-SFML)
+	
+set_target_properties (ImGui-SFML PROPERTIES FOLDER Externals)
+#Spine sfml
+set(SPINE_SFML_DIR ${EXTERNAL_DIR}/spine-3.6/)
+add_subdirectory(${SPINE_SFML_DIR})
+include_directories(${SPINE_SFML_DIR}/spine-sfml/src ${SPINE_SFML_DIR}/spine-c/src)
+LIST(APPEND Neko_LIBRARIES spine-c spine-sfml)
 
+set_target_properties (spine-c spine-sfml PROPERTIES FOLDER Externals)
 #BOX2D
 set(BOX2D_DIR ${EXTERNAL_DIR}/Box2D-2.3.1)
 set(BOX2D_BUILD_EXAMPLES OFF CACHE INTERNAL "")
@@ -187,7 +202,8 @@ add_subdirectory(${BOX2D_DIR})
 include_directories(${BOX2D_DIR}/)
 LIST(APPEND Neko_LIBRARIES
 	Box2D)
-
+	
+set_target_properties (Box2D PROPERTIES FOLDER Externals)
 	#glm
 set(GLM_DIR ${EXTERNAL_DIR}/glm)
 include_directories(${GLM_DIR})
@@ -202,7 +218,7 @@ set(REMOTERY_DIR ${EXTERNAL_DIR}/Remotery)
 add_subdirectory(${REMOTERY_DIR})
 include_directories(${REMOTERY_DIR})
 LIST(APPEND Neko_LIBRARIES Remotery)
-
+set_target_properties (Remotery PROPERTIES FOLDER Externals)
 #Neko_COMMON
 
 include_directories(include/ extensions/include/)
@@ -213,6 +229,8 @@ add_dependencies(Neko_COMMON DataTarget)
 set_property(TARGET Neko_COMMON PROPERTY CXX_STANDARD 17)
 target_compile_definitions(Neko_COMMON PUBLIC $<$<CONFIG:Debug>:__neko_dbg__>)
 target_compile_definitions(Neko_COMMON PUBLIC $<$<CONFIG:RelWithDebInfo>:__neko_dbg__>)
+
+set_target_properties (Neko_COMMON PROPERTIES FOLDER Neko)
 #Neko TEST
 SET(Neko_TEST_DIR ${CMAKE_SOURCE_DIR}/test)
 file(GLOB TEST_FILES ${Neko_TEST_DIR}/*.cpp )
@@ -222,6 +240,8 @@ if (APPLE)
 else()
 	target_link_libraries(Neko_TEST gtest gtest_main Neko_COMMON City)
 endif(APPLE)
+
+set_target_properties (Neko_TEST PROPERTIES FOLDER Neko)
 #extensions
 file(GLOB EXTENSIONS_FOLDERS extensions/src/* extensions/include/*)
 foreach(EXTENSION_FOLDER ${EXTENSIONS_FOLDERS})
@@ -231,6 +251,7 @@ foreach(EXTENSION_FOLDER ${EXTENSIONS_FOLDERS})
 		source_group("Extensions\\${EXTENSION_DIR}"            FILES ${EXTENSION_FILES})
 		if(NOT TARGET ${EXTENSION_DIR})
 			add_library(${EXTENSION_DIR} STATIC ${EXTENSION_FILES})
+			set_target_properties (${EXTENSION_DIR} PROPERTIES FOLDER Neko\\ExtensionsLibs)
 			target_link_libraries(${EXTENSION_DIR} PUBLIC Neko_COMMON)
 		else()
 			target_sources(${EXTENSION_DIR} PRIVATE ${EXTENSION_FILES})

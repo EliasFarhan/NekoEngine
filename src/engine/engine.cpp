@@ -168,9 +168,6 @@ void MainEngine::EngineLoop()
     renderThread_.detach();
     while (isRunning)
     {
-
-
-
         rmt_ScopedCPUSample(EngineLoop, 0);
         clockDeltatime = engineClock_.restart();
         if (frameIndex > 0)

@@ -25,6 +25,7 @@
 #include <sstream>
 #include <City/city_behavior_tree_manager.h>
 #include <engine/log.h>
+#include "utilities/vector_utility.h"
 
 namespace neko {
 
@@ -388,16 +389,8 @@ namespace neko {
 		Index comp,
 		const json& jsonContent)
 	{
-		auto behaviorTree = ParseBehaviorTreeFromJson(comp, jsonContent);
-		size_t futureSize = vecBehaviorTree_.capacity();
-		if (futureSize <= comp)
-		{
-			while (futureSize <= comp)
-			{
-				futureSize *= 2;
-			}
-			vecBehaviorTree_.resize(futureSize);
-		}
+		const auto behaviorTree = ParseBehaviorTreeFromJson(comp, jsonContent);
+		ResizeIfNecessary(vecBehaviorTree_, comp);
 		if (behaviorTree) {
 			vecBehaviorTree_.at(comp) = behaviorTree;
 			return comp;
