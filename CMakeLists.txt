@@ -65,7 +65,10 @@ set(EXTERNAL_DIR ${CMAKE_SOURCE_DIR}/externals)
 
 #data
 
-file(GLOB_RECURSE JSON_FILES "${PROJECT_SOURCE_DIR}/data/*.json")
+file(GLOB_RECURSE TEXT_FILES 
+"${PROJECT_SOURCE_DIR}/data/*.json" 
+"${PROJECT_SOURCE_DIR}/data/*.txt"
+)
 file(GLOB_RECURSE IMG_FILES
 		"${PROJECT_SOURCE_DIR}/data/*.jpg"
 		"${PROJECT_SOURCE_DIR}/data/*.png"
@@ -81,7 +84,7 @@ file(GLOB_RECURSE SND_FILES
 		"${PROJECT_SOURCE_DIR}/data/*.wav"
 		"${PROJECT_SOURCE_DIR}/data/*.ogg"
 		)
-LIST(APPEND DATA_FILES ${IMG_FILES} ${SND_FILES} ${JSON_FILES})
+LIST(APPEND DATA_FILES ${IMG_FILES} ${SND_FILES} ${TEXT_FILES})
 foreach(DATA ${DATA_FILES})
 	get_filename_component(FILE_NAME ${DATA} NAME)
 	get_filename_component(PATH_NAME ${DATA} DIRECTORY)
@@ -119,7 +122,7 @@ source_group("Engine"				FILES ${Neko_ENGINE_SRC})
 source_group("Utility"				FILES ${Neko_UTILITY_SRC})
 source_group("Physics"				FILES ${Neko_PHYSICS_SRC})
 source_group("Sound"				FILES ${Neko_SOUND_SRC})
-source_group("Data\\Json"           FILES ${JSON_FILES})
+source_group("Data\\Text"           FILES ${TEXT_FILES})
 source_group("Data\\Img"            FILES ${IMG_FILES})
 source_group("Data\\Snd"			FILES ${SND_FILES})
 
@@ -129,7 +132,7 @@ List(APPEND Neko_SRC
 	${Neko_UTILITY_SRC} 
 	${Neko_PHYSICS_SRC}
 	${Neko_SOUND_SRC}
-	${JSON_FILES} 
+	${TEXT_FILES} 
 	${IMG_FILES}
 	${SND_FILES})
 
