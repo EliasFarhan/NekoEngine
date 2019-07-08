@@ -27,6 +27,7 @@
 #include <queue>
 #include <sstream>
 #include <cmath>
+#include <algorithm>
 #include <engine/log.h>
 #include <Remotery.h>
 

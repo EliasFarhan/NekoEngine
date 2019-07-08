@@ -27,6 +27,8 @@ if(UNIX AND NOT APPLE)
 			SET (CMAKE_OBJDUMP "${LLVM_ROOT}/bin/llvm-objdump")
 			SET (CMAKE_RANLIB  "${LLVM_ROOT}/bin/llvm-ranlib")
 		else()
+			LIST(APPEND Neko_LIBRARIES
+					stdc++fs)
 			set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")# -fsanitize=address")
 		endif()
 

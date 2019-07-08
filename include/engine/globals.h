@@ -25,6 +25,7 @@
  */
 
 #include <cstdint>
+#include <cstdlib>
 #include <limits>
 #include <SFML/System/Vector2.hpp>
 
