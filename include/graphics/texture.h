@@ -24,7 +24,10 @@
  SOFTWARE.
  */
 #include <vector>
+#include <limits>
+#include <memory>
 #include <SFML/Graphics/Texture.hpp>
+#include "engine/globals.h"
 
 namespace neko
 {
@@ -35,13 +38,13 @@ public:
     TextureManager();
 
     bool HasValidExtension(const std::string& filename);
-//TODO should return an index to avoid pointer invalidation
-    sf::Texture* LoadTexture(std::string filename);
+	//Return an index to avoid pointer invalidation
+	Index LoadTexture(std::string filename);
+	const std::shared_ptr<sf::Texture> GetTexture(const Index index) const;
 
-    std::vector<std::string> m_TexturePaths;
-    std::vector<sf::Texture> m_Textures;
-    std::vector<size_t> m_TextureIdsRefCounts;
-
-
+private:
+    std::vector<std::string> texturePaths_;
+    std::vector<std::shared_ptr<sf::Texture>> textures_;
 };
+
 }

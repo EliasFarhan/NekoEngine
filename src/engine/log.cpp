@@ -22,6 +22,7 @@
  SOFTWARE.
  */
 #include <engine/log.h>
+#include <memory>
 #include <atomic>
 #include <iostream>
 #include <chrono>
@@ -42,33 +43,33 @@ public:
     std::condition_variable newMsgSync;
 
 	std::mutex msgMutex;
+	std::mutex loggingMutex;
 private:
-    std::thread logThread;
-    std::vector<std::string> msgQueue;
+    std::thread logThread_;
+    std::vector<std::string> msgQueue_;
 
 };
 
 
-static DebugLogger* debugLogger = nullptr;
+static std::unique_ptr<DebugLogger> debugLogger = nullptr;
 
 DebugLogger::DebugLogger()
 {
     {
-        std::chrono::time_point<std::chrono::system_clock> end;
-        end = std::chrono::system_clock::now();
-        std::time_t end_time = std::chrono::system_clock::to_time_t(end);
+	    const auto end = std::chrono::system_clock::now();
+        const auto end_time = std::chrono::system_clock::to_time_t(end);
         std::ofstream logFile("neko_log.txt", std::ios::out | std::ios::app);
         logFile << "\nNeko Engine : " << std::ctime(&end_time) << "\n";
     }
-    logThread = std::thread(&DebugLogger::logLoop, this);
-    logThread.detach();
+    logThread_ = std::thread(&DebugLogger::logLoop, this);
+    logThread_.detach();
 }
 
 void DebugLogger::write(std::string msg)
 {
     {
         std::unique_lock<std::mutex> lock(msgMutex);
-        msgQueue.push_back(msg);
+        msgQueue_.push_back(msg);
     }
     newMsgSync.notify_one();
 }
@@ -79,20 +80,35 @@ void DebugLogger::logLoop()
     {
         {
             std::unique_lock<std::mutex> lock(msgMutex);
-            newMsgSync.wait(lock);
+            using namespace std::chrono_literals;
+            newMsgSync.wait_for(lock, 1ms);
         }
         {
-            std::ofstream logFile("neko_log.txt", std::ios::out | std::ios::app);
-            while (!msgQueue.empty())
+            std::unique_lock<std::mutex> lock(loggingMutex);
+            bool msgQueueEmpty = true;
             {
-                std::string msg;
+                std::unique_lock<std::mutex> checkingQueueLock(msgMutex);
+                msgQueueEmpty = msgQueue_.empty();
+            }
+            if(!msgQueueEmpty)
+            {
+                std::ofstream logFile("neko_log.txt", std::ios::out | std::ios::app);
+                while (!msgQueueEmpty)
                 {
-                    std::unique_lock<std::mutex> lock(msgMutex);
-                    msg = msgQueue.front();
-					msgQueue.erase(msgQueue.begin());
+                    std::string msg;
+                    {
+                        std::unique_lock<std::mutex> masgLock(msgMutex);
+                        msg = msgQueue_.front();
+                        msgQueue_.erase(msgQueue_.begin());
+                    }
+                    logFile << msg << "\n";
+                    std::cout << msg << std::endl;
+                    {
+                        std::unique_lock<std::mutex> msgLock(msgMutex);
+                        msgQueueEmpty = msgQueue_.empty();
+                    }
+
                 }
-                logFile << msg << "\n";
-                std::cout << msg << "\n";
             }
         }
     }
@@ -101,12 +117,14 @@ void DebugLogger::logLoop()
 
 void initLog()
 {
-    debugLogger = new DebugLogger();
+    debugLogger = std::make_unique<DebugLogger>();
 }
 
 void logDebug(std::string msg)
 {
+#ifdef __neko_dbg__
     debugLogger->write(msg);
+#endif
 }
 
 void destroyLog()
@@ -115,9 +133,9 @@ void destroyLog()
     debugLogger->isRunning = false;
     debugLogger->newMsgSync.notify_all();
     {
-		std::unique_lock<std::mutex> lock(debugLogger->msgMutex);
-		debugLogger->newMsgSync.wait(lock);
+		std::unique_lock<std::mutex> lock(debugLogger->loggingMutex);
+        using namespace std::chrono_literals;
+		debugLogger->newMsgSync.wait_for(lock, 5ms);
     }
-	delete(debugLogger);
 	debugLogger = nullptr;
 }

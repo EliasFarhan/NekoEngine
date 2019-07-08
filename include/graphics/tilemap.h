@@ -25,6 +25,7 @@
  */
 
 #include <vector>
+#include <memory>
 #include <SFML/Graphics/VertexArray.hpp>
 #include <SFML/Graphics/Texture.hpp>
 #include <physics/physics.h>
@@ -38,7 +39,7 @@ class GraphicsManager;
  */
 struct Tilesheet
 {
-	sf::Texture* texture = nullptr;
+	std::shared_ptr<sf::Texture> texture = nullptr;
 	/**
 	 * \brief vertex array with 2 vectors for double buffering with the render thread
 	 */
@@ -72,7 +73,7 @@ public:
     Init(const std::string& tilemapPath, TextureManager& textureManager, Physics2dManager* physics2DManager = nullptr);
 	void PushCommand(GraphicsManager* graphicsManager) override;
 protected:
-	std::vector<Tiledsheet> tileSheets;
+	std::vector<Tiledsheet> tileSheets_;
 
 };
 }

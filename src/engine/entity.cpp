@@ -23,49 +23,81 @@
  */
 #include <engine/entity.h>
 #include "engine/globals.h"
+#include <algorithm>
 
 namespace neko
 {
 
 EntityManager::EntityManager()
 {
-    m_MaskArray.reserve(InitEntityNmb);
+    entityMaskArray_.reserve(INIT_ENTITY_NMB);
 }
 
 EntityMask EntityManager::GetMask(Entity entity)
 {
-    return m_MaskArray[entity - 1];
+    return entityMaskArray_[entity];
 }
 
-Entity EntityManager::CreateEntity(Entity wantedEntity)
+Entity EntityManager::CreateEntity()
 {
-    for (Entity entity = 1U; entity <= m_MaskArray.size(); entity++)
+    const auto entityMaskIt = std::find_if(entityMaskArray_.begin(), entityMaskArray_.end(),[](EntityMask entityMask){
+       return  entityMask == INVALID_ENTITY_MASK;
+    });
+    if(entityMaskIt == entityMaskArray_.end())
     {
-        if (m_MaskArray[entity - 1] == INVALID_ENTITY)
-        {
-            return entity;
-        }
+        entityMaskArray_.push_back(INVALID_ENTITY_MASK);
+        return Entity(entityMaskArray_.size()-1);
     }
-    return INVALID_ENTITY;
+    else
+    {
+        return Entity(entityMaskIt-entityMaskArray_.begin());
+    }
 }
 
 void EntityManager::DestroyEntity(Entity entity)
 {
-    m_MaskArray[entity - 1] = INVALID_ENTITY;
+    entityMaskArray_[entity] = INVALID_ENTITY_MASK;
 }
 
-bool EntityManager::HasComponent(Entity entity, ComponentType componentType)
+bool EntityManager::HasComponent(Entity entity, EntityMask componentType)
 {
-    return (m_MaskArray[entity - 1] & static_cast<EntityMask>(componentType)) == static_cast<EntityMask>(componentType);
+	if (entity >= entityMaskArray_.size())
+		return false;
+    return (entityMaskArray_[entity] & EntityMask(componentType)) == EntityMask(componentType);
 }
 
-void EntityManager::AddComponentType(Entity entity, ComponentType componentType)
+void EntityManager::AddComponentType(Entity entity, EntityMask componentType)
 {
-    m_MaskArray[entity - 1] = m_MaskArray[entity - 1] | static_cast<EntityMask>(componentType);
+    entityMaskArray_[entity] |= EntityMask(componentType);
 }
 
-void EntityManager::RemoveComponentType(Entity entity, ComponentType componentType)
+void EntityManager::RemoveComponentType(Entity entity, EntityMask componentType)
 {
-    m_MaskArray[entity - 1] &= ~static_cast<EntityMask>(componentType);
+    entityMaskArray_[entity] &= ~EntityMask(componentType);
+}
+
+size_t EntityManager::GetEntitiesNmb(EntityMask filterComponents)
+{
+    return std::count_if(entityMaskArray_.begin(), entityMaskArray_.end(),[&filterComponents](EntityMask entityMask){
+        return entityMask != INVALID_ENTITY_MASK && (entityMask & EntityMask(filterComponents)) == EntityMask(filterComponents);
+    });
+}
+
+std::vector<Entity> EntityManager::FilterEntities(EntityMask filterComponents)
+{
+	std::vector<Entity> entities;
+	for(Entity i = 0; i < entityMaskArray_.size();i++)
+	{
+		if(HasComponent(i, filterComponents))
+		{
+			entities.push_back(i);
+		}
+	}
+	return entities;
+}
+
+bool EntityManager::EntityExists(Entity entity)
+{
+    return entityMaskArray_[entity] != INVALID_ENTITY_MASK;
 }
 }

@@ -25,13 +25,21 @@
  */
 
 #include <vector>
+#include <engine/globals.h>
 
 namespace neko
 {
-using Entity = unsigned;
-using EntityMask = unsigned;
+/**
+ * \brief Entity start at 0 and goes to N
+ */
+using Entity = Index;
+/**
+ * \brief EntityMask is a bitmask representation of the activated components
+ */
+using EntityMask = std::uint32_t;
 enum class ComponentType : unsigned;
-const Entity INVALID_ENTITY = 0U;
+const Entity INVALID_ENTITY = std::numeric_limits<Index>::max();
+const EntityMask INVALID_ENTITY_MASK = 0u;
 
 /**
  * \brief Used in an Entity-Component-System to store all entities and what components they have
@@ -39,20 +47,31 @@ const Entity INVALID_ENTITY = 0U;
 class EntityManager
 {
 public:
-    EntityManager();
+	EntityManager();
 
-    EntityMask GetMask(Entity entity);
+	EntityMask GetMask(Entity entity);
 
-    Entity CreateEntity(Entity wantedEntity = 0u);
+	Entity CreateEntity();
 
-    void DestroyEntity(Entity entity);
+	void DestroyEntity(Entity entity);
 
-    bool HasComponent(Entity entity, ComponentType componentType);
+	bool HasComponent(Entity entity, EntityMask componentType);
 
-    void AddComponentType(Entity entity, ComponentType componentType);
+	bool EntityExists(Entity entity);
 
-    void RemoveComponentType(Entity entity, ComponentType componentType);
+	size_t GetEntitiesNmb(EntityMask filterComponents = INVALID_ENTITY_MASK);
 
-    std::vector<EntityMask> m_MaskArray;
+	std::vector<Entity> FilterEntities(EntityMask filterComponents = INVALID_ENTITY_MASK);
+
+	void AddComponentType(Entity entity, EntityMask componentType);
+
+	void RemoveComponentType(Entity entity, EntityMask componentType);
+private:
+	std::vector<EntityMask> entityMaskArray_;
+};
+
+struct Component
+{
+	Entity entity = INVALID_ENTITY;
 };
 }

@@ -35,10 +35,9 @@ namespace neko
 void TiledMap::Init(const std::string& tilemapPath, TextureManager& textureManager, Physics2dManager* physics2DManager)
 {
 
-    std::string sourceFolderPath = GetFileParentPath(tilemapPath);
-    std::unique_ptr<json> tileMapJsonPtr;
-    tileMapJsonPtr = LoadJson(tilemapPath);
-    json tileMapJson = *tileMapJsonPtr;
+    const std::string sourceFolderPath = GetFileParentPath(tilemapPath);
+    const std::unique_ptr<json> tileMapJsonPtr = LoadJson(tilemapPath);
+    const json tileMapJson = *tileMapJsonPtr;
 
     //TODO import the texture and fill the double buffer vertex arrays of tilesheets
     for (auto& tilesheetPathJson : tileMapJson["tilesets"])
@@ -50,7 +49,8 @@ void TiledMap::Init(const std::string& tilemapPath, TextureManager& textureManag
         Tiledsheet tileSheet;
 
         std::string textureSource = tiledSheetJson["image"];
-        tileSheet.texture = textureManager.LoadTexture(LinkFolderAndFile(sourceFolderPath, textureSource));
+		Index textureIndex = textureManager.LoadTexture(LinkFolderAndFile(sourceFolderPath, textureSource));
+		tileSheet.texture = textureManager.GetTexture(textureIndex);
         tileSheet.tileSize = sf::Vector2u(tiledSheetJson["tilewidth"], tiledSheetJson["tileheight"]);
         tileSheet.firstId = tilesheetPathJson["firstgid"];
         tileSheet.size = sf::Vector2u(tileSheet.texture->getSize().x / tileSheet.tileSize.x,
@@ -59,7 +59,7 @@ void TiledMap::Init(const std::string& tilemapPath, TextureManager& textureManag
 
         tileSheet.tilemap[0].setPrimitiveType(sf::Triangles);
         tileSheet.tilemap[1].setPrimitiveType(sf::Triangles);
-        tileSheets.push_back(tileSheet);
+        tileSheets_.push_back(tileSheet);
     }
 
     for (auto& layer : tileMapJson["layers"])
@@ -75,7 +75,7 @@ void TiledMap::Init(const std::string& tilemapPath, TextureManager& textureManag
 
                 unsigned tile = layer["data"][i];
                 Tiledsheet* currentTilesheet = nullptr;
-                for (auto& tilesheet : tileSheets)
+                for (auto& tilesheet : tileSheets_)
                 {
                     if (tile >= tilesheet.firstId && tile < tilesheet.firstId + tilesheet.tileNmb)
                     {
@@ -136,7 +136,7 @@ void TiledMap::Init(const std::string& tilemapPath, TextureManager& textureManag
                     fixtureDef.shape = &platformBox;
                     neko::Collider boxCollider;
                     boxCollider.entity =2;
-                    physics2DManager->colliders.push_back(boxCollider);
+                    physics2DManager->colliders_.push_back(boxCollider);
                     physics2DManager->CreateBody(bodyDef, &fixtureDef, 1);
 
                 }
@@ -151,9 +151,10 @@ void TiledMap::PushCommand(GraphicsManager* graphicsManager)
 {
     rmt_ScopedCPUSample(PushTilemapCommands, 0)
     const int frameIndex = MainEngine::GetInstance()->frameIndex % 2;
-    for (auto& tilesheet: tileSheets)
+    for (auto& tilesheet: tileSheets_)
     {
-        graphicsManager->Draw(&tilesheet.tilemap[frameIndex], tilesheet.texture);
+		// TODO probably move the graphics manager to handle share_ptr also.
+        graphicsManager->Draw(&tilesheet.tilemap[frameIndex], tilesheet.texture.get());
     }
 }
 }

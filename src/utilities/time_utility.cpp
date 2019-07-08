@@ -22,6 +22,8 @@
  SOFTWARE.
  */
 
+#include <thread>
+#include <chrono>
 #include <utilities/time_utility.h>
 
 namespace neko
@@ -66,6 +68,12 @@ float Timer::GetTimeFromStart() const
 {
     return period - time;
 }
+
+void SleepMs(const uint32_t ms)
+{
+	std::this_thread::sleep_for(std::chrono::milliseconds(ms));
+} 
+
 }
 
 

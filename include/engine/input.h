@@ -33,11 +33,6 @@
 
 namespace neko
 {
-struct KeyPressedStatus
-{
-    bool previousKeyPressed;
-    bool keyPressed;
-};
 
 /**
  * \brief manages the inputs from the keyboards through the window events.
@@ -47,6 +42,7 @@ struct KeyPressedStatus
 class KeyboardManager 
 {
 public:
+	KeyboardManager();
     /**
      * \brief Should be called each frame before retrieving the new window event
      * it is called by MainEngine::Update
@@ -73,9 +69,18 @@ public:
     void AddReleaseKey(sf::Keyboard::Key key);
 
 private:
-    std::vector<sf::Keyboard::Key> pressedKey;
-    std::vector<sf::Keyboard::Key> releasedKey;
-    std::array<bool, sf::Keyboard::KeyCount> keyStatusArray;
+    /**
+     * \brief list of current frame pressed key
+     */
+    std::vector<sf::Keyboard::Key> pressedKeys_;
+    /**
+     * \brief list of current frame released key
+     */
+    std::vector<sf::Keyboard::Key> releasedKeys_;
+    /**
+     * \brief store the status of each key to check if
+     */
+    std::array<bool, sf::Keyboard::KeyCount> keyStatusArray_;
 };
 
 /**
@@ -85,6 +90,7 @@ private:
 class MouseManager
 {
 public:
+    void SetWindow(sf::Window* window);
 	sf::Vector2i GetPosition() const;
 	sf::Vector2i GetLocalPosition(sf::Window& window) const;
 	bool IsButtonPressed(sf::Mouse::Button button) const;
@@ -102,8 +108,9 @@ public:
 	float GetWheelDelta() const;
 	sf::Vector2i GetMouseDelta() const;
 private:
-	float wheelDelta = 0.0f;
-	sf::Vector2i previousMousePos = sf::Vector2i(0, 0);
-	sf::Vector2i currentMousePos = sf::Vector2i(0, 0);
+    sf::Window* window_ = nullptr;
+	float wheelDelta_ = 0.0f;
+	sf::Vector2i previousMousePos_ = sf::Vector2i(0, 0);
+	sf::Vector2i currentMousePos_ = sf::Vector2i(0, 0);
 };
 }

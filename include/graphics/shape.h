@@ -27,6 +27,7 @@
 #include <vector>
 #include <SFML/Graphics/ConvexShape.hpp>
 #include <engine/globals.h>
+#include <engine/transform.h>
 
 namespace neko
 {
@@ -51,15 +52,15 @@ public:
 
     Index AddPolygon(const sf::Vector2f& pos, const sf::Vector2f* points, size_t pointNmb, const ShapeDef& shapeDef);
 
-    void CopyPosition(const sf::Vector2f* positions, size_t start, size_t length);
 
-    void PushCommands(GraphicsManager* graphicsManager, size_t start = 0, size_t length = InitEntityNmb);
+    void CopyTransformPosition(Transform2dManager& transformManager, size_t start = 0, size_t length = INIT_ENTITY_NMB);
+    void PushCommands(GraphicsManager* graphicsManager, size_t start = 0, size_t length = INIT_ENTITY_NMB);
 
 private:
     /**
      * \brief storing the shape and putting two vectors for double buffering with the render thread
      */
-    std::vector<sf::ConvexShape> convexShape[2];
+    std::vector<sf::ConvexShape> convexShape_[2];
 };
 
 }

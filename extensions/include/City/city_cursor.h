@@ -1,8 +1,9 @@
 #pragma once
+
 /*
  MIT License
 
- Copyright (c) 2019 SAE Institute Switzerland AG
+ Copyright (c) 2017 SAE Institute Switzerland AG
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -22,62 +23,30 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-#include <vector>
-#include "SFML/System/Vector2.hpp"
+#include <SFML/Graphics/RectangleShape.hpp>
 #include "engine/system.h"
-#include <PerlinNoise.hpp>
-
+#include "City/city_editor.h"
 
 namespace neko
 {
+class CityBuilderEngine;
 
-enum class EnvironmentTile : unsigned
-{
-	GRASS = 0,
-	WATER
-};
-
-enum class CityElementType : unsigned 
-{
-	ROAD,
-	BRIDGE,
-	PARKING,
-	RAIL,
-	TRAIN_STATION,
-	CHURCH,
-	TREES,
-	BUILDING,
-	HOUSE
-
-};
-
-struct City
-{
-	sf::Vector2u mapSize = sf::Vector2u(256,128);
-	float forestRatio = 0.5f;
-	float perlinFreq = 20.0f;
-};
-
-struct CityElement
-{
-	sf::Vector2i position;
-	sf::Vector2u size = sf::Vector2u(1, 1);
-	CityElementType elementType;
-};
-
-class CityBuilderMap : public System
+class CityCursor : public System
 {
 public:
 	void Init() override;
-	void Update() override;
+	void Update(float dt) override;
 	void Destroy() override;
+	void OnEvent(sf::Event& event);
+	void SetCursorMode(ButtonIconType cursorMode);
+	sf::Vector2i GetMouseWorldPos() const;
+	sf::Vector2i GetMouseTilePos() const;
+	CityBuilderEngine* engine_;
+protected:
 
-	size_t Position2Index(sf::Vector2i pos) const;
-	sf::Vector2i Index2Position(size_t index) const;
-
-	City city{};
-	std::vector<EnvironmentTile> environmentTiles;
-	std::vector<CityElement> elements;
+	ButtonIconType cursorMode_ = ButtonIconType::NONE;
+	//for double buffering
+	sf::RectangleShape cursorRect_[2];
+	sf::Vector2i originPos_ =sf::Vector2i(-1,-1);
 };
-
 }

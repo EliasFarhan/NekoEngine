@@ -52,21 +52,23 @@ public:
     void Init() override
     {
         MainEngine::Init();
-        texture = textureManager.LoadTexture("data/sprites/wall.jpg");
+		const neko::Index textureIndex = 
+			textureManager.LoadTexture("data/sprites/wall.jpg");
+		texture = textureManager.GetTexture(textureIndex);
         sprite.setTexture(*texture);
 
     }
 
-    void Update() override
+    void Update(float dt) override
     {
-        MainEngine::Update();
-        graphicsManager->Draw(sprite);
+        MainEngine::Update(dt);
+        graphicsManager_->Draw(sprite);
 
     }
 
 private:
     neko::TextureManager textureManager;
-    sf::Texture* texture;
+    std::shared_ptr<sf::Texture> texture;
     sf::Sprite sprite;
 };
 
@@ -83,36 +85,40 @@ public:
     void Init() override
     {
         MainEngine::Init();
-        const auto* texture = textureManager.LoadTexture("data/sprites/wall.jpg");
+		const neko::Index textureIndex = 
+			textureManager.LoadTexture("data/sprites/wall.jpg");
+		const std::shared_ptr<sf::Texture> texture = textureManager.GetTexture(textureIndex);
 
-        std::uniform_real_distribution<float> randomX(0.0f,
-                                                      config.screenSize.x); // generates random floats between 0.0 and 1.0
-        std::uniform_real_distribution<float> randomY(0.0f,
-                                                      config.screenSize.y); // generates random floats between 0.0 and 1.0
+        std::uniform_real_distribution<float> randomX(
+			0.0f,
+			static_cast<float>(config.screenSize.x)); // generates random floats between 0.0 and 1.0
+        std::uniform_real_distribution<float> randomY(
+			0.0f,
+			static_cast<float>(config.screenSize.y)); // generates random floats between 0.0 and 1.0
         std::uniform_real_distribution<float> randomScale(0.01f, 0.1f); // generates random floats between 0.0 and 1.0
         std::default_random_engine generator;
         std::uniform_real_distribution<float> randomAngle(0.0f, 360.0f); // generates random floats between 0.0 and 1.0
-        for (auto i = 0u; i < InitEntityNmb; i++)
+        for (auto i = 0u; i < neko::INIT_ENTITY_NMB; i++)
         {
 
             spriteManager.AddSprite(texture);
 
-            transformManager.positions.emplace_back(randomX(generator), randomY(generator));
+            transformManager.AddPosition(sf::Vector2f(randomX(generator), randomY(generator)));
             const float scale = randomScale(generator);
-            transformManager.scales.emplace_back(scale, scale);
-            transformManager.angles.push_back(randomAngle(generator));
+            transformManager.AddScale(sf::Vector2f(scale, scale));
+            transformManager.AddAngle(randomAngle(generator));
 
         }
 
     }
 
-    void Update() override
+    void Update(float dt) override
     {
-        MainEngine::Update();
+        MainEngine::Update(dt);
         spriteManager.CopyTransformPosition(transformManager);
         spriteManager.CopyTransformScales(transformManager);
         spriteManager.CopyTransformAngles(transformManager);
-        spriteManager.PushCommands(graphicsManager);
+        spriteManager.PushCommands(graphicsManager_.get());
     }
 
 protected:
@@ -138,7 +144,7 @@ public:
         MainEngine::Init();
 
         {
-            transformManager.positions.push_back(sf::Vector2f(renderWindow->getSize()) / 2.0f);
+            transformManager.AddPosition(sf::Vector2f(renderWindow->getSize()) / 2.0f);
             auto spriteIndex = spriteManager.AddSprite(nullptr);
             auto& animator = animatorManager.CreateSpriteAnimator();
 
@@ -195,27 +201,27 @@ public:
 
     }
 
-    void Update() override
+    void Update(float dt) override
     {
-        MainEngine::Update();
-        if (keyboardManager.IsKeyDown(sf::Keyboard::Up))
+        MainEngine::Update(dt);
+        if (keyboardManager_.IsKeyDown(sf::Keyboard::Up))
         {
             auto* animator = animatorManager.GetAnimatorAt(0);
             animator->PlayAnim("jump");
         }
-        if (keyboardManager.IsKeyDown(sf::Keyboard::Down))
+        if (keyboardManager_.IsKeyDown(sf::Keyboard::Down))
         {
             auto* animator = animatorManager.GetAnimatorAt(0);
             animator->PlayAnim("idle");
         }
-        if (keyboardManager.IsKeyDown(sf::Keyboard::Right))
+        if (keyboardManager_.IsKeyDown(sf::Keyboard::Right))
         {
             auto* animator = animatorManager.GetAnimatorAt(0);
             animator->PlayAnim("walk");
         }
-        animatorManager.Update(spriteManager, dt.asSeconds());
+        animatorManager.Update(spriteManager, dt);
         spriteManager.CopyTransformPosition(transformManager, 0, 1);
-        spriteManager.PushCommands(graphicsManager, 0, 1);
+        spriteManager.PushCommands(graphicsManager_.get(), 0, 1);
     }
 
     void Destroy() override
@@ -248,10 +254,10 @@ public:
         tiledMap.Init("data/tilemap/platformer.json", textureManager);
     }
 
-    void Update() override
+    void Update(float dt) override
     {
-        MainEngine::Update();
-        tiledMap.PushCommand(graphicsManager);
+        MainEngine::Update(dt);
+        tiledMap.PushCommand(graphicsManager_.get());
     }
 
     void Destroy() override

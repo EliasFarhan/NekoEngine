@@ -21,84 +21,13 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-#include <sstream>
-#include <engine/engine.h>
-#include <city_tilemap.h>
-#include <city_map.h>
-#include "engine/input.h"
 
-#include <SFML/Window/Event.hpp>
-#include "engine/log.h"
 
-class CityBuilderEngine : public neko::MainEngine
+#include <City/city_engine.h>
+
+int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 {
-public:
-
-	
-
-	void Init() override
-	{
-		MainEngine::Init();
-		cityBuilderMap.Init();
-		environmentTilemap.Init(textureManager);
-        environmentTilemap.UpdateTilemap(cityBuilderMap, neko::CityTilesheetType::LENGTH);
-		mainView = renderWindow->getView();
-	}
-
-	void Update() override
-	{
-		MainEngine::Update();
-
-		if(mouseManager.IsButtonPressed(sf::Mouse::Button::Middle))
-		{
-			const auto delta = sf::Vector2f(mouseManager.GetMouseDelta());
-			mainView.setCenter(mainView.getCenter() - currentZoom*delta);
-		}
-
-		environmentTilemap.PushCommand(graphicsManager);
-		graphicsManager->SetView(mainView);
-	}
-
-	void OnEvent(sf::Event& event) override
-	{
-		MainEngine::OnEvent(event);
-		if(event.type == sf::Event::MouseWheelScrolled)
-		{
-			const float wheelDelta = event.mouseWheelScroll.delta;
-			{
-				std::ostringstream oss;
-				oss << "Mouse Wheel Delta: " << wheelDelta;
-				logDebug(oss.str());
-			}
-			const auto size = mainView.getSize();
-			currentZoom -= wheelDelta * scrollDelta * currentZoom;
-
-			mainView.setSize(size - wheelDelta * scrollDelta * size);
-		}
-	}
-
-	void Destroy() override
-	{
-		MainEngine::Destroy();
-	}
-
-private:
-	sf::View mainView;
-	neko::EntityManager entityManager;
-	neko::TextureManager textureManager;
-	neko::CityBuilderTilemap environmentTilemap;
-	neko::CityBuilderMap cityBuilderMap;
-
-	const float scrollDelta = 0.1f;
-	float currentZoom = 1.0f;
-};
-
-
-int main(int argc, char** argv)
-{
-	(void)argc;
-	(void)argv;
-	CityBuilderEngine engine;
+	neko::CityBuilderEngine engine;
 	engine.Init();
 	engine.EngineLoop();
 	return EXIT_SUCCESS;

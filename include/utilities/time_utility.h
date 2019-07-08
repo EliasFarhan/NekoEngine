@@ -24,10 +24,15 @@
  SOFTWARE.
  */
 
+#include <cstdint>
 
 namespace neko
 {
-
+/**
+ * \brief simple timer class in second, that needs to be updated with the current delta time of the frame
+ * period is how long will the timer will run
+ * time is the current time from period to 0
+ */
 class Timer
 {
 public:
@@ -44,8 +49,11 @@ public:
     float GetTimeFromStart() const;
 
 
-    float time;
-    float period;
+    float time = 0.0f;
+    float period = 0.0f;
 private:
 };
+
+void SleepMs(const uint32_t ms);
+
 }

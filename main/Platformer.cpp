@@ -57,11 +57,12 @@ public:
             playerData.playerEntity = 1;
             const auto playerPos = sf::Vector2f(200, 200);
 
-            transformManager.positions.push_back(playerPos);
-            transformManager.scales.emplace_back(1,1);
-            transformManager.angles.push_back(0.0f);
+            transformManager.AddPosition(playerPos);
+            transformManager.AddScale(sf::Vector2f(1,1));
+            transformManager.AddAngle(0.0f);
 
-            auto* texture = textureManager.LoadTexture("data/sprites/hero/jump/hero1.png");
+            auto textureIndex = textureManager.LoadTexture("data/sprites/hero/jump/hero1.png");
+			const std::shared_ptr<sf::Texture> texture = textureManager.GetTexture(textureIndex);
             spriteManager.AddSprite(texture);
 
             const auto physicsSize = neko::pixel2meter(sf::Vector2f(texture->getSize()));
@@ -95,7 +96,7 @@ public:
             fixtureDef[0].shape = &playerBox[0];
 			fixtureDef[0].friction = 0.0f;
             mainPlayerCollider.entity = playerData.playerEntity;
-            physicsManager.colliders.push_back(mainPlayerCollider);
+            physicsManager.AddCollider(mainPlayerCollider);
 
             neko::Collider footCollider{};
             footCollider.entity = playerData.playerEntity;
@@ -112,7 +113,7 @@ public:
             //auto footShapeIndex = shapeManager.AddPolygon(neko::meter2pixel(footPoints[0]), points, 3, shapeDef);
             //footCollider.shapeIndex = footShapeIndex;
 #endif
-            physicsManager.colliders.push_back(footCollider);
+            physicsManager.AddCollider(footCollider);
 
             playerData.playerBody = physicsManager.CreateBody(bodyDef, fixtureDef, 2);
         }
@@ -128,11 +129,11 @@ public:
         MainEngine::OnEvent(event);
         if(event.type == sf::Event::KeyPressed)
         {
-            keyboardManager.AddPressKey(event.key.code);
+            keyboardManager_.AddPressKey(event.key.code);
         }
         if(event.type == sf::Event::KeyReleased)
         {
-            keyboardManager.AddReleaseKey(event.key.code);
+            keyboardManager_.AddReleaseKey(event.key.code);
         }
     }
 
@@ -147,12 +148,12 @@ public:
             physicsManager.Update();
             physicsTimer.time += physicsTimer.period;
         }
-        tiledMap.PushCommand(graphicsManager);
+        tiledMap.PushCommand(graphicsManager_.get());
         //Player management
         {
             rmt_ScopedCPUSample(PlayerManageLoop, 0)
             //Jumping
-            if(playerData.contactNmb > 0 && keyboardManager.IsKeyDown(sf::Keyboard::Space))
+            if(playerData.contactNmb > 0 && keyboardManager_.IsKeyDown(sf::Keyboard::Space))
             {
                 rmt_ScopedCPUSample(CMakePlayerJump, 0);
                 const auto playerVelocity = playerData.playerBody->GetLinearVelocity();
@@ -162,8 +163,8 @@ public:
             {
                 rmt_ScopedCPUSample(MovePlayer, 0);
                 int move = 0;
-                move -= keyboardManager.IsKeyHeld(sf::Keyboard::Left);
-                move += keyboardManager.IsKeyHeld(sf::Keyboard::Right);
+                move -= keyboardManager_.IsKeyHeld(sf::Keyboard::Left);
+                move += keyboardManager_.IsKeyHeld(sf::Keyboard::Right);
                 const auto playerVelocity = playerData.playerBody->GetLinearVelocity();
                 playerData.playerBody->SetLinearVelocity(b2Vec2(move*moveVelocity, playerVelocity.y));
             }
@@ -171,7 +172,7 @@ public:
                 rmt_ScopedCPUSample(CopyPlayerGraphics, 0);
                 transformManager.CopyPositionsFromPhysics2d(physicsManager, 0, 1);
                 spriteManager.CopyTransformPosition(transformManager, 0, 1);
-                spriteManager.PushCommands(graphicsManager, 0, 1);
+                spriteManager.PushCommands(graphicsManager_.get(), 0, 1);
             }
         }
 

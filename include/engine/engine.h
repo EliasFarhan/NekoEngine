@@ -31,6 +31,7 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <Box2D/Common/b2Math.h>
 #include "input.h"
+#include <SFML/Window/WindowStyle.hpp>
 
 
 struct Remotery;
@@ -53,13 +54,47 @@ struct Configuration
     sf::Color bgColor = sf::Color::Black;
     bool vSync = true;
     unsigned int framerateLimit = 0u;
+    int windowStyle = sf::Style::Default;
+};
+
+/**
+ * \brief basic engine class with no graphics manager implementation
+ */
+
+class BasicEngine : public sf::NonCopyable, public System
+{
+public:
+    explicit BasicEngine(Configuration* config = nullptr);
+
+    virtual ~BasicEngine();
+    void Init() override;
+
+    void Update(float dt) override;
+
+    void Destroy() override;
+
+    virtual void EngineLoop();
+
+
+    virtual void OnEvent(sf::Event& event);
+
+    Configuration config;
+    bool isRunning = false;
+    std::unique_ptr<sf::RenderWindow> renderWindow = nullptr;
+	MouseManager& GetMouseManager();
+    sf::Time clockDeltatime;
+protected:
+    sf::Clock engineClock_;
+    Remotery* rmt_ = nullptr;
+    KeyboardManager keyboardManager_;
+    MouseManager mouseManager_;
 };
 
 /**
  * \brief main loop engine class, it runs its own graphics manager thread and manage the window events
  */
 
-class MainEngine : public sf::NonCopyable, public System
+class MainEngine : public BasicEngine
 {
 public:
     explicit MainEngine(Configuration* config = nullptr);
@@ -68,11 +103,13 @@ public:
 
     void Init() override;
 
-    void Update() override;
+    void Update(float dt) override;
 
     void Destroy() override;
-
-    void EngineLoop();
+    /**
+     * \brief completely override the BasicEngine loop due to the render thread synchronization
+     */
+    void EngineLoop() override;
 
     virtual void OnBeginContact(const Collider* colliderA, const Collider* colliderB)
     {}
@@ -80,39 +117,30 @@ public:
     virtual void OnEndContact(const Collider* colliderA, const Collider* colliderB)
     {}
 
-    virtual void OnEvent(sf::Event& event);
-
-    Configuration config;
-    sf::RenderWindow* renderWindow = nullptr;
+    GraphicsManager* GetGraphicsManager() const;
+	
 
     static MainEngine* GetInstance();
 
-    //TODO change to non atomic and to avoid data race with render thread
-    std::atomic<bool> isRunning = false;
-    //TODO find a way with frameIndex, condition_variable to sync with render thread without using atomic
-    std::atomic<bool> isReady = false;
     sf::Vector2u renderTargetSize;
 
     //used to sync with the render thread
     std::condition_variable condSyncRender;
-    std::mutex renderMutex;
-    //TODO change using lock with frame initialization outside of graphics manager context
-    std::atomic<unsigned> frameIndex = 0;
+    std::mutex renderStartMutex;
 
-    sf::Time dt;
+    std::atomic<Index> frameIndex = 0u;
+
 protected:
-    sf::Clock engineClock;
-    Remotery* rmt = nullptr;
-    ctpl::thread_pool workingThreadPool;
-    std::thread renderThread;
-    GraphicsManager* graphicsManager{};
 
-	KeyboardManager keyboardManager;
-	MouseManager mouseManager;
+    ctpl::thread_pool workingThreadPool_;
+    std::thread renderThread_;
+    std::unique_ptr<GraphicsManager> graphicsManager_ = nullptr;
+
+
 /**
  * static instance use to access the engine from anywhere, because I don't want to have thousands of MainEngine& ref
  */
-    static MainEngine* instance;
+    static MainEngine* instance_;
 };
 
 }

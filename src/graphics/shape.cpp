@@ -30,8 +30,8 @@ namespace neko
 {
 ShapeManager::ShapeManager()
 {
-    convexShape[0].reserve(InitEntityNmb);
-    convexShape[1].reserve(InitEntityNmb);
+    convexShape_[0].reserve(INIT_ENTITY_NMB);
+    convexShape_[1].reserve(INIT_ENTITY_NMB);
 }
 
 
@@ -62,21 +62,13 @@ ShapeManager::AddPolygon(const sf::Vector2f& pos, const sf::Vector2f* points, si
     newPolygon.setOutlineColor(shapeDef.outlineColor);
     newPolygon.setOutlineThickness(shapeDef.outlineThickness);
 
-    const Index index = convexShape[0].size();
-    convexShape[0].push_back(newPolygon);
-    convexShape[1].push_back(newPolygon);
+    const Index index = Index(convexShape_[0].size());
+    convexShape_[0].push_back(newPolygon);
+    convexShape_[1].push_back(newPolygon);
     return index;
 }
 
-void ShapeManager::CopyPosition(const sf::Vector2f* positions, size_t start, size_t length)
-{
-    rmt_ScopedCPUSample(CopyShapePositions, 0);
-    for (auto i = start; i < start + length; i++)
-    {
-        convexShape[0][i].setPosition(positions[i - start]);
-        convexShape[1][i].setPosition(positions[i - start]);
-    }
-}
+
 
 void ShapeManager::PushCommands(GraphicsManager* graphicsManager, size_t start, size_t length)
 {
@@ -84,7 +76,17 @@ void ShapeManager::PushCommands(GraphicsManager* graphicsManager, size_t start, 
     const int frameIndex = MainEngine::GetInstance()->frameIndex % 2;
     for (auto i = start; i < start + length; i++)
     {
-        graphicsManager->Draw(convexShape[frameIndex][i]);
+        graphicsManager->Draw(convexShape_[frameIndex][i]);
+    }
+}
+
+void ShapeManager::CopyTransformPosition(Transform2dManager& transformManager, size_t start, size_t length)
+{
+    rmt_ScopedCPUSample(CopySpritePositions, 0);
+    const int frameIndex = MainEngine::GetInstance()->frameIndex % 2;
+    for (auto i = start; i < start + length; i++)
+    {
+        convexShape_[frameIndex][i].setPosition(transformManager.positions_[i]);
     }
 }
 
