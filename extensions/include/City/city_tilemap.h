@@ -157,7 +157,7 @@ public:
 	void UpdateTilemap(const CityBuilderMap& cityBuilderMap, const CityCarManager& cityCarManager,
                        const CityBuildingManager& buildingManager, const Transform2dManager& transformManager,
                        sf::View mainView, CityTilesheetType updatedCityTileType = CityTilesheetType::LENGTH);
-	void PushCommand(GraphicsManager* graphicsManager) override;
+	void PushCommand(MultiThreadGraphicsManager* graphicsManager) override;
 protected:
     /**
      *

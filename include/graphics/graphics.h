@@ -43,6 +43,7 @@ class MainEngine;
  */
 struct Command
 {
+    int layer = 0;
     virtual void Draw(sf::RenderTarget* renderTarget) = 0;
 };
 
@@ -69,13 +70,25 @@ struct TilemapCommand : public Command
     void Draw(sf::RenderTarget* renderTarget) override;
 };
 
+class BasicGraphicsManager
+{
+public:
+    virtual void Draw(sf::Drawable& drawable, int layer = 0);
+
+    virtual void Draw(sf::VertexArray* vertexArray, sf::Texture* texture, int layer = 0);
+
+protected:
+    virtual void Draw(std::array<Command*, MAX_COMMAND_NMB>& commandBuffers_);
+    std::array<Command*, MAX_COMMAND_NMB> commandBuffer_;
+};
+
 /**
  * \brief graphics manager run in a render thread by the MainEngine
  */
-class GraphicsManager
+class MultiThreadGraphicsManager
 {
 public:
-    GraphicsManager();
+    MultiThreadGraphicsManager();
 
 /**
  * \brief called by the render loop when iterating through all the basic sfml commands

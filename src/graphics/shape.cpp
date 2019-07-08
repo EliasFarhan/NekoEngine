@@ -70,7 +70,7 @@ ShapeManager::AddPolygon(const sf::Vector2f& pos, const sf::Vector2f* points, si
 
 
 
-void ShapeManager::PushCommands(GraphicsManager* graphicsManager, size_t start, size_t length)
+void ShapeManager::PushCommands(MultiThreadGraphicsManager* graphicsManager, size_t start, size_t length)
 {
     rmt_ScopedCPUSample(PushShapeCommands, 0);
     const int frameIndex = MainEngine::GetInstance()->frameIndex % 2;

@@ -81,7 +81,7 @@ void SpriteManager::CopyTransformAngles(Transform2dManager& transformManager, si
     }
 }
 
-void SpriteManager::PushCommands(GraphicsManager* graphicsManager, size_t start, size_t length)
+void SpriteManager::PushCommands(MultiThreadGraphicsManager* graphicsManager, size_t start, size_t length)
 {
     rmt_ScopedCPUSample(PushSpriteCommands, 0);
     const int frameIndex = MainEngine::GetInstance()->frameIndex % 2;

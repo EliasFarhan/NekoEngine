@@ -34,7 +34,7 @@ namespace neko
 {
 class Transform2dManager;
 
-class GraphicsManager;
+class MultiThreadGraphicsManager;
 
 /**
  * \brief store the sfml sprite and allow to copy transform from Transform2dManager,
@@ -60,7 +60,7 @@ public:
  * @param start
  * @param length
  */
-    void PushCommands(GraphicsManager* graphicsManager, size_t start = 0, size_t length = INIT_ENTITY_NMB);
+    void PushCommands(MultiThreadGraphicsManager* graphicsManager, size_t start = 0, size_t length = INIT_ENTITY_NMB);
 
 private:
     /**

@@ -30,7 +30,7 @@
 
 namespace neko
 {
-class GraphicsManager;
+class MultiThreadGraphicsManager;
 /**
  * \brief used in the graphics manager to show informations from the engine/game/systems in used
  */
@@ -48,7 +48,7 @@ public:
     /**
      * \brief Non owning ptr on graphics manager
      */
-    GraphicsManager* graphicsManager_ = nullptr;
+    MultiThreadGraphicsManager* graphicsManager_ = nullptr;
     /**
      * \brief Non owning ptr to renderwindow
      */

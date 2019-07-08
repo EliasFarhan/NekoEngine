@@ -73,7 +73,7 @@ void CityZoneManager::UpdateZoneTilemap(const CityBuilderMap& cityMap, CityBuild
     }
 }
 
-void CityZoneManager::PushCommand(GraphicsManager* graphicsManager)
+void CityZoneManager::PushCommand(MultiThreadGraphicsManager* graphicsManager)
 {
     const auto frameIndex = MainEngine::GetInstance()->frameIndex % 2;
     graphicsManager->Draw(zoneVertexArray_[frameIndex]);

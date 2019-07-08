@@ -3,6 +3,11 @@
 
 namespace neko
 {
+
+BasicSpineDrawable::BasicSpineDrawable()
+{
+
+}
 BasicSpineDrawable::~BasicSpineDrawable()
 {
 	if(skeletonData)
@@ -10,6 +15,7 @@ BasicSpineDrawable::~BasicSpineDrawable()
 	if(atlas)
 		Atlas_dispose(atlas);
 }
+
 
 SkeletonData* readSkeletonJsonData(const char* filename, Atlas* atlas, float scale) {
 	SkeletonJson* json = SkeletonJson_create(atlas);
@@ -35,4 +41,26 @@ SkeletonData* readSkeletonBinaryData(const char* filename, Atlas* atlas, float s
 	SkeletonBinary_dispose(binary);
 	return skeletonData;
 }
+
+void SpineManager::Init()
+{
+    spineDrawables_.resize(INIT_ENTITY_NMB);
+}
+
+void SpineManager::Update(EntityManager& entityManager, float dt)
+{
+    for(int i = 0; i < spineDrawables_.size(); i++)
+    {
+        if(entityManager.HasComponent(i, EntityMask(NekoComponentType::SPINE)))
+        {
+            spineDrawables_[i].skeletonDrawable->update(dt);
+        }
+    }
+}
+
+void SpineManager::Destroy()
+{
+
+}
+
 }

@@ -661,7 +661,7 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 	rmt_EndCPUSample();
 }
 
-void CityBuilderTilemap::PushCommand(GraphicsManager* graphicsManager)
+void CityBuilderTilemap::PushCommand(MultiThreadGraphicsManager* graphicsManager)
 {
 	rmt_ScopedCPUSample(PushCityTilemapCommands, 0);
 	const Index frameIndex = MainEngine::GetInstance()->frameIndex % 2;

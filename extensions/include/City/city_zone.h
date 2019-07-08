@@ -32,7 +32,7 @@
 
 namespace neko
 {
-class GraphicsManager;
+class MultiThreadGraphicsManager;
 class CityBuilderMap;
 class CityBuildingManager;
 
@@ -72,7 +72,7 @@ public:
     void
     UpdateZoneTilemap(const CityBuilderMap& cityMap, CityBuildingManager& cityBuildingMap, sf::View mainView);
 
-    void PushCommand(GraphicsManager* graphicsManager);
+    void PushCommand(MultiThreadGraphicsManager* graphicsManager);
 
     void AddZone(sf::Vector2i position, ZoneType zoneType, CityBuilderMap& cityMap);
 

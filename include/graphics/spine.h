@@ -37,7 +37,7 @@ struct BasicSpineDrawable : Component
 	virtual ~BasicSpineDrawable();
 	Atlas* atlas = nullptr;
 	SkeletonData* skeletonData = nullptr;
-	std::unique_ptr<spine::SkeletonDrawable> skeletonDrawable = nullptr;
+	std::shared_ptr<spine::SkeletonDrawable> skeletonDrawable = nullptr;
 };
 
 class SpineManager
@@ -45,6 +45,7 @@ class SpineManager
 public:
 	void Init();
 	void Update(EntityManager& entityManager, float dt);
+
 	void Destroy();
 
 	Entity AddSpineDrawable(Entity entity, const std::string_view atlasFilename, const std::string_view skeletonFilename);

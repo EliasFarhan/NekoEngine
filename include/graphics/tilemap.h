@@ -33,7 +33,7 @@
 
 namespace neko
 {
-class GraphicsManager;
+class MultiThreadGraphicsManager;
 /**
  * \brief simple abstraction for one tilesheet with a tilemap texture with a double buffered vertex array
  */
@@ -49,7 +49,7 @@ struct Tilesheet
 class Tilemap
 {
 public:
-    virtual void PushCommand(GraphicsManager* graphicsManager) = 0;
+    virtual void PushCommand(MultiThreadGraphicsManager* graphicsManager) = 0;
 };
 
 /**
@@ -71,7 +71,7 @@ class TiledMap : public Tilemap
 public:
     void
     Init(const std::string& tilemapPath, TextureManager& textureManager, Physics2dManager* physics2DManager = nullptr);
-	void PushCommand(GraphicsManager* graphicsManager) override;
+	void PushCommand(MultiThreadGraphicsManager* graphicsManager) override;
 protected:
 	std::vector<Tiledsheet> tileSheets_;
 

@@ -164,7 +164,7 @@ void MainEngine::EngineLoop()
 {
 
     isRunning = true;
-    renderThread_ = std::thread(&GraphicsManager::RenderLoop, graphicsManager_.get());
+    renderThread_ = std::thread(&MultiThreadGraphicsManager::RenderLoop, graphicsManager_.get());
     renderThread_.detach();
     while (isRunning)
     {
@@ -229,7 +229,7 @@ void MainEngine::Init()
     renderWindow->setActive(false);
     instance_ = this;
 
-    graphicsManager_ = std::make_unique<GraphicsManager>();
+    graphicsManager_ = std::make_unique<MultiThreadGraphicsManager>();
 
 
 }
@@ -251,7 +251,7 @@ void MainEngine::Destroy()
     graphicsManager_ = nullptr;
 }
 
-GraphicsManager* MainEngine::GetGraphicsManager() const
+MultiThreadGraphicsManager* MainEngine::GetGraphicsManager() const
 {
 	return graphicsManager_.get();
 }

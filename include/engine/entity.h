@@ -37,9 +37,21 @@ using Entity = Index;
  * \brief EntityMask is a bitmask representation of the activated components
  */
 using EntityMask = std::uint32_t;
-enum class ComponentType : unsigned;
 const Entity INVALID_ENTITY = std::numeric_limits<Index>::max();
 const EntityMask INVALID_ENTITY_MASK = 0u;
+
+enum class NekoComponentType : ComponentType
+{
+    POSITION2D = 1<<1,
+    SCALE2D = 1<<2,
+    ANGLE2D = 1<<3,
+    POSITION3D = 1<<4,
+    SCALE3D = 1<<5,
+    ANGLE3D = 1<<6,
+    SPRITE2D = 1 << 7,
+    SPINE = 1 << 8,
+
+};
 
 /**
  * \brief Used in an Entity-Component-System to store all entities and what components they have
@@ -73,5 +85,6 @@ private:
 struct Component
 {
 	Entity entity = INVALID_ENTITY;
+	ComponentType componentType = INVALID_COMPONENT_TYPE;
 };
 }

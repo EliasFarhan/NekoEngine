@@ -117,7 +117,7 @@ public:
     virtual void OnEndContact(const Collider* colliderA, const Collider* colliderB)
     {}
 
-    GraphicsManager* GetGraphicsManager() const;
+    MultiThreadGraphicsManager* GetGraphicsManager() const;
 	
 
     static MainEngine* GetInstance();
@@ -134,7 +134,7 @@ protected:
 
     ctpl::thread_pool workingThreadPool_;
     std::thread renderThread_;
-    std::unique_ptr<GraphicsManager> graphicsManager_ = nullptr;
+    std::unique_ptr<MultiThreadGraphicsManager> graphicsManager_ = nullptr;
 
 
 /**

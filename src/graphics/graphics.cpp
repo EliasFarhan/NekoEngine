@@ -36,14 +36,14 @@ void SfmlCommand::Draw(sf::RenderTarget* renderTarget)
     renderTarget->draw(*drawable);
 }
 
-GraphicsManager::GraphicsManager()
+MultiThreadGraphicsManager::MultiThreadGraphicsManager()
 {
 	commandBuffers_[0].fill(nullptr);
 	commandBuffers_[1].fill(nullptr);
 	editor = std::make_unique<Editor>();
 }
 
-void GraphicsManager::Draw(sf::Drawable& drawable)
+void MultiThreadGraphicsManager::Draw(sf::Drawable& drawable)
 {
     if (nextRenderLength_ >= MAX_COMMAND_NMB)
     {
@@ -73,7 +73,7 @@ void TilemapCommand::Draw(sf::RenderTarget* renderTarget)
 }
 
 
-void GraphicsManager::Draw(sf::VertexArray* vertexArray, sf::Texture* texture)
+void MultiThreadGraphicsManager::Draw(sf::VertexArray* vertexArray, sf::Texture* texture)
 {
     const int index = MainEngine::GetInstance()->frameIndex % 2;
     TilemapCommand tilemapCommand;
@@ -86,13 +86,13 @@ void GraphicsManager::Draw(sf::VertexArray* vertexArray, sf::Texture* texture)
     nextRenderLength_++;
 }
 
-void GraphicsManager::SetView(sf::View view)
+void MultiThreadGraphicsManager::SetView(sf::View view)
 {
     const int index = MainEngine::GetInstance()->frameIndex % 2;
     views_[index] = view;
 }
 
-void GraphicsManager::RenderLoop()
+void MultiThreadGraphicsManager::RenderLoop()
 {
     auto* engine = MainEngine::GetInstance();
 
@@ -169,7 +169,7 @@ void GraphicsManager::RenderLoop()
 
 }
 
-bool GraphicsManager::DidRenderingStart() const
+bool MultiThreadGraphicsManager::DidRenderingStart() const
 {
 	return isRendering_;
 }

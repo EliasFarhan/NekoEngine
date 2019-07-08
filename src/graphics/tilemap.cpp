@@ -147,7 +147,7 @@ void TiledMap::Init(const std::string& tilemapPath, TextureManager& textureManag
 
 }
 
-void TiledMap::PushCommand(GraphicsManager* graphicsManager)
+void TiledMap::PushCommand(MultiThreadGraphicsManager* graphicsManager)
 {
     rmt_ScopedCPUSample(PushTilemapCommands, 0)
     const int frameIndex = MainEngine::GetInstance()->frameIndex % 2;
