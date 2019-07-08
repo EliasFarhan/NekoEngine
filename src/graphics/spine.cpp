@@ -1,8 +1,15 @@
-#include <graphics/spine_utility.h>
+#include <graphics/spine.h>
 #include "engine/log.h"
 
 namespace neko
 {
+BasicSpineDrawable::~BasicSpineDrawable()
+{
+	if(skeletonData)
+		SkeletonData_dispose(skeletonData);
+	if(atlas)
+		Atlas_dispose(atlas);
+}
 
 SkeletonData* readSkeletonJsonData(const char* filename, Atlas* atlas, float scale) {
 	SkeletonJson* json = SkeletonJson_create(atlas);

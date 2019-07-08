@@ -24,7 +24,7 @@
 
 #include <gtest/gtest.h>
 #include <spine/spine-sfml.h>
-#include "graphics/spine_utility.h"
+#include "graphics/spine.h"
 #include "engine/engine.h"
 #include <engine/log.h>
 
@@ -74,8 +74,8 @@ public:
 		skeleton->flipY = false;
 		Skeleton_setToSetupPose(skeleton);
 
-		skeleton->x = config.screenSize.x/2;
-		skeleton->y = config.screenSize.y;
+		skeleton->x = float(config.screenSize.x/2);
+		skeleton->y = float(config.screenSize.y);
 		Skeleton_updateWorldTransform(skeleton);
 		AnimationState_setAnimation(catBody->state, 0, catBodyData->animations[0], 1);
 	}

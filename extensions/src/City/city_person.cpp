@@ -3,6 +3,7 @@
 #include <City/city_building.h>
 #include <engine/transform.h>
 #include "engine/log.h"
+#include "utilities/vector_utility.h"
 
 namespace neko
 {
@@ -371,15 +372,7 @@ Entity CityPeopleManager::AddPerson(Entity entity, sf::Vector2i position)
 		people_.push_back(person);
 		return Index(people_.size());
 	}
-	if (people_.size() <= entity)
-	{
-		size_t futureSize = people_.size();
-		while (futureSize <= entity)
-		{
-			futureSize *= 2;
-		}
-		people_.resize(futureSize);
-	}
+	ResizeIfNecessary(people_, entity);
 
 	people_[entity] = person;
 	return entity;

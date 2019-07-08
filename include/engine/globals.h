@@ -28,7 +28,8 @@
 #include <limits>
 #include <SFML/System/Vector2.hpp>
 
-namespace neko {
+namespace neko 
+{
 
 	const size_t INIT_ENTITY_NMB = 128;
 	using Index = uint32_t;
