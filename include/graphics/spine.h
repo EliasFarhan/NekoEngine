@@ -24,6 +24,7 @@
  SOFTWARE.
  */
 #include <vector>
+#include <memory>
 #include <spine/spine-sfml.h>
 #include "engine/entity.h"
 
