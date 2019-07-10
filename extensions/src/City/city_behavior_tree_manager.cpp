@@ -396,7 +396,7 @@ namespace neko {
 			return comp;
 		}
 		logDebug("ERROR could not parse the file: " + jsonContent.get<std::string>());
-		return INDEX_INVALID;
+		return INVALID_INDEX;
 	}
 
 	Index BehaviorTreeManager::LoadBehaviorTreeFromJsonFileIndex(
@@ -417,7 +417,7 @@ namespace neko {
 			return comp;
 		}
 		logDebug("ERROR could not parse the file: " + jsonFile);
-		return INDEX_INVALID;
+		return INVALID_INDEX;
 	}
 
 	void BehaviorTreeManager::LogBehaviorTreeIndex(Index id) const

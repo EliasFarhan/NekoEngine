@@ -62,15 +62,15 @@ public:
 protected:
 	std::vector<std::shared_ptr<CityCommand>>commandQueue_[2];
 	CityBuilderEngine* engine_ = nullptr;
-	Index soundErase_ = INDEX_INVALID;
-	Index soundBuild_ = INDEX_INVALID;
-	Index soundRoad_ = INDEX_INVALID;
-	Index soundSelect_ = INDEX_INVALID;
-	Index soundBufferOut_ = INDEX_INVALID;
-	Index soundBufferErase_ = INDEX_INVALID;
-	Index soundBufferBuild_ = INDEX_INVALID;
-	Index soundBufferRoad_ = INDEX_INVALID;
-	Index soundBufferSelect_ = INDEX_INVALID;
-	Index soundOut_ = INDEX_INVALID;
+	Index soundErase_ = INVALID_INDEX;
+	Index soundBuild_ = INVALID_INDEX;
+	Index soundRoad_ = INVALID_INDEX;
+	Index soundSelect_ = INVALID_INDEX;
+	Index soundBufferOut_ = INVALID_INDEX;
+	Index soundBufferErase_ = INVALID_INDEX;
+	Index soundBufferBuild_ = INVALID_INDEX;
+	Index soundBufferRoad_ = INVALID_INDEX;
+	Index soundBufferSelect_ = INVALID_INDEX;
+	Index soundOut_ = INVALID_INDEX;
 };
 }

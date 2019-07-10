@@ -117,7 +117,7 @@ private:
 
     const float scrollDelta_ = 0.1f;
     float currentZoom_ = 1.0f;
-	Index musicInd_ = INDEX_INVALID;
+	Index musicInd_ = INVALID_INDEX;
 
 	long long cityMoney_ = baseCityBudget;
 };

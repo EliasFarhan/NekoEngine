@@ -208,7 +208,7 @@ TEST_F(BehaviorTreeManagerTest, IsBehaviorTreeExecuteCorrect)
 	neko::Index id = behaviorTreeManager_.ParseBehaviorTreeFromJsonIndex(
 			comp,
 			jsonBehaviorTree_);
-	EXPECT_TRUE(id != neko::INDEX_INVALID);
+	EXPECT_TRUE(id != neko::INVALID_INDEX);
 	neko::FunctionMap funcMap(comp);
 	funcMap.SetFunction(
 		"EnergyLevel", 

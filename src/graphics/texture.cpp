@@ -73,9 +73,9 @@ Index TextureManager::LoadTexture(std::string filename)
         std::ostringstream oss;
         oss << "[ERROR] Texture path: " << filename << " has invalid extension";
         logDebug(oss.str());
-        return INDEX_INVALID;
+        return INVALID_INDEX;
     }
-    int textureIndex = INDEX_INVALID;
+    int textureIndex = INVALID_INDEX;
     for (auto i = 0u; i < texturePaths_.size(); i++)
     {
         if (filename == texturePaths_[i])
@@ -85,7 +85,7 @@ Index TextureManager::LoadTexture(std::string filename)
         }
     }
     //Was or still is loaded
-    if (textureIndex != INDEX_INVALID)
+    if (textureIndex != INVALID_INDEX)
     {
         //Check if the texture was destroyed
         if (textures_[textureIndex]->getNativeHandle() != 0U)
@@ -99,7 +99,7 @@ Index TextureManager::LoadTexture(std::string filename)
                 std::ostringstream oss;
                 oss << "[ERROR] Could not load texture file: " << filename;
                 logDebug(oss.str());
-                return INDEX_INVALID;
+                return INVALID_INDEX;
             }
             return textureIndex;
         }
@@ -113,7 +113,7 @@ Index TextureManager::LoadTexture(std::string filename)
             std::ostringstream oss;
             oss << "[ERROR] Could not load texture file: " << filename;
             logDebug(oss.str());
-            return INDEX_INVALID;
+            return INVALID_INDEX;
         }
         textures_.emplace_back(std::make_shared<sf::Texture>(texture));
         texturePaths_.push_back(filename);
@@ -126,12 +126,12 @@ Index TextureManager::LoadTexture(std::string filename)
         oss << "[ERROR] Could not load texture file: " << filename;
         logDebug(oss.str());
     }
-    return INDEX_INVALID;
+    return INVALID_INDEX;
 }
 
 const std::shared_ptr<sf::Texture> TextureManager::GetTexture(const Index index) const
 {
-    if (index == INDEX_INVALID || index >= textures_.size())
+    if (index == INVALID_INDEX || index >= textures_.size())
     {
         return {}; // Same as return nullptr.
     }

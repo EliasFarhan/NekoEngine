@@ -11,16 +11,16 @@ namespace neko {
 	Index Sound::LoadSoundBuffer(const std::string_view soundFile)
 	{
 		Index ind = GetNextIndex();
-		if (ind == INDEX_INVALID) 
+		if (ind == INVALID_INDEX) 
 		{
-			return INDEX_INVALID;
+			return INVALID_INDEX;
 		}
 		soundBufferMap_.insert(
 			std::make_pair(ind, std::make_unique<sf::SoundBuffer>()));
 		if (!soundBufferMap_[ind]->loadFromFile(std::string(soundFile)))
 		{
 			soundBufferMap_.erase(ind);
-			return INDEX_INVALID;
+			return INVALID_INDEX;
 		}
 		soundBufferSoundMap_.insert({ ind, {} });
 		index_.insert(ind);
@@ -30,14 +30,14 @@ namespace neko {
 	Index Sound::CreateSoundFromBuffer(Index indBuffer)
 	{
 		Index ind = GetNextSoundIndex();
-		if (ind == INDEX_INVALID)
+		if (ind == INVALID_INDEX)
 		{
-			return INDEX_INVALID;
+			return INVALID_INDEX;
 		}
 		auto it = soundBufferMap_.find(indBuffer);
 		if (it == soundBufferMap_.end())
 		{
-			return INDEX_INVALID;
+			return INVALID_INDEX;
 		}
 		soundMap_.insert({ ind, {} });
 		soundMap_[ind].setBuffer(*it->second);
@@ -99,15 +99,15 @@ namespace neko {
 	Index Sound::LoadMusic(const std::string_view musicFile)
 	{
 		Index ind = GetNextIndex();
-		if (ind == INDEX_INVALID)
+		if (ind == INVALID_INDEX)
 		{
-			return INDEX_INVALID;
+			return INVALID_INDEX;
 		}
 		musicMap_.insert(std::make_pair(ind, std::make_unique<sf::Music>()));
 		if (!musicMap_[ind]->openFromFile(std::string(musicFile)))
 		{
 			musicMap_.erase(ind);
-			return INDEX_INVALID;
+			return INVALID_INDEX;
 		}
 		index_.insert(ind);
 		return ind;
@@ -160,7 +160,7 @@ namespace neko {
 		static Index index = 0;
 		if (musicMap_.size() + soundBufferMap_.size() > 255)
 		{
-			return INDEX_INVALID;
+			return INVALID_INDEX;
 		}
 		return index++;
 	}

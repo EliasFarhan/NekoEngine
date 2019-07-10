@@ -81,7 +81,7 @@ macro(sfml_add_library target)
     endif()
 
     # set the target's folder (for IDEs that support it, e.g. Visual Studio)
-    set_target_properties(${target} PROPERTIES FOLDER "SFML")
+    set_target_properties(${target} PROPERTIES FOLDER "Externals\\SFML")
 
     # set the target flags to use the appropriate C++ standard library
     sfml_set_stdlib(${target})

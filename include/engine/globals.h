@@ -36,7 +36,7 @@ namespace neko
 	using Index = uint32_t;
 	using ComponentType = uint32_t;
 	const ComponentType INVALID_COMPONENT_TYPE = 0u;
-	const Index INDEX_INVALID = std::numeric_limits<uint32_t>::max();
+	const Index INVALID_INDEX = std::numeric_limits<uint32_t>::max();
 	const sf::Vector2i INVALID_TILE_POS = sf::Vector2i(-1, -1);
 
 
