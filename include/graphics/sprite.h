@@ -37,7 +37,7 @@ class OldTransform2dManager;
 
 class MultiThreadGraphicsManager;
 
-class SpriteManager : public ComponentManager<sf::Sprite, ComponentType(NekoComponentType::SPRITE2D)>
+class BasicSpriteManager : public ComponentManager<sf::Sprite, ComponentType(NekoComponentType::SPRITE2D)>
 {
 	
 };
