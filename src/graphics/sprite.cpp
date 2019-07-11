@@ -31,13 +31,13 @@
 
 namespace neko
 {
-SpriteManager::SpriteManager()
+MultiThreadSpriteManager::MultiThreadSpriteManager()
 {
     sprites_[0].reserve(INIT_ENTITY_NMB);
     sprites_[1].reserve(INIT_ENTITY_NMB);
 }
 
-Index SpriteManager::AddSprite(const std::shared_ptr<sf::Texture> texture)
+Index MultiThreadSpriteManager::AddSprite(const std::shared_ptr<sf::Texture> texture)
 {
     sf::Sprite sprite;
     if (texture.get() != nullptr)
@@ -51,7 +51,7 @@ Index SpriteManager::AddSprite(const std::shared_ptr<sf::Texture> texture)
     return index;
 }
 
-void SpriteManager::CopyTransformPosition(Transform2dManager& transformManager, size_t start, size_t length)
+void MultiThreadSpriteManager::CopyTransformPosition(OldTransform2dManager& transformManager, size_t start, size_t length)
 {
     rmt_ScopedCPUSample(CopySpritePositions, 0);
     const int frameIndex = MainEngine::GetInstance()->frameIndex % 2;
@@ -61,7 +61,7 @@ void SpriteManager::CopyTransformPosition(Transform2dManager& transformManager, 
     }
 }
 
-void SpriteManager::CopyTransformScales(Transform2dManager& transformManager, size_t start, size_t length)
+void MultiThreadSpriteManager::CopyTransformScales(OldTransform2dManager& transformManager, size_t start, size_t length)
 {
     rmt_ScopedCPUSample(CopySpriteScales, 0);
     const int frameIndex = MainEngine::GetInstance()->frameIndex % 2;
@@ -71,7 +71,7 @@ void SpriteManager::CopyTransformScales(Transform2dManager& transformManager, si
     }
 }
 
-void SpriteManager::CopyTransformAngles(Transform2dManager& transformManager, size_t start, size_t length)
+void MultiThreadSpriteManager::CopyTransformAngles(OldTransform2dManager& transformManager, size_t start, size_t length)
 {
     rmt_ScopedCPUSample(CopySpriteAngles, 0);
     const int frameIndex = MainEngine::GetInstance()->frameIndex % 2;
@@ -81,7 +81,7 @@ void SpriteManager::CopyTransformAngles(Transform2dManager& transformManager, si
     }
 }
 
-void SpriteManager::PushCommands(MultiThreadGraphicsManager* graphicsManager, size_t start, size_t length)
+void MultiThreadSpriteManager::PushCommands(MultiThreadGraphicsManager* graphicsManager, size_t start, size_t length)
 {
     rmt_ScopedCPUSample(PushSpriteCommands, 0);
     const int frameIndex = MainEngine::GetInstance()->frameIndex % 2;
@@ -91,7 +91,7 @@ void SpriteManager::PushCommands(MultiThreadGraphicsManager* graphicsManager, si
     }
 }
 
-sf::Sprite* SpriteManager::GetSpriteAt(unsigned int spriteIndex)
+sf::Sprite* MultiThreadSpriteManager::GetSpriteAt(unsigned int spriteIndex)
 {
     const int frameIndex = MainEngine::GetInstance()->frameIndex % 2;
     if (spriteIndex >= sprites_[frameIndex].size())

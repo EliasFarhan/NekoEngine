@@ -40,18 +40,7 @@ using EntityMask = std::uint32_t;
 const Entity INVALID_ENTITY = std::numeric_limits<Index>::max();
 const EntityMask INVALID_ENTITY_MASK = 0u;
 
-enum class NekoComponentType : ComponentType
-{
-    POSITION2D = 1<<1,
-    SCALE2D = 1<<2,
-    ANGLE2D = 1<<3,
-    POSITION3D = 1<<4,
-    SCALE3D = 1<<5,
-    ANGLE3D = 1<<6,
-    SPRITE2D = 1 << 7,
-    SPINE = 1 << 8,
 
-};
 
 /**
  * \brief Used in an Entity-Component-System to store all entities and what components they have
@@ -72,19 +61,16 @@ public:
 	bool EntityExists(Entity entity);
 
 	size_t GetEntitiesNmb(EntityMask filterComponents = INVALID_ENTITY_MASK);
+	size_t GetEntitiesSize() const;
 
 	std::vector<Entity> FilterEntities(EntityMask filterComponents = INVALID_ENTITY_MASK);
 
 	void AddComponentType(Entity entity, EntityMask componentType);
 
 	void RemoveComponentType(Entity entity, EntityMask componentType);
+
 private:
 	std::vector<EntityMask> entityMaskArray_;
 };
 
-struct Component
-{
-	Entity entity = INVALID_ENTITY;
-	ComponentType componentType = INVALID_COMPONENT_TYPE;
-};
 }

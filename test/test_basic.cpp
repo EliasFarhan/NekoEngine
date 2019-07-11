@@ -123,8 +123,8 @@ public:
 
 protected:
     neko::TextureManager textureManager;
-    neko::SpriteManager spriteManager;
-    neko::Transform2dManager transformManager;
+    neko::MultiThreadSpriteManager spriteManager;
+    neko::OldTransform2dManager transformManager;
 };
 
 TEST(Basic, MovingSprite)
@@ -233,8 +233,8 @@ public:
 protected:
     neko::AnimatorManager animatorManager;
     neko::TextureManager textureManager;
-    neko::SpriteManager spriteManager;
-    neko::Transform2dManager transformManager;
+    neko::MultiThreadSpriteManager spriteManager;
+    neko::OldTransform2dManager transformManager;
 };
 
 TEST(Basic, SpriteAnimator)

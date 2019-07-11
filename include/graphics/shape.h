@@ -53,7 +53,7 @@ public:
     Index AddPolygon(const sf::Vector2f& pos, const sf::Vector2f* points, size_t pointNmb, const ShapeDef& shapeDef);
 
 
-    void CopyTransformPosition(Transform2dManager& transformManager, size_t start = 0, size_t length = INIT_ENTITY_NMB);
+    void CopyTransformPosition(OldTransform2dManager& transformManager, size_t start = 0, size_t length = INIT_ENTITY_NMB);
     void PushCommands(MultiThreadGraphicsManager* graphicsManager, size_t start = 0, size_t length = INIT_ENTITY_NMB);
 
 private:

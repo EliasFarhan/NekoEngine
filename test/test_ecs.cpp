@@ -58,3 +58,4 @@ TEST(Entity, EntityManager)
     }
     EXPECT_EQ(entityManager.GetEntitiesNmb(), entityNmb / 2);
 }
+

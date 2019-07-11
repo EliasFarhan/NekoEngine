@@ -35,7 +35,7 @@
 
 namespace neko
 {
-class SpriteManager;
+class MultiThreadSpriteManager;
 /**
  * \brief 2d animation data used to switch between the textures at the given frequency, used in Init and Update
  */
@@ -88,7 +88,7 @@ public:
 //TODO should return an index
     SpriteAnimator& CreateSpriteAnimator();
 
-    void Update(SpriteManager& spriteManager, float dt);
+    void Update(MultiThreadSpriteManager& spriteManager, float dt);
 
     SpriteAnimator* GetAnimatorAt(unsigned int i);
 

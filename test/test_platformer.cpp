@@ -199,14 +199,14 @@ public:
 			}
 
 			transformManager.CopyPositionsFromPhysics2d(physicsManager, 0, 1);
-			spriteManager.CopyTransformPosition(transformManager, 0, 1);
-			spriteManager.PushCommands(graphicsManager_.get(), 0, 1);
+			spriteManager.CopyTransformPosition(transformManager, 0,1);
+			spriteManager.PushCommands(graphicsManager_.get(), 0,1);
 		}
 
 
 		{
 			spriteManager.CopyTransformPosition(transformManager, 1, platformsNmb);
-			spriteManager.PushCommands(graphicsManager_.get(), 1, platformsNmb);
+			spriteManager.PushCommands(graphicsManager_.get(), 1,platformsNmb);
 		}
 #ifdef __neko_dbg__
         {
@@ -263,9 +263,9 @@ public:
 
 protected:
 	neko::Timer physicsTimer{0.0f,0.0f};
-	neko::SpriteManager spriteManager;
+	neko::MultiThreadSpriteManager spriteManager;
 	neko::TextureManager textureManager;
-	neko::Transform2dManager transformManager;
+	neko::OldTransform2dManager transformManager;
 	neko::Physics2dManager physicsManager;
     neko::ShapeManager shapeManager;
 	PlayerData playerData = {};

@@ -28,18 +28,20 @@
 #include "SFML/System/Vector2.hpp"
 #include "globals.h"
 #include <engine/entity.h>
+#include "component.h"
 
 namespace neko
 {
+class Body2dManager;
 class Physics2dManager;
 
 /**
  * \brief manage the graphic transform of any kind of objects in a SOA fashions
  */
-class Transform2dManager
+class OldTransform2dManager
 {
 public:
-    Transform2dManager();
+    OldTransform2dManager();
 
     void
     CopyPositionsFromPhysics2d(Physics2dManager& physics2dManager, size_t start = 0, size_t length = INIT_ENTITY_NMB);
@@ -54,11 +56,34 @@ public:
 	void SetPosition(const sf::Vector2f& position, Index i);
 
 private:
-    friend class SpriteManager;
+    friend class MultiThreadSpriteManager;
     friend class ShapeManager;
 
     std::vector<sf::Vector2f> positions_;
     std::vector<sf::Vector2f> scales_;
     std::vector<float> angles_;
+
+	std::vector<Index> transformHierarchy_;
+	std::vector<char> dirtyFlags_;
+};
+
+class Position2dManager : public ComponentManager<sf::Vector2f, ComponentType(NekoComponentType::POSITION2D)>
+{
+public:
+	using ComponentManager::ComponentManager;
+	void CopyPositionsFromBody2d(EntityManager& entityManager, Body2dManager& body2dManager);
+};
+
+class Scale2dManager : public ComponentManager<sf::Vector2f, ComponentType(NekoComponentType::SCALE2D)>
+{
+public :
+	using ComponentManager::ComponentManager;
+};
+
+class Angle2dManager : public ComponentManager<float, ComponentType(NekoComponentType::ANGLE2D)>
+{
+public:
+	using ComponentManager::ComponentManager;
+	void CopyAnglesFromBody2d(EntityManager& entityManager, Body2dManager& body2dManager);
 };
 }

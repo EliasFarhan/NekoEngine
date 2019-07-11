@@ -29,7 +29,8 @@
 #include <Box2D/Box2D.h>
 #include "SFML/System/Vector2.hpp"
 #include <vector>
-#include "collider.h"
+#include "physics/collider.h"
+#include "engine/component.h"
 
 namespace neko
 {
@@ -61,7 +62,7 @@ public:
     b2Body* GetBodyAt(Index i);
 
 private:
-    friend class Transform2dManager;
+    friend class OldTransform2dManager;
     friend class TiledMap;
     std::unique_ptr<b2World> world_ = nullptr;
     std::vector<b2Body*> bodies_;
@@ -77,5 +78,9 @@ float pixel2meter(float v);
 sf::Vector2f meter2pixel(const b2Vec2& v);
 
 b2Vec2 pixel2meter(const sf::Vector2f& v);
+
+class Body2dManager : public ComponentManager <b2Body*,ComponentType(NekoComponentType::BODY2D)>
+{
+};
 
 }

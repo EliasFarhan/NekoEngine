@@ -28,44 +28,50 @@
 #include <memory>
 #include <SFML/Graphics/Sprite.hpp>
 #include <engine/globals.h>
+#include "engine/component.h"
 
 
 namespace neko
 {
-class Transform2dManager;
+class OldTransform2dManager;
 
 class MultiThreadGraphicsManager;
 
-/**
+class SpriteManager : public ComponentManager<sf::Sprite, ComponentType(NekoComponentType::SPRITE2D)>
+{
+	
+};
+
+	/**
  * \brief store the sfml sprite and allow to copy transform from Transform2dManager,
  * but transform need to be at the same index as sprite in an Entity Component System way
  */
-class SpriteManager
-{
-public:
-    SpriteManager();
+	class MultiThreadSpriteManager
+	{
+	public:
+		MultiThreadSpriteManager();
 
-    Index AddSprite(const std::shared_ptr<sf::Texture> texture);
+		Index AddSprite(const std::shared_ptr<sf::Texture> texture);
 
-    sf::Sprite* GetSpriteAt(unsigned int spriteIndex);
+		sf::Sprite* GetSpriteAt(unsigned int spriteIndex);
 
-    void CopyTransformPosition(Transform2dManager& transformManager, size_t start = 0, size_t length = INIT_ENTITY_NMB);
+		void CopyTransformPosition(OldTransform2dManager& transformManager, size_t start = 0, size_t length = INIT_ENTITY_NMB);
 
-    void CopyTransformScales(Transform2dManager& transformManager, size_t start = 0, size_t length = INIT_ENTITY_NMB);
+		void CopyTransformScales(OldTransform2dManager& transformManager, size_t start = 0, size_t length = INIT_ENTITY_NMB);
 
-    void CopyTransformAngles(Transform2dManager& transformManager, size_t start = 0, size_t length = INIT_ENTITY_NMB);
-/**
+		void CopyTransformAngles(OldTransform2dManager& transformManager, size_t start = 0, size_t length = INIT_ENTITY_NMB);
+		/**
  * \brief push basic graphic command to the render thread to be processed next frame
  * @param graphicsManager
  * @param start
  * @param length
  */
-    void PushCommands(MultiThreadGraphicsManager* graphicsManager, size_t start = 0, size_t length = INIT_ENTITY_NMB);
+		void PushCommands(MultiThreadGraphicsManager* graphicsManager, size_t start = 0, size_t length = INIT_ENTITY_NMB);
 
-private:
-    /**
+	private:
+		/**
      * \brief store the sfml sprites with two vectors for double buffering with the render thread
      */
-    std::vector<sf::Sprite> sprites_[2];
-};
+		std::vector<sf::Sprite> sprites_[2];
+	};
 }

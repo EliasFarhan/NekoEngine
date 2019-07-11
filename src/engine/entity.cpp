@@ -24,13 +24,14 @@
 #include <engine/entity.h>
 #include "engine/globals.h"
 #include <algorithm>
+#include <utilities/vector_utility.h>
 
 namespace neko
 {
 
 EntityManager::EntityManager()
 {
-    entityMaskArray_.reserve(INIT_ENTITY_NMB);
+    entityMaskArray_.resize(INIT_ENTITY_NMB);
 }
 
 EntityMask EntityManager::GetMask(Entity entity)
@@ -45,8 +46,9 @@ Entity EntityManager::CreateEntity()
     });
     if(entityMaskIt == entityMaskArray_.end())
     {
-        entityMaskArray_.push_back(INVALID_ENTITY_MASK);
-        return Entity(entityMaskArray_.size()-1);
+		const auto newEntity = entityMaskArray_.size();
+		ResizeIfNecessary(entityMaskArray_, newEntity);
+        return Entity(newEntity);
     }
     else
     {
@@ -81,6 +83,11 @@ size_t EntityManager::GetEntitiesNmb(EntityMask filterComponents)
     return std::count_if(entityMaskArray_.begin(), entityMaskArray_.end(),[&filterComponents](EntityMask entityMask){
         return entityMask != INVALID_ENTITY_MASK && (entityMask & EntityMask(filterComponents)) == EntityMask(filterComponents);
     });
+}
+
+size_t EntityManager::GetEntitiesSize() const
+{
+	return entityMaskArray_.size();
 }
 
 std::vector<Entity> EntityManager::FilterEntities(EntityMask filterComponents)

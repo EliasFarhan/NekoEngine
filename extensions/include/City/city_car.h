@@ -28,10 +28,11 @@
 #include "engine/system.h"
 #include "utilities/time_utility.h"
 #include "engine/entity.h"
+#include "engine/component.h"
 
 namespace neko
 {
-class Transform2dManager;
+class OldTransform2dManager;
 class TileMapGraph;
 class CityBuilderMap;
 
@@ -72,7 +73,7 @@ public:
 private:
 	std::vector<CityCar> cars_;
 	EntityManager* entityManagerPtr_ = nullptr;
-	Transform2dManager* transformManagerPtr_ = nullptr;
+	OldTransform2dManager* transformManagerPtr_ = nullptr;
 	TileMapGraph* roadGraphPtr_ = nullptr;
 	CityBuilderMap* cityMap_ = nullptr;
 	Timer spawningTimer = Timer(1.0f, 1.0f);

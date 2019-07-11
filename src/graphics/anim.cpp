@@ -146,13 +146,16 @@ SpriteAnimator& AnimatorManager::CreateSpriteAnimator()
     return animators_.back();
 }
 
-void AnimatorManager::Update(SpriteManager& spriteManager, float dt)
+void AnimatorManager::Update(MultiThreadSpriteManager& spriteManager, float dt)
 {
 
     for (auto& animator : animators_)
     {
-        auto sprite = spriteManager.GetSpriteAt(animator.spriteIndex);
-        animator.Update(sprite, dt);
+        auto* sprite = spriteManager.GetSpriteAt(animator.spriteIndex);
+		if (sprite != nullptr)
+		{
+			animator.Update(sprite, dt);
+		}
     }
 }
 

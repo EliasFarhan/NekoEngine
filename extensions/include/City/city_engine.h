@@ -81,7 +81,7 @@ public:
 
     EntityManager& GetEntityManager();
 
-    Transform2dManager& GetTransformManager();
+    OldTransform2dManager& GetTransformManager();
 
     CityCarManager& GetCarManager();
 
@@ -102,7 +102,7 @@ private:
 
     tf::Executor executor_{std::thread::hardware_concurrency() - 2};
     EntityManager entityManager_;
-    Transform2dManager transformManager_;
+    OldTransform2dManager transformManager_;
     TextureManager textureManager_;
 
 	CityPeopleManager cityPeopleManager_;

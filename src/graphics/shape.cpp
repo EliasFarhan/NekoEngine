@@ -80,7 +80,7 @@ void ShapeManager::PushCommands(MultiThreadGraphicsManager* graphicsManager, siz
     }
 }
 
-void ShapeManager::CopyTransformPosition(Transform2dManager& transformManager, size_t start, size_t length)
+void ShapeManager::CopyTransformPosition(OldTransform2dManager& transformManager, size_t start, size_t length)
 {
     rmt_ScopedCPUSample(CopySpritePositions, 0);
     const int frameIndex = MainEngine::GetInstance()->frameIndex % 2;

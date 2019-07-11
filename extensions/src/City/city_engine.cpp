@@ -224,7 +224,7 @@ EntityManager& CityBuilderEngine::GetEntityManager()
 	return entityManager_;
 }
 
-Transform2dManager& CityBuilderEngine::GetTransformManager()
+OldTransform2dManager& CityBuilderEngine::GetTransformManager()
 {
 	return transformManager_;
 }

@@ -107,7 +107,7 @@ void CityBuilderTilemap::Init(TextureManager& textureManager)
 
 void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, const CityCarManager& cityCarManager,
 	const CityBuildingManager& buildingManager,
-	const Transform2dManager& transformManager,
+	const OldTransform2dManager& transformManager,
 	sf::View mainView, CityTilesheetType updatedCityTileType)
 {
 	const Index frameIndex = MainEngine::GetInstance()->frameIndex % 2;
