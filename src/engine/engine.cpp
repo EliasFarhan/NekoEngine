@@ -1,100 +1,265 @@
+/*
+ MIT License
+
+ Copyright (c) 2017 SAE Institute Switzerland AG
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
+ */
 #include <engine/engine.h>
 #include <SFML/Window/Event.hpp>
-#include "SFML/Graphics/RenderTexture.hpp"
+
+#ifdef __linux__
+
+#include <X11/Xlib.h>
+
+#endif //__linux__
+
+#include <engine/log.h>
+#include <sstream>
+#include <Remotery.h>
+#include "imgui.h"
+#include "imgui-SFML.h"
 
 namespace neko
 {
 
+BasicEngine::BasicEngine(Configuration* config)
+{
+    if (config != nullptr)
+    {
+        this->config = *config;
+    }
+    initLog();
 
-MainEngine * MainEngine::instance = nullptr;
+    rmt_CreateGlobalInstance(&rmt_);
+}
 
-Engine::Engine()
+BasicEngine::~BasicEngine()
+{
+    logDebug("Destroy Basic Engine");
+    destroyLog();
+    rmt_DestroyGlobalInstance(rmt_);
+}
+
+void BasicEngine::Update(float dt)
 {
 
 }
 
-Engine::~Engine()
+void BasicEngine::Init()
 {
+    renderWindow = std::make_unique<sf::RenderWindow>(
+		sf::VideoMode(config.screenSize.x, config.screenSize.y), "Neko Engine", config.windowStyle);
+    if (config.vSync)
+    {
+        renderWindow->setVerticalSyncEnabled(config.vSync);
+    }
+    else
+    {
+        renderWindow->setFramerateLimit(config.framerateLimit);
+    }
+    ImGui::SFML::Init(*renderWindow);
+    mouseManager_.SetWindow(renderWindow.get());
 }
 
-void Engine::Init()
+void BasicEngine::Destroy()
 {
-	graphicsManager = new GraphicsManager();
-	if (renderTarget == nullptr)
-	{
-		auto* renderTexture = new sf::RenderTexture();
-		renderTexture->create(renderTargetSize.x, renderTargetSize.y);
-		renderTarget = renderTexture;
-	}
-	renderThread = std::thread(&GraphicsManager::RenderLoop, graphicsManager, this, std::ref(condSyncRender), std::ref(renderMutex));
-	renderThread.detach();
+    renderWindow->close();
+    ImGui::SFML::Shutdown();
+    renderWindow = nullptr;
 }
 
-
-void Engine::EngineLoop()
+void BasicEngine::EngineLoop()
 {
-	isRunning = true;
+    isRunning = true;
+    while (isRunning)
+    {
 
-	while (isRunning)
-	{
+        rmt_ScopedCPUSample(EngineLoop, 0);
+        clockDeltatime = engineClock_.restart();
 
-		Update();
-		condSyncRender.notify_all();
-	}
+        keyboardManager_.ClearKeys();
+        mouseManager_.ClearFrameData();
+        sf::Event event{};
+        while (renderWindow->pollEvent(event))
+        {
+            OnEvent(event);
+            ImGui::SFML::ProcessEvent(event);
+        }
 
-	Destroy();
-	delete(renderTarget);
-	renderTarget = nullptr;
+        {
+            rmt_ScopedCPUSample(Draw, 0);
+            renderWindow->clear(config.bgColor);
+            ImGui::SFML::Update(*renderWindow, clockDeltatime);
+            Update(clockDeltatime.asSeconds());
+            ImGui::SFML::Render(*renderWindow);
+            renderWindow->display();
+        }
+    }
+
+    Destroy();
 }
 
-void Engine::OnEvent(sf::Event& event)
+void BasicEngine::OnEvent(sf::Event& event)
 {
+    switch (event.type)
+    {
+        case sf::Event::Closed:
+        {
+            isRunning = false;
+            break;
+        }
+        case sf::Event::KeyPressed:
+        {
+
+            keyboardManager_.AddPressKey(event.key.code);
+            break;
+        }
+        case sf::Event::KeyReleased:
+        {
+            if (event.key.code == sf::Keyboard::Escape)
+            {
+                isRunning = false;
+            }
+            keyboardManager_.AddReleaseKey(event.key.code);
+            break;
+        }
+        case sf::Event::MouseWheelScrolled:
+        {
+            mouseManager_.OnWheelScrolled(event);
+            break;
+        }
+        default:
+        {
+            break;
+        }
+    }
 }
 
-MainEngine::MainEngine()
+MouseManager& BasicEngine::GetMouseManager()
 {
+	return mouseManager_;
+}
+
+MainEngine* MainEngine::instance_ = nullptr;
+
+
+void MainEngine::EngineLoop()
+{
+
+    isRunning = true;
+    renderThread_ = std::thread(&MultiThreadGraphicsManager::RenderLoop, graphicsManager_.get());
+    renderThread_.detach();
+    while (isRunning)
+    {
+        rmt_ScopedCPUSample(EngineLoop, 0);
+        clockDeltatime = engineClock_.restart();
+        if (frameIndex > 0)
+        {
+            rmt_ScopedCPUSample(WaitForGraphics, 0);
+            std::unique_lock<std::mutex> lock(renderStartMutex);
+			if (graphicsManager_->DidRenderingStart())
+			{
+				condSyncRender.notify_all();
+			}
+			else
+			{
+				//Wait until the graphics manager is ready to draw the next frame
+				continue;
+			}
+        }
+        keyboardManager_.ClearKeys();
+        mouseManager_.ClearFrameData();
+        sf::Event event{};
+        while (renderWindow->pollEvent(event))
+        {
+            OnEvent(event);
+            ImGui::SFML::ProcessEvent(event);
+        }
+        Update(clockDeltatime.asSeconds());
+
+        if (frameIndex > 0)
+        {
+            //wait for the end of the rendering
+            std::unique_lock<std::mutex> lock(graphicsManager_->renderingMutex);
+        }
+
+		++frameIndex;
+    }
+
+    Destroy();
+}
+
+MainEngine::MainEngine(Configuration* config) : BasicEngine(config)
+{
+
 }
 
 MainEngine::~MainEngine()
 {
+
+    logDebug("Destroy Main Engine");
+
+
 }
 
 void MainEngine::Init()
 {
-	workingThreadPool.resize(std::thread::hardware_concurrency() - 2);//removing main and render thread
+    //workingThreadPool.resize(std::max(1u,std::thread::hardware_concurrency() - 3));//removing main and render and audio thread
+#ifdef __linux__
+    XInitThreads();
+#endif
+    BasicEngine::Init();
+    renderWindow->setActive(false);
+    instance_ = this;
 
-	renderWindow = new sf::RenderWindow(sf::VideoMode(1280, 720), "Neko Engine");
-	renderTarget = renderWindow;
-	renderTarget->setActive(false);
-	Engine::Init();
+    graphicsManager_ = std::make_unique<MultiThreadGraphicsManager>();
+
+
 }
 
-void MainEngine::Update()
+void MainEngine::Update(float dt)
 {
-	sf::Event event = {};
-	while (renderWindow->pollEvent(event))
-	{
-		// "close requested" event: we close the window
-		if (event.type == sf::Event::Closed)
-		{
-			isRunning = false;
-		}
-		OnEvent(event);
-	}
+
 }
 
 void MainEngine::Destroy()
 {
-	renderWindow->close();
+    {
+        std::unique_lock<std::mutex> lock(graphicsManager_->renderingMutex);
+    }
+    renderWindow->setActive(true);
+
+    BasicEngine::Destroy();
+    instance_ = nullptr;
+    graphicsManager_ = nullptr;
 }
 
-void MainEngine::OnEvent(sf::Event& event)
+MultiThreadGraphicsManager* MainEngine::GetGraphicsManager() const
 {
+	return graphicsManager_.get();
 }
 
 MainEngine* MainEngine::GetInstance()
 {
-	return instance;
+    return instance_;
 }
+
 
 }
