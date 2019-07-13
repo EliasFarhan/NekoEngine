@@ -29,7 +29,7 @@
 #include "engine/engine.h"
 #include "engine/log.h"
 
-namespace neko {
+namespace city {
 
 	BehaviorTreeNode::BehaviorTreeNode(
 		const std::vector<std::pair<std::string, std::string>>& il)

@@ -30,13 +30,12 @@
 #include <City/city_command.h>
 #include <City/city_graph.h>
 
-namespace neko
+namespace city
 {
-class MultiThreadGraphicsManager;
 class CityBuilderMap;
 class CityBuildingManager;
 
-const Index ZONE_RADIUS = 4;
+const neko::Index ZONE_RADIUS = 4;
 enum class ZoneType
 {
     RESIDENTIAL,
@@ -48,7 +47,7 @@ enum class ZoneType
 struct AddZoneCommand : CityCommand
 {
     ZoneType zoneType = ZoneType::NONE;
-    sf::Vector2i position = INVALID_TILE_POS;
+    sf::Vector2i position = neko::INVALID_TILE_POS;
 };
 
 
@@ -61,7 +60,7 @@ const static std::map<ZoneType, sf::Color> zoneColorMap =
 
 struct Zone
 {
-    sf::Vector2i position = INVALID_TILE_POS;
+    sf::Vector2i position = neko::INVALID_TILE_POS;
     ZoneType zoneType = ZoneType::NONE;
 };
 
@@ -72,7 +71,7 @@ public:
     void
     UpdateZoneTilemap(const CityBuilderMap& cityMap, CityBuildingManager& cityBuildingMap, sf::View mainView);
 
-    void PushCommand(MultiThreadGraphicsManager* graphicsManager);
+    void PushCommand(multi::GraphicsManager* graphicsManager);
 
     void AddZone(sf::Vector2i position, ZoneType zoneType, CityBuilderMap& cityMap);
 

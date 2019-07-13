@@ -41,8 +41,8 @@ enum class NekoComponentType : ComponentType
 	ANGLE3D = 1 << 6,
 	SPRITE2D = 1 << 7,
 	SPINE = 1 << 8,
-	BODY2D = 1 << 9
-
+	BODY2D = 1 << 9,
+	CONVEX_SHAPE2D = 1 << 10
 };
 struct Component
 {

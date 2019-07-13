@@ -28,36 +28,36 @@
 #include "utilities/json_utility.h"
 #include "utilities/time_utility.h"
 
-namespace neko
+namespace city
 {
 
 const int INIT_PERSON_MONEY = 100;
 struct Person
 {
-	sf::Vector2i position = INVALID_TILE_POS;
-	Entity personEntity = INVALID_ENTITY;
-	Entity carEntity = INVALID_ENTITY;
-	sf::Vector2i housePos = INVALID_TILE_POS;
-	sf::Vector2i workPos = INVALID_TILE_POS;
+	sf::Vector2i position = neko::INVALID_TILE_POS;
+	neko::Entity personEntity = neko::INVALID_ENTITY;
+	neko::Entity carEntity = neko::INVALID_ENTITY;
+	sf::Vector2i housePos = neko::INVALID_TILE_POS;
+	sf::Vector2i workPos = neko::INVALID_TILE_POS;
 	unsigned dayCount = 0;
 	int money = INIT_PERSON_MONEY;
 	int salary = 0;
 };
 
-class CityPeopleManager : public System
+class CityPeopleManager : public neko::System
 {
 public:
 	void Init() override;
 	void Update(float dt) override;
 	void Destroy() override;
-	Entity SpawnPerson();
-	Entity AddPerson(Entity entity, sf::Vector2i position);
-	Person* GetPersonAt(Entity entity);
-	Index GetPeopleCount();
-	void DestroyPerson(Entity entity);
+	neko::Entity SpawnPerson();
+	neko::Entity AddPerson(neko::Entity neko::Entity, sf::Vector2i position);
+	Person* GetPersonAt(neko::Entity neko::Entity);
+    neko::Index GetPeopleCount();
+	void DestroyPerson(neko::Entity neko::Entity);
 protected:
 	json personBehaviorTree_;
 	std::vector<Person> people_;
-	Timer spawningTimer_ = Timer(1.0f, .1f);
+    neko::Timer spawningTimer_ = neko::Timer(1.0f, .1f);
 };
 }

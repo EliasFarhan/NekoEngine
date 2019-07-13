@@ -30,7 +30,7 @@
 #include "City/city_editor.h"
 #include "sound/sound.h"
 
-namespace neko
+namespace city
 {
 void CityCommandManager::AddCommand(std::unique_ptr<CityCommand> command, bool fromRenderThread)
 {

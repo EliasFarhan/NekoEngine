@@ -41,10 +41,11 @@
 #include "city_behavior_tree_manager.h"
 #include "city_person.h"
 
-namespace neko
+#include <MultiThreadEngine/engine.h>
+namespace city
 {
 
-enum class CityComponentType : EntityMask
+enum class CityComponentType : neko::EntityMask
 {
 	TRANSFORM = 1 << 0,
 	CAR = 1 << 1,
@@ -58,7 +59,7 @@ const int zoneCost = 1000;
 const int personBaseSalary = 100;
 const int baseCityBudget = 1'000'000;
 
-class CityBuilderEngine : public neko::MainEngine
+class CityBuilderEngine : public multi::MainEngine
 {
 public:
     void Init() override;
@@ -69,7 +70,7 @@ public:
 
     void Destroy() override;
 
-    TextureManager& GetTextureManager();
+    neko::TextureManager& GetTextureManager();
 
     CityCommandManager& GetCommandManager();
 
@@ -79,9 +80,9 @@ public:
 
     CityBuilderMap& GetCityMap();
 
-    EntityManager& GetEntityManager();
+    neko::EntityManager& GetEntityManager();
 
-    OldTransform2dManager& GetTransformManager();
+    neko::OldTransform2dManager& GetTransformManager();
 
     CityCarManager& GetCarManager();
 
@@ -101,9 +102,9 @@ public:
 private:
 
     tf::Executor executor_{std::thread::hardware_concurrency() - 2};
-    EntityManager entityManager_;
-    OldTransform2dManager transformManager_;
-    TextureManager textureManager_;
+    neko::EntityManager entityManager_;
+    neko::OldTransform2dManager transformManager_;
+    neko::TextureManager textureManager_;
 
 	CityPeopleManager cityPeopleManager_;
     CityCommandManager commandManager_;
@@ -117,7 +118,7 @@ private:
 
     const float scrollDelta_ = 0.1f;
     float currentZoom_ = 1.0f;
-	Index musicInd_ = INVALID_INDEX;
+    neko::Index musicInd_ = neko::INVALID_INDEX;
 
 	long long cityMoney_ = baseCityBudget;
 };

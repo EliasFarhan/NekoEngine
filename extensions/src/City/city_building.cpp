@@ -27,7 +27,7 @@
 #include <City/city_engine.h>
 #include <City/city_zone.h>
 
-namespace neko
+namespace city
 {
 
 void CityBuildingManager::Update(const CityZoneManager& zoneManager, CityBuilderMap& cityMap, const float dt)
@@ -56,8 +56,8 @@ void CityBuildingManager::Update(const CityZoneManager& zoneManager, CityBuilder
 					newHousePlace.position,
 					sf::Vector2i(1, 1),
 					CityTileType(
-						(rand() % (Index(CityTileType::HOUSE4) - Index(CityTileType::HOUSE1))) +
-						Index(CityTileType::HOUSE1)),
+						(rand() % (neko::Index(CityTileType::HOUSE4) - neko::Index(CityTileType::HOUSE1))) +
+                                neko::Index(CityTileType::HOUSE1)),
 					(rand() % (10u - 5u)) + 5u
 					},
 					zoneManager,
@@ -112,7 +112,7 @@ void CityBuildingManager::Update(const CityZoneManager& zoneManager, CityBuilder
 					AddBuilding({
 						newWorkPlace.position,
 						sf::Vector2i(3, 3),
-						CityTileType((rand() % (Index(CityTileType::OFFICE5) - Index(CityTileType::OFFICE2))) + Index(CityTileType::OFFICE2)),
+						CityTileType((rand() % (neko::Index(CityTileType::OFFICE5) - neko::Index(CityTileType::OFFICE2))) + neko::Index(CityTileType::OFFICE2)),
 					((rand() % (60u - 40u)) + 40u)
 						}, zoneManager, cityMap);
 				}
@@ -196,13 +196,13 @@ sf::Vector2i CityBuildingManager::FindBuilding(ZoneType zoneType)
 			}
 		}
 		if (houseBuildings.empty())
-			return INVALID_TILE_POS;
+			return neko::INVALID_TILE_POS;
 		return houseBuildings[rand() % houseBuildings.size()]->position;
 		break;
 	}
 	case ZoneType::COMMERCIAL:
 	{
-		auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+		auto* engine = neko::BasicEngine::GetInstance<CityBuilderEngine>();
 		std::vector<Building*> workBuildings;
 		workBuildings.reserve(buildings_.size());
 		for (auto& building : buildings_)
@@ -219,7 +219,7 @@ sf::Vector2i CityBuildingManager::FindBuilding(ZoneType zoneType)
 			}
 		}
 		if (workBuildings.empty())
-			return INVALID_TILE_POS;
+			return neko::INVALID_TILE_POS;
 		return workBuildings[rand() % workBuildings.size()]->position;
 	}
 	break;
@@ -228,7 +228,7 @@ sf::Vector2i CityBuildingManager::FindBuilding(ZoneType zoneType)
 	default:
 		break;
 	}
-	return INVALID_TILE_POS;
+	return neko::INVALID_TILE_POS;
 }
 
 Building* CityBuildingManager::GetBuildingAt(sf::Vector2i position)

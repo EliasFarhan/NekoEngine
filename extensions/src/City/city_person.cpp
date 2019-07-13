@@ -5,7 +5,7 @@
 #include "engine/log.h"
 #include "utilities/vector_utility.h"
 
-namespace neko
+namespace city
 {
 void CityPeopleManager::Init()
 {

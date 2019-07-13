@@ -26,13 +26,13 @@
 #include <array>
 #include <vector>
 #include <map>
-
+#include <MultiThreadEngine/graphics.h>
 #include <graphics/tilemap.h>
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/View.hpp>
 #include "SFML/Graphics/RectangleShape.hpp"
 
-namespace neko
+namespace city
 {
 
 class TextureManager;
@@ -41,7 +41,7 @@ class CityCarManager;
 class OldTransform2dManager;
 class CityBuildingManager;
 
-enum class CityTileType : Index
+enum class CityTileType : neko::Index
 {
 
 	GRASS = 0,
@@ -111,9 +111,9 @@ const static std::map<CityTileType, std::string> mapCityTileString =
 
 
 };
-enum class CarType : Index
+enum class CarType : neko::Index
 {
-	BUS = Index(CityTileType::LENGTH),
+	BUS = neko::Index(CityTileType::LENGTH),
 	TRUCK,
 	BIG_CAR,
 	LONG_CAR,
@@ -157,7 +157,7 @@ public:
 	void UpdateTilemap(const CityBuilderMap& cityBuilderMap, const CityCarManager& cityCarManager,
                        const CityBuildingManager& buildingManager, const OldTransform2dManager& transformManager,
                        sf::View mainView, CityTilesheetType updatedCityTileType = CityTilesheetType::LENGTH);
-	void PushCommand(MultiThreadGraphicsManager* graphicsManager) override;
+	void PushCommand(multi::GraphicsManager* graphicsManager) override;
 protected:
     /**
      *

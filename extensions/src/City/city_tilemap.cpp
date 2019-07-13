@@ -32,7 +32,7 @@
 #include <City/city_building.h>
 #include <City/city_engine.h>
 
-namespace neko
+namespace city
 {
 void CityBuilderTilemap::Init(TextureManager& textureManager)
 {

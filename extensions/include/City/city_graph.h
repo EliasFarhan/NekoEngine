@@ -31,7 +31,7 @@
 #include <map>
 #include "engine/globals.h"
 
-namespace neko
+namespace city
 {
 
 using NeighborBit = std::uint16_t;
@@ -58,11 +58,11 @@ void RemoveNeighborToBit(NeighborBit& neighborBit, NeighborType neighborType);
 
 bool HasBitNeighbor(const NeighborBit& neighborBit, NeighborType neighborType);
 
-const static Index maxNeighborsNmb = 4;
+const static neko::Index maxNeighborsNmb = 4;
 struct Node
 {
-	sf::Vector2i position = INVALID_TILE_POS;
-	std::array<Index, maxNeighborsNmb> neighborsIndex;
+	sf::Vector2i position = neko::INVALID_TILE_POS;
+	std::array<neko::Index, maxNeighborsNmb> neighborsIndex;
     NeighborBit neighborBitwise = 0u;
 };
 

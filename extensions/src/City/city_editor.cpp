@@ -27,15 +27,16 @@
 #include <imgui.h>
 #include "engine/engine.h"
 #include <City/city_engine.h>
+#include <graphics/texture.h>
 
-namespace neko
+namespace city
 {
 void CityEditor::Init()
 {
-	engine_ = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
-	for (Index i = 0; i < Index(ButtonIconType::LENGTH); i++)
+	auto* engine = neko::BasicEngine::GetInstance<CityBuilderEngine>();
+	for (neko::Index i = 0; i < neko::Index(ButtonIconType::LENGTH); i++)
 	{
-		buttonUiIndex[i] = engine_->GetTextureManager().LoadTexture(buttonIconTexture[i]);
+		buttonUiIndex[i] = engine->GetTextureManager().LoadTexture(buttonIconTexture[i]);
 	}
 }
 

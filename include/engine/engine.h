@@ -60,7 +60,6 @@ struct Configuration
 /**
  * \brief basic engine class with no graphics manager implementation
  */
-
 class BasicEngine : public sf::NonCopyable, public System
 {
 public:
@@ -83,64 +82,15 @@ public:
     std::unique_ptr<sf::RenderWindow> renderWindow = nullptr;
 	MouseManager& GetMouseManager();
     sf::Time clockDeltatime;
+    template <typename T = BasicEngine>
+    static T* GetInstance(){ return dynamic_cast<T>(instance_);};
 protected:
+    static BasicEngine* instance_;
     sf::Clock engineClock_;
     Remotery* rmt_ = nullptr;
     KeyboardManager keyboardManager_;
     MouseManager mouseManager_;
 };
 
-/**
- * \brief main loop engine class, it runs its own graphics manager thread and manage the window events
- */
-
-class MainEngine : public BasicEngine
-{
-public:
-    explicit MainEngine(Configuration* config = nullptr);
-
-    virtual ~MainEngine();
-
-    void Init() override;
-
-    void Update(float dt) override;
-
-    void Destroy() override;
-    /**
-     * \brief completely override the BasicEngine loop due to the render thread synchronization
-     */
-    void EngineLoop() override;
-
-    virtual void OnBeginContact(const Collider* colliderA, const Collider* colliderB)
-    {}
-
-    virtual void OnEndContact(const Collider* colliderA, const Collider* colliderB)
-    {}
-
-    MultiThreadGraphicsManager* GetGraphicsManager() const;
-	
-
-    static MainEngine* GetInstance();
-
-    sf::Vector2u renderTargetSize;
-
-    //used to sync with the render thread
-    std::condition_variable condSyncRender;
-    std::mutex renderStartMutex;
-
-    std::atomic<Index> frameIndex = 0u;
-
-protected:
-
-    ctpl::thread_pool workingThreadPool_;
-    std::thread renderThread_;
-    std::unique_ptr<MultiThreadGraphicsManager> graphicsManager_ = nullptr;
-
-
-/**
- * static instance use to access the engine from anywhere, because I don't want to have thousands of MainEngine& ref
- */
-    static MainEngine* instance_;
-};
 
 }

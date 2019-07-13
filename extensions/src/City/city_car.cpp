@@ -27,12 +27,13 @@
 #include <City/city_map.h>
 #include <utilities/vector_utility.h>
 #include <Remotery.h>
+#include <engine/transform.h>
 
-namespace neko
+namespace city
 {
 void CityCarManager::Init()
 {
-	auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+	auto* engine = neko::BasicEngine::GetInstance<CityBuilderEngine>();
 	entityManagerPtr_ = &engine->GetEntityManager();
 	transformManagerPtr_ = &engine->GetTransformManager();
 
@@ -134,25 +135,25 @@ void CityCarManager::Destroy()
 {
 }
 
-Entity CityCarManager::SpawnCar(sf::Vector2i position, CarType carType)
+neko::Entity CityCarManager::SpawnCar(sf::Vector2i position, CarType carType)
 {
-	const Entity newCarEntity = entityManagerPtr_->CreateEntity();
+	const neko::Entity newCarEntity = entityManagerPtr_->CreateEntity();
 	AddCar(newCarEntity, carType, position);
-	entityManagerPtr_->AddComponentType(newCarEntity, EntityMask(CityComponentType::CAR));
+	entityManagerPtr_->AddComponentType(newCarEntity, neko::EntityMask(CityComponentType::CAR));
 	auto& car = cars_[newCarEntity];
 	car.entity = newCarEntity;
 	const auto tileSize = cityMap_->city.tileSize;
 	transformManagerPtr_->AddPosition(sf::Vector2f(car.position.x * float(tileSize.x), car.position.y * float(tileSize.y)), newCarEntity);
-	entityManagerPtr_->AddComponentType(newCarEntity, EntityMask(CityComponentType::TRANSFORM));
+	entityManagerPtr_->AddComponentType(newCarEntity, neko::EntityMask(CityComponentType::TRANSFORM));
 	return newCarEntity;
 }
 
-Entity CityCarManager::AddCar(Entity entity, CarType carType, sf::Vector2i position)
+neko::Entity CityCarManager::AddCar(neko::Entity entity, CarType carType, sf::Vector2i position)
 {
 	ResizeIfNecessary(cars_, entity);
 	cars_[entity].carType = carType;
 	cars_[entity].currentPath.clear();
-	if (position == INVALID_TILE_POS)
+	if (position == neko::INVALID_TILE_POS)
 	{
 
 	}
@@ -167,9 +168,9 @@ const std::vector<CityCar>& CityCarManager::GetCarsVector() const
 
 void CityCarManager::RescheduleCarPathfinding(const sf::Vector2i& removedPosition)
 {
-	for (Entity carEntity = 0u; carEntity < cars_.size(); carEntity++)
+	for (neko::Entity carEntity = 0u; carEntity < cars_.size(); carEntity++)
 	{
-		if (entityManagerPtr_->HasComponent(carEntity, EntityMask(CityComponentType::CAR) | EntityMask(CityComponentType::TRANSFORM)))
+		if (entityManagerPtr_->HasComponent(carEntity, neko::EntityMask(CityComponentType::CAR) | neko::EntityMask(CityComponentType::TRANSFORM)))
 		{
 			auto& car = cars_[carEntity];
 			auto posIt = std::find(car.currentPath.begin(), car.currentPath.end(), removedPosition);
@@ -188,10 +189,10 @@ void CityCarManager::RescheduleCarPathfinding(const sf::Vector2i& removedPositio
 
 size_t CityCarManager::CountCar() const
 {
-	Index count = 0;
-	for (Entity entity = 0; entity < cars_.size(); entity++)
+    neko::Index count = 0;
+	for (neko::Entity entity = 0; entity < cars_.size(); entity++)
 	{
-		if (entityManagerPtr_->HasComponent(entity, EntityMask(CityComponentType::CAR)))
+		if (entityManagerPtr_->HasComponent(entity, neko::EntityMask(CityComponentType::CAR)))
 		{
 			count++;
 		}
@@ -199,7 +200,7 @@ size_t CityCarManager::CountCar() const
 	return count;
 }
 
-CityCar* CityCarManager::GetCar(Index carEntity)
+CityCar* CityCarManager::GetCar(neko::Index carEntity)
 {
 	if (carEntity >= cars_.size())
 		return nullptr;

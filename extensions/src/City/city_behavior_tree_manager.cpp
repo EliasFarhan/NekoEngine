@@ -27,7 +27,7 @@
 #include <engine/log.h>
 #include "utilities/vector_utility.h"
 
-namespace neko {
+namespace city {
 
 	BehaviorTreeManager::NodeVariableDesc
 		BehaviorTreeManager::ParseJsonVariablesNodes(

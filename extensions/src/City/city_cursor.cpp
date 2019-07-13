@@ -27,7 +27,7 @@
 #include "engine/engine.h"
 #include <City/city_engine.h>
 
-namespace neko
+namespace city
 {
 const static sf::Color cursorColor[size_t(ButtonIconType::LENGTH)] =
 {

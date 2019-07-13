@@ -28,10 +28,10 @@
 #include "City/city_command.h"
 #include "engine/globals.h"
 
-namespace neko
+namespace city
 {
 
-enum class ButtonIconType : Index
+enum class ButtonIconType : neko::Index
 {
 	ROAD,
 	BULLDOZER,
@@ -51,7 +51,7 @@ struct ChangeTaxCommand : public CityCommand
 	float houseTax = 0.0f;
 };
 
-const static std::string buttonIconTexture[Index(ButtonIconType::LENGTH)] =
+const static std::string buttonIconTexture[neko::Index(ButtonIconType::LENGTH)] =
 {
 	"data/sprites/icons/icons8-road-48.png",
 	"data/sprites/icons/icons8-bulldozer-48.png",
@@ -59,15 +59,14 @@ const static std::string buttonIconTexture[Index(ButtonIconType::LENGTH)] =
 	"data/sprites/icons/link-company-parent.png"
 };
 
-class CityEditor : public Editor
+class CityEditor : public neko::Editor
 {
 public:
 	void Init() override;
 	void Update(float dt) override;
 	void Destroy() override;
 private:
-	CityBuilderEngine* engine_ = nullptr;
-	Index buttonUiIndex[Index(ButtonIconType::LENGTH)] = {};
-	bool buttonSelected[Index(ButtonIconType::LENGTH)] = {};
+    neko::Index buttonUiIndex[neko::Index(ButtonIconType::LENGTH)] = {};
+	bool buttonSelected[neko::Index(ButtonIconType::LENGTH)] = {};
 };
 }

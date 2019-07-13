@@ -30,52 +30,51 @@
 #include "engine/entity.h"
 #include "engine/component.h"
 
-namespace neko
+namespace city
 {
-class OldTransform2dManager;
 class TileMapGraph;
 class CityBuilderMap;
 
-enum class CarType : Index;
+enum class CarType : neko::Index;
 
-enum class CarState : Index
+enum class CarState : neko::Index
 {
 	ARRIVED,
 	MOVING_TO_NEXT_POS,
 	RESCHEDULE
 };
 
-struct CityCar : Component
+struct CityCar : neko::Component
 {
 	CarType carType;
 	std::vector<sf::Vector2i> currentPath;
-	Index currentIndex = 0;
-	Timer movingTimer = Timer(0.0f, 0.1f);//2 tiles per second
+    neko::Index currentIndex = 0;
+    neko::Timer movingTimer = neko::Timer(0.0f, 0.1f);//2 tiles per second
 	CarState carState = CarState::ARRIVED;
-	sf::Vector2i position = INVALID_TILE_POS;
+	sf::Vector2i position = neko::INVALID_TILE_POS;
 	const sf::Vector2f spriteSize = sf::Vector2f(32.0f, 16.0f);
 };
 
-class CityCarManager : public System
+class CityCarManager : public neko::System
 {
 public:
 	void Init() override;
 	void Update(float dt) override;
 	void Destroy() override;
 
-	Entity SpawnCar(sf::Vector2i position, CarType carType);
+    neko::Entity SpawnCar(sf::Vector2i position, CarType carType);
 
-	Entity AddCar(Entity entity, CarType carType, sf::Vector2i position = INVALID_TILE_POS);
+    neko::Entity AddCar(neko::Entity entity, CarType carType, sf::Vector2i position = neko::INVALID_TILE_POS);
 	const std::vector<CityCar>& GetCarsVector() const;
 	void RescheduleCarPathfinding(const sf::Vector2i& removedPosition);
 	size_t CountCar() const;
-	CityCar* GetCar(Index carEntity);
+	CityCar* GetCar(neko::Index carEntity);
 private:
 	std::vector<CityCar> cars_;
-	EntityManager* entityManagerPtr_ = nullptr;
+    neko::EntityManager* entityManagerPtr_ = nullptr;
 	OldTransform2dManager* transformManagerPtr_ = nullptr;
 	TileMapGraph* roadGraphPtr_ = nullptr;
 	CityBuilderMap* cityMap_ = nullptr;
-	Timer spawningTimer = Timer(1.0f, 1.0f);
+    neko::Timer spawningTimer = neko::Timer(1.0f, 1.0f);
 };
 }

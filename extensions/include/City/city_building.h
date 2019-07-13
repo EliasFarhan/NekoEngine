@@ -29,12 +29,12 @@
 #include "City/city_tilemap.h"
 #include "City/city_zone.h"
 
-namespace neko
+namespace city
 {
 
 struct Building
 {
-    sf::Vector2i position = INVALID_TILE_POS;
+    sf::Vector2i position = neko::INVALID_TILE_POS;
     sf::Vector2i size = sf::Vector2i(1,1);
     CityTileType buildingType = CityTileType::NONE;
 	unsigned capacity = 0;
@@ -52,6 +52,6 @@ public:
     const std::vector<Building>& GetBuildingsVector() const;
 private:
     std::vector<Building> buildings_;
-    Timer spawnTimer_ = Timer(0.0f, 0.2f);
+    neko::Timer spawnTimer_ = neko::Timer(0.0f, 0.2f);
 };
 }

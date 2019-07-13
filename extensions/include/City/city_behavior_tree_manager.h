@@ -28,7 +28,7 @@
 #include "City/city_function_map.h"
 #include "City/city_behavior_tree.h"
 
-namespace neko {
+namespace city {
 
 	class BehaviorTreeManager 
 	{

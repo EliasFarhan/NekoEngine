@@ -29,7 +29,7 @@
 #include <Remotery.h>
 #include "City/city_function_map.h"
 
-namespace neko
+namespace city
 {
 void CityBuilderEngine::Init()
 {
@@ -172,7 +172,7 @@ void CityBuilderEngine::OnEvent(sf::Event& event)
 	if (event.type == sf::Event::MouseWheelScrolled)
 	{
 		const float wheelDelta = event.mouseWheelScroll.delta;
-#ifdef __neko_dbg__
+#ifdef __city_dbg__
 		{
 			std::ostringstream oss;
 			oss << "Mouse Wheel Delta: " << wheelDelta;
@@ -194,7 +194,7 @@ void CityBuilderEngine::Destroy()
 	MainEngine::Destroy();
 }
 
-TextureManager& CityBuilderEngine::GetTextureManager()
+neko::TextureManager& CityBuilderEngine::GetTextureManager()
 {
 	return textureManager_;
 }
@@ -219,12 +219,12 @@ CityBuilderMap& CityBuilderEngine::GetCityMap()
 	return cityBuilderMap_;
 }
 
-EntityManager& CityBuilderEngine::GetEntityManager()
+neko::EntityManager& CityBuilderEngine::GetEntityManager()
 {
 	return entityManager_;
 }
 
-OldTransform2dManager& CityBuilderEngine::GetTransformManager()
+neko::OldTransform2dManager& CityBuilderEngine::GetTransformManager()
 {
 	return transformManager_;
 }

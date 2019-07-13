@@ -31,7 +31,7 @@
 #include <City/city_graph.h>
 
 
-namespace neko
+namespace city
 {
 
 enum class EnvironmentTile : unsigned
@@ -40,7 +40,7 @@ enum class EnvironmentTile : unsigned
 	WATER
 };
 
-enum class CityElementType : Index
+enum class CityElementType : neko::Index
 {
 	ROAD,
 	BRIDGE,
@@ -92,7 +92,7 @@ struct RoadElement : CityElement
     unsigned neighborsBitwise = 0u;
 };
 
-class CityBuilderMap : public System
+class CityBuilderMap : public neko::System
 {
 public:
 	void Init() override;

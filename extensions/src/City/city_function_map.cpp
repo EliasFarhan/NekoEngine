@@ -25,7 +25,7 @@
 #include <City/city_function_map.h>
 #include <engine/log.h>
 
-namespace neko {
+namespace city {
 
 	std::map<
 		std::string, 

@@ -38,6 +38,7 @@ const size_t MAX_COMMAND_NMB = 1024;
 
 class MainEngine;
 
+
 /**
  * \brief abstraction of a graphic command send to the render thread
  */
@@ -70,7 +71,20 @@ struct TilemapCommand : public Command
     void Draw(sf::RenderTarget* renderTarget) override;
 };
 
-class BasicGraphicsManager
+
+class GraphicsManager
+{
+public:
+    virtual void Draw(sf::Drawable& drawable, int layer = 0) = 0;
+
+    virtual void Draw(sf::VertexArray* vertexArray, sf::Texture* texture, int layer = 0) = 0;
+
+protected:
+
+    virtual void Draw(std::array<Command*, MAX_COMMAND_NMB>& commandBuffers_) = 0;
+};
+
+class BasicGraphicsManager : public GraphicsManager
 {
 public:
     virtual void Draw(sf::Drawable& drawable, int layer = 0);
@@ -80,55 +94,8 @@ public:
 protected:
     virtual void Draw(std::array<Command*, MAX_COMMAND_NMB>& commandBuffers_);
     std::array<Command*, MAX_COMMAND_NMB> commandBuffer_;
+    std::array<neko::SfmlCommand, neko::MAX_COMMAND_NMB> commands_;
+    std::array<neko::TilemapCommand, neko::MAX_COMMAND_NMB> tileCommands_;
 };
 
-/**
- * \brief graphics manager run in a render thread by the MainEngine
- */
-class MultiThreadGraphicsManager
-{
-public:
-    MultiThreadGraphicsManager();
-
-/**
- * \brief called by the render loop when iterating through all the basic sfml commands
- * Should not be called from engine thread
- * @param drawable
- */
-    virtual void Draw(sf::Drawable& drawable);
-/**
- * \brief called by the render loop when iterating through all the tilemap commands
- * Should not be called from engine thread
- * @param vertexArray
- * @param texture
- */
-    virtual void Draw(sf::VertexArray* vertexArray, sf::Texture* texture);
-/**
- * \brief called from engine loop, changing the view for the next frame
- * @param view
- */
-    virtual void SetView(sf::View view);
-/**
- * \brief run by MainEngine in the render thread
- */
-    virtual void RenderLoop();
-
-	bool DidRenderingStart() const;
-    std::unique_ptr<Editor> editor = nullptr;
-    //Used for Engine loop to wait for graphics thread
-    std::mutex renderingMutex;
-protected:
-    /**
-     * \brief non owning ptr to renderwindow
-     */
-    sf::RenderWindow* renderWindow_ = nullptr;
-    std::array<SfmlCommand, MAX_COMMAND_NMB> commands_[2];
-    std::array<TilemapCommand, MAX_COMMAND_NMB> tileCommands_[2];
-    std::array<Command*, MAX_COMMAND_NMB> commandBuffers_[2];
-    sf::View views_[2];
-    size_t renderLength_ = 0;
-    size_t nextRenderLength_ = 0;
-    Index frameIndex = 0u;
-	bool isRendering_ = false;
-};
 }

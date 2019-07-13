@@ -27,11 +27,11 @@
 #include "engine/system.h"
 #include "City/city_editor.h"
 
-namespace neko
+namespace city
 {
 class CityBuilderEngine;
 
-class CityCursor : public System
+class CityCursor : public neko::System
 {
 public:
 	void Init() override;

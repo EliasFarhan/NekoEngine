@@ -7,7 +7,7 @@
 #include <cstring>
 #include <iterator>
 
-namespace neko
+namespace city
 {
 class MainEngine;
 

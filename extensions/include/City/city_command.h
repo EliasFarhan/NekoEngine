@@ -28,7 +28,7 @@
 #include "engine/system.h"
 #include "engine/globals.h"
 
-namespace neko
+namespace city
 {
 class CityBuilderEngine;
 enum class CityCommandType
@@ -49,7 +49,7 @@ struct CityCommand
 	CityCommandType commandType = CityCommandType::NONE;
 };
 
-class CityCommandManager : public System
+class CityCommandManager : public neko::System
 {
 	
 public:
@@ -62,15 +62,15 @@ public:
 protected:
 	std::vector<std::shared_ptr<CityCommand>>commandQueue_[2];
 	CityBuilderEngine* engine_ = nullptr;
-	Index soundErase_ = INVALID_INDEX;
-	Index soundBuild_ = INVALID_INDEX;
-	Index soundRoad_ = INVALID_INDEX;
-	Index soundSelect_ = INVALID_INDEX;
-	Index soundBufferOut_ = INVALID_INDEX;
-	Index soundBufferErase_ = INVALID_INDEX;
-	Index soundBufferBuild_ = INVALID_INDEX;
-	Index soundBufferRoad_ = INVALID_INDEX;
-	Index soundBufferSelect_ = INVALID_INDEX;
-	Index soundOut_ = INVALID_INDEX;
+    neko::Index soundErase_ = neko::INVALID_INDEX;
+    neko::Index soundBuild_ = neko::INVALID_INDEX;
+    neko::Index soundRoad_ = neko::INVALID_INDEX;
+    neko::Index soundSelect_ = neko::INVALID_INDEX;
+    neko::Index soundBufferOut_ = neko::INVALID_INDEX;
+    neko::Index soundBufferErase_ = neko::INVALID_INDEX;
+    neko::Index soundBufferBuild_ = neko::INVALID_INDEX;
+    neko::Index soundBufferRoad_ = neko::INVALID_INDEX;
+    neko::Index soundBufferSelect_ = neko::INVALID_INDEX;
+    neko::Index soundOut_ = neko::INVALID_INDEX;
 };
 }

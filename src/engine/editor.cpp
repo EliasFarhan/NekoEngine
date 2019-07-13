@@ -28,41 +28,8 @@
 #include <engine/engine.h>
 #include <graphics/graphics.h>
 
-#include <utility>
 
 namespace neko
 {
-void Editor::Init()
-{
 
-}
-
-void Editor::Update(float dt)
-{
-	const auto* engine = MainEngine::GetInstance();
-	const Index frameIndex = (engine->frameIndex - 1) % 2; //Render frame is always the previous one
-	ImGui::SFML::Update(*renderWindow_, engine->clockDeltatime);
-
-	ImGui::Begin("Inspector");
-	//Draw inspector data
-	for (auto& inspectorData : inspectorValues_[frameIndex])
-	{
-		ImGui::LabelText(inspectorData.first.c_str(), "%s", inspectorData.second.c_str());
-	}
-	ImGui::End();
-	inspectorValues_[frameIndex].clear();
-
-	ImGui::SFML::Render(*renderWindow_);
-}
-
-void Editor::Destroy()
-{
-
-}
-
-void Editor::AddInspectorInfo(const std::string_view name, const std::string_view value)
-{
-	const Index frameIndex = MainEngine::GetInstance()->frameIndex % 2;
-	inspectorValues_[frameIndex].push_back(std::pair<std::string, std::string>(name, value));
-}
 }

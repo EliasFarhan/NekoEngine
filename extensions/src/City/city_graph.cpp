@@ -47,7 +47,7 @@ struct hash<sf::Vector2i>
 	}
 };
 }
-namespace neko
+namespace city
 {
 const std::vector<Node>& TileMapGraph::GetNodesVector() const
 {
