@@ -1,6 +1,7 @@
 #include <benchmark/benchmark.h>
 #include <City/city_graph.h>
 #include <unordered_map>
+#include <cmath>
 
 const unsigned long fromRange = 8;
 const unsigned long toRange = 32768;

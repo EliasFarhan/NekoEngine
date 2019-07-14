@@ -80,6 +80,7 @@ void MainEngine::Init()
     //workingThreadPool.resize(std::max(1u,std::thread::hardware_concurrency() - 3));//removing main and render and audio thread
 #ifdef __linux__
     XInitThreads();
+    logDebug("XInitThreads called...");
 #endif
     BasicEngine::Init();
     renderWindow->setActive(false);

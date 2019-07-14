@@ -28,11 +28,11 @@ void DoSomethingWithFilter(EntityManager& entityManager)
 {
 	std::vector<Entity> entities;
 	entities.reserve(entityManager.GetEntitiesSize());
-	for (Entity i = 0; i < entityManager.GetEntitiesSize(); i++)
+	for (const auto& entity: entities)
 	{
-		if (entityManager.HasComponent(i, componentType))
+		if (entityManager.HasComponent(entity, componentType))
 		{
-			entities.push_back(i);
+			entities.push_back(entity);
 		}
 	}
 	for (auto& entity : entities)
@@ -72,6 +72,7 @@ static void BM_FooAlias(benchmark::State& state)
 	for (auto _ : state) 
 	{
 		DoSomethingWithFilter(entityManager);
+		
 	}
 }
 BENCHMARK(BM_FooAlias)->Range(fromRange, toRange);
