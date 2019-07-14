@@ -236,12 +236,29 @@ target_compile_definitions(Neko_COMMON PUBLIC $<$<CONFIG:Debug>:__neko_dbg__>)
 target_compile_definitions(Neko_COMMON PUBLIC $<$<CONFIG:RelWithDebInfo>:__neko_dbg__>)
 
 set_target_properties (Neko_COMMON PROPERTIES FOLDER Neko)
+#extensions
+file(GLOB EXTENSIONS_FOLDERS extensions/src/* extensions/include/*)
+foreach(EXTENSION_FOLDER ${EXTENSIONS_FOLDERS})
+	if(IS_DIRECTORY ${EXTENSION_FOLDER})
+		get_filename_component(EXTENSION_DIR ${EXTENSION_FOLDER} NAME)
+		file(GLOB_RECURSE  EXTENSION_FILES ${EXTENSION_FOLDER}/*.h ${EXTENSION_FOLDER}/*.cpp)
+		source_group("Extensions\\${EXTENSION_DIR}"            FILES ${EXTENSION_FILES})
+		if(NOT TARGET ${EXTENSION_DIR})
+			add_library(${EXTENSION_DIR} STATIC ${EXTENSION_FILES})
+			LIST(APPEND EXTENSIONS_LIBS ${EXTENSION_DIR})
+			set_target_properties (${EXTENSION_DIR} PROPERTIES FOLDER Neko\\ExtensionsLibs)
+			target_link_libraries(${EXTENSION_DIR} PUBLIC Neko_COMMON)
+		else()
+			target_sources(${EXTENSION_DIR} PRIVATE ${EXTENSION_FILES})
+		endif()
+	endif()
+endforeach()
 #Neko TEST
 SET(Neko_TEST_DIR ${CMAKE_SOURCE_DIR}/test)
 file(GLOB TEST_FILES ${Neko_TEST_DIR}/*.cpp )
 add_executable(Neko_TEST ${TEST_FILES})
 
-target_link_libraries(Neko_TEST gtest gtest_main Neko_COMMON City multi)
+target_link_libraries(Neko_TEST gtest gtest_main Neko_COMMON ${EXTENSIONS_LIBS})
 if (APPLE)
 	target_link_libraries(Neko_TEST ${Boost_LIBRARIES})
 else()
@@ -260,7 +277,7 @@ foreach(course_file ${COURSE_FILES} )
     string( REPLACE ".cpp" "" course_name ${course_relative_path} )
     add_executable(${course_name} ${course_file})
     # Make sure YourLib is linked to each app
-    target_link_libraries(${course_name} PUBLIC benchmark benchmark_main Neko_COMMON multi City )
+    target_link_libraries(${course_name} PUBLIC benchmark benchmark_main Neko_COMMON ${EXTENSIONS_LIBS} )
     set_property(TARGET ${course_name} PROPERTY CXX_STANDARD 17)
 
 
@@ -278,22 +295,7 @@ foreach(course_file ${COURSE_FILES} )
     ENDIF()
 endforeach()
 
-#extensions
-file(GLOB EXTENSIONS_FOLDERS extensions/src/* extensions/include/*)
-foreach(EXTENSION_FOLDER ${EXTENSIONS_FOLDERS})
-	if(IS_DIRECTORY ${EXTENSION_FOLDER})
-		get_filename_component(EXTENSION_DIR ${EXTENSION_FOLDER} NAME)
-		file(GLOB_RECURSE  EXTENSION_FILES ${EXTENSION_FOLDER}/*.h ${EXTENSION_FOLDER}/*.cpp)
-		source_group("Extensions\\${EXTENSION_DIR}"            FILES ${EXTENSION_FILES})
-		if(NOT TARGET ${EXTENSION_DIR})
-			add_library(${EXTENSION_DIR} STATIC ${EXTENSION_FILES})
-			set_target_properties (${EXTENSION_DIR} PROPERTIES FOLDER Neko\\ExtensionsLibs)
-			target_link_libraries(${EXTENSION_DIR} PUBLIC Neko_COMMON)
-		else()
-			target_sources(${EXTENSION_DIR} PRIVATE ${EXTENSION_FILES})
-		endif()
-	endif()
-endforeach()
+
 
 #City Builder
 add_executable(CityBuilder ${CMAKE_SOURCE_DIR}/main/CityBuilder.cpp)

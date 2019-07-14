@@ -42,7 +42,7 @@ void DoSomethingWithFilter(EntityManager& entityManager)
 }
 
 
-static void BM_Foo(benchmark::State& state) 
+static void BM_Box1(benchmark::State& state) 
 {
 	const unsigned long length = state.range(0);
 	EntityManager entityManager;
@@ -57,7 +57,7 @@ static void BM_Foo(benchmark::State& state)
 		DoSomethingWithBranch(entityManager);
 	}
 }
-BENCHMARK(BM_Foo)->Range(fromRange, toRange);
+BENCHMARK(BM_Box1)->Range(fromRange, toRange);
 
 
 static void BM_FooAlias(benchmark::State& state) 
