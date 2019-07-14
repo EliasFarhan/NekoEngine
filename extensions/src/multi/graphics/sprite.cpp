@@ -34,7 +34,7 @@ void SpriteManager::CopyTransformPosition(neko::Position2dManager& transformMana
     const int frameIndex = MainEngine::GetFrameIndex() % 2;
     for (auto i = start; i < start + length; i++)
     {
-        sprites_[frameIndex][i].setPosition(transformManager.GetComponent(i));
+        sprites_[frameIndex][i].setPosition(transformManager.GetComponent(neko::Entity(i)));
     }
 }
 
@@ -44,7 +44,7 @@ void SpriteManager::CopyTransformScales(neko::Scale2dManager& transformManager, 
     const int frameIndex = MainEngine::GetFrameIndex() % 2;
     for (auto i = start; i < start + length; i++)
     {
-        sprites_[frameIndex][i].setScale(transformManager.GetComponent(i));
+        sprites_[frameIndex][i].setScale(transformManager.GetComponent(neko::Entity(i)));
     }
 }
 
@@ -54,7 +54,7 @@ void SpriteManager::CopyTransformAngles(neko::Angle2dManager& transformManager, 
     const int frameIndex = MainEngine::GetFrameIndex() % 2;
     for (auto i = start; i < start + length; i++)
     {
-        sprites_[frameIndex][i].setRotation(transformManager.GetComponent(i));
+        sprites_[frameIndex][i].setRotation(transformManager.GetComponent(neko::Entity(i)));
     }
 }
 

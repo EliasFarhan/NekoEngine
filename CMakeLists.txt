@@ -172,7 +172,12 @@ include_directories(${GOOGLE_TEST_DIR}/include)
 
 set_target_properties (gtest gtest_main PROPERTIES
 		FOLDER Externals\\GTest)
-		
+#Google benchmark
+set(GOOGLE_BENCH_DIR ${EXTERNAL_DIR}/benchmark-1.5.0)
+add_subdirectory(${GOOGLE_BENCH_DIR})
+include_directories(${GOOGLE_BENCH_DIR}/include)
+set_target_properties (benchmark benchmark_main PROPERTIES
+		FOLDER Externals\\GTest)
 #SFML Imgui
 set(SFML_IMGUI ${EXTERNAL_DIR}/imgui-sfml-2.0.1/)
 set(IMGUI_ROOT ${EXTERNAL_DIR}/imgui-1.70/ CACHE INTERNAL "")
@@ -243,6 +248,36 @@ else()
 endif(APPLE)
 
 set_target_properties (Neko_TEST PROPERTIES FOLDER Neko)
+
+#Benchmarks
+
+SET(COURSE_DIR ${CMAKE_SOURCE_DIR}/benchmark)
+file(GLOB COURSE_FILES ${COURSE_DIR}/*.cpp)
+
+foreach(course_file ${COURSE_FILES} )
+    # I used a simple string replace, to cut off .cpp.
+    file(RELATIVE_PATH course_relative_path ${COURSE_DIR} ${course_file})
+    string( REPLACE ".cpp" "" course_name ${course_relative_path} )
+    add_executable(${course_name} ${course_file})
+    # Make sure YourLib is linked to each app
+    target_link_libraries(${course_name} PUBLIC benchmark benchmark_main Neko_COMMON multi City )
+    set_property(TARGET ${course_name} PROPERTY CXX_STANDARD 17)
+
+
+	IF(MSVC)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:AVX2 /Oi")
+    elseif(UNIX)
+    set_target_properties(${course_name} PROPERTIES COMPILE_FLAGS "-save-temps -march=native")
+    ENDIF(MSVC)
+    set_target_properties (${course_name} PROPERTIES
+        FOLDER Courses)
+    IF(APPLE)
+        set_target_properties(${course_name} PROPERTIES
+                RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}
+                RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR})
+    ENDIF()
+endforeach()
+
 #extensions
 file(GLOB EXTENSIONS_FOLDERS extensions/src/* extensions/include/*)
 foreach(EXTENSION_FOLDER ${EXTENSIONS_FOLDERS})
@@ -251,7 +286,7 @@ foreach(EXTENSION_FOLDER ${EXTENSIONS_FOLDERS})
 		file(GLOB_RECURSE  EXTENSION_FILES ${EXTENSION_FOLDER}/*.h ${EXTENSION_FOLDER}/*.cpp)
 		source_group("Extensions\\${EXTENSION_DIR}"            FILES ${EXTENSION_FILES})
 		if(NOT TARGET ${EXTENSION_DIR})
-			add_library(${EXTENSION_DIR} STATIC ${EXTENSION_FILES} extensions/include/multi/engine/engine.h extensions/src/multi/engine/engine.cpp)
+			add_library(${EXTENSION_DIR} STATIC ${EXTENSION_FILES})
 			set_target_properties (${EXTENSION_DIR} PROPERTIES FOLDER Neko\\ExtensionsLibs)
 			target_link_libraries(${EXTENSION_DIR} PUBLIC Neko_COMMON)
 		else()

@@ -155,7 +155,7 @@ TileMapGraph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vect
 	if (startNodeIt == nodes_.end())
 	{
 #ifdef __neko_dbg__
-		logDebug("[Error] Because of start pos");
+		//logDebug("[Error] Because of start pos");
 #endif
 		return path;
 	}
@@ -166,7 +166,7 @@ TileMapGraph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vect
 	if (endNodeIt == nodes_.end())
 	{
 #ifdef __neko_dbg__
-		logDebug("[Error] Because of end pos");
+		//logDebug("[Error] Because of end pos");
 #endif
 		return path;
 	}
@@ -194,7 +194,7 @@ TileMapGraph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vect
 		if (currentNode->position == endPos)
 		{
 #ifdef __neko_dbg__
-			logDebug("Manage to go to the end");
+			//logDebug("Manage to go to the end");
 #endif
 			break;
 		}
@@ -257,7 +257,7 @@ TileMapGraph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vect
 	else
 	{
 #ifdef __neko_dbg__
-		logDebug("[Error] No parent for end");
+		//logDebug("[Error] No parent for end");
 #endif
 	}
 	return path;

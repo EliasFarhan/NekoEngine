@@ -63,7 +63,7 @@ void ShapeManager::CopyTransformPosition(neko::Position2dManager& positionManage
     const int frameIndex = MainEngine::GetFrameIndex() % 2;
     for (auto i = start; i < start + length; i++)
     {
-        convexShape_[frameIndex][i].setPosition(positionManager.GetComponent(i));
+        convexShape_[frameIndex][i].setPosition(positionManager.GetComponent(neko::Entity(i)));
     }
 }
 

@@ -71,8 +71,7 @@ void Position2dManager::CopyPositionsFromPhysics2d(EntityManager& entityManager,
 {
     for(Index i = 0; i < entityManager.GetEntitiesSize();i++)
     {
-        if(entityManager.HasComponent(i, EntityMask(NekoComponentType::BODY2D) )&&
-        entityManager.HasComponent(i, EntityMask(NekoComponentType::POSITION2D)))
+        if(entityManager.HasComponent(i, EntityMask(NekoComponentType::POSITION2D)))
         {
             components_[i] = meter2pixel(body2dManager.GetBodyAt(i)->GetPosition());
         }

@@ -44,7 +44,11 @@ sf::Sprite* BasicSpriteManager::GetSpriteAt(unsigned int spriteIndex)
 
 void BasicSpriteManager::CopyTransformPosition(Position2dManager& transformManager, size_t start, size_t length)
 {
-
+	rmt_ScopedCPUSample(CopySpritePositions, 0);
+	for (auto i = start; i < start + length; i++)
+	{
+		components_[i].setPosition(transformManager.GetComponent(neko::Entity(i)));
+	}
 }
 
 void BasicSpriteManager::CopyTransformScales(Scale2dManager& transformManager, size_t start, size_t length)
