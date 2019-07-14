@@ -34,7 +34,7 @@ namespace city
 {
 void CityCommandManager::AddCommand(std::unique_ptr<CityCommand> command, bool fromRenderThread)
 {
-	const Index frameIndex = (MainEngine::GetInstance()->frameIndex - (fromRenderThread ? 1 : 0)) % 2;
+	const neko::Index frameIndex = (multi::MainEngine::GetFrameIndex() - (fromRenderThread ? 1 : 0)) % 2;
 	if (command->commandType == CityCommandType::CHANGE_CURSOR_MODE)
 	{
 		commandQueue_[frameIndex].insert(commandQueue_[frameIndex].begin(), std::move(command));
@@ -56,17 +56,16 @@ void CityCommandManager::AddCommand(std::unique_ptr<CityCommand> command, bool f
 
 void CityCommandManager::Init()
 {
-	engine_ = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
-	soundBufferErase_ = Sound::LoadSoundBuffer("data/Swip.wav");
-	soundBufferBuild_ = Sound::LoadSoundBuffer("data/Truip.wav");
-	soundBufferRoad_ = Sound::LoadSoundBuffer("data/Buip.wav");
-	soundBufferSelect_ = Sound::LoadSoundBuffer("data/Wiz.wav");
-	soundBufferOut_ = Sound::LoadSoundBuffer("data/Out.wav");
-	soundErase_ = Sound::CreateSoundFromBuffer(soundBufferErase_);
-	soundBuild_ = Sound::CreateSoundFromBuffer(soundBufferBuild_);
-	soundRoad_ = Sound::CreateSoundFromBuffer(soundBufferRoad_);
-	soundSelect_ = Sound::CreateSoundFromBuffer(soundBufferSelect_);
-	soundOut_ = Sound::CreateSoundFromBuffer(soundBufferOut_);
+	soundBufferErase_ = neko::Sound::LoadSoundBuffer("data/Swip.wav");
+	soundBufferBuild_ = neko::Sound::LoadSoundBuffer("data/Truip.wav");
+	soundBufferRoad_ = neko::Sound::LoadSoundBuffer("data/Buip.wav");
+	soundBufferSelect_ = neko::Sound::LoadSoundBuffer("data/Wiz.wav");
+	soundBufferOut_ = neko::Sound::LoadSoundBuffer("data/Out.wav");
+	soundErase_ = neko::Sound::CreateSoundFromBuffer(soundBufferErase_);
+	soundBuild_ = neko::Sound::CreateSoundFromBuffer(soundBufferBuild_);
+	soundRoad_ = neko::Sound::CreateSoundFromBuffer(soundBufferRoad_);
+	soundSelect_ = neko::Sound::CreateSoundFromBuffer(soundBufferSelect_);
+	soundOut_ = neko::Sound::CreateSoundFromBuffer(soundBufferOut_);
 }
 
 void CityCommandManager::ExecuteCommand(const std::shared_ptr<CityCommand>& command) const
@@ -77,14 +76,14 @@ void CityCommandManager::ExecuteCommand(const std::shared_ptr<CityCommand>& comm
 	{
 		auto* cursorCommand = dynamic_cast<ChangeModeCommand*>(command.get());
 		engine_->GetCursor().SetCursorMode(cursorCommand->newCursorMode);
-		Sound::PlaySound(soundSelect_);
+		neko::Sound::PlaySound(soundSelect_);
 		break;
 	}
 	case CityCommandType::CREATE_CITY_ELEMENT:
 	{
 		if (engine_->GetCityMoney() < roadCost)
 		{
-			Sound::PlaySound(soundOut_);
+			neko::Sound::PlaySound(soundOut_);
 			break;
 		}
 		auto* buildCommand = dynamic_cast<BuildElementCommand*>(command.get());
@@ -95,7 +94,7 @@ void CityCommandManager::ExecuteCommand(const std::shared_ptr<CityCommand>& comm
 			engine_->ChangeCityMoney(-roadCost);
 			engine_->GetBuildingManager().RemoveBuilding(buildCommand->position);
 		}
-		Sound::PlaySound(soundRoad_);
+		neko::Sound::PlaySound(soundRoad_);
 		break;
 	}
 	case CityCommandType::DELETE_CITY_ELEMENT:
@@ -105,7 +104,7 @@ void CityCommandManager::ExecuteCommand(const std::shared_ptr<CityCommand>& comm
 		engine_->GetCarManager().RescheduleCarPathfinding(buildCommand->position);
 		engine_->GetZoneManager().RemoveZone(buildCommand->position);
 		engine_->GetBuildingManager().RemoveBuilding(buildCommand->position);
-		Sound::PlaySound(soundErase_);
+        neko::Sound::PlaySound(soundErase_);
 		break;
 	}
 	case CityCommandType::ADD_CITY_ZONE:
@@ -113,10 +112,10 @@ void CityCommandManager::ExecuteCommand(const std::shared_ptr<CityCommand>& comm
 		auto* zoneCommand = dynamic_cast<AddZoneCommand*>(command.get());
 		if (engine_->GetCityMoney() < zoneCost)
 		{
-			Sound::PlaySound(soundOut_);
+            neko::Sound::PlaySound(soundOut_);
 		}
 		engine_->GetZoneManager().AddZone(zoneCommand->position, zoneCommand->zoneType, engine_->GetCityMap());
-		Sound::PlaySound(soundBuild_);
+        neko::Sound::PlaySound(soundBuild_);
 		break;
 	}
 	case CityCommandType::CHANGE_TAX:
@@ -132,7 +131,7 @@ void CityCommandManager::ExecuteCommand(const std::shared_ptr<CityCommand>& comm
 
 void CityCommandManager::Update(float dt)
 {
-	const Index frameIndex = (MainEngine::GetInstance()->frameIndex) % 2;
+	const neko::Index frameIndex = (multi::MainEngine::GetFrameIndex()) % 2;
 	const auto commandNmb = commandQueue_[frameIndex].size();
 	for (auto i = 0u; i < commandNmb; i++)
 	{
@@ -144,9 +143,9 @@ void CityCommandManager::Update(float dt)
 
 void CityCommandManager::Destroy()
 {
-	Sound::RemoveSoundBuffer(soundBufferErase_);
-	Sound::RemoveSoundBuffer(soundBufferBuild_);
-	Sound::RemoveSoundBuffer(soundBufferRoad_);
-	Sound::RemoveSoundBuffer(soundBufferSelect_);
+    neko::Sound::RemoveSoundBuffer(soundBufferErase_);
+    neko::Sound::RemoveSoundBuffer(soundBufferBuild_);
+    neko::Sound::RemoveSoundBuffer(soundBufferRoad_);
+    neko::Sound::RemoveSoundBuffer(soundBufferSelect_);
 }
 }

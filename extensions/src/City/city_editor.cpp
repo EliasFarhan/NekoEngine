@@ -42,8 +42,10 @@ void CityEditor::Init()
 
 void CityEditor::Update(float dt)
 {
-	const Index frameIndex = (engine_->frameIndex - 1) % 2; //Render frame is always the previous one
-	ImGui::SFML::Update(*renderWindow_, engine_->clockDeltatime);
+	const neko::Index frameIndex = (multi::MainEngine::GetFrameIndex()- 1) % 2; //Render frame is always the previous one
+	auto* engine = neko::BasicEngine::GetInstance<CityBuilderEngine>();
+	auto* renderWindow = engine->renderWindow.get();
+	ImGui::SFML::Update(*renderWindow, engine->clockDeltatime);
 
 	ImGui::Begin("Inspector");
 	//Draw inspector data
@@ -55,9 +57,9 @@ void CityEditor::Update(float dt)
 
 
 	ImGui::Begin("Gameplay");
-	for (Index i = 0; i < Index(ButtonIconType::LENGTH); i++)
+	for (neko::Index i = 0; i < neko::Index(ButtonIconType::LENGTH); i++)
 	{
-		const auto buttonTexture = engine_->GetTextureManager().GetTexture(buttonUiIndex[i]);
+		const auto buttonTexture = engine->GetTextureManager().GetTexture(buttonUiIndex[i]);
 		if (ImGui::ImageButton(*buttonTexture))
 		{
 			std::fill(std::begin(buttonSelected), std::end(buttonSelected), false);
@@ -66,28 +68,28 @@ void CityEditor::Update(float dt)
 			auto newCommand = std::make_unique<ChangeModeCommand>();
 			newCommand->newCursorMode = ButtonIconType(i);
 			newCommand->commandType = CityCommandType::CHANGE_CURSOR_MODE;
-			engine_->GetCommandManager().AddCommand(std::move(newCommand), true);
+			engine->GetCommandManager().AddCommand(std::move(newCommand), true);
 		}
 	}
 	//Tax management
 	{
-		int newWorkTax = int(100.0f * engine_->workTax);
+		int newWorkTax = int(100.0f * engine->workTax);
 		ImGui::SliderInt("Work Tax", &newWorkTax, 0, 50, "%d%");
-		int newHouseTax = int(100.0f * engine_->houseTax);
+		int newHouseTax = int(100.0f * engine->houseTax);
 		ImGui::SliderInt("House Tax", &newHouseTax, 0, 50, "%d%");
-		if (newWorkTax != int(100.0f * engine_->workTax) || newHouseTax != int(100.0f * engine_->houseTax))
+		if (newWorkTax != int(100.0f * engine->workTax) || newHouseTax != int(100.0f * engine->houseTax))
 		{
 			auto newCommand = std::make_unique<ChangeTaxCommand>();
 			newCommand->workTax = float(newWorkTax) / 100.0f;
 			newCommand->houseTax = float(newHouseTax) / 100.0f;
 			newCommand->commandType = CityCommandType::CHANGE_TAX;
-			engine_->GetCommandManager().AddCommand(std::move(newCommand), true);
+			engine->GetCommandManager().AddCommand(std::move(newCommand), true);
 		}
 	}
 	ImGui::End();
 	inspectorValues_[frameIndex].clear();
 
-	ImGui::SFML::Render(*renderWindow_);
+	ImGui::SFML::Render(*renderWindow);
 }
 
 void CityEditor::Destroy()

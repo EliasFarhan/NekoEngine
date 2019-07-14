@@ -30,6 +30,11 @@
 #include "engine/entity.h"
 #include "engine/component.h"
 
+namespace neko
+{
+class Position2dManager;
+}
+
 namespace city
 {
 class TileMapGraph;
@@ -72,7 +77,7 @@ public:
 private:
 	std::vector<CityCar> cars_;
     neko::EntityManager* entityManagerPtr_ = nullptr;
-	OldTransform2dManager* transformManagerPtr_ = nullptr;
+    neko::Position2dManager* positionManager_ = nullptr;
 	TileMapGraph* roadGraphPtr_ = nullptr;
 	CityBuilderMap* cityMap_ = nullptr;
     neko::Timer spawningTimer = neko::Timer(1.0f, 1.0f);

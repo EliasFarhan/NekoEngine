@@ -82,8 +82,16 @@ public:
     std::unique_ptr<sf::RenderWindow> renderWindow = nullptr;
 	MouseManager& GetMouseManager();
     sf::Time clockDeltatime;
+
+    virtual void OnBeginContact(const neko::Collider* colliderA, const neko::Collider* colliderB)
+    {}
+
+    virtual void OnEndContact(const neko::Collider* colliderA, const neko::Collider* colliderB)
+    {}
+
+
     template <typename T = BasicEngine>
-    static T* GetInstance(){ return dynamic_cast<T>(instance_);};
+    static T* GetInstance(){ return dynamic_cast<T*>(instance_);};
 protected:
     static BasicEngine* instance_;
     sf::Clock engineClock_;

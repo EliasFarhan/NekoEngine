@@ -105,17 +105,17 @@ namespace city {
 	class BehaviorTreeDecorator : public BehaviorTreeNode
 	{
 	public:
-		BehaviorTreeDecorator(Index comp) : funcMap_(comp) {}
+		BehaviorTreeDecorator(neko::Index comp) : funcMap_(comp) {}
 		BehaviorTreeDecorator(
-			Index comp,
+                neko::Index comp,
 			std::shared_ptr<BehaviorTreeNode> child) :
 			funcMap_(comp),	child_(child) {}
 		BehaviorTreeDecorator(
-			Index comp,
+                neko::Index comp,
 			const std::vector<std::pair<std::string, std::string>>& il) :
 			BehaviorTreeNode(il), funcMap_(comp) {}
 		BehaviorTreeDecorator(
-			Index comp,
+                neko::Index comp,
 			std::shared_ptr<BehaviorTreeNode> child,
 			const std::vector<std::pair<std::string, std::string>>& il) :
 			BehaviorTreeNode(il), funcMap_(comp), child_(child) {}
@@ -252,9 +252,9 @@ namespace city {
 	class BehaviorTreeLeafCondition : public BehaviorTreeLeaf
 	{
 	public:
-		BehaviorTreeLeafCondition(Index comp) : funcMap_(comp) {}
+		BehaviorTreeLeafCondition(neko::Index comp) : funcMap_(comp) {}
 		BehaviorTreeLeafCondition(
-			Index comp,
+                neko::Index comp,
 			const std::vector<std::pair<std::string, std::string>>& ilVariables) :
 			BehaviorTreeLeaf(ilVariables),
 			funcMap_(comp) {}
@@ -299,9 +299,9 @@ namespace city {
 	class BehaviorTreeLeafMoveTo : public BehaviorTreeLeaf
 	{
 	public:
-		BehaviorTreeLeafMoveTo(Index comp) : funcMap_(comp) {}
+		BehaviorTreeLeafMoveTo(neko::Index comp) : funcMap_(comp) {}
 		BehaviorTreeLeafMoveTo(
-			Index comp,
+                neko::Index comp,
 			const std::vector<std::pair<std::string, std::string>>& ilVariables) :
 			BehaviorTreeLeaf(ilVariables), funcMap_(comp) {}
 
@@ -326,9 +326,9 @@ namespace city {
 	class BehaviorTreeLeafFunctional : public BehaviorTreeLeaf
 	{
 	public:
-		BehaviorTreeLeafFunctional(Index comp) : funcMap_(comp) {}
+		BehaviorTreeLeafFunctional(neko::Index comp) : funcMap_(comp) {}
 		BehaviorTreeLeafFunctional(
-			Index comp,
+                neko::Index comp,
 			const std::vector<std::pair<std::string, std::string>>& ilVariables) :
 			BehaviorTreeLeaf(ilVariables), funcMap_(comp) {}
 

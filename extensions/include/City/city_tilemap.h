@@ -26,19 +26,19 @@
 #include <array>
 #include <vector>
 #include <map>
-#include <MultiThreadEngine/graphics.h>
+#include <multi/graphics/graphics.h>
+#include <multi/graphics/tilemap.h>
 #include <graphics/tilemap.h>
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/View.hpp>
+#include <engine/transform.h>
 #include "SFML/Graphics/RectangleShape.hpp"
 
 namespace city
 {
 
-class TextureManager;
 class CityBuilderMap;
 class CityCarManager;
-class OldTransform2dManager;
 class CityBuildingManager;
 
 enum class CityTileType : neko::Index
@@ -152,12 +152,12 @@ struct CityBuilderTile
 class CityBuilderTilemap : public neko::Tilemap
 {
 public:
-	void Init(TextureManager& textureManager);
+	void Init(neko::TextureManager& textureManager);
 
 	void UpdateTilemap(const CityBuilderMap& cityBuilderMap, const CityCarManager& cityCarManager,
-                       const CityBuildingManager& buildingManager, const OldTransform2dManager& transformManager,
+                       const CityBuildingManager& buildingManager, const neko::Position2dManager& positionManager,
                        sf::View mainView, CityTilesheetType updatedCityTileType = CityTilesheetType::LENGTH);
-	void PushCommand(multi::GraphicsManager* graphicsManager) override;
+	void PushCommand(neko::GraphicsManager* graphicsManager) override;
 protected:
     /**
      *
@@ -181,7 +181,7 @@ protected:
 	 */
 	sf::FloatRect windowView_{};
 	sf::RectangleShape bgRect[2];
-	std::array<Tilesheet, size_t(CityTilesheetType::LENGTH)> tilesheets_;
+	std::array<multi::Tilesheet, size_t(CityTilesheetType::LENGTH)> tilesheets_;
 	std::array<sf::FloatRect, size_t(CarType::LENGTH)> textureRects_;
 	std::array<sf::Vector2f, size_t(CarType::LENGTH)> rectCenter_;
 	const std::string cityTextureName_ = "data/tilemap/CuteCityBuilder.png";

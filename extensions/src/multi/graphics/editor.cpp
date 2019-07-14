@@ -2,22 +2,22 @@
 // Created by efarhan on 13.07.19.
 //
 
-#include <MultiThreadEngine/editor.h>
-#include <MultiThreadEngine/engine.h>
+#include <multi/graphics/editor.h>
+#include <multi/engine/engine.h>
 #include <imgui.h>
 #include <imgui-SFML.h>
 
 namespace multi
 {
-void MultiEditor::Init()
+void Editor::Init()
 {
 
 }
 
-void MultiEditor::Update(float dt)
+void Editor::Update(float dt)
 {
     const auto* engine = neko::BasicEngine::GetInstance<MainEngine>();
-    const neko::Index frameIndex = (engine->frameIndex - 1) % 2; //Render frame is always the previous one
+    const neko::Index frameIndex = MainEngine::GetFrameIndex() % 2; //Render frame is always the previous one
     auto* renderWindow = engine->renderWindow.get();
     ImGui::SFML::Update(*renderWindow, engine->clockDeltatime);
 
@@ -33,14 +33,14 @@ void MultiEditor::Update(float dt)
     ImGui::SFML::Render(*renderWindow);
 }
 
-void MultiEditor::Destroy()
+void Editor::Destroy()
 {
 
 }
 
-void MultiEditor::AddInspectorInfo(const std::string_view name, const std::string_view value)
+void Editor::AddInspectorInfo(const std::string_view name, const std::string_view value)
 {
-    const neko::Index frameIndex = neko::BasicEngine::GetInstance<MainEngine>()->frameIndex % 2;
+    const neko::Index frameIndex = MainEngine::GetFrameIndex()  % 2;
     inspectorValues_[frameIndex].push_back(std::pair<std::string, std::string>(name, value));
 }
 }

@@ -24,7 +24,7 @@
  SOFTWARE.
  */
 
-#include <engine/editor.h>
+#include <multi/graphics/editor.h>
 #include "City/city_command.h"
 #include "engine/globals.h"
 
@@ -59,7 +59,7 @@ const static std::string buttonIconTexture[neko::Index(ButtonIconType::LENGTH)] 
 	"data/sprites/icons/link-company-parent.png"
 };
 
-class CityEditor : public neko::Editor
+class CityEditor : public multi::Editor
 {
 public:
 	void Init() override;

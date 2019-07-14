@@ -29,12 +29,12 @@ namespace city {
 
 	std::map<
 		std::string, 
-		std::function<bool(Index, const std::vector<double>&)>>
+		std::function<bool(neko::Index, const std::vector<double>&)>>
 		FunctionMap::staticNameFunctionMap_;
 
 	void FunctionMap::SetFunction(
 		const std::string_view name,
-		std::function<bool(Index, const std::vector<double>&)> func)
+		std::function<bool(neko::Index, const std::vector<double>&)> func)
 	{
 		staticNameFunctionMap_.insert(std::make_pair(std::string(name), func));
 	}

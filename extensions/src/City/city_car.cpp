@@ -35,7 +35,7 @@ void CityCarManager::Init()
 {
 	auto* engine = neko::BasicEngine::GetInstance<CityBuilderEngine>();
 	entityManagerPtr_ = &engine->GetEntityManager();
-	transformManagerPtr_ = &engine->GetTransformManager();
+	positionManager_ = &engine->GetPositionManager();
 
 	cityMap_ = &engine->GetCityMap();
 	roadGraphPtr_ = &cityMap_->GetRoadGraph();
@@ -143,8 +143,8 @@ neko::Entity CityCarManager::SpawnCar(sf::Vector2i position, CarType carType)
 	auto& car = cars_[newCarEntity];
 	car.entity = newCarEntity;
 	const auto tileSize = cityMap_->city.tileSize;
-	transformManagerPtr_->AddPosition(sf::Vector2f(car.position.x * float(tileSize.x), car.position.y * float(tileSize.y)), newCarEntity);
-	entityManagerPtr_->AddComponentType(newCarEntity, neko::EntityMask(CityComponentType::TRANSFORM));
+	positionManager_->AddComponent(*entityManagerPtr_, newCarEntity);
+	positionManager_->SetComponent(newCarEntity, sf::Vector2f(car.position.x * float(tileSize.x), car.position.y * float(tileSize.y)));
 	return newCarEntity;
 }
 

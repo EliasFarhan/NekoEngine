@@ -39,12 +39,12 @@ const static sf::Color cursorColor[size_t(ButtonIconType::LENGTH)] =
 
 void CityCursor::Init()
 {
-	engine_ = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+	engine_ = neko::BasicEngine::GetInstance<CityBuilderEngine>();
 }
 
 void CityCursor::Update(float dt)
 {
-	const Index frameIndex = MainEngine::GetInstance()->frameIndex % 2;
+	const neko::Index frameIndex = multi::MainEngine::GetFrameIndex() % 2;
 
 	const auto tileSize = sf::Vector2f(engine_->GetCityMap().city.tileSize);
 	auto& rect = cursorRect_[frameIndex];
@@ -55,7 +55,7 @@ void CityCursor::Update(float dt)
 	{
 	case ButtonIconType::ROAD:
 	{
-		if (originPos_ == INVALID_TILE_POS)
+		if (originPos_ == neko::INVALID_TILE_POS)
 		{
 			rect.setSize(sf::Vector2f(tileSize));
 		}
@@ -101,14 +101,14 @@ void CityCursor::Update(float dt)
 			}
 		}
 
-		rect.setFillColor(cursorColor[Index(cursorMode_)]);
+		rect.setFillColor(cursorColor[neko::Index(cursorMode_)]);
 		break;
 	}
 	case ButtonIconType::BULLDOZER:
 	case ButtonIconType::RESIDENTIAL:
 	case ButtonIconType::COMMERCIAL:
 	{
-		if (originPos_ == INVALID_TILE_POS)
+		if (originPos_ == neko::INVALID_TILE_POS)
 		{
 			rect.setSize(sf::Vector2f(tileSize.x, tileSize.y));
 		}
@@ -133,7 +133,7 @@ void CityCursor::Update(float dt)
 			}
 
 		}
-		rect.setFillColor(cursorColor[Index(cursorMode_)]);
+		rect.setFillColor(cursorColor[neko::Index(cursorMode_)]);
 		break;
 	}
 	default:
@@ -141,7 +141,7 @@ void CityCursor::Update(float dt)
 		break;
 	}
 
-	MainEngine::GetInstance()->GetGraphicsManager()->Draw(rect);
+	neko::BasicEngine::GetInstance<CityBuilderEngine>()->GetGraphicsManager()->Draw(rect);
 }
 
 void CityCursor::Destroy()
@@ -158,7 +158,7 @@ void CityCursor::OnEvent(sf::Event& event)
 			originPos_ = GetMouseTilePos();
 			break;
 		case sf::Mouse::Right:
-			originPos_ = INVALID_TILE_POS;
+			originPos_ = neko::INVALID_TILE_POS;
 			break;
 		default:
 			break;
@@ -173,16 +173,16 @@ void CityCursor::OnEvent(sf::Event& event)
 		case ButtonIconType::ROAD:
 		{
 			auto& cityMap = engine_->GetCityMap();
-			if (originPos_ == INVALID_TILE_POS) break;
+			if (originPos_ == neko::INVALID_TILE_POS) break;
 			if (originPos_.x < 0 || originPos_.y < 0 || originPos_.x >= int(cityMap.city.mapSize.x) || originPos_.y >= int(cityMap.city.mapSize.y))
 			{
-				originPos_ = INVALID_TILE_POS;
+				originPos_ = neko::INVALID_TILE_POS;
 				return;
 			}
 			const auto currentPos = GetMouseTilePos();
 			if (currentPos.x < 0 || currentPos.y < 0 || currentPos.x >= int(cityMap.city.mapSize.x) || currentPos.y >= int(cityMap.city.mapSize.y))
 			{
-				originPos_ = INVALID_TILE_POS;
+				originPos_ = neko::INVALID_TILE_POS;
 				return;
 			}
 			const auto deltaPos = currentPos - originPos_;
@@ -206,7 +206,7 @@ void CityCursor::OnEvent(sf::Event& event)
 				command->position = originPos_ + direction * i;
 				engine_->GetCommandManager().AddCommand(std::move(command));
 			}
-			originPos_ = INVALID_TILE_POS;
+			originPos_ = neko::INVALID_TILE_POS;
 
 
 			break;
@@ -216,16 +216,16 @@ void CityCursor::OnEvent(sf::Event& event)
 		case ButtonIconType::COMMERCIAL:
 		{
 			auto& cityMap = engine_->GetCityMap();
-			if (originPos_ == INVALID_TILE_POS) break;
+			if (originPos_ == neko::INVALID_TILE_POS) break;
 			if (originPos_.x < 0 || originPos_.y < 0 || originPos_.x >= int(cityMap.city.mapSize.x) || originPos_.y >= int(cityMap.city.mapSize.y))
 			{
-				originPos_ = INVALID_TILE_POS;
+				originPos_ = neko::INVALID_TILE_POS;
 				return;
 			}
 			const auto currentPos = GetMouseTilePos();
 			if (currentPos.x < 0 || currentPos.y < 0 || currentPos.x >= int(cityMap.city.mapSize.x) || currentPos.y >= int(cityMap.city.mapSize.y))
 			{
-				originPos_ = INVALID_TILE_POS;
+				originPos_ = neko::INVALID_TILE_POS;
 				return; 
 			}
 			const auto deltaPos = currentPos - originPos_;
@@ -269,7 +269,7 @@ void CityCursor::OnEvent(sf::Event& event)
 					}
 				}
 			}
-			originPos_ = INVALID_TILE_POS;
+			originPos_ = neko::INVALID_TILE_POS;
 			break;
 		}
 		default:
@@ -280,7 +280,7 @@ void CityCursor::OnEvent(sf::Event& event)
 
 void CityCursor::SetCursorMode(ButtonIconType cursorMode)
 {
-	originPos_ = INVALID_TILE_POS;
+	originPos_ = neko::INVALID_TILE_POS;
 	this->cursorMode_ = cursorMode;
 	
 }

@@ -25,27 +25,20 @@ public:
      */
     void EngineLoop() override;
 
-    virtual void OnBeginContact(const neko::Collider* colliderA, const neko::Collider* colliderB)
-    {}
-
-    virtual void OnEndContact(const neko::Collider* colliderA, const neko::Collider* colliderB)
-    {}
-
+    static const neko::Index GetFrameIndex() { return neko::BasicEngine::GetInstance<MainEngine>()->frameIndex;};
     GraphicsManager* GetGraphicsManager() const;
-
-
-
     sf::Vector2u renderTargetSize;
 
     //used to sync with the render thread
     std::condition_variable condSyncRender;
     std::mutex renderStartMutex;
 
-    std::atomic<neko::Index> frameIndex = 0u;
 protected:
+
+    std::atomic<neko::Index> frameIndex = 0u;
     ctpl::thread_pool workingThreadPool_;
     std::thread renderThread_;
-    std::unique_ptr<GraphicsManager> graphicsManager_ = nullptr;
+    std::unique_ptr<GraphicsManager> graphicsManager_;
 };
 
 }

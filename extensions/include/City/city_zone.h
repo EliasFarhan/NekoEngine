@@ -30,6 +30,12 @@
 #include <City/city_command.h>
 #include <City/city_graph.h>
 
+namespace neko
+{
+class GraphicsManager;
+}
+
+
 namespace city
 {
 class CityBuilderMap;
@@ -71,7 +77,7 @@ public:
     void
     UpdateZoneTilemap(const CityBuilderMap& cityMap, CityBuildingManager& cityBuildingMap, sf::View mainView);
 
-    void PushCommand(multi::GraphicsManager* graphicsManager);
+    void PushCommand(neko::GraphicsManager* graphicsManager);
 
     void AddZone(sf::Vector2i position, ZoneType zoneType, CityBuilderMap& cityMap);
 

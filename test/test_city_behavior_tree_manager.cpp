@@ -101,7 +101,7 @@ protected:
 	}
 
 	json jsonBehaviorTree_;
-	neko::BehaviorTreeManager behaviorTreeManager_;
+	city::BehaviorTreeManager behaviorTreeManager_;
 };
 
 TEST_F(BehaviorTreeManagerTest, IsInitFromJsonWorking) 
@@ -121,79 +121,79 @@ TEST_F(BehaviorTreeManagerTest, IsBehaviorTreeCorrect)
 			jsonBehaviorTree_);
 	EXPECT_TRUE(behaviorTreeNodePtr_);
 	{	// Base selector
-		std::shared_ptr<neko::BehaviorTreeCompositeSelector> selector =
-			std::dynamic_pointer_cast<neko::BehaviorTreeCompositeSelector>(
+		std::shared_ptr<city::BehaviorTreeCompositeSelector> selector =
+			std::dynamic_pointer_cast<city::BehaviorTreeCompositeSelector>(
 				behaviorTreeNodePtr_);
 		ASSERT_TRUE(selector);
-		const std::vector<std::shared_ptr<neko::BehaviorTreeNode>>& 
+		const std::vector<std::shared_ptr<city::BehaviorTreeNode>>& 
 			selector_children =
 			selector->GetChildrenList();
 		EXPECT_EQ(selector_children.size(), 2);
 		{	// First sequence
-			std::shared_ptr<neko::BehaviorTreeCompositeSequence> sequence =
-				std::dynamic_pointer_cast<neko::BehaviorTreeCompositeSequence>(
+			std::shared_ptr<city::BehaviorTreeCompositeSequence> sequence =
+				std::dynamic_pointer_cast<city::BehaviorTreeCompositeSequence>(
 					selector_children[0]);
 			ASSERT_TRUE(sequence);
-			const std::vector<std::shared_ptr<neko::BehaviorTreeNode>>& 
+			const std::vector<std::shared_ptr<city::BehaviorTreeNode>>& 
 				sequence_children =
 				sequence->GetChildrenList();
 			EXPECT_EQ(sequence_children.size(), 3);
 			{
-				std::shared_ptr<neko::BehaviorTreeLeafCondition> condition =
-					std::dynamic_pointer_cast<neko::BehaviorTreeLeafCondition>(
+				std::shared_ptr<city::BehaviorTreeLeafCondition> condition =
+					std::dynamic_pointer_cast<city::BehaviorTreeLeafCondition>(
 						sequence_children[0]);
 				ASSERT_TRUE(condition);
 				EXPECT_EQ(
 					condition->GetVariable("condition"), "EnergyLevel(0.3)");
 			}
 			{
-				std::shared_ptr<neko::BehaviorTreeLeafMoveTo> move_to =
-					std::dynamic_pointer_cast<neko::BehaviorTreeLeafMoveTo>(
+				std::shared_ptr<city::BehaviorTreeLeafMoveTo> move_to =
+					std::dynamic_pointer_cast<city::BehaviorTreeLeafMoveTo>(
 						sequence_children[1]);
 				ASSERT_TRUE(move_to);
 				EXPECT_EQ(move_to->GetVariable("to"), "MoveTo(12, 34)");
 			}
 			{
-				std::shared_ptr<neko::BehaviorTreeLeafWait> leaf_wait =
-					std::dynamic_pointer_cast<neko::BehaviorTreeLeafWait>(
+				std::shared_ptr<city::BehaviorTreeLeafWait> leaf_wait =
+					std::dynamic_pointer_cast<city::BehaviorTreeLeafWait>(
 						sequence_children[2]);
 				ASSERT_TRUE(leaf_wait);
 				EXPECT_EQ(leaf_wait->GetVariable("delay"), "2.0");
 			}
 		}
 		{	// Second sequence
-			std::shared_ptr<neko::BehaviorTreeCompositeSequence> sequence =
-				std::dynamic_pointer_cast<neko::BehaviorTreeCompositeSequence>(
+			std::shared_ptr<city::BehaviorTreeCompositeSequence> sequence =
+				std::dynamic_pointer_cast<city::BehaviorTreeCompositeSequence>(
 					selector_children[1]);
 			ASSERT_TRUE(sequence);
-			const std::vector<std::shared_ptr<neko::BehaviorTreeNode>>& 
+			const std::vector<std::shared_ptr<city::BehaviorTreeNode>>& 
 				sequence_children =
 				sequence->GetChildrenList();
 			EXPECT_EQ(sequence_children.size(), 4);
 			{
-				std::shared_ptr<neko::BehaviorTreeLeafMoveTo> move_to =
-					std::dynamic_pointer_cast<neko::BehaviorTreeLeafMoveTo>(
+				std::shared_ptr<city::BehaviorTreeLeafMoveTo> move_to =
+					std::dynamic_pointer_cast<city::BehaviorTreeLeafMoveTo>(
 						sequence_children[0]);
 				ASSERT_TRUE(move_to);
 				EXPECT_EQ(move_to->GetVariable("to"), "MoveTo(12, 34)");
 			}
 			{
-				std::shared_ptr<neko::BehaviorTreeLeafWait> leaf_wait =
-					std::dynamic_pointer_cast<neko::BehaviorTreeLeafWait>(
+				std::shared_ptr<city::BehaviorTreeLeafWait> leaf_wait =
+					std::dynamic_pointer_cast<city::BehaviorTreeLeafWait>(
 						sequence_children[1]);
 				ASSERT_TRUE(leaf_wait);
 				EXPECT_EQ(leaf_wait->GetVariable("delay"), "1.0");
 			}
 			{
-				std::shared_ptr<neko::BehaviorTreeLeafMoveTo> move_to =
-					std::dynamic_pointer_cast<neko::BehaviorTreeLeafMoveTo>(
+				std::shared_ptr<city::BehaviorTreeLeafMoveTo> move_to =
+					std::dynamic_pointer_cast<city::BehaviorTreeLeafMoveTo>(
 						sequence_children[2]);
 				ASSERT_TRUE(move_to);
 				EXPECT_EQ(move_to->GetVariable("to"), "MoveTo(12, 34)");
 			}
 			{
-				std::shared_ptr<neko::BehaviorTreeLeafWait> leaf_wait =
-					std::dynamic_pointer_cast<neko::BehaviorTreeLeafWait>(
+				std::shared_ptr<city::BehaviorTreeLeafWait> leaf_wait =
+					std::dynamic_pointer_cast<city::BehaviorTreeLeafWait>(
 						sequence_children[3]);
 				ASSERT_TRUE(leaf_wait);
 				EXPECT_EQ(leaf_wait->GetVariable("delay"), "1.0");
@@ -209,7 +209,7 @@ TEST_F(BehaviorTreeManagerTest, IsBehaviorTreeExecuteCorrect)
 			comp,
 			jsonBehaviorTree_);
 	EXPECT_TRUE(id != neko::INVALID_INDEX);
-	neko::FunctionMap funcMap(comp);
+	city::FunctionMap funcMap(comp);
 	funcMap.SetFunction(
 		"EnergyLevel", 
 		[](neko::Index comp, const std::vector<double>& values)
@@ -231,34 +231,34 @@ TEST_F(BehaviorTreeManagerTest, IsBehaviorTreeExecuteCorrect)
 	// Failure to the condition
 	EXPECT_EQ(
 		behaviorTreeManager_.ExecuteIndex(id), 
-		neko::BehaviorTreeFlow::FAILURE);
+		city::BehaviorTreeFlow::FAILURE);
 	// Move to a
 	EXPECT_EQ(
 		behaviorTreeManager_.ExecuteIndex(id), 
-		neko::BehaviorTreeFlow::SUCCESS);
+		city::BehaviorTreeFlow::SUCCESS);
 	// Wait at a
-	neko::BehaviorTreeFlow status;
+	city::BehaviorTreeFlow status;
 	do 
 	{
 		status = behaviorTreeManager_.ExecuteIndex(id);
-		if (status != neko::BehaviorTreeFlow::SUCCESS)
+		if (status != city::BehaviorTreeFlow::SUCCESS)
 		{
-			EXPECT_EQ(status, neko::BehaviorTreeFlow::RUNNING);
+			EXPECT_EQ(status, city::BehaviorTreeFlow::RUNNING);
 		}
 	} 
-	while (status != neko::BehaviorTreeFlow::SUCCESS);
+	while (status != city::BehaviorTreeFlow::SUCCESS);
 	// Move to b
 	EXPECT_EQ(
 		behaviorTreeManager_.ExecuteIndex(id), 
-		neko::BehaviorTreeFlow::SUCCESS);
+		city::BehaviorTreeFlow::SUCCESS);
 	// Wait at b
 	do 
 	{
 		status = behaviorTreeManager_.ExecuteIndex(id);
-		if (status != neko::BehaviorTreeFlow::SUCCESS)
+		if (status != city::BehaviorTreeFlow::SUCCESS)
 		{
-			EXPECT_EQ(status, neko::BehaviorTreeFlow::RUNNING);
+			EXPECT_EQ(status, city::BehaviorTreeFlow::RUNNING);
 		}
 	} 
-	while (status != neko::BehaviorTreeFlow::SUCCESS);
+	while (status != city::BehaviorTreeFlow::SUCCESS);
 }

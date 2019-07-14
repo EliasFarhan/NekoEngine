@@ -34,17 +34,7 @@
 namespace neko
 {
 class GraphicsManager;
-/**
- * \brief simple abstraction for one tilesheet with a tilemap texture with a double buffered vertex array
- */
-struct Tilesheet
-{
-	std::shared_ptr<sf::Texture> texture = nullptr;
-	/**
-	 * \brief vertex array with 2 vectors for double buffering with the render thread
-	 */
-	sf::VertexArray tilemap[2];
-};
+
 
 class Tilemap
 {
@@ -52,28 +42,4 @@ public:
     virtual void PushCommand(GraphicsManager* graphicsManager) = 0;
 };
 
-/**
- * \brief Abstraction of Tiled (https://www.mapeditor.org/) tilesheets
- */
-struct Tiledsheet : public Tilesheet
-{
-	sf::Vector2u tileSize;
-	sf::Vector2u size;
-	unsigned firstId;
-	unsigned tileNmb;
-};
-
-/*
-* Abstraction of Tiled tilemap with different tilesheets with their own vertex arrays
-*/
-class TiledMap : public Tilemap
-{
-public:
-    void
-    Init(const std::string& tilemapPath, TextureManager& textureManager, Physics2dManager* physics2DManager = nullptr);
-	void PushCommand(GraphicsManager* graphicsManager) override;
-protected:
-	std::vector<Tiledsheet> tileSheets_;
-
-};
 }

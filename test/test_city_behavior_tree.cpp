@@ -27,7 +27,7 @@
 #include <engine/log.h>
 #include <City/city_behavior_tree.h>
 
-class BehaviorTreeTest : public ::testing::Test, public neko::BasicEngine 
+class BehaviorTreeTest : public ::testing::Test, public neko::BasicEngine
 {
 protected:
 	void SetUp() override 
@@ -50,15 +50,15 @@ protected:
 		{"functional", "functional(0.0, 1.0, 2.0, 3.0)"},
 	};
 	const neko::Index comp_ = 0xbeef;
-	neko::FunctionMap funcMap_ = neko::FunctionMap(comp_);
+	city::FunctionMap funcMap_ = city::FunctionMap(comp_);
 };
 
 TEST_F(BehaviorTreeTest, CompositeConstructorTest)
 {
-	neko::BehaviorTreeComposite composite;
+    city::BehaviorTreeComposite composite;
 	EXPECT_EQ(
-		composite.GetType(), 
-		neko::BehaviorTreeObjectType::INTERFACE_COMPOSITE);
+		composite.GetType(),
+        city::BehaviorTreeObjectType::INTERFACE_COMPOSITE);
 	EXPECT_EQ(composite.GetVariable("name"), "<null>");
 }
 
@@ -73,7 +73,7 @@ TEST_F(BehaviorTreeTest, DecoratorConstructorTest)
 		EXPECT_EQ(values.size(), 1);
 		// Basically return what was send.
 		if (values[0] ==
-			static_cast<double>(neko::BehaviorTreeFlow::SUCCESS))
+			static_cast<double>(city::BehaviorTreeFlow::SUCCESS))
 		{
 			return true;
 		}
@@ -88,24 +88,24 @@ TEST_F(BehaviorTreeTest, DecoratorConstructorTest)
 		EXPECT_EQ(values.size(), 1);
 		return true;
 	});
-	neko::BehaviorTreeDecorator decorator(
+	city::BehaviorTreeDecorator decorator(
 		comp_, 
-		std::make_shared<neko::BehaviorTreeLeafCondition>(
-			neko::BehaviorTreeLeafCondition(comp_, ilVariables_)),
+		std::make_shared<city::BehaviorTreeLeafCondition>(
+			city::BehaviorTreeLeafCondition(comp_, ilVariables_)),
 		ilVariables_);
 	EXPECT_EQ(
 		decorator.GetType(), 
-		neko::BehaviorTreeObjectType::INTERFACE_DECORATOR);
+		city::BehaviorTreeObjectType::INTERFACE_DECORATOR);
 	EXPECT_EQ(decorator.GetVariable("name"), "test");
-	EXPECT_EQ(decorator.Execute(), neko::BehaviorTreeFlow::SUCCESS);
+	EXPECT_EQ(decorator.Execute(), city::BehaviorTreeFlow::SUCCESS);
 }
 
 TEST_F(BehaviorTreeTest, LeafConstructorTest)
 {
-	neko::BehaviorTreeLeaf leaf;
+	city::BehaviorTreeLeaf leaf;
 	EXPECT_EQ(
 		leaf.GetType(), 
-		neko::BehaviorTreeObjectType::INTERFACE_LEAF);
+		city::BehaviorTreeObjectType::INTERFACE_LEAF);
 }
 
 TEST_F(BehaviorTreeTest, ConditionConstructorTest)
@@ -118,11 +118,11 @@ TEST_F(BehaviorTreeTest, ConditionConstructorTest)
 		EXPECT_EQ(values.size(), 1);
 		return true;
 	});
-	neko::BehaviorTreeLeafCondition condition(comp_, ilVariables_);
+	city::BehaviorTreeLeafCondition condition(comp_, ilVariables_);
 	EXPECT_EQ(
 		condition.GetType(), 
-		neko::BehaviorTreeObjectType::LEAF_CONDITION);
-	EXPECT_EQ(condition.Execute(), neko::BehaviorTreeFlow::SUCCESS);
+		city::BehaviorTreeObjectType::LEAF_CONDITION);
+	EXPECT_EQ(condition.Execute(), city::BehaviorTreeFlow::SUCCESS);
 }
 
 TEST_F(BehaviorTreeTest, MoveToConstructorTest)
@@ -137,11 +137,11 @@ TEST_F(BehaviorTreeTest, MoveToConstructorTest)
 		EXPECT_EQ(values[1], 2.0);
 		return true;
 	});
-	neko::BehaviorTreeLeafMoveTo moveTo(comp_, ilVariables_);
+	city::BehaviorTreeLeafMoveTo moveTo(comp_, ilVariables_);
 	EXPECT_EQ(
 		moveTo.GetType(), 
-		neko::BehaviorTreeObjectType::LEAF_MOVE_TO);
-	EXPECT_EQ(moveTo.Execute(), neko::BehaviorTreeFlow::SUCCESS);
+		city::BehaviorTreeObjectType::LEAF_MOVE_TO);
+	EXPECT_EQ(moveTo.Execute(), city::BehaviorTreeFlow::SUCCESS);
 }
 
 TEST_F(BehaviorTreeTest, FunctionalConstructorTest)
@@ -158,30 +158,30 @@ TEST_F(BehaviorTreeTest, FunctionalConstructorTest)
 		EXPECT_EQ(values[3], 3.0);
 		return true;
 	});
-	neko::BehaviorTreeLeafFunctional functional(comp_, ilVariables_);
+	city::BehaviorTreeLeafFunctional functional(comp_, ilVariables_);
 	EXPECT_EQ(
 		functional.GetType(),
-		neko::BehaviorTreeObjectType::LEAF_FUNCTIONAL);
-	EXPECT_EQ(functional.Execute(), neko::BehaviorTreeFlow::SUCCESS);
+		city::BehaviorTreeObjectType::LEAF_FUNCTIONAL);
+	EXPECT_EQ(functional.Execute(), city::BehaviorTreeFlow::SUCCESS);
 }
 
 TEST_F(BehaviorTreeTest, WaitConstructorTest)
 {
-	neko::BehaviorTreeLeafWait wait(ilVariables_);
+	city::BehaviorTreeLeafWait wait(ilVariables_);
 	EXPECT_EQ(
 		wait.GetType(), 
-		neko::BehaviorTreeObjectType::LEAF_WAIT);
+		city::BehaviorTreeObjectType::LEAF_WAIT);
 	const auto now = std::chrono::system_clock::now();
-	neko::BehaviorTreeFlow status;
+	city::BehaviorTreeFlow status;
 	do 
 	{
 		status = wait.Execute();
-		if (status != neko::BehaviorTreeFlow::SUCCESS) 
+		if (status != city::BehaviorTreeFlow::SUCCESS) 
 		{
-			EXPECT_EQ(status, neko::BehaviorTreeFlow::RUNNING);
+			EXPECT_EQ(status, city::BehaviorTreeFlow::RUNNING);
 		}
 	} 
-	while (status != neko::BehaviorTreeFlow::SUCCESS);
+	while (status != city::BehaviorTreeFlow::SUCCESS);
 	const auto msdt = 
 		std::chrono::duration_cast<std::chrono::milliseconds>(
 			std::chrono::system_clock::now() - now);
@@ -192,33 +192,33 @@ TEST_F(BehaviorTreeTest, WaitConstructorTest)
 
 TEST_F(BehaviorTreeTest, SelectorConstructorTest)
 {
-	neko::BehaviorTreeCompositeSelector selector(
-		std::vector<std::shared_ptr<neko::BehaviorTreeNode>>{
-			std::make_shared<neko::BehaviorTreeLeafCondition>(
-				neko::BehaviorTreeLeafCondition(comp_, ilVariables_)),
-			std::make_shared<neko::BehaviorTreeLeafCondition>(
-				neko::BehaviorTreeLeafCondition(comp_))},
+	city::BehaviorTreeCompositeSelector selector(
+		std::vector<std::shared_ptr<city::BehaviorTreeNode>>{
+			std::make_shared<city::BehaviorTreeLeafCondition>(
+				city::BehaviorTreeLeafCondition(comp_, ilVariables_)),
+			std::make_shared<city::BehaviorTreeLeafCondition>(
+				city::BehaviorTreeLeafCondition(comp_))},
 		ilVariables_);
 	EXPECT_EQ(
 		selector.GetType(), 
-		neko::BehaviorTreeObjectType::COMPOSITE_SELECTOR);
-	EXPECT_EQ(selector.Execute(), neko::BehaviorTreeFlow::SUCCESS);
+		city::BehaviorTreeObjectType::COMPOSITE_SELECTOR);
+	EXPECT_EQ(selector.Execute(), city::BehaviorTreeFlow::SUCCESS);
 	// Should stick in the success.
-	EXPECT_EQ(selector.Execute(), neko::BehaviorTreeFlow::SUCCESS);
+	EXPECT_EQ(selector.Execute(), city::BehaviorTreeFlow::SUCCESS);
 }
 
 TEST_F(BehaviorTreeTest, SequenceConstructorTest)
 {
-	neko::BehaviorTreeCompositeSequence sequence(
-		std::vector<std::shared_ptr<neko::BehaviorTreeNode>>{
-			std::make_shared<neko::BehaviorTreeLeafCondition>(
-				neko::BehaviorTreeLeafCondition(comp_, ilVariables_)),
-			std::make_shared<neko::BehaviorTreeLeafCondition>(
-				neko::BehaviorTreeLeafCondition(comp_))},
+	city::BehaviorTreeCompositeSequence sequence(
+		std::vector<std::shared_ptr<city::BehaviorTreeNode>>{
+			std::make_shared<city::BehaviorTreeLeafCondition>(
+				city::BehaviorTreeLeafCondition(comp_, ilVariables_)),
+			std::make_shared<city::BehaviorTreeLeafCondition>(
+				city::BehaviorTreeLeafCondition(comp_))},
 		ilVariables_);
 	EXPECT_EQ(
 		sequence.GetType(), 
-		neko::BehaviorTreeObjectType::COMPOSITE_SEQUENCE);
-	EXPECT_EQ(sequence.Execute(), neko::BehaviorTreeFlow::SUCCESS);
-	EXPECT_EQ(sequence.Execute(), neko::BehaviorTreeFlow::FAILURE);
+		city::BehaviorTreeObjectType::COMPOSITE_SEQUENCE);
+	EXPECT_EQ(sequence.Execute(), city::BehaviorTreeFlow::SUCCESS);
+	EXPECT_EQ(sequence.Execute(), city::BehaviorTreeFlow::FAILURE);
 }

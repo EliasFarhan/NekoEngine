@@ -34,6 +34,10 @@
 #include "engine/input.h"
 #include <engine/log.h>
 #include <SFML/Window/Event.hpp>
+#include <multi/engine/engine.h>
+#include <multi/graphics/graphics.h>
+#include <multi/graphics/sprite.h>
+#include <multi/graphics/shape.h>
 
 struct PlayerData
 {
@@ -42,7 +46,7 @@ struct PlayerData
 	b2Body* playerBody = nullptr;
 };
 
-class PlatformerEngine : public neko::MainEngine
+class PlatformerEngine : public multi::MainEngine
 {
 public:
 	void Init() override
@@ -51,12 +55,11 @@ public:
 		MainEngine::Init();
 		physicsManager.Init();
 		{
-			playerData.playerEntity = 1;
+			playerData.playerEntity = entityManager.CreateEntity();
 			const auto playerPos = sf::Vector2f(200, 200);
 			
-			transformManager.AddPosition(playerPos);
-			transformManager.AddScale(sf::Vector2f(1,1));
-			transformManager.AddAngle(0.0f);
+			positionManager.AddComponent(entityManager, playerData.playerEntity);
+			positionManager.SetComponent(playerData.playerEntity, playerPos);
 
 			const neko::Index textureIndex = textureManager.LoadTexture("data/sprites/hero/jump/hero1.png");
 			std::shared_ptr<sf::Texture> texture = textureManager.GetTexture(textureIndex);
@@ -127,9 +130,9 @@ public:
 
 			for (auto i = 0u ; i < platformsNmb;i++)
 			{
-				transformManager.AddPosition(platformPositions[i]);
-				transformManager.AddScale(sf::Vector2f(1, 1));
-				transformManager.AddAngle(0.0f);
+			    const auto platformEntity = entityManager.CreateEntity();
+			    positionManager.AddComponent(entityManager, platformEntity);
+			    positionManager.SetComponent(platformEntity, platformPositions[i]);
 
 				const auto physicsSize = neko::pixel2meter(sf::Vector2f(platformTexture->getSize()));
 				b2BodyDef bodyDef;
@@ -198,26 +201,26 @@ public:
  				playerData.playerBody->SetLinearVelocity(b2Vec2(move*moveVelocity, playerVelocity.y));
 			}
 
-			transformManager.CopyPositionsFromPhysics2d(physicsManager, 0, 1);
-			spriteManager.CopyTransformPosition(transformManager, 0,1);
+			positionManager.CopyPositionsFromPhysics2d(entityManager, physicsManager);
+			spriteManager.CopyTransformPosition(positionManager, 0,1);
 			spriteManager.PushCommands(graphicsManager_.get(), 0,1);
 		}
 
 
 		{
-			spriteManager.CopyTransformPosition(transformManager, 1, platformsNmb);
+			spriteManager.CopyTransformPosition(positionManager, 1, platformsNmb);
 			spriteManager.PushCommands(graphicsManager_.get(), 1,platformsNmb);
 		}
 #ifdef __neko_dbg__
         {
 
             //Main playerbox
-            shapeManager.CopyTransformPosition(transformManager, 0, 1);
+            shapeManager.CopyTransformPosition(positionManager, 0, 1);
             shapeManager.PushCommands(graphicsManager_.get(), 0, 1+platformsNmb);
         }
         {
             std::ostringstream oss;
-            auto pos = transformManager.GetPosition(playerData.playerEntity);
+            auto pos = transformManager.GetComponent(playerData.playerEntity);
             oss << "("<<pos.x<<", "<<pos.y<<")";
             graphicsManager_->editor->AddInspectorInfo("PlayerPos", oss.str());
         }
@@ -263,11 +266,14 @@ public:
 
 protected:
 	neko::Timer physicsTimer{0.0f,0.0f};
-	neko::MultiThreadSpriteManager spriteManager;
+	neko::EntityManager entityManager;
+	multi::SpriteManager spriteManager;
 	neko::TextureManager textureManager;
-	neko::OldTransform2dManager transformManager;
+	neko::Position2dManager positionManager;
+	neko::Scale2dManager transformManager;
+	neko::Angle2dManager angleManager;
 	neko::Physics2dManager physicsManager;
-    neko::ShapeManager shapeManager;
+    multi::ShapeManager shapeManager;
 	PlayerData playerData = {};
 	static const size_t platformsNmb = 3;
 	const float jumpVelocity = 4.0f;

@@ -32,4 +32,33 @@
 namespace neko
 {
 
+Index BasicSpriteManager::AddSprite(const std::shared_ptr<sf::Texture> texture)
+{
+    return 0;
+}
+
+sf::Sprite* BasicSpriteManager::GetSpriteAt(unsigned int spriteIndex)
+{
+    return nullptr;
+}
+
+void BasicSpriteManager::CopyTransformPosition(Position2dManager& transformManager, size_t start, size_t length)
+{
+
+}
+
+void BasicSpriteManager::CopyTransformScales(Scale2dManager& transformManager, size_t start, size_t length)
+{
+
+}
+
+void BasicSpriteManager::CopyTransformAngles(Angle2dManager& transformManager, size_t start, size_t length)
+{
+
+}
+
+void BasicSpriteManager::PushCommands(neko::GraphicsManager* graphicsManager, size_t start, size_t length)
+{
+
+}
 }

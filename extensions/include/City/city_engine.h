@@ -41,7 +41,7 @@
 #include "city_behavior_tree_manager.h"
 #include "city_person.h"
 
-#include <MultiThreadEngine/engine.h>
+#include <multi/engine/engine.h>
 namespace city
 {
 
@@ -82,7 +82,7 @@ public:
 
     neko::EntityManager& GetEntityManager();
 
-    neko::OldTransform2dManager& GetTransformManager();
+    neko::Position2dManager& GetPositionManager();
 
     CityCarManager& GetCarManager();
 
@@ -103,7 +103,7 @@ private:
 
     tf::Executor executor_{std::thread::hardware_concurrency() - 2};
     neko::EntityManager entityManager_;
-    neko::OldTransform2dManager transformManager_;
+    neko::Position2dManager positionManager_;
     neko::TextureManager textureManager_;
 
 	CityPeopleManager cityPeopleManager_;

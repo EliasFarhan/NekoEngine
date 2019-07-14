@@ -48,14 +48,14 @@ void CityBuilderEngine::Init()
 	cityCarManager_.Init();
 
 	cityPeopleManager_.Init();
-	musicInd_ = Sound::LoadMusic("data/Meydn01.ogg");
-	if (!Sound::PlayMusic(musicInd_))
+	musicInd_ = neko::Sound::LoadMusic("data/Meydn01.ogg");
+	if (!neko::Sound::PlayMusic(musicInd_))
 	{
 		logDebug("Could not load music...");
 	}
 	else
 	{
-		Sound::SetLoop(musicInd_, true);
+        neko::Sound::SetLoop(musicInd_, true);
 	}
 }
 
@@ -72,7 +72,7 @@ void CityBuilderEngine::Update(float dt)
 	});
 	auto btUpdateTask = taskflow.emplace([&]()
 	{
-		auto btEntities = entityManager_.FilterEntities(EntityMask(CityComponentType::BEHAVIOR_TREE));
+		auto btEntities = entityManager_.FilterEntities(neko::EntityMask(CityComponentType::BEHAVIOR_TREE));
 		for (auto entity : btEntities)
 		{
 			behaviorTreeManager_.ExecuteIndex(entity);
@@ -119,7 +119,7 @@ void CityBuilderEngine::Update(float dt)
 	for (int i = 0; i < int(CityTilesheetType::LENGTH); i++)
 	{
 		tilemapUpdateTasks[i] = taskflow.emplace(std::bind([&](CityTilesheetType cityTilesheetType) {
-			environmentTilemap_.UpdateTilemap(cityBuilderMap_, cityCarManager_, cityBuildingManager_, transformManager_,
+			environmentTilemap_.UpdateTilemap(cityBuilderMap_, cityCarManager_, cityBuildingManager_, positionManager_,
 				mainView, cityTilesheetType);
 		}, CityTilesheetType(i)));
 
@@ -188,7 +188,7 @@ void CityBuilderEngine::OnEvent(sf::Event& event)
 
 void CityBuilderEngine::Destroy()
 {
-	Sound::RemoveMusic(musicInd_);
+    neko::Sound::RemoveMusic(musicInd_);
 	cursor_.Destroy();
 	commandManager_.Destroy();
 	MainEngine::Destroy();
@@ -224,9 +224,9 @@ neko::EntityManager& CityBuilderEngine::GetEntityManager()
 	return entityManager_;
 }
 
-neko::OldTransform2dManager& CityBuilderEngine::GetTransformManager()
+neko::Position2dManager& CityBuilderEngine::GetPositionManager()
 {
-	return transformManager_;
+	return positionManager_;
 }
 
 CityCarManager& CityBuilderEngine::GetCarManager()

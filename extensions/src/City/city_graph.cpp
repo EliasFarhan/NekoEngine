@@ -80,14 +80,14 @@ void TileMapGraph::AddNode(sf::Vector2i pos)
 			{
 				{
 					const auto neighborType = GetNeighborType(-dir);
-					const Index neighborIndex = Index(log2(double(neighborType)));
-					neighborIt->neighborsIndex[neighborIndex] = Index(nodes_.size() - 1);
+					const neko::Index neighborIndex = neko::Index(log2(double(neighborType)));
+					neighborIt->neighborsIndex[neighborIndex] = neko::Index(nodes_.size() - 1);
 					AddNeighbor(*neighborIt, neighborType);
 				}
 				{
 					const auto neighborType = GetNeighborType(dir);
-					const Index neighborIndex = Index(log2(double(neighborType)));
-					nodePtr->neighborsIndex[neighborIndex] = Index(neighborIt - nodes_.begin());
+					const neko::Index neighborIndex = neko::Index(log2(double(neighborType)));
+					nodePtr->neighborsIndex[neighborIndex] = neko::Index(neighborIt - nodes_.begin());
 					AddNeighbor(*nodePtr, neighborType);
 				}
 			}
@@ -104,11 +104,11 @@ void TileMapGraph::RemoveNode(sf::Vector2i pos)
 	//Cannot remove a node that does not exist
 	if (nodeIt == nodes_.end())
 		return;
-	const Index nodeIndex = Index(nodeIt - nodes_.begin());
+	const neko::Index nodeIndex = neko::Index(nodeIt - nodes_.begin());
 	nodes_.erase(nodeIt);
 	for (auto& otherNode : nodes_)
 	{
-		for (Index i = 0; i < maxNeighborsNmb; i++)
+		for (neko::Index i = 0; i < maxNeighborsNmb; i++)
 		{
 			if (otherNode.position + GetDirection(NeighborType(1u << i)) == pos)
 			{
@@ -145,7 +145,7 @@ TileMapGraph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vect
 {
 	rmt_ScopedCPUSample(GeneratePath, 0);
 	auto path = std::vector<sf::Vector2i>();
-	if (startPos == INVALID_TILE_POS || endPos == INVALID_TILE_POS)
+	if (startPos == neko::INVALID_TILE_POS || endPos == neko::INVALID_TILE_POS)
 		return path;
 	const auto startNodeIt = std::find_if(nodes_.begin(), nodes_.end(), [&startPos](const Node& node)
 	{

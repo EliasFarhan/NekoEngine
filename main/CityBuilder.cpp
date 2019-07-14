@@ -27,7 +27,7 @@
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 {
-	neko::CityBuilderEngine engine;
+	city::CityBuilderEngine engine;
 	engine.Init();
 	engine.EngineLoop();
 	return EXIT_SUCCESS;

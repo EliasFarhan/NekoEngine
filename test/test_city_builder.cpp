@@ -27,6 +27,7 @@
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <imgui.h>
 #include <Remotery.h>
+#include <multi/graphics/tilemap.h>
 
 class PathfindingEngine : public neko::BasicEngine
 {
@@ -145,7 +146,7 @@ public:
 	}
 private:
 	std::vector<sf::RectangleShape> rects_;
-    neko::TileMapGraph graph_;
+    city::TileMapGraph graph_;
 	const sf::Vector2i tileNmb = sf::Vector2i(200, 200);
 	const size_t roadNmb_ = 20'000;
 	const float outlineThickness = 1.0f;

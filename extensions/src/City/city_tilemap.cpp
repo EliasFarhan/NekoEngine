@@ -34,7 +34,7 @@
 
 namespace city
 {
-void CityBuilderTilemap::Init(TextureManager& textureManager)
+void CityBuilderTilemap::Init(neko::TextureManager& textureManager)
 {
 	static const auto reverseCityMap =
 		[]() ->std::map<std::string, CityTileType>
@@ -59,41 +59,41 @@ void CityBuilderTilemap::Init(TextureManager& textureManager)
 		return reverse;
 	}();
 
-	const std::unique_ptr<json> cityTilemapJsonPtr = LoadJson("data/tilemap/CuteCityBuilder.json");
+	const std::unique_ptr<json> cityTilemapJsonPtr = neko::LoadJson("data/tilemap/CuteCityBuilder.json");
 	const auto cityTilemapJsonContent = *cityTilemapJsonPtr;
 	//City texture
 	for (int i = 0; i < int(CityTilesheetType::CAR); i++)
 	{
-		const Index textureIndex = textureManager.LoadTexture(cityTilemapJsonContent["image"]);
+		const neko::Index textureIndex = textureManager.LoadTexture(cityTilemapJsonContent["image"]);
 		tilesheets_[i].texture = textureManager.GetTexture(textureIndex);
 		tilesheets_[i].texture->setRepeated(false);
 	}
 	//Car texture
 	{
-		const Index textureIndex = textureManager.LoadTexture(carTextureName_);
-		tilesheets_[Index(CityTilesheetType::CAR)].texture = textureManager.GetTexture(textureIndex);
-		tilesheets_[Index(CityTilesheetType::CAR)].texture->setRepeated(false);
+		const neko::Index textureIndex = textureManager.LoadTexture(carTextureName_);
+		tilesheets_[neko::Index(CityTilesheetType::CAR)].texture = textureManager.GetTexture(textureIndex);
+		tilesheets_[neko::Index(CityTilesheetType::CAR)].texture->setRepeated(false);
 	}
 	for (auto& cityTileElementJson : cityTilemapJsonContent["tile_elements"])
 	{
 		const auto typeIt = reverseCityMap.find(cityTileElementJson["type"].get<std::string>());
 		if (typeIt != reverseCityMap.end())
 		{
-			const auto typeIndex = Index(typeIt->second);
-			rectCenter_[typeIndex] = GetVectorFromJson(cityTileElementJson, "center");
-			textureRects_[typeIndex] = GetFloatRectFromJson(cityTileElementJson, "rect");
+			const auto typeIndex = neko::Index(typeIt->second);
+			rectCenter_[typeIndex] = neko::GetVectorFromJson(cityTileElementJson, "center");
+			textureRects_[typeIndex] = neko::GetFloatRectFromJson(cityTileElementJson, "rect");
 		}
 	}
-	const auto cityCarJsonPtr = LoadJson("data/tilemap/car.json");
+	const auto cityCarJsonPtr = neko::LoadJson("data/tilemap/car.json");
 	const auto cityCarJsonContent = *cityCarJsonPtr;
 	for (auto& carElementJson : cityCarJsonContent["elements"])
 	{
 		const auto typeIt = reverseCarMap.find(carElementJson["type"].get<std::string>());
 		if (typeIt != reverseCarMap.end())
 		{
-			const auto typeIndex = Index(typeIt->second);
-			rectCenter_[typeIndex] = GetVectorFromJson(carElementJson, "center");
-			textureRects_[typeIndex] = GetFloatRectFromJson(carElementJson, "rect");
+			const auto typeIndex = neko::Index(typeIt->second);
+			rectCenter_[typeIndex] = neko::GetVectorFromJson(carElementJson, "center");
+			textureRects_[typeIndex] = neko::GetFloatRectFromJson(carElementJson, "rect");
 		}
 	}
 
@@ -106,20 +106,20 @@ void CityBuilderTilemap::Init(TextureManager& textureManager)
 }
 
 void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, const CityCarManager& cityCarManager,
-	const CityBuildingManager& buildingManager,
-	const OldTransform2dManager& transformManager,
-	sf::View mainView, CityTilesheetType updatedCityTileType)
+                                       const CityBuildingManager& buildingManager,
+                                       const neko::Position2dManager& positionManager,
+                                       sf::View mainView, CityTilesheetType updatedCityTileType)
 {
-	const Index frameIndex = MainEngine::GetInstance()->frameIndex % 2;
+	const neko::Index frameIndex = multi::MainEngine::GetFrameIndex();
 	//Manage window view
 	windowView_ = sf::FloatRect((mainView.getCenter() - mainView.getSize() / 2.0f), mainView.getSize());
 
 	if (updatedCityTileType == CityTilesheetType::LENGTH)
 	{
 		rmt_ScopedCPUSample(UpdateTilemap, 0);
-		for (Index i = 0u; i < Index(CityTilesheetType::LENGTH); i++)
+		for (neko::Index i = 0u; i < neko::Index(CityTilesheetType::LENGTH); i++)
 		{
-			UpdateTilemap(cityBuilderMap, cityCarManager, buildingManager, transformManager, mainView,
+			UpdateTilemap(cityBuilderMap, cityCarManager, buildingManager, positionManager, mainView,
 				CityTilesheetType(i));
 		}
 		return;
@@ -138,14 +138,14 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 		rmt_BeginCPUSample(UpdateCarTilemap, 0); break;
 	default: break;
 	}
-	tilesheets_[Index(updatedCityTileType)].tilemap[frameIndex].clear();
+	tilesheets_[neko::Index(updatedCityTileType)].tilemap[frameIndex].clear();
 
 	switch (updatedCityTileType)
 	{
 		//ENVIRONMENT
 	case CityTilesheetType::ENVIRONMENT:
 	{
-		const Index grassIndex = Index(CityTileType::GRASS);
+		const neko::Index grassIndex = neko::Index(CityTileType::GRASS);
 		//Fill the vertex array with grass
 		for (auto x = 0u; x < cityBuilderMap.city.mapSize.x; x++)
 		{
@@ -166,7 +166,7 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 			for (auto y = 0u; y < cityBuilderMap.city.mapSize.y; y++)
 			{
 
-				Index waterIndex = 0u;
+                neko::Index waterIndex = 0u;
 				bool directions[] = { 0, 0, 0, 0 };//UP, DOWN, LEFT, RIGHT
 
 				const sf::Vector2i tmpPos = sf::Vector2i(x, y);
@@ -223,27 +223,27 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 				}
 				if (directions[1] && directions[3])
 				{
-					waterIndex = Index(CityTileType::WATER_DOWN_RIGHT);
+					waterIndex = neko::Index(CityTileType::WATER_DOWN_RIGHT);
 				}
 				if (directions[1] && directions[2])
 				{
-					waterIndex = Index(CityTileType::WATER_DOWN_LEFT);
+					waterIndex = neko::Index(CityTileType::WATER_DOWN_LEFT);
 				}
 				if (directions[0] && directions[3])
 				{
-					waterIndex = Index(CityTileType::WATER_UP_RIGHT);
+					waterIndex = neko::Index(CityTileType::WATER_UP_RIGHT);
 				}
 				if (directions[0] && directions[2])
 				{
-					waterIndex = Index(CityTileType::WATER_UP_LEFT);
+					waterIndex = neko::Index(CityTileType::WATER_UP_LEFT);
 				}
 				if (directions[0] && directions[1])
 				{
-					waterIndex = Index(CityTileType::WATER_VERTICAL);
+					waterIndex = neko::Index(CityTileType::WATER_VERTICAL);
 				}
 				if (directions[2] && directions[3])
 				{
-					waterIndex = Index(CityTileType::WATER_HORIZONTAL);
+					waterIndex = neko::Index(CityTileType::WATER_HORIZONTAL);
 				}
 				const auto position = sf::Vector2f(
 					static_cast<float>(x * tileSize_.x),
@@ -330,13 +330,13 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 			const auto position = sf::Vector2f(
 				static_cast<float>(road.position.x * tileSize_.x),
 				static_cast<float>(road.position.y * tileSize_.y));
-			Index roadIndex = 0;
+            neko::Index roadIndex = 0;
 
 			if ((directions[0] && directions[1] && !directions[2] && !directions[3]) or
 				(directions[0] && !directions[1] && !directions[2] && !directions[3]) or
 				(!directions[0] && directions[1] && !directions[2] && !directions[3]))
 			{
-				roadIndex = Index(
+				roadIndex = neko::Index(
 					isWater ? CityTileType::ROAD_BRIDGE_VERTICAL : CityTileType::ROAD_LINE);
 				const auto rect = textureRects_[roadIndex];
 				const auto center = rectCenter_[roadIndex];
@@ -351,7 +351,7 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 				(!directions[0] && !directions[1] && directions[2] && !directions[3]) or
 				(!directions[0] && !directions[1] && !directions[2] && !directions[3]))
 			{
-				roadIndex = Index(
+				roadIndex = neko::Index(
 					isWater ? CityTileType::ROAD_BRIDGE_HORIZONTAL : CityTileType::ROAD_LINE);
 				const auto rect = textureRects_[roadIndex];
 				const auto center = rectCenter_[roadIndex];
@@ -363,7 +363,7 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 			}
 			else if (directions[0] && directions[1] && directions[2] && directions[3])
 			{
-				roadIndex = Index(CityTileType::CROSS_ROAD);
+				roadIndex = neko::Index(CityTileType::CROSS_ROAD);
 				const auto rect = textureRects_[roadIndex];
 				const auto center = rectCenter_[roadIndex];
 				const auto size = sf::Vector2f(float(tileSize_.x), float(tileSize_.y));
@@ -372,7 +372,7 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 			}
 			else if (directions[0] && directions[1] && !directions[2] && directions[3])
 			{
-				roadIndex = Index(CityTileType::ROAD_T);
+				roadIndex = neko::Index(CityTileType::ROAD_T);
 				const auto rect = textureRects_[roadIndex];
 				const auto center = rectCenter_[roadIndex];
 				const auto size = sf::Vector2f(float(tileSize_.x), float(tileSize_.y));
@@ -381,7 +381,7 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 			}
 			else if (directions[0] && directions[1] && directions[2] && !directions[3])
 			{
-				roadIndex = Index(CityTileType::ROAD_T);
+				roadIndex = neko::Index(CityTileType::ROAD_T);
 				const auto rect = textureRects_[roadIndex];
 				const auto center = rectCenter_[roadIndex];
 				const auto size = sf::Vector2f(float(tileSize_.x), float(tileSize_.y));
@@ -390,7 +390,7 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 			}
 			else if (directions[0] && !directions[1] && directions[2] && directions[3])
 			{
-				roadIndex = Index(CityTileType::ROAD_T);
+				roadIndex = neko::Index(CityTileType::ROAD_T);
 				const auto rect = textureRects_[roadIndex];
 				const auto center = rectCenter_[roadIndex];
 				const auto size = sf::Vector2f(float(tileSize_.x), float(tileSize_.y));
@@ -399,7 +399,7 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 			}
 			else if (!directions[0] && directions[1] && directions[2] && directions[3])
 			{
-				roadIndex = Index(CityTileType::ROAD_T);
+				roadIndex = neko::Index(CityTileType::ROAD_T);
 				const auto rect = textureRects_[roadIndex];
 				const auto center = rectCenter_[roadIndex];
 				const auto size = sf::Vector2f(float(tileSize_.x), float(tileSize_.y));
@@ -408,7 +408,7 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 			}
 			else if (!directions[0] && directions[1] && !directions[2] && directions[3])
 			{
-				roadIndex = Index(CityTileType::ROAD_TURN);
+				roadIndex = neko::Index(CityTileType::ROAD_TURN);
 				const auto rect = textureRects_[roadIndex];
 				const auto center = rectCenter_[roadIndex];
 				const auto size = sf::Vector2f(float(tileSize_.x), float(tileSize_.y));
@@ -417,7 +417,7 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 			}
 			else if (!directions[0] && directions[1] && directions[2] && !directions[3])
 			{
-				roadIndex = Index(CityTileType::ROAD_TURN);
+				roadIndex = neko::Index(CityTileType::ROAD_TURN);
 				const auto rect = textureRects_[roadIndex];
 				const auto center = rectCenter_[roadIndex];
 				const auto size = sf::Vector2f(float(tileSize_.x), float(tileSize_.y));
@@ -426,7 +426,7 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 			}
 			else if (directions[0] && !directions[1] && !directions[2] && directions[3])
 			{
-				roadIndex = Index(CityTileType::ROAD_TURN);
+				roadIndex = neko::Index(CityTileType::ROAD_TURN);
 				const auto rect = textureRects_[roadIndex];
 				const auto center = rectCenter_[roadIndex];
 				const auto size = sf::Vector2f(float(tileSize_.x), float(tileSize_.y));
@@ -435,7 +435,7 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 			}
 			else if (directions[0] && !directions[1] && directions[2] && !directions[3])
 			{
-				roadIndex = Index(CityTileType::ROAD_TURN);
+				roadIndex = neko::Index(CityTileType::ROAD_TURN);
 				const auto rect = textureRects_[roadIndex];
 				const auto center = rectCenter_[roadIndex];
 				const auto size = sf::Vector2f(float(tileSize_.x), float(tileSize_.y));
@@ -532,7 +532,7 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 			//UP RIGHT
 			else if (directions[0] && directions[3])
 			{
-				const Index railIndex = Index(CityTileType::RAIL_TURN);
+				const neko::Index railIndex = neko::Index(CityTileType::RAIL_TURN);
 				const auto rect = textureRects_[railIndex];
 				const auto center = rectCenter_[railIndex];
 				const auto size = sf::Vector2f(tileSize_);
@@ -592,7 +592,7 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 			case CityElementType::TREES:
 			{
 				//TREES
-				const auto treesIndex = Index(CityTileType::TREES);
+				const auto treesIndex = neko::Index(CityTileType::TREES);
 				if (cityBuilderMap.environmentTiles_[cityBuilderMap.Position2Index(element.position)] ==
 					EnvironmentTile::WATER)
 				{
@@ -613,7 +613,7 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 			case CityElementType::TRAIN_STATION:
 			{
 				//TRAIN STATION
-				const auto trainStationIndex = Index(CityTileType::TRAIN_STATION);
+				const auto trainStationIndex = neko::Index(CityTileType::TRAIN_STATION);
 				const auto position = sf::Vector2f(
 					float(element.position.x * tileSize_.x),
 					float(element.position.y * tileSize_.y));
@@ -632,7 +632,7 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 
 		for (const auto& building : buildingManager.GetBuildingsVector())
 		{
-			const auto buildingIndex = Index(building.buildingType);
+			const auto buildingIndex = neko::Index(building.buildingType);
 			const auto position = sf::Vector2f(float(building.position.x * tileSize_.x), float(building.position.y * tileSize_.y));
 			const auto size = rectCenter_[buildingIndex] * 2.0f;
 			AddNewCityTile(position, size, textureRects_[buildingIndex], rectCenter_[buildingIndex], updatedCityTileType);
@@ -643,12 +643,12 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 	{
 		for (const auto& car : cityCarManager.GetCarsVector())
 		{
-			if (car.entity == INVALID_ENTITY)
+			if (car.entity == neko::INVALID_ENTITY)
 				continue;
 
-			const auto rect = textureRects_[Index(car.carType)];
-			const auto center = rectCenter_[Index(car.carType)];
-			const auto position = transformManager.GetPosition(car.entity);
+			const auto rect = textureRects_[neko::Index(car.carType)];
+			const auto center = rectCenter_[neko::Index(car.carType)];
+			const auto position = positionManager.GetConstComponent(car.entity);
 			auto deltaPos = car.currentPath[car.currentIndex + 1] - car.currentPath[car.currentIndex];
 
 			AddCar(position, car.spriteSize, rect, center, deltaPos.x > 0 ? false : true, false);
@@ -661,13 +661,13 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 	rmt_EndCPUSample();
 }
 
-void CityBuilderTilemap::PushCommand(MultiThreadGraphicsManager* graphicsManager)
+void CityBuilderTilemap::PushCommand(neko::GraphicsManager* graphicsManager)
 {
 	rmt_ScopedCPUSample(PushCityTilemapCommands, 0);
-	const Index frameIndex = MainEngine::GetInstance()->frameIndex % 2;
+	const neko::Index frameIndex = multi::MainEngine::GetFrameIndex() % 2;
 
 	{
-		auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+		auto* engine = neko::BasicEngine::GetInstance<CityBuilderEngine>();
 		auto& city = engine->GetCityMap().city;
 		auto& rect = bgRect[frameIndex];
 		rect.setPosition(sf::Vector2f(0, 0));
@@ -678,14 +678,14 @@ void CityBuilderTilemap::PushCommand(MultiThreadGraphicsManager* graphicsManager
 		graphicsManager->Draw(rect);
 	}
 
-	graphicsManager->Draw(&tilesheets_[Index(CityTilesheetType::ENVIRONMENT)].tilemap[frameIndex],
-		tilesheets_[unsigned(CityTilesheetType::ENVIRONMENT)].texture.get());
-	graphicsManager->Draw(&tilesheets_[Index(CityTilesheetType::TRANSPORT)].tilemap[frameIndex],
-		tilesheets_[unsigned(CityTilesheetType::TRANSPORT)].texture.get());
-	graphicsManager->Draw(&tilesheets_[Index(CityTilesheetType::CAR)].tilemap[frameIndex],
-		tilesheets_[unsigned(CityTilesheetType::CAR)].texture.get());
-	graphicsManager->Draw(&tilesheets_[Index(CityTilesheetType::CITY)].tilemap[frameIndex],
-		tilesheets_[unsigned(CityTilesheetType::CITY)].texture.get());
+	graphicsManager->Draw(&tilesheets_[neko::Index(CityTilesheetType::ENVIRONMENT)].tilemap[frameIndex],
+		tilesheets_[neko::Index(CityTilesheetType::ENVIRONMENT)].texture.get());
+	graphicsManager->Draw(&tilesheets_[neko::Index(CityTilesheetType::TRANSPORT)].tilemap[frameIndex],
+		tilesheets_[neko::Index(CityTilesheetType::TRANSPORT)].texture.get());
+	graphicsManager->Draw(&tilesheets_[neko::Index(CityTilesheetType::CAR)].tilemap[frameIndex],
+		tilesheets_[neko::Index(CityTilesheetType::CAR)].texture.get());
+	graphicsManager->Draw(&tilesheets_[neko::Index(CityTilesheetType::CITY)].tilemap[frameIndex],
+		tilesheets_[neko::Index(CityTilesheetType::CITY)].texture.get());
 
 
 }
@@ -694,7 +694,7 @@ void CityBuilderTilemap::AddNewCityTile(const sf::Vector2f position, const sf::V
 	const sf::Vector2f center, CityTilesheetType updatedCityTileType, bool flipX,
 	bool flipY, bool rotate90, bool culling)
 {
-	const Index frameIndex = MainEngine::GetInstance()->frameIndex % 2;
+	const neko::Index frameIndex = multi::MainEngine::GetFrameIndex() % 2;
 	sf::Vector2f sizeOffset = (size - sf::Vector2f(tileSize_)) / 2.0f;
 	sizeOffset.y = -sizeOffset.y;
 	if (culling)
@@ -764,7 +764,7 @@ void CityBuilderTilemap::AddNewCityTile(const sf::Vector2f position, const sf::V
 void CityBuilderTilemap::AddCar(const sf::Vector2f position, const sf::Vector2f size, const sf::FloatRect rect,
 	const sf::Vector2f center, bool flipX, bool culling)
 {
-	const Index frameIndex = MainEngine::GetInstance()->frameIndex % 2;
+	const neko::Index frameIndex = multi::MainEngine::GetFrameIndex() % 2;
 	if (culling)
 	{
 		const sf::FloatRect tileRect = sf::FloatRect((position - center), size);
@@ -799,7 +799,7 @@ void CityBuilderTilemap::AddCar(const sf::Vector2f position, const sf::Vector2f 
 		rect.top);
 	for (auto& v : quad)
 	{
-		tilesheets_[Index(CityTilesheetType::CAR)].tilemap[frameIndex].append(v);
+		tilesheets_[neko::Index(CityTilesheetType::CAR)].tilemap[frameIndex].append(v);
 	}
 }
 }

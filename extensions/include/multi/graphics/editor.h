@@ -1,14 +1,13 @@
 #pragma once
 
 #include <engine/editor.h>
-#inclued <gra
 
 namespace multi
 {
 /**
  * \brief used in the graphics manager to show informations from the engine/game/systems in used
  */
-class MultiEditor : public neko::Editor
+class Editor : public neko::Editor
 {
 public:
     void Init() override;

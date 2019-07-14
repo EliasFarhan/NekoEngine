@@ -2,19 +2,25 @@
 // Created by efarhan on 13.07.19.
 //
 
-#include <MultiThreadEngine/engine.h>
-
+#include <multi/engine/engine.h>
+#include <multi/graphics/graphics.h>
+#include <Remotery.h>
+#include <imgui-SFML.h>
+#include <SFML/Window/Event.hpp>
+#include <engine/log.h>
+#ifdef __linux__
+#include <X11/Xlib.h>
+#endif
 namespace multi
 {
 
-MainEngine* MainEngine::engine_ = nullptr;
 
 
 void MainEngine::EngineLoop()
 {
 
     isRunning = true;
-    renderThread_ = std::thread(&MultiThreadGraphicsManager::RenderLoop, graphicsManager_.get());
+    renderThread_ = std::thread(&GraphicsManager::RenderLoop, graphicsManager_.get());
     renderThread_.detach();
     while (isRunning)
     {
@@ -77,9 +83,8 @@ void MainEngine::Init()
 #endif
     BasicEngine::Init();
     renderWindow->setActive(false);
-    instance_ = this;
 
-    graphicsManager_ = std::make_unique<MultiThreadGraphicsManager>();
+    graphicsManager_ = std::make_unique<GraphicsManager>();
 
 
 }
@@ -97,18 +102,12 @@ void MainEngine::Destroy()
     renderWindow->setActive(true);
 
     BasicEngine::Destroy();
-    instance_ = nullptr;
     graphicsManager_ = nullptr;
 }
 
 GraphicsManager* MainEngine::GetGraphicsManager() const
 {
     return graphicsManager_.get();
-}
-
-MainEngine* MainEngine::GetInstance()
-{
-    return instance_;
 }
 
 }

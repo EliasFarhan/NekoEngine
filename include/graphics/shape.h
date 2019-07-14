@@ -40,33 +40,31 @@ struct ShapeDef
     float outlineThickness = 0.0f;
 };
 
-
-class ConvexShapeManager : public ComponentManager<sf::ConvexShape, ComponentType(NekoComponentType::CONVEX_SHAPE2D)>
-{
-
-};
-
 /**
  * \brief managing graphic shape from the SFML API
  */
 class ShapeManager
 {
 public:
-    ShapeManager();
+    ShapeManager() = default;
 
-    Index AddBox(const sf::Vector2f& pos, const sf::Vector2f& halfSize, const ShapeDef& shapeDef);
+    virtual Index AddBox(const sf::Vector2f& pos, const sf::Vector2f& halfSize, const ShapeDef& shapeDef) = 0;
 
-    Index AddPolygon(const sf::Vector2f& pos, const sf::Vector2f* points, size_t pointNmb, const ShapeDef& shapeDef);
+    virtual Index AddPolygon(const sf::Vector2f& pos, const sf::Vector2f* points, size_t pointNmb, const ShapeDef& shapeDef) = 0;
 
 
-    void CopyTransformPosition(OldTransform2dManager& transformManager, size_t start = 0, size_t length = INIT_ENTITY_NMB);
-    void PushCommands(GraphicsManager* graphicsManager, size_t start = 0, size_t length = INIT_ENTITY_NMB);
+    virtual void CopyTransformPosition(Position2dManager& positionManager, size_t start = 0,
+                                       size_t length = neko::INIT_ENTITY_NMB) = 0;
+    virtual void PushCommands(GraphicsManager* graphicsManager, size_t start = 0, size_t length = INIT_ENTITY_NMB) = 0;
 
-private:
-    /**
-     * \brief storing the shape and putting two vectors for double buffering with the render thread
-     */
-    std::vector<sf::ConvexShape> convexShape_[2];
 };
+
+class ConvexShapeManager : public ShapeManager, public ComponentManager<sf::ConvexShape, ComponentType(NekoComponentType::CONVEX_SHAPE2D)>
+{
+public:
+    using ComponentManager::ComponentManager;
+};
+
+
 
 }

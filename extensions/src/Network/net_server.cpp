@@ -2,6 +2,7 @@
 #include <engine/log.h>
 #include <engine/globals.h>
 #include <utilities/vector_utility.h>
+#include <algorithm>
 
 namespace neko
 {
@@ -25,7 +26,7 @@ void Server::SendUnreliable(const NetCommand& command)
 
 void Server::ServerLoop()
 {
-	// lie l'écouteur à un port
+	// lie l'ï¿½couteur ï¿½ un port
 	if (listener_.listen(SERVER_PORT) == sf::Socket::Done)
 	{
 		while (isRunning || currentIndex == INVALID_INDEX)

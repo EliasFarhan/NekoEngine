@@ -51,10 +51,10 @@ public:
 	void Update(float dt) override;
 	void Destroy() override;
 	neko::Entity SpawnPerson();
-	neko::Entity AddPerson(neko::Entity neko::Entity, sf::Vector2i position);
-	Person* GetPersonAt(neko::Entity neko::Entity);
+	neko::Entity AddPerson(neko::Entity entity, sf::Vector2i position);
+	Person* GetPersonAt(neko::Entity entity);
     neko::Index GetPeopleCount();
-	void DestroyPerson(neko::Entity neko::Entity);
+	void DestroyPerson(neko::Entity entity);
 protected:
 	json personBehaviorTree_;
 	std::vector<Person> people_;

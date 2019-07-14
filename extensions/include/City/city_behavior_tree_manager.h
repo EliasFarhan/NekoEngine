@@ -37,24 +37,24 @@ namespace city {
 		void LogBehaviorTree(
 			const std::shared_ptr<BehaviorTreeNode> behaviorTree) const;
 		std::shared_ptr<BehaviorTreeNode> ParseBehaviorTreeFromJson(
-			Index comp,
+			neko::Index comp,
 			const json& jsonContent) const;
 		std::shared_ptr<BehaviorTreeNode> LoadBehaviorTreeFromJsonFile(
-			Index comp,
+                neko::Index comp,
 			const std::string& jsonFile) const;
 
 	public:
 		BehaviorTreeManager();
 		// Index based functions
-		Index ParseBehaviorTreeFromJsonIndex(
-			Index comp,
+        neko::Index ParseBehaviorTreeFromJsonIndex(
+                neko::Index comp,
 			const json& jsonContent);
-		Index LoadBehaviorTreeFromJsonFileIndex(
-			Index comp,
+        neko::Index LoadBehaviorTreeFromJsonFileIndex(
+                neko::Index comp,
 			const std::string& jsonFile);
-		void LogBehaviorTreeIndex(Index id) const;
-		std::shared_ptr<BehaviorTreeNode> GetBehaviorTreeRootIndex(Index id);
-		BehaviorTreeFlow ExecuteIndex(Index id);
+		void LogBehaviorTreeIndex(neko::Index id) const;
+		std::shared_ptr<BehaviorTreeNode> GetBehaviorTreeRootIndex(neko::Index id);
+		BehaviorTreeFlow ExecuteIndex(neko::Index id);
 
 	protected:
 		struct NodeVariableDesc
@@ -70,39 +70,39 @@ namespace city {
 			BTT_LEAF = 3,
 		};
 		std::shared_ptr<BehaviorTreeNode> ParseJsonObject(
-			Index comp,
+                neko::Index comp,
 			const json& jsonContent) const;
 		NodeVariableDesc ParseJsonVariablesNodes(
-			Index comp,
+                neko::Index comp,
 			const json& jsonContent,
 			BehaviorTreeElementType behaviorTreeElementType = 
 				BehaviorTreeElementType::BTT_LEAF) const;
 		std::shared_ptr<BehaviorTreeNode> ParseJsonCompositeSequence(
-			Index comp,
+                neko::Index comp,
 			const json& jsonContent) const;
 		std::shared_ptr<BehaviorTreeNode> ParseJsonCompositeSelector(
-			Index comp,
+                neko::Index comp,
 			const json& jsonContent) const;
 		std::shared_ptr<BehaviorTreeNode> ParseJsonComposite(
-			Index comp,
+                neko::Index comp,
 			const json& jsonContent) const;
 		std::shared_ptr<BehaviorTreeNode> ParseJsonDecorator(
-			Index comp,
+                neko::Index comp,
 			const json& jsonContent) const;
 		std::shared_ptr<BehaviorTreeNode> ParseJsonLeafCondition(
-			Index comp,
+                neko::Index comp,
 			const json& jsonContent) const;
 		std::shared_ptr<BehaviorTreeNode> ParseJsonLeafWait(
-			Index comp,
+                neko::Index comp,
 			const json& jsonContent) const;
 		std::shared_ptr<BehaviorTreeNode> ParseJsonLeafMoveTo(
-			Index comp,
+                neko::Index comp,
 			const json& jsonContent) const;
 		std::shared_ptr<BehaviorTreeNode> ParseJsonLeafFunctional(
-			Index comp,
+                neko::Index comp,
 			const json& jsonContent) const;
 		std::shared_ptr<BehaviorTreeNode> ParseJsonLeaf(
-			Index comp,
+                neko::Index comp,
 			const json& jsonContent) const;
 		BehaviorTreeObjectType GetTypeFromJson(const json& jsonContent) const;
 	

@@ -38,7 +38,7 @@
 
 namespace neko
 {
-
+BasicEngine* BasicEngine::instance_ = nullptr;
 BasicEngine::BasicEngine(Configuration* config)
 {
     if (config != nullptr)
@@ -64,6 +64,7 @@ void BasicEngine::Update(float dt)
 
 void BasicEngine::Init()
 {
+    instance_ = this;
     renderWindow = std::make_unique<sf::RenderWindow>(
 		sf::VideoMode(config.screenSize.x, config.screenSize.y), "Neko Engine", config.windowStyle);
     if (config.vSync)
@@ -80,6 +81,7 @@ void BasicEngine::Init()
 
 void BasicEngine::Destroy()
 {
+    instance_ = nullptr;
     renderWindow->close();
     ImGui::SFML::Shutdown();
     renderWindow = nullptr;

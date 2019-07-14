@@ -35,7 +35,7 @@ float Physics2dManager::pixelPerMeter = 100.0f;
 
 void Physics2dManager::Init()
 {
-	MainEngine* engine = MainEngine::GetInstance();
+	auto* engine = BasicEngine::GetInstance();
 	config_ = &engine->config;
 	pixelPerMeter = config_->pixelPerMeter;
 	world_ = std::make_unique<b2World>(config_->gravity);

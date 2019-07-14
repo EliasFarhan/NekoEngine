@@ -61,9 +61,10 @@ public:
 
     b2Body* GetBodyAt(Index i);
 
+    std::vector<Collider>& GetColliderVector(){ return colliders_;}
+
 private:
-    friend class OldTransform2dManager;
-    friend class TiledMap;
+    friend class Transform2dManager;
     std::unique_ptr<b2World> world_ = nullptr;
     std::vector<b2Body*> bodies_;
     std::vector<Collider> colliders_;
@@ -79,8 +80,14 @@ sf::Vector2f meter2pixel(const b2Vec2& v);
 
 b2Vec2 pixel2meter(const sf::Vector2f& v);
 
+
 class Body2dManager : public ComponentManager <b2Body*,ComponentType(NekoComponentType::BODY2D)>
 {
+};
+
+class Collider2dManager : public ComponentManager<Collider, ComponentType(NekoComponentType::COLLIDER2D)>
+{
+
 };
 
 }

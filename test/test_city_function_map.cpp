@@ -40,7 +40,7 @@ protected:
 		Destroy();
 	}
 
-	neko::FunctionMap funcMap_ = neko::FunctionMap(0xdeadbeef);
+	city::FunctionMap funcMap_ = city::FunctionMap(0xdeadbeef);
 };
 
 TEST_F(FunctionMapTest, FunctionDoesntRespondInCaseDoesntExist)

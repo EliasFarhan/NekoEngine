@@ -28,7 +28,8 @@
 #include <map>
 #include <SFML/Graphics/Sprite.hpp>
 #include "SFML/Graphics/Texture.hpp"
-#include "texture.h"
+#include "graphics/texture.h"
+#include "graphics/sprite.h"
 #include <utilities/time_utility.h>
 #include <utilities/json_utility.h>
 #include <engine/system.h>
@@ -88,7 +89,7 @@ public:
 //TODO should return an index
     SpriteAnimator& CreateSpriteAnimator();
 
-    void Update(MultiThreadSpriteManager& spriteManager, float dt);
+    void Update(SpriteManager& spriteManager, float dt);
 
     SpriteAnimator* GetAnimatorAt(unsigned int i);
 

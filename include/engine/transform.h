@@ -38,31 +38,11 @@ class Physics2dManager;
 /**
  * \brief manage the graphic transform of any kind of objects in a SOA fashions
  */
-class OldTransform2dManager
+class Transform2dManager
 {
 public:
-    OldTransform2dManager();
-
-    void
-    CopyPositionsFromPhysics2d(Physics2dManager& physics2dManager, size_t start = 0, size_t length = INIT_ENTITY_NMB);
-
-    void CopyAnglesFromPhysics2d(Physics2dManager& physics2dManager, size_t start = 0, size_t length = INIT_ENTITY_NMB);
-
-    Index AddPosition(sf::Vector2f position, Entity entity = INVALID_ENTITY);
-    Index AddScale(sf::Vector2f scale, Entity entity = INVALID_ENTITY);
-    Index AddAngle(float angle, Entity entity = INVALID_ENTITY);
-
-    sf::Vector2f GetPosition(Index i) const;
-	void SetPosition(const sf::Vector2f& position, Index i);
-
+    Transform2dManager();
 private:
-    friend class MultiThreadSpriteManager;
-    friend class ShapeManager;
-
-    std::vector<sf::Vector2f> positions_;
-    std::vector<sf::Vector2f> scales_;
-    std::vector<float> angles_;
-
 	std::vector<Index> transformHierarchy_;
 	std::vector<char> dirtyFlags_;
 };
@@ -72,6 +52,7 @@ class Position2dManager : public ComponentManager<sf::Vector2f, ComponentType(Ne
 public:
 	using ComponentManager::ComponentManager;
 	void CopyPositionsFromBody2d(EntityManager& entityManager, Body2dManager& body2dManager);
+	void CopyPositionsFromPhysics2d(EntityManager& entityManager, Physics2dManager& physics2dManager);
 };
 
 class Scale2dManager : public ComponentManager<sf::Vector2f, ComponentType(NekoComponentType::SCALE2D)>

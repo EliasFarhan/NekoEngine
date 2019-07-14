@@ -35,7 +35,7 @@ namespace city
 void CityZoneManager::UpdateZoneTilemap(const CityBuilderMap& cityMap, CityBuildingManager& cityBuildingMap,
                                         sf::View mainView)
 {
-    const auto frameIndex = MainEngine::GetInstance()->frameIndex % 2;
+    const auto frameIndex = multi::MainEngine::GetFrameIndex() % 2;
     const auto windowView_ = sf::FloatRect((mainView.getCenter() - mainView.getSize() / 2.0f), mainView.getSize());
     zoneVertexArray_[frameIndex].clear();
     zoneVertexArray_[frameIndex].setPrimitiveType(sf::PrimitiveType::Triangles);
@@ -73,15 +73,15 @@ void CityZoneManager::UpdateZoneTilemap(const CityBuilderMap& cityMap, CityBuild
     }
 }
 
-void CityZoneManager::PushCommand(MultiThreadGraphicsManager* graphicsManager)
+void CityZoneManager::PushCommand(neko::GraphicsManager* graphicsManager)
 {
-    const auto frameIndex = MainEngine::GetInstance()->frameIndex % 2;
+    const auto frameIndex = multi::MainEngine::GetFrameIndex() % 2;
     graphicsManager->Draw(zoneVertexArray_[frameIndex]);
 }
 
 void CityZoneManager::AddZone(sf::Vector2i position, ZoneType zoneType, CityBuilderMap& cityMap)
 {
-	auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+	auto* engine = neko::BasicEngine::GetInstance<CityBuilderEngine>();
 	if(engine->GetCityMoney() < zoneCost)
 		return;
 	if(position.x < 0 || position.y < 0 || position.x >= int(cityMap.city.mapSize.x) || position.y >= int(cityMap.city.mapSize.y))

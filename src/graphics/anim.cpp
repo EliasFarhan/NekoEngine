@@ -146,7 +146,7 @@ SpriteAnimator& AnimatorManager::CreateSpriteAnimator()
     return animators_.back();
 }
 
-void AnimatorManager::Update(MultiThreadSpriteManager& spriteManager, float dt)
+void AnimatorManager::Update(SpriteManager& spriteManager, float dt)
 {
 
     for (auto& animator : animators_)

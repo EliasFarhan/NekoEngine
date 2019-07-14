@@ -1,4 +1,6 @@
 #pragma once
+
+
 #include <mutex>
 #include <array>
 #include <SFML/Graphics/Drawable.hpp>
@@ -7,6 +9,7 @@
 
 #include <engine/editor.h>
 #include <graphics/graphics.h>
+
 namespace multi
 {
 /**
@@ -22,14 +25,14 @@ public:
  * Should not be called from engine thread
  * @param drawable
  */
-    virtual void Draw(sf::Drawable& drawable);
+    virtual void Draw(sf::Drawable& drawable, int layer = 0) override;
 /**
  * \brief called by the render loop when iterating through all the tilemap commands
  * Should not be called from engine thread
  * @param vertexArray
  * @param texture
  */
-    virtual void Draw(sf::VertexArray* vertexArray, sf::Texture* texture);
+    virtual void Draw(sf::VertexArray* vertexArray, sf::Texture* texture, int layer = 0) override;
 /**
  * \brief called from engine loop, changing the view for the next frame
  * @param view
@@ -41,10 +44,14 @@ public:
     virtual void RenderLoop();
 
     bool DidRenderingStart() const;
+
+public:
     std::unique_ptr<neko::Editor> editor = nullptr;
     //Used for Engine loop to wait for graphics thread
     std::mutex renderingMutex;
 protected:
+    void Draw(std::array<neko::Command*, neko::MAX_COMMAND_NMB>& commandBuffers_) override;
+
     /**
      * \brief non owning ptr to renderwindow
      */

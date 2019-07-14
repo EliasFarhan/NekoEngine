@@ -9,7 +9,7 @@ namespace city
 {
 void CityPeopleManager::Init()
 {
-	people_.resize(INIT_ENTITY_NMB);
+	people_.resize(neko::INIT_ENTITY_NMB);
 	personBehaviorTree_ = R"JSON(
 	{
 		"type" : "composite_selector",
@@ -84,9 +84,9 @@ void CityPeopleManager::Init()
 	})JSON"_json;
 
 
-	const auto moveToFunc = [&](Index entity, const std::vector<double>&) -> bool
+	const auto moveToFunc = [&](neko::Index entity, const std::vector<double>&) -> bool
 	{
-		auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+		auto* engine = neko::BasicEngine::GetInstance<CityBuilderEngine>();
 		Person* personPtr = engine->GetPeopleManager().GetPersonAt(entity);
 		if (personPtr == nullptr)
 		{
@@ -109,9 +109,9 @@ void CityPeopleManager::Init()
 			if (car->currentIndex >= car->currentPath.size() - 1)
 			{
 				car->carState = CarState::ARRIVED;
-				car->entity = INVALID_ENTITY;
+				car->entity = neko::INVALID_ENTITY;
 				engine->GetEntityManager().DestroyEntity(personPtr->carEntity);
-				personPtr->carEntity = INVALID_ENTITY;
+				personPtr->carEntity = neko::INVALID_ENTITY;
 				return true;
 			}
 			car->position = car->currentPath[car->currentIndex];
@@ -124,18 +124,17 @@ void CityPeopleManager::Init()
 			deltaPos = sf::Vector2f(deltaPos.x * tileSize.x, deltaPos.y * tileSize.y);
 		}
 		const auto carWorldPos = sf::Vector2f(car->position.x * float(tileSize.x), car->position.y * float(tileSize.y));
-		engine->GetTransformManager().SetPosition(
-			carWorldPos + deltaPos,
-			personPtr->carEntity);
+        engine->GetPositionManager().SetComponent(personPtr->carEntity,
+			carWorldPos + deltaPos);
 		return false; //return false means still running
 	};
 
 	FunctionMap functionMap;
-	functionMap.SetFunction("FindHouse", [&](Index entity, const std::vector<double>&) -> bool
+	functionMap.SetFunction("FindHouse", [&](neko::Index entity, const std::vector<double>&) -> bool
 	{
 
 		logDebug("Find House " + std::to_string(entity));
-		auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+		auto* engine = neko::BasicEngine::GetInstance<CityBuilderEngine>();
 		Person* personPtr = engine->GetPeopleManager().GetPersonAt(entity);
 		if (personPtr == nullptr)
 		{
@@ -145,7 +144,7 @@ void CityPeopleManager::Init()
 		}
 		auto housePos = personPtr->housePos;
 		bool searchNewHouse = false;
-		if (housePos != INVALID_TILE_POS)
+		if (housePos != neko::INVALID_TILE_POS)
 		{
 			auto* building = engine->GetBuildingManager().GetBuildingAt(housePos);
 			if (building == nullptr)
@@ -171,7 +170,7 @@ void CityPeopleManager::Init()
 			personPtr->housePos = housePos;
 
 		}
-		if (housePos != INVALID_TILE_POS)
+		if (housePos != neko::INVALID_TILE_POS)
 		{
 
 			const auto closestCurrentPos = engine->GetCityMap().GetRoadGraph().GetClosestNode(personPtr->position)->position;
@@ -192,12 +191,12 @@ void CityPeopleManager::Init()
 			car->movingTimer.Reset();
 
 		}
-		return housePos != INVALID_TILE_POS;
+		return housePos != neko::INVALID_TILE_POS;
 	});
-	functionMap.SetFunction("FindWork", [&](Index entity, const std::vector<double>&) -> bool
+	functionMap.SetFunction("FindWork", [&](neko::Index entity, const std::vector<double>&) -> bool
 	{
 		logDebug("Find Work " + std::to_string(entity));
-		auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+		auto* engine = neko::BasicEngine::GetInstance<CityBuilderEngine>();
 		Person* personPtr = engine->GetPeopleManager().GetPersonAt(entity);
 		if (personPtr == nullptr)
 		{
@@ -207,7 +206,7 @@ void CityPeopleManager::Init()
 		}
 		auto workPos = personPtr->workPos;
 		bool searchNewWork = false;
-		if (workPos != INVALID_TILE_POS)
+		if (workPos != neko::INVALID_TILE_POS)
 		{
 			auto* building = engine->GetBuildingManager().GetBuildingAt(workPos);
 			if (building == nullptr)
@@ -233,7 +232,7 @@ void CityPeopleManager::Init()
 			personPtr->workPos = workPos;
 
 		}
-		if (workPos != INVALID_TILE_POS)
+		if (workPos != neko::INVALID_TILE_POS)
 		{
 			const auto closestCurrentPos = engine->GetCityMap().GetRoadGraph().GetClosestNode(personPtr->position)->position;
 			const auto closestWorkPos = engine->GetCityMap().GetRoadGraph().GetClosestNode(workPos)->position;
@@ -253,11 +252,11 @@ void CityPeopleManager::Init()
 			car->movingTimer.Reset();
 
 		}
-		return workPos != INVALID_TILE_POS;
+		return workPos != neko::INVALID_TILE_POS;
 	});
-	functionMap.SetFunction("CheckHomeAndWork", [&](Index entity, const std::vector<double>&) -> bool
+	functionMap.SetFunction("CheckHomeAndWork", [&](neko::Index entity, const std::vector<double>&) -> bool
 	{
-		auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+        auto* engine = neko::BasicEngine::GetInstance<CityBuilderEngine>();
 		logDebug("CheckHomeAndWork " + std::to_string(entity));
 		auto* person = GetPersonAt(entity);
 		if (person == nullptr)
@@ -283,7 +282,7 @@ void CityPeopleManager::Init()
 			person->workPos = workPos;
 		}
 
-		const bool leaving = housePos == INVALID_TILE_POS || workPos == INVALID_TILE_POS;
+		const bool leaving = housePos == neko::INVALID_TILE_POS || workPos == neko::INVALID_TILE_POS;
 		if(leaving)
 		{
 			//Pathfinding to exit
@@ -307,15 +306,15 @@ void CityPeopleManager::Init()
 		}
 		return leaving;
 	});
-	functionMap.SetFunction("KillMyself", [&](Index entity, const std::vector<double>&) -> bool
+	functionMap.SetFunction("KillMyself", [&](neko::Index entity, const std::vector<double>&) -> bool
 	{
 		logDebug("Kill Myself " + std::to_string(entity));
 		DestroyPerson(entity);
 		return true;//might or might not find a house
 	});
-	functionMap.SetFunction("IncreaseDayCount", [&](Index entity, const std::vector<double>&)->bool
+	functionMap.SetFunction("IncreaseDayCount", [&](neko::Index entity, const std::vector<double>&)->bool
 	{
-		auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+        auto* engine = neko::BasicEngine::GetInstance<CityBuilderEngine>();
 		auto* person = GetPersonAt(entity);
 		if( person != nullptr)
 		{
@@ -346,31 +345,31 @@ void CityPeopleManager::Destroy()
 {
 }
 
-Entity CityPeopleManager::SpawnPerson()
+neko::Entity CityPeopleManager::SpawnPerson()
 {
-	auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+	auto* engine = neko::BasicEngine::GetInstance<CityBuilderEngine>();
 	const auto mapEnds = engine->GetCityMap().GetRoadEnds();
 	if (mapEnds.empty())
-		return INVALID_ENTITY;
+		return neko::INVALID_ENTITY;
 	auto& entityManager = engine->GetEntityManager();
 	auto& btManager = engine->GetBehaviorTreeManager();
-	const Entity person = entityManager.CreateEntity();
+	const neko::Entity person = entityManager.CreateEntity();
 
-	auto index = btManager.ParseBehaviorTreeFromJsonIndex(person, personBehaviorTree_);
+	const auto index = btManager.ParseBehaviorTreeFromJsonIndex(person, personBehaviorTree_);
 	assert(index == person);
-	entityManager.AddComponentType(person, EntityMask(CityComponentType::PERSON));
-	entityManager.AddComponentType(person, EntityMask(CityComponentType::BEHAVIOR_TREE));
+	entityManager.AddComponentType(person, neko::EntityMask(CityComponentType::PERSON));
+	entityManager.AddComponentType(person, neko::EntityMask(CityComponentType::BEHAVIOR_TREE));
 	AddPerson(person, mapEnds[rand() % mapEnds.size()]);
 	return person;
 }
 
-Entity CityPeopleManager::AddPerson(Entity entity, sf::Vector2i position)
+neko::Entity CityPeopleManager::AddPerson(neko::Entity entity, sf::Vector2i position)
 {
 	const Person person = { position, entity };
-	if (entity == INVALID_ENTITY)
+	if (entity == neko::INVALID_ENTITY)
 	{
 		people_.push_back(person);
-		return Index(people_.size());
+		return neko::Index(people_.size());
 	}
 	ResizeIfNecessary(people_, entity);
 
@@ -378,7 +377,7 @@ Entity CityPeopleManager::AddPerson(Entity entity, sf::Vector2i position)
 	return entity;
 }
 
-Person* CityPeopleManager::GetPersonAt(Entity entity)
+Person* CityPeopleManager::GetPersonAt(neko::Entity entity)
 {
 	if (entity >= people_.size())
 	{
@@ -387,21 +386,21 @@ Person* CityPeopleManager::GetPersonAt(Entity entity)
 	return &people_[entity];
 }
 
-Index CityPeopleManager::GetPeopleCount()
+neko::Index CityPeopleManager::GetPeopleCount()
 {
-	auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
-	return Index(std::count_if(people_.begin(), people_.end(), [&engine](const Person& person)
+	auto* engine = neko::BasicEngine::GetInstance<CityBuilderEngine>();
+	return neko::Index(std::count_if(people_.begin(), people_.end(), [&engine](const Person& person)
 	{
-		return engine->GetEntityManager().HasComponent(person.personEntity, EntityMask(CityComponentType::PERSON)) && 
-			person.housePos != INVALID_TILE_POS;
+		return engine->GetEntityManager().HasComponent(person.personEntity, neko::EntityMask(CityComponentType::PERSON)) &&
+			person.housePos != neko::INVALID_TILE_POS;
 	}));
 }
 
-void CityPeopleManager::DestroyPerson(Entity entity)
+void CityPeopleManager::DestroyPerson(neko::Entity entity)
 {
-	if (entity == INVALID_ENTITY)
+	if (entity == neko::INVALID_ENTITY)
 		return;
-	auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+	auto* engine = neko::BasicEngine::GetInstance<CityBuilderEngine>();
 	auto* person = GetPersonAt(entity);
 	if (person == nullptr)
 		return;

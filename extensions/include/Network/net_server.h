@@ -8,6 +8,7 @@
 #include <queue>
 #include <Network/net_command.h>
 #include <mutex>
+#include <condition_variable>
 
 
 namespace neko
