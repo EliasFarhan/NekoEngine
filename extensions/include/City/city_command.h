@@ -61,7 +61,6 @@ public:
 
 protected:
 	std::vector<std::shared_ptr<CityCommand>>commandQueue_[2];
-	CityBuilderEngine* engine_ = nullptr;
     neko::Index soundErase_ = neko::INVALID_INDEX;
     neko::Index soundBuild_ = neko::INVALID_INDEX;
     neko::Index soundRoad_ = neko::INVALID_INDEX;

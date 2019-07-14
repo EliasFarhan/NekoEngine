@@ -110,7 +110,7 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
                                        const neko::Position2dManager& positionManager,
                                        sf::View mainView, CityTilesheetType updatedCityTileType)
 {
-	const neko::Index frameIndex = multi::MainEngine::GetFrameIndex();
+	const neko::Index frameIndex = multi::MainEngine::GetFrameIndex() %2;
 	//Manage window view
 	windowView_ = sf::FloatRect((mainView.getCenter() - mainView.getSize() / 2.0f), mainView.getSize());
 

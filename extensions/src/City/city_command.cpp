@@ -70,29 +70,30 @@ void CityCommandManager::Init()
 
 void CityCommandManager::ExecuteCommand(const std::shared_ptr<CityCommand>& command) const
 {
+	auto* engine = neko::BasicEngine::GetInstance<CityBuilderEngine>();
 	switch (command->commandType)
 	{
 	case CityCommandType::CHANGE_CURSOR_MODE:
 	{
 		auto* cursorCommand = dynamic_cast<ChangeModeCommand*>(command.get());
-		engine_->GetCursor().SetCursorMode(cursorCommand->newCursorMode);
+		engine->GetCursor().SetCursorMode(cursorCommand->newCursorMode);
 		neko::Sound::PlaySound(soundSelect_);
 		break;
 	}
 	case CityCommandType::CREATE_CITY_ELEMENT:
 	{
-		if (engine_->GetCityMoney() < roadCost)
+		if (engine->GetCityMoney() < roadCost)
 		{
 			neko::Sound::PlaySound(soundOut_);
 			break;
 		}
 		auto* buildCommand = dynamic_cast<BuildElementCommand*>(command.get());
-		engine_->GetZoneManager().RemoveZone(buildCommand->position);
-		engine_->GetCityMap().AddCityElement(buildCommand->elementType, buildCommand->position);
+		engine->GetZoneManager().RemoveZone(buildCommand->position);
+		engine->GetCityMap().AddCityElement(buildCommand->elementType, buildCommand->position);
 		if (buildCommand->elementType == CityElementType::ROAD)
 		{
-			engine_->ChangeCityMoney(-roadCost);
-			engine_->GetBuildingManager().RemoveBuilding(buildCommand->position);
+			engine->ChangeCityMoney(-roadCost);
+			engine->GetBuildingManager().RemoveBuilding(buildCommand->position);
 		}
 		neko::Sound::PlaySound(soundRoad_);
 		break;
@@ -100,29 +101,29 @@ void CityCommandManager::ExecuteCommand(const std::shared_ptr<CityCommand>& comm
 	case CityCommandType::DELETE_CITY_ELEMENT:
 	{
 		auto* buildCommand = dynamic_cast<DestroyElementCommand*>(command.get());
-		engine_->GetCityMap().RemoveCityElement(buildCommand->position);
-		engine_->GetCarManager().RescheduleCarPathfinding(buildCommand->position);
-		engine_->GetZoneManager().RemoveZone(buildCommand->position);
-		engine_->GetBuildingManager().RemoveBuilding(buildCommand->position);
+		engine->GetCityMap().RemoveCityElement(buildCommand->position);
+		engine->GetCarManager().RescheduleCarPathfinding(buildCommand->position);
+		engine->GetZoneManager().RemoveZone(buildCommand->position);
+		engine->GetBuildingManager().RemoveBuilding(buildCommand->position);
         neko::Sound::PlaySound(soundErase_);
 		break;
 	}
 	case CityCommandType::ADD_CITY_ZONE:
 	{
 		auto* zoneCommand = dynamic_cast<AddZoneCommand*>(command.get());
-		if (engine_->GetCityMoney() < zoneCost)
+		if (engine->GetCityMoney() < zoneCost)
 		{
             neko::Sound::PlaySound(soundOut_);
 		}
-		engine_->GetZoneManager().AddZone(zoneCommand->position, zoneCommand->zoneType, engine_->GetCityMap());
+		engine->GetZoneManager().AddZone(zoneCommand->position, zoneCommand->zoneType, engine->GetCityMap());
         neko::Sound::PlaySound(soundBuild_);
 		break;
 	}
 	case CityCommandType::CHANGE_TAX:
 	{
 		auto* taxCommand = dynamic_cast<ChangeTaxCommand*>(command.get());
-		engine_->houseTax = taxCommand->houseTax;
-		engine_->workTax = taxCommand->workTax;
+		engine->houseTax = taxCommand->houseTax;
+		engine->workTax = taxCommand->workTax;
 	}
 	default:
 		break;
