@@ -31,6 +31,9 @@ SOFTWARE.
 
 #ifdef WIN32
 #include <intrin.h>
+#ifdef __AVX2__
+#define __SSE__
+#endif
 #else
 #include <x86intrin.h>
 #endif
@@ -40,6 +43,12 @@ const int toRange = 1 << 22;
 
 #ifdef __AVX2__
 #define SIMD_REGISTER_SIZE 8
+#else
+#ifdef __SSE__
+#define SIMD_REGISTER_SIZE 4
+#else
+#define SIMD_REGISTER_SIZE 4
+#endif
 #endif
 
 float floatRand()
@@ -295,13 +304,13 @@ public:
             std::array<float,8> values;
 
             std::generate(values.begin(), values.end(),floatRand);
-            transform.positionsX = _mm256_loadu_ps(&values[0]);
+            transform.positionsX = _mm256_load_ps(&values[0]);
             std::generate(values.begin(), values.end(),floatRand);
-            transform.positionsY = _mm256_loadu_ps(&values[0]);
+            transform.positionsY = _mm256_load_ps(&values[0]);
             std::generate(values.begin(), values.end(),floatRand);
-            transform.positionsZ = _mm256_loadu_ps(&values[0]);
+            transform.positionsZ = _mm256_load_ps(&values[0]);
             std::generate(values.begin(), values.end(),floatRand);
-            transform.positionsW = _mm256_loadu_ps(&values[0]);
+            transform.positionsW = _mm256_load_ps(&values[0]);
 
         }
     }
@@ -321,6 +330,56 @@ public:
     }
 private:
     std::vector<PackedVec4f> transforms_;
+};
+}
+#endif
+#ifdef __SSE__
+namespace SSE
+{
+struct PackedVec4f
+{
+	__m128 positionsX;
+	__m128 positionsY;
+	__m128 positionsZ;
+	__m128 positionsW;
+};
+class TransformSystem
+{
+public:
+	TransformSystem(size_t length)
+	{
+		transforms_.resize(length / 4);
+		for (auto& transform : transforms_)
+		{
+			std::array<float, 8> values;
+
+			std::generate(values.begin(), values.end(), floatRand);
+			transform.positionsX = _mm_load_ps(&values[0]);
+			std::generate(values.begin(), values.end(), floatRand);
+			transform.positionsY = _mm_load_ps(&values[0]);
+			std::generate(values.begin(), values.end(), floatRand);
+			transform.positionsZ = _mm_load_ps(&values[0]);
+			std::generate(values.begin(), values.end(), floatRand);
+			transform.positionsW = _mm_load_ps(&values[0]);
+
+		}
+	}
+	void Translate(const neko::Vec4f moveValue)
+	{
+		const __m128 moveX = _mm_load1_ps(&moveValue.x);
+		const __m128 moveY = _mm_load1_ps(&moveValue.x);
+		const __m128 moveZ = _mm_load1_ps(&moveValue.x);
+		const __m128 moveW = _mm_load1_ps(&moveValue.x);
+		for (auto& transform : transforms_)
+		{
+			transform.positionsX = _mm_add_ps(transform.positionsX, moveX);
+			transform.positionsY = _mm_add_ps(transform.positionsY, moveY);
+			transform.positionsZ = _mm_add_ps(transform.positionsZ, moveZ);
+			transform.positionsW = _mm_add_ps(transform.positionsW, moveW);
+		}
+	}
+private:
+	std::vector<PackedVec4f> transforms_;
 };
 }
 #endif
@@ -367,6 +426,17 @@ static void BM_AOSOA_AVX2(benchmark::State& state) {
     }
 }
 BENCHMARK(BM_AOSOA_AVX2)->Range(fromRange, toRange);
+#endif
+#ifdef __SSE__
+static void BM_AOSOA_SSE(benchmark::State& state) {
+	auto transformSystem = std::make_unique<SSE::TransformSystem>(state.range(0));
+	const auto move = neko::Vec4f(floatRand(), floatRand(), floatRand(), floatRand());
+	for (auto _ : state)
+	{
+		transformSystem->Translate(move);
+	}
+}
+BENCHMARK(BM_AOSOA_SSE)->Range(fromRange, toRange);
 #endif
 
 BENCHMARK_MAIN();
