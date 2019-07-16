@@ -29,9 +29,18 @@ SOFTWARE.
 #include <memory>
 #include <cmath>
 
-const int fromRange = 8;
-const int toRange = 1 << 20;
+#ifdef WIN32
+#include <intrin.h>
+#else
+#include <x86intrin.h>
+#endif
 
+const int fromRange = 8;
+const int toRange = 1 << 22;
+
+#ifdef __AVX2__
+#define SIMD_REGISTER_SIZE 8
+#endif
 
 float floatRand()
 {
@@ -210,56 +219,111 @@ namespace AOSOA
 template<size_t N>
 struct PackedVec4f
 {
-	std::array<float, N> positionsX;
-	std::array<float, N> positionsY;
-	std::array<float, N> positionsZ;
-	std::array<float, N> positionsW;
+
+    std::array<float, N> positionsX;
+    std::array<float, N> positionsY;
+    std::array<float, N> positionsZ;
+    std::array<float, N> positionsW;
+
 };
 
 template<size_t N>
 class TransformSystem
 {
 public:
-	TransformSystem(size_t length)
-	{
-		transforms_.resize(length / N);
-		for (auto& transform : transforms_)
-		{
-			for (int i = 0; i < N; i++)
-			{
-				transform.positionsX[i] = floatRand();
-				transform.positionsY[i] = floatRand();
-				transform.positionsZ[i] = floatRand();
-				transform.positionsW[i] = floatRand();
-			}
-		}
-	}
-	void Translate(const neko::Vec4f moveValue)
-	{
-		for (auto& transform : transforms_)
-		{
-			for(auto& position : transform.positionsX)
-			{
-				position += moveValue.x;
-			}
-			for(auto& position : transform.positionsY)
-			{
-				position += moveValue.y;
-			}
-			for(auto& position : transform.positionsZ)
-			{
-				position += moveValue.z;
-			}
-			for(auto& position : transform.positionsW)
-			{
-				position += moveValue.w;
-			}
-		}
-	}
+    TransformSystem(size_t length)
+    {
+        transforms_.resize(length / N);
+        for (auto& transform : transforms_)
+        {
+            for (int i = 0; i < N; i++)
+            {
+                transform.positionsX[i] = floatRand();
+                transform.positionsY[i] = floatRand();
+                transform.positionsZ[i] = floatRand();
+                transform.positionsW[i] = floatRand();
+            }
+        }
+    }
+
+    void Translate(const neko::Vec4f moveValue)
+    {
+        for (auto& transform : transforms_)
+        {
+            for (auto& position : transform.positionsX)
+            {
+                position += moveValue.x;
+            }
+            for (auto& position : transform.positionsY)
+            {
+                position += moveValue.y;
+            }
+            for (auto& position : transform.positionsZ)
+            {
+                position += moveValue.z;
+            }
+            for (auto& position : transform.positionsW)
+            {
+                position += moveValue.w;
+            }
+        }
+    }
+
 private:
-	std::vector<PackedVec4f<N>> transforms_;
+    std::vector<PackedVec4f<N>> transforms_;
 };
 }
+
+#ifdef __AVX2__
+namespace AVX2
+{
+struct PackedVec4f
+{
+    __m256 positionsX;
+    __m256 positionsY;
+    __m256 positionsZ;
+    __m256 positionsW;
+};
+class TransformSystem
+{
+public:
+    TransformSystem(size_t length)
+    {
+        transforms_.resize(length / 8);
+        for (auto& transform : transforms_)
+        {
+            std::array<float,8> values;
+
+            std::generate(values.begin(), values.end(),floatRand);
+            transform.positionsX = _mm256_loadu_ps(&values[0]);
+            std::generate(values.begin(), values.end(),floatRand);
+            transform.positionsY = _mm256_loadu_ps(&values[0]);
+            std::generate(values.begin(), values.end(),floatRand);
+            transform.positionsZ = _mm256_loadu_ps(&values[0]);
+            std::generate(values.begin(), values.end(),floatRand);
+            transform.positionsW = _mm256_loadu_ps(&values[0]);
+
+        }
+    }
+    void Translate(const neko::Vec4f moveValue)
+    {
+        const __m256 moveX = _mm256_broadcast_ss(&moveValue.x);
+        const __m256 moveY = _mm256_broadcast_ss(&moveValue.x);
+        const __m256 moveZ = _mm256_broadcast_ss(&moveValue.x);
+        const __m256 moveW = _mm256_broadcast_ss(&moveValue.x);
+        for (auto& transform : transforms_)
+        {
+            transform.positionsX = _mm256_add_ps(transform.positionsX, moveX);
+            transform.positionsY = _mm256_add_ps(transform.positionsY, moveY);
+            transform.positionsZ = _mm256_add_ps(transform.positionsZ, moveZ);
+            transform.positionsW = _mm256_add_ps(transform.positionsW, moveW);
+        }
+    }
+private:
+    std::vector<PackedVec4f> transforms_;
+};
+}
+#endif
 
 static void BM_AOS(benchmark::State& state)
 {
@@ -285,7 +349,7 @@ static void BM_SOA(benchmark::State& state) {
 BENCHMARK(BM_SOA)->Range(fromRange, toRange);
 
 static void BM_AOSOA(benchmark::State& state) {
-	auto transformSystem = std::make_unique<AOSOA::TransformSystem<4>>(state.range(0));
+	auto transformSystem = std::make_unique<AOSOA::TransformSystem<SIMD_REGISTER_SIZE>>(state.range(0));
 	const auto move = neko::Vec4f(floatRand(), floatRand(), floatRand(), floatRand());
 	for (auto _ : state)
 	{
@@ -293,6 +357,16 @@ static void BM_AOSOA(benchmark::State& state) {
 	}
 }
 BENCHMARK(BM_AOSOA)->Range(fromRange, toRange);
-
+#ifdef __AVX2__
+static void BM_AOSOA_AVX2(benchmark::State& state) {
+    auto transformSystem = std::make_unique<AVX2::TransformSystem>(state.range(0));
+    const auto move = neko::Vec4f(floatRand(), floatRand(), floatRand(), floatRand());
+    for (auto _ : state)
+    {
+        transformSystem->Translate(move);
+    }
+}
+BENCHMARK(BM_AOSOA_AVX2)->Range(fromRange, toRange);
+#endif
 
 BENCHMARK_MAIN();
