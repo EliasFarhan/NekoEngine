@@ -62,7 +62,7 @@ static void BM_AdderNoAlias(benchmark::State& state)
 	values.resize(length);
 	for (auto& v : values)
 	{
-		v = rand() % 32767;
+		v = rand() % 32768;
 	}
 	for (auto _ : state)
 	{

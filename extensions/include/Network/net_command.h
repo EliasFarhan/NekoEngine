@@ -1,6 +1,7 @@
 #pragma once
 #include <engine/globals.h>
 #include <SFML/Network/Packet.hpp>
+#include <memory>
 
 namespace neko
 {
@@ -17,12 +18,13 @@ public:
 
 
 }
-inline sf::Packet& operator <<(sf::Packet& packet, const neko::NetCommand& command)
+template <class T = neko::NetCommand>
+sf::Packet& operator <<(sf::Packet& packet, const std::shared_ptr<T> command)
 {
-	return packet << command.netCommandType;
+	return packet << command->netCommandType;
 }
-
-inline sf::Packet& operator >>(sf::Packet& packet, neko::NetCommand& command)
+template <class T = neko::NetCommand>
+sf::Packet& operator >>(sf::Packet& packet, std::shared_ptr <T> command)
 {
-	return packet >> command.netCommandType;
+	return packet >> command->netCommandType;
 }

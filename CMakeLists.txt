@@ -303,6 +303,11 @@ target_link_libraries(CityBuilder PUBLIC Neko_COMMON City multi)
 set_property(TARGET CityBuilder PROPERTY CXX_STANDARD 17)
 set_target_properties (CityBuilder PROPERTIES FOLDER Main)
 
+#Splash
+add_executable(SplashDebug ${CMAKE_SOURCE_DIR}/main/SplashDebug.cpp)
+target_link_libraries(SplashDebug PUBLIC Neko_COMMON Network Splash)
+set_property(TARGET SplashDebug PROPERTY CXX_STANDARD 17)
+set_target_properties (SplashDebug PROPERTIES FOLDER Main)
 
 if(MSVC)
 if(NOT CMAKE_CL_64)

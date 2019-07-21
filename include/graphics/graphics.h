@@ -75,9 +75,11 @@ struct TilemapCommand : public Command
 class GraphicsManager
 {
 public:
+	virtual ~GraphicsManager() {}
     virtual void Draw(sf::Drawable& drawable, int layer = 0) = 0;
 
     virtual void Draw(sf::VertexArray* vertexArray, sf::Texture* texture, int layer = 0) = 0;
+
 
 protected:
 
@@ -90,10 +92,11 @@ public:
     virtual void Draw(sf::Drawable& drawable, int layer = 0);
 
     virtual void Draw(sf::VertexArray* vertexArray, sf::Texture* texture, int layer = 0);
-
+	
 protected:
     virtual void Draw(std::array<Command*, MAX_COMMAND_NMB>& commandBuffers_);
-    std::array<Command*, MAX_COMMAND_NMB> commandBuffer_;
+
+    std::array<Command*, MAX_COMMAND_NMB> commandBuffer_ = {};
     std::array<neko::SfmlCommand, neko::MAX_COMMAND_NMB> commands_;
     std::array<neko::TilemapCommand, neko::MAX_COMMAND_NMB> tileCommands_;
 };

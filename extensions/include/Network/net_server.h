@@ -1,7 +1,7 @@
 #pragma once
 #include <thread>
 #include <array>
-#include <vector>
+#include <atomic>
 #include <SFML/Network/TcpSocket.hpp>
 #include <SFML/Network/TcpListener.hpp>
 #include "engine/globals.h"
@@ -14,7 +14,9 @@
 namespace neko
 {
 
+const std::string SERVER_IP = "localhost";
 const short SERVER_PORT = 12345;
+
 const size_t MAX_CLIENT_NMB = 128;
 
 struct ClientData
@@ -30,19 +32,21 @@ struct ClientData
 class Server
 {
 public:
+	virtual ~Server() = default;
 	void Start();
+	void Stop();
 	void SendReliable(const std::shared_ptr<NetCommand> command, Index clientId);
 	void SendUnreliable(const NetCommand& command);
 protected:
 	void ServerLoop();
-	void TcpSocketLoop(Index clientId);
-	virtual void ParseCommand(const sf::Packet& packet);
+	void TcpSocketLoop(const Index clientId);
+	virtual void ParseCommand(sf::Packet& packet, const Index clientId) = 0 ;
 
 
 	std::thread serverThread;
     sf::TcpListener listener_;
 	std::array<ClientData, MAX_CLIENT_NMB> clients_;
-    bool isRunning = true;
+    std::atomic<bool> isRunning = true;
 	Index currentIndex = 0;
 };
 }
