@@ -6,7 +6,7 @@
 #include <SFML/Network/TcpListener.hpp>
 #include "engine/globals.h"
 #include <queue>
-#include <Network/net_command.h>
+#include "net_command.h"
 #include <mutex>
 #include <condition_variable>
 

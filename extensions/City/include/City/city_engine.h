@@ -26,18 +26,18 @@
 
 #include <thread>
 #include <engine/engine.h>
-#include <City/city_tilemap.h>
-#include <City/city_map.h>
+#include "city_tilemap.h"
+#include "city_map.h"
 #include "engine/input.h"
 
 #include <SFML/Window/Event.hpp>
-#include "City/city_command.h"
-#include <City/city_cursor.h>
+#include "city_command.h"
+#include "city_cursor.h"
 #include <engine/transform.h>
 #include <core/executor.hpp>
-#include "City/city_car.h"
-#include "City/city_zone.h"
-#include <City/city_building.h>
+#include "city_car.h"
+#include "city_zone.h"
+#include "city_building.h"
 #include "city_behavior_tree_manager.h"
 #include "city_person.h"
 

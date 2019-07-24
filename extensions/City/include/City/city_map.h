@@ -27,8 +27,8 @@
 #include "engine/system.h"
 #include <PerlinNoise.hpp>
 #include "engine/globals.h"
-#include "City/city_command.h"
-#include <City/city_graph.h>
+#include "city_command.h"
+#include "city_graph.h"
 
 
 namespace city

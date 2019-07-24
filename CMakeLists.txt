@@ -226,7 +226,7 @@ LIST(APPEND Neko_LIBRARIES Remotery)
 set_target_properties (Remotery PROPERTIES FOLDER Externals)
 #Neko_COMMON
 
-include_directories(include/ extensions/include/)
+include_directories(include/)
 
 add_library(Neko_COMMON STATIC ${Neko_SRC})
 target_link_libraries(Neko_COMMON PUBLIC ${Neko_LIBRARIES})
@@ -237,20 +237,18 @@ target_compile_definitions(Neko_COMMON PUBLIC $<$<CONFIG:RelWithDebInfo>:__neko_
 
 set_target_properties (Neko_COMMON PROPERTIES FOLDER Neko)
 #extensions
-file(GLOB EXTENSIONS_FOLDERS extensions/src/* extensions/include/*)
+file(GLOB EXTENSIONS_FOLDERS extensions/*)
 foreach(EXTENSION_FOLDER ${EXTENSIONS_FOLDERS})
 	if(IS_DIRECTORY ${EXTENSION_FOLDER})
 		get_filename_component(EXTENSION_DIR ${EXTENSION_FOLDER} NAME)
 		file(GLOB_RECURSE  EXTENSION_FILES ${EXTENSION_FOLDER}/*.h ${EXTENSION_FOLDER}/*.cpp)
 		source_group("Extensions\\${EXTENSION_DIR}"            FILES ${EXTENSION_FILES})
-		if(NOT TARGET ${EXTENSION_DIR})
-			add_library(${EXTENSION_DIR} STATIC ${EXTENSION_FILES})
-			LIST(APPEND EXTENSIONS_LIBS ${EXTENSION_DIR})
-			set_target_properties (${EXTENSION_DIR} PROPERTIES FOLDER Neko\\ExtensionsLibs)
-			target_link_libraries(${EXTENSION_DIR} PUBLIC Neko_COMMON)
-		else()
-			target_sources(${EXTENSION_DIR} PRIVATE ${EXTENSION_FILES})
-		endif()
+		include_directories("${EXTENSION_FOLDER}/include/")
+		add_library(${EXTENSION_DIR} STATIC ${EXTENSION_FILES})
+		LIST(APPEND EXTENSIONS_LIBS ${EXTENSION_DIR})
+		set_target_properties (${EXTENSION_DIR} PROPERTIES FOLDER Neko\\ExtensionsLibs)
+		target_link_libraries(${EXTENSION_DIR} PUBLIC Neko_COMMON)
+
 	endif()
 endforeach()
 #Neko TEST
