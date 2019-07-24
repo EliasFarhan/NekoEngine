@@ -42,27 +42,40 @@ sf::Sprite* BasicSpriteManager::GetSpriteAt(unsigned int spriteIndex)
     return nullptr;
 }
 
-void BasicSpriteManager::CopyTransformPosition(Position2dManager& transformManager, size_t start, size_t length)
+void BasicSpriteManager::CopyTransformPosition(Position2dManager& positionManager, size_t start, size_t length)
 {
 	rmt_ScopedCPUSample(CopySpritePositions, 0);
 	for (auto i = start; i < start + length; i++)
 	{
-		components_[i].setPosition(transformManager.GetComponent(neko::Entity(i)));
+		components_[i].setPosition(positionManager.GetComponent(neko::Entity(i)));
 	}
 }
 
-void BasicSpriteManager::CopyTransformScales(Scale2dManager& transformManager, size_t start, size_t length)
+void BasicSpriteManager::CopyTransformScales(Scale2dManager& scaleManager, size_t start, size_t length)
 {
-
+	rmt_ScopedCPUSample(CopySpritePositions, 0);
+	for (auto i = start; i < start + length; i++)
+	{
+		components_[i].setScale(scaleManager.GetComponent(neko::Entity(i)));
+	}
 }
 
-void BasicSpriteManager::CopyTransformAngles(Angle2dManager& transformManager, size_t start, size_t length)
+void BasicSpriteManager::CopyTransformAngles(Angle2dManager& angleManager, size_t start, size_t length)
 {
-
+	rmt_ScopedCPUSample(CopySpritePositions, 0);
+	for (auto i = start; i < start + length; i++)
+	{
+		components_[i].setRotation(angleManager.GetComponent(neko::Entity(i)));
+	}
 }
 
 void BasicSpriteManager::PushCommands(neko::GraphicsManager* graphicsManager, size_t start, size_t length)
 {
 
+	if (graphicsManager == nullptr) return;
+	for(size_t i = start; i < start+length;i++)
+	{
+		graphicsManager->Draw(components_[i]);
+	}
 }
 }

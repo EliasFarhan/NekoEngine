@@ -37,9 +37,9 @@ public:
 
     TextureManager();
 
-    bool HasValidExtension(const std::string& filename);
+    bool HasValidExtension(const std::string_view filename);
 	//Return an index to avoid pointer invalidation
-	Index LoadTexture(std::string filename);
+	Index LoadTexture(const std::string_view filename);
 	const std::shared_ptr<sf::Texture> GetTexture(const Index index) const;
 
 private:

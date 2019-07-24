@@ -47,16 +47,36 @@ void TilemapCommand::Draw(sf::RenderTarget* renderTarget)
 //TODO Generate render command
 void BasicGraphicsManager::Draw(sf::Drawable& drawable, int layer)
 {
+	SfmlCommand sfmlCommand;
+	sfmlCommand.drawable = &drawable;
+	sfmlCommand.layer = layer;
 
+	sfmlCommands[renderLength] = sfmlCommand;
+	commandBuffer_[renderLength] = &sfmlCommands[renderLength];
+	renderLength++;
 }
 //TODO Generate render command
 void BasicGraphicsManager::Draw(sf::VertexArray* vertexArray, sf::Texture* texture, int layer)
 {
 
 }
+
+void BasicGraphicsManager::Render(sf::RenderTarget* renderTarget)
+{
+	std::sort(commandBuffer_.begin(), commandBuffer_.begin() + renderLength, [](Command* c1, Command* c2)
+	{
+		return c1->layer > c2->layer;
+	});
+	for (size_t i = 0; i < renderLength; i++)
+	{
+		commandBuffer_[i]->Draw(renderTarget);
+	}
+	renderLength = 0;
+}
+
 //TODO Generate render command
 void BasicGraphicsManager::Draw(std::array<Command*, MAX_COMMAND_NMB>& commandBuffers_)
 {
-
+	
 }
 }

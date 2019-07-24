@@ -89,16 +89,17 @@ protected:
 class BasicGraphicsManager : public GraphicsManager
 {
 public:
-    virtual void Draw(sf::Drawable& drawable, int layer = 0);
+    virtual void Draw(sf::Drawable& drawable, int layer = 0) override;
 
-    virtual void Draw(sf::VertexArray* vertexArray, sf::Texture* texture, int layer = 0);
-	
+    virtual void Draw(sf::VertexArray* vertexArray, sf::Texture* texture, int layer = 0) override;
+
+	void Render(sf::RenderTarget* renderTarget);
 protected:
-    virtual void Draw(std::array<Command*, MAX_COMMAND_NMB>& commandBuffers_);
+    virtual void Draw(std::array<Command*, MAX_COMMAND_NMB>& commandBuffers_) override;
 
     std::array<Command*, MAX_COMMAND_NMB> commandBuffer_ = {};
-    std::array<neko::SfmlCommand, neko::MAX_COMMAND_NMB> commands_;
-    std::array<neko::TilemapCommand, neko::MAX_COMMAND_NMB> tileCommands_;
+	std::array<SfmlCommand, MAX_COMMAND_NMB> sfmlCommands = {};
+	size_t renderLength = 0;
 };
 
 }

@@ -68,11 +68,11 @@ public:
 
     sf::Sprite* GetSpriteAt(unsigned int spriteIndex) override;
 
-    void CopyTransformPosition(Position2dManager& transformManager, size_t start, size_t length) override;
+    void CopyTransformPosition(Position2dManager& positionManager, size_t start, size_t length) override;
 
-    void CopyTransformScales(Scale2dManager& transformManager, size_t start, size_t length) override;
+    void CopyTransformScales(Scale2dManager& scaleManager, size_t start, size_t length) override;
 
-    void CopyTransformAngles(Angle2dManager& transformManager, size_t start, size_t length) override;
+    void CopyTransformAngles(Angle2dManager& angleManager, size_t start, size_t length) override;
 
     void PushCommands(neko::GraphicsManager* graphicsManager, size_t start, size_t length) override;
 

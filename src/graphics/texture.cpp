@@ -51,7 +51,7 @@ TextureManager::TextureManager()
     textures_.reserve(INIT_ENTITY_NMB);
 }
 
-bool TextureManager::HasValidExtension(const std::string& filename)
+bool TextureManager::HasValidExtension(const std::string_view filename)
 {
     const auto filenameExtensionIndex = filename.find_last_of('.');
     if (filenameExtensionIndex >= filename.size())
@@ -64,7 +64,7 @@ bool TextureManager::HasValidExtension(const std::string& filename)
     return imgExtensionSet.find(extension) != imgExtensionSet.end();
 }
 
-Index TextureManager::LoadTexture(std::string filename)
+Index TextureManager::LoadTexture(const std::string_view filename)
 {
 
 
@@ -94,7 +94,7 @@ Index TextureManager::LoadTexture(std::string filename)
         }
         else
         {
-            if (!textures_[textureIndex]->loadFromFile(filename))
+            if (!textures_[textureIndex]->loadFromFile(filename.data()))
             {
                 std::ostringstream oss;
                 oss << "[ERROR] Could not load texture file: " << filename;
@@ -108,7 +108,7 @@ Index TextureManager::LoadTexture(std::string filename)
     if (FileExists(filename))
     {
         auto texture = sf::Texture();
-        if (!texture.loadFromFile(filename))
+        if (!texture.loadFromFile(filename.data()))
         {
             std::ostringstream oss;
             oss << "[ERROR] Could not load texture file: " << filename;
@@ -116,7 +116,7 @@ Index TextureManager::LoadTexture(std::string filename)
             return INVALID_INDEX;
         }
         textures_.emplace_back(std::make_shared<sf::Texture>(texture));
-        texturePaths_.push_back(filename);
+        texturePaths_.push_back(filename.data());
 
         return static_cast<Index>(textures_.size() - 1);
     }
