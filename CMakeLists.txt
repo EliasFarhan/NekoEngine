@@ -97,6 +97,7 @@ foreach(DATA ${DATA_FILES})
 
 	add_custom_command(
 			OUTPUT ${DATA_OUTPUT}
+			DEPENDS ${DATA}
 			COMMAND ${CMAKE_COMMAND} -E make_directory "${PROJECT_BINARY_DIR}/data/"
 			COMMAND ${CMAKE_COMMAND} -E make_directory "${PROJECT_BINARY_DIR}/data/${PATH_NAME}"
 			COMMAND ${CMAKE_COMMAND} -E copy ${DATA} "${PROJECT_BINARY_DIR}/data/${PATH_NAME}/${FILE_NAME}")
@@ -104,8 +105,7 @@ foreach(DATA ${DATA_FILES})
 endforeach(DATA)
 add_custom_target(
 		DataTarget
-		DEPENDS ${DATA_BINARY_FILES}
-)
+		DEPENDS ${DATA_BINARY_FILES})
 
 set_target_properties (DataTarget PROPERTIES FOLDER Neko)
 
@@ -248,6 +248,7 @@ foreach(EXTENSION_FOLDER ${EXTENSIONS_FOLDERS})
 			LIST(APPEND EXTENSIONS_LIBS ${EXTENSION_DIR})
 			set_target_properties (${EXTENSION_DIR} PROPERTIES FOLDER Neko\\ExtensionsLibs)
 			target_link_libraries(${EXTENSION_DIR} PUBLIC Neko_COMMON)
+			add_dependencies(${EXTENSION_DIR} DataTarget)
 		else()
 			target_sources(${EXTENSION_DIR} PRIVATE ${EXTENSION_FILES})
 		endif()
@@ -263,6 +264,7 @@ if (APPLE)
 	target_link_libraries(Neko_TEST ${Boost_LIBRARIES})
 else()
 endif(APPLE)
+add_dependencies(Neko_TEST DataTarget)
 
 set_target_properties (Neko_TEST PROPERTIES FOLDER Neko)
 
@@ -279,7 +281,7 @@ foreach(course_file ${COURSE_FILES} )
     # Make sure YourLib is linked to each app
     target_link_libraries(${course_name} PUBLIC benchmark benchmark_main Neko_COMMON ${EXTENSIONS_LIBS} )
     set_property(TARGET ${course_name} PROPERTY CXX_STANDARD 17)
-
+	add_dependencies(${course_name} DataTarget)
 
 	IF(MSVC)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:AVX2 /Oi")
@@ -302,13 +304,13 @@ add_executable(CityBuilder ${CMAKE_SOURCE_DIR}/main/CityBuilder.cpp)
 target_link_libraries(CityBuilder PUBLIC Neko_COMMON City multi)
 set_property(TARGET CityBuilder PROPERTY CXX_STANDARD 17)
 set_target_properties (CityBuilder PROPERTIES FOLDER Main)
-
+add_dependencies(CityBuilder DataTarget)
 #Splash
 add_executable(SplashDebug ${CMAKE_SOURCE_DIR}/main/SplashDebug.cpp)
 target_link_libraries(SplashDebug PUBLIC Neko_COMMON Network Splash)
 set_property(TARGET SplashDebug PROPERTY CXX_STANDARD 17)
 set_target_properties (SplashDebug PROPERTIES FOLDER Main)
-
+add_dependencies(SplashDebug DataTarget)
 if(MSVC)
 if(NOT CMAKE_CL_64)
 file(COPY ${SFML_DIR}/extlibs/bin/x86/openal32.dll DESTINATION ${CMAKE_BINARY_DIR}/)

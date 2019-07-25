@@ -286,6 +286,7 @@ private:
 #ifdef __AVX2__
 namespace AVX2
 {
+using float8 = __m256;
 struct PackedVec4f
 {
     __m256 positionsX;
@@ -317,9 +318,9 @@ public:
     void Translate(const neko::Vec4f moveValue)
     {
         const __m256 moveX = _mm256_broadcast_ss(&moveValue.x);
-        const __m256 moveY = _mm256_broadcast_ss(&moveValue.x);
-        const __m256 moveZ = _mm256_broadcast_ss(&moveValue.x);
-        const __m256 moveW = _mm256_broadcast_ss(&moveValue.x);
+        const __m256 moveY = _mm256_broadcast_ss(&moveValue.y);
+        const __m256 moveZ = _mm256_broadcast_ss(&moveValue.z);
+        const __m256 moveW = _mm256_broadcast_ss(&moveValue.w);
         for (auto& transform : transforms_)
         {
             transform.positionsX = _mm256_add_ps(transform.positionsX, moveX);
