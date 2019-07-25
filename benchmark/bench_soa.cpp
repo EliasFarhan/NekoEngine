@@ -141,7 +141,38 @@ struct Vec4f
 };
 }
 
-//#define SOA_VECTOR2
+namespace AOS
+{
+struct Transform
+{
+    neko::Vec4f position;
+};
+
+class TransformSystem
+{
+public:
+    TransformSystem(size_t length)
+    {
+        m_Transforms.resize(length);
+        for (auto& transform : m_Transforms)
+        {
+            transform.position = neko::Vec4f(floatRand(), floatRand(), floatRand(), floatRand());
+        }
+    }
+
+    void Translate(const neko::Vec4f moveValue)
+    {
+        for (auto& transform : m_Transforms)
+        {
+            transform.position += moveValue;
+        }
+    }
+private:
+    std::vector <Transform> m_Transforms;
+};
+}
+
+
 namespace SOA
 {
 class TransformSystem
@@ -186,42 +217,16 @@ private:
 	std::vector<float> m_PositionsY;
 	std::vector<float> m_PositionsZ;
 	std::vector<float> m_PositionsW;
+
+    std::vector<float> m_ScalesX;
+    std::vector<float> m_ScaleY;
+    std::vector<float> m_ScaleZ;
+    std::vector<float> m_ScaleW;
+
+    std::vector<float> m_Angles;
 };
 }
-namespace AOS
-{
-struct Transform
-{
-	neko::Vec4f position;
-};
 
-class TransformSystem
-{
-public:
-	TransformSystem(size_t length)
-	{
-		m_Transforms.resize(length);
-		for (auto& transform : m_Transforms)
-		{
-			transform.position = neko::Vec4f(floatRand(), floatRand(), floatRand(), floatRand());
-		}
-	}
-
-	void Translate(const neko::Vec4f moveValue)
-	{
-		for (auto& transform : m_Transforms)
-		{
-			transform.position += moveValue;
-		}
-	}
-private:
-#ifdef AOS_LIST
-	std::list <Transform> m_Transforms;
-#else
-	std::vector <Transform> m_Transforms;
-#endif
-};
-}
 
 namespace AOSOA
 {
@@ -289,10 +294,11 @@ namespace AVX2
 using float8 = __m256;
 struct PackedVec4f
 {
-    __m256 positionsX;
-    __m256 positionsY;
-    __m256 positionsZ;
-    __m256 positionsW;
+    float8 positionsX;
+    float8 positionsY;
+    float8 positionsZ;
+    float8 positionsW;
+
 };
 class TransformSystem
 {
@@ -317,10 +323,12 @@ public:
     }
     void Translate(const neko::Vec4f moveValue)
     {
-        const __m256 moveX = _mm256_broadcast_ss(&moveValue.x);
-        const __m256 moveY = _mm256_broadcast_ss(&moveValue.y);
-        const __m256 moveZ = _mm256_broadcast_ss(&moveValue.z);
-        const __m256 moveW = _mm256_broadcast_ss(&moveValue.w);
+
+        const float8 moveX = _mm256_broadcast_ss(&moveValue.x);
+        const float8 moveY = _mm256_broadcast_ss(&moveValue.y);
+        const float8 moveZ = _mm256_broadcast_ss(&moveValue.z);
+        const float8 moveW = _mm256_broadcast_ss(&moveValue.w);
+
         for (auto& transform : transforms_)
         {
             transform.positionsX = _mm256_add_ps(transform.positionsX, moveX);
@@ -337,12 +345,13 @@ private:
 #ifdef __SSE__
 namespace SSE
 {
+using float4 = __m128;
 struct PackedVec4f
 {
-	__m128 positionsX;
-	__m128 positionsY;
-	__m128 positionsZ;
-	__m128 positionsW;
+	float4 positionsX;
+	float4 positionsY;
+	float4 positionsZ;
+	float4 positionsW;
 };
 class TransformSystem
 {
@@ -367,10 +376,10 @@ public:
 	}
 	void Translate(const neko::Vec4f moveValue)
 	{
-		const __m128 moveX = _mm_load1_ps(&moveValue.x);
-		const __m128 moveY = _mm_load1_ps(&moveValue.x);
-		const __m128 moveZ = _mm_load1_ps(&moveValue.x);
-		const __m128 moveW = _mm_load1_ps(&moveValue.x);
+		const float4 moveX = _mm_load1_ps(&moveValue.x);
+		const float4 moveY = _mm_load1_ps(&moveValue.x);
+		const float4 moveZ = _mm_load1_ps(&moveValue.x);
+		const float4 moveW = _mm_load1_ps(&moveValue.x);
 		for (auto& transform : transforms_)
 		{
 			transform.positionsX = _mm_add_ps(transform.positionsX, moveX);

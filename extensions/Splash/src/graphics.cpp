@@ -1,4 +1,4 @@
-#include <Splash/graphics.h>
+#include "Splash/graphics.h"
 
 namespace sbp
 {

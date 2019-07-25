@@ -5,8 +5,8 @@
 
 #include <SFML/Network/TcpSocket.hpp>
 
-#include "Network/net_command.h"
-#include "Network/net_server.h"
+#include "net_command.h"
+#include "net_server.h"
 
 namespace neko
 {
