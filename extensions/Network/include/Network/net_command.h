@@ -8,6 +8,11 @@ namespace neko
 using NetCommandType = sf::Uint32;
 const NetCommandType INVALID_NET_COMMAND = 0u;
 
+enum class NetCommandEnum : NetCommandType
+{
+    HELLO,
+    CLOSE
+};
 
 class NetCommand
 {

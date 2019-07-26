@@ -16,9 +16,11 @@ class Client
 public:
 	void Start();
 	void Stop();
+	void Update();
 	void SendReliable(std::shared_ptr<NetCommand> command);
 protected:
 	void TcpSocketLoop();
+    virtual void ParseCommand(sf::Packet& packet) = 0;
 
 	std::atomic<bool> isRunning;
 

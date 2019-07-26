@@ -64,7 +64,7 @@ void CityBuilderTilemap::Init(neko::TextureManager& textureManager)
 	//City texture
 	for (int i = 0; i < int(CityTilesheetType::CAR); i++)
 	{
-		const neko::Index textureIndex = textureManager.LoadTexture(cityTilemapJsonContent["image"]);
+		const neko::Index textureIndex = textureManager.LoadTexture(cityTilemapJsonContent["image"].get<std::string>());
 		tilesheets_[i].texture = textureManager.GetTexture(textureIndex);
 		tilesheets_[i].texture->setRepeated(false);
 	}

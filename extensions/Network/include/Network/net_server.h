@@ -15,7 +15,7 @@ namespace neko
 {
 
 const std::string SERVER_IP = "localhost";
-const short SERVER_PORT = 12345;
+const unsigned short SERVER_PORT = 53'000;
 
 const size_t MAX_CLIENT_NMB = 128;
 
@@ -27,6 +27,7 @@ struct ClientData
 	std::queue<sf::Packet> receivedCommands;
 	std::mutex commandMutex;
 	std::condition_variable commandSync;
+
 };
 
 class Server
@@ -35,12 +36,13 @@ public:
 	virtual ~Server() = default;
 	void Start();
 	void Stop();
+	void Update();
 	void SendReliable(const std::shared_ptr<NetCommand> command, Index clientId);
 	void SendUnreliable(const NetCommand& command);
 protected:
 	void ServerLoop();
 	void TcpSocketLoop(const Index clientId);
-	virtual void ParseCommand(sf::Packet& packet, const Index clientId) = 0 ;
+	virtual void ParseCommand(sf::Packet& packet, const Index clientId) = 0;
 
 
 	std::thread serverThread;
