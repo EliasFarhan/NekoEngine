@@ -54,6 +54,7 @@
 #include <set>
 #include <numeric>
 #include <cassert>
+#include <variant>
 
 #include "spmc_queue.hpp"
 #include "notifier.hpp"
@@ -608,7 +609,7 @@ inline void Executor::_invoke(unsigned me, Node* node) {
       }
     }
     else {
-      if(auto &f = std::get<Node::StaticWork>(node->_work); f != nullptr){
+      if(auto f = std::get_if<Node::StaticWork>(&node->_work); f != nullptr){
         _invoke_static_work(me, node);
       }
     }
@@ -693,11 +694,11 @@ inline void Executor::_invoke(unsigned me, Node* node) {
 inline void Executor::_invoke_static_work(unsigned me, Node* node) {
   if(_observer) {
     _observer->on_entry(me, TaskView(node));
-    std::invoke(std::get<Node::StaticWork>(node->_work));
+    std::invoke(*std::get_if<Node::StaticWork>(&node->_work));
     _observer->on_exit(me, TaskView(node));
   }
   else {
-    std::invoke(std::get<Node::StaticWork>(node->_work));
+    std::invoke(*std::get_if<Node::StaticWork>(&node->_work));
   }
 }
 
@@ -705,11 +706,11 @@ inline void Executor::_invoke_static_work(unsigned me, Node* node) {
 inline void Executor::_invoke_dynamic_work(unsigned me, Node* node, Subflow& sf) {
   if(_observer) {
     _observer->on_entry(me, TaskView(node));
-    std::invoke(std::get<Node::DynamicWork>(node->_work), sf);
+    std::invoke(*std::get_if<Node::DynamicWork>(&node->_work), sf);
     _observer->on_exit(me, TaskView(node));
   }
   else {
-    std::invoke(std::get<Node::DynamicWork>(node->_work), sf);
+    std::invoke(*std::get_if<Node::DynamicWork>(&node->_work), sf);
   }
 }
 

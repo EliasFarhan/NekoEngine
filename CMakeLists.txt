@@ -298,7 +298,17 @@ endforeach()
 
 
 #City Builder
-add_executable(CityBuilder ${CMAKE_SOURCE_DIR}/main/CityBuilder.cpp)
+if(APPLE)
+	add_executable(CityBuilder MACOSX_BUNDLE ${CMAKE_SOURCE_DIR}/main/CityBuilder.cpp)
+	add_custom_command(
+			TARGET CityBuilder
+			POST_BUILD
+			COMMAND ${CMAKE_COMMAND} -E copy_directory data ${CMAKE_BINARY_DIR}/CityBuilder.app/Contents/MacOS/data
+			COMMAND ${CMAKE_COMMAND} -E copy_directory ${SFML_DIR}/extlibs/libs-osx/Frameworks/ ${CMAKE_BINARY_DIR}/CityBuilder.app/Contents/Frameworks
+	)
+else()
+	add_executable(CityBuilder ${CMAKE_SOURCE_DIR}/main/CityBuilder.cpp)
+endif()
 target_link_libraries(CityBuilder PUBLIC Neko_COMMON City multi)
 set_property(TARGET CityBuilder PROPERTY CXX_STANDARD 17)
 set_target_properties (CityBuilder PROPERTIES FOLDER Main)
