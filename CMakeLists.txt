@@ -298,27 +298,11 @@ endforeach()
 
 
 #City Builder
-if(APPLE)
-	add_executable(CityBuilder MACOSX_BUNDLE ${CMAKE_SOURCE_DIR}/main/CityBuilder.cpp)
-	add_custom_command(
-			TARGET CityBuilder
-			POST_BUILD
-			COMMAND ${CMAKE_COMMAND} -E copy_directory data ${CMAKE_BINARY_DIR}/CityBuilder.app/Contents/MacOS/data
-			COMMAND ${CMAKE_COMMAND} -E copy_directory ${SFML_DIR}/extlibs/libs-osx/Frameworks/ ${CMAKE_BINARY_DIR}/CityBuilder.app/Contents/Frameworks
-	)
-else()
-	add_executable(CityBuilder ${CMAKE_SOURCE_DIR}/main/CityBuilder.cpp)
-endif()
-target_link_libraries(CityBuilder PUBLIC Neko_COMMON City multi)
-set_property(TARGET CityBuilder PROPERTY CXX_STANDARD 17)
-set_target_properties (CityBuilder PROPERTIES FOLDER Main)
-add_dependencies(CityBuilder DataTarget)
+include(cmake/neko_executable.cmake)
+add_neko_executable(CityBuilder main/CityBuilder.cpp City multi Neko_COMMON)
 #Splash
-add_executable(SplashDebug ${CMAKE_SOURCE_DIR}/main/SplashDebug.cpp)
-target_link_libraries(SplashDebug PUBLIC Neko_COMMON Network Splash)
-set_property(TARGET SplashDebug PROPERTY CXX_STANDARD 17)
-set_target_properties (SplashDebug PROPERTIES FOLDER Main)
-add_dependencies(SplashDebug DataTarget)
+add_neko_executable(SplashDebug ${CMAKE_SOURCE_DIR}/main/SplashDebug.cpp  Neko_COMMON Network Splash)
+
 if(MSVC)
 if(NOT CMAKE_CL_64)
 file(COPY ${SFML_DIR}/extlibs/bin/x86/openal32.dll DESTINATION ${CMAKE_BINARY_DIR}/)
