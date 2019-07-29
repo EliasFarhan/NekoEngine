@@ -65,14 +65,14 @@ void CityBuilderTilemap::Init(neko::TextureManager& textureManager)
 	for (int i = 0; i < int(CityTilesheetType::CAR); i++)
 	{
 		const neko::Index textureIndex = textureManager.LoadTexture(cityTilemapJsonContent["image"].get<std::string>());
-		tilesheets_[i].texture = textureManager.GetTexture(textureIndex);
-		tilesheets_[i].texture->setRepeated(false);
+		tilesheets_[i].texture = *textureManager.GetTexture(textureIndex);
+		tilesheets_[i].texture.setRepeated(false);
 	}
 	//Car texture
 	{
 		const neko::Index textureIndex = textureManager.LoadTexture(carTextureName_);
-		tilesheets_[neko::Index(CityTilesheetType::CAR)].texture = textureManager.GetTexture(textureIndex);
-		tilesheets_[neko::Index(CityTilesheetType::CAR)].texture->setRepeated(false);
+		tilesheets_[neko::Index(CityTilesheetType::CAR)].texture = *textureManager.GetTexture(textureIndex);
+		tilesheets_[neko::Index(CityTilesheetType::CAR)].texture.setRepeated(false);
 	}
 	for (auto& cityTileElementJson : cityTilemapJsonContent["tile_elements"])
 	{
@@ -679,13 +679,13 @@ void CityBuilderTilemap::PushCommand(neko::GraphicsManager* graphicsManager)
 	}
 
 	graphicsManager->Draw(&tilesheets_[neko::Index(CityTilesheetType::ENVIRONMENT)].tilemap[frameIndex],
-		tilesheets_[neko::Index(CityTilesheetType::ENVIRONMENT)].texture.get());
+		&tilesheets_[neko::Index(CityTilesheetType::ENVIRONMENT)].texture);
 	graphicsManager->Draw(&tilesheets_[neko::Index(CityTilesheetType::TRANSPORT)].tilemap[frameIndex],
-		tilesheets_[neko::Index(CityTilesheetType::TRANSPORT)].texture.get());
+		&tilesheets_[neko::Index(CityTilesheetType::TRANSPORT)].texture);
 	graphicsManager->Draw(&tilesheets_[neko::Index(CityTilesheetType::CAR)].tilemap[frameIndex],
-		tilesheets_[neko::Index(CityTilesheetType::CAR)].texture.get());
+		&tilesheets_[neko::Index(CityTilesheetType::CAR)].texture);
 	graphicsManager->Draw(&tilesheets_[neko::Index(CityTilesheetType::CITY)].tilemap[frameIndex],
-		tilesheets_[neko::Index(CityTilesheetType::CITY)].texture.get());
+		&tilesheets_[neko::Index(CityTilesheetType::CITY)].texture);
 
 
 }

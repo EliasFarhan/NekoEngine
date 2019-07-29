@@ -88,13 +88,13 @@ Index TextureManager::LoadTexture(const std::string_view filename)
     if (textureIndex != INVALID_INDEX)
     {
         //Check if the texture was destroyed
-        if (textures_[textureIndex]->getNativeHandle() != 0U)
+        if (textures_[textureIndex].getNativeHandle() != 0U)
         {
             return textureIndex;
         }
         else
         {
-            if (!textures_[textureIndex]->loadFromFile(filename.data()))
+            if (!textures_[textureIndex].loadFromFile(filename.data()))
             {
                 std::ostringstream oss;
                 oss << "[ERROR] Could not load texture file: " << filename;
@@ -115,7 +115,7 @@ Index TextureManager::LoadTexture(const std::string_view filename)
             logDebug(oss.str());
             return INVALID_INDEX;
         }
-        textures_.emplace_back(std::make_shared<sf::Texture>(texture));
+        textures_.emplace_back(sf::Texture(texture));
         texturePaths_.push_back(filename.data());
 
         return static_cast<Index>(textures_.size() - 1);
@@ -129,13 +129,13 @@ Index TextureManager::LoadTexture(const std::string_view filename)
     return INVALID_INDEX;
 }
 
-const std::shared_ptr<sf::Texture> TextureManager::GetTexture(const Index index) const
+const sf::Texture* TextureManager::GetTexture(const Index index) const
 {
     if (index == INVALID_INDEX || index >= textures_.size())
     {
         return {}; // Same as return nullptr.
     }
-    return textures_[index];
+    return &textures_[index];
 }
 
 } // namespace neko

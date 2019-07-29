@@ -60,8 +60,8 @@ public:
         MainEngine::Init();
 		const neko::Index textureIndex = 
 			textureManager.LoadTexture("data/sprites/wall.jpg");
-		texture = textureManager.GetTexture(textureIndex);
-        sprite.setTexture(*texture);
+		texture = *textureManager.GetTexture(textureIndex);
+        sprite.setTexture(texture);
 
     }
 
@@ -74,7 +74,7 @@ public:
 
 private:
     neko::TextureManager textureManager;
-    std::shared_ptr<sf::Texture> texture;
+    sf::Texture texture;
     sf::Sprite sprite;
 };
 
@@ -93,7 +93,7 @@ public:
         MainEngine::Init();
 		const neko::Index textureIndex = 
 			textureManager_.LoadTexture("data/sprites/wall.jpg");
-		const std::shared_ptr<sf::Texture> texture = textureManager_.GetTexture(textureIndex);
+		const auto* texture = textureManager_.GetTexture(textureIndex);
 
         std::uniform_real_distribution<float> randomX(
 			0.0f,

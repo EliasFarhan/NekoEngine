@@ -62,7 +62,7 @@ public:
 			positionManager.SetComponent(playerData.playerEntity, playerPos);
 
 			const neko::Index textureIndex = textureManager.LoadTexture("data/sprites/hero/jump/hero1.png");
-			std::shared_ptr<sf::Texture> texture = textureManager.GetTexture(textureIndex);
+			auto* texture = textureManager.GetTexture(textureIndex);
 			spriteManager.AddSprite(texture);
 
 			const auto physicsSize = neko::pixel2meter(sf::Vector2f(texture->getSize()));
@@ -126,7 +126,7 @@ public:
 			};
 			const neko::Index textureIndex = 
 				textureManager.LoadTexture("data/sprites/platform.jpg");
-			std::shared_ptr<sf::Texture> platformTexture = textureManager.GetTexture(textureIndex);
+			auto* platformTexture = textureManager.GetTexture(textureIndex);
 
 			for (auto i = 0u ; i < platformsNmb;i++)
 			{

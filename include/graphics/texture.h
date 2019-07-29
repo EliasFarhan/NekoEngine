@@ -40,11 +40,11 @@ public:
     bool HasValidExtension(const std::string_view filename);
 	//Return an index to avoid pointer invalidation
 	Index LoadTexture(const std::string_view filename);
-	const std::shared_ptr<sf::Texture> GetTexture(const Index index) const;
+	const sf::Texture* GetTexture(const Index index) const;
 
 private:
     std::vector<std::string> texturePaths_;
-    std::vector<std::shared_ptr<sf::Texture>> textures_;
+    std::vector<sf::Texture> textures_;
 };
 
 }

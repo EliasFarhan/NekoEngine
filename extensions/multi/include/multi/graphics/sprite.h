@@ -18,7 +18,7 @@ class SpriteManager : public neko::SpriteManager
 public:
     SpriteManager();
 
-    neko::Index AddSprite(const std::shared_ptr<sf::Texture> texture) override;
+    neko::Index AddSprite(const sf::Texture* texture) override;
 
     sf::Sprite* GetSpriteAt(unsigned int spriteIndex) override ;
 

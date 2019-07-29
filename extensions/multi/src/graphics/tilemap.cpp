@@ -26,11 +26,11 @@ void TiledMap::Init(const std::string& tilemapPath, neko::TextureManager& textur
 
         std::string textureSource = tiledSheetJson["image"];
         neko::Index textureIndex = textureManager.LoadTexture(neko::LinkFolderAndFile(sourceFolderPath, textureSource));
-        tileSheet.texture = textureManager.GetTexture(textureIndex);
+        tileSheet.texture = *textureManager.GetTexture(textureIndex);
         tileSheet.tileSize = sf::Vector2u(tiledSheetJson["tilewidth"], tiledSheetJson["tileheight"]);
         tileSheet.firstId = tilesheetPathJson["firstgid"];
-        tileSheet.size = sf::Vector2u(tileSheet.texture->getSize().x / tileSheet.tileSize.x,
-                                      tileSheet.texture->getSize().y / tileSheet.tileSize.y);
+        tileSheet.size = sf::Vector2u(tileSheet.texture.getSize().x / tileSheet.tileSize.x,
+                                      tileSheet.texture.getSize().y / tileSheet.tileSize.y);
         tileSheet.tileNmb = tileSheet.size.x * tileSheet.size.y;
 
         tileSheet.tilemap[0].setPrimitiveType(sf::Triangles);
@@ -130,7 +130,7 @@ void TiledMap::PushCommand(neko::GraphicsManager* graphicsManager)
     for (auto& tilesheet: tileSheets_)
     {
         // TODO probably move the graphics manager to handle share_ptr also.
-        graphicsManager->Draw(&tilesheet.tilemap[frameIndex], tilesheet.texture.get());
+        graphicsManager->Draw(&tilesheet.tilemap[frameIndex], &tilesheet.texture);
     }
 }
 

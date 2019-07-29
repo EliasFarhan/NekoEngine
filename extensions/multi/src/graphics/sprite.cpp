@@ -14,10 +14,10 @@ SpriteManager::SpriteManager()
     sprites_[1].reserve(neko::INIT_ENTITY_NMB);
 }
 
-neko::Index SpriteManager::AddSprite(const std::shared_ptr<sf::Texture> texture)
+neko::Index SpriteManager::AddSprite(const sf::Texture* texture)
 {
     sf::Sprite sprite;
-    if (texture.get() != nullptr)
+    if (texture != nullptr)
     {
         sprite.setTexture(*texture);
         sprite.setOrigin(sf::Vector2f(texture->getSize()) / 2.0f);

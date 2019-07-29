@@ -16,7 +16,7 @@ namespace multi
  */
 struct Tilesheet
 {
-    std::shared_ptr<sf::Texture> texture = nullptr;
+    sf::Texture texture;
     /**
      * \brief vertex array with 2 vectors for double buffering with the render thread
      */

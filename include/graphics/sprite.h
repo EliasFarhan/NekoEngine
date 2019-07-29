@@ -42,7 +42,7 @@ class SpriteManager
 public:
     SpriteManager() = default;
 
-    virtual neko::Index AddSprite(const std::shared_ptr<sf::Texture> texture) = 0;
+    virtual neko::Index AddSprite(const sf::Texture* texture) = 0;
 
     virtual sf::Sprite* GetSpriteAt(unsigned int spriteIndex) = 0;
 
@@ -64,10 +64,11 @@ class BasicSpriteManager : public SpriteManager, public ComponentManager<sf::Spr
 {
 public:
     using ComponentManager::ComponentManager;
-    Index AddSprite(const std::shared_ptr<sf::Texture> texture) override;
+    Index AddSprite(const sf::Texture* texture) override;
 
     sf::Sprite* GetSpriteAt(unsigned int spriteIndex) override;
 
+    void CopySpriteOrigin(const sf::Vector2f& origin, size_t start, size_t length);
     void CopyTransformPosition(Position2dManager& positionManager, size_t start, size_t length) override;
 
     void CopyTransformScales(Scale2dManager& scaleManager, size_t start, size_t length) override;

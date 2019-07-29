@@ -32,7 +32,7 @@
 namespace neko
 {
 
-Index BasicSpriteManager::AddSprite(const std::shared_ptr<sf::Texture> texture)
+Index BasicSpriteManager::AddSprite(const sf::Texture* texture)
 {
     return 0;
 }
@@ -77,5 +77,14 @@ void BasicSpriteManager::PushCommands(neko::GraphicsManager* graphicsManager, si
 	{
 		graphicsManager->Draw(components_[i]);
 	}
+}
+
+void BasicSpriteManager::CopySpriteOrigin(const sf::Vector2f& origin, size_t start, size_t length)
+{
+    for(size_t i = start; i < start+length;i++)
+    {
+        const auto localBounds = components_[i].getLocalBounds();
+        components_[i].setOrigin(sf::Vector2f(localBounds.width*origin.x, localBounds.height*origin.y));
+    }
 }
 }
