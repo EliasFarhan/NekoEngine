@@ -70,6 +70,7 @@ set(EXTERNAL_DIR ${CMAKE_SOURCE_DIR}/externals)
 file(GLOB_RECURSE TEXT_FILES 
 "${PROJECT_SOURCE_DIR}/data/*.json" 
 "${PROJECT_SOURCE_DIR}/data/*.txt"
+"${PROJECT_SOURCE_DIR}/data/*.scene"
 )
 file(GLOB_RECURSE IMG_FILES
 		"${PROJECT_SOURCE_DIR}/data/*.jpg"
@@ -86,21 +87,32 @@ file(GLOB_RECURSE SND_FILES
 		"${PROJECT_SOURCE_DIR}/data/*.wav"
 		"${PROJECT_SOURCE_DIR}/data/*.ogg"
 		)
+find_package (Python3 COMPONENTS Interpreter)
+MESSAGE("Python Interpreter: ${Python3_EXECUTABLE}")
 LIST(APPEND DATA_FILES ${IMG_FILES} ${SND_FILES} ${TEXT_FILES})
 foreach(DATA ${DATA_FILES})
 	get_filename_component(FILE_NAME ${DATA} NAME)
 	get_filename_component(PATH_NAME ${DATA} DIRECTORY)
 	get_filename_component(EXTENSION ${DATA} EXT)
 	file(RELATIVE_PATH PATH_NAME "${PROJECT_SOURCE_DIR}/shaders/" ${PATH_NAME})
-	#MESSAGE("GLSL PATH: ${PATH_NAME} NAME: ${FILE_NAME}")
+	MESSAGE("DATA: ${FILE_NAME} ${PATH_NAME} ${EXTENSION}")
 	set(DATA_OUTPUT "${PROJECT_BINARY_DIR}/data/${PATH_NAME}/${FILE_NAME}")
-
+	if(${EXTENSION} STREQUAL ".scene")
+		add_custom_command(
+				OUTPUT ${DATA_OUTPUT}
+				DEPENDS ${DATA}
+				COMMAND ${CMAKE_COMMAND} -E make_directory "${PROJECT_BINARY_DIR}/data/"
+				COMMAND ${CMAKE_COMMAND} -E make_directory "${PROJECT_BINARY_DIR}/data/${PATH_NAME}"
+				COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/scripts/scene_validator.py"  "${DATA}"
+				COMMAND ${CMAKE_COMMAND} -E copy ${DATA} "${PROJECT_BINARY_DIR}/data/${PATH_NAME}/${FILE_NAME}")
+	else()
 	add_custom_command(
 			OUTPUT ${DATA_OUTPUT}
 			DEPENDS ${DATA}
 			COMMAND ${CMAKE_COMMAND} -E make_directory "${PROJECT_BINARY_DIR}/data/"
 			COMMAND ${CMAKE_COMMAND} -E make_directory "${PROJECT_BINARY_DIR}/data/${PATH_NAME}"
 			COMMAND ${CMAKE_COMMAND} -E copy ${DATA} "${PROJECT_BINARY_DIR}/data/${PATH_NAME}/${FILE_NAME}")
+	endif()
 	list(APPEND DATA_BINARY_FILES ${DATA_OUTPUT})
 endforeach(DATA)
 add_custom_target(
@@ -302,7 +314,8 @@ include(cmake/neko_executable.cmake)
 add_neko_executable(CityBuilder main/CityBuilder.cpp City multi Neko_COMMON)
 #Splash
 add_neko_executable(SplashDebug ${CMAKE_SOURCE_DIR}/main/SplashDebug.cpp  Neko_COMMON Network Splash)
-
+#NekoEditor
+add_neko_executable(NekoEditor ${CMAKE_SOURCE_DIR}/main/NekoEditor.cpp Neko_COMMON tools)
 if(MSVC)
 if(NOT CMAKE_CL_64)
 file(COPY ${SFML_DIR}/extlibs/bin/x86/openal32.dll DESTINATION ${CMAKE_BINARY_DIR}/)
