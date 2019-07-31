@@ -246,6 +246,7 @@ add_dependencies(Neko_COMMON DataTarget)
 set_property(TARGET Neko_COMMON PROPERTY CXX_STANDARD 17)
 target_compile_definitions(Neko_COMMON PUBLIC $<$<CONFIG:Debug>:__neko_dbg__>)
 target_compile_definitions(Neko_COMMON PUBLIC $<$<CONFIG:RelWithDebInfo>:__neko_dbg__>)
+target_compile_definitions(Neko_COMMON PUBLIC SOURCE_PATH="${CMAKE_SOURCE_DIR}")
 
 set_target_properties (Neko_COMMON PROPERTIES FOLDER Neko)
 #extensions
@@ -315,7 +316,7 @@ add_neko_executable(CityBuilder main/CityBuilder.cpp City multi Neko_COMMON)
 #Splash
 add_neko_executable(SplashDebug ${CMAKE_SOURCE_DIR}/main/SplashDebug.cpp  Neko_COMMON Network Splash)
 #NekoEditor
-add_neko_executable(NekoEditor ${CMAKE_SOURCE_DIR}/main/NekoEditor.cpp Neko_COMMON tools)
+add_neko_executable(NekoEditor2d ${CMAKE_SOURCE_DIR}/main/NekoEditor.cpp Neko_COMMON tools)
 if(MSVC)
 if(NOT CMAKE_CL_64)
 file(COPY ${SFML_DIR}/extlibs/bin/x86/openal32.dll DESTINATION ${CMAKE_BINARY_DIR}/)

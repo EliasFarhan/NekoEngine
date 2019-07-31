@@ -57,6 +57,7 @@ struct Configuration
     bool vSync = true;
     unsigned int framerateLimit = 0u;
     int windowStyle = sf::Style::Default;
+    std::string rootPath = "../data/";
 };
 
 /**

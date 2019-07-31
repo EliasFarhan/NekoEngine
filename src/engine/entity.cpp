@@ -25,6 +25,7 @@
 #include "engine/globals.h"
 #include <algorithm>
 #include <utilities/vector_utility.h>
+#include <engine/component.h>
 
 namespace neko
 {
@@ -52,11 +53,14 @@ Entity EntityManager::CreateEntity(Entity entity)
         {
             const auto newEntity = entityMaskArray_.size();
             ResizeIfNecessary(entityMaskArray_, newEntity);
+            AddComponentType(newEntity, EntityMask(NekoComponentType::EMPTY));
             return Entity(newEntity);
         }
         else
         {
-            return Entity(entityMaskIt - entityMaskArray_.begin());
+            const auto newEntity = entityMaskIt - entityMaskArray_.begin();
+            AddComponentType(newEntity, EntityMask(NekoComponentType::EMPTY));
+            return Entity(newEntity);
         }
     }
     else
@@ -64,6 +68,7 @@ Entity EntityManager::CreateEntity(Entity entity)
         ResizeIfNecessary(entityMaskArray_, entity);
         if(!EntityExists(entity))
         {
+            AddComponentType(entity, EntityMask(NekoComponentType::EMPTY));
             return entity;
         }
         else

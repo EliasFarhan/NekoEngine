@@ -4,9 +4,12 @@
 
 #include <tools/entity_viewer.h>
 #include <imgui.h>
+#include <tools/editor_scene.h>
+#include <utilities/vector_utility.h>
+
 namespace editor
 {
-void EntityViewer::Update(neko::EntityManager& entityManager)
+void EntityViewer::Update(neko::EntityManager& entityManager, EditorSceneManager& sceneManager)
 {
     entities_.clear();
     entitiesName_.clear();
@@ -15,7 +18,7 @@ void EntityViewer::Update(neko::EntityManager& entityManager)
         if(entityManager.EntityExists(entity))
         {
             entities_.push_back(entity);
-            entitiesName_.push_back("Entity "+std::to_string(entity));
+            entitiesName_.push_back(sceneManager.GetCurrentScene().entitiesNames[entity]);
         }
     }
     ImGui::Begin("Entity Viewer");
@@ -25,6 +28,13 @@ void EntityViewer::Update(neko::EntityManager& entityManager)
         {
             selectedEntity_ = i;
         }
+    }
+    if(ImGui::Button("Add"))
+    {
+        auto entity = entityManager.CreateEntity();
+        auto& entitiesName = sceneManager.GetCurrentScene().entitiesNames;
+        ResizeIfNecessary(entitiesName, entity);
+        entitiesName[entity] = std::string("Entity ")+std::to_string(entity);
     }
     ImGui::End();
 }

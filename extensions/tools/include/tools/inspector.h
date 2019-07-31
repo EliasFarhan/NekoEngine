@@ -10,8 +10,10 @@ class Inspector
 {
 public:
     explicit Inspector(NekoEditor& nekoEditor) : nekoEditor_(nekoEditor){ }
-    void ShowEntityInfo(neko::Entity entity);
 
+    void BeginWindow();
+    void ShowEntityInfo(neko::Entity entity);
+    void EndWindow();
 private:
     NekoEditor& nekoEditor_;
 };

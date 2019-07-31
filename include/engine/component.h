@@ -27,6 +27,8 @@
 
 #include <engine/globals.h>
 #include <utilities/vector_utility.h>
+#include <utilities/json_utility.h>
+
 
 namespace neko
 {
@@ -43,13 +45,15 @@ enum class NekoComponentType : ComponentType
 	SPINE = 1 << 8,
 	BODY2D = 1 << 9,
 	COLLIDER2D = 1 << 10,
-	CONVEX_SHAPE2D = 1 << 11
+	CONVEX_SHAPE2D = 1 << 11,
+	EMPTY = 1 << 12,
 };
 struct Component
 {
 	Entity entity = INVALID_ENTITY;
 	ComponentType componentType = INVALID_COMPONENT_TYPE;
 };
+
 
 
 template<typename T, ComponentType componentType>
@@ -71,6 +75,9 @@ public:
 
 	const std::vector<T>& GetConstComponentsVector() const { return components_; }
 	std::vector<T>& GetComponentsVector() { return components_; }
+
+	virtual void ParseComponentJson(json& componentJson, Entity entity){};
+	virtual json SerializeComponentJson(Entity entity){ return json();};
 protected:
 	std::vector<T> components_;
 };

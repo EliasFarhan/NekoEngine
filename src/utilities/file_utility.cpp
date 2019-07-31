@@ -173,4 +173,17 @@ std::string LinkFolderAndFile(const std::string_view folderPath, const std::stri
     fs::path l = f / p;
     return l.string();
 }
+
+void WriteStringToFile(const std::string& path, const std::string_view content)
+{
+    std::ofstream t(path);
+    t << content;
+
+}
+
+std::string GetFilename(const std::string_view path)
+{
+    fs::path p = path;
+    return p.filename();
+}
 }
