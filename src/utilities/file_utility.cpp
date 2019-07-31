@@ -183,7 +183,7 @@ void WriteStringToFile(const std::string& path, const std::string_view content)
 
 std::string GetFilename(const std::string_view path)
 {
-    fs::path p = path;
-    return p.filename();
+	const fs::path p = path;
+    return p.filename().string();
 }
 }
