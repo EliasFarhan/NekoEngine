@@ -11,7 +11,9 @@ const NetCommandType INVALID_NET_COMMAND = 0u;
 enum class NetCommandEnum : NetCommandType
 {
     HELLO,
-    CLOSE
+    OK,
+    CLOSE,
+    COMMAND_LENGTH
 };
 
 class NetCommand
@@ -23,6 +25,8 @@ public:
 
 
 }
+
+//Beurk
 template <class T = neko::NetCommand>
 sf::Packet& operator <<(sf::Packet& packet, const std::shared_ptr<T> command)
 {

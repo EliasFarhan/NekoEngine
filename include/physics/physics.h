@@ -87,7 +87,6 @@ class Body2dManager : public ComponentManager <b2Body*,ComponentType(NekoCompone
 
 class Collider2dManager : public ComponentManager<Collider, ComponentType(NekoComponentType::COLLIDER2D)>
 {
-
 };
 
 }

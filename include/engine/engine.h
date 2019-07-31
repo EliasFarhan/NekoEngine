@@ -45,7 +45,9 @@ struct Collider;
  */
 struct Configuration
 {
-    sf::Vector2u screenSize = sf::Vector2u(1280, 720);
+    sf::Vector2u realWindowSize = sf::Vector2u(1280, 720);
+    sf::Vector2u gameWindowSize = sf::Vector2u(1280, 720);
+    bool fullscreen = false;
     b2Vec2 gravity = b2Vec2(0.0f, 9.81f);
     float physicsTimeStep = 1.0f / 50.0f;
     int velocityIterations = 8;

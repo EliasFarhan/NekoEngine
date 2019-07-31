@@ -8,7 +8,7 @@ namespace multi
 /**
  * \brief managing graphic shape from the SFML API
  */
-class ShapeManager : neko::ShapeManager
+class ShapeManager : neko::BadShapeManager
 {
 public:
     ShapeManager();

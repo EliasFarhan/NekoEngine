@@ -6,7 +6,7 @@ namespace neko
 {
 void Client::Start()
 {
-	clientData.thread = std::thread(&Client::TcpSocketLoop, this);
+	clientData.thread = std::thread(&Client::TcpReceiveSocketLoop, this);
 	clientData.thread.detach();
 	isRunning = true;
 }
@@ -24,7 +24,7 @@ void Client::SendReliable(std::shared_ptr<NetCommand> command)
 	clientData.commandSync.notify_one();
 }
 
-void Client::TcpSocketLoop()
+void Client::TcpReceiveSocketLoop()
 {
 	const sf::Socket::Status status = clientData.tcpSocket.connect(SERVER_IP, SERVER_PORT);
 	if (status != sf::Socket::Done)
@@ -85,6 +85,11 @@ void Client::Update()
             clientData.receivedCommands.pop();
         }
     }
+
+}
+
+void Client::TcpSendSocketLoop()
+{
 
 }
 }

@@ -54,7 +54,7 @@ void Server::ServerLoop()
             }
             continue;
         }
-        clients_[currentIndex].thread = std::thread(&Server::TcpSocketLoop, this, currentIndex);
+        clients_[currentIndex].thread = std::thread(&Server::TcpSendSocketLoop, this, currentIndex);
         clients_[currentIndex].thread.detach();
         //Wait 1 ms before preparing the new connection
         using namespace std::chrono_literals;
@@ -80,7 +80,7 @@ void Server::ServerLoop()
     }
 }
 
-void Server::TcpSocketLoop(const Index clientId)
+void Server::TcpSendSocketLoop(const Index clientId)
 {
 
     while (isRunning)
@@ -135,6 +135,11 @@ void Server::Update()
             client.receivedCommands.pop();
         }
     }
+}
+
+void Server::TcpReceiveSocketLoop(const Index clientId)
+{
+
 }
 
 }

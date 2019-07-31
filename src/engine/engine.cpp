@@ -66,7 +66,7 @@ void BasicEngine::Init()
 {
     instance_ = this;
     renderWindow = std::make_unique<sf::RenderWindow>(
-		sf::VideoMode(config.screenSize.x, config.screenSize.y), "Neko Engine", config.windowStyle);
+		sf::VideoMode(config.realWindowSize.x, config.realWindowSize.y), "Neko Engine", config.windowStyle);
     if (config.vSync)
     {
         renderWindow->setVerticalSyncEnabled(config.vSync);
@@ -145,6 +145,11 @@ void BasicEngine::OnEvent(sf::Event& event)
         case sf::Event::MouseWheelScrolled:
         {
             mouseManager_.OnWheelScrolled(event);
+            break;
+        }
+        case sf::Event::Resized:
+        {
+            config.realWindowSize = sf::Vector2u(event.size.width, event.size.height);
             break;
         }
         default:

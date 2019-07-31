@@ -26,7 +26,7 @@ public:
 		const auto textureId = textureManager_.LoadTexture(texturePath_);
 		const auto texture = textureManager_.GetTexture(textureId);
 		spriteManager_.AddComponent(entityManager_, spriteEntity_);
-		spriteManager_.GetComponent(spriteEntity_).setTexture(*texture);
+		spriteManager_.CopyTexture(texture, spriteEntity_, 1);
 		
 	}
 	void Update(float dt) override
@@ -66,23 +66,22 @@ public:
 		BasicEngine::Init();
 		std::uniform_real_distribution<float> randomX(
 			0.0f,
-			static_cast<float>(config.screenSize.x)); // generates random floats between 0.0 and 1.0
+			static_cast<float>(config.realWindowSize.x)); // generates random floats between 0.0 and 1.0
 		std::uniform_real_distribution<float> randomY(
 			0.0f,
-			static_cast<float>(config.screenSize.y)); // generates random floats between 0.0 and 1.0
+			static_cast<float>(config.realWindowSize.y)); // generates random floats between 0.0 and 1.0
 		std::uniform_real_distribution<float> randomScale(0.01f, 0.1f); // generates random floats between 0.0 and 1.0
 		std::default_random_engine generator;
 		std::uniform_real_distribution<float> randomAngle(0.0f, 360.0f); // generates random floats between 0.0 and 1.0
-
+        const auto textureId = textureManager_.LoadTexture(texturePath_);
+        const auto* texture = textureManager_.GetTexture(textureId);
 		for(Index i = 0; i < INIT_ENTITY_NMB; i++)
 		{
-			const auto entity = entityManager_.CreateEntity();
+			const auto entity = entityManager_.CreateEntity(i);
 
-			const auto textureId = textureManager_.LoadTexture(texturePath_);
-			const auto texture = textureManager_.GetTexture(textureId);
+
 
 			spriteManager_.AddComponent(entityManager_, entity);
-			spriteManager_.GetComponent(entity).setTexture(*texture);
 
 			positionManager_.AddComponent(entityManager_, entity);
 			positionManager_.SetComponent(entity, sf::Vector2f(randomX(generator), randomY(generator)));
@@ -94,6 +93,8 @@ public:
 			angleManager_.AddComponent(entityManager_, entity);
 			angleManager_.SetComponent(entity, randomAngle(generator));
 		}
+		spriteManager_.CopySpriteOrigin(sf::Vector2f(0.5f,0.5f),0, INIT_ENTITY_NMB);
+		spriteManager_.CopyTexture(texture, 0, INIT_ENTITY_NMB);
 		
 	}
 	void Update(float dt) override

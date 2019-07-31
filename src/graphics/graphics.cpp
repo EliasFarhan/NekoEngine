@@ -65,7 +65,7 @@ void BasicGraphicsManager::Render(sf::RenderTarget* renderTarget)
 {
 	std::sort(commandBuffer_.begin(), commandBuffer_.begin() + renderLength, [](Command* c1, Command* c2)
 	{
-		return c1->layer > c2->layer;
+		return c1->layer < c2->layer;
 	});
 	for (size_t i = 0; i < renderLength; i++)
 	{

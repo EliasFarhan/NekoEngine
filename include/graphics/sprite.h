@@ -60,7 +60,14 @@ public:
     virtual void PushCommands(neko::GraphicsManager* graphicsManager, size_t start = 0, size_t length = neko::INIT_ENTITY_NMB) = 0;
 };
 
-class BasicSpriteManager : public SpriteManager, public ComponentManager<sf::Sprite, ComponentType(NekoComponentType::SPRITE2D)>
+struct Sprite
+{
+    sf::Sprite sprite;
+    int layer;
+    sf::Vector2f origin;
+};
+
+class BasicSpriteManager : public SpriteManager, public ComponentManager<Sprite, ComponentType(NekoComponentType::SPRITE2D)>
 {
 public:
     using ComponentManager::ComponentManager;
@@ -69,6 +76,7 @@ public:
     sf::Sprite* GetSpriteAt(unsigned int spriteIndex) override;
 
     void CopySpriteOrigin(const sf::Vector2f& origin, size_t start, size_t length);
+    void CopyTexture(const sf::Texture* texture, size_t start, size_t length);
     void CopyTransformPosition(Position2dManager& positionManager, size_t start, size_t length) override;
 
     void CopyTransformScales(Scale2dManager& scaleManager, size_t start, size_t length) override;
@@ -77,6 +85,7 @@ public:
 
     void PushCommands(neko::GraphicsManager* graphicsManager, size_t start, size_t length) override;
 
+    void CopyLayer(int layer, size_t start, size_t length);
 };
 
 }

@@ -40,6 +40,7 @@
 #include <multi/graphics/graphics.h>
 #include <multi/graphics/sprite.h>
 #include <multi/graphics/tilemap.h>
+#include <multi/graphics/shape.h>
 
 namespace multi
 {
@@ -97,10 +98,10 @@ public:
 
         std::uniform_real_distribution<float> randomX(
 			0.0f,
-			static_cast<float>(config.screenSize.x)); // generates random floats between 0.0 and 1.0
+			static_cast<float>(config.realWindowSize.x)); // generates random floats between 0.0 and 1.0
         std::uniform_real_distribution<float> randomY(
 			0.0f,
-			static_cast<float>(config.screenSize.y)); // generates random floats between 0.0 and 1.0
+			static_cast<float>(config.realWindowSize.y)); // generates random floats between 0.0 and 1.0
         std::uniform_real_distribution<float> randomScale(0.01f, 0.1f); // generates random floats between 0.0 and 1.0
         std::default_random_engine generator;
         std::uniform_real_distribution<float> randomAngle(0.0f, 360.0f); // generates random floats between 0.0 and 1.0
@@ -288,6 +289,255 @@ protected:
 TEST(Multi, Tilemap)
 {
     TilemapEngine engine;
+    engine.Init();
+    engine.EngineLoop();
+}
+
+struct PlayerData
+{
+    neko::Entity playerEntity;
+    int contactNmb;
+    b2Body* playerBody = nullptr;
+};
+
+class PlatformerEngine : public multi::MainEngine
+{
+public:
+    void Init() override
+    {
+        config.bgColor = sf::Color::White;
+        MainEngine::Init();
+        physicsManager.Init();
+        {
+            playerData.playerEntity = entityManager.CreateEntity();
+            const auto playerPos = sf::Vector2f(200, 200);
+
+            positionManager.AddComponent(entityManager, playerData.playerEntity);
+            positionManager.SetComponent(playerData.playerEntity, playerPos);
+
+            const neko::Index textureIndex = textureManager.LoadTexture("data/sprites/hero/jump/hero1.png");
+            auto* texture = textureManager.GetTexture(textureIndex);
+            spriteManager.AddSprite(texture);
+
+            const auto physicsSize = neko::pixel2meter(sf::Vector2f(texture->getSize()));
+            b2BodyDef bodyDef;
+            bodyDef.position = neko::pixel2meter(playerPos);
+            bodyDef.linearVelocity = b2Vec2(0,0);
+            bodyDef.fixedRotation = true;
+            bodyDef.type = b2_dynamicBody;
+
+            b2PolygonShape playerBox[2];
+            playerBox[0].SetAsBox(physicsSize.x/2.0f, physicsSize.y/2.0f);
+
+            const float footOffset = 5.0f;
+            const b2Vec2 footPoints[3] = {
+                    b2Vec2(0,physicsSize.y/2.0f),
+                    b2Vec2(neko::pixel2meter(footOffset),physicsSize.y/2.0f + neko::pixel2meter(footOffset)),
+                    b2Vec2(neko::pixel2meter(-footOffset),physicsSize.y/2.0f + neko::pixel2meter(footOffset)),
+            };
+            playerBox[1].Set(footPoints, 3);
+
+            b2FixtureDef fixtureDef[2];
+
+            neko::Collider mainPlayerCollider{};
+#ifdef __neko_dbg__
+            neko::ShapeDef shapeDef;
+			shapeDef.fillColor = sf::Color::Transparent;
+			shapeDef.outlineColor = sf::Color::Green;
+			shapeDef.outlineThickness = 1.0f;
+			auto mainPlayerShapeIndex = shapeManager.AddBox(playerPos, neko::meter2pixel(b2Vec2(physicsSize.x/2.0f, physicsSize.y/2.0f)), shapeDef);
+			mainPlayerCollider.shapeIndex = mainPlayerShapeIndex;
+#endif
+            fixtureDef[0].shape = &playerBox[0];
+            fixtureDef[0].friction = 0.0f;
+            mainPlayerCollider.entity = playerData.playerEntity;
+            physicsManager.AddCollider(mainPlayerCollider);
+
+            neko::Collider footCollider{};
+            footCollider.entity = playerData.playerEntity;
+            fixtureDef[1].shape = &playerBox[1];
+            fixtureDef[1].isSensor = true;
+#ifdef __neko_dbg__
+
+            sf::Vector2f points[3];
+			for(int i = 0; i < 3; i++)
+            {
+			    points[i] = neko::meter2pixel(footPoints[i]);
+            }
+
+            //auto footShapeIndex = shapeManager.AddPolygon(neko::meter2pixel(footPoints[0]), points, 3, shapeDef);
+            //footCollider.shapeIndex = footShapeIndex;
+#endif
+            physicsManager.AddCollider(footCollider);
+
+            playerData.playerBody = physicsManager.CreateBody(bodyDef, fixtureDef, 2);
+        }
+        {
+            const sf::Vector2f platformPositions[PlatformerEngine::platformsNmb] = {
+                    sf::Vector2f(200,400),
+                    sf::Vector2f(300,300),
+                    sf::Vector2f(300,500)
+            };
+            const neko::Index textureIndex =
+                    textureManager.LoadTexture("data/sprites/platform.jpg");
+            auto* platformTexture = textureManager.GetTexture(textureIndex);
+
+            for (auto i = 0u ; i < platformsNmb;i++)
+            {
+                const auto platformEntity = entityManager.CreateEntity();
+                positionManager.AddComponent(entityManager, platformEntity);
+                positionManager.SetComponent(platformEntity, platformPositions[i]);
+
+                const auto physicsSize = neko::pixel2meter(sf::Vector2f(platformTexture->getSize()));
+                b2BodyDef bodyDef;
+                bodyDef.position = neko::pixel2meter(platformPositions[i]);
+                bodyDef.fixedRotation = true;
+                bodyDef.type = b2_staticBody;
+
+                b2PolygonShape playerBox;
+                playerBox.SetAsBox(physicsSize.x / 2.0f, physicsSize.y / 2.0f);
+
+                b2FixtureDef fixtureDef;
+                fixtureDef.shape = &playerBox;
+
+                neko::Collider platformCollider{};
+                platformCollider.entity = playerData.playerEntity + i + 1;
+#ifdef __neko_dbg__
+                neko::ShapeDef shapeDef;
+                shapeDef.fillColor = sf::Color::Transparent;
+                shapeDef.outlineColor = sf::Color::Green;
+                shapeDef.outlineThickness = 1.0f;
+                auto platformShapeIndex = shapeManager.AddBox(platformPositions[i], neko::meter2pixel(b2Vec2(physicsSize.x/2.0f, physicsSize.y/2.0f)), shapeDef);
+                platformCollider.shapeIndex = platformShapeIndex;
+#endif
+                physicsManager.AddCollider(platformCollider);
+                physicsManager.CreateBody(bodyDef, &fixtureDef, 1);
+                spriteManager.AddSprite(platformTexture);
+            }
+        }
+        physicsTimer.period = config.physicsTimeStep;
+        physicsTimer.Reset();
+
+    }
+
+
+
+
+    void Update(float dt) override
+    {
+
+        MainEngine::Update(dt);
+        physicsTimer.Update(dt);
+        if(physicsTimer.IsOver())
+        {
+            physicsManager.Update(dt);
+            physicsTimer.time += physicsTimer.period;
+        }
+        //Player management
+        {
+            //Jumping
+            if(playerData.contactNmb > 0 && keyboardManager_.IsKeyDown(sf::Keyboard::Space))
+            {
+                const auto playerVelocity = playerData.playerBody->GetLinearVelocity();
+                playerData.playerBody->SetLinearVelocity(b2Vec2(playerVelocity.x, -jumpVelocity));
+            }
+            //Move horizontal
+            {
+                int move = 0;
+                move -= keyboardManager_.IsKeyHeld(sf::Keyboard::Left);
+                move += keyboardManager_.IsKeyHeld(sf::Keyboard::Right);
+                {
+                    std::ostringstream oss;
+                    oss << "Player Key Move: "<<move;
+                    logDebug(oss.str());
+                }
+                const auto playerVelocity = playerData.playerBody->GetLinearVelocity();
+                playerData.playerBody->SetLinearVelocity(b2Vec2(move*moveVelocity, playerVelocity.y));
+            }
+
+            positionManager.CopyPositionsFromPhysics2d(entityManager, physicsManager);
+            spriteManager.CopyTransformPosition(positionManager, 0,1);
+            spriteManager.PushCommands(graphicsManager_.get(), 0,1);
+        }
+
+
+        {
+            spriteManager.CopyTransformPosition(positionManager, 1, platformsNmb);
+            spriteManager.PushCommands(graphicsManager_.get(), 1,platformsNmb);
+        }
+#ifdef __neko_dbg__
+        {
+
+            //Main playerbox
+            shapeManager.CopyTransformPosition(positionManager, 0, 1);
+            shapeManager.PushCommands(graphicsManager_.get(), 0, 1+platformsNmb);
+        }
+        {
+            std::ostringstream oss;
+            auto pos = transformManager.GetComponent(playerData.playerEntity);
+            oss << "("<<pos.x<<", "<<pos.y<<")";
+            graphicsManager_->editor->AddInspectorInfo("PlayerPos", oss.str());
+        }
+        {
+            std::ostringstream oss;
+            auto* body = physicsManager.GetBodyAt(playerData.playerEntity);
+            b2Vec2 velocity = body->GetLinearVelocity();
+            oss << "("<<velocity.x<<", "<<velocity.y<<")";
+            graphicsManager_->editor->AddInspectorInfo("PlayerVel", oss.str());
+        }
+#endif
+
+    }
+
+    void Destroy() override
+    {
+        physicsManager.Destroy();
+        MainEngine::Destroy();
+    }
+
+    void OnBeginContact(const neko::Collider* colliderA, const neko::Collider* colliderB) override
+    {
+        if(colliderA->entity == playerData.playerEntity && colliderA->fixture->IsSensor())
+        {
+            playerData.contactNmb++;
+        }
+        if (colliderB->entity == playerData.playerEntity && colliderB->fixture->IsSensor())
+        {
+            playerData.contactNmb++;
+        }
+    }
+    void OnEndContact(const neko::Collider* colliderA, const neko::Collider* colliderB) override
+    {
+        if (colliderA->entity == playerData.playerEntity && colliderA->fixture->IsSensor())
+        {
+            playerData.contactNmb--;
+        }
+        if (colliderB->entity == playerData.playerEntity && colliderB->fixture->IsSensor())
+        {
+            playerData.contactNmb--;
+        }
+    }
+
+protected:
+    neko::Timer physicsTimer{0.0f,0.0f};
+    neko::EntityManager entityManager;
+    multi::SpriteManager spriteManager;
+    neko::TextureManager textureManager;
+    neko::Position2dManager positionManager;
+    neko::Scale2dManager transformManager;
+    neko::Angle2dManager angleManager;
+    neko::Physics2dManager physicsManager;
+    multi::ShapeManager shapeManager;
+
+    PlayerData playerData = {};
+    static const size_t platformsNmb = 3;
+    const float jumpVelocity = 4.0f;
+    const float moveVelocity = 2.0f;
+};
+
+TEST(Multi, PlatformerBasic)
+{
+    PlatformerEngine engine;
     engine.Init();
     engine.EngineLoop();
 }

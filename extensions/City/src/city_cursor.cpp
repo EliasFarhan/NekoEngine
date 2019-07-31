@@ -291,7 +291,7 @@ sf::Vector2i CityCursor::GetMouseWorldPos() const
 	const auto view = engine_->mainView;
 
 	return sf::Vector2i(view.getCenter() + engine_->GetCurrentZoom() *
-		(-sf::Vector2f(engine_->config.screenSize) / 2.0f + sf::Vector2f(mousePos)));
+		(-sf::Vector2f(engine_->config.realWindowSize) / 2.0f + sf::Vector2f(mousePos)));
 
 }
 

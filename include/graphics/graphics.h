@@ -34,7 +34,7 @@
 namespace neko
 {
 
-const size_t MAX_COMMAND_NMB = 1024;
+const size_t MAX_COMMAND_NMB = 8'192;
 
 class MainEngine;
 

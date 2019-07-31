@@ -35,7 +35,7 @@ public:
 	void Init() override
 	{
 		
-		config.screenSize = sf::Vector2u(800, 800);
+		config.realWindowSize = sf::Vector2u(800, 800);
 		
 		BasicEngine::Init();
 		roadPositions_.reserve(roadNmb_);
@@ -49,7 +49,7 @@ public:
 		{
 			sf::RectangleShape rect;
 
-			const auto rectSize = sf::Vector2f(float(config.screenSize.x / tileNmb.x), float(config.screenSize.y / tileNmb.y));
+			const auto rectSize = sf::Vector2f(float(config.realWindowSize.x / tileNmb.x), float(config.realWindowSize.y / tileNmb.y));
 			rect.setFillColor(sf::Color::Blue);
 			rect.setOutlineColor(sf::Color::Green);
 			rect.setOutlineThickness(outlineThickness);
@@ -92,7 +92,7 @@ public:
             }
             sf::RectangleShape rect;
 
-            const auto rectSize = sf::Vector2f(float(config.screenSize.x / tileNmb.x), float(config.screenSize.y / tileNmb.y));
+            const auto rectSize = sf::Vector2f(float(config.realWindowSize.x / tileNmb.x), float(config.realWindowSize.y / tileNmb.y));
             rect.setFillColor(sf::Color::Blue);
             rect.setOutlineColor(sf::Color::Green);
             rect.setOutlineThickness(outlineThickness);
@@ -111,7 +111,7 @@ public:
 	{
 		BasicEngine::Update(dt);
 		const auto mousePos = mouseManager_.GetPosition();
-		const auto rectSize = sf::Vector2f(float(config.screenSize.x / tileNmb.x), float(config.screenSize.y / tileNmb.y));
+		const auto rectSize = sf::Vector2f(float(config.realWindowSize.x / tileNmb.x), float(config.realWindowSize.y / tileNmb.y));
 		const sf::Vector2i tilePos = sf::Vector2i(int(mousePos.x / rectSize.x), int(mousePos.y / rectSize.y));
 		const auto path = graph_.CalculateShortestPath(sf::Vector2i(0, 0), tilePos);
 

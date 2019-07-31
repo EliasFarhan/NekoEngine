@@ -30,4 +30,48 @@ namespace neko
 {
 
 
+void ConvexShapeManager::AddBox(Entity entity, const sf::Vector2f& pos, const sf::Vector2f& halfSize, const ShapeDef& shapeDef)
+{
+    sf::Vector2f points[4] =
+            {
+                    -halfSize,
+                    sf::Vector2f(-halfSize.x, halfSize.y),
+                    halfSize,
+                    sf::Vector2f(halfSize.x, -halfSize.y)
+            };
+    AddPolygon(entity, pos, points, 4, shapeDef);
+}
+
+void ConvexShapeManager::AddPolygon(Entity entity, const sf::Vector2f& pos, const sf::Vector2f* points, size_t pointNmb,
+                                     const ShapeDef& shapeDef)
+{
+    sf::ConvexShape newPolygon;
+    newPolygon.setPointCount(pointNmb);
+    newPolygon.setPosition(pos);
+    for (auto i = 0u; i < pointNmb; i++)
+    {
+        newPolygon.setPoint(i, points[i]);
+    }
+    newPolygon.setFillColor(shapeDef.fillColor);
+    newPolygon.setOutlineColor(shapeDef.outlineColor);
+    newPolygon.setOutlineThickness(shapeDef.outlineThickness);
+    ResizeIfNecessary(components_, entity);
+    components_[entity] = newPolygon;
+}
+
+void ConvexShapeManager::CopyTransformPosition(Position2dManager& positionManager, size_t start, size_t length)
+{
+    for(auto i = start; i < start+length; i++)
+    {
+        components_[i].setPosition(positionManager.GetConstComponentsVector()[i]);
+    }
+}
+
+void ConvexShapeManager::PushCommands(GraphicsManager* graphicsManager, size_t start, size_t length)
+{
+    for(auto i = start; i < start+length;i++)
+    {
+        graphicsManager->Draw(components_[i]);
+    }
+}
 }

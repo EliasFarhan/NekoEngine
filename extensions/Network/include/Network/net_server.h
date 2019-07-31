@@ -41,7 +41,8 @@ public:
 	void SendUnreliable(const NetCommand& command);
 protected:
 	void ServerLoop();
-	void TcpSocketLoop(const Index clientId);
+	void TcpSendSocketLoop(const Index clientId);
+	void TcpReceiveSocketLoop(const Index clientId);
 	virtual void ParseCommand(sf::Packet& packet, const Index clientId) = 0;
 
 

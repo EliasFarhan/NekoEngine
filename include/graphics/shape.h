@@ -43,10 +43,10 @@ struct ShapeDef
 /**
  * \brief managing graphic shape from the SFML API
  */
-class ShapeManager
+class BadShapeManager
 {
 public:
-    ShapeManager() = default;
+    BadShapeManager() = default;
 
     virtual Index AddBox(const sf::Vector2f& pos, const sf::Vector2f& halfSize, const ShapeDef& shapeDef) = 0;
 
@@ -59,10 +59,20 @@ public:
 
 };
 
-class ConvexShapeManager : public ShapeManager, public ComponentManager<sf::ConvexShape, ComponentType(NekoComponentType::CONVEX_SHAPE2D)>
+class ConvexShapeManager : public ComponentManager<sf::ConvexShape, ComponentType(NekoComponentType::CONVEX_SHAPE2D)>
 {
 public:
     using ComponentManager::ComponentManager;
+
+    void AddBox(Entity entity, const sf::Vector2f& pos, const sf::Vector2f& halfSize, const ShapeDef& shapeDef);
+
+    void AddPolygon(Entity entity, const sf::Vector2f& pos, const sf::Vector2f* points, size_t pointNmb, const ShapeDef& shapeDef);
+
+    void CopyTransformPosition(Position2dManager& positionManager, size_t start, size_t length);
+
+    void PushCommands(GraphicsManager* graphicsManager, size_t start, size_t length);
+
+
 };
 
 

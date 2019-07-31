@@ -47,7 +47,7 @@ void BasicSpriteManager::CopyTransformPosition(Position2dManager& positionManage
 	rmt_ScopedCPUSample(CopySpritePositions, 0);
 	for (auto i = start; i < start + length; i++)
 	{
-		components_[i].setPosition(positionManager.GetComponent(neko::Entity(i)));
+		components_[i].sprite.setPosition(positionManager.GetComponent(neko::Entity(i)));
 	}
 }
 
@@ -56,7 +56,7 @@ void BasicSpriteManager::CopyTransformScales(Scale2dManager& scaleManager, size_
 	rmt_ScopedCPUSample(CopySpritePositions, 0);
 	for (auto i = start; i < start + length; i++)
 	{
-		components_[i].setScale(scaleManager.GetComponent(neko::Entity(i)));
+		components_[i].sprite.setScale(scaleManager.GetComponent(neko::Entity(i)));
 	}
 }
 
@@ -65,7 +65,7 @@ void BasicSpriteManager::CopyTransformAngles(Angle2dManager& angleManager, size_
 	rmt_ScopedCPUSample(CopySpritePositions, 0);
 	for (auto i = start; i < start + length; i++)
 	{
-		components_[i].setRotation(angleManager.GetComponent(neko::Entity(i)));
+		components_[i].sprite.setRotation(angleManager.GetComponent(neko::Entity(i)));
 	}
 }
 
@@ -75,7 +75,7 @@ void BasicSpriteManager::PushCommands(neko::GraphicsManager* graphicsManager, si
 	if (graphicsManager == nullptr) return;
 	for(size_t i = start; i < start+length;i++)
 	{
-		graphicsManager->Draw(components_[i]);
+		graphicsManager->Draw(components_[i].sprite, components_[i].layer);
 	}
 }
 
@@ -83,8 +83,27 @@ void BasicSpriteManager::CopySpriteOrigin(const sf::Vector2f& origin, size_t sta
 {
     for(size_t i = start; i < start+length;i++)
     {
-        const auto localBounds = components_[i].getLocalBounds();
-        components_[i].setOrigin(sf::Vector2f(localBounds.width*origin.x, localBounds.height*origin.y));
+        const auto localBounds = components_[i].sprite.getLocalBounds();
+        components_[i].origin = origin;
+        components_[i].sprite.setOrigin(sf::Vector2f(localBounds.width*origin.x, localBounds.height*origin.y));
+    }
+}
+
+void BasicSpriteManager::CopyTexture(const sf::Texture* texture, size_t start, size_t length)
+{
+    if(texture == nullptr)
+        return;
+    for(auto i = start; i < start+length;i++)
+    {
+        components_[i].sprite.setTexture(*texture);
+    }
+}
+
+void BasicSpriteManager::CopyLayer(int layer, size_t start, size_t length)
+{
+    for(auto i = start; i < start+length;i++)
+    {
+        components_[i].layer = layer;
     }
 }
 }

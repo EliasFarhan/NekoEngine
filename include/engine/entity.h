@@ -52,7 +52,7 @@ public:
 
 	EntityMask GetMask(Entity entity);
 
-	Entity CreateEntity();
+	Entity CreateEntity(Entity entity = INVALID_ENTITY);
 
 	void DestroyEntity(Entity entity);
 
@@ -68,6 +68,7 @@ public:
 	void AddComponentType(Entity entity, EntityMask componentType);
 
 	void RemoveComponentType(Entity entity, EntityMask componentType);
+
 
 private:
 	std::vector<EntityMask> entityMaskArray_;

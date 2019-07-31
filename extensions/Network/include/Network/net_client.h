@@ -19,7 +19,8 @@ public:
 	void Update();
 	void SendReliable(std::shared_ptr<NetCommand> command);
 protected:
-	void TcpSocketLoop();
+	void TcpReceiveSocketLoop();
+	void TcpSendSocketLoop();
     virtual void ParseCommand(sf::Packet& packet) = 0;
 
 	std::atomic<bool> isRunning;

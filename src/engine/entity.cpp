@@ -39,20 +39,37 @@ EntityMask EntityManager::GetMask(Entity entity)
     return entityMaskArray_[entity];
 }
 
-Entity EntityManager::CreateEntity()
+Entity EntityManager::CreateEntity(Entity entity)
 {
-    const auto entityMaskIt = std::find_if(entityMaskArray_.begin(), entityMaskArray_.end(),[](EntityMask entityMask){
-       return  entityMask == INVALID_ENTITY_MASK;
-    });
-    if(entityMaskIt == entityMaskArray_.end())
+    if(entity == INVALID_ENTITY)
     {
-		const auto newEntity = entityMaskArray_.size();
-		ResizeIfNecessary(entityMaskArray_, newEntity);
-        return Entity(newEntity);
+        const auto entityMaskIt = std::find_if(entityMaskArray_.begin(), entityMaskArray_.end(),
+                                               [](EntityMask entityMask)
+                                               {
+                                                   return entityMask == INVALID_ENTITY_MASK;
+                                               });
+        if (entityMaskIt == entityMaskArray_.end())
+        {
+            const auto newEntity = entityMaskArray_.size();
+            ResizeIfNecessary(entityMaskArray_, newEntity);
+            return Entity(newEntity);
+        }
+        else
+        {
+            return Entity(entityMaskIt - entityMaskArray_.begin());
+        }
     }
     else
     {
-        return Entity(entityMaskIt-entityMaskArray_.begin());
+        ResizeIfNecessary(entityMaskArray_, entity);
+        if(!EntityExists(entity))
+        {
+            return entity;
+        }
+        else
+        {
+            return CreateEntity(INVALID_ENTITY);
+        }
     }
 }
 
@@ -93,6 +110,7 @@ size_t EntityManager::GetEntitiesSize() const
 std::vector<Entity> EntityManager::FilterEntities(EntityMask filterComponents)
 {
 	std::vector<Entity> entities;
+	entities.reserve(entityMaskArray_.size());
 	for(Entity i = 0; i < entityMaskArray_.size();i++)
 	{
 		if(HasComponent(i, filterComponents))
@@ -107,4 +125,5 @@ bool EntityManager::EntityExists(Entity entity)
 {
     return entityMaskArray_[entity] != INVALID_ENTITY_MASK;
 }
+
 }
