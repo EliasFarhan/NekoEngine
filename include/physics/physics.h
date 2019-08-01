@@ -85,6 +85,17 @@ class Body2dManager : public ComponentManager <b2Body*,ComponentType(NekoCompone
 {
 };
 
+class BodyDef2dManager : public ComponentManager<b2BodyDef, ComponentType(NekoComponentType::BODY2D)>
+{
+public:
+    void ParseComponentJson(json& componentJson, Entity entity) override;
+
+    json SerializeComponentJson(Entity entity) override;
+
+public:
+
+};
+
 class Collider2dManager : public ComponentManager<Collider, ComponentType(NekoComponentType::COLLIDER2D)>
 {
 };

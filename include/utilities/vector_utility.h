@@ -3,7 +3,7 @@
 #include "engine/globals.h"
 
 template<typename T>
-void ResizeIfNecessary(std::vector<T>& vector, size_t index)
+void ResizeIfNecessary(std::vector<T>& vector, size_t index, T default_value)
 {
 
 	if(vector.size() <= index)
@@ -17,6 +17,6 @@ void ResizeIfNecessary(std::vector<T>& vector, size_t index)
 		{
 			futureSize *= 2;
 		}
-		vector.resize(futureSize);
+		vector.resize(futureSize, default_value);
 	}
 }

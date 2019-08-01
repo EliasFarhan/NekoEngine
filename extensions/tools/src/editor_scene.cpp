@@ -20,7 +20,7 @@ void EditorSceneManager::ParseEntityJson(json& entityJson)
     entityManager.CreateEntity(entity);
     if (neko::CheckJsonParameter(entityJson, "name", json::value_t::string))
     {
-        ResizeIfNecessary(currentScene_.entitiesNames, entity);
+        ResizeIfNecessary(currentScene_.entitiesNames, entity, std::string());
         currentScene_.entitiesNames[entity] = entityJson["name"];
 
     }

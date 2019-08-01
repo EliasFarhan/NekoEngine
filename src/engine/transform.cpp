@@ -51,7 +51,7 @@ void Angle2dManager::CopyAnglesFromBody2d(EntityManager& entityManager, Body2dMa
 	}
 }
 
-void Position2dManager::CopyPositionsFromBody2d(EntityManager& entityManager, Body2dManager& body2dManager)
+void Position2dManager::CopyAllPositionsFromBody2d(EntityManager& entityManager, Body2dManager& body2dManager)
 {
 	const auto entityNmb = entityManager.GetEntitiesSize();
 	const auto& bodies = body2dManager.GetConstComponentsVector();
@@ -77,4 +77,11 @@ void Position2dManager::CopyPositionsFromPhysics2d(EntityManager& entityManager,
         }
     }
 }
+
+Index Scale2dManager::AddComponent(EntityManager& entityManager, Entity entity)
+{
+    ResizeIfNecessary(components_, entity, sf::Vector2f(1.0f,1.0f));
+    return ComponentManager::AddComponent(entityManager, entity);
+}
+
 }

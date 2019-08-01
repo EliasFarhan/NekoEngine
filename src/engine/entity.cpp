@@ -52,7 +52,7 @@ Entity EntityManager::CreateEntity(Entity entity)
         if (entityMaskIt == entityMaskArray_.end())
         {
             const auto newEntity = entityMaskArray_.size();
-            ResizeIfNecessary(entityMaskArray_, newEntity);
+            ResizeIfNecessary(entityMaskArray_, newEntity, INVALID_ENTITY_MASK);
             AddComponentType(newEntity, EntityMask(NekoComponentType::EMPTY));
             return Entity(newEntity);
         }
@@ -65,7 +65,7 @@ Entity EntityManager::CreateEntity(Entity entity)
     }
     else
     {
-        ResizeIfNecessary(entityMaskArray_, entity);
+        ResizeIfNecessary(entityMaskArray_, entity, INVALID_ENTITY_MASK);
         if(!EntityExists(entity))
         {
             AddComponentType(entity, EntityMask(NekoComponentType::EMPTY));

@@ -39,6 +39,10 @@ public:
 
     void logLoop();
 
+    std::vector<std::string_view>& GetMsgHistory()
+    {
+        return msgHistory_;
+    }
     std::atomic<bool> isRunning = true;
     std::condition_variable newMsgSync;
 
@@ -47,7 +51,7 @@ public:
 private:
     std::thread logThread_;
     std::vector<std::string> msgQueue_;
-
+    std::vector<std::string_view> msgHistory_;
 };
 
 
@@ -67,6 +71,7 @@ DebugLogger::DebugLogger()
 
 void DebugLogger::write(std::string msg)
 {
+    msgHistory_.push_back(msg);
     {
         std::unique_lock<std::mutex> lock(msgMutex);
         msgQueue_.push_back(msg);
@@ -137,4 +142,9 @@ void destroyLog()
 		debugLogger->newMsgSync.wait_for(lock, 5ms);
     }
 	debugLogger = nullptr;
+}
+
+std::vector<std::string_view>& getLog()
+{
+    return debugLogger->GetMsgHistory();
 }

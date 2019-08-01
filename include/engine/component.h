@@ -42,7 +42,7 @@ enum class NekoComponentType : ComponentType
 	SCALE3D = 1 << 5,
 	ANGLE3D = 1 << 6,
 	SPRITE2D = 1 << 7,
-	SPINE = 1 << 8,
+	SPINE_ANIMATION = 1 << 8,
 	BODY2D = 1 << 9,
 	COLLIDER2D = 1 << 10,
 	CONVEX_SHAPE2D = 1 << 11,
@@ -60,7 +60,12 @@ template<typename T, ComponentType componentType>
 class ComponentManager
 {
 public:
-	ComponentManager() { components_.resize(INIT_ENTITY_NMB); }
+	ComponentManager()
+	{ ResizeIfNecessary(components_, INIT_ENTITY_NMB-1, T{});}
+	explicit ComponentManager(T default_value)
+    {
+        ResizeIfNecessary(components_, INIT_ENTITY_NMB-1, default_value);
+    }
 	virtual ~ComponentManager(){};
 	virtual Index AddComponent(EntityManager& entityManager, Entity entity);
 	virtual void DestroyComponent(EntityManager& entityManager, Entity entity);
@@ -85,7 +90,7 @@ protected:
 template <typename T, ComponentType componentType>
 Index ComponentManager<T, componentType>::AddComponent(EntityManager& entityManager, Entity entity)
 {
-	ResizeIfNecessary(components_, entity);
+    ResizeIfNecessary(components_, entity, T{});
 	entityManager.AddComponentType(entity, componentType);
 	return entity;
 }

@@ -41,7 +41,9 @@ public:
 	//Return an index to avoid pointer invalidation
 	Index LoadTexture(const std::string_view filename);
 	const sf::Texture* GetTexture(const Index index) const;
+    std::string GetTexturePath(const Index index) const;
 
+    size_t GetTextureCount() const;
 private:
     std::vector<std::string> texturePaths_;
     std::vector<sf::Texture> textures_;

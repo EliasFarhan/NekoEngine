@@ -55,7 +55,7 @@ void ConvexShapeManager::AddPolygon(Entity entity, const sf::Vector2f& pos, cons
     newPolygon.setFillColor(shapeDef.fillColor);
     newPolygon.setOutlineColor(shapeDef.outlineColor);
     newPolygon.setOutlineThickness(shapeDef.outlineThickness);
-    ResizeIfNecessary(components_, entity);
+    ResizeIfNecessary(components_, entity, sf::ConvexShape());
     components_[entity] = newPolygon;
 }
 

@@ -34,7 +34,7 @@
 
 namespace neko
 {
-
+class TextureManager;
 class GraphicsManager;
 
 class SpriteManager
@@ -42,9 +42,9 @@ class SpriteManager
 public:
     SpriteManager() = default;
 
-    virtual neko::Index AddSprite(const sf::Texture* texture) = 0;
+    virtual neko::Index AddSprite(const sf::Texture* texture){ return 0;};
 
-    virtual sf::Sprite* GetSpriteAt(unsigned int spriteIndex) = 0;
+    virtual sf::Sprite* GetSpriteAt(unsigned int spriteIndex) {return nullptr;};
 
     virtual void CopyTransformPosition(Position2dManager& transformManager, size_t start = 0, size_t length = neko::INIT_ENTITY_NMB)= 0;
 
@@ -63,29 +63,34 @@ public:
 struct Sprite
 {
     sf::Sprite sprite;
-    int layer;
-    sf::Vector2f origin;
+    int layer = 0;
+    sf::Vector2f origin = sf::Vector2f(0.0f,0.0f);
+    Index textureId = INVALID_INDEX;
 };
 
-class BasicSpriteManager : public SpriteManager, public ComponentManager<Sprite, ComponentType(NekoComponentType::SPRITE2D)>
+class BasicSpriteManager :
+        public ComponentManager<Sprite, ComponentType(NekoComponentType::SPRITE2D)>
 {
 public:
-    using ComponentManager::ComponentManager;
-    Index AddSprite(const sf::Texture* texture) override;
-
-    sf::Sprite* GetSpriteAt(unsigned int spriteIndex) override;
+    explicit BasicSpriteManager(TextureManager& textureManager);
 
     void CopySpriteOrigin(const sf::Vector2f& origin, size_t start, size_t length);
-    void CopyTexture(const sf::Texture* texture, size_t start, size_t length);
-    void CopyTransformPosition(Position2dManager& positionManager, size_t start, size_t length) override;
 
-    void CopyTransformScales(Scale2dManager& scaleManager, size_t start, size_t length) override;
-
-    void CopyTransformAngles(Angle2dManager& angleManager, size_t start, size_t length) override;
-
-    void PushCommands(neko::GraphicsManager* graphicsManager, size_t start, size_t length) override;
+    void CopyTexture(const Index textureId, size_t start, size_t length);
 
     void CopyLayer(int layer, size_t start, size_t length);
+
+    void CopyAllTransformPositions(EntityManager& entityManager, Position2dManager& positionManager);
+
+    void CopyAllTransformScales(EntityManager& entityManager, Scale2dManager& scaleManager);
+
+    void CopyAllTransformAngles(EntityManager& entityManager, Angle2dManager& angleManager);
+
+    void PushAllCommands(EntityManager& entityManager, GraphicsManager& graphicsManager);
+
+
+protected:
+    TextureManager& textureManager_;
 };
 
 }

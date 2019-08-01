@@ -57,7 +57,7 @@ struct CityCar : neko::Component
     neko::Timer movingTimer = neko::Timer(0.0f, 0.1f);//2 tiles per second
 	CarState carState = CarState::ARRIVED;
 	sf::Vector2i position = neko::INVALID_TILE_POS;
-	const sf::Vector2f spriteSize = sf::Vector2f(32.0f, 16.0f);
+	sf::Vector2f spriteSize = sf::Vector2f(32.0f, 16.0f);
 };
 
 class CityCarManager : public neko::System

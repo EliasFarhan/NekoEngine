@@ -390,7 +390,7 @@ namespace city {
 		const json& jsonContent)
 	{
 		const auto behaviorTree = ParseBehaviorTreeFromJson(comp, jsonContent);
-		ResizeIfNecessary(vecBehaviorTree_, comp);
+        ResizeIfNecessary(vecBehaviorTree_, comp, (std::shared_ptr<BehaviorTreeNode>)nullptr);
 		if (behaviorTree) {
 			vecBehaviorTree_.at(comp) = behaviorTree;
 			return comp;

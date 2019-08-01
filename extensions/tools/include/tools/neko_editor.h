@@ -10,6 +10,7 @@
 
 #include <imgui.h>
 #include <imfilebrowser.h>
+#include <graphics/sprite.h>
 
 namespace editor
 {
@@ -27,12 +28,23 @@ public:
 
     void Destroy() override;
 
-    neko::EntityManager& GetEntityManager() { return entityManager_;}
-    neko::Position2dManager& GetPositionManager(){ return positionManager_;}
-
+    neko::EntityManager& GetEntityManager();
+    neko::Position2dManager& GetPositionManager();
+    neko::Scale2dManager& GetScaleManager();
+    neko::Angle2dManager& GetAngleManager();
+    neko::SceneManager& GetSceneManager();
+    neko::BodyDef2dManager& GetBodyDefManager();
+    neko::BasicSpriteManager& GetSpriteManager();
+    neko::TextureManager& GetTextureManager();
 private:
     neko::EntityManager entityManager_;
     EntityViewer entityViewer_;
+    neko::TextureManager textureManager_;
+
+
+    neko::BasicSpriteManager spriteManager_{this->textureManager_};
+
+
 
     neko::BasicGraphicsManager graphicsManager_;
     sf::RenderTexture sceneRenderTexture_;
@@ -41,10 +53,11 @@ private:
     EditorSceneManager sceneManager_{*this};
 
     neko::Position2dManager positionManager_;
+    neko::Scale2dManager scaleManager_{sf::Vector2f(1.0f,1.0f)};
+    neko::Angle2dManager angleManager_;
 
+    neko::BodyDef2dManager bodyDefManager_;
     Inspector inspector_{*this};
-
-    ImGui::FileBrowser fileDialog;
 
     FileOperation fileOperationStatus_ = FileOperation::OPEN;
 

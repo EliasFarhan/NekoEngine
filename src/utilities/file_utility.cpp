@@ -75,7 +75,7 @@ bool IsDirectory(const std::string_view filename)
     return fs::is_directory(p);
 }
 
-void IterateDirectory(const std::string_view dirname, std::function<void(const std::string_view)> func)
+void IterateDirectory(const std::string_view dirname, std::function<void(const std::string_view)> func, bool recursive)
 {
 
     if (IsDirectory(dirname))
@@ -86,7 +86,14 @@ void IterateDirectory(const std::string_view dirname, std::function<void(const s
         for (auto& p : fs::directory_iterator(dirname))
 #endif
         {
-            func(p.path().generic_string());
+            if(IsRegularFile(p.path().generic_string()))
+            {
+                func(p.path().generic_string());
+            }
+            else if(recursive && IsDirectory(p.path().generic_string()))
+            {
+                IterateDirectory(p.path().generic_string(), func, recursive);
+            }
         }
     }
 }

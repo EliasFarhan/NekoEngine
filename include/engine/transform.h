@@ -51,14 +51,16 @@ class Position2dManager : public ComponentManager<sf::Vector2f, ComponentType(Ne
 {
 public:
 	using ComponentManager::ComponentManager;
-	void CopyPositionsFromBody2d(EntityManager& entityManager, Body2dManager& body2dManager);
+	void CopyAllPositionsFromBody2d(EntityManager& entityManager, Body2dManager& body2dManager);
 	void CopyPositionsFromPhysics2d(EntityManager& entityManager, Physics2dManager& physics2dManager);
 };
 
 class Scale2dManager : public ComponentManager<sf::Vector2f, ComponentType(NekoComponentType::SCALE2D)>
 {
-public :
-	using ComponentManager::ComponentManager;
+public:
+    using ComponentManager::ComponentManager;
+    Index AddComponent(EntityManager& entityManager, Entity entity) override;
+
 };
 
 class Angle2dManager : public ComponentManager<float, ComponentType(NekoComponentType::ANGLE2D)>

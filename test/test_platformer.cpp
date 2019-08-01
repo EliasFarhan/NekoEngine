@@ -59,11 +59,10 @@ public:
         positionManager.AddComponent(entityManager_, bgEntity);
         positionManager.SetComponent(bgEntity, sf::Vector2f());
         const neko::Index bgTextureIndex = textureManager_.LoadTexture("data/sprites/bg/bg.png");
-        auto* bgTexture = textureManager_.GetTexture(bgTextureIndex);
         spriteManager_.AddComponent(entityManager_, bgEntity);
 
         auto& bgSprite = spriteManager_.GetComponent(bgEntity);
-        spriteManager_.CopyTexture(bgTexture, bgEntity, 1);
+        spriteManager_.CopyTexture(bgTextureIndex, bgEntity, 1);
         spriteManager_.CopyLayer(-1, bgEntity, 1);
 
         /*
@@ -78,8 +77,8 @@ public:
         const neko::Index playerTextureIndex = textureManager_.LoadTexture("data/sprites/hero/jump/hero1.png");
         auto* playerTexture = textureManager_.GetTexture(playerTextureIndex);
         spriteManager_.AddComponent(entityManager_, playerData.playerEntity);
-        spriteManager_.CopyTexture(playerTexture, playerData.playerEntity,1);
-        spriteManager_.CopySpriteOrigin(sf::Vector2f(0.5f,0.5f), playerData.playerEntity, 1);
+        spriteManager_.CopyTexture(playerTextureIndex, playerData.playerEntity, 1);
+        spriteManager_.CopySpriteOrigin(sf::Vector2f(0.5f, 0.5f), playerData.playerEntity, 1);
 
         const auto physicsSize = neko::pixel2meter(sf::Vector2f(playerTexture->getSize()));
         b2BodyDef bodyDef;
@@ -191,8 +190,8 @@ public:
             bodyManager_.SetComponent(platformEntity, body);
 
             spriteManager_.AddComponent(entityManager_, platformEntity);
-            spriteManager_.CopyTexture(platformTexture, platformEntity, 1);
-            spriteManager_.CopySpriteOrigin(sf::Vector2f(0.5f,0.5f), platformEntity,1);
+            spriteManager_.CopyTexture(platformTextureIndex, platformEntity, 1);
+            spriteManager_.CopySpriteOrigin(sf::Vector2f(0.5f, 0.5f), platformEntity, 1);
         }
 
 
@@ -226,23 +225,23 @@ public:
             {
                 std::ostringstream oss;
                 oss << "Player Key Move: " << move;
-                logDebug(oss.str()+" Player pos: "+std::to_string(playerData.playerBody->GetPosition().x)+ ", "+std::to_string(playerData.playerBody->GetPosition().y));
+                logDebug(oss.str() + " Player pos: " + std::to_string(playerData.playerBody->GetPosition().x) + ", " +
+                         std::to_string(playerData.playerBody->GetPosition().y));
             }
 #endif
             const auto playerVelocity = playerData.playerBody->GetLinearVelocity();
             playerData.playerBody->SetLinearVelocity(b2Vec2(move * moveVelocity, playerVelocity.y));
         }
-        positionManager.CopyPositionsFromBody2d(entityManager_, bodyManager_);
+        positionManager.CopyAllPositionsFromBody2d(entityManager_, bodyManager_);
 
         renderTexture_.clear(config.bgColor);
 
         tmpEntities = entityManager_.FilterEntities(neko::EntityMask(neko::NekoComponentType::POSITION2D) |
                                                     neko::EntityMask(neko::NekoComponentType::SPRITE2D));
-        for (auto entity : tmpEntities)
-        {
-            spriteManager_.CopyTransformPosition(positionManager, entity, 1);
-            spriteManager_.PushCommands(&graphicsManager_, entity, 1);
-        }
+
+        spriteManager_.CopyAllTransformPositions(entityManager_, positionManager);
+        spriteManager_.PushAllCommands(entityManager_, graphicsManager_);
+
         tmpEntities = entityManager_.FilterEntities(neko::EntityMask(neko::NekoComponentType::POSITION2D) |
                                                     neko::EntityMask(neko::NekoComponentType::CONVEX_SHAPE2D));
         for (auto entity : tmpEntities)
@@ -267,9 +266,10 @@ public:
     {
         BasicEngine::Destroy();
     }
+
     void OnBeginContact(const neko::Collider* colliderA, const neko::Collider* colliderB) override
     {
-        if(colliderA->entity == playerData.playerEntity && colliderA->fixture->IsSensor())
+        if (colliderA->entity == playerData.playerEntity && colliderA->fixture->IsSensor())
         {
             playerData.contactNmb++;
         }
@@ -278,6 +278,7 @@ public:
             playerData.contactNmb++;
         }
     }
+
     void OnEndContact(const neko::Collider* colliderA, const neko::Collider* colliderB) override
     {
         if (colliderA->entity == playerData.playerEntity && colliderA->fixture->IsSensor())
@@ -289,6 +290,7 @@ public:
             playerData.contactNmb--;
         }
     }
+
 private:
 
     sf::RenderTexture renderTexture_;
@@ -301,7 +303,7 @@ private:
     neko::Position2dManager positionManager;
 
     neko::TextureManager textureManager_;
-    neko::BasicSpriteManager spriteManager_;
+    neko::BasicSpriteManager spriteManager_{this->textureManager_};
     neko::BasicGraphicsManager graphicsManager_;
     neko::ConvexShapeManager shapeManager_;
 

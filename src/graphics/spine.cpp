@@ -51,7 +51,7 @@ void SpineManager::Update(EntityManager& entityManager, float dt)
 {
     for(int i = 0; i < spineDrawables_.size(); i++)
     {
-        if(entityManager.HasComponent(i, EntityMask(NekoComponentType::SPINE)))
+        if(entityManager.HasComponent(i, EntityMask(NekoComponentType::SPINE_ANIMATION)))
         {
             spineDrawables_[i].skeletonDrawable->update(dt);
         }

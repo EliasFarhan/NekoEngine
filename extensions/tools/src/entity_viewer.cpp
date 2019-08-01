@@ -21,7 +21,7 @@ void EntityViewer::Update(neko::EntityManager& entityManager, EditorSceneManager
             entitiesName_.push_back(sceneManager.GetCurrentScene().entitiesNames[entity]);
         }
     }
-    ImGui::Begin("Entity Viewer");
+    ImGui::Begin("Entity Viewer", nullptr, ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoCollapse);
     for(int i = 0; i < entities_.size();i++)
     {
         if(ImGui::Selectable(entitiesName_[i].c_str(), selectedEntity_ == i))
@@ -33,7 +33,7 @@ void EntityViewer::Update(neko::EntityManager& entityManager, EditorSceneManager
     {
         auto entity = entityManager.CreateEntity();
         auto& entitiesName = sceneManager.GetCurrentScene().entitiesNames;
-        ResizeIfNecessary(entitiesName, entity);
+        ResizeIfNecessary(entitiesName, entity, std::string());
         entitiesName[entity] = std::string("Entity ")+std::to_string(entity);
     }
     ImGui::End();

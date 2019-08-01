@@ -27,83 +27,101 @@
 #include <engine/engine.h>
 #include "engine/globals.h"
 #include <Remotery.h>
-#include <SFML/Graphics/Texture.hpp>
+#include <graphics/texture.h>
 
 namespace neko
 {
 
-Index BasicSpriteManager::AddSprite(const sf::Texture* texture)
-{
-    return 0;
-}
-
-sf::Sprite* BasicSpriteManager::GetSpriteAt(unsigned int spriteIndex)
-{
-    return nullptr;
-}
-
-void BasicSpriteManager::CopyTransformPosition(Position2dManager& positionManager, size_t start, size_t length)
-{
-	rmt_ScopedCPUSample(CopySpritePositions, 0);
-	for (auto i = start; i < start + length; i++)
-	{
-		components_[i].sprite.setPosition(positionManager.GetComponent(neko::Entity(i)));
-	}
-}
-
-void BasicSpriteManager::CopyTransformScales(Scale2dManager& scaleManager, size_t start, size_t length)
-{
-	rmt_ScopedCPUSample(CopySpritePositions, 0);
-	for (auto i = start; i < start + length; i++)
-	{
-		components_[i].sprite.setScale(scaleManager.GetComponent(neko::Entity(i)));
-	}
-}
-
-void BasicSpriteManager::CopyTransformAngles(Angle2dManager& angleManager, size_t start, size_t length)
-{
-	rmt_ScopedCPUSample(CopySpritePositions, 0);
-	for (auto i = start; i < start + length; i++)
-	{
-		components_[i].sprite.setRotation(angleManager.GetComponent(neko::Entity(i)));
-	}
-}
-
-void BasicSpriteManager::PushCommands(neko::GraphicsManager* graphicsManager, size_t start, size_t length)
-{
-
-	if (graphicsManager == nullptr) return;
-	for(size_t i = start; i < start+length;i++)
-	{
-		graphicsManager->Draw(components_[i].sprite, components_[i].layer);
-	}
-}
-
 void BasicSpriteManager::CopySpriteOrigin(const sf::Vector2f& origin, size_t start, size_t length)
 {
-    for(size_t i = start; i < start+length;i++)
+    for (size_t i = start; i < start + length; i++)
     {
         const auto localBounds = components_[i].sprite.getLocalBounds();
         components_[i].origin = origin;
-        components_[i].sprite.setOrigin(sf::Vector2f(localBounds.width*origin.x, localBounds.height*origin.y));
+        components_[i].sprite.setOrigin(sf::Vector2f(localBounds.width * origin.x, localBounds.height * origin.y));
     }
 }
 
-void BasicSpriteManager::CopyTexture(const sf::Texture* texture, size_t start, size_t length)
+void BasicSpriteManager::CopyTexture(const Index textureId, size_t start, size_t length)
 {
-    if(texture == nullptr)
-        return;
-    for(auto i = start; i < start+length;i++)
+
+    auto* texture = textureManager_.GetTexture(textureId);
+    for (auto i = start; i < start + length; i++)
     {
-        components_[i].sprite.setTexture(*texture);
+        components_[i].textureId = textureId;
+        if(textureId != INVALID_INDEX)
+        {
+            components_[i].sprite.setTexture( *texture);
+        }
+        else
+        {
+            components_[i].sprite.setTexture( sf::Texture());
+        }
+
     }
 }
 
 void BasicSpriteManager::CopyLayer(int layer, size_t start, size_t length)
 {
-    for(auto i = start; i < start+length;i++)
+    for (auto i = start; i < start + length; i++)
     {
         components_[i].layer = layer;
     }
 }
+
+BasicSpriteManager::BasicSpriteManager(TextureManager& textureManager) :
+        textureManager_(textureManager),
+        ComponentManager::ComponentManager()
+{
+
+}
+
+void BasicSpriteManager::CopyAllTransformPositions(EntityManager& entityManager, Position2dManager& positionManager)
+{
+    const auto entityMask = EntityMask(NekoComponentType::POSITION2D) | EntityMask(NekoComponentType::SPRITE2D);
+    for(Entity entity = 0; entity < entityManager.GetEntitiesSize();entity++)
+    {
+        if(entityManager.HasComponent(entity, entityMask))
+        {
+            components_[entity].sprite.setPosition(positionManager.GetConstComponent(entity));
+        }
+    }
+}
+
+void BasicSpriteManager::CopyAllTransformScales(EntityManager& entityManager, Scale2dManager& scaleManager)
+{
+    const auto entityMask = EntityMask(NekoComponentType::SCALE2D) | EntityMask(NekoComponentType::SPRITE2D);
+    for(Entity entity = 0; entity < entityManager.GetEntitiesSize();entity++)
+    {
+        if(entityManager.HasComponent(entity, entityMask))
+        {
+            components_[entity].sprite.setScale(scaleManager.GetConstComponent(entity));
+        }
+    }
+}
+
+void BasicSpriteManager::CopyAllTransformAngles(EntityManager& entityManager, Angle2dManager& angleManager)
+{
+    const auto entityMask = EntityMask(NekoComponentType::ANGLE2D) | EntityMask(NekoComponentType::SPRITE2D);
+    for(Entity entity = 0; entity < entityManager.GetEntitiesSize();entity++)
+    {
+        if(entityManager.HasComponent(entity, entityMask))
+        {
+            components_[entity].sprite.setRotation(angleManager.GetConstComponent(entity));
+        }
+    }
+}
+
+void BasicSpriteManager::PushAllCommands(EntityManager& entityManager, GraphicsManager& graphicsManager)
+{
+    const auto entityMask = EntityMask(NekoComponentType::SPRITE2D);
+    for(Entity entity = 0; entity < entityManager.GetEntitiesSize();entity++)
+    {
+        if(entityManager.HasComponent(entity, entityMask))
+        {
+            graphicsManager.Draw(components_[entity].sprite, components_[entity].layer);
+        }
+    }
+}
+
 }

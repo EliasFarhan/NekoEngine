@@ -371,7 +371,7 @@ neko::Entity CityPeopleManager::AddPerson(neko::Entity entity, sf::Vector2i posi
 		people_.push_back(person);
 		return neko::Index(people_.size());
 	}
-	ResizeIfNecessary(people_, entity);
+    ResizeIfNecessary(people_, entity, Person());
 
 	people_[entity] = person;
 	return entity;

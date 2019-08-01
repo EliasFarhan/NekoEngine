@@ -150,7 +150,7 @@ neko::Entity CityCarManager::SpawnCar(sf::Vector2i position, CarType carType)
 
 neko::Entity CityCarManager::AddCar(neko::Entity entity, CarType carType, sf::Vector2i position)
 {
-	ResizeIfNecessary(cars_, entity);
+    ResizeIfNecessary(cars_, entity, CityCar());
 	cars_[entity].carType = carType;
 	cars_[entity].currentPath.clear();
 	if (position == neko::INVALID_TILE_POS)

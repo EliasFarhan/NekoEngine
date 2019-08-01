@@ -110,4 +110,28 @@ sf::Vector2f meter2pixel(const b2Vec2& meter)
 }
 
 
+void BodyDef2dManager::ParseComponentJson(json& componentJson, Entity entity)
+{
+    b2BodyDef bodyDef;
+    bodyDef.gravityScale = componentJson["gravityScale"];
+    bodyDef.type = componentJson["type"];
+    bodyDef.angularDamping = componentJson["angularDamping"];
+    bodyDef.linearDamping = componentJson["linearDamping"];
+    bodyDef.fixedRotation = componentJson["fixedRotation"];
+    bodyDef.allowSleep = componentJson["allowSleep"];
+    components_[entity] = bodyDef;
+}
+
+json BodyDef2dManager::SerializeComponentJson(Entity entity)
+{
+    const auto& bodyDef = GetConstComponent(entity);
+    json componentJson;
+    componentJson["gravityScale"] = bodyDef.gravityScale;
+    componentJson["type"] = bodyDef.type;
+    componentJson["angularDamping"] = bodyDef.angularDamping;
+    componentJson["linearDamping"] = bodyDef.linearDamping;
+    componentJson["fixedRotation"] = bodyDef.fixedRotation;
+    componentJson["allowSleep"] = bodyDef.allowSleep;
+    return ComponentManager::SerializeComponentJson(entity);
+}
 }

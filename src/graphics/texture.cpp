@@ -66,8 +66,6 @@ bool TextureManager::HasValidExtension(const std::string_view filename)
 
 Index TextureManager::LoadTexture(const std::string_view filename)
 {
-
-
     if (!HasValidExtension(filename))
     {
         std::ostringstream oss;
@@ -116,7 +114,7 @@ Index TextureManager::LoadTexture(const std::string_view filename)
             return INVALID_INDEX;
         }
         textures_.emplace_back(sf::Texture(texture));
-        texturePaths_.push_back(filename.data());
+        texturePaths_.emplace_back(filename.data());
 
         return static_cast<Index>(textures_.size() - 1);
     }
@@ -136,6 +134,18 @@ const sf::Texture* TextureManager::GetTexture(const Index index) const
         return {}; // Same as return nullptr.
     }
     return &textures_[index];
+}
+
+std::string TextureManager::GetTexturePath(const Index index) const
+{
+    if(index == INVALID_INDEX)
+        return "None";
+    return texturePaths_[index];
+}
+
+size_t TextureManager::GetTextureCount() const
+{
+    return textures_.size();
 }
 
 } // namespace neko

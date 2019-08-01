@@ -24,15 +24,14 @@ public:
 		BasicEngine::Init();
 		spriteEntity_ = entityManager_.CreateEntity();
 		const auto textureId = textureManager_.LoadTexture(texturePath_);
-		const auto texture = textureManager_.GetTexture(textureId);
 		spriteManager_.AddComponent(entityManager_, spriteEntity_);
-		spriteManager_.CopyTexture(texture, spriteEntity_, 1);
+        spriteManager_.CopyTexture(textureId, spriteEntity_, 1);
 		
 	}
 	void Update(float dt) override
 	{
 		BasicEngine::Update(dt);
-		spriteManager_.PushCommands(&graphicsManager_, 0, 1);
+		spriteManager_.PushAllCommands(entityManager_, graphicsManager_);
 		graphicsManager_.Render(renderWindow.get());
 	}
 	void Destroy() override
@@ -42,8 +41,9 @@ public:
 protected:
 	EntityManager entityManager_;
 	BasicGraphicsManager graphicsManager_;
-	BasicSpriteManager spriteManager_;
-	TextureManager textureManager_;
+
+    TextureManager textureManager_;
+	BasicSpriteManager spriteManager_{this->textureManager_};
 
 	Entity spriteEntity_ = INVALID_ENTITY;
 
@@ -74,7 +74,6 @@ public:
 		std::default_random_engine generator;
 		std::uniform_real_distribution<float> randomAngle(0.0f, 360.0f); // generates random floats between 0.0 and 1.0
         const auto textureId = textureManager_.LoadTexture(texturePath_);
-        const auto* texture = textureManager_.GetTexture(textureId);
 		for(Index i = 0; i < INIT_ENTITY_NMB; i++)
 		{
 			const auto entity = entityManager_.CreateEntity(i);
@@ -94,17 +93,17 @@ public:
 			angleManager_.SetComponent(entity, randomAngle(generator));
 		}
 		spriteManager_.CopySpriteOrigin(sf::Vector2f(0.5f,0.5f),0, INIT_ENTITY_NMB);
-		spriteManager_.CopyTexture(texture, 0, INIT_ENTITY_NMB);
+        spriteManager_.CopyTexture(textureId, 0, INIT_ENTITY_NMB);
 		
 	}
 	void Update(float dt) override
 	{
 		BasicEngine::Update(dt);
-		spriteManager_.CopyTransformPosition(positionManager_, 0, INIT_ENTITY_NMB);
-		spriteManager_.CopyTransformScales(scaleManager_, 0, INIT_ENTITY_NMB);
-		spriteManager_.CopyTransformAngles(angleManager_, 0, INIT_ENTITY_NMB);
+		spriteManager_.CopyAllTransformPositions(entityManager_, positionManager_);
+		spriteManager_.CopyAllTransformScales(entityManager_, scaleManager_);
+		spriteManager_.CopyAllTransformAngles(entityManager_, angleManager_);
 
-		spriteManager_.PushCommands(&graphicsManager_, 0, INIT_ENTITY_NMB);
+		spriteManager_.PushAllCommands(entityManager_, graphicsManager_);
 
 		graphicsManager_.Render(renderWindow.get());
 	}
@@ -118,7 +117,7 @@ protected:
 	Scale2dManager scaleManager_;
 	Angle2dManager angleManager_;
 	TextureManager textureManager_;
-	BasicSpriteManager spriteManager_;
+	BasicSpriteManager spriteManager_{this->textureManager_};
 	BasicGraphicsManager graphicsManager_;
 	const std::string texturePath_ = "data/sprites/wall.jpg";
 
