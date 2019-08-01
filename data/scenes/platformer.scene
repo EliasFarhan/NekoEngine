@@ -1,8 +1,149 @@
 {
-  "entites":
-          [
-            {
-              "entity": 0
-            }
-          ]
+    "entities": [
+        {
+            "components": [
+                {
+                    "component": 2,
+                    "position": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "component": 4,
+                    "scale": [
+                        0.75,
+                        0.75
+                    ]
+                },
+                {
+                    "component": 128,
+                    "layer": -1,
+                    "origin": [
+                        0.0,
+                        0.0
+                    ],
+                    "texture": "data/sprites/bg/bg.png"
+                }
+            ],
+            "entity": 0,
+            "name": "Background"
+        },
+        {
+            "components": [
+                {
+                    "component": 2,
+                    "position": [
+                        200.0,
+                        200.0
+                    ]
+                },
+                {
+                    "component": 4,
+                    "scale": [
+                        2.0,
+                        2.0
+                    ]
+                },
+                {
+                    "component": 128,
+                    "layer": 0,
+                    "origin": [
+                        0.0,
+                        0.0
+                    ],
+                    "texture": "data/sprites/hero/jump/hero1.png"
+                }
+            ],
+            "entity": 1,
+            "name": "Player"
+        },
+        {
+            "components": [
+                {
+                    "component": 2,
+                    "position": [
+                        200.0,
+                        300.0
+                    ]
+                },
+                {
+                    "component": 4,
+                    "scale": [
+                        2.0,
+                        2.0
+                    ]
+                },
+                {
+                    "component": 128,
+                    "layer": 0,
+                    "origin": [
+                        0.0,
+                        0.0
+                    ],
+                    "texture": "data/sprites/platform.jpg"
+                }
+            ],
+            "entity": 2,
+            "name": "Platform 1"
+        },
+        {
+            "components": [
+                {
+                    "component": 2,
+                    "position": [
+                        400.0,
+                        500.0
+                    ]
+                },
+                {
+                    "component": 4,
+                    "scale": [
+                        2.0,
+                        2.0
+                    ]
+                },
+                {
+                    "component": 128,
+                    "layer": 0,
+                    "origin": [
+                        0.0,
+                        0.0
+                    ],
+                    "texture": "data/sprites/platform.jpg"
+                }
+            ],
+            "entity": 3,
+            "name": "Platform 2"
+        },
+        {
+            "components": [
+                {
+                    "component": 2,
+                    "position": [
+                        600.0,
+                        200.0
+                    ]
+                },
+                {
+                    "component": 4,
+                    "scale": [
+                        2.0,
+                        2.0
+                    ]
+                },
+                {
+                    "component": 128,
+                    "layer": 0,
+                    "origin": [
+                        0.0,
+                        0.0
+                    ],
+                    "texture": "data/sprites/platform.jpg"
+                }
+            ],
+            "entity": 4,
+            "name": "Platform 3"
+        }
+    ]
 }

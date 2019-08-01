@@ -28,6 +28,7 @@
 #include <engine/globals.h>
 #include <utilities/vector_utility.h>
 #include <utilities/json_utility.h>
+#include <set>
 
 
 namespace neko
@@ -48,6 +49,9 @@ enum class NekoComponentType : ComponentType
 	CONVEX_SHAPE2D = 1 << 11,
 	EMPTY = 1 << 12,
 };
+
+const std::set<NekoComponentType>& GetComponentTypeSet();
+
 struct Component
 {
 	Entity entity = INVALID_ENTITY;

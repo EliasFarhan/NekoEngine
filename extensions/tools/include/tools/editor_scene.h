@@ -1,6 +1,7 @@
 #pragma once
 
 #include <engine/scene.h>
+#include <engine/component.h>
 namespace editor
 {
 class NekoEditor;
@@ -13,6 +14,7 @@ public:
     void ParseComponentJson(json& componentJson, neko::Entity entity) override;
 
 
+    virtual json SerializeComponent(neko::Entity entity, neko::NekoComponentType componentType);
     virtual json SerializeEntity(neko::Entity entity);
     virtual json SerializeScene();
 private:

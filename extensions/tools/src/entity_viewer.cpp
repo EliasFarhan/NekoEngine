@@ -24,10 +24,25 @@ void EntityViewer::Update(neko::EntityManager& entityManager, EditorSceneManager
     ImGui::Begin("Entity Viewer", nullptr, ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoCollapse);
     for(int i = 0; i < entities_.size();i++)
     {
-        if(ImGui::Selectable(entitiesName_[i].c_str(), selectedEntity_ == i))
+        ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.7f);
+        if(ImGui::Selectable(entitiesName_[i].c_str(), selectedEntity_ == entities_[i], ImGuiSelectableFlags_None,
+                ImVec2(ImGui::GetContentRegionAvail().x * 0.7f, 0)))
         {
-            selectedEntity_ = i;
+            selectedEntity_ = entities_[i];
         }
+        ImGui::PopItemWidth();
+        ImGui::SameLine();
+        ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.3f);
+        std::string removeLabel = "Remove Entity "+std::to_string(entities_[i]);
+        ImGui::PushID(removeLabel.c_str());
+        if(ImGui::Button("Remove"))
+        {
+            entityManager.DestroyEntity(entities_[i]);
+            if(selectedEntity_ == entities_[i])
+                selectedEntity_ = neko::INVALID_ENTITY;
+        }
+        ImGui::PopID();
+        ImGui::PopItemWidth();
     }
     if(ImGui::Button("Add"))
     {

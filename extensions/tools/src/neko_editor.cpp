@@ -47,7 +47,7 @@ void NekoEditor::Update(float dt)
             if (ImGui::MenuItem("Open", "CTRL+O"))
             {
                 fileDialog = ImGui::FileBrowser();
-                fileDialog.SetPwd(config.dataRootPath);
+                fileDialog.SetPwd("../"+config.dataRootPath);
                 fileDialog.Open();
                 fileOperationStatus_ = FileOperation::OPEN;
             }
@@ -58,7 +58,7 @@ void NekoEditor::Update(float dt)
                 {
                     fileDialog = ImGui::FileBrowser(
                             ImGuiFileBrowserFlags_EnterNewFilename | ImGuiFileBrowserFlags_CreateNewDir);
-                    fileDialog.SetPwd(config.dataRootPath);
+                    fileDialog.SetPwd("../"+config.dataRootPath);
                     fileDialog.Open();
                     fileOperationStatus_ = FileOperation::SAVE;
                 }

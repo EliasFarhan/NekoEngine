@@ -28,6 +28,8 @@ public:
 
     void Destroy() override;
 
+
+
     neko::EntityManager& GetEntityManager();
     neko::Position2dManager& GetPositionManager();
     neko::Scale2dManager& GetScaleManager();
