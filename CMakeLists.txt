@@ -308,13 +308,9 @@ foreach(course_file ${COURSE_FILES} )
     ENDIF()
 endforeach()
 
-
-
-#City Builder
 include(cmake/neko_executable.cmake)
-add_neko_executable(CityBuilder main/CityBuilder.cpp City multi Neko_COMMON)
 #Splash
-add_neko_executable(SplashDebug ${CMAKE_SOURCE_DIR}/main/SplashDebug.cpp  Neko_COMMON Network Splash)
+add_neko_executable(SplashDebug ${CMAKE_SOURCE_DIR}/main/SplashDebug.cpp Neko_COMMON Network Splash)
 #NekoEditor
 add_neko_executable(NekoEditor2d ${CMAKE_SOURCE_DIR}/main/NekoEditor.cpp Neko_COMMON tools)
 if(MSVC)

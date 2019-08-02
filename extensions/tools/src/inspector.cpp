@@ -19,34 +19,31 @@ void Inspector::ShowEntityInfo(neko::Entity entity)
     {
 
         auto& positionManager = nekoEditor_.GetPositionManager();
-        ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.7f);
+        bool keepComponent = true;
+
+        if (ImGui::CollapsingHeader("Position2d Component", &keepComponent))
         {
-            if (ImGui::CollapsingHeader("Position2d Component"))
+            auto& pos = positionManager.GetComponent(entity);
+            float posRaw[2] = {pos.x, pos.y};
+            if (ImGui::InputFloat2("Position", posRaw))
             {
-                auto& pos = positionManager.GetComponent(entity);
-                float posRaw[2] = {pos.x, pos.y};
-                if (ImGui::InputFloat2("Position", posRaw))
-                {
-                    positionManager.SetComponent(entity, sf::Vector2f(posRaw[0], posRaw[1]));
-                }
+                positionManager.SetComponent(entity, sf::Vector2f(posRaw[0], posRaw[1]));
             }
         }
-        ImGui::SameLine();
-        ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.3f);
-        std::string removeComponent = "Remove Position";
-        ImGui::PushID(removeComponent.c_str());
-        if (ImGui::Button("Remove"))
+
+
+        if (!keepComponent)
         {
             positionManager.DestroyComponent(entityManager, entity);
         }
-        ImGui::PopID();
     }
 
     if (entityManager.HasComponent(entity, neko::EntityMask(neko::NekoComponentType::SCALE2D)))
     {
 
         auto& scaleManager = nekoEditor_.GetScaleManager();
-        if (ImGui::CollapsingHeader("Scale2d Component"))
+        bool keepComponent = true;
+        if (ImGui::CollapsingHeader("Scale2d Component", &keepComponent))
         {
             auto& scale = scaleManager.GetComponent(entity);
             float scaleRaw[2] = {scale.x, scale.y};
@@ -55,20 +52,18 @@ void Inspector::ShowEntityInfo(neko::Entity entity)
                 scaleManager.SetComponent(entity, sf::Vector2f(scaleRaw[0], scaleRaw[1]));
             }
         }
-        ImGui::SameLine();
-        std::string removeComponent = "Remove Scale";
-        ImGui::PushID(removeComponent.c_str());
-        if (ImGui::Button("Remove"))
+
+        if (!keepComponent)
         {
             scaleManager.DestroyComponent(entityManager, entity);
         }
-        ImGui::PopID();
     }
 
     if (entityManager.HasComponent(entity, neko::EntityMask(neko::NekoComponentType::ANGLE2D)))
     {
         auto& angleManager = nekoEditor_.GetAngleManager();
-        if (ImGui::CollapsingHeader("Angle2d Component"))
+        bool keepComponent = true;
+        if (ImGui::CollapsingHeader("Angle2d Component", &keepComponent))
         {
             auto& angle = angleManager.GetComponent(entity);
             if (ImGui::InputFloat("Angle", &angle))
@@ -76,25 +71,22 @@ void Inspector::ShowEntityInfo(neko::Entity entity)
                 angleManager.SetComponent(entity, angle);
             }
         }
-        ImGui::SameLine();
-        std::string removeComponent = "Remove Angle";
-        ImGui::PushID(removeComponent.c_str());
-        if (ImGui::Button("Remove"))
+
+        if (!keepComponent)
         {
             angleManager.DestroyComponent(entityManager, entity);
         }
-        ImGui::PopID();
 
     }
     if (entityManager.HasComponent(entity, neko::EntityMask(neko::NekoComponentType::SPRITE2D)))
     {
 
         auto& spriteManager = nekoEditor_.GetSpriteManager();
-        if (ImGui::CollapsingHeader("Sprite2d Component"))
+        bool keepComponent = true;
+        if (ImGui::CollapsingHeader("Sprite2d Component", &keepComponent))
         {
             auto& textureManager = nekoEditor_.GetTextureManager();
             auto& sprite = spriteManager.GetComponent(entity);
-
             const auto& textureName = textureManager.GetTexturePath(sprite.textureId);
             if (ImGui::Button(textureName.c_str()))
             {
@@ -131,38 +123,45 @@ void Inspector::ShowEntityInfo(neko::Entity entity)
             ImGui::InputInt("Layer", &sprite.layer);
 
         }
-        ImGui::SameLine();
-        std::string removeComponent = "Remove Sprite";
-        ImGui::PushID(removeComponent.c_str());
-        if (ImGui::Button("Remove"))
+
+        if (!keepComponent)
         {
             spriteManager.DestroyComponent(entityManager, entity);
         }
-        ImGui::PopID();
     }
     if (entityManager.HasComponent(entity, neko::EntityMask(neko::NekoComponentType::BODY2D)))
     {
         auto& bodyDefManager = nekoEditor_.GetBodyDefManager();
-        if (ImGui::CollapsingHeader("Body2d Component"))
+        bool keepComponent = true;
+        if (ImGui::CollapsingHeader("Body2d Component", &keepComponent))
         {
             auto& bodyDef = bodyDefManager.GetComponent(entity);
             const char* bodyTypeMap[3] =
-                    {
-                            "Static",
-                            "Kinematic",
-                            "Dynamic"
-                    };
+            {
+                "Static",
+                "Kinematic",
+                "Dynamic"
+            };
             ImGui::Combo("Body Type", (int*) (&bodyDef.type), bodyTypeMap, 3);
             ImGui::InputFloat("Gravity Scale", &bodyDef.gravityScale);
+            ImGui::Checkbox("Fixed Rotation", &bodyDef.fixedRotation);
+            if(!bodyDef.fixedRotation && !entityManager.HasComponent(entity, neko::EntityMask(neko::NekoComponentType::ANGLE2D)))
+            {
+                ImGui::SameLine();
+                ImGui::TextColored(ImColor(255,0,0), "Warning!");
+                if (ImGui::IsItemHovered())
+                {
+                    ImGui::BeginTooltip();
+                    ImGui::TextColored(ImColor(255,0,0), "[Warning] Rotation without Angle component");
+                    ImGui::EndTooltip();
+                }
+            }
         }
-        ImGui::SameLine();
-        std::string removeComponent = "Remove Body";
-        ImGui::PushID(removeComponent.c_str());
-        if (ImGui::Button("Remove"))
+
+        if (!keepComponent)
         {
             bodyDefManager.DestroyComponent(entityManager, entity);
         }
-        ImGui::PopID();
     }
 
     if (ImGui::Button("Add Component"))
@@ -222,6 +221,11 @@ void Inspector::ShowEntityInfo(neko::Entity entity)
                     {
                         auto& bodyDefManager = nekoEditor_.GetBodyDefManager();
                         bodyDefManager.AddComponent(entityManager, entity);
+                        if(!entityManager.HasComponent(entity, neko::EntityMask(neko::NekoComponentType::POSITION2D)))
+                        {
+                            auto& positionManager = nekoEditor_.GetPositionManager();
+                            positionManager.AddComponent(entityManager, entity);
+                        }
                         break;
                     }
                     case neko::NekoComponentType::COLLIDER2D:
