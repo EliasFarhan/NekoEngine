@@ -57,7 +57,7 @@ struct SfmlCommand : public Command
      * \brief non owning raw pointer of an SFML Drawable stored in a graphic class with double buffering (SpriteManager, ShapeManager, etc...)
      */
     sf::Drawable* drawable = nullptr;
-
+    sf::RenderStates states = sf::RenderStates::Default;
     void Draw(sf::RenderTarget* renderTarget) override;
 };
 /**
@@ -67,7 +67,7 @@ struct TilemapCommand : public Command
 {
     sf::Texture* texture = nullptr;
     sf::VertexArray* vertexArray = nullptr;
-
+    sf::RenderStates states = sf::RenderStates::Default;
     void Draw(sf::RenderTarget* renderTarget) override;
 };
 
@@ -75,27 +75,12 @@ struct TilemapCommand : public Command
 class GraphicsManager
 {
 public:
-	virtual ~GraphicsManager() {}
-    virtual void Draw(sf::Drawable& drawable, int layer = 0) = 0;
+    virtual void Draw(sf::Drawable& drawable, int layer = 0, const sf::RenderStates& states = sf::RenderStates::Default);
 
-    virtual void Draw(sf::VertexArray* vertexArray, sf::Texture* texture, int layer = 0) = 0;
-
-
-protected:
-
-    virtual void Draw(std::array<Command*, MAX_COMMAND_NMB>& commandBuffers_) = 0;
-};
-
-class BasicGraphicsManager : public GraphicsManager
-{
-public:
-    virtual void Draw(sf::Drawable& drawable, int layer = 0) override;
-
-    virtual void Draw(sf::VertexArray* vertexArray, sf::Texture* texture, int layer = 0) override;
+    virtual void Draw(sf::VertexArray* vertexArray, sf::Texture* texture, int layer = 0, const sf::RenderStates& states = sf::RenderStates::Default);
 
 	void Render(sf::RenderTarget* renderTarget);
 protected:
-    virtual void Draw(std::array<Command*, MAX_COMMAND_NMB>& commandBuffers_) override;
 
     std::array<Command*, MAX_COMMAND_NMB> commandBuffer_ = {};
 	std::array<SfmlCommand, MAX_COMMAND_NMB> sfmlCommands = {};

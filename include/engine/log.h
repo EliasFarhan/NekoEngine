@@ -47,4 +47,4 @@ void logDebug(std::string msg);
  */
 void destroyLog();
 
-std::vector<std::string_view>& getLog();
+std::vector<std::string>& getLog();

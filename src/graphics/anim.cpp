@@ -146,11 +146,9 @@ void AnimatorManager::Update(SpriteManager& spriteManager, float dt)
 
     for (auto& animator : animators_)
     {
-        auto* sprite = spriteManager.GetSpriteAt(animator.spriteIndex);
-		if (sprite != nullptr)
-		{
-			animator.Update(sprite, dt);
-		}
+        auto sprite = spriteManager.GetComponent(animator.spriteIndex);
+		animator.Update(&sprite.sprite, dt);
+
     }
 }
 

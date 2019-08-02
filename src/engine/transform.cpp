@@ -67,17 +67,6 @@ void Position2dManager::CopyAllPositionsFromBody2d(EntityManager& entityManager,
 	}
 }
 
-void Position2dManager::CopyPositionsFromPhysics2d(EntityManager& entityManager, Physics2dManager& body2dManager)
-{
-    for(Index i = 0; i < entityManager.GetEntitiesSize();i++)
-    {
-        if(entityManager.HasComponent(i, EntityMask(NekoComponentType::POSITION2D)))
-        {
-            components_[i] = meter2pixel(body2dManager.GetBodyAt(i)->GetPosition());
-        }
-    }
-}
-
 Index Scale2dManager::AddComponent(EntityManager& entityManager, Entity entity)
 {
     ResizeIfNecessary(components_, entity, sf::Vector2f(1.0f,1.0f));

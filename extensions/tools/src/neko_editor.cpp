@@ -26,11 +26,21 @@ void NekoEditor::Update(float dt)
     const static float yOffset = 20.0f;
     ImGui::SetNextWindowPos(ImVec2(0.0f, windowSize.y * 0.7f), ImGuiCond_Always);
     ImGui::SetNextWindowSize(ImVec2(windowSize.x * 0.8f, windowSize.y * 0.3f), ImGuiCond_Always);
-
     ImGui::Begin("Debug Window", nullptr,
                  ImGuiWindowFlags_NoTitleBar |
                  ImGuiWindowFlags_NoResize |
                  ImGuiWindowFlags_NoCollapse);
+
+    //Log tab
+    if (ImGui::BeginTabBar("Lower Tab", ImGuiTabBarFlags_None))
+    {
+        if(ImGui::BeginTabItem("Debug Log"))
+        {
+            logViewer_.Update();
+            ImGui::EndTabItem();
+        }
+        ImGui::EndTabBar();
+    }
     static ImGui::FileBrowser fileDialog;
     if (ImGui::BeginMainMenuBar())
     {
@@ -47,7 +57,7 @@ void NekoEditor::Update(float dt)
             if (ImGui::MenuItem("Open", "CTRL+O"))
             {
                 fileDialog = ImGui::FileBrowser();
-                fileDialog.SetPwd("../"+config.dataRootPath);
+                fileDialog.SetPwd("../" + config.dataRootPath);
                 fileDialog.Open();
                 fileOperationStatus_ = FileOperation::OPEN;
             }
@@ -58,7 +68,7 @@ void NekoEditor::Update(float dt)
                 {
                     fileDialog = ImGui::FileBrowser(
                             ImGuiFileBrowserFlags_EnterNewFilename | ImGuiFileBrowserFlags_CreateNewDir);
-                    fileDialog.SetPwd("../"+config.dataRootPath);
+                    fileDialog.SetPwd("../" + config.dataRootPath);
                     fileDialog.Open();
                     fileOperationStatus_ = FileOperation::SAVE;
                 }
@@ -101,6 +111,7 @@ void NekoEditor::Update(float dt)
                 neko::WriteStringToFile(sceneJsonPath, sceneTxt);
                 sceneManager_.GetCurrentScene().scenePath = sceneJsonPath;
                 sceneManager_.GetCurrentScene().sceneName = neko::GetFilename(sceneJsonPath);
+                logDebug("Saved scene file: "+sceneJsonPath);
                 break;
             }
             default:
@@ -109,15 +120,32 @@ void NekoEditor::Update(float dt)
         fileDialog.ClearSelected();
         fileDialog.Close();
     }
+
     ImGui::End();
-    sceneRenderTexture_.clear(config.bgColor);
+    ImGui::SetNextWindowPos(ImVec2(windowSize.x * 0.8f, windowSize.y * 0.7f), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(windowSize.x * 0.2f, windowSize.y * 0.3f), ImGuiCond_Always);
+    ImGui::Begin("Previewer", nullptr,
+
+                 ImGuiWindowFlags_NoResize |
+                 ImGuiWindowFlags_NoCollapse);
+    previewer_.Update(dt);
+    ImGui::End();
+
 
     //Draw things into the graphics manager
+    sceneRenderTexture_.clear(config.bgColor);
+
     spriteManager_.CopyAllTransformPositions(entityManager_, positionManager_);
     spriteManager_.CopyAllTransformScales(entityManager_, scaleManager_);
     spriteManager_.CopyAllTransformAngles(entityManager_, angleManager_);
 
     spriteManager_.PushAllCommands(entityManager_, graphicsManager_);
+
+    spineManager_.Update(entityManager_, dt);
+    spineManager_.CopyAllTransformPositions(entityManager_, positionManager_);
+    spineManager_.CopyAllTransformScales(entityManager_, scaleManager_);
+    spineManager_.CopyAllTransformAngles(entityManager_, angleManager_);
+    spineManager_.PushAllCommands(entityManager_, graphicsManager_);
 
     graphicsManager_.Render(&sceneRenderTexture_);
     sceneRenderTexture_.display();
@@ -132,15 +160,20 @@ void NekoEditor::Update(float dt)
                  ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
     if (ImGui::BeginTabBar("Central Tab"))
     {
+
         sceneViewer_.Update(sceneRenderTexture_);
+
         //TODO add animator and other things in the central viewer
+
         ImGui::EndTabBar();
     }
+
     ImGui::End();
 
     ImGui::SetNextWindowPos(ImVec2(windowSize.x * 0.8f, yOffset), ImGuiCond_Always);
     ImGui::SetNextWindowSize(ImVec2(windowSize.x * 0.2f, windowSize.y * 0.7f - yOffset), ImGuiCond_Always);
     inspector_.BeginWindow();
+
     inspector_.ShowEntityInfo(entityViewer_.GetSelectedEntity());
     inspector_.EndWindow();
 }
@@ -180,7 +213,7 @@ neko::SceneManager& NekoEditor::GetSceneManager()
     return sceneManager_;
 }
 
-neko::BasicSpriteManager& NekoEditor::GetSpriteManager()
+neko::SpriteManager& NekoEditor::GetSpriteManager()
 {
     return spriteManager_;
 }
@@ -188,6 +221,16 @@ neko::BasicSpriteManager& NekoEditor::GetSpriteManager()
 neko::TextureManager& NekoEditor::GetTextureManager()
 {
     return textureManager_;
+}
+
+Previewer& NekoEditor::GetPreviewer()
+{
+    return previewer_;
+}
+
+neko::SpineManager& NekoEditor::GetSpineManager()
+{
+    return spineManager_;
 }
 
 }

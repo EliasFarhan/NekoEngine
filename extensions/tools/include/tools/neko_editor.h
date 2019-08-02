@@ -7,6 +7,8 @@
 #include "scene_viewer.h"
 #include "inspector.h"
 #include "editor_scene.h"
+#include "log_viewer.h"
+#include "previewer.h"
 
 #include <imgui.h>
 #include <imfilebrowser.h>
@@ -27,28 +29,26 @@ public:
     void Update(float dt) override;
 
     void Destroy() override;
-
-
-
     neko::EntityManager& GetEntityManager();
     neko::Position2dManager& GetPositionManager();
     neko::Scale2dManager& GetScaleManager();
     neko::Angle2dManager& GetAngleManager();
     neko::SceneManager& GetSceneManager();
     neko::BodyDef2dManager& GetBodyDefManager();
-    neko::BasicSpriteManager& GetSpriteManager();
+    neko::SpriteManager& GetSpriteManager();
     neko::TextureManager& GetTextureManager();
+    neko::SpineManager& GetSpineManager();
+
+    Previewer& GetPreviewer();
 private:
     neko::EntityManager entityManager_;
     EntityViewer entityViewer_;
     neko::TextureManager textureManager_;
 
+    neko::SpineManager spineManager_;
+    neko::SpriteManager spriteManager_{this->textureManager_};
 
-    neko::BasicSpriteManager spriteManager_{this->textureManager_};
-
-
-
-    neko::BasicGraphicsManager graphicsManager_;
+    neko::GraphicsManager graphicsManager_;
     sf::RenderTexture sceneRenderTexture_;
     SceneViewer sceneViewer_;
 
@@ -60,6 +60,9 @@ private:
 
     neko::BodyDef2dManager bodyDefManager_;
     Inspector inspector_{*this};
+    LogViewer logViewer_;
+    Previewer previewer_;
+
 
     FileOperation fileOperationStatus_ = FileOperation::OPEN;
 

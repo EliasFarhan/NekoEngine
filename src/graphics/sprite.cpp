@@ -32,7 +32,7 @@
 namespace neko
 {
 
-void BasicSpriteManager::CopySpriteOrigin(const sf::Vector2f& origin, size_t start, size_t length)
+void SpriteManager::CopySpriteOrigin(const sf::Vector2f& origin, size_t start, size_t length)
 {
     for (size_t i = start; i < start + length; i++)
     {
@@ -42,7 +42,7 @@ void BasicSpriteManager::CopySpriteOrigin(const sf::Vector2f& origin, size_t sta
     }
 }
 
-void BasicSpriteManager::CopyTexture(const Index textureId, size_t start, size_t length)
+void SpriteManager::CopyTexture(const Index textureId, size_t start, size_t length)
 {
 
     auto* texture = textureManager_.GetTexture(textureId);
@@ -61,7 +61,7 @@ void BasicSpriteManager::CopyTexture(const Index textureId, size_t start, size_t
     }
 }
 
-void BasicSpriteManager::CopyLayer(int layer, size_t start, size_t length)
+void SpriteManager::CopyLayer(int layer, size_t start, size_t length)
 {
     for (auto i = start; i < start + length; i++)
     {
@@ -69,14 +69,14 @@ void BasicSpriteManager::CopyLayer(int layer, size_t start, size_t length)
     }
 }
 
-BasicSpriteManager::BasicSpriteManager(TextureManager& textureManager) :
+SpriteManager::SpriteManager(TextureManager& textureManager) :
         textureManager_(textureManager),
         ComponentManager::ComponentManager()
 {
 
 }
 
-void BasicSpriteManager::CopyAllTransformPositions(EntityManager& entityManager, Position2dManager& positionManager)
+void SpriteManager::CopyAllTransformPositions(EntityManager& entityManager, Position2dManager& positionManager)
 {
     const auto entityMask = EntityMask(NekoComponentType::POSITION2D) | EntityMask(NekoComponentType::SPRITE2D);
     for(Entity entity = 0; entity < entityManager.GetEntitiesSize();entity++)
@@ -88,7 +88,7 @@ void BasicSpriteManager::CopyAllTransformPositions(EntityManager& entityManager,
     }
 }
 
-void BasicSpriteManager::CopyAllTransformScales(EntityManager& entityManager, Scale2dManager& scaleManager)
+void SpriteManager::CopyAllTransformScales(EntityManager& entityManager, Scale2dManager& scaleManager)
 {
     const auto entityMask = EntityMask(NekoComponentType::SCALE2D) | EntityMask(NekoComponentType::SPRITE2D);
     for(Entity entity = 0; entity < entityManager.GetEntitiesSize();entity++)
@@ -100,7 +100,7 @@ void BasicSpriteManager::CopyAllTransformScales(EntityManager& entityManager, Sc
     }
 }
 
-void BasicSpriteManager::CopyAllTransformAngles(EntityManager& entityManager, Angle2dManager& angleManager)
+void SpriteManager::CopyAllTransformAngles(EntityManager& entityManager, Angle2dManager& angleManager)
 {
     const auto entityMask = EntityMask(NekoComponentType::ANGLE2D) | EntityMask(NekoComponentType::SPRITE2D);
     for(Entity entity = 0; entity < entityManager.GetEntitiesSize();entity++)
@@ -112,7 +112,7 @@ void BasicSpriteManager::CopyAllTransformAngles(EntityManager& entityManager, An
     }
 }
 
-void BasicSpriteManager::PushAllCommands(EntityManager& entityManager, GraphicsManager& graphicsManager)
+void SpriteManager::PushAllCommands(EntityManager& entityManager, GraphicsManager& graphicsManager)
 {
     const auto entityMask = EntityMask(NekoComponentType::SPRITE2D);
     for(Entity entity = 0; entity < entityManager.GetEntitiesSize();entity++)
@@ -122,6 +122,26 @@ void BasicSpriteManager::PushAllCommands(EntityManager& entityManager, GraphicsM
             graphicsManager.Draw(components_[entity].sprite, components_[entity].layer);
         }
     }
+}
+
+void SpriteManager::ParseComponentJson(json& componentJson, Entity entity)
+{
+    std::string textureName = componentJson["texture"];
+    const auto textureId = textureManager_.LoadTexture(textureName);
+    CopyTexture(textureId, entity, 1);
+    CopyLayer(componentJson["layer"], entity, 1);
+    const auto origin = neko::GetVectorFromJson(componentJson, "origin");
+    CopySpriteOrigin(origin, entity, 1);
+}
+
+json SpriteManager::SerializeComponentJson(Entity entity)
+{
+    const auto& sprite = GetConstComponent(entity);
+    json componentJson;
+    componentJson["texture"] = textureManager_.GetTexturePath(sprite.textureId);
+    componentJson["layer"] = sprite.layer;
+    componentJson["origin"] = {sprite.origin.x, sprite.origin.y};
+    return componentJson;
 }
 
 }

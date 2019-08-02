@@ -2,6 +2,8 @@
 #include <tools/neko_editor.h>
 #include <imgui.h>
 #include <misc/cpp/imgui_stdlib.h>
+#include <utilities/file_utility.h>
+#include <engine/log.h>
 
 namespace editor
 {
@@ -129,6 +131,121 @@ void Inspector::ShowEntityInfo(neko::Entity entity)
             spriteManager.DestroyComponent(entityManager, entity);
         }
     }
+
+    if (entityManager.HasComponent(entity, neko::EntityMask(neko::NekoComponentType::SPINE_ANIMATION)))
+    {
+        auto& spineManager = nekoEditor_.GetSpineManager();
+        auto& spineDrawable = spineManager.GetComponent(entity);
+        auto& spineDrawableInfo = spineManager.GetInfo(entity);
+        if (ImGui::Button(spineDrawableInfo.atlasPath.c_str()))
+        {
+            ImGui::OpenPopup("Atlas Popup");
+
+        }
+        ImGui::SameLine();
+        ImGui::Text("Atlas");
+
+        static std::vector<std::string> atlasList;
+        if (ImGui::BeginPopup("Atlas Popup"))
+        {
+            if (atlasList.empty())
+            {
+                neko::IterateDirectory(nekoEditor_.config.dataRootPath, [this](const std::string_view filename)
+                {
+                    if (filename.find(".atlas.txt") != std::string_view::npos)
+                    {
+                        atlasList.push_back(filename.data());
+                    }
+                }, true);
+            }
+            if (ImGui::Selectable("No Atlas"))
+            {
+                spineDrawableInfo.atlasPath = "";
+            }
+            for (auto& atlasFilename : atlasList)
+            {
+                if (ImGui::Selectable(atlasFilename.c_str()))
+                {
+                    spineDrawableInfo.atlasPath = atlasFilename;
+                }
+
+            }
+            ImGui::EndPopup();
+        }
+        else
+        {
+            atlasList.clear();
+        }
+
+        if (ImGui::Button(spineDrawableInfo.skeletonDataPath.c_str()))
+        {
+            ImGui::OpenPopup("Skeleton Data Popup");
+        }
+        ImGui::SameLine();
+        ImGui::Text("SkeletonData");
+
+        static std::vector<std::string> skeletonDataList;
+        if (ImGui::BeginPopup("Skeleton Data Popup"))
+        {
+            if (skeletonDataList.empty())
+            {
+                neko::IterateDirectory(nekoEditor_.config.dataRootPath, [this](const std::string_view filename)
+                {
+                    if (filename.find(".json") != std::string_view::npos)
+                    {
+                        skeletonDataList.push_back(filename.data());
+                    }
+                }, true);
+            }
+            if (ImGui::Selectable("No Skeleton Data"))
+            {
+                spineDrawableInfo.skeletonDataPath = "";
+            }
+            for (auto& skeletonDataFilename : skeletonDataList)
+            {
+                if (ImGui::Selectable(skeletonDataFilename.c_str()))
+                {
+                    spineDrawableInfo.skeletonDataPath = skeletonDataFilename;
+                }
+            }
+
+            ImGui::EndPopup();
+        }
+        else
+        {
+            skeletonDataList.clear();
+        }
+        ImGui::PushID("Load Spine Component");
+        if(ImGui::Button("Load..."))
+        {
+            if(spineManager.AddSpineDrawable(entity, spineDrawableInfo.atlasPath, spineDrawableInfo.skeletonDataPath))
+            {
+                logDebug("Successfully load spine drawable");
+            }
+            else
+            {
+                logDebug("[Error] Could not load spine drawable");
+            }
+        }
+        ImGui::PopID();
+        ImGui::SameLine();
+        ImGui::PushID("Preview Spine Component");
+        if(ImGui::Button("Preview..."))
+        {
+            if(spineDrawable.skeletonDrawable != nullptr)
+            {
+                auto& previewer = nekoEditor_.GetPreviewer();
+                previewer.SetSpineAnimation(&spineDrawable);
+            }
+            else
+            {
+                logDebug("[Error] Load the spine component first");
+            }
+        }
+        ImGui::PopID();
+        ImGui::Separator();
+    }
+
     if (entityManager.HasComponent(entity, neko::EntityMask(neko::NekoComponentType::BODY2D)))
     {
         auto& bodyDefManager = nekoEditor_.GetBodyDefManager();
@@ -137,22 +254,23 @@ void Inspector::ShowEntityInfo(neko::Entity entity)
         {
             auto& bodyDef = bodyDefManager.GetComponent(entity);
             const char* bodyTypeMap[3] =
-            {
-                "Static",
-                "Kinematic",
-                "Dynamic"
-            };
+                    {
+                            "Static",
+                            "Kinematic",
+                            "Dynamic"
+                    };
             ImGui::Combo("Body Type", (int*) (&bodyDef.type), bodyTypeMap, 3);
             ImGui::InputFloat("Gravity Scale", &bodyDef.gravityScale);
             ImGui::Checkbox("Fixed Rotation", &bodyDef.fixedRotation);
-            if(!bodyDef.fixedRotation && !entityManager.HasComponent(entity, neko::EntityMask(neko::NekoComponentType::ANGLE2D)))
+            if (!bodyDef.fixedRotation &&
+                !entityManager.HasComponent(entity, neko::EntityMask(neko::NekoComponentType::ANGLE2D)))
             {
                 ImGui::SameLine();
-                ImGui::TextColored(ImColor(255,0,0), "Warning!");
+                ImGui::TextColored(ImColor(255, 0, 0), "Warning!");
                 if (ImGui::IsItemHovered())
                 {
                     ImGui::BeginTooltip();
-                    ImGui::TextColored(ImColor(255,0,0), "[Warning] Rotation without Angle component");
+                    ImGui::TextColored(ImColor(255, 0, 0), "[Warning] Rotation without Angle component");
                     ImGui::EndTooltip();
                 }
             }
@@ -168,11 +286,12 @@ void Inspector::ShowEntityInfo(neko::Entity entity)
         ImGui::OpenPopup("Component Popup");
     const static std::map<neko::NekoComponentType, std::string> componentNameMap =
             {
-                    {neko::NekoComponentType::POSITION2D, "Position 2D"},
-                    {neko::NekoComponentType::SCALE2D,    "Scale 2D"},
-                    {neko::NekoComponentType::ANGLE2D,    "Angle 2D"},
-                    {neko::NekoComponentType::SPRITE2D,   "Sprite 2D"},
-                    {neko::NekoComponentType::BODY2D,     "Body 2D"},
+                    {neko::NekoComponentType::POSITION2D,      "Position 2D"},
+                    {neko::NekoComponentType::SCALE2D,         "Scale 2D"},
+                    {neko::NekoComponentType::ANGLE2D,         "Angle 2D"},
+                    {neko::NekoComponentType::SPRITE2D,        "Sprite 2D"},
+                    {neko::NekoComponentType::BODY2D,          "Body 2D"},
+                    {neko::NekoComponentType::SPINE_ANIMATION, "Spine Animation 2D"},
             };
 
     ImGui::SameLine();
@@ -215,13 +334,15 @@ void Inspector::ShowEntityInfo(neko::Entity entity)
                     }
                     case neko::NekoComponentType::SPINE_ANIMATION:
                     {
+                        auto& spineManager = nekoEditor_.GetSpineManager();
+                        spineManager.AddComponent(entityManager, entity);
                         break;
                     }
                     case neko::NekoComponentType::BODY2D:
                     {
                         auto& bodyDefManager = nekoEditor_.GetBodyDefManager();
                         bodyDefManager.AddComponent(entityManager, entity);
-                        if(!entityManager.HasComponent(entity, neko::EntityMask(neko::NekoComponentType::POSITION2D)))
+                        if (!entityManager.HasComponent(entity, neko::EntityMask(neko::NekoComponentType::POSITION2D)))
                         {
                             auto& positionManager = nekoEditor_.GetPositionManager();
                             positionManager.AddComponent(entityManager, entity);

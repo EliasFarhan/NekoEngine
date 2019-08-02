@@ -39,18 +39,17 @@ void EditorSceneManager::ParseComponentJson(json& componentJson, neko::Entity en
         case neko::NekoComponentType::SPRITE2D:
         {
             auto& spriteManager = nekoEditor_.GetSpriteManager();
-            auto& textureManager = nekoEditor_.GetTextureManager();
             spriteManager.AddComponent(entityManager, entity);
-            std::string textureName = componentJson["texture"];
-            const auto textureId = textureManager.LoadTexture(textureName);
-            spriteManager.CopyTexture(textureId, entity, 1);
-            spriteManager.CopyLayer(componentJson["layer"], entity, 1);
-            const auto origin = neko::GetVectorFromJson(componentJson, "origin");
-            spriteManager.CopySpriteOrigin(origin, entity, 1);
+            spriteManager.ParseComponentJson(componentJson, entity);
             break;
         }
         case neko::NekoComponentType::SPINE_ANIMATION:
+        {
+            auto& spineManager = nekoEditor_.GetSpineManager();
+            spineManager.AddComponent(entityManager, entity);
+            spineManager.ParseComponentJson(componentJson, entity);
             break;
+        }
         case neko::NekoComponentType::BODY2D:
             break;
         case neko::NekoComponentType::COLLIDER2D:
@@ -123,15 +122,15 @@ json EditorSceneManager::SerializeComponent(neko::Entity entity, neko::NekoCompo
         case neko::NekoComponentType::SPRITE2D:
         {
             auto& spriteManager = nekoEditor_.GetSpriteManager();
-            auto& textureManager = nekoEditor_.GetTextureManager();
-            const auto& sprite = spriteManager.GetComponent(entity);
-            componentJson["texture"] = textureManager.GetTexturePath(sprite.textureId);
-            componentJson["layer"] = sprite.layer;
-            componentJson["origin"] = {sprite.origin.x, sprite.origin.y};
+            componentJson = spriteManager.SerializeComponentJson(entity);
             break;
         }
         case neko::NekoComponentType::SPINE_ANIMATION:
+        {
+            auto& spineManager = nekoEditor_.GetSpineManager();
+            componentJson = spineManager.SerializeComponentJson(entity);
             break;
+        }
         case neko::NekoComponentType::BODY2D:
             break;
         case neko::NekoComponentType::COLLIDER2D:

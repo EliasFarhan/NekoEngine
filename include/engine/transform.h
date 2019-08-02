@@ -43,7 +43,7 @@ class Transform2dManager
 public:
     Transform2dManager();
 private:
-	std::vector<Index> transformHierarchy_;
+	std::vector<Entity> transformHierarchy_;
 	std::vector<char> dirtyFlags_;
 };
 
@@ -52,7 +52,6 @@ class Position2dManager : public ComponentManager<sf::Vector2f, ComponentType(Ne
 public:
 	using ComponentManager::ComponentManager;
 	void CopyAllPositionsFromBody2d(EntityManager& entityManager, Body2dManager& body2dManager);
-	void CopyPositionsFromPhysics2d(EntityManager& entityManager, Physics2dManager& physics2dManager);
 };
 
 class Scale2dManager : public ComponentManager<sf::Vector2f, ComponentType(NekoComponentType::SCALE2D)>

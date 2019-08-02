@@ -37,29 +37,6 @@ namespace neko
 class TextureManager;
 class GraphicsManager;
 
-class SpriteManager
-{
-public:
-    SpriteManager() = default;
-
-    virtual neko::Index AddSprite(const sf::Texture* texture){ return 0;};
-
-    virtual sf::Sprite* GetSpriteAt(unsigned int spriteIndex) {return nullptr;};
-
-    virtual void CopyTransformPosition(Position2dManager& transformManager, size_t start = 0, size_t length = neko::INIT_ENTITY_NMB)= 0;
-
-    virtual void CopyTransformScales(Scale2dManager& transformManager, size_t start = 0, size_t length = neko::INIT_ENTITY_NMB) = 0;
-
-    virtual void CopyTransformAngles(Angle2dManager& transformManager, size_t start = 0, size_t length = neko::INIT_ENTITY_NMB) = 0;
-    /**
-* \brief push basic graphic command to the render thread to be processed next frame
-* @param graphicsManager
-* @param start
-* @param length
-*/
-    virtual void PushCommands(neko::GraphicsManager* graphicsManager, size_t start = 0, size_t length = neko::INIT_ENTITY_NMB) = 0;
-};
-
 struct Sprite
 {
     sf::Sprite sprite;
@@ -68,17 +45,17 @@ struct Sprite
     Index textureId = INVALID_INDEX;
 };
 
-class BasicSpriteManager :
+class SpriteManager :
         public ComponentManager<Sprite, ComponentType(NekoComponentType::SPRITE2D)>
 {
 public:
-    explicit BasicSpriteManager(TextureManager& textureManager);
+    explicit SpriteManager(TextureManager& textureManager);
 
-    void CopySpriteOrigin(const sf::Vector2f& origin, size_t start, size_t length);
+    void CopySpriteOrigin(const sf::Vector2f& origin, size_t start, size_t length=1);
 
-    void CopyTexture(const Index textureId, size_t start, size_t length);
+    void CopyTexture(const Index textureId, size_t start, size_t length=1);
 
-    void CopyLayer(int layer, size_t start, size_t length);
+    void CopyLayer(int layer, size_t start, size_t length=1);
 
     void CopyAllTransformPositions(EntityManager& entityManager, Position2dManager& positionManager);
 
@@ -87,6 +64,10 @@ public:
     void CopyAllTransformAngles(EntityManager& entityManager, Angle2dManager& angleManager);
 
     void PushAllCommands(EntityManager& entityManager, GraphicsManager& graphicsManager);
+
+    void ParseComponentJson(json& componentJson, Entity entity) override;
+
+    json SerializeComponentJson(Entity entity) override;
 
 
 protected:

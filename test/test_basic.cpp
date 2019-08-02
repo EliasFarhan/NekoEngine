@@ -40,10 +40,10 @@ public:
 	}
 protected:
 	EntityManager entityManager_;
-	BasicGraphicsManager graphicsManager_;
+	GraphicsManager graphicsManager_;
 
     TextureManager textureManager_;
-	BasicSpriteManager spriteManager_{this->textureManager_};
+	SpriteManager spriteManager_{this->textureManager_};
 
 	Entity spriteEntity_ = INVALID_ENTITY;
 
@@ -117,8 +117,8 @@ protected:
 	Scale2dManager scaleManager_;
 	Angle2dManager angleManager_;
 	TextureManager textureManager_;
-	BasicSpriteManager spriteManager_{this->textureManager_};
-	BasicGraphicsManager graphicsManager_;
+	SpriteManager spriteManager_{this->textureManager_};
+	GraphicsManager graphicsManager_;
 	const std::string texturePath_ = "data/sprites/wall.jpg";
 
 };

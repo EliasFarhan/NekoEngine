@@ -39,7 +39,7 @@ public:
 
     void logLoop();
 
-    std::vector<std::string_view>& GetMsgHistory()
+    std::vector<std::string>& GetMsgHistory()
     {
         return msgHistory_;
     }
@@ -51,7 +51,7 @@ public:
 private:
     std::thread logThread_;
     std::vector<std::string> msgQueue_;
-    std::vector<std::string_view> msgHistory_;
+    std::vector<std::string> msgHistory_;
 };
 
 
@@ -144,7 +144,7 @@ void destroyLog()
 	debugLogger = nullptr;
 }
 
-std::vector<std::string_view>& getLog()
+std::vector<std::string>& getLog()
 {
     return debugLogger->GetMsgHistory();
 }

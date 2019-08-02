@@ -33,35 +33,35 @@ namespace neko
 {
 void SfmlCommand::Draw(sf::RenderTarget* renderTarget)
 {
-    renderTarget->draw(*drawable);
+
+    renderTarget->draw(*drawable, states);
 }
 
 
 void TilemapCommand::Draw(sf::RenderTarget* renderTarget)
 {
-    sf::RenderStates states;
     states.texture = texture;
     renderTarget->draw(*vertexArray, states);
 }
 
 //TODO Generate render command
-void BasicGraphicsManager::Draw(sf::Drawable& drawable, int layer)
+void GraphicsManager::Draw(sf::Drawable& drawable, int layer, const sf::RenderStates& states)
 {
 	SfmlCommand sfmlCommand;
 	sfmlCommand.drawable = &drawable;
 	sfmlCommand.layer = layer;
-
+    sfmlCommand.states = states;
 	sfmlCommands[renderLength] = sfmlCommand;
 	commandBuffer_[renderLength] = &sfmlCommands[renderLength];
 	renderLength++;
 }
 //TODO Generate render command
-void BasicGraphicsManager::Draw(sf::VertexArray* vertexArray, sf::Texture* texture, int layer)
+void GraphicsManager::Draw(sf::VertexArray* vertexArray, sf::Texture* texture, int layer, const sf::RenderStates& states)
 {
 
 }
 
-void BasicGraphicsManager::Render(sf::RenderTarget* renderTarget)
+void GraphicsManager::Render(sf::RenderTarget* renderTarget)
 {
 	std::sort(commandBuffer_.begin(), commandBuffer_.begin() + renderLength, [](Command* c1, Command* c2)
 	{
@@ -74,9 +74,4 @@ void BasicGraphicsManager::Render(sf::RenderTarget* renderTarget)
 	renderLength = 0;
 }
 
-//TODO Generate render command
-void BasicGraphicsManager::Draw(std::array<Command*, MAX_COMMAND_NMB>& commandBuffers_)
-{
-	
-}
 }

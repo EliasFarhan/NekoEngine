@@ -303,8 +303,8 @@ private:
     neko::Position2dManager positionManager;
 
     neko::TextureManager textureManager_;
-    neko::BasicSpriteManager spriteManager_{this->textureManager_};
-    neko::BasicGraphicsManager graphicsManager_;
+    neko::SpriteManager spriteManager_{this->textureManager_};
+    neko::GraphicsManager graphicsManager_;
     neko::ConvexShapeManager shapeManager_;
 
     PlayerData playerData;

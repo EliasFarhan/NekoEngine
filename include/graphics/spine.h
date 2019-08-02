@@ -32,30 +32,59 @@
 
 namespace neko
 {
+class GraphicsManager;
+class Position2dManager;
+class Scale2dManager;
+class Angle2dManager;
 
 struct BasicSpineDrawable : Component
 {
-	BasicSpineDrawable();
-	virtual ~BasicSpineDrawable();
-	Atlas* atlas = nullptr;
-	SkeletonData* skeletonData = nullptr;
-	std::shared_ptr<spine::SkeletonDrawable> skeletonDrawable = nullptr;
+    BasicSpineDrawable();
+
+    virtual ~BasicSpineDrawable();
+
+    Atlas* atlas = nullptr;
+    SkeletonData* skeletonData = nullptr;
+    std::shared_ptr<spine::SkeletonDrawable> skeletonDrawable = nullptr;
+    int layer = 0;
+    sf::Transform transform{};
+    void SetPosition(const sf::Vector2f& position);
+    sf::Vector2f GetPosition();
+};
+struct SpineDrawableInfo
+{
+    std::string atlasPath = "";
+    std::string skeletonDataPath = "";
 };
 
-class SpineManager
+class SpineManager : public ComponentManager<BasicSpineDrawable, EntityMask(NekoComponentType::SPINE_ANIMATION)>
 {
 public:
-	void Init();
-	void Update(EntityManager& entityManager, float dt);
+    SpineManager();
+    void Update(EntityManager& entityManager, float dt);
 
-	void Destroy();
+    bool AddSpineDrawable(Entity entity,
+                          const std::string_view atlasFilename,
+                          const std::string_view skeletonFilename);
 
-	Entity AddSpineDrawable(Entity entity, const std::string_view atlasFilename, const std::string_view skeletonFilename);
+    void ParseComponentJson(json& componentJson, Entity entity) override;
+    void CopyAllTransformPositions(EntityManager& entityManager, Position2dManager& position2Manager);
+    void CopyAllTransformScales(EntityManager& entityManager, Scale2dManager& scale2DManager);
+    void CopyAllTransformAngles(EntityManager& entityManager, Angle2dManager& angle2DManager);
+    void PushAllCommands(EntityManager& entityManager, GraphicsManager& graphicsManager);
+
+    Index AddComponent(EntityManager& entityManager, Entity entity) override;
+
+    json SerializeComponentJson(Entity entity) override;
+
+    SpineDrawableInfo& GetInfo(Entity entity);
+
 private:
-	std::vector<BasicSpineDrawable> spineDrawables_;
+    std::vector<SpineDrawableInfo> infos_;
 };
 
 
 SkeletonData* readSkeletonJsonData(const char* filename, Atlas* atlas, float scale);
+
 SkeletonData* readSkeletonBinaryData(const char* filename, Atlas* atlas, float scale);
 }
