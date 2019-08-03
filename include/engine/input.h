@@ -80,7 +80,7 @@ private:
     /**
      * \brief store the status of each key to check if
      */
-    std::array<bool, sf::Keyboard::KeyCount> keyStatusArray_;
+    std::vector<char> keyStatusArray_;
 };
 
 /**

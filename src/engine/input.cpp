@@ -34,7 +34,7 @@ namespace neko
 {
 KeyboardManager::KeyboardManager()
 {
-    keyStatusArray_.fill(false);
+	keyStatusArray_.resize(sf::Keyboard::KeyCount, false);
 }
 
 void KeyboardManager::ClearKeys()

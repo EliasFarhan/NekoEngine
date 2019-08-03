@@ -75,6 +75,7 @@ struct TilemapCommand : public Command
 class GraphicsManager
 {
 public:
+	GraphicsManager();
     virtual void Draw(sf::Drawable& drawable, int layer = 0, const sf::RenderStates& states = sf::RenderStates::Default);
 
     virtual void Draw(sf::VertexArray* vertexArray, sf::Texture* texture, int layer = 0, const sf::RenderStates& states = sf::RenderStates::Default);
@@ -82,8 +83,8 @@ public:
 	void Render(sf::RenderTarget* renderTarget);
 protected:
 
-    std::array<Command*, MAX_COMMAND_NMB> commandBuffer_ = {};
-	std::array<SfmlCommand, MAX_COMMAND_NMB> sfmlCommands = {};
+    std::vector<Command*> commandBuffer_ = {};
+	std::vector<SfmlCommand> sfmlCommands = {};
 	size_t renderLength = 0;
 };
 

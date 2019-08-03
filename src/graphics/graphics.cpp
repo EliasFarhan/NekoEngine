@@ -44,6 +44,12 @@ void TilemapCommand::Draw(sf::RenderTarget* renderTarget)
     renderTarget->draw(*vertexArray, states);
 }
 
+GraphicsManager::GraphicsManager()
+{
+	commandBuffer_.resize(MAX_COMMAND_NMB);
+	sfmlCommands.resize(MAX_COMMAND_NMB);
+}
+
 //TODO Generate render command
 void GraphicsManager::Draw(sf::Drawable& drawable, int layer, const sf::RenderStates& states)
 {
