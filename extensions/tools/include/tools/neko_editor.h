@@ -32,12 +32,13 @@ public:
     neko::EntityManager& GetEntityManager();
     neko::Position2dManager& GetPositionManager();
     neko::Scale2dManager& GetScaleManager();
-    neko::Angle2dManager& GetAngleManager();
+    neko::Rotation2dManager& GetRotationManager();
     neko::SceneManager& GetSceneManager();
     neko::BodyDef2dManager& GetBodyDefManager();
     neko::SpriteManager& GetSpriteManager();
     neko::TextureManager& GetTextureManager();
     neko::SpineManager& GetSpineManager();
+    neko::Transform2dManager& GetTransformManager();
 
     Previewer& GetPreviewer();
 private:
@@ -54,9 +55,6 @@ private:
 
     EditorSceneManager sceneManager_{*this};
 
-    neko::Position2dManager positionManager_;
-    neko::Scale2dManager scaleManager_{sf::Vector2f(1.0f,1.0f)};
-    neko::Angle2dManager angleManager_;
 
     neko::BodyDef2dManager bodyDefManager_;
     Inspector inspector_{*this};
@@ -66,6 +64,7 @@ private:
 
     FileOperation fileOperationStatus_ = FileOperation::OPEN;
 
+    neko::Transform2dManager transformManager_;
 };
 
 }

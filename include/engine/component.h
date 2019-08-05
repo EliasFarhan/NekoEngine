@@ -39,7 +39,7 @@ enum class NekoComponentType : ComponentType
 {
     POSITION2D = 1 << 1,
     SCALE2D = 1 << 2,
-    ANGLE2D = 1 << 3,
+    ROTATION2D = 1 << 3,
     POSITION3D = 1 << 4,
     SCALE3D = 1 << 5,
     ANGLE3D = 1 << 6,

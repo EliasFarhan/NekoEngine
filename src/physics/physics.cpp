@@ -109,6 +109,16 @@ sf::Vector2f meter2pixel(const b2Vec2& meter)
 	return sf::Vector2f(meter2pixel(meter.x), meter2pixel(meter.y));
 }
 
+Vec2f pixel2unit(const sf::Vector2f& v)
+{
+    return Vec2f(pixel2meter(v.x), pixel2meter(v.y));
+}
+
+sf::Vector2f unit2pixel(const Vec2f& v)
+{
+    return sf::Vector2f(meter2pixel(v.x), meter2pixel(v.y));
+}
+
 
 void BodyDef2dManager::ParseComponentJson(json& componentJson, Entity entity)
 {

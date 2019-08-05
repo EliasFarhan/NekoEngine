@@ -29,9 +29,9 @@ void EditorSceneManager::ParseComponentJson(json& componentJson, neko::Entity en
             scaleManager.SetComponent(entity, scale);
             break;
         }
-        case neko::NekoComponentType::ANGLE2D:
+        case neko::NekoComponentType::ROTATION2D:
         {
-            auto& angleManager = nekoEditor_.GetAngleManager();
+            auto& angleManager = nekoEditor_.GetRotationManager();
             angleManager.AddComponent(entityManager, entity);
             angleManager.SetComponent(entity, componentJson["angle"]);
             break;
@@ -75,6 +75,17 @@ void EditorSceneManager::ParseEntityJson(json& entityJson)
     }
     auto& entityManager = nekoEditor_.GetEntityManager();
     entityManager.CreateEntity(entity);
+    if (neko::CheckJsonNumber(entityJson, "parent"))
+    {
+        int parentEntity = entityJson["parent"];
+
+        logDebug("Parsing entity: "+std::to_string(entity)+" with parent: "+std::to_string(parentEntity));
+        if(parentEntity >= 0)
+        {
+            auto& transformManager = nekoEditor_.GetTransformManager();
+            transformManager.SetTransformParent(entity, neko::Entity(parentEntity));
+        }
+    }
     if (neko::CheckJsonParameter(entityJson, "name", json::value_t::string))
     {
         ResizeIfNecessary(currentScene_.entitiesNames, entity, std::string());
@@ -113,9 +124,9 @@ json EditorSceneManager::SerializeComponent(neko::Entity entity, neko::NekoCompo
             componentJson["scale"] = {scale.x, scale.y};
             break;
         }
-        case neko::NekoComponentType::ANGLE2D:
+        case neko::NekoComponentType::ROTATION2D:
         {
-            auto& angleManager = nekoEditor_.GetAngleManager();
+            auto& angleManager = nekoEditor_.GetRotationManager();
             componentJson["angle"] = angleManager.GetComponent(entity);
             break;
         }
@@ -155,7 +166,19 @@ json EditorSceneManager::SerializeEntity(neko::Entity entity)
     }
     entityJson["name"] = currentScene_.entitiesNames[entity];
     entityJson["entity"] = entity;
-
+    //parent entity
+    {
+        auto& transformManager = nekoEditor_.GetTransformManager();
+        auto parentEntity = transformManager.GetParentEntity(entity);
+        if(parentEntity == neko::INVALID_ENTITY)
+        {
+            entityJson["parent"] = int(parentEntity);
+        }
+        else
+        {
+            entityJson["parent"] = -1;
+        }
+    }
     entityJson["components"] = json::array();
     for (auto componentType : neko::GetComponentTypeSet())
     {

@@ -135,16 +135,12 @@ void NekoEditor::Update(float dt)
     //Draw things into the graphics manager
     sceneRenderTexture_.clear(config.bgColor);
 
-    spriteManager_.CopyAllTransformPositions(entityManager_, positionManager_);
-    spriteManager_.CopyAllTransformScales(entityManager_, scaleManager_);
-    spriteManager_.CopyAllTransformAngles(entityManager_, angleManager_);
+    spriteManager_.CopyAllTransforms(entityManager_, transformManager_);
 
     spriteManager_.PushAllCommands(entityManager_, graphicsManager_);
 
     spineManager_.Update(entityManager_, dt);
-    spineManager_.CopyAllTransformPositions(entityManager_, positionManager_);
-    spineManager_.CopyAllTransformScales(entityManager_, scaleManager_);
-    spineManager_.CopyAllTransformAngles(entityManager_, angleManager_);
+    spineManager_.CopyAllTransforms(entityManager_, transformManager_);
     spineManager_.PushAllCommands(entityManager_, graphicsManager_);
 
     graphicsManager_.Render(&sceneRenderTexture_);
@@ -152,7 +148,7 @@ void NekoEditor::Update(float dt)
 
     ImGui::SetNextWindowPos(ImVec2(0.0f, yOffset), ImGuiCond_Always);
     ImGui::SetNextWindowSize(ImVec2(windowSize.x * 0.2f, windowSize.y * 0.7f - yOffset), ImGuiCond_Always);
-    entityViewer_.Update(entityManager_, sceneManager_);
+    entityViewer_.Update(entityManager_, sceneManager_, transformManager_);
 
     ImGui::SetNextWindowPos(ImVec2(windowSize.x * 0.2f, yOffset), ImGuiCond_Always);
     ImGui::SetNextWindowSize(ImVec2(windowSize.x * 0.6f, windowSize.y * 0.7f - yOffset), ImGuiCond_Always);
@@ -195,17 +191,17 @@ neko::EntityManager& NekoEditor::GetEntityManager()
 
 neko::Position2dManager& NekoEditor::GetPositionManager()
 {
-    return positionManager_;
+    return transformManager_.GetPositionManager();
 }
 
 neko::Scale2dManager& NekoEditor::GetScaleManager()
 {
-    return scaleManager_;
+    return transformManager_.GetScaleManager();
 }
 
-neko::Angle2dManager& NekoEditor::GetAngleManager()
+neko::Rotation2dManager& NekoEditor::GetRotationManager()
 {
-    return angleManager_;
+    return transformManager_.GetRotationManager();
 }
 
 neko::SceneManager& NekoEditor::GetSceneManager()
@@ -231,6 +227,11 @@ Previewer& NekoEditor::GetPreviewer()
 neko::SpineManager& NekoEditor::GetSpineManager()
 {
     return spineManager_;
+}
+
+neko::Transform2dManager& NekoEditor::GetTransformManager()
+{
+    return transformManager_;
 }
 
 }

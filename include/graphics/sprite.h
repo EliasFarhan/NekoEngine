@@ -57,11 +57,12 @@ public:
 
     void CopyLayer(int layer, size_t start, size_t length=1);
 
+    void CopyAllTransforms(EntityManager& entityManager, Transform2dManager& transformManager);
     void CopyAllTransformPositions(EntityManager& entityManager, Position2dManager& positionManager);
 
     void CopyAllTransformScales(EntityManager& entityManager, Scale2dManager& scaleManager);
 
-    void CopyAllTransformAngles(EntityManager& entityManager, Angle2dManager& angleManager);
+    void CopyAllTransformAngles(EntityManager& entityManager, Rotation2dManager& angleManager);
 
     void PushAllCommands(EntityManager& entityManager, GraphicsManager& graphicsManager);
 

@@ -35,7 +35,8 @@ namespace neko
 class GraphicsManager;
 class Position2dManager;
 class Scale2dManager;
-class Angle2dManager;
+class Rotation2dManager;
+class Transform2dManager;
 
 struct BasicSpineDrawable : Component
 {
@@ -68,9 +69,10 @@ public:
                           const std::string_view skeletonFilename);
 
     void ParseComponentJson(json& componentJson, Entity entity) override;
+    void CopyAllTransforms(EntityManager& entityManager, Transform2dManager& transformManager);
     void CopyAllTransformPositions(EntityManager& entityManager, Position2dManager& position2Manager);
     void CopyAllTransformScales(EntityManager& entityManager, Scale2dManager& scale2DManager);
-    void CopyAllTransformAngles(EntityManager& entityManager, Angle2dManager& angle2DManager);
+    void CopyAllTransformAngles(EntityManager& entityManager, Rotation2dManager& angle2DManager);
     void PushAllCommands(EntityManager& entityManager, GraphicsManager& graphicsManager);
 
     Index AddComponent(EntityManager& entityManager, Entity entity) override;

@@ -6,7 +6,7 @@ namespace neko
     {
             NekoComponentType::POSITION2D,
             NekoComponentType::SCALE2D,
-            NekoComponentType::ANGLE2D,
+            NekoComponentType::ROTATION2D,
             NekoComponentType::POSITION3D,
             NekoComponentType::SCALE3D,
             NekoComponentType::ANGLE3D,

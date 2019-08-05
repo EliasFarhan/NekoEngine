@@ -31,10 +31,68 @@ namespace neko
 
 Transform2dManager::Transform2dManager()
 {
+    transformHierarchy_.resize(INIT_ENTITY_NMB, INVALID_ENTITY);
 }
 
-//TODO Benchmark copy entites before apply or filter on loop
-void Angle2dManager::CopyAnglesFromBody2d(EntityManager& entityManager, Body2dManager& body2dManager)
+bool Transform2dManager::SetTransformParent(Entity entity, Entity parentEntity)
+{
+    //Check if not creating circuit
+    if(!CanParentTransform(entity, parentEntity))
+        return false;
+    transformHierarchy_[entity] = parentEntity;
+    return true;
+}
+
+bool Transform2dManager::CanParentTransform(Entity entity, Entity parentEntity)
+{
+    if(entity == neko::INVALID_ENTITY)
+    {
+        return false;
+    }
+    if(parentEntity == neko::INVALID_ENTITY)
+    {
+        return true;
+    }
+    ResizeIfNecessary(transformHierarchy_, entity, INVALID_ENTITY);
+    ResizeIfNecessary(transformHierarchy_, parentEntity, INVALID_ENTITY);
+    Entity currentCheckedEntity = parentEntity;
+    do
+    {
+        currentCheckedEntity = transformHierarchy_[currentCheckedEntity];
+        if(currentCheckedEntity == entity)
+        {
+            return false;
+        }
+    } while(currentCheckedEntity != INVALID_ENTITY);
+    return true;
+}
+
+Entity
+Transform2dManager::FindNextChild(Entity parentEntity, Entity entityChild)
+{
+    auto begin = transformHierarchy_.cbegin();
+
+    if(entityChild != INVALID_ENTITY)
+    {
+        begin += entityChild+1;
+    }
+
+    auto it = std::find_if(begin, transformHierarchy_.cend(), [&parentEntity](const Entity& entity){
+        return parentEntity == entity;
+    });
+    if(it == transformHierarchy_.cend())
+        return INVALID_ENTITY;
+    return Entity(it-transformHierarchy_.cbegin());
+
+}
+
+Entity Transform2dManager::GetParentEntity(Entity entity)
+{
+    ResizeIfNecessary(transformHierarchy_, entity, INVALID_ENTITY);
+    return transformHierarchy_[entity];
+}
+
+void Rotation2dManager::CopyAnglesFromBody2d(EntityManager& entityManager, Body2dManager& body2dManager)
 {
 	const auto entityNmb = entityManager.GetEntitiesSize();
 	const auto& bodies = body2dManager.GetConstComponentsVector();
@@ -43,7 +101,7 @@ void Angle2dManager::CopyAnglesFromBody2d(EntityManager& entityManager, Body2dMa
 	{
 		if (
 			entityManager.HasComponent(i, EntityMask(NekoComponentType::BODY2D)) &&
-			entityManager.HasComponent(i, EntityMask(NekoComponentType::ANGLE2D))
+			entityManager.HasComponent(i, EntityMask(NekoComponentType::ROTATION2D))
 			)
 		{
 			components_[i] = glm::degrees(bodies[i]->GetAngle());

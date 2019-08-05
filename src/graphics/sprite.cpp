@@ -100,9 +100,9 @@ void SpriteManager::CopyAllTransformScales(EntityManager& entityManager, Scale2d
     }
 }
 
-void SpriteManager::CopyAllTransformAngles(EntityManager& entityManager, Angle2dManager& angleManager)
+void SpriteManager::CopyAllTransformAngles(EntityManager& entityManager, Rotation2dManager& angleManager)
 {
-    const auto entityMask = EntityMask(NekoComponentType::ANGLE2D) | EntityMask(NekoComponentType::SPRITE2D);
+    const auto entityMask = EntityMask(NekoComponentType::ROTATION2D) | EntityMask(NekoComponentType::SPRITE2D);
     for(Entity entity = 0; entity < entityManager.GetEntitiesSize();entity++)
     {
         if(entityManager.HasComponent(entity, entityMask))
@@ -142,6 +142,11 @@ json SpriteManager::SerializeComponentJson(Entity entity)
     componentJson["layer"] = sprite.layer;
     componentJson["origin"] = {sprite.origin.x, sprite.origin.y};
     return componentJson;
+}
+
+void SpriteManager::CopyAllTransforms(EntityManager& entityManager, Transform2dManager& transformManager)
+{
+
 }
 
 }

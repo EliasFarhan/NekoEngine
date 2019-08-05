@@ -115,7 +115,7 @@ protected:
 	EntityManager entityManager_;
 	Position2dManager positionManager_;
 	Scale2dManager scaleManager_;
-	Angle2dManager angleManager_;
+	Rotation2dManager angleManager_;
 	TextureManager textureManager_;
 	SpriteManager spriteManager_{this->textureManager_};
 	GraphicsManager graphicsManager_;

@@ -160,10 +160,10 @@ void SpineManager::CopyAllTransformScales(EntityManager& entityManager, Scale2dM
     }
 }
 
-void SpineManager::CopyAllTransformAngles(EntityManager& entityManager, Angle2dManager& angle2DManager)
+void SpineManager::CopyAllTransformAngles(EntityManager& entityManager, Rotation2dManager& angle2DManager)
 {
-    EntityMask entityMask = EntityMask(NekoComponentType::ANGLE2D) |
-            EntityMask(NekoComponentType::SPINE_ANIMATION);
+    EntityMask entityMask = EntityMask(NekoComponentType::ROTATION2D) |
+                            EntityMask(NekoComponentType::SPINE_ANIMATION);
 
     for (Entity entity = 0; entity < entityManager.GetEntitiesSize(); entity++)
     {
@@ -211,6 +211,11 @@ json SpineManager::SerializeComponentJson(Entity entity)
 SpineDrawableInfo& SpineManager::GetInfo(Entity entity)
 {
     return infos_[entity];
+}
+
+void SpineManager::CopyAllTransforms(EntityManager& entityManager, Transform2dManager& transformManager)
+{
+
 }
 
 }

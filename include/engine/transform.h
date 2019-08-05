@@ -28,30 +28,20 @@
 #include "SFML/System/Vector2.hpp"
 #include "globals.h"
 #include <engine/entity.h>
-#include "component.h"
+#include "engine/component.h"
+#include "engine/vector.h"
 
 namespace neko
 {
 class Body2dManager;
 class Physics2dManager;
 
-/**
- * \brief manage the graphic transform of any kind of objects in a SOA fashions
- */
-class Transform2dManager
-{
-public:
-    Transform2dManager();
-private:
-	std::vector<Entity> transformHierarchy_;
-	std::vector<char> dirtyFlags_;
-};
 
-class Position2dManager : public ComponentManager<sf::Vector2f, ComponentType(NekoComponentType::POSITION2D)>
+class Position2dManager : public ComponentManager<Vec2f, ComponentType(NekoComponentType::POSITION2D)>
 {
 public:
-	using ComponentManager::ComponentManager;
-	void CopyAllPositionsFromBody2d(EntityManager& entityManager, Body2dManager& body2dManager);
+    using ComponentManager::ComponentManager;
+    void CopyAllPositionsFromBody2d(EntityManager& entityManager, Body2dManager& body2dManager);
 };
 
 class Scale2dManager : public ComponentManager<sf::Vector2f, ComponentType(NekoComponentType::SCALE2D)>
@@ -62,10 +52,34 @@ public:
 
 };
 
-class Angle2dManager : public ComponentManager<float, ComponentType(NekoComponentType::ANGLE2D)>
+class Rotation2dManager : public ComponentManager<float, ComponentType(NekoComponentType::ROTATION2D)>
 {
 public:
-	using ComponentManager::ComponentManager;
-	void CopyAnglesFromBody2d(EntityManager& entityManager, Body2dManager& body2dManager);
+    using ComponentManager::ComponentManager;
+    void CopyAnglesFromBody2d(EntityManager& entityManager, Body2dManager& body2dManager);
 };
+
+/**
+ * \brief manage the graphic transform of any kind of objects in a SOA fashions
+ */
+class Transform2dManager
+{
+public:
+    Transform2dManager();
+
+    Position2dManager& GetPositionManager(){ return positionManager_;}
+    Scale2dManager& GetScaleManager() { return scaleManager_; }
+    Rotation2dManager& GetRotationManager() { return rotationManager_;}
+    bool CanParentTransform(Entity entity, Entity parentEntity);
+    bool SetTransformParent(Entity entity, Entity parentEntity);
+    Entity GetParentEntity(Entity entity);
+    Entity FindNextChild(Entity parentEntity, Entity entityChild);
+private:
+    Position2dManager positionManager_;
+    Scale2dManager scaleManager_{sf::Vector2f(1.0f,1.0f)};
+    Rotation2dManager rotationManager_;
+	std::vector<Entity> transformHierarchy_;
+	std::vector<char> dirtyFlags_;
+};
+
 }

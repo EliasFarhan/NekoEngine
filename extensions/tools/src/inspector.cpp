@@ -17,6 +17,18 @@ void Inspector::ShowEntityInfo(neko::Entity entity)
     auto& sceneManager = nekoEditor_.GetSceneManager();
 
     ImGui::InputText("Entity Name: ", &sceneManager.GetCurrentScene().entitiesNames[entity]);
+    {
+        auto& transformManager = nekoEditor_.GetTransformManager();
+        auto parentEntity = transformManager.GetParentEntity(entity);
+        if (parentEntity != neko::INVALID_ENTITY)
+        {
+            ImGui::LabelText("Entity Parent", "%u", parentEntity);
+        }
+        else
+        {
+            ImGui::LabelText("Entity Parent", "None");
+        }
+    }
     if (entityManager.HasComponent(entity, neko::EntityMask(neko::NekoComponentType::POSITION2D)))
     {
 
@@ -61,9 +73,9 @@ void Inspector::ShowEntityInfo(neko::Entity entity)
         }
     }
 
-    if (entityManager.HasComponent(entity, neko::EntityMask(neko::NekoComponentType::ANGLE2D)))
+    if (entityManager.HasComponent(entity, neko::EntityMask(neko::NekoComponentType::ROTATION2D)))
     {
-        auto& angleManager = nekoEditor_.GetAngleManager();
+        auto& angleManager = nekoEditor_.GetRotationManager();
         bool keepComponent = true;
         if (ImGui::CollapsingHeader("Angle2d Component", &keepComponent))
         {
@@ -216,9 +228,9 @@ void Inspector::ShowEntityInfo(neko::Entity entity)
             skeletonDataList.clear();
         }
         ImGui::PushID("Load Spine Component");
-        if(ImGui::Button("Load..."))
+        if (ImGui::Button("Load..."))
         {
-            if(spineManager.AddSpineDrawable(entity, spineDrawableInfo.atlasPath, spineDrawableInfo.skeletonDataPath))
+            if (spineManager.AddSpineDrawable(entity, spineDrawableInfo.atlasPath, spineDrawableInfo.skeletonDataPath))
             {
                 logDebug("Successfully load spine drawable");
             }
@@ -230,9 +242,9 @@ void Inspector::ShowEntityInfo(neko::Entity entity)
         ImGui::PopID();
         ImGui::SameLine();
         ImGui::PushID("Preview Spine Component");
-        if(ImGui::Button("Preview..."))
+        if (ImGui::Button("Preview..."))
         {
-            if(spineDrawable.skeletonDrawable != nullptr)
+            if (spineDrawable.skeletonDrawable != nullptr)
             {
                 auto& previewer = nekoEditor_.GetPreviewer();
                 previewer.SetSpineAnimation(&spineDrawable);
@@ -263,7 +275,7 @@ void Inspector::ShowEntityInfo(neko::Entity entity)
             ImGui::InputFloat("Gravity Scale", &bodyDef.gravityScale);
             ImGui::Checkbox("Fixed Rotation", &bodyDef.fixedRotation);
             if (!bodyDef.fixedRotation &&
-                !entityManager.HasComponent(entity, neko::EntityMask(neko::NekoComponentType::ANGLE2D)))
+                !entityManager.HasComponent(entity, neko::EntityMask(neko::NekoComponentType::ROTATION2D)))
             {
                 ImGui::SameLine();
                 ImGui::TextColored(ImColor(255, 0, 0), "Warning!");
@@ -288,7 +300,7 @@ void Inspector::ShowEntityInfo(neko::Entity entity)
             {
                     {neko::NekoComponentType::POSITION2D,      "Position 2D"},
                     {neko::NekoComponentType::SCALE2D,         "Scale 2D"},
-                    {neko::NekoComponentType::ANGLE2D,         "Angle 2D"},
+                    {neko::NekoComponentType::ROTATION2D,      "Angle 2D"},
                     {neko::NekoComponentType::SPRITE2D,        "Sprite 2D"},
                     {neko::NekoComponentType::BODY2D,          "Body 2D"},
                     {neko::NekoComponentType::SPINE_ANIMATION, "Spine Animation 2D"},
@@ -320,9 +332,9 @@ void Inspector::ShowEntityInfo(neko::Entity entity)
                         positionManager.AddComponent(entityManager, entity);
                         break;
                     }
-                    case neko::NekoComponentType::ANGLE2D:
+                    case neko::NekoComponentType::ROTATION2D:
                     {
-                        auto& angleManager = nekoEditor_.GetAngleManager();
+                        auto& angleManager = nekoEditor_.GetRotationManager();
                         angleManager.AddComponent(entityManager, entity);
                         break;
                     }
