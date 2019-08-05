@@ -218,4 +218,10 @@ void SpineManager::CopyAllTransforms(EntityManager& entityManager, Transform2dMa
 
 }
 
+void SpineManager::DestroyComponent(EntityManager& entityManager, Entity entity)
+{
+    ComponentManager::DestroyComponent(entityManager, entity);
+    components_[entity] = BasicSpineDrawable();
+}
+
 }

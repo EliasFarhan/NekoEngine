@@ -22,11 +22,9 @@ public:
     { return selectedEntity_; }
 
 private:
-    void DrawEntityHierarchy(neko::Entity entity,
-                             size_t index,
-                             neko::Transform2dManager& transformManager,
-                             std::set<neko::Entity>& entitySet,
-                             bool draw);
+    void DrawEntityHierarchy(neko::Entity entity, size_t index, neko::Transform2dManager& transformManager,
+                             neko::EntityManager& entityManager, std::set<neko::Entity>& entitySet, bool draw,
+                             bool destroy = false);
 
     std::vector<neko::Entity> entities_;
     std::vector<std::string> entitiesName_;

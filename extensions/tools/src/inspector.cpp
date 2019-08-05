@@ -35,7 +35,7 @@ void Inspector::ShowEntityInfo(neko::Entity entity)
         auto& positionManager = nekoEditor_.GetPositionManager();
         bool keepComponent = true;
 
-        if (ImGui::CollapsingHeader("Position2d Component", &keepComponent))
+        if (ImGui::CollapsingHeader("Position2d Component", &keepComponent, ImGuiTreeNodeFlags_DefaultOpen))
         {
             auto& pos = positionManager.GetComponent(entity);
             float posRaw[2] = {pos.x, pos.y};
@@ -57,7 +57,7 @@ void Inspector::ShowEntityInfo(neko::Entity entity)
 
         auto& scaleManager = nekoEditor_.GetScaleManager();
         bool keepComponent = true;
-        if (ImGui::CollapsingHeader("Scale2d Component", &keepComponent))
+        if (ImGui::CollapsingHeader("Scale2d Component", &keepComponent, ImGuiTreeNodeFlags_DefaultOpen))
         {
             auto& scale = scaleManager.GetComponent(entity);
             float scaleRaw[2] = {scale.x, scale.y};
@@ -77,7 +77,7 @@ void Inspector::ShowEntityInfo(neko::Entity entity)
     {
         auto& angleManager = nekoEditor_.GetRotationManager();
         bool keepComponent = true;
-        if (ImGui::CollapsingHeader("Angle2d Component", &keepComponent))
+        if (ImGui::CollapsingHeader("Angle2d Component", &keepComponent, ImGuiTreeNodeFlags_DefaultOpen))
         {
             auto& angle = angleManager.GetComponent(entity);
             if (ImGui::InputFloat("Angle", &angle))
@@ -97,7 +97,7 @@ void Inspector::ShowEntityInfo(neko::Entity entity)
 
         auto& spriteManager = nekoEditor_.GetSpriteManager();
         bool keepComponent = true;
-        if (ImGui::CollapsingHeader("Sprite2d Component", &keepComponent))
+        if (ImGui::CollapsingHeader("Sprite2d Component", &keepComponent, ImGuiTreeNodeFlags_DefaultOpen))
         {
             auto& textureManager = nekoEditor_.GetTextureManager();
             auto& sprite = spriteManager.GetComponent(entity);
@@ -149,112 +149,121 @@ void Inspector::ShowEntityInfo(neko::Entity entity)
         auto& spineManager = nekoEditor_.GetSpineManager();
         auto& spineDrawable = spineManager.GetComponent(entity);
         auto& spineDrawableInfo = spineManager.GetInfo(entity);
-        if (ImGui::Button(spineDrawableInfo.atlasPath.c_str()))
+        bool keepComponent = true;
+        if (ImGui::CollapsingHeader("Spine2d Component", &keepComponent, ImGuiTreeNodeFlags_DefaultOpen))
         {
-            ImGui::OpenPopup("Atlas Popup");
-
-        }
-        ImGui::SameLine();
-        ImGui::Text("Atlas");
-
-        static std::vector<std::string> atlasList;
-        if (ImGui::BeginPopup("Atlas Popup"))
-        {
-            if (atlasList.empty())
+            if (ImGui::Button(spineDrawableInfo.atlasPath.c_str()))
             {
-                neko::IterateDirectory(nekoEditor_.config.dataRootPath, [this](const std::string_view filename)
+                ImGui::OpenPopup("Atlas Popup");
+
+            }
+            ImGui::SameLine();
+            ImGui::Text("Atlas");
+
+            static std::vector<std::string> atlasList;
+            if (ImGui::BeginPopup("Atlas Popup"))
+            {
+                if (atlasList.empty())
                 {
-                    if (filename.find(".atlas.txt") != std::string_view::npos)
+                    neko::IterateDirectory(nekoEditor_.config.dataRootPath, [this](const std::string_view filename)
                     {
-                        atlasList.push_back(filename.data());
-                    }
-                }, true);
-            }
-            if (ImGui::Selectable("No Atlas"))
-            {
-                spineDrawableInfo.atlasPath = "";
-            }
-            for (auto& atlasFilename : atlasList)
-            {
-                if (ImGui::Selectable(atlasFilename.c_str()))
-                {
-                    spineDrawableInfo.atlasPath = atlasFilename;
+                        if (filename.find(".atlas.txt") != std::string_view::npos)
+                        {
+                            atlasList.push_back(filename.data());
+                        }
+                    }, true);
                 }
-
-            }
-            ImGui::EndPopup();
-        }
-        else
-        {
-            atlasList.clear();
-        }
-
-        if (ImGui::Button(spineDrawableInfo.skeletonDataPath.c_str()))
-        {
-            ImGui::OpenPopup("Skeleton Data Popup");
-        }
-        ImGui::SameLine();
-        ImGui::Text("SkeletonData");
-
-        static std::vector<std::string> skeletonDataList;
-        if (ImGui::BeginPopup("Skeleton Data Popup"))
-        {
-            if (skeletonDataList.empty())
-            {
-                neko::IterateDirectory(nekoEditor_.config.dataRootPath, [this](const std::string_view filename)
+                if (ImGui::Selectable("No Atlas"))
                 {
-                    if (filename.find(".json") != std::string_view::npos)
+                    spineDrawableInfo.atlasPath = "";
+                }
+                for (auto& atlasFilename : atlasList)
+                {
+                    if (ImGui::Selectable(atlasFilename.c_str()))
                     {
-                        skeletonDataList.push_back(filename.data());
+                        spineDrawableInfo.atlasPath = atlasFilename;
                     }
-                }, true);
-            }
-            if (ImGui::Selectable("No Skeleton Data"))
-            {
-                spineDrawableInfo.skeletonDataPath = "";
-            }
-            for (auto& skeletonDataFilename : skeletonDataList)
-            {
-                if (ImGui::Selectable(skeletonDataFilename.c_str()))
-                {
-                    spineDrawableInfo.skeletonDataPath = skeletonDataFilename;
-                }
-            }
 
-            ImGui::EndPopup();
-        }
-        else
-        {
-            skeletonDataList.clear();
-        }
-        ImGui::PushID("Load Spine Component");
-        if (ImGui::Button("Load..."))
-        {
-            if (spineManager.AddSpineDrawable(entity, spineDrawableInfo.atlasPath, spineDrawableInfo.skeletonDataPath))
-            {
-                logDebug("Successfully load spine drawable");
+                }
+                ImGui::EndPopup();
             }
             else
             {
-                logDebug("[Error] Could not load spine drawable");
+                atlasList.clear();
             }
-        }
-        ImGui::PopID();
-        ImGui::SameLine();
-        ImGui::PushID("Preview Spine Component");
-        if (ImGui::Button("Preview..."))
-        {
-            if (spineDrawable.skeletonDrawable != nullptr)
+
+            if (ImGui::Button(spineDrawableInfo.skeletonDataPath.c_str()))
             {
-                auto& previewer = nekoEditor_.GetPreviewer();
-                previewer.SetSpineAnimation(&spineDrawable);
+                ImGui::OpenPopup("Skeleton Data Popup");
+            }
+            ImGui::SameLine();
+            ImGui::Text("SkeletonData");
+
+            static std::vector<std::string> skeletonDataList;
+            if (ImGui::BeginPopup("Skeleton Data Popup"))
+            {
+                if (skeletonDataList.empty())
+                {
+                    neko::IterateDirectory(nekoEditor_.config.dataRootPath, [this](const std::string_view filename)
+                    {
+                        if (filename.find(".json") != std::string_view::npos)
+                        {
+                            skeletonDataList.push_back(filename.data());
+                        }
+                    }, true);
+                }
+                if (ImGui::Selectable("No Skeleton Data"))
+                {
+                    spineDrawableInfo.skeletonDataPath = "";
+                }
+                for (auto& skeletonDataFilename : skeletonDataList)
+                {
+                    if (ImGui::Selectable(skeletonDataFilename.c_str()))
+                    {
+                        spineDrawableInfo.skeletonDataPath = skeletonDataFilename;
+                    }
+                }
+
+                ImGui::EndPopup();
             }
             else
             {
-                logDebug("[Error] Load the spine component first");
+                skeletonDataList.clear();
             }
+            ImGui::PushID("Load Spine Component");
+            if (ImGui::Button("Load..."))
+            {
+                if (spineManager.AddSpineDrawable(entity, spineDrawableInfo.atlasPath,
+                                                  spineDrawableInfo.skeletonDataPath))
+                {
+                    logDebug("Successfully load spine drawable");
+                }
+                else
+                {
+                    logDebug("[Error] Could not load spine drawable");
+                }
+            }
+            ImGui::PopID();
+            ImGui::SameLine();
+            ImGui::PushID("Preview Spine Component");
+            if (ImGui::Button("Preview..."))
+            {
+                if (spineDrawable.skeletonDrawable != nullptr)
+                {
+                    auto& previewer = nekoEditor_.GetPreviewer();
+                    previewer.SetSpineAnimation(&spineDrawable);
+                }
+                else
+                {
+                    logDebug("[Error] Load the spine component first");
+                }
+            }
+            ImGui::PopID();
         }
-        ImGui::PopID();
+        if (!keepComponent)
+        {
+            spineManager.DestroyComponent(entityManager, entity);
+        }
         ImGui::Separator();
     }
 

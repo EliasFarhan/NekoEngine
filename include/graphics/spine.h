@@ -81,6 +81,8 @@ public:
 
     SpineDrawableInfo& GetInfo(Entity entity);
 
+    void DestroyComponent(EntityManager& entityManager, Entity entity) override;
+
 private:
     std::vector<SpineDrawableInfo> infos_;
 };
