@@ -92,6 +92,25 @@ Entity Transform2dManager::GetParentEntity(Entity entity)
     return transformHierarchy_[entity];
 }
 
+sf::Transform Transform2dManager::CalculateTransform(Entity entity)
+{
+    sf::Transform transform = sf::Transform::Identity;
+    sf::Transform parentTransform = sf::Transform::Identity;
+
+    auto parentEntity = GetParentEntity(entity);
+    if(parentEntity != INVALID_ENTITY)
+    {
+        parentTransform = CalculateTransform(parentEntity);
+    }
+    auto point = parentTransform.transformPoint(unit2pixel(positionManager_.GetConstComponent(entity)));
+
+    transform.rotate(rotationManager_.GetConstComponent(entity), point);
+    transform.scale(scaleManager_.GetConstComponent(entity));
+    transform.translate(point);
+
+    return transform;
+}
+
 void Rotation2dManager::CopyAnglesFromBody2d(EntityManager& entityManager, Body2dManager& body2dManager)
 {
 	const auto entityNmb = entityManager.GetEntitiesSize();
