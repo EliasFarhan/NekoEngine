@@ -128,12 +128,14 @@ void Inspector::ShowEntityInfo(neko::Entity entity)
                 ImGui::EndPopup();
             }
             auto& origin = sprite.origin;
+
             float originRaw[2] = {origin.x, origin.y};
             if (ImGui::InputFloat2("Origin", originRaw))
             {
                 origin.x = originRaw[0];
                 origin.y = originRaw[1];
             }
+
             ImGui::InputInt("Layer", &sprite.layer);
 
         }
@@ -307,6 +309,7 @@ void Inspector::ShowEntityInfo(neko::Entity entity)
         ImGui::OpenPopup("Component Popup");
     const static std::map<neko::NekoComponentType, std::string> componentNameMap =
             {
+                    {neko::NekoComponentType::TRANSFORM2D, "Transform 2D"},
                     {neko::NekoComponentType::POSITION2D,      "Position 2D"},
                     {neko::NekoComponentType::SCALE2D,         "Scale 2D"},
                     {neko::NekoComponentType::ROTATION2D,      "Angle 2D"},
@@ -343,6 +346,16 @@ void Inspector::ShowEntityInfo(neko::Entity entity)
                     }
                     case neko::NekoComponentType::ROTATION2D:
                     {
+                        auto& angleManager = nekoEditor_.GetRotationManager();
+                        angleManager.AddComponent(entityManager, entity);
+                        break;
+                    }
+                    case neko::NekoComponentType::TRANSFORM2D:
+                    {
+                        auto& positionManager = nekoEditor_.GetPositionManager();
+                        positionManager.AddComponent(entityManager, entity);
+                        auto& scaleManager = nekoEditor_.GetScaleManager();
+                        scaleManager.AddComponent(entityManager, entity);
                         auto& angleManager = nekoEditor_.GetRotationManager();
                         angleManager.AddComponent(entityManager, entity);
                         break;

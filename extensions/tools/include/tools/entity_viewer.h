@@ -12,8 +12,8 @@ namespace editor
 class EntityViewer
 {
 public:
-    void Update(neko::EntityManager& entityManager, EditorSceneManager& sceneManager,
-                neko::Transform2dManager& transformManager);
+    EntityViewer(NekoEditor& editor);
+    void Update();
 
     void Reset()
     { selectedEntity_ = neko::INVALID_ENTITY; }
@@ -22,13 +22,12 @@ public:
     { return selectedEntity_; }
 
 private:
-    void DrawEntityHierarchy(neko::Entity entity, size_t index, neko::Transform2dManager& transformManager,
-                             neko::EntityManager& entityManager, std::set<neko::Entity>& entitySet, bool draw,
-                             bool destroy = false);
+    void DrawEntityHierarchy(neko::Entity entity, size_t index, std::set<neko::Entity>& entitySet, bool draw,
+                             bool destroy);
 
     std::vector<neko::Entity> entities_;
     std::vector<std::string> entitiesName_;
-
+    NekoEditor& nekoEditor_;
     neko::Entity selectedEntity_ = neko::INVALID_ENTITY;
 };
 }

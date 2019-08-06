@@ -34,7 +34,7 @@ void NekoEditor::Update(float dt)
     //Log tab
     if (ImGui::BeginTabBar("Lower Tab", ImGuiTabBarFlags_None))
     {
-        if(ImGui::BeginTabItem("Debug Log"))
+        if (ImGui::BeginTabItem("Debug Log"))
         {
             logViewer_.Update();
             ImGui::EndTabItem();
@@ -111,7 +111,7 @@ void NekoEditor::Update(float dt)
                 neko::WriteStringToFile(sceneJsonPath, sceneTxt);
                 sceneManager_.GetCurrentScene().scenePath = sceneJsonPath;
                 sceneManager_.GetCurrentScene().sceneName = neko::GetFilename(sceneJsonPath);
-                logDebug("Saved scene file: "+sceneJsonPath);
+                logDebug("Saved scene file: " + sceneJsonPath);
                 break;
             }
             default:
@@ -148,7 +148,7 @@ void NekoEditor::Update(float dt)
 
     ImGui::SetNextWindowPos(ImVec2(0.0f, yOffset), ImGuiCond_Always);
     ImGui::SetNextWindowSize(ImVec2(windowSize.x * 0.2f, windowSize.y * 0.7f - yOffset), ImGuiCond_Always);
-    entityViewer_.Update(entityManager_, sceneManager_, transformManager_);
+    entityViewer_.Update();
 
     ImGui::SetNextWindowPos(ImVec2(windowSize.x * 0.2f, yOffset), ImGuiCond_Always);
     ImGui::SetNextWindowSize(ImVec2(windowSize.x * 0.6f, windowSize.y * 0.7f - yOffset), ImGuiCond_Always);
@@ -232,6 +232,16 @@ neko::SpineManager& NekoEditor::GetSpineManager()
 neko::Transform2dManager& NekoEditor::GetTransformManager()
 {
     return transformManager_;
+}
+
+NekoEditor::NekoEditor()
+        : BasicEngine(),
+        entityViewer_(*this),
+        inspector_(*this),
+        spriteManager_(textureManager_),
+        sceneManager_(*this)
+{
+
 }
 
 }

@@ -102,12 +102,13 @@ sf::Transform Transform2dManager::CalculateTransform(Entity entity)
     {
         parentTransform = CalculateTransform(parentEntity);
     }
-    auto point = parentTransform.transformPoint(unit2pixel(positionManager_.GetConstComponent(entity)));
+    auto point = unit2pixel(positionManager_.GetConstComponent(entity));
 
-    transform.rotate(rotationManager_.GetConstComponent(entity), point);
-    transform.scale(scaleManager_.GetConstComponent(entity));
-    transform.translate(point);
+    transform = transform.translate(point);
+    transform = transform.scale(scaleManager_.GetConstComponent(entity));
+    transform = transform.rotate(rotationManager_.GetConstComponent(entity));
 
+    transform = parentTransform.combine(transform);
     return transform;
 }
 
@@ -142,6 +143,10 @@ void Position2dManager::CopyAllPositionsFromBody2d(EntityManager& entityManager,
 			components_[i] = meter2pixel(bodies[i]->GetPosition());
 		}
 	}
+}
+
+Position2dManager::Position2dManager() : ComponentManager::ComponentManager()
+{
 }
 
 Index Scale2dManager::AddComponent(EntityManager& entityManager, Entity entity)

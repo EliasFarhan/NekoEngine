@@ -101,7 +101,7 @@ public:
 		BasicEngine::Update(dt);
 		spriteManager_.CopyAllTransformPositions(entityManager_, positionManager_);
 		spriteManager_.CopyAllTransformScales(entityManager_, scaleManager_);
-		spriteManager_.CopyAllTransformAngles(entityManager_, angleManager_);
+        spriteManager_.CopyAllTransformRotations(entityManager_, angleManager_);
 
 		spriteManager_.PushAllCommands(entityManager_, graphicsManager_);
 

@@ -43,6 +43,7 @@ struct Sprite
     int layer = 0;
     sf::Vector2f origin = sf::Vector2f(0.0f,0.0f);
     Index textureId = INVALID_INDEX;
+    sf::Transform transform = sf::Transform::Identity;
 };
 
 class SpriteManager :
@@ -62,7 +63,7 @@ public:
 
     void CopyAllTransformScales(EntityManager& entityManager, Scale2dManager& scaleManager);
 
-    void CopyAllTransformAngles(EntityManager& entityManager, Rotation2dManager& angleManager);
+    void CopyAllTransformRotations(EntityManager& entityManager, Rotation2dManager& angleManager);
 
     void PushAllCommands(EntityManager& entityManager, GraphicsManager& graphicsManager);
 

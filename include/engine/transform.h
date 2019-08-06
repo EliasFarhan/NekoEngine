@@ -30,6 +30,7 @@
 #include <engine/entity.h>
 #include "engine/component.h"
 #include "engine/vector.h"
+#include <SFML/Graphics/Transform.hpp>
 
 namespace neko
 {
@@ -40,8 +41,9 @@ class Physics2dManager;
 class Position2dManager : public ComponentManager<Vec2f, ComponentType(NekoComponentType::POSITION2D)>
 {
 public:
-    using ComponentManager::ComponentManager;
+    Position2dManager();
     void CopyAllPositionsFromBody2d(EntityManager& entityManager, Body2dManager& body2dManager);
+
 };
 
 class Scale2dManager : public ComponentManager<sf::Vector2f, ComponentType(NekoComponentType::SCALE2D)>
@@ -74,10 +76,13 @@ public:
     bool SetTransformParent(Entity entity, Entity parentEntity);
     Entity GetParentEntity(Entity entity);
     Entity FindNextChild(Entity parentEntity, Entity entityChild);
+
+    sf::Transform CalculateTransform(Entity entity);
 private:
     Position2dManager positionManager_;
     Scale2dManager scaleManager_{sf::Vector2f(1.0f,1.0f)};
     Rotation2dManager rotationManager_;
+
 	std::vector<Entity> transformHierarchy_;
 	std::vector<char> dirtyFlags_;
 };

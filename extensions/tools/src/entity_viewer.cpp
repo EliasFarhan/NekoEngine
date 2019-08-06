@@ -8,13 +8,15 @@
 #include <utilities/vector_utility.h>
 #include <engine/transform.h>
 #include <engine/log.h>
+#include <tools/neko_editor.h>
 
 namespace editor
 {
-void EntityViewer::Update(neko::EntityManager& entityManager,
-                          EditorSceneManager& sceneManager,
-                          neko::Transform2dManager& transformManager)
+void EntityViewer::Update()
 {
+    auto& sceneManager = nekoEditor_.GetSceneManager();
+    auto& entityManager = nekoEditor_.GetEntityManager();
+    auto& transformManager = nekoEditor_.GetTransformManager();
     entities_.clear();
     entitiesName_.clear();
 
@@ -51,7 +53,7 @@ void EntityViewer::Update(neko::EntityManager& entityManager,
         if(transformManager.GetParentEntity(entities_[i]) == neko::INVALID_ENTITY and
         std::find(entitiesSet.cbegin(), entitiesSet.cend(), entities_[i]) == entitiesSet.end())
         {
-            DrawEntityHierarchy(entities_[i], i, transformManager, entityManager, entitiesSet, sceneOpen, false);
+            DrawEntityHierarchy(entities_[i], i, entitiesSet, sceneOpen, false);
         }
     }
 
@@ -67,12 +69,16 @@ void EntityViewer::Update(neko::EntityManager& entityManager,
     ImGui::End();
 }
 
-void EntityViewer::DrawEntityHierarchy(neko::Entity entity, size_t index, neko::Transform2dManager& transformManager,
-                                       neko::EntityManager& entityManager, std::set<neko::Entity>& entitySet, bool draw,
-                                       bool destroy)
+void EntityViewer::DrawEntityHierarchy(neko::Entity entity,
+        size_t index,
+        std::set<neko::Entity>& entitySet,
+        bool draw,
+        bool destroy)
 {
+    auto& transformManager = nekoEditor_.GetTransformManager();
     bool nodeOpen = draw;
     bool destroyEntity = destroy;
+    bool createEntity = false;
     bool leaf = transformManager.FindNextChild(entity, neko::INVALID_ENTITY) == neko::INVALID_ENTITY;
 
     if(draw)
@@ -96,6 +102,59 @@ void EntityViewer::DrawEntityHierarchy(neko::Entity entity, size_t index, neko::
         ImGui::PopItemWidth();
         if (ImGui::IsItemClicked())
             selectedEntity_ = entity;
+
+        const std::string entityPopupName = "Entity Popup "+std::to_string(entity);
+        if(ImGui::IsItemClicked(1))
+        {
+            logDebug("Left Clicked on Entity: "+std::to_string(entity));
+
+            ImGui::OpenPopup(entityPopupName.c_str());
+        }
+
+        if(ImGui::BeginPopup(entityPopupName.c_str()))
+        {
+            const std::string entityMenuName = "Entity Menu "+std::to_string(entity);
+            enum class EntityMenuComboItem
+            {
+                ADD_EMPTY_ENTITY,
+                DELETE,
+                LENGTH
+            };
+            const char* entityMenuComboItemName[int(EntityMenuComboItem::LENGTH)] = {
+                    "Add Empty Entity",
+                    "Delete Entity"
+            };
+
+            const auto entityComboName = entityMenuName + " Combo";
+            for(int i = 0 ; i < int(EntityMenuComboItem::LENGTH);i++)
+            {
+                const auto key = entityComboName+" "+entityMenuComboItemName[i];
+                ImGui::PushID(key.c_str());
+                if(ImGui::Selectable(entityMenuComboItemName[i]))
+                {
+                    const auto item = EntityMenuComboItem(i);
+                    switch (item)
+                    {
+                        case EntityMenuComboItem::ADD_EMPTY_ENTITY:
+                        {
+                            createEntity = true;
+                            break;
+                        }
+                        case EntityMenuComboItem::DELETE:
+                        {
+                            destroyEntity = true;
+                            break;
+                        }
+                        default:
+                            break;
+                    }
+                    ImGui::CloseCurrentPopup();
+                }
+                ImGui::PopID();
+            }
+
+            ImGui::EndPopup();
+        }
         ImGuiDragDropFlags srcFlags = 0;
         srcFlags |= ImGuiDragDropFlags_SourceNoDisableHover;     // Keep the source displayed as hovered
         srcFlags |= ImGuiDragDropFlags_SourceNoHoldToOpenOthers; // Because our dragging is local, we disable the feature of opening foreign treenodes/tabs while dragging
@@ -122,32 +181,43 @@ void EntityViewer::DrawEntityHierarchy(neko::Entity entity, size_t index, neko::
             }
             ImGui::EndDragDropTarget();
         }
-        ImGui::SameLine();
-        std::string buttonId = "Remove Entity "+std::to_string(entity);
-        ImGui::PushID(buttonId.c_str());
-        if(ImGui::Button("Remove"))
-        {
-            destroyEntity = true;
-        }
-        ImGui::PopID();
     }
     entitySet.emplace(entity);
     if(destroyEntity)
     {
+        auto& entityManager = nekoEditor_.GetEntityManager();
         entityManager.DestroyEntity(entity);
     }
     auto entityChild = neko::INVALID_ENTITY;
     do
     {
+        auto& entityManager = nekoEditor_.GetEntityManager();
         entityChild = transformManager.FindNextChild(entity, entityChild);
-        if(entityChild != neko::INVALID_ENTITY)
+        if(entityChild != neko::INVALID_ENTITY and entityManager.EntityExists(entityChild))
         {
             size_t childIndex = std::find(entities_.cbegin(), entities_.cend(), entityChild) - entities_.begin();
-            DrawEntityHierarchy(entityChild, childIndex, transformManager, entityManager, entitySet, nodeOpen, destroyEntity);
+            DrawEntityHierarchy(entityChild, childIndex, entitySet, nodeOpen, destroyEntity);
         }
     }
     while (entityChild != neko::INVALID_ENTITY);
+
+    if(createEntity)
+    {
+        auto& sceneManager = nekoEditor_.GetSceneManager();
+        auto& entityManager = nekoEditor_.GetEntityManager();
+
+        auto newEntity = entityManager.CreateEntity();
+        auto& entitiesName = sceneManager.GetCurrentScene().entitiesNames;
+        ResizeIfNecessary(entitiesName, newEntity, std::string());
+        entitiesName[newEntity] = std::string("Entity ") + std::to_string(newEntity);
+        transformManager.SetTransformParent(newEntity, entity);
+    }
     if(nodeOpen and !leaf)
         ImGui::TreePop();
+}
+
+EntityViewer::EntityViewer(NekoEditor& editor) : nekoEditor_(editor)
+{
+
 }
 }

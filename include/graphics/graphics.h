@@ -27,8 +27,6 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <condition_variable>
 #include <array>
-#include <atomic>
-#include <engine/editor.h>
 #include "tilemap.h"
 
 namespace neko

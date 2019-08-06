@@ -24,6 +24,7 @@ enum class FileOperation
 class NekoEditor : public neko::BasicEngine
 {
 public:
+    NekoEditor();
     void Init() override;
 
     void Update(float dt) override;
@@ -47,17 +48,16 @@ private:
     neko::TextureManager textureManager_;
 
     neko::SpineManager spineManager_;
-    neko::SpriteManager spriteManager_{this->textureManager_};
+    neko::SpriteManager spriteManager_;
 
     neko::GraphicsManager graphicsManager_;
     sf::RenderTexture sceneRenderTexture_;
     SceneViewer sceneViewer_;
 
-    EditorSceneManager sceneManager_{*this};
-
+    EditorSceneManager sceneManager_;
 
     neko::BodyDef2dManager bodyDefManager_;
-    Inspector inspector_{*this};
+    Inspector inspector_;
     LogViewer logViewer_;
     Previewer previewer_;
 
