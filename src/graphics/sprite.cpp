@@ -122,7 +122,7 @@ void SpriteManager::PushAllCommands(EntityManager& entityManager, GraphicsManage
     {
         if(entityManager.HasComponent(entity, entityMask))
         {
-            components_[entity].sprite.resetTransform();
+
             auto spriteSize = components_[entity].sprite.getLocalBounds();
             auto origin = components_[entity].origin;
             components_[entity].sprite.setOrigin(origin.x*spriteSize.width, origin.y*spriteSize.height);

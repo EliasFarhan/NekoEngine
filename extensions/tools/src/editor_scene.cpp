@@ -1,3 +1,27 @@
+
+/*
+ MIT License
+
+ Copyright (c) 2019 SAE Institute Switzerland AG
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
+ */
 #include <tools/editor_scene.h>
 #include <engine/log.h>
 #include <tools/neko_editor.h>
@@ -51,8 +75,13 @@ void EditorSceneManager::ParseComponentJson(json& componentJson, neko::Entity en
             break;
         }
         case neko::NekoComponentType::BODY2D:
+        {
+            auto& bodyDefManager = nekoEditor_.GetBodyDefManager();
+            bodyDefManager.AddComponent(entityManager, entity);
+            bodyDefManager.ParseComponentJson(componentJson, entity);
             break;
-        case neko::NekoComponentType::COLLIDER2D:
+        }
+        case neko::NekoComponentType::BOXCOLLIDER2D:
             break;
         case neko::NekoComponentType::CONVEX_SHAPE2D:
             break;
@@ -79,8 +108,8 @@ void EditorSceneManager::ParseEntityJson(json& entityJson)
     {
         int parentEntity = entityJson["parent"];
 
-        logDebug("Parsing entity: "+std::to_string(entity)+" with parent: "+std::to_string(parentEntity));
-        if(parentEntity >= 0)
+        logDebug("Parsing entity: " + std::to_string(entity) + " with parent: " + std::to_string(parentEntity));
+        if (parentEntity >= 0)
         {
             auto& transformManager = nekoEditor_.GetTransformManager();
             transformManager.SetTransformParent(entity, neko::Entity(parentEntity));
@@ -144,7 +173,7 @@ json EditorSceneManager::SerializeComponent(neko::Entity entity, neko::NekoCompo
         }
         case neko::NekoComponentType::BODY2D:
             break;
-        case neko::NekoComponentType::COLLIDER2D:
+        case neko::NekoComponentType::BOXCOLLIDER2D:
             break;
         case neko::NekoComponentType::CONVEX_SHAPE2D:
             break;
@@ -170,7 +199,7 @@ json EditorSceneManager::SerializeEntity(neko::Entity entity)
     {
         auto& transformManager = nekoEditor_.GetTransformManager();
         auto parentEntity = transformManager.GetParentEntity(entity);
-        if(parentEntity == neko::INVALID_ENTITY)
+        if (parentEntity == neko::INVALID_ENTITY)
         {
             entityJson["parent"] = int(parentEntity);
         }
@@ -194,7 +223,7 @@ json EditorSceneManager::SerializeScene()
 {
     json sceneJson;
     sceneJson["entities"] = json::array();
-
+    sceneJson["sceneName"] = currentScene_.sceneName;
     auto& entityManager = nekoEditor_.GetEntityManager();
 
     for (neko::Entity entity = 0; entity < entityManager.GetEntitiesSize(); entity++)

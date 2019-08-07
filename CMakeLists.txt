@@ -94,7 +94,7 @@ foreach(DATA ${DATA_FILES})
 	get_filename_component(FILE_NAME ${DATA} NAME)
 	get_filename_component(PATH_NAME ${DATA} DIRECTORY)
 	get_filename_component(EXTENSION ${DATA} EXT)
-	file(RELATIVE_PATH PATH_NAME "${PROJECT_SOURCE_DIR}/shaders/" ${PATH_NAME})
+	file(RELATIVE_PATH PATH_NAME "${PROJECT_SOURCE_DIR}" ${PATH_NAME})
 	MESSAGE("DATA: ${FILE_NAME} ${PATH_NAME} ${EXTENSION}")
 	set(DATA_OUTPUT "${PROJECT_BINARY_DIR}/data/${PATH_NAME}/${FILE_NAME}")
 	if(${EXTENSION} STREQUAL ".scene")
@@ -104,6 +104,14 @@ foreach(DATA ${DATA_FILES})
 				COMMAND ${CMAKE_COMMAND} -E make_directory "${PROJECT_BINARY_DIR}/data/"
 				COMMAND ${CMAKE_COMMAND} -E make_directory "${PROJECT_BINARY_DIR}/data/${PATH_NAME}"
 				COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/scripts/scene_validator.py"  "${DATA}"
+				COMMAND ${CMAKE_COMMAND} -E copy ${DATA} "${PROJECT_BINARY_DIR}/data/${PATH_NAME}/${FILE_NAME}")
+	elseif(${EXTENSION} STREQUAL ".atlas.txt")
+		add_custom_command(
+				OUTPUT ${DATA_OUTPUT}
+				DEPENDS ${DATA}
+				COMMAND ${CMAKE_COMMAND} -E make_directory "${PROJECT_BINARY_DIR}/data/"
+				COMMAND ${CMAKE_COMMAND} -E make_directory "${PROJECT_BINARY_DIR}/data/${PATH_NAME}"
+				COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/scripts/spine_validator.py"  "${DATA}" "${PROJECT_SOURCE_DIR}/data/${PATH_NAME}/" "${PROJECT_BINARY_DIR}/data/${PATH_NAME}/"
 				COMMAND ${CMAKE_COMMAND} -E copy ${DATA} "${PROJECT_BINARY_DIR}/data/${PATH_NAME}/${FILE_NAME}")
 	else()
 	add_custom_command(

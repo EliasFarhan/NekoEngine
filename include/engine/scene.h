@@ -8,7 +8,7 @@ namespace neko
 
 struct Scene
 {
-    std::string sceneName = "";
+    std::string sceneName = "New Scene";
     std::string scenePath = "";
     std::vector<std::string> entitiesNames;
 };

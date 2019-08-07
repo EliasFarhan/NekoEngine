@@ -98,7 +98,7 @@ public:
 
 };
 
-class Collider2dManager : public ComponentManager<Collider, ComponentType(NekoComponentType::COLLIDER2D)>
+class Collider2dManager : public ComponentManager<Collider, ComponentType(NekoComponentType::BOXCOLLIDER2D)>
 {
 };
 

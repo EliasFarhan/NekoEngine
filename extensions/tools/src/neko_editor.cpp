@@ -1,6 +1,27 @@
-//
-// Created by efarhan on 7/31/19.
-//
+
+/*
+ MIT License
+
+ Copyright (c) 2019 SAE Institute Switzerland AG
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
+ */
 #include <tools/neko_editor.h>
 #include <utilities/file_utility.h>
 #include <engine/log.h>
@@ -75,6 +96,7 @@ void NekoEditor::Update(float dt)
                 else
                 {
                     auto sceneJson = sceneManager_.SerializeScene();
+                    sceneJson["scenePath"] = path;
                     auto sceneTxt = sceneJson.dump(4);
                     neko::WriteStringToFile(path, sceneTxt);
                 }
@@ -100,6 +122,7 @@ void NekoEditor::Update(float dt)
                     break;
                 }
                 auto sceneJson = neko::LoadJson(sceneJsonPath);
+                (*sceneJson)["scenePath"] = sceneJsonPath;
                 sceneManager_.ParseSceneJson(*sceneJson);
                 break;
             }
@@ -107,6 +130,7 @@ void NekoEditor::Update(float dt)
             {
                 auto sceneJsonPath = fileDialog.GetSelected().string();
                 auto sceneJson = sceneManager_.SerializeScene();
+                sceneJson["scenePath"] = sceneJsonPath;
                 auto sceneTxt = sceneJson.dump(4);
                 neko::WriteStringToFile(sceneJsonPath, sceneTxt);
                 sceneManager_.GetCurrentScene().scenePath = sceneJsonPath;
@@ -142,7 +166,7 @@ void NekoEditor::Update(float dt)
     spineManager_.Update(entityManager_, dt);
     spineManager_.CopyAllTransforms(entityManager_, transformManager_);
     spineManager_.PushAllCommands(entityManager_, graphicsManager_);
-
+    colliderDefManager_.PushAllCommands(graphicsManager_);
     graphicsManager_.Render(&sceneRenderTexture_);
     sceneRenderTexture_.display();
 
@@ -239,9 +263,15 @@ NekoEditor::NekoEditor()
         entityViewer_(*this),
         inspector_(*this),
         spriteManager_(textureManager_),
-        sceneManager_(*this)
+        sceneManager_(*this),
+        colliderDefManager_(*this)
 {
 
+}
+
+ColliderDefManager& NekoEditor::GetColliderDefManager()
+{
+    return colliderDefManager_;
 }
 
 }

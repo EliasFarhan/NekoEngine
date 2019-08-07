@@ -47,9 +47,12 @@ enum class NekoComponentType : ComponentType
     SPRITE2D = 1 << 7,
     SPINE_ANIMATION = 1 << 8,
     BODY2D = 1 << 9,
-    COLLIDER2D = 1 << 10,
-    CONVEX_SHAPE2D = 1 << 11,
-    EMPTY = 1 << 12,
+    BOXCOLLIDER2D = 1 << 10,
+    CIRCLECOLLIDER2D = 1 << 11,
+    POLYGONCOLLIDER2D = 1 << 12,
+    CONVEX_SHAPE2D = 1 << 13,
+    EMPTY = 1 << 14,
+
 };
 
 const std::set<NekoComponentType>& GetComponentTypeSet();

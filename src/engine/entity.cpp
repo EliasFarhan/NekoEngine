@@ -83,7 +83,7 @@ void EntityManager::DestroyEntity(Entity entity)
     entityMaskArray_[entity] = INVALID_ENTITY_MASK;
 }
 
-bool EntityManager::HasComponent(Entity entity, EntityMask componentType)
+bool EntityManager::HasComponent(Entity entity, EntityMask componentType) const
 {
 	if (entity >= entityMaskArray_.size())
 		return false;

@@ -56,7 +56,7 @@ public:
 
 	void DestroyEntity(Entity entity);
 
-	bool HasComponent(Entity entity, EntityMask componentType);
+	bool HasComponent(Entity entity, EntityMask componentType) const;
 
 	bool EntityExists(Entity entity);
 

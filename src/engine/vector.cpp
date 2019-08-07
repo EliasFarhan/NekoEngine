@@ -45,7 +45,7 @@ Vec2f::Vec2f()
 
 }
 
-float Vec2f::GetMagnitude()
+float Vec2f::GetMagnitude() const
 {
     return sqrtf(x * x + y * y);
 }

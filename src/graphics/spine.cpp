@@ -215,13 +215,29 @@ SpineDrawableInfo& SpineManager::GetInfo(Entity entity)
 
 void SpineManager::CopyAllTransforms(EntityManager& entityManager, Transform2dManager& transformManager)
 {
-
+    const auto entityMask = EntityMask(NekoComponentType::TRANSFORM2D) | EntityMask(NekoComponentType::SPINE_ANIMATION);
+    for(Entity entity = 0; entity < entityManager.GetEntitiesSize(); entity++)
+    {
+        if(entityManager.HasComponent(entity, entityMask))
+        {
+            const auto transform = transformManager.CalculateTransform(entity);
+            components_[entity].transform = transform;
+        }
+    }
 }
 
 void SpineManager::DestroyComponent(EntityManager& entityManager, Entity entity)
 {
     ComponentManager::DestroyComponent(entityManager, entity);
     components_[entity] = BasicSpineDrawable();
+}
+
+void SpineManager::CopyLayer(int layer, size_t start, size_t length)
+{
+    for (auto i = start; i < start + length; i++)
+    {
+        components_[i].layer = layer;
+    }
 }
 
 }

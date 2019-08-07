@@ -40,7 +40,7 @@ class Vec2f
 #ifdef SFML_VECTOR2_HPP
   Vec2f( const sf::Vector2f& v);//copy construct
 #endif
-  float GetMagnitude();
+  float GetMagnitude() const;
   Vec2f Normalized();
   Vec2f Rotate(float angle) const;
   static Vec2f Lerp(const Vec2f& v1, const Vec2f& v2, float t);
@@ -57,9 +57,9 @@ class Vec2f
   Vec2f& operator-=(const Vec2f& rhs);
   Vec2f operator*(float rhs) const;
   Vec2f operator/(float rhs) const;
-
+#ifdef SFML_VECTOR2_HPP
   operator sf::Vector2f() const;
-
+#endif
 
 };
 

@@ -17,8 +17,11 @@
                     ]
                 },
                 {
-                    "component": 128,
-                    "layer": -1,
+                    "angle": 0.0,
+                    "component": 8
+                },
+                {
+                    "layer": -5,
                     "origin": [
                         0.0,
                         0.0
@@ -27,15 +30,16 @@
                 }
             ],
             "entity": 0,
-            "name": "Background"
+            "name": "Background",
+            "parent": -1
         },
         {
             "components": [
                 {
                     "component": 2,
                     "position": [
-                        200.0,
-                        200.0
+                        3.0,
+                        3.0
                     ]
                 },
                 {
@@ -46,17 +50,21 @@
                     ]
                 },
                 {
-                    "component": 128,
-                    "layer": 0,
+                    "angle": 0.0,
+                    "component": 8
+                },
+                {
+                    "layer": 1,
                     "origin": [
-                        0.0,
-                        0.0
+                        0.5,
+                        0.5
                     ],
                     "texture": "data/sprites/hero/jump/hero1.png"
                 }
             ],
             "entity": 1,
-            "name": "Player"
+            "name": "Player",
+            "parent": -1
         },
         {
             "components": [
@@ -75,7 +83,10 @@
                     ]
                 },
                 {
-                    "component": 128,
+                    "angle": 0.0,
+                    "component": 8
+                },
+                {
                     "layer": 0,
                     "origin": [
                         0.0,
@@ -85,7 +96,8 @@
                 }
             ],
             "entity": 2,
-            "name": "Platform 1"
+            "name": "Platform 1",
+            "parent": -1
         },
         {
             "components": [
@@ -104,7 +116,10 @@
                     ]
                 },
                 {
-                    "component": 128,
+                    "angle": 0.0,
+                    "component": 8
+                },
+                {
                     "layer": 0,
                     "origin": [
                         0.0,
@@ -114,7 +129,8 @@
                 }
             ],
             "entity": 3,
-            "name": "Platform 2"
+            "name": "Platform 2",
+            "parent": -1
         },
         {
             "components": [
@@ -133,7 +149,10 @@
                     ]
                 },
                 {
-                    "component": 128,
+                    "angle": 0.0,
+                    "component": 8
+                },
+                {
                     "layer": 0,
                     "origin": [
                         0.0,
@@ -143,7 +162,14 @@
                 }
             ],
             "entity": 4,
-            "name": "Platform 3"
+            "name": "Platform 3",
+            "parent": -1
+        },
+        {
+            "components": [],
+            "entity": 5,
+            "name": "Foot",
+            "parent": -1
         }
     ]
 }
