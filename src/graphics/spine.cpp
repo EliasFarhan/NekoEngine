@@ -37,6 +37,21 @@ sf::Vector2f BasicSpineDrawable::GetPosition()
     return sf::Vector2f(skeletonDrawable->skeleton->x,skeletonDrawable->skeleton->y);
 }
 
+void BasicSpineDrawable::SetSkinByName(std::string_view skinName)
+{
+    if(skeletonDrawable == nullptr)
+        return;
+    Skeleton_setSkinByName(skeletonDrawable->skeleton, skinName.data());
+    Skeleton_setSlotsToSetupPose(skeletonDrawable->skeleton);
+}
+
+void BasicSpineDrawable::SetAnimationByName(std::string_view animName)
+{
+    if(skeletonDrawable == nullptr)
+        return;
+    AnimationState_setAnimationByName(skeletonDrawable->state, 0, animName.data(), 1);
+}
+
 
 SkeletonData* readSkeletonJsonData(const char* filename, Atlas* atlas, float scale)
 {

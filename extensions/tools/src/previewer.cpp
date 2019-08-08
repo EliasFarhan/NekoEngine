@@ -32,18 +32,64 @@ namespace editor
 
 void Previewer::Update(float dt)
 {
-	if (previewTexture_.getSize() == sf::Vector2u(0, 0))
-	{
-		const auto imWindowSize = ImGui::GetContentRegionAvail();
-		previewTexture_.create(unsigned(imWindowSize.x), unsigned(imWindowSize.y));
-	}
+
+
 	switch (status_)
 	{
 	case PreviewStatus::SpineAnimation:
 	{
+	    if(spineDrawable_.skeletonData != nullptr)
+        {
+	        auto animations = spineDrawable_.skeletonData->animations;
+            static const char* currentAnim = spineDrawable_.skeletonData->animations[0]->name;            // Here our selection is a single pointer stored outside the object.
+            if (ImGui::BeginCombo("Animation", currentAnim)) // The second parameter is the label previewed before opening the combo.
+            {
+                for (int n = 0; n < spineDrawable_.skeletonData->animationsCount; n++)
+                {
+                    bool isSelected = (currentAnim == animations[n]->name);
+                    if (ImGui::Selectable(animations[n]->name, isSelected))
+                    {
+                        currentAnim = animations[n]->name;
+                        if (spineDrawable_.skeletonDrawable != nullptr)
+                        {
+                            spineDrawable_.SetAnimationByName(animations[n]->name);
+                        }
+                    };
+                    if (isSelected)
+                        ImGui::SetItemDefaultFocus();   // Set the initial focus when opening the combo (scrolling + for keyboard navigation support in the upcoming navigation branch)
+                }
+                ImGui::EndCombo();
+            }
+            auto skins = spineDrawable_.skeletonData->skins;
+            static const char* currentSkin = spineDrawable_.skeletonData->skins[0]->name;            // Here our selection is a single pointer stored outside the object.
+            if (ImGui::BeginCombo("Skin", currentSkin)) // The second parameter is the label previewed before opening the combo.
+            {
+                for (int n = 0; n < spineDrawable_.skeletonData->skinsCount; n++)
+                {
+                    bool isSelected = (currentSkin == skins[n]->name);
+                    if (ImGui::Selectable(skins[n]->name, isSelected))
+                    {
+                        currentSkin = skins[n]->name;
+                        if (spineDrawable_.skeletonDrawable != nullptr)
+                        {
+                            spineDrawable_.SetSkinByName(skins[n]->name);
+                        }
+                    };
+                    if (isSelected)
+                        ImGui::SetItemDefaultFocus();   // Set the initial focus when opening the combo (scrolling + for keyboard navigation support in the upcoming navigation branch)
+                }
+                ImGui::EndCombo();
+            }
+        }
+        if (previewTexture_.getSize() == sf::Vector2u(0, 0))
+        {
+            const auto imWindowSize = ImGui::GetContentRegionAvail();
+            previewTexture_.create(unsigned(imWindowSize.x), unsigned(imWindowSize.y));
+        }
 		previewTexture_.clear();
 		if (spineDrawable_.skeletonDrawable != nullptr)
 		{
+		    spineDrawable_.skeletonDrawable->update(dt);
 			spineDrawable_.SetPosition(sf::Vector2f(previewTexture_.getSize()) / 2.0f);
 			previewTexture_.draw(*spineDrawable_.skeletonDrawable);
 			auto view = previewTexture_.getView();

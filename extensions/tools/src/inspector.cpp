@@ -166,8 +166,8 @@ void Inspector::ShowEntityInfo(neko::Entity entity)
 			}
 			ImGui::SameLine();
 			ImGui::Text("Spine");
-            ImGui::LabelText("Atlas", spineDrawableInfo.atlasPath.c_str());
-            ImGui::LabelText("Skeleton", spineDrawableInfo.skeletonDataPath.c_str());
+            ImGui::LabelText("Atlas", "%s", spineDrawableInfo.atlasPath.c_str());
+            ImGui::LabelText("Skeleton", "%s", spineDrawableInfo.skeletonDataPath.c_str());
 
             static std::vector<std::string> spineFileList;
             if (ImGui::BeginPopup("Spine Popup"))

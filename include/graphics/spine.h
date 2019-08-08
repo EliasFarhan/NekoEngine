@@ -49,6 +49,10 @@ struct BasicSpineDrawable : Component
     std::shared_ptr<spine::SkeletonDrawable> skeletonDrawable = nullptr;
     int layer = 0;
     sf::Transform transform{};
+
+    void SetAnimationByName(std::string_view animName);
+    void SetSkinByName(std::string_view skinName);
+
     void SetPosition(const sf::Vector2f& position);
     sf::Vector2f GetPosition();
 };
