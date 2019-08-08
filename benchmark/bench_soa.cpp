@@ -53,7 +53,7 @@ const int toRange = 1 << 22;
 
 float floatRand()
 {
-	return float(rand()) / (float(RAND_MAX) + 1.0);
+	return float(rand()) / (float(RAND_MAX) + 1.0f);
 }
 
 namespace neko

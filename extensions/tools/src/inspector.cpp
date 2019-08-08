@@ -19,7 +19,7 @@ void Inspector::ShowEntityInfo(neko::Entity entity)
     ImGui::InputText("Entity Name: ", &sceneManager.GetCurrentScene().entitiesNames[entity]);
     {
         auto& transformManager = nekoEditor_.GetTransformManager();
-        auto parentEntity = transformManager.GetParentEntity(entity);
+        const auto parentEntity = transformManager.GetParentEntity(entity);
         if (parentEntity != neko::INVALID_ENTITY)
         {
             ImGui::LabelText("Entity Parent", "%u", parentEntity);
@@ -155,36 +155,43 @@ void Inspector::ShowEntityInfo(neko::Entity entity)
         bool keepComponent = true;
         if (ImGui::CollapsingHeader("Spine2d Component", &keepComponent, ImGuiTreeNodeFlags_DefaultOpen))
         {
-            if (ImGui::Button(spineDrawableInfo.atlasPath.c_str()))
-            {
-                ImGui::OpenPopup("Atlas Popup");
+			std::string spineButtonName = spineDrawableInfo.spinePath;
+			if(spineButtonName.empty())
+			{
+				spineButtonName = "None";
+			}
+			if(ImGui::Button(spineButtonName.c_str()))
+			{
+				ImGui::OpenPopup("Spine Popup");
+			}
+			ImGui::SameLine();
+			ImGui::Text("Spine");
+            ImGui::LabelText("Atlas", spineDrawableInfo.atlasPath.c_str());
+            ImGui::LabelText("Skeleton", spineDrawableInfo.skeletonDataPath.c_str());
 
-            }
-            ImGui::SameLine();
-            ImGui::Text("Atlas");
-
-            static std::vector<std::string> atlasList;
-            if (ImGui::BeginPopup("Atlas Popup"))
+            static std::vector<std::string> spineFileList;
+            if (ImGui::BeginPopup("Spine Popup"))
             {
-                if (atlasList.empty())
+                if (spineFileList.empty())
                 {
                     neko::IterateDirectory(nekoEditor_.config.dataRootPath, [this](const std::string_view filename)
                     {
-                        if (filename.find(".atlas.txt") != std::string_view::npos)
+                        if (filename.find(".spine") != std::string_view::npos)
                         {
-                            atlasList.push_back(filename.data());
+                            spineFileList.push_back(filename.data());
                         }
                     }, true);
                 }
-                if (ImGui::Selectable("No Atlas"))
+                ImGui::Selectable("No Spine File");
+                    
+                for (auto& spineFilename : spineFileList)
                 {
-                    spineDrawableInfo.atlasPath = "";
-                }
-                for (auto& atlasFilename : atlasList)
-                {
-                    if (ImGui::Selectable(atlasFilename.c_str()))
+                    if (ImGui::Selectable(spineFilename.c_str()))
                     {
-                        spineDrawableInfo.atlasPath = atlasFilename;
+						auto spineJsonObj = neko::LoadJson(spineFilename);
+						auto& spineJson = *spineJsonObj;
+                        spineDrawableInfo.atlasPath = spineJson["atlas"];
+						spineDrawableInfo.skeletonDataPath = spineJson["skeleton"];
                     }
 
                 }
@@ -192,47 +199,10 @@ void Inspector::ShowEntityInfo(neko::Entity entity)
             }
             else
             {
-                atlasList.clear();
+                spineFileList.clear();
             }
 
-            if (ImGui::Button(spineDrawableInfo.skeletonDataPath.c_str()))
-            {
-                ImGui::OpenPopup("Skeleton Data Popup");
-            }
-            ImGui::SameLine();
-            ImGui::Text("SkeletonData");
 
-            static std::vector<std::string> skeletonDataList;
-            if (ImGui::BeginPopup("Skeleton Data Popup"))
-            {
-                if (skeletonDataList.empty())
-                {
-                    neko::IterateDirectory(nekoEditor_.config.dataRootPath, [this](const std::string_view filename)
-                    {
-                        if (filename.find(".json") != std::string_view::npos)
-                        {
-                            skeletonDataList.push_back(filename.data());
-                        }
-                    }, true);
-                }
-                if (ImGui::Selectable("No Skeleton Data"))
-                {
-                    spineDrawableInfo.skeletonDataPath = "";
-                }
-                for (auto& skeletonDataFilename : skeletonDataList)
-                {
-                    if (ImGui::Selectable(skeletonDataFilename.c_str()))
-                    {
-                        spineDrawableInfo.skeletonDataPath = skeletonDataFilename;
-                    }
-                }
-
-                ImGui::EndPopup();
-            }
-            else
-            {
-                skeletonDataList.clear();
-            }
             ImGui::PushID("Load Spine Component");
             if (ImGui::Button("Load..."))
             {

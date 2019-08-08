@@ -110,8 +110,8 @@ Vec2f Vec2f::Lerp(const Vec2f& v1, const Vec2f& v2, float t)
 
 float Vec2f::AngleBetween(const Vec2f& v1, const Vec2f& v2)
 {
-    float dot = Vec2f::Dot(v1, v2);
-    float angle = acosf(dot) / M_PI * 180.0f;
+	const float dot = Dot(v1, v2);
+    const float angle = acosf(dot) / float(M_PI) * 180.0f;
     return (dot < 0.0f ? -1.0f : 1.0f) * angle;
 }
 

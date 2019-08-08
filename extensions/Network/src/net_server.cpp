@@ -131,7 +131,7 @@ void Server::Update()
         while(!client.receivedCommands.empty())
         {
             auto packet = client.receivedCommands.front();
-            ParseCommand(packet, i);
+            ParseCommand(packet, Index(i));
             client.receivedCommands.pop();
         }
     }

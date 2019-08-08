@@ -43,7 +43,7 @@ void NekoEditor::Init()
 void NekoEditor::Update(float dt)
 {
     BasicEngine::Update(dt);
-    const ImVec2 windowSize = ImVec2(config.realWindowSize.x, config.realWindowSize.y);
+    const ImVec2 windowSize = ImVec2(float(config.realWindowSize.x), float(config.realWindowSize.y));
     const static float yOffset = 20.0f;
     ImGui::SetNextWindowPos(ImVec2(0.0f, windowSize.y * 0.7f), ImGuiCond_Always);
     ImGui::SetNextWindowSize(ImVec2(windowSize.x * 0.8f, windowSize.y * 0.3f), ImGuiCond_Always);

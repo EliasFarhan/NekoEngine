@@ -15,8 +15,8 @@ def validate_with_atlas(file: str):
         sys.stderr.write("Skeleton does not exist: "+skeleton_json_file+"\n")
         return 1
     spine_json = {
-        "atlas": filename,
-        "skeleton": skeleton_json_file
+        "atlas": data_binary_dir+"/"+filename,
+        "skeleton": data_binary_dir+"/"+skeleton_json_file
     }
 
     spine_json_txt = json.dumps(spine_json, indent=4)

@@ -35,7 +35,7 @@ void Previewer::Update(float dt)
     if(previewTexture_.getSize() == sf::Vector2u(0,0))
     {
         const auto imWindowSize = ImGui::GetWindowSize();
-        previewTexture_.create(imWindowSize.x, imWindowSize.y);
+        previewTexture_.create(unsigned(imWindowSize.x), unsigned(imWindowSize.y));
     }
     switch (status_)
     {

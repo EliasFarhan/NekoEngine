@@ -30,7 +30,7 @@
 
 namespace neko
 {
-class BasicSpineDrawable;
+struct BasicSpineDrawable;
 }
 namespace editor
 {

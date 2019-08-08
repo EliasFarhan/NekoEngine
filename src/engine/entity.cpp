@@ -53,13 +53,13 @@ Entity EntityManager::CreateEntity(Entity entity)
         {
             const auto newEntity = entityMaskArray_.size();
             ResizeIfNecessary(entityMaskArray_, newEntity, INVALID_ENTITY_MASK);
-            AddComponentType(newEntity, EntityMask(NekoComponentType::EMPTY));
+            AddComponentType(Entity(newEntity), EntityMask(NekoComponentType::EMPTY));
             return Entity(newEntity);
         }
         else
         {
             const auto newEntity = entityMaskIt - entityMaskArray_.begin();
-            AddComponentType(newEntity, EntityMask(NekoComponentType::EMPTY));
+            AddComponentType(Entity(newEntity), EntityMask(NekoComponentType::EMPTY));
             return Entity(newEntity);
         }
     }

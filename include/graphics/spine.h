@@ -54,6 +54,7 @@ struct BasicSpineDrawable : Component
 };
 struct SpineDrawableInfo
 {
+	std::string spinePath = "";
     std::string atlasPath = "";
     std::string skeletonDataPath = "";
 };

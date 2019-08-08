@@ -133,6 +133,7 @@ file(GLOB_RECURSE Neko_UTILITY_SRC src/utilities/*.cpp include/utilities/*.h)
 file(GLOB_RECURSE Neko_PHYSICS_SRC src/physics/*.cpp include/physics/*.h)
 file(GLOB_RECURSE Neko_SOUND_SRC src/sound/*.cpp include/sound/*.h)
 file(GLOB_RECURSE Neko_EXTENSIONS_SRC extensions/src/*.cpp extensions/include/*.h)
+file(GLOB_RECURSE SCRIPT_FILES scripts/*.py)
 
 include_directories(include ${CMAKE_SOURCE_DIR}/include)
 set_property(GLOBAL PROPERTY USE_FOLDERS On)
@@ -147,6 +148,7 @@ source_group("Sound"				FILES ${Neko_SOUND_SRC})
 source_group("Data\\Text"           FILES ${TEXT_FILES})
 source_group("Data\\Img"            FILES ${IMG_FILES})
 source_group("Data\\Snd"			FILES ${SND_FILES})
+source_group("Scripts"			FILES ${SCRIPT_FILES})
 
 List(APPEND Neko_SRC 
 	${Neko_ENGINE_SRC} 
@@ -156,7 +158,8 @@ List(APPEND Neko_SRC
 	${Neko_SOUND_SRC}
 	${TEXT_FILES} 
 	${IMG_FILES}
-	${SND_FILES})
+	${SND_FILES}
+	${SCRIPT_FILES})
 
 if(MSVC)
     add_compile_options(
@@ -260,8 +263,6 @@ foreach(EXTENSION_FOLDER ${EXTENSIONS_FOLDERS})
 	if(IS_DIRECTORY ${EXTENSION_FOLDER})
 		get_filename_component(EXTENSION_DIR ${EXTENSION_FOLDER} NAME)
 		file(GLOB_RECURSE  EXTENSION_FILES ${EXTENSION_FOLDER}/*.h ${EXTENSION_FOLDER}/*.cpp)
-		source_group("Extensions\\${EXTENSION_DIR}"            FILES ${EXTENSION_FILES})
-	
 		include_directories("${EXTENSION_FOLDER}/include/")
 		add_library(${EXTENSION_DIR} STATIC ${EXTENSION_FILES})
 		LIST(APPEND EXTENSIONS_LIBS ${EXTENSION_DIR})
