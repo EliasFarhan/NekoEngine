@@ -109,7 +109,7 @@ public:
         shapeManager_.AddComponent(entityManager_, playerData.playerEntity);
         shapeManager_.AddBox(playerData.playerEntity, playerPos,
                              neko::meter2pixel(b2Vec2(physicsSize.x / 2.0f, physicsSize.y / 2.0f)), shapeDef);
-        mainPlayerCollider.shapeIndex = playerData.playerEntity;
+
 #endif
         fixtureDef[0].shape = &playerBox[0];
         fixtureDef[0].friction = 0.0f;
@@ -181,7 +181,7 @@ public:
             shapeManager_.AddComponent(entityManager_, platformEntity);
             shapeManager_.AddBox(platformEntity, platformPositions[i], neko::meter2pixel(
                     b2Vec2(platformPhysicsSize.x / 2.0f, platformPhysicsSize.y / 2.0f)), platformShapeDef);
-            platformCollider.shapeIndex = platformEntity;
+
 #endif
             physicsManager_.AddCollider(platformCollider);
             auto* body = physicsManager_.CreateBody(platformBodyDef, &platformFixtureDef, 1);
