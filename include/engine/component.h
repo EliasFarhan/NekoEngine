@@ -37,21 +37,23 @@ namespace neko
 
 enum class NekoComponentType : ComponentType
 {
-    POSITION2D = 1 << 1,
-    SCALE2D = 1 << 2,
-    ROTATION2D = 1 << 3,
+    EMPTY = 1u << 0u,
+    POSITION2D = 1u << 1u,
+    SCALE2D = 1u << 2u,
+    ROTATION2D = 1u << 3u,
     TRANSFORM2D = ROTATION2D|SCALE2D|POSITION2D,
-    POSITION3D = 1 << 4,
-    SCALE3D = 1 << 5,
-    ANGLE3D = 1 << 6,
-    SPRITE2D = 1 << 7,
-    SPINE_ANIMATION = 1 << 8,
-    BODY2D = 1 << 9,
-    BOXCOLLIDER2D = 1 << 10,
-    CIRCLECOLLIDER2D = 1 << 11,
-    POLYGONCOLLIDER2D = 1 << 12,
-    CONVEX_SHAPE2D = 1 << 13,
-    EMPTY = 1 << 14,
+    POSITION3D = 1u << 4u,
+    SCALE3D = 1u << 5u,
+    ANGLE3D = 1u << 6u,
+    SPRITE2D = 1u << 7u,
+    SPINE_ANIMATION = 1u << 8u,
+    BODY2D = 1u << 9u,
+    BOX_COLLIDER2D = 1u << 10u,
+    CIRCLE_COLLIDER2D = 1u << 11u,
+    POLYGON_COLLIDER2D = 1u << 12u,
+    CONVEX_SHAPE2D = 1u << 13u,
+    SPINE_FOLLOW_BONE = 1u << 14u,
+
 
 };
 

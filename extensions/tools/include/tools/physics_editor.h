@@ -40,12 +40,12 @@ struct PolygonCollider : Collider<b2PolygonShape, sf::ConvexShape>
 };
 
 class BoxColliderDefManager : public neko::ComponentManager
-        <BoxCollider, neko::ComponentType(neko::NekoComponentType::BOXCOLLIDER2D)>
+        <BoxCollider, neko::ComponentType(neko::NekoComponentType::BOX_COLLIDER2D)>
 {
 
 };
 class CircleColliderDefManager : public neko::ComponentManager
-        <CircleCollider, neko::ComponentType(neko::NekoComponentType::CIRCLECOLLIDER2D)>
+        <CircleCollider, neko::ComponentType(neko::NekoComponentType::CIRCLE_COLLIDER2D)>
 {
 public:
     neko::Index AddComponent(neko::EntityManager& entityManager, neko::Entity entity) override;
@@ -53,7 +53,7 @@ public:
 };
 
 class PolygonColldierDefManager : public neko::ComponentManager
-        <PolygonCollider, neko::ComponentType(neko::NekoComponentType::POLYGONCOLLIDER2D)>
+        <PolygonCollider, neko::ComponentType(neko::NekoComponentType::POLYGON_COLLIDER2D)>
 {
 
 };

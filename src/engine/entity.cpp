@@ -131,4 +131,16 @@ bool EntityManager::EntityExists(Entity entity)
     return entityMaskArray_[entity] != INVALID_ENTITY_MASK;
 }
 
+Entity EntityManager::GetLastEntity()
+{
+    const auto it = std::find_if(
+            entityMaskArray_.rbegin(),
+            entityMaskArray_.rend(),
+                    [](EntityMask entityMask){
+       return entityMask != INVALID_ENTITY_MASK;
+    });
+
+    return Entity(it-entityMaskArray_.rend());
+}
+
 }

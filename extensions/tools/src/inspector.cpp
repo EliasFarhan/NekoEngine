@@ -275,7 +275,7 @@ void Inspector::ShowEntityInfo(neko::Entity entity)
             bodyDefManager.DestroyComponent(entityManager, entity);
         }
     }
-    if(entityManager.HasComponent(entity, neko::EntityMask(neko::NekoComponentType::BOXCOLLIDER2D)))
+    if(entityManager.HasComponent(entity, neko::EntityMask(neko::NekoComponentType::BOX_COLLIDER2D)))
     {
         auto& boxColliderDefManager = nekoEditor_.GetColliderDefManager().GetBoxColliderDefManager();
         bool keepComponent = true;
@@ -299,7 +299,7 @@ void Inspector::ShowEntityInfo(neko::Entity entity)
 
         }
     }
-    if(entityManager.HasComponent(entity, neko::EntityMask(neko::NekoComponentType::CIRCLECOLLIDER2D)))
+    if(entityManager.HasComponent(entity, neko::EntityMask(neko::NekoComponentType::CIRCLE_COLLIDER2D)))
     {
         auto& circleColliderDefManager = nekoEditor_.GetColliderDefManager().GetCircleColliderDefManager();
         bool keepComponent = true;
@@ -319,7 +319,7 @@ void Inspector::ShowEntityInfo(neko::Entity entity)
             }
         }
     }
-    if(entityManager.HasComponent(entity, neko::EntityMask(neko::NekoComponentType::POLYGONCOLLIDER2D)))
+    if(entityManager.HasComponent(entity, neko::EntityMask(neko::NekoComponentType::POLYGON_COLLIDER2D)))
     {
         auto& polygonColliderDefManager = nekoEditor_.GetColliderDefManager().GetPolygonColliderDefManager();
         bool keepComponent = true;
@@ -336,14 +336,14 @@ void Inspector::ShowEntityInfo(neko::Entity entity)
             {
                     {neko::NekoComponentType::TRANSFORM2D,       "Transform 2D"},
                     {neko::NekoComponentType::POSITION2D,        "Position 2D"},
-                    {neko::NekoComponentType::SCALE2D,           "Scale 2D"},
-                    {neko::NekoComponentType::ROTATION2D,        "Angle 2D"},
-                    {neko::NekoComponentType::SPRITE2D,          "Sprite 2D"},
-                    {neko::NekoComponentType::BODY2D,            "Body 2D"},
-                    {neko::NekoComponentType::BOXCOLLIDER2D,     "Box Collider 2D"},
-                    {neko::NekoComponentType::CIRCLECOLLIDER2D,  "Circle Collider 2D"},
-                    {neko::NekoComponentType::POLYGONCOLLIDER2D, "Polygon Collider 2D"},
-                    {neko::NekoComponentType::SPINE_ANIMATION,   "Spine Animation 2D"},
+                    {neko::NekoComponentType::SCALE2D,            "Scale 2D"},
+                    {neko::NekoComponentType::ROTATION2D,         "Angle 2D"},
+                    {neko::NekoComponentType::SPRITE2D,           "Sprite 2D"},
+                    {neko::NekoComponentType::BODY2D,             "Body 2D"},
+                    {neko::NekoComponentType::BOX_COLLIDER2D,     "Box Collider 2D"},
+                    {neko::NekoComponentType::CIRCLE_COLLIDER2D,  "Circle Collider 2D"},
+                    {neko::NekoComponentType::POLYGON_COLLIDER2D, "Polygon Collider 2D"},
+                    {neko::NekoComponentType::SPINE_ANIMATION,    "Spine Animation 2D"},
             };
 
     ImGui::SameLine();
@@ -411,21 +411,21 @@ void Inspector::ShowEntityInfo(neko::Entity entity)
                         }
                         break;
                     }
-                    case neko::NekoComponentType::BOXCOLLIDER2D:
+                    case neko::NekoComponentType::BOX_COLLIDER2D:
                     {
                         auto& colliderDefManager = nekoEditor_.GetColliderDefManager();
                         auto& boxColliderDefManager = colliderDefManager.GetBoxColliderDefManager();
                         boxColliderDefManager.AddComponent(entityManager, entity);
                         break;
                     }
-                    case neko::NekoComponentType::CIRCLECOLLIDER2D:
+                    case neko::NekoComponentType::CIRCLE_COLLIDER2D:
                     {
                         auto& colliderDefManager = nekoEditor_.GetColliderDefManager();
                         auto& circleColliderDefManager = colliderDefManager.GetCircleColliderDefManager();
                         circleColliderDefManager.AddComponent(entityManager, entity);
                         break;
                     }
-                    case neko::NekoComponentType::POLYGONCOLLIDER2D:
+                    case neko::NekoComponentType::POLYGON_COLLIDER2D:
                     {
                         auto& colliderDefManager = nekoEditor_.GetColliderDefManager();
                         auto& polygonColliderDefManager = colliderDefManager.GetPolygonColliderDefManager();

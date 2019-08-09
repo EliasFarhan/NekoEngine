@@ -69,11 +69,7 @@ void NekoEditor::Update(float dt)
         {
             if (ImGui::MenuItem("New", "CTRL+N"))
             {
-                for (neko::Entity entity = 0; entity < entityManager_.GetEntitiesSize(); entity++)
-                {
-                    entityManager_.DestroyEntity(entity);
-                    entityViewer_.Reset();
-                }
+                sceneManager_.ClearScene();
             }
             if (ImGui::MenuItem("Open", "CTRL+O"))
             {
@@ -95,10 +91,7 @@ void NekoEditor::Update(float dt)
                 }
                 else
                 {
-                    auto sceneJson = sceneManager_.SerializeScene();
-                    sceneJson["scenePath"] = path;
-                    auto sceneTxt = sceneJson.dump(4);
-                    neko::WriteStringToFile(path, sceneTxt);
+                    sceneManager_.SaveScene(path);
                 }
             }
             ImGui::EndMenu();
@@ -129,12 +122,7 @@ void NekoEditor::Update(float dt)
             case FileOperation::SAVE:
             {
                 auto sceneJsonPath = fileDialog.GetSelected().string();
-                auto sceneJson = sceneManager_.SerializeScene();
-                sceneJson["scenePath"] = sceneJsonPath;
-                auto sceneTxt = sceneJson.dump(4);
-                neko::WriteStringToFile(sceneJsonPath, sceneTxt);
-                sceneManager_.GetCurrentScene().scenePath = sceneJsonPath;
-                sceneManager_.GetCurrentScene().sceneName = neko::GetFilename(sceneJsonPath);
+               sceneManager_.SaveScene(sceneJsonPath);
                 logDebug("Saved scene file: " + sceneJsonPath);
                 break;
             }
@@ -160,14 +148,15 @@ void NekoEditor::Update(float dt)
     sceneRenderTexture_.clear(config.bgColor);
 
     spriteManager_.CopyAllTransforms(entityManager_, transformManager_);
-
     spriteManager_.PushAllCommands(entityManager_, graphicsManager_);
 
     spineManager_.Update(entityManager_, dt);
     spineManager_.CopyAllTransforms(entityManager_, transformManager_);
     spineManager_.PushAllCommands(entityManager_, graphicsManager_);
+
     colliderDefManager_.PushAllCommands(graphicsManager_);
     graphicsManager_.Render(&sceneRenderTexture_);
+
     sceneRenderTexture_.display();
 
     ImGui::SetNextWindowPos(ImVec2(0.0f, yOffset), ImGuiCond_Always);
@@ -180,11 +169,33 @@ void NekoEditor::Update(float dt)
                  ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
     if (ImGui::BeginTabBar("Central Tab"))
     {
-
-        sceneViewer_.Update(sceneRenderTexture_);
-
-        //TODO add animator and other things in the central viewer
-
+        if (ImGui::BeginTabItem("Scene Viewer"))
+        {
+            sceneViewer_.Update(sceneRenderTexture_);
+            ImGui::EndTabItem();
+        }
+        if(ImGui::IsItemClicked(0))
+        {
+            logDebug("Clicked on Scene Viewer");
+        }
+        if (ImGui::BeginTabItem("Prefab Viewer"))
+        {
+            prefabViewer_.Update(dt);
+            ImGui::EndTabItem();
+        }
+        if(ImGui::IsItemClicked(0))
+        {
+            logDebug("Clicked on Prefab Viewer");
+            auto& path = sceneManager_.GetCurrentScene().scenePath;
+            if(!path.empty())
+            {
+                sceneManager_.SaveScene(path);
+            }
+            else
+            {
+                sceneManager_.SaveScene(".tmp.scene");
+            }
+        }
         ImGui::EndTabBar();
     }
 
@@ -260,11 +271,11 @@ neko::Transform2dManager& NekoEditor::GetTransformManager()
 
 NekoEditor::NekoEditor()
         : BasicEngine(),
-        entityViewer_(*this),
-        inspector_(*this),
-        spriteManager_(textureManager_),
-        sceneManager_(*this),
-        colliderDefManager_(*this)
+          entityViewer_(*this),
+          inspector_(*this),
+          spriteManager_(textureManager_),
+          sceneManager_(*this),
+          colliderDefManager_(*this)
 {
 
 }

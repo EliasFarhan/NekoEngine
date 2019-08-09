@@ -30,7 +30,7 @@
 #include <ctpl_stl.h>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <Box2D/Common/b2Math.h>
-#include "input.h"
+#include "engine/input.h"
 #include <SFML/Window/WindowStyle.hpp>
 
 
@@ -102,6 +102,5 @@ protected:
     KeyboardManager keyboardManager_;
     MouseManager mouseManager_;
 };
-
 
 }

@@ -16,9 +16,9 @@ ColliderDefManager::ColliderDefManager(NekoEditor& nekoEditor) : nekoEditor_(nek
 
 void ColliderDefManager::PushAllCommands(neko::GraphicsManager& graphicsManager)
 {
-    const auto boxEntityMask = neko::EntityMask(neko::NekoComponentType::BOXCOLLIDER2D);
-    const auto circleEntityMask = neko::EntityMask(neko::NekoComponentType::CIRCLECOLLIDER2D);
-    const auto polygonEntityMask = neko::EntityMask(neko::NekoComponentType::POLYGONCOLLIDER2D);
+    const auto boxEntityMask = neko::EntityMask(neko::NekoComponentType::BOX_COLLIDER2D);
+    const auto circleEntityMask = neko::EntityMask(neko::NekoComponentType::CIRCLE_COLLIDER2D);
+    const auto polygonEntityMask = neko::EntityMask(neko::NekoComponentType::POLYGON_COLLIDER2D);
     const auto& entityManager = nekoEditor_.GetEntityManager();
     auto& transformManager = nekoEditor_.GetTransformManager();
     for(neko::Entity entity = 0; entity < entityManager.GetEntitiesSize();entity++)

@@ -13,7 +13,7 @@ namespace neko
             NekoComponentType::SPRITE2D,
             NekoComponentType::SPINE_ANIMATION,
             NekoComponentType::BODY2D,
-            NekoComponentType::BOXCOLLIDER2D,
+            NekoComponentType::BOX_COLLIDER2D,
             NekoComponentType::CONVEX_SHAPE2D
     };
     const std::set<NekoComponentType>& GetComponentTypeSet()

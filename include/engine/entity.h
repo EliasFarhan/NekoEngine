@@ -40,8 +40,6 @@ using EntityMask = std::uint32_t;
 const Entity INVALID_ENTITY = std::numeric_limits<Index>::max();
 const EntityMask INVALID_ENTITY_MASK = 0u;
 
-
-
 /**
  * \brief Used in an Entity-Component-System to store all entities and what components they have
  */
@@ -53,6 +51,8 @@ public:
 	EntityMask GetMask(Entity entity);
 
 	Entity CreateEntity(Entity entity = INVALID_ENTITY);
+
+	Entity GetLastEntity();
 
 	void DestroyEntity(Entity entity);
 

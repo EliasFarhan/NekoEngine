@@ -33,6 +33,7 @@
 #include "log_viewer.h"
 #include "previewer.h"
 #include "physics_editor.h"
+#include "prefab_viewer.h"
 
 #include <imgui.h>
 #include <imfilebrowser.h>
@@ -78,6 +79,7 @@ private:
     neko::GraphicsManager graphicsManager_;
     sf::RenderTexture sceneRenderTexture_;
     SceneViewer sceneViewer_;
+    PrefabViewer prefabViewer_;
 
     EditorSceneManager sceneManager_;
 

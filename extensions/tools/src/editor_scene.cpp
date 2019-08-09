@@ -25,6 +25,7 @@
 #include <tools/editor_scene.h>
 #include <engine/log.h>
 #include <tools/neko_editor.h>
+#include <utilities/file_utility.h>
 
 
 namespace editor
@@ -81,7 +82,7 @@ void EditorSceneManager::ParseComponentJson(json& componentJson, neko::Entity en
             bodyDefManager.ParseComponentJson(componentJson, entity);
             break;
         }
-        case neko::NekoComponentType::BOXCOLLIDER2D:
+        case neko::NekoComponentType::BOX_COLLIDER2D:
             break;
         case neko::NekoComponentType::CONVEX_SHAPE2D:
             break;
@@ -135,7 +136,6 @@ void EditorSceneManager::ParseEntityJson(json& entityJson)
 json EditorSceneManager::SerializeComponent(neko::Entity entity, neko::NekoComponentType componentType)
 {
     json componentJson;
-    componentJson["component"] = int(componentType);
     switch (componentType)
     {
 
@@ -173,13 +173,15 @@ json EditorSceneManager::SerializeComponent(neko::Entity entity, neko::NekoCompo
         }
         case neko::NekoComponentType::BODY2D:
             break;
-        case neko::NekoComponentType::BOXCOLLIDER2D:
+        case neko::NekoComponentType::BOX_COLLIDER2D:
             break;
         case neko::NekoComponentType::CONVEX_SHAPE2D:
             break;
         default:
             break;
     }
+
+    componentJson["component"] = int(componentType);
     return componentJson;
 }
 
@@ -199,7 +201,7 @@ json EditorSceneManager::SerializeEntity(neko::Entity entity)
     {
         auto& transformManager = nekoEditor_.GetTransformManager();
         auto parentEntity = transformManager.GetParentEntity(entity);
-        if (parentEntity == neko::INVALID_ENTITY)
+        if (parentEntity != neko::INVALID_ENTITY)
         {
             entityJson["parent"] = int(parentEntity);
         }
@@ -235,6 +237,36 @@ json EditorSceneManager::SerializeScene()
         }
     }
     return sceneJson;
+}
+
+void EditorSceneManager::SaveScene(std::string_view path)
+{
+    auto sceneJson = SerializeScene();
+    sceneJson["scenePath"] = path;
+    auto sceneTxt = sceneJson.dump(4);
+    neko::WriteStringToFile(path.data(), sceneTxt);
+    currentScene_.scenePath = path;
+    currentScene_.sceneName = neko::GetFilename(path);
+}
+
+void EditorSceneManager::LoadScene(std::string_view path)
+{
+    auto sceneJsonPtr = neko::LoadJson(path.data());
+    if(sceneJsonPtr == nullptr)
+        return;
+    auto sceneJson = *sceneJsonPtr;
+    ParseSceneJson(sceneJson);
+}
+
+void EditorSceneManager::ClearScene()
+{
+    auto& entityManager = nekoEditor_.GetEntityManager();
+    auto& transformManager = nekoEditor_.GetTransformManager();
+    for (neko::Entity entity = 0; entity < entityManager.GetEntitiesSize(); entity++)
+    {
+        transformManager.SetTransformParent(entity, neko::INVALID_ENTITY);
+        entityManager.DestroyEntity(entity);
+    }
 }
 
 }

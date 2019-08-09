@@ -56,11 +56,23 @@ struct BasicSpineDrawable : Component
     void SetPosition(const sf::Vector2f& position);
     sf::Vector2f GetPosition();
 };
+
+struct SpineBoneFollower
+{
+    Entity followingEntity = INVALID_ENTITY;
+    Bone* followingBone = nullptr;
+};
+
 struct SpineDrawableInfo
 {
 	std::string spinePath = "";
     std::string atlasPath = "";
     std::string skeletonDataPath = "";
+};
+
+class SpineBoneFollowerManager : public ComponentManager<SpineBoneFollower, EntityMask(NekoComponentType::SPINE_FOLLOW_BONE)>
+{
+
 };
 
 class SpineManager : public ComponentManager<BasicSpineDrawable, EntityMask(NekoComponentType::SPINE_ANIMATION)>
@@ -91,6 +103,7 @@ public:
     void DestroyComponent(EntityManager& entityManager, Entity entity) override;
 
 private:
+    SpineBoneFollowerManager spineBoneFollowerManager_;
     std::vector<SpineDrawableInfo> infos_;
 };
 

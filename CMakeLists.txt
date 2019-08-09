@@ -273,7 +273,7 @@ foreach(EXTENSION_FOLDER ${EXTENSIONS_FOLDERS})
 endforeach()
 #Neko TEST
 SET(Neko_TEST_DIR ${CMAKE_SOURCE_DIR}/test)
-file(GLOB TEST_FILES ${Neko_TEST_DIR}/*.cpp )
+file(GLOB TEST_FILES ${Neko_TEST_DIR}/*.cpp)
 add_executable(Neko_TEST ${TEST_FILES})
 
 target_link_libraries(Neko_TEST gtest gtest_main Neko_COMMON ${EXTENSIONS_LIBS})
@@ -316,7 +316,7 @@ endforeach()
 
 include(cmake/neko_executable.cmake)
 #Splash
-add_neko_executable(SplashDebug ${CMAKE_SOURCE_DIR}/main/SplashDebug.cpp Neko_COMMON Network Splash)
+add_neko_executable(SplashDebug ${CMAKE_SOURCE_DIR}/main/SplashDebug.cpp Neko_COMMON Network Splash engine2d)
 #NekoEditor
 add_neko_executable(NekoEditor2d ${CMAKE_SOURCE_DIR}/main/NekoEditor.cpp Neko_COMMON tools)
 if(MSVC)
