@@ -32,11 +32,13 @@
 
 namespace editor
 {
+class NekoEditor;
+enum class EditorMode : std::uint8_t;
 class EntityViewer
 {
 public:
     EntityViewer(NekoEditor& editor);
-    void Update();
+    void Update(EditorMode editorMode);
 
     void Reset()
     { selectedEntity_ = neko::INVALID_ENTITY; }
@@ -52,5 +54,6 @@ private:
     std::vector<std::string> entitiesName_;
     NekoEditor& nekoEditor_;
     neko::Entity selectedEntity_ = neko::INVALID_ENTITY;
+    neko::Entity currentPrefabEntity_ = neko::INIT_ENTITY_NMB;
 };
 }

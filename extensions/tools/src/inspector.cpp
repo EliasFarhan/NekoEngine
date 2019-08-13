@@ -17,16 +17,13 @@ void Inspector::ShowEntityInfo(neko::Entity entity)
     auto& sceneManager = nekoEditor_.GetSceneManager();
 
     ImGui::InputText("Entity Name: ", &sceneManager.GetCurrentScene().entitiesNames[entity]);
+    ImGui::LabelText("Entity Value: ", "%u", entity);
     {
         auto& transformManager = nekoEditor_.GetTransformManager();
         const auto parentEntity = transformManager.GetParentEntity(entity);
         if (parentEntity != neko::INVALID_ENTITY)
         {
             ImGui::LabelText("Entity Parent", "%u", parentEntity);
-        }
-        else
-        {
-            ImGui::LabelText("Entity Parent", "None");
         }
     }
     if (entityManager.HasComponent(entity, neko::EntityMask(neko::NekoComponentType::POSITION2D)))
@@ -188,10 +185,10 @@ void Inspector::ShowEntityInfo(neko::Entity entity)
                 {
                     if (ImGui::Selectable(spineFilename.c_str()))
                     {
-						auto spineJsonObj = neko::LoadJson(spineFilename);
-						auto& spineJson = *spineJsonObj;
+						auto spineJson = neko::LoadJson(spineFilename);
                         spineDrawableInfo.atlasPath = spineJson["atlas"];
 						spineDrawableInfo.skeletonDataPath = spineJson["skeleton"];
+						spineFileList.clear();
                     }
 
                 }

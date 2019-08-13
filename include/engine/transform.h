@@ -75,7 +75,7 @@ public:
     bool CanParentTransform(Entity entity, Entity parentEntity);
     bool SetTransformParent(Entity entity, Entity parentEntity);
     Entity GetParentEntity(Entity entity);
-    Entity FindNextChild(Entity parentEntity, Entity entityChild);
+    Entity FindNextChild(Entity parentEntity, Entity entityChild=neko::INVALID_ENTITY);
 
     sf::Transform CalculateTransform(Entity entity);
 private:

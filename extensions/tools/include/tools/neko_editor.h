@@ -33,18 +33,27 @@
 #include "log_viewer.h"
 #include "previewer.h"
 #include "physics_editor.h"
-#include "prefab_viewer.h"
+#include "editor_prefab.h"
 
 #include <imgui.h>
 #include <imfilebrowser.h>
 #include <graphics/sprite.h>
+#include <engine/prefab.h>
 
 namespace editor
 {
 enum class FileOperation
 {
-    OPEN,
-    SAVE
+    OPEN_SCENE,
+    OPEN_PREFAB,
+    SAVE_SCENE,
+    SAVE_PREFAB,
+    NONE,
+};
+enum class EditorMode : std::uint8_t
+{
+    SceneMode,
+    PrefabMode
 };
 class NekoEditor : public neko::BasicEngine
 {
@@ -55,23 +64,28 @@ public:
     void Update(float dt) override;
 
     void Destroy() override;
+
+    void SwitchEditorMode(EditorMode editorMode);
+
     neko::EntityManager& GetEntityManager();
     neko::Position2dManager& GetPositionManager();
     neko::Scale2dManager& GetScaleManager();
     neko::Rotation2dManager& GetRotationManager();
-    neko::SceneManager& GetSceneManager();
+    EditorSceneManager& GetSceneManager();
     neko::BodyDef2dManager& GetBodyDefManager();
     neko::SpriteManager& GetSpriteManager();
     neko::TextureManager& GetTextureManager();
     neko::SpineManager& GetSpineManager();
     neko::Transform2dManager& GetTransformManager();
     ColliderDefManager& GetColliderDefManager();
+    EditorPrefabManager& GetPrefabManager();
 
     Previewer& GetPreviewer();
 private:
     neko::EntityManager entityManager_;
     EntityViewer entityViewer_;
     neko::TextureManager textureManager_;
+    EditorPrefabManager prefabManager_;
 
     neko::SpineManager spineManager_;
     neko::SpriteManager spriteManager_;
@@ -79,7 +93,6 @@ private:
     neko::GraphicsManager graphicsManager_;
     sf::RenderTexture sceneRenderTexture_;
     SceneViewer sceneViewer_;
-    PrefabViewer prefabViewer_;
 
     EditorSceneManager sceneManager_;
 
@@ -92,8 +105,8 @@ private:
     Previewer previewer_;
 
 
-    FileOperation fileOperationStatus_ = FileOperation::OPEN;
-
+    FileOperation fileOperationStatus_ = FileOperation::NONE;
+    EditorMode editorMode_ = EditorMode::SceneMode;
     neko::Transform2dManager transformManager_;
 };
 

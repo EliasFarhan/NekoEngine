@@ -140,7 +140,12 @@ Entity EntityManager::GetLastEntity()
        return entityMask != INVALID_ENTITY_MASK;
     });
 
-    return Entity(it-entityMaskArray_.rend());
+    return Entity(std::distance(entityMaskArray_.begin(), it.base()) - 1);
+}
+
+bool EntityManager::IsPrefab(Entity entity) const
+{
+    return HasComponent(entity, EntityMask(NekoComponentType::PREFAB));
 }
 
 }

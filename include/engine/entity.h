@@ -57,7 +57,7 @@ public:
 	void DestroyEntity(Entity entity);
 
 	bool HasComponent(Entity entity, EntityMask componentType) const;
-
+    bool IsPrefab(Entity entity) const;
 	bool EntityExists(Entity entity);
 
 	size_t GetEntitiesNmb(EntityMask filterComponents = INVALID_ENTITY_MASK);

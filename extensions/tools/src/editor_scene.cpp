@@ -241,6 +241,7 @@ json EditorSceneManager::SerializeScene()
 
 void EditorSceneManager::SaveScene(std::string_view path)
 {
+    logDebug("Saving scene: "+std::string(path));
     auto sceneJson = SerializeScene();
     sceneJson["scenePath"] = path;
     auto sceneTxt = sceneJson.dump(4);
@@ -251,10 +252,7 @@ void EditorSceneManager::SaveScene(std::string_view path)
 
 void EditorSceneManager::LoadScene(std::string_view path)
 {
-    auto sceneJsonPtr = neko::LoadJson(path.data());
-    if(sceneJsonPtr == nullptr)
-        return;
-    auto sceneJson = *sceneJsonPtr;
+    auto sceneJson = neko::LoadJson(path.data());
     ParseSceneJson(sceneJson);
 }
 
@@ -268,5 +266,6 @@ void EditorSceneManager::ClearScene()
         entityManager.DestroyEntity(entity);
     }
 }
+
 
 }

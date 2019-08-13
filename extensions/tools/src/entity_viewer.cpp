@@ -29,20 +29,23 @@
 #include <engine/transform.h>
 #include <engine/log.h>
 #include <tools/neko_editor.h>
+#include <tools/editor_prefab.h>
 
 namespace editor
 {
-void EntityViewer::Update()
+void EntityViewer::Update(EditorMode editorMode)
 {
     auto& sceneManager = nekoEditor_.GetSceneManager();
     auto& entityManager = nekoEditor_.GetEntityManager();
     auto& transformManager = nekoEditor_.GetTransformManager();
+    auto& prefabManager = nekoEditor_.GetPrefabManager();
+
     entities_.clear();
     entitiesName_.clear();
 
     ImGui::Begin("Entity Viewer", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 
-    bool sceneOpen = ImGui::CollapsingHeader("Scene", ImGuiTreeNodeFlags_DefaultOpen);
+    bool sceneOpen = ImGui::CollapsingHeader(editorMode == EditorMode::PrefabMode?"Prefab Edition Mode":"Scene", ImGuiTreeNodeFlags_DefaultOpen);
     if (ImGui::BeginDragDropTarget())
     {
         ImGuiDragDropFlags target_flags = 0;
@@ -83,7 +86,8 @@ void EntityViewer::Update()
         auto& entitiesName = sceneManager.GetCurrentScene().entitiesNames;
         ResizeIfNecessary(entitiesName, entity, std::string());
         entitiesName[entity] = std::string("Entity ") + std::to_string(entity);
-        transformManager.SetTransformParent(entity, neko::INVALID_ENTITY);
+        transformManager.SetTransformParent(entity,
+                editorMode == EditorMode::SceneMode?neko::INVALID_ENTITY:0);
     }
 
     ImGui::End();
@@ -99,7 +103,7 @@ void EntityViewer::DrawEntityHierarchy(neko::Entity entity,
     bool nodeOpen = draw;
     bool destroyEntity = destroy;
     bool createEntity = false;
-    bool leaf = transformManager.FindNextChild(entity, neko::INVALID_ENTITY) == neko::INVALID_ENTITY;
+    bool leaf = transformManager.FindNextChild(entity) == neko::INVALID_ENTITY;
 
     if(draw)
     {
@@ -137,12 +141,14 @@ void EntityViewer::DrawEntityHierarchy(neko::Entity entity,
             enum class EntityMenuComboItem
             {
                 ADD_EMPTY_ENTITY,
-                DELETE,
+                DELETE_ENTITY,
+                MAKE_PREFAB,
                 LENGTH
             };
             const char* entityMenuComboItemName[int(EntityMenuComboItem::LENGTH)] = {
                     "Add Empty Entity",
-                    "Delete Entity"
+                    "Delete Entity",
+                    "Make Prefab"
             };
 
             const auto entityComboName = entityMenuName + " Combo";
@@ -160,9 +166,19 @@ void EntityViewer::DrawEntityHierarchy(neko::Entity entity,
                             createEntity = true;
                             break;
                         }
-                        case EntityMenuComboItem::DELETE:
+                        case EntityMenuComboItem::DELETE_ENTITY:
                         {
                             destroyEntity = true;
+                            break;
+                        }
+                        case EntityMenuComboItem::MAKE_PREFAB:
+                        {
+                            auto& prefabManager = nekoEditor_.GetPrefabManager();
+                            auto newIndex = prefabManager.CreatePrefabFromEntity(entity);
+                            nekoEditor_.SwitchEditorMode(EditorMode::PrefabMode);
+                            prefabManager.SetCurrentPrefabIndex(newIndex);
+                            nekoEditor_.GetSceneManager().ClearScene();
+                            prefabManager.InstantiatePrefab(newIndex, nekoEditor_.GetEntityManager());
                             break;
                         }
                         default:

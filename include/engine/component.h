@@ -53,6 +53,7 @@ enum class NekoComponentType : ComponentType
     POLYGON_COLLIDER2D = 1u << 12u,
     CONVEX_SHAPE2D = 1u << 13u,
     SPINE_FOLLOW_BONE = 1u << 14u,
+    PREFAB = 1u << 15u,
 
 
 };

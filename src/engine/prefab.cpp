@@ -1,5 +1,7 @@
 #include <engine/prefab.h>
 
+#include <engine/scene.h>
+
 namespace neko
 {
 
@@ -8,8 +10,42 @@ PrefabManager::PrefabManager(SceneManager& sceneManager) : sceneManager_(sceneMa
 
 }
 
-void PrefabManager::LoadPrefab(std::string_view prefabPath)
+Index PrefabManager::LoadPrefab(std::string_view prefabPath, bool forceReload)
 {
-    //TODO adding prefab loading with caching
+    const auto prefabIt = std::find(prefabPaths_.begin(), prefabPaths_.end(), prefabPath);
+    if (prefabIt != prefabPaths_.end())
+    {
+        const auto prefabIndex = Index(prefabIt - prefabPaths_.begin());
+        if (forceReload)
+        {
+            const auto prefabFileJson = LoadJson(prefabPath.data());
+            prefabJsons_[prefabIndex] = prefabFileJson;
+        }
+        return prefabIndex;
+    }
+    else
+    {
+        const auto prefabFileJson = LoadJson(prefabPath.data());
+        prefabJsons_.push_back(prefabFileJson);
+        prefabPaths_.push_back(prefabPath.data());
+        return Index(prefabJsons_.size() - 1);
+    }
+}
+
+void PrefabManager::InstantiatePrefab(Index prefabIndex, EntityManager& entityManager)
+{
+    auto prefabJson = prefabJsons_[prefabIndex];
+    auto entityBase = entityManager.GetLastEntity() + 1;
+    for (auto& entityJson: prefabJson["entities"])
+    {
+        Entity entity = entityJson["entity"];
+        entityJson["entity"] = entity + entityBase;
+        int parent = entityJson["parent"];
+        if (parent != -1)
+        {
+            entityJson["parent"] = Entity(parent) + entityBase;
+        }
+        sceneManager_.ParseEntityJson(entityJson);
+    }
 }
 }

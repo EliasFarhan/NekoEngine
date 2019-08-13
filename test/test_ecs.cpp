@@ -57,5 +57,14 @@ TEST(Entity, EntityManager)
         entityManager.DestroyEntity(i * 2);
     }
     EXPECT_EQ(entityManager.GetEntitiesNmb(), entityNmb / 2);
+
+    EXPECT_EQ(entityManager.GetLastEntity(), entityNmb-1);
+    //Adding a new entity and destroying it directly to still have the same last entity
+    {
+        auto entity = entityManager.CreateEntity(entityNmb+1);
+        EXPECT_EQ(entityManager.GetLastEntity(), entityNmb+1);
+        entityManager.DestroyEntity(entity);
+    }
+    EXPECT_EQ(entityManager.GetLastEntity(), entityNmb-1);
 }
 

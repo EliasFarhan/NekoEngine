@@ -89,28 +89,29 @@ sf::Vector2f GetVectorFromJson(const json & jsonObject, std::string parameterNam
 	return vector;
 }
 
-std::unique_ptr<json> LoadJson(const std::string& jsonPath)
+json LoadJson(const std::string& jsonPath)
 {
+
+    json jsonContent;
 	std::ifstream jsonFile(jsonPath.c_str());
 	if (jsonFile.peek() == std::ifstream::traits_type::eof())
 	{
 		{
 			std::ostringstream oss;
-			oss << "[JSON ERROR] EMPTY JSON FILE at: " << jsonPath;
+			oss << "[Error] Empty json file at: " << jsonPath;
 			logDebug(oss.str());
 		}
-		return nullptr;
+		return jsonContent;
 	}
-	std::unique_ptr<json> jsonContent = std::make_unique<json>();
 	try
 	{
-		jsonFile >> *jsonContent;
+		jsonFile >> jsonContent;
 	}
 	catch (json::parse_error& e)
 	{
 		{
 			std::ostringstream oss;
-			oss << "THE FILE: " << jsonPath << " IS NOT JSON\n" << e.what();
+			oss << "[Error] File: " << jsonPath << " is not json\n" << e.what();
 			logDebug(oss.str());
 		}
 		return nullptr;
