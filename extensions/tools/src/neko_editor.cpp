@@ -248,7 +248,7 @@ void NekoEditor::Update(float dt)
     {
         case EditorMode::SceneMode:
         {
-            sf::FloatRect screenRect = sf::FloatRect(0, 0, config.gameWindowSize.x, config.gameWindowSize.y);
+            const auto screenRect = sf::FloatRect(0, 0, float(config.gameWindowSize.x), float(config.gameWindowSize.y));
             sceneRenderTexture_.setView(sf::View(screenRect));
             graphicsManager_.Render(sceneRenderTexture_);
             break;

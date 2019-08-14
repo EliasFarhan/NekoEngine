@@ -47,7 +47,7 @@ void EditorPrefabManager::SavePrefab(const std::string_view path)
     }
     else
     {
-        currentPrefabIndex_ = prefabJsons_.size();
+        currentPrefabIndex_ = neko::Index(prefabJsons_.size());
         prefabJsons_.push_back(prefabJson);
         prefabPaths_.push_back(path.data());
     }
