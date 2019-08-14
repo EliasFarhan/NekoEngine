@@ -31,6 +31,7 @@
 namespace editor
 {
 
+const char* sceneTmpPath = "data/.tmp.scene";
 
 void EditorSceneManager::ParseComponentJson(json& componentJson, neko::Entity entity)
 {
@@ -265,6 +266,24 @@ void EditorSceneManager::ClearScene()
         transformManager.SetTransformParent(entity, neko::INVALID_ENTITY);
         entityManager.DestroyEntity(entity);
     }
+}
+
+void EditorSceneManager::SaveCurrentScene()
+{
+    if(IsCurrentSceneTmp())
+    {
+        currentScene_.scenePath = sceneTmpPath;
+        SaveScene(sceneTmpPath);
+    }
+    else
+    {
+        SaveScene(currentScene_.scenePath);
+    }
+}
+
+bool EditorSceneManager::IsCurrentSceneTmp()
+{
+    return currentScene_.scenePath.empty() or currentScene_.scenePath == sceneTmpPath;
 }
 
 

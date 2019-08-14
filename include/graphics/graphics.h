@@ -43,7 +43,7 @@ class MainEngine;
 struct Command
 {
     int layer = 0;
-    virtual void Draw(sf::RenderTarget* renderTarget) = 0;
+    virtual void Draw(sf::RenderTarget& renderTarget) = 0;
 };
 
 /**
@@ -56,7 +56,7 @@ struct SfmlCommand : public Command
      */
     sf::Drawable* drawable = nullptr;
     sf::RenderStates states = sf::RenderStates::Default;
-    void Draw(sf::RenderTarget* renderTarget) override;
+    void Draw(sf::RenderTarget& renderTarget) override;
 };
 /**
  * \brief specialization for SFML vertex array drawing type
@@ -66,7 +66,7 @@ struct TilemapCommand : public Command
     sf::Texture* texture = nullptr;
     sf::VertexArray* vertexArray = nullptr;
     sf::RenderStates states = sf::RenderStates::Default;
-    void Draw(sf::RenderTarget* renderTarget) override;
+    void Draw(sf::RenderTarget& renderTarget) override;
 };
 
 
@@ -78,7 +78,7 @@ public:
 
     virtual void Draw(sf::VertexArray* vertexArray, sf::Texture* texture, int layer = 0, const sf::RenderStates& states = sf::RenderStates::Default);
 
-	void Render(sf::RenderTarget* renderTarget);
+	void Render(sf::RenderTarget& renderTarget);
 protected:
 
     std::vector<Command*> commandBuffer_ = {};

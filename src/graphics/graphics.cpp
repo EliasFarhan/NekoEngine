@@ -31,17 +31,16 @@
 
 namespace neko
 {
-void SfmlCommand::Draw(sf::RenderTarget* renderTarget)
+void SfmlCommand::Draw(sf::RenderTarget& renderTarget)
 {
-
-    renderTarget->draw(*drawable, states);
+    renderTarget.draw(*drawable, states);
 }
 
 
-void TilemapCommand::Draw(sf::RenderTarget* renderTarget)
+void TilemapCommand::Draw(sf::RenderTarget& renderTarget)
 {
     states.texture = texture;
-    renderTarget->draw(*vertexArray, states);
+    renderTarget.draw(*vertexArray, states);
 }
 
 GraphicsManager::GraphicsManager()
@@ -50,7 +49,6 @@ GraphicsManager::GraphicsManager()
 	sfmlCommands.resize(MAX_COMMAND_NMB);
 }
 
-//TODO Generate render command
 void GraphicsManager::Draw(sf::Drawable& drawable, int layer, const sf::RenderStates& states)
 {
 	SfmlCommand sfmlCommand;
@@ -67,9 +65,9 @@ void GraphicsManager::Draw(sf::VertexArray* vertexArray, sf::Texture* texture, i
 
 }
 
-void GraphicsManager::Render(sf::RenderTarget* renderTarget)
+void GraphicsManager::Render(sf::RenderTarget& renderTarget)
 {
-	std::sort(commandBuffer_.begin(), commandBuffer_.begin() + renderLength, [](Command* c1, Command* c2)
+    std::sort(commandBuffer_.begin(), commandBuffer_.begin() + renderLength, [](Command* c1, Command* c2)
 	{
 		return c1->layer < c2->layer;
 	});

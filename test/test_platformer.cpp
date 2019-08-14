@@ -251,7 +251,7 @@ public:
         }
 
         //Render the game texture into the window
-        graphicsManager_.Render(&renderTexture_);
+        graphicsManager_.Render(renderTexture_);
         renderTexture_.display();
 
         sf::Sprite sprite(renderTexture_.getTexture());

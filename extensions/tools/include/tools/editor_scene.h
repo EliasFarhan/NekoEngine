@@ -42,12 +42,13 @@ public:
     virtual json SerializeScene();
 
     void ClearScene();
-    void SaveScene(std::string_view path);
+    bool IsCurrentSceneTmp();
+    void SaveCurrentScene();
     void LoadScene(std::string_view path);
 
+protected:
 
-
-private:
+    void SaveScene(std::string_view path);
     NekoEditor& nekoEditor_;
 
 

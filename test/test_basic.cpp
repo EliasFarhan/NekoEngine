@@ -32,7 +32,7 @@ public:
 	{
 		BasicEngine::Update(dt);
 		spriteManager_.PushAllCommands(entityManager_, graphicsManager_);
-		graphicsManager_.Render(renderWindow.get());
+        graphicsManager_.Render(*renderWindow.get());
 	}
 	void Destroy() override
 	{
@@ -105,7 +105,7 @@ public:
 
 		spriteManager_.PushAllCommands(entityManager_, graphicsManager_);
 
-		graphicsManager_.Render(renderWindow.get());
+        graphicsManager_.Render(*renderWindow.get());
 	}
 	void Destroy() override
 	{

@@ -25,6 +25,7 @@
 #include <tools/neko_editor.h>
 #include <utilities/file_utility.h>
 #include <engine/log.h>
+#include <SFML/Window/Event.hpp>
 
 namespace editor
 {
@@ -40,7 +41,7 @@ void NekoEditor::Init()
         {
             textureManager_.LoadTexture(path);
         }
-        if(neko::GetFilenameExtension(path) == ".prefab")
+        if (neko::GetFilenameExtension(path) == ".prefab")
         {
             prefabManager_.LoadPrefab(path, false);
         }
@@ -60,6 +61,8 @@ void NekoEditor::Update(float dt)
                  ImGuiWindowFlags_NoResize |
                  ImGuiWindowFlags_NoCollapse);
 
+
+
     //Log tab
     if (ImGui::BeginTabBar("Lower Tab", ImGuiTabBarFlags_None))
     {
@@ -70,7 +73,6 @@ void NekoEditor::Update(float dt)
         }
         ImGui::EndTabBar();
     }
-    static ImGui::FileBrowser fileDialog;
     if (ImGui::BeginMainMenuBar())
     {
         if (ImGui::BeginMenu("File"))
@@ -89,19 +91,7 @@ void NekoEditor::Update(float dt)
                     }
                     if (ImGui::MenuItem("Save Scene", "CTRL+S"))
                     {
-                        auto& path = sceneManager_.GetCurrentScene().scenePath;
-                        if (path.empty() || !neko::FileExists(path) || path == "data/.tmp.scene")
-                        {
-                            fileDialog = ImGui::FileBrowser(
-                                    ImGuiFileBrowserFlags_EnterNewFilename | ImGuiFileBrowserFlags_CreateNewDir);
-                            fileDialog.SetPwd("../" + config.dataRootPath);
-                            fileDialog.Open();
-                            fileOperationStatus_ = FileOperation::SAVE_SCENE;
-                        }
-                        else
-                        {
-                            sceneManager_.SaveScene(path);
-                        }
+                        SaveSceneEvent();
                     }
                     break;
                 }
@@ -118,24 +108,11 @@ void NekoEditor::Update(float dt)
 
                     if (ImGui::MenuItem("Save Prefab", "CTRL+S"))
                     {
-                        auto& path = prefabManager_.GetCurrentPrefabPath();
-                        if (path.empty() || !neko::FileExists(path) || path == "data/.tmp.prefab")
-                        {
-                            fileDialog = ImGui::FileBrowser(
-                                    ImGuiFileBrowserFlags_EnterNewFilename | ImGuiFileBrowserFlags_CreateNewDir);
-                            fileDialog.SetPwd("../" + config.dataRootPath);
-                            fileDialog.Open();
-                            fileOperationStatus_ = FileOperation::SAVE_PREFAB;
-                        }
-                        else
-                        {
-                            prefabManager_.SaveCurrentPrefab(path);
-                        }
+                        SavePrefabEvent();
                     }
                     break;
                 }
             }
-
 
 
             ImGui::EndMenu();
@@ -144,7 +121,7 @@ void NekoEditor::Update(float dt)
     }
 
 
-    fileDialog.Display();
+    fileDialog_.Display();
 
 
     switch (fileOperationStatus_)
@@ -163,24 +140,25 @@ void NekoEditor::Update(float dt)
         }
         case FileOperation::SAVE_SCENE:
         {
-            if (fileDialog.HasSelected())
+            if (fileDialog_.HasSelected())
             {
-                auto sceneJsonPath = fileDialog.GetSelected().string();
-                sceneManager_.SaveScene(sceneJsonPath);
-                fileDialog.ClearSelected();
-                fileDialog.Close();
+                auto sceneJsonPath = fileDialog_.GetSelected().string();
+                sceneManager_.GetCurrentScene().scenePath = sceneJsonPath;
+                sceneManager_.SaveCurrentScene();
+                fileDialog_.ClearSelected();
+                fileDialog_.Close();
             }
             break;
         }
         case FileOperation::SAVE_PREFAB:
         {
-            if (fileDialog.HasSelected())
+            if (fileDialog_.HasSelected())
             {
-                const auto prefabJsonPath = fileDialog.GetSelected().string();
-                prefabManager_.SaveCurrentPrefab(prefabJsonPath);
+                const auto prefabJsonPath = fileDialog_.GetSelected().string();
                 prefabManager_.SetCurrentPrefabPath(prefabJsonPath);
-                fileDialog.ClearSelected();
-                fileDialog.Close();
+                prefabManager_.SaveCurrentPrefab();
+                fileDialog_.ClearSelected();
+                fileDialog_.Close();
             }
             break;
         }
@@ -266,7 +244,28 @@ void NekoEditor::Update(float dt)
     spineManager_.PushAllCommands(entityManager_, graphicsManager_);
 
     colliderDefManager_.PushAllCommands(graphicsManager_);
-    graphicsManager_.Render(&sceneRenderTexture_);
+    switch (editorMode_)
+    {
+        case EditorMode::SceneMode:
+        {
+            sf::FloatRect screenRect = sf::FloatRect(0, 0, config.gameWindowSize.x, config.gameWindowSize.y);
+            sceneRenderTexture_.setView(sf::View(screenRect));
+            graphicsManager_.Render(sceneRenderTexture_);
+            break;
+        }
+        case EditorMode::PrefabMode:
+        {
+            auto rect = prefabManager_.CalculatePrefabBound();
+            const auto screenRect = sf::FloatRect(sf::Vector2f(), sf::Vector2f(sceneRenderTexture_.getSize()));
+            const auto rectRatio = rect.width / rect.height;
+            const auto screenRatio = float(screenRect.width) / screenRect.height;
+            rect.width *= screenRatio / rectRatio;
+            sf::View renderView(rect);
+            sceneRenderTexture_.setView(renderView);
+            graphicsManager_.Render(sceneRenderTexture_);
+            break;
+        }
+    }
 
     sceneRenderTexture_.display();
 
@@ -281,7 +280,8 @@ void NekoEditor::Update(float dt)
     if (ImGui::BeginTabBar("Central Tab"))
     {
         bool sceneViewerOpen = editorMode_ == EditorMode::SceneMode;
-        if (ImGui::BeginTabItem("Scene Viewer", nullptr, sceneViewerOpen?ImGuiTabItemFlags_SetSelected:ImGuiTabItemFlags_None  ))
+        if (ImGui::BeginTabItem("Scene Viewer", nullptr,
+                                sceneViewerOpen ? ImGuiTabItemFlags_SetSelected : ImGuiTabItemFlags_None))
         {
             sceneViewer_.Update(sceneRenderTexture_);
             ImGui::EndTabItem();
@@ -291,7 +291,8 @@ void NekoEditor::Update(float dt)
             SwitchEditorMode(EditorMode::SceneMode);
         }
         bool prefabViewerOpen = editorMode_ == EditorMode::PrefabMode;
-        if (ImGui::BeginTabItem("Prefab Viewer", nullptr, prefabViewerOpen?ImGuiTabItemFlags_SetSelected:ImGuiTabItemFlags_None))
+        if (ImGui::BeginTabItem("Prefab Viewer", nullptr,
+                                prefabViewerOpen ? ImGuiTabItemFlags_SetSelected : ImGuiTabItemFlags_None))
         {
             sceneViewer_.Update(sceneRenderTexture_);
             ImGui::EndTabItem();
@@ -402,17 +403,7 @@ void NekoEditor::SwitchEditorMode(EditorMode editorMode)
         {
             if (editorMode_ == EditorMode::PrefabMode)
             {
-                auto& path = prefabManager_.GetCurrentPrefabPath();
-                std::string tmpPath = "data/.tmp.prefab";
-                if (!path.empty())
-                {
-                    prefabManager_.SaveCurrentPrefab(path);
-                }
-                else
-                {
-                    prefabManager_.SaveCurrentPrefab(tmpPath);
-                    prefabManager_.SetCurrentPrefabPath(tmpPath);
-                }
+                prefabManager_.SaveCurrentPrefab();
             }
             entityViewer_.Reset();
 
@@ -428,16 +419,7 @@ void NekoEditor::SwitchEditorMode(EditorMode editorMode)
         {
             if (editorMode_ == EditorMode::SceneMode)
             {
-                auto& path = sceneManager_.GetCurrentScene().scenePath;
-                std::string tmpPath = "data/.tmp.scene";
-                if (!path.empty())
-                {
-                    sceneManager_.SaveScene(path);
-                }
-                else
-                {
-                    sceneManager_.SaveScene(tmpPath);
-                }
+                sceneManager_.SaveCurrentScene();
             }
             entityViewer_.Reset();
             sceneManager_.ClearScene();
@@ -462,6 +444,109 @@ void NekoEditor::SwitchEditorMode(EditorMode editorMode)
 EditorPrefabManager& NekoEditor::GetPrefabManager()
 {
     return prefabManager_;
+}
+
+void NekoEditor::OnEvent(sf::Event& event)
+{
+    BasicEngine::OnEvent(event);
+    if (event.type != sf::Event::KeyPressed)
+        return;
+    switch (editorMode_)
+    {
+        case EditorMode::SceneMode:
+        {
+            if (event.key.control)
+            {
+                switch (event.key.code)
+                {
+                    case sf::Keyboard::N:
+                    {
+                        sceneManager_.ClearScene();
+                        sceneManager_.GetCurrentScene().scenePath = "";
+                        break;
+                    }
+                    case sf::Keyboard::O:
+                    {
+                        fileOperationStatus_ = FileOperation::OPEN_SCENE;
+                        break;
+                    }
+                    case sf::Keyboard::S:
+                    {
+                        SaveSceneEvent();
+                        break;
+                    }
+                    default:
+                        break;
+                }
+            }
+            break;
+        }
+        case EditorMode::PrefabMode:
+            if (event.key.control)
+            {
+                switch (event.key.code)
+                {
+                    case sf::Keyboard::N:
+                    {
+                        sceneManager_.ClearScene();
+                        auto rootEntity = entityManager_.CreateEntity();
+                        auto& entitiesName = sceneManager_.GetCurrentScene().entitiesNames;
+                        ResizeIfNecessary(entitiesName, rootEntity, std::string());
+                        entitiesName[rootEntity] = "Root Entity";
+                        break;
+                    }
+                    case sf::Keyboard::O:
+                    {
+                        fileOperationStatus_ = FileOperation::OPEN_PREFAB;
+                        break;
+                    }
+                    case sf::Keyboard::S:
+                    {
+                        SavePrefabEvent();
+                        break;
+                    }
+                    default:
+                        break;
+                }
+            }
+            break;
+        default:
+            break;
+    }
+}
+
+void NekoEditor::SaveSceneEvent()
+{
+    auto& path = sceneManager_.GetCurrentScene().scenePath;
+    if (sceneManager_.IsCurrentSceneTmp() or !neko::FileExists(path))
+    {
+        fileDialog_ = ImGui::FileBrowser(
+                ImGuiFileBrowserFlags_EnterNewFilename | ImGuiFileBrowserFlags_CreateNewDir);
+        fileDialog_.SetPwd("../" + config.dataRootPath);
+        fileDialog_.Open();
+        fileOperationStatus_ = FileOperation::SAVE_SCENE;
+    }
+    else
+    {
+        sceneManager_.SaveCurrentScene();
+    }
+}
+
+void NekoEditor::SavePrefabEvent()
+{
+    auto& path = prefabManager_.GetCurrentPrefabPath();
+    if (prefabManager_.IsCurrentPrefabTmp() or !neko::FileExists(path))
+    {
+        fileDialog_ = ImGui::FileBrowser(
+                ImGuiFileBrowserFlags_EnterNewFilename | ImGuiFileBrowserFlags_CreateNewDir);
+        fileDialog_.SetPwd("../" + config.dataRootPath);
+        fileDialog_.Open();
+        fileOperationStatus_ = FileOperation::SAVE_PREFAB;
+    }
+    else
+    {
+        prefabManager_.SaveCurrentPrefab();
+    }
 }
 
 }

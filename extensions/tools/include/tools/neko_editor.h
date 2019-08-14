@@ -81,6 +81,11 @@ public:
     EditorPrefabManager& GetPrefabManager();
 
     Previewer& GetPreviewer();
+
+    void OnEvent(sf::Event& event) override;
+    void SaveSceneEvent();
+    void SavePrefabEvent();
+
 private:
     neko::EntityManager entityManager_;
     EntityViewer entityViewer_;
@@ -104,7 +109,7 @@ private:
     LogViewer logViewer_;
     Previewer previewer_;
 
-
+    ImGui::FileBrowser fileDialog_;
     FileOperation fileOperationStatus_ = FileOperation::NONE;
     EditorMode editorMode_ = EditorMode::SceneMode;
     neko::Transform2dManager transformManager_;

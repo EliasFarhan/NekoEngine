@@ -51,11 +51,11 @@ void SpriteManager::CopyTexture(const Index textureId, size_t start, size_t leng
         components_[i].textureId = textureId;
         if(textureId != INVALID_INDEX)
         {
-            components_[i].sprite.setTexture( *texture);
+            components_[i].sprite.setTexture( *texture, true);
         }
         else
         {
-            components_[i].sprite.setTexture( sf::Texture());
+            components_[i].sprite.setTexture( sf::Texture(), true);
         }
 
     }
@@ -122,7 +122,6 @@ void SpriteManager::PushAllCommands(EntityManager& entityManager, GraphicsManage
     {
         if(entityManager.HasComponent(entity, entityMask))
         {
-
             auto spriteSize = components_[entity].sprite.getLocalBounds();
             auto origin = components_[entity].origin;
             components_[entity].sprite.setOrigin(origin.x*spriteSize.width, origin.y*spriteSize.height);
