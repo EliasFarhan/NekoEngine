@@ -127,6 +127,12 @@ sf::FloatRect EditorPrefabManager::CalculatePrefabBound()
     const auto boxEntityMask =
             neko::EntityMask(neko::NekoComponentType::BOX_COLLIDER2D) |
             neko::EntityMask(neko::NekoComponentType::TRANSFORM2D);
+    const auto circleEntityMask =
+            neko::EntityMask(neko::NekoComponentType::CIRCLE_COLLIDER2D) |
+            neko::EntityMask(neko::NekoComponentType::TRANSFORM2D);
+    const auto spineEntityMask =
+            neko::EntityMask(neko::NekoComponentType::SPINE_ANIMATION) |
+            neko::EntityMask(neko::NekoComponentType::TRANSFORM2D);
     auto& transformManager = nekoEditor_.GetTransformManager();
 
     sf::FloatRect entityRect;
@@ -177,10 +183,30 @@ sf::FloatRect EditorPrefabManager::CalculatePrefabBound()
         if(entityManager.HasComponent(entity, boxEntityMask))
         {
             auto& boxColliderManager = nekoEditor_.GetColliderDefManager().GetBoxColliderDefManager();
-            auto& box = boxColliderManager.GetConstComponent(entity);
+            const auto& box = boxColliderManager.GetConstComponent(entity);
             const auto rect = transform.transformRect(box.shape.getGlobalBounds());
             updateEntityRect(rect);
         }
+        if(entityManager.HasComponent(entity, circleEntityMask))
+        {
+            auto& circleColliderDefManager = nekoEditor_.GetColliderDefManager().GetCircleColliderDefManager();
+            const auto& circleCollider = circleColliderDefManager.GetConstComponent(entity);
+            const auto rect = transform.transformRect(circleCollider.shape.getGlobalBounds());
+            updateEntityRect(rect);
+        }
+        if(entityManager.HasComponent(entity, spineEntityMask))
+        {
+            auto& spineManager = nekoEditor_.GetSpineManager();
+            const auto& spineComp = spineManager.GetConstComponent(entity);
+            if(spineComp.skeletonDrawable != nullptr)
+            {
+                const auto rect = transform.transformRect(
+                        spineComp.skeletonDrawable->vertexArray->getBounds());
+                updateEntityRect(rect);
+
+            }
+        }
+
 
     };
     std::function<void(neko::Entity)> includeEntityRectRecursive = [&](neko::Entity parent)
