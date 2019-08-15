@@ -114,9 +114,6 @@ void Previewer::SetSpineAnimation(neko::BasicSpineDrawable* spineDrawablePtr)
 	spineDrawable_.skeletonDrawable = std::make_shared<spine::SkeletonDrawable>(
 		spineDrawable_.skeletonData);
 	spineDrawable_.skeletonDrawable->update(0.0f);
-
-	auto rect = spineDrawable_.skeletonDrawable->vertexArray->getBounds();
-
 	status_ = PreviewStatus::SpineAnimation;
 
 }

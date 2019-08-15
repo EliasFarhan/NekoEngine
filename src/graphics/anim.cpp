@@ -112,7 +112,7 @@ void SpriteAnimator::Update(sf::Sprite* sprite, float dt)
         if (animTimer_.IsOver())
         {
             currentIndex_++;
-            if (currentIndex_ >= static_cast<int>(currentAnim_->imgIndexes.size()))
+            if (currentIndex_ >= Index(currentAnim_->imgIndexes.size()))
             {
                 currentIndex_ = 0;
             }

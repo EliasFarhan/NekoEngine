@@ -38,8 +38,6 @@ void EntityViewer::Update(EditorMode editorMode)
     auto& sceneManager = nekoEditor_.GetSceneManager();
     auto& entityManager = nekoEditor_.GetEntityManager();
     auto& transformManager = nekoEditor_.GetTransformManager();
-    auto& prefabManager = nekoEditor_.GetPrefabManager();
-
     entities_.clear();
     entitiesName_.clear();
 

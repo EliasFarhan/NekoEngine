@@ -171,7 +171,7 @@ void NekoEditor::Update(float dt)
         static std::vector<std::string> sceneFileList;
         if (sceneFileList.empty())
         {
-            neko::IterateDirectory("../" + config.dataRootPath, [this](const std::string_view filename)
+            neko::IterateDirectory("../" + config.dataRootPath, [](const std::string_view filename)
             {
                 if (filename.find(".scene") != std::string_view::npos)
                 {
@@ -198,7 +198,7 @@ void NekoEditor::Update(float dt)
         static std::vector<std::string> prefabFileList;
         if (prefabFileList.empty())
         {
-            neko::IterateDirectory("../" + config.dataRootPath, [this](const std::string_view filename)
+            neko::IterateDirectory("../" + config.dataRootPath, [](const std::string_view filename)
             {
                 if (filename.find(".prefab") != std::string_view::npos)
                 {
@@ -378,10 +378,10 @@ NekoEditor::NekoEditor()
         : BasicEngine(),
           entityViewer_(*this),
           prefabManager_(*this),
-          inspector_(*this),
           spriteManager_(textureManager_),
           sceneManager_(*this),
-          colliderDefManager_(*this)
+          colliderDefManager_(*this),
+          inspector_(*this)
 {
 
 }

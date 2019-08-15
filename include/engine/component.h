@@ -108,10 +108,10 @@ public:
     std::vector<T>& GetComponentsVector()
     { return components_; }
 
-    virtual void ParseComponentJson(json& componentJson, Entity entity)
+    virtual void ParseComponentJson([[maybe_unused]]json& componentJson, [[maybe_unused]]Entity entity)
     {};
 
-    virtual json SerializeComponentJson(Entity entity)
+    virtual json SerializeComponentJson([[maybe_unused]]Entity entity)
     { return json(); };
 protected:
     std::vector<T> components_;

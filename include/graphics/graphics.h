@@ -34,14 +34,13 @@ namespace neko
 
 const size_t MAX_COMMAND_NMB = 8'192;
 
-class MainEngine;
-
 
 /**
  * \brief abstraction of a graphic command send to the render thread
  */
 struct Command
 {
+    virtual ~Command() = default;
     int layer = 0;
     virtual void Draw(sf::RenderTarget& renderTarget) = 0;
 };
@@ -52,7 +51,7 @@ struct Command
 struct SfmlCommand : public Command
 {
     /**
-     * \brief non owning raw pointer of an SFML Drawable stored in a graphic class with double buffering (SpriteManager, ShapeManager, etc...)
+     * \brief non owning raw pointer of an SFML Drawable stored in a graphic class
      */
     sf::Drawable* drawable = nullptr;
     sf::RenderStates states = sf::RenderStates::Default;

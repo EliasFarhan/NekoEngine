@@ -45,6 +45,7 @@ void Physics2dManager::Init()
 
 void Physics2dManager::Update(float dt)
 {
+    (void)dt;//TODO put physics clock here
 	world_->Step(config_->physicsTimeStep, config_->velocityIterations, config_->positionIterations);
 }
 

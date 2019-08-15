@@ -73,7 +73,7 @@ Index TextureManager::LoadTexture(const std::string_view filename)
         logDebug(oss.str());
         return INVALID_INDEX;
     }
-    int textureIndex = INVALID_INDEX;
+    Index textureIndex = INVALID_INDEX;
     for (auto i = 0u; i < texturePaths_.size(); i++)
     {
         if (filename == texturePaths_[i])

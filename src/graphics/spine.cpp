@@ -90,7 +90,7 @@ SpineManager::SpineManager() : ComponentManager::ComponentManager()
 
 void SpineManager::Update(EntityManager& entityManager, float dt)
 {
-    for (int i = 0; i < components_.size(); i++)
+    for (size_t i = 0; i < components_.size(); i++)
     {
         if (entityManager.HasComponent(i, EntityMask(NekoComponentType::SPINE_ANIMATION)))
         {
@@ -138,7 +138,6 @@ bool SpineManager::AddSpineDrawable(Entity entity,
 
 void SpineManager::ParseComponentJson(json& componentJson, Entity entity)
 {
-    auto& spineAnimation = GetComponent(entity);
     const std::string atlasFilename = componentJson["atlas"];
     const std::string skeletonDataFilename = componentJson["skeletonData"];
     AddSpineDrawable(entity, atlasFilename, skeletonDataFilename);

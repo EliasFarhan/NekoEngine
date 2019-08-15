@@ -171,7 +171,7 @@ void Inspector::ShowEntityInfo(neko::Entity entity)
             {
                 if (spineFileList.empty())
                 {
-                    neko::IterateDirectory(nekoEditor_.config.dataRootPath, [this](const std::string_view filename)
+                    neko::IterateDirectory(nekoEditor_.config.dataRootPath, [](const std::string_view filename)
                     {
                         if (filename.find(".spine") != std::string_view::npos)
                         {
@@ -319,6 +319,7 @@ void Inspector::ShowEntityInfo(neko::Entity entity)
     if(entityManager.HasComponent(entity, neko::EntityMask(neko::NekoComponentType::POLYGON_COLLIDER2D)))
     {
         auto& polygonColliderDefManager = nekoEditor_.GetColliderDefManager().GetPolygonColliderDefManager();
+        (void)polygonColliderDefManager;
         bool keepComponent = true;
         if (ImGui::CollapsingHeader("Polygon Collider 2D Component", &keepComponent, ImGuiTreeNodeFlags_DefaultOpen))
         {

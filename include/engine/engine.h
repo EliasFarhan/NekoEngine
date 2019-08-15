@@ -86,10 +86,10 @@ public:
 	MouseManager& GetMouseManager();
     sf::Time clockDeltatime;
 
-    virtual void OnBeginContact(const neko::Collider* colliderA, const neko::Collider* colliderB)
+    virtual void OnBeginContact([[maybe_unused]]const neko::Collider* colliderA, [[maybe_unused]]const neko::Collider* colliderB)
     {}
 
-    virtual void OnEndContact(const neko::Collider* colliderA, const neko::Collider* colliderB)
+    virtual void OnEndContact([[maybe_unused]]const neko::Collider* colliderA, [[maybe_unused]]const neko::Collider* colliderB)
     {}
 
 

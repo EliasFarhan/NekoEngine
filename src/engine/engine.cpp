@@ -57,7 +57,7 @@ BasicEngine::~BasicEngine()
     rmt_DestroyGlobalInstance(rmt_);
 }
 
-void BasicEngine::Update(float dt)
+void BasicEngine::Update([[maybe_unused]]float dt)
 {
 
 }

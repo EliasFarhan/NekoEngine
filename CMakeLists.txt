@@ -249,6 +249,10 @@ set_target_properties (Remotery PROPERTIES FOLDER Externals)
 include_directories(include/)
 
 add_library(Neko_COMMON STATIC ${Neko_SRC})
+target_compile_options(Neko_COMMON PRIVATE $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
+		-Wall -Wextra>
+		$<$<CXX_COMPILER_ID:MSVC>:
+		/W4>)
 target_link_libraries(Neko_COMMON PUBLIC ${Neko_LIBRARIES})
 add_dependencies(Neko_COMMON DataTarget)
 set_property(TARGET Neko_COMMON PROPERTY CXX_STANDARD 17)
@@ -265,6 +269,10 @@ foreach(EXTENSION_FOLDER ${EXTENSIONS_FOLDERS})
 		file(GLOB_RECURSE  EXTENSION_FILES ${EXTENSION_FOLDER}/*.h ${EXTENSION_FOLDER}/*.cpp)
 		include_directories("${EXTENSION_FOLDER}/include/")
 		add_library(${EXTENSION_DIR} STATIC ${EXTENSION_FILES})
+		target_compile_options(${EXTENSION_DIR} PRIVATE $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
+				-Wall -Wextra>
+				$<$<CXX_COMPILER_ID:MSVC>:
+				/W4>)
 		LIST(APPEND EXTENSIONS_LIBS ${EXTENSION_DIR})
 		set_target_properties (${EXTENSION_DIR} PROPERTIES FOLDER Neko\\ExtensionsLibs)
 		target_link_libraries(${EXTENSION_DIR} PUBLIC Neko_COMMON)

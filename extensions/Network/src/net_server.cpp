@@ -34,6 +34,7 @@ void Server::SendReliable(const std::shared_ptr<NetCommand> command, Index clien
 
 void Server::SendUnreliable(const NetCommand& command)
 {
+    (void)command;
 }
 
 void Server::ServerLoop()
@@ -139,7 +140,7 @@ void Server::Update()
 
 void Server::TcpReceiveSocketLoop(const Index clientId)
 {
-
+    (void)clientId;
 }
 
 }

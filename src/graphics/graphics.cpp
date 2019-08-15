@@ -62,7 +62,10 @@ void GraphicsManager::Draw(sf::Drawable& drawable, int layer, const sf::RenderSt
 //TODO Generate render command
 void GraphicsManager::Draw(sf::VertexArray* vertexArray, sf::Texture* texture, int layer, const sf::RenderStates& states)
 {
-
+    (void)vertexArray;
+    (void)texture;
+    (void)layer;
+    (void)states;
 }
 
 void GraphicsManager::Render(sf::RenderTarget& renderTarget)

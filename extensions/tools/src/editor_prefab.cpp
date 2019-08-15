@@ -59,7 +59,6 @@ neko::Index EditorPrefabManager::CreatePrefabFromEntity(neko::Entity entity)
     auto newIndex = neko::Index(prefabJsons_.size());
     auto& sceneManager = dynamic_cast<EditorSceneManager&>(sceneManager_);
     auto& transformManager = nekoEditor_.GetTransformManager();
-    auto& entityManager = nekoEditor_.GetEntityManager();
 
     json prefabJson;
     prefabJson["entities"] = json::array();
@@ -83,7 +82,6 @@ neko::Index EditorPrefabManager::CreatePrefabFromEntity(neko::Entity entity)
             prefabJson["entities"].push_back(entityJson);
             updateInstanceEntityfunc(currentEntity);
             currentEntity = transformManager.FindNextChild(parent, currentEntity);
-
         }
     };
     updateInstanceEntityfunc(currentParentEntity);
@@ -94,8 +92,9 @@ neko::Index EditorPrefabManager::CreatePrefabFromEntity(neko::Entity entity)
 
 }
 
-EditorPrefabManager::EditorPrefabManager(NekoEditor& editor) : nekoEditor_(editor),
-                                                               PrefabManager(editor.GetSceneManager())
+EditorPrefabManager::EditorPrefabManager(NekoEditor& editor) :
+    PrefabManager(editor.GetSceneManager()),
+    nekoEditor_(editor)
 {
 
 }

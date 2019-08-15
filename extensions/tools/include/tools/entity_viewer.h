@@ -54,6 +54,5 @@ private:
     std::vector<std::string> entitiesName_;
     NekoEditor& nekoEditor_;
     neko::Entity selectedEntity_ = neko::INVALID_ENTITY;
-    neko::Entity currentPrefabEntity_ = neko::INIT_ENTITY_NMB;
 };
 }
