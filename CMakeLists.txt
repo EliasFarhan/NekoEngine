@@ -309,7 +309,7 @@ foreach(course_file ${COURSE_FILES} )
 	add_dependencies(${course_name} DataTarget)
 
 	IF(MSVC)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:AVX2 /Oi")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Oi")#not forcing avx2 uhuh
     elseif(UNIX)
     set_target_properties(${course_name} PROPERTIES COMPILE_FLAGS "-save-temps -march=native")
     ENDIF(MSVC)

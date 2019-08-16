@@ -23,7 +23,7 @@ SOFTWARE.
 */
 
 #include <utilities/json_utility.h>
-
+#include <utilities/file_utility.h>
 #include <fstream>
 #include <string>
 #include "engine/log.h"
@@ -89,32 +89,28 @@ sf::Vector2f GetVectorFromJson(const json & jsonObject, std::string parameterNam
 	return vector;
 }
 
-json LoadJson(const std::string& jsonPath)
+json LoadJson(const std::string_view jsonPath)
 {
 
     json jsonContent;
-	std::ifstream jsonFile(jsonPath.c_str());
-	if (jsonFile.peek() == std::ifstream::traits_type::eof())
+	if (!neko::FileExists(jsonPath))
 	{
-		{
-			std::ostringstream oss;
-			oss << "[Error] Empty json file at: " << jsonPath;
-			logDebug(oss.str());
-		}
+		logDebug("[Error] File does not exist: " + std::string(jsonPath));
 		return jsonContent;
 	}
+	
 	try
 	{
-		jsonFile >> jsonContent;
+		const auto jsonStrContent = LoadFile(jsonPath.data());
+		jsonContent = json::parse(jsonStrContent, nullptr, false);
 	}
 	catch (json::parse_error& e)
 	{
-		{
-			std::ostringstream oss;
-			oss << "[Error] File: " << jsonPath << " is not json\n" << e.what();
-			logDebug(oss.str());
-		}
-		return nullptr;
+		
+		std::ostringstream oss;
+		oss << "[Error] File: " << jsonPath << " is not json\n" << e.what();
+		logDebug(oss.str());
+		
 	}
 	return jsonContent;
 }

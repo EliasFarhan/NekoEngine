@@ -253,7 +253,7 @@ void EditorSceneManager::SaveScene(std::string_view path)
 
 void EditorSceneManager::LoadScene(std::string_view path)
 {
-    auto sceneJson = neko::LoadJson(path.data());
+    auto sceneJson = neko::LoadJson(path);
     ParseSceneJson(sceneJson);
 }
 

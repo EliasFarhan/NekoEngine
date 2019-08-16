@@ -171,7 +171,7 @@ void NekoEditor::Update(float dt)
         static std::vector<std::string> sceneFileList;
         if (sceneFileList.empty())
         {
-            neko::IterateDirectory("../" + config.dataRootPath, [](const std::string_view filename)
+            neko::IterateDirectory(neko::LinkFolderAndFile("..", config.dataRootPath), [](const std::string_view filename)
             {
                 if (filename.find(".scene") != std::string_view::npos)
                 {
@@ -180,7 +180,7 @@ void NekoEditor::Update(float dt)
             }, true);
         }
         ImGui::Selectable("Cancel Open Scene...");
-        for (auto& sceneFilename : sceneFileList)
+        for (const auto& sceneFilename : sceneFileList)
         {
             if (ImGui::Selectable(sceneFilename.c_str()))
             {
