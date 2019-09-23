@@ -46,6 +46,7 @@ public:
     void SaveCurrentScene();
     void LoadScene(std::string_view path);
 
+    const std::string_view GetSceneTmpPath();
 protected:
 
     void SaveScene(std::string_view path);

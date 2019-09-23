@@ -435,6 +435,7 @@ void NekoEditor::SwitchEditorMode(EditorMode editorMode)
                 auto& entitiesName = sceneManager_.GetCurrentScene().entitiesNames;
                 ResizeIfNecessary(entitiesName, rootEntity, std::string());
                 entitiesName[rootEntity] = "Root Entity";
+
             }
             break;
         }

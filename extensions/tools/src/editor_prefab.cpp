@@ -57,13 +57,13 @@ void EditorPrefabManager::SavePrefab(const std::string_view path)
     auto& sceneManager = dynamic_cast<EditorSceneManager&>(sceneManager_);
     json prefabJson = sceneManager.SerializeScene();
     prefabJson.erase("sceneName");
-	for(auto& entityJson : prefabJson["entities"])
-	{
-		if(entityJson["entity"] == 0)
-		{
-			entityJson["prefab"] = false;
-		}
-	}
+    for (auto& entityJson : prefabJson["entities"])
+    {
+        if (entityJson["entity"] == 0)
+        {
+            entityJson["prefab"] = false;
+        }
+    }
 
     const auto prefabTxt = prefabJson.dump(4);
     if (currentPrefabIndex_ != neko::INVALID_INDEX and currentPrefabIndex_ < prefabJsons_.size())
@@ -81,24 +81,24 @@ void EditorPrefabManager::SavePrefab(const std::string_view path)
 
 neko::Index EditorPrefabManager::CreatePrefabFromEntity(neko::Entity entity)
 {
-	const auto newIndex = neko::Index(prefabJsons_.size());
+    const auto newIndex = neko::Index(prefabJsons_.size());
     auto& sceneManager = dynamic_cast<EditorSceneManager&>(sceneManager_);
     auto& transformManager = nekoEditor_.GetTransformManager();
-	auto& entityManager = nekoEditor_.GetEntityManager();
+    auto& entityManager = nekoEditor_.GetEntityManager();
     json prefabJson;
     prefabJson["entities"] = json::array();
     neko::Entity rootEntity = entity;
-	entityManager.AddComponentType(entity, neko::EntityMask(neko::NekoComponentType::PREFAB));
+    entityManager.AddComponentType(entity, neko::EntityMask(neko::NekoComponentType::PREFAB));
     {
         auto entityJson = sceneManager.SerializeEntity(rootEntity);
         entityJson["parent"] = -1;//No parent in prefab
         entityJson["entity"] = 0;//Root entity is 0
-		entityJson["prefab"] = false;
-		prefabJson["entities"].push_back(entityJson);
+        entityJson["prefab"] = false;
+        prefabJson["entities"].push_back(entityJson);
 
     }
 
-	const neko::Entity currentParentEntity = rootEntity;
+    const neko::Entity currentParentEntity = rootEntity;
     std::function<void(neko::Entity)> updateInstanceEntityFunc = [&](neko::Entity parent)
     {
         neko::Entity currentEntity = transformManager.FindNextChild(parent);
@@ -112,27 +112,27 @@ neko::Index EditorPrefabManager::CreatePrefabFromEntity(neko::Entity entity)
             currentEntity = transformManager.FindNextChild(parent, currentEntity);
         }
     };
-	updateInstanceEntityFunc(currentParentEntity);
-	const std::function<void(neko::Entity)> removeChildrenEntityFunc = [&](neko::Entity parent)
-	{
-		neko::Entity currentEntity = transformManager.FindNextChild(parent);
-		while (currentEntity != neko::INVALID_ENTITY)
-		{
-			entityManager.DestroyEntity(currentEntity);
-			currentEntity = transformManager.FindNextChild(parent, currentEntity);
-		}
-	};
-	removeChildrenEntityFunc(currentParentEntity);
+    updateInstanceEntityFunc(currentParentEntity);
+    const std::function<void(neko::Entity)> removeChildrenEntityFunc = [&](neko::Entity parent)
+    {
+        neko::Entity currentEntity = transformManager.FindNextChild(parent);
+        while (currentEntity != neko::INVALID_ENTITY)
+        {
+            entityManager.DestroyEntity(currentEntity);
+            currentEntity = transformManager.FindNextChild(parent, currentEntity);
+        }
+    };
+    removeChildrenEntityFunc(currentParentEntity);
     prefabJsons_.push_back(prefabJson);
     prefabPaths_.push_back("");
-
+    currentPrefabIndex_ = prefabJsons_.size()-1;
     return newIndex;
 
 }
 
 EditorPrefabManager::EditorPrefabManager(NekoEditor& editor) :
-    PrefabManager(editor.GetSceneManager()),
-    nekoEditor_(editor)
+        PrefabManager(editor.GetSceneManager()),
+        nekoEditor_(editor)
 {
 
 }
@@ -141,7 +141,26 @@ void EditorPrefabManager::SaveCurrentPrefab()
 {
     if (IsCurrentPrefabTmp())
     {
-	    const std::string prefabTmpPath = "data/.tmp" + std::to_string(currentPrefabIndex_) + ".prefab";
+        if(currentPrefabIndex_ == neko::INVALID_INDEX)
+            currentPrefabIndex_ = 0;
+        const std::string prefabTmpPath = "data/.tmp" + std::to_string(currentPrefabIndex_) + ".prefab";
+        auto& sceneManager = nekoEditor_.GetSceneManager();
+        const auto& scene = sceneManager.GetCurrentScene();
+        const std::string_view scenePath = scene.scenePath;
+
+        if (!scenePath.empty())
+        {
+            json sceneJson = neko::LoadJson(scenePath);
+            const auto prefabIndex = GetCurrentPrefabIndex();
+            if (prefabIndex < sceneJson.size())
+            {
+                sceneJson["prefabPaths"][prefabIndex] = prefabTmpPath;
+                const auto sceneTxt = sceneJson.dump(4);
+                neko::WriteStringToFile(scenePath.data(), sceneTxt);
+                logDebug("Update scene with prefab path: " + prefabTmpPath);
+            }
+        }
+
         SetCurrentPrefabPath(prefabTmpPath);
         SavePrefab(prefabTmpPath);
     }
@@ -153,7 +172,7 @@ void EditorPrefabManager::SaveCurrentPrefab()
 
 bool EditorPrefabManager::IsCurrentPrefabTmp()
 {
-	const std::string prefabTmpPath = "data/.tmp" + std::to_string(currentPrefabIndex_) + ".prefab";
+    const std::string prefabTmpPath = "data/.tmp" + std::to_string(currentPrefabIndex_) + ".prefab";
     return currentPrefabPath_.empty() or currentPrefabPath_ == prefabTmpPath;
 }
 
@@ -176,7 +195,7 @@ sf::FloatRect EditorPrefabManager::CalculatePrefabBound()
 
     sf::FloatRect entityRect;
     if (entityManager.HasComponent(0u,
-            neko::EntityMask(neko::NekoComponentType::POSITION2D)))
+                                   neko::EntityMask(neko::NekoComponentType::POSITION2D)))
     {
         const auto pos = neko::unit2pixel(transformManager.GetPositionManager().GetConstComponent(0u));
         entityRect.left = pos.x;
@@ -219,25 +238,25 @@ sf::FloatRect EditorPrefabManager::CalculatePrefabBound()
             updateEntityRect(rect);
 
         }
-        if(entityManager.HasComponent(entity, boxEntityMask))
+        if (entityManager.HasComponent(entity, boxEntityMask))
         {
             auto& boxColliderManager = nekoEditor_.GetColliderDefManager().GetBoxColliderDefManager();
             const auto& box = boxColliderManager.GetConstComponent(entity);
             const auto rect = transform.transformRect(box.shape.getGlobalBounds());
             updateEntityRect(rect);
         }
-        if(entityManager.HasComponent(entity, circleEntityMask))
+        if (entityManager.HasComponent(entity, circleEntityMask))
         {
             auto& circleColliderDefManager = nekoEditor_.GetColliderDefManager().GetCircleColliderDefManager();
             const auto& circleCollider = circleColliderDefManager.GetConstComponent(entity);
             const auto rect = transform.transformRect(circleCollider.shape.getGlobalBounds());
             updateEntityRect(rect);
         }
-        if(entityManager.HasComponent(entity, spineEntityMask))
+        if (entityManager.HasComponent(entity, spineEntityMask))
         {
             auto& spineManager = nekoEditor_.GetSpineManager();
             const auto& spineComp = spineManager.GetConstComponent(entity);
-            if(spineComp.skeletonDrawable != nullptr)
+            if (spineComp.skeletonDrawable != nullptr)
             {
                 const auto rect = transform.transformRect(
                         spineComp.skeletonDrawable->vertexArray->getBounds());

@@ -99,7 +99,7 @@ void EditorSceneManager::ParseSceneJson(json& sceneJson)
 	prefabManager.ClearPrefabs();
 	if (neko::CheckJsonParameter(sceneJson, "prefabPaths", json::value_t::array))
 	{
-		for (auto& prefabPath : sceneJson["prefabPaths"])
+		for (const std::string& prefabPath : sceneJson["prefabPaths"])
 		{
 			prefabManager.LoadPrefab(prefabPath);
 		}
@@ -337,6 +337,11 @@ void EditorSceneManager::SaveCurrentScene()
 bool EditorSceneManager::IsCurrentSceneTmp()
 {
     return currentScene_.scenePath.empty() or currentScene_.scenePath == sceneTmpPath;
+}
+
+const std::string_view EditorSceneManager::GetSceneTmpPath()
+{
+    return sceneTmpPath;
 }
 
 
