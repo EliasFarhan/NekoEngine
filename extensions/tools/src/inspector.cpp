@@ -8,7 +8,7 @@
 namespace editor
 {
 
-void Inspector::ShowEntityInfo(neko::Entity entity)
+void Inspector::ShowEntityInfo(neko::Entity entity) const
 {
     if (entity == neko::INVALID_ENTITY)
         return;
@@ -26,6 +26,14 @@ void Inspector::ShowEntityInfo(neko::Entity entity)
             ImGui::LabelText("Entity Parent", "%u", parentEntity);
         }
     }
+	if(entityManager.HasComponent(entity, neko::EntityMask(neko::NekoComponentType::PREFAB)))
+	{
+		const auto index = sceneManager.GetConstComponent(entity);
+		if(index != neko::INVALID_INDEX)
+		{
+			ImGui::LabelText("Prefab Index", "%u", index);
+		}
+	}
     if (entityManager.HasComponent(entity, neko::EntityMask(neko::NekoComponentType::POSITION2D)))
     {
 

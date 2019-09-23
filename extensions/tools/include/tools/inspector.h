@@ -35,7 +35,7 @@ public:
     explicit Inspector(NekoEditor& nekoEditor) : nekoEditor_(nekoEditor){ }
 
     void BeginWindow();
-    void ShowEntityInfo(neko::Entity entity);
+    void ShowEntityInfo(neko::Entity entity) const;
     void EndWindow();
 private:
     NekoEditor& nekoEditor_;

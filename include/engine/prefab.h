@@ -39,7 +39,8 @@ public:
     explicit PrefabManager(SceneManager& sceneManager);
     void InstantiatePrefab(Index prefabIndex, EntityManager& entityManager);
     Index LoadPrefab(std::string_view prefabPath, bool forceReload=false);
-
+	void ClearPrefabs();
+    const std::vector<std::string>& GetConstPrefabPaths() const;
 protected:
     std::vector<std::string> prefabPaths_;
     std::vector<json> prefabJsons_;

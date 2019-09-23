@@ -307,12 +307,10 @@ inline void ImGui::FileBrowser::Display()
                        (!rsc.isDir && !(flags_ & ImGuiFileBrowserFlags_SelectDirectory)))
                     {
                         selectedFilename_ = rsc.name;
-                        if(!(flags_ & ImGuiFileBrowserFlags_SelectDirectory))
-#ifdef WIN32
-                            strcpy_s(inputNameBuf_->data(), selectedFilename_.size(), selectedFilename_.c_str());
-#else
+                        if (!(flags_ & ImGuiFileBrowserFlags_SelectDirectory))
+                        {
                             std::strcpy(inputNameBuf_->data(), selectedFilename_.c_str());
-#endif
+                        }
                     }
                 }
             }

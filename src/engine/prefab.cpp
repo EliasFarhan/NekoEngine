@@ -32,15 +32,26 @@ Index PrefabManager::LoadPrefab(std::string_view prefabPath, bool forceReload)
     }
 }
 
+void PrefabManager::ClearPrefabs()
+{
+	prefabPaths_.clear();
+	prefabJsons_.clear();
+}
+
+const std::vector<std::string>& PrefabManager::GetConstPrefabPaths() const
+{
+	return prefabPaths_;
+}
+
 void PrefabManager::InstantiatePrefab(Index prefabIndex, EntityManager& entityManager)
 {
     auto prefabJson = prefabJsons_[prefabIndex];
-    auto entityBase = entityManager.GetLastEntity() + 1;
+    const auto entityBase = entityManager.GetLastEntity() + 1;
     for (auto& entityJson: prefabJson["entities"])
     {
-        Entity entity = entityJson["entity"];
+	    const Entity entity = entityJson["entity"];
         entityJson["entity"] = entity + entityBase;
-        int parent = entityJson["parent"];
+	    const int parent = entityJson["parent"];
         if (parent != -1)
         {
             entityJson["parent"] = Entity(parent) + entityBase;

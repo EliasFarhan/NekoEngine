@@ -43,7 +43,7 @@ void EntityViewer::Update(EditorMode editorMode)
 
     ImGui::Begin("Entity Viewer", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 
-    bool sceneOpen = ImGui::CollapsingHeader(editorMode == EditorMode::PrefabMode?"Prefab Edition Mode":"Scene", ImGuiTreeNodeFlags_DefaultOpen);
+    const bool sceneOpen = ImGui::CollapsingHeader(editorMode == EditorMode::PrefabMode?"Prefab Edition Mode":"Scene", ImGuiTreeNodeFlags_DefaultOpen);
     if (ImGui::BeginDragDropTarget())
     {
         ImGuiDragDropFlags target_flags = 0;
@@ -51,9 +51,9 @@ void EntityViewer::Update(EditorMode editorMode)
         target_flags |= ImGuiDragDropFlags_AcceptNoDrawDefaultRect; // Don't display the yellow rectangle
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DND_DEMO_NAME", target_flags))
         {
-            neko::Entity move_from = *(const neko::Entity*) payload->Data;
-            neko::Entity move_to = neko::INVALID_ENTITY;
-            transformManager.SetTransformParent(move_from, move_to);
+	        const neko::Entity moveFrom = *static_cast<const neko::Entity*>(payload->Data);
+	        const neko::Entity moveTo = neko::INVALID_ENTITY;
+            transformManager.SetTransformParent(moveFrom, moveTo);
         }
         ImGui::EndDragDropTarget();
     }
@@ -66,13 +66,13 @@ void EntityViewer::Update(EditorMode editorMode)
             entitiesName_.push_back(sceneManager.GetCurrentScene().entitiesNames[entity]);
         }
     }
-    std::set<neko::Entity> entitiesSet;
 
+    std::set<neko::Entity> entitiesSet;
     for (size_t i = 0; i < entities_.size(); i++)
     {
 
         if(transformManager.GetParentEntity(entities_[i]) == neko::INVALID_ENTITY and
-        std::find(entitiesSet.cbegin(), entitiesSet.cend(), entities_[i]) == entitiesSet.end())
+			std::find(entitiesSet.cbegin(), entitiesSet.cend(), entities_[i]) == entitiesSet.end())
         {
             DrawEntityHierarchy(entities_[i], i, entitiesSet, sceneOpen, false);
         }
@@ -172,7 +172,11 @@ void EntityViewer::DrawEntityHierarchy(neko::Entity entity,
                         case EntityMenuComboItem::MAKE_PREFAB:
                         {
                             auto& prefabManager = nekoEditor_.GetPrefabManager();
-                            auto newIndex = prefabManager.CreatePrefabFromEntity(entity);
+							auto& sceneManager = nekoEditor_.GetSceneManager();
+							auto& entityManager = nekoEditor_.GetEntityManager();
+                        	const auto newIndex = prefabManager.CreatePrefabFromEntity(entity);
+							sceneManager.AddComponent(entityManager, entity); //adding prefab
+							sceneManager.SetComponent(entity, newIndex);
                             nekoEditor_.SwitchEditorMode(EditorMode::PrefabMode);
                             prefabManager.SetCurrentPrefabIndex(newIndex);
                             nekoEditor_.GetSceneManager().ClearScene();

@@ -1,7 +1,26 @@
-//
-// Created by efarhan on 8/13/19.
-//
+/*
+ MIT License
 
+ Copyright (c) 2019 SAE Institute Switzerland AG
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
+ */
 #include <tools/editor_prefab.h>
 #include <tools/editor_scene.h>
 #include <utilities/file_utility.h>
@@ -11,7 +30,6 @@
 namespace editor
 {
 
-const char* prefabTmpPath = "data/.tmp.prefab";
 
 const std::string& EditorPrefabManager::GetCurrentPrefabPath() const
 {
@@ -39,9 +57,16 @@ void EditorPrefabManager::SavePrefab(const std::string_view path)
     auto& sceneManager = dynamic_cast<EditorSceneManager&>(sceneManager_);
     json prefabJson = sceneManager.SerializeScene();
     prefabJson.erase("sceneName");
+	for(auto& entityJson : prefabJson["entities"])
+	{
+		if(entityJson["entity"] == 0)
+		{
+			entityJson["prefab"] = false;
+		}
+	}
 
     const auto prefabTxt = prefabJson.dump(4);
-    if (currentPrefabIndex_ != neko::INVALID_INDEX)
+    if (currentPrefabIndex_ != neko::INVALID_INDEX and currentPrefabIndex_ < prefabJsons_.size())
     {
         prefabJsons_[currentPrefabIndex_] = prefabJson;
     }
@@ -56,22 +81,25 @@ void EditorPrefabManager::SavePrefab(const std::string_view path)
 
 neko::Index EditorPrefabManager::CreatePrefabFromEntity(neko::Entity entity)
 {
-    auto newIndex = neko::Index(prefabJsons_.size());
+	const auto newIndex = neko::Index(prefabJsons_.size());
     auto& sceneManager = dynamic_cast<EditorSceneManager&>(sceneManager_);
     auto& transformManager = nekoEditor_.GetTransformManager();
-
+	auto& entityManager = nekoEditor_.GetEntityManager();
     json prefabJson;
     prefabJson["entities"] = json::array();
     neko::Entity rootEntity = entity;
+	entityManager.AddComponentType(entity, neko::EntityMask(neko::NekoComponentType::PREFAB));
     {
         auto entityJson = sceneManager.SerializeEntity(rootEntity);
         entityJson["parent"] = -1;//No parent in prefab
         entityJson["entity"] = 0;//Root entity is 0
-        prefabJson["entities"].push_back(entityJson);
+		entityJson["prefab"] = false;
+		prefabJson["entities"].push_back(entityJson);
+
     }
 
-    neko::Entity currentParentEntity = rootEntity;
-    std::function<void(neko::Entity)> updateInstanceEntityfunc = [&](neko::Entity parent)
+	const neko::Entity currentParentEntity = rootEntity;
+    std::function<void(neko::Entity)> updateInstanceEntityFunc = [&](neko::Entity parent)
     {
         neko::Entity currentEntity = transformManager.FindNextChild(parent);
         while (currentEntity != neko::INVALID_ENTITY)
@@ -80,11 +108,21 @@ neko::Index EditorPrefabManager::CreatePrefabFromEntity(neko::Entity entity)
             entityJson["entity"] = currentEntity - rootEntity;//TODO negative entity
             entityJson["parent"] = parent - rootEntity;//TODO negative parent
             prefabJson["entities"].push_back(entityJson);
-            updateInstanceEntityfunc(currentEntity);
+            updateInstanceEntityFunc(currentEntity);
             currentEntity = transformManager.FindNextChild(parent, currentEntity);
         }
     };
-    updateInstanceEntityfunc(currentParentEntity);
+	updateInstanceEntityFunc(currentParentEntity);
+	const std::function<void(neko::Entity)> removeChildrenEntityFunc = [&](neko::Entity parent)
+	{
+		neko::Entity currentEntity = transformManager.FindNextChild(parent);
+		while (currentEntity != neko::INVALID_ENTITY)
+		{
+			entityManager.DestroyEntity(currentEntity);
+			currentEntity = transformManager.FindNextChild(parent, currentEntity);
+		}
+	};
+	removeChildrenEntityFunc(currentParentEntity);
     prefabJsons_.push_back(prefabJson);
     prefabPaths_.push_back("");
 
@@ -103,6 +141,7 @@ void EditorPrefabManager::SaveCurrentPrefab()
 {
     if (IsCurrentPrefabTmp())
     {
+	    const std::string prefabTmpPath = "data/.tmp" + std::to_string(currentPrefabIndex_) + ".prefab";
         SetCurrentPrefabPath(prefabTmpPath);
         SavePrefab(prefabTmpPath);
     }
@@ -114,6 +153,7 @@ void EditorPrefabManager::SaveCurrentPrefab()
 
 bool EditorPrefabManager::IsCurrentPrefabTmp()
 {
+	const std::string prefabTmpPath = "data/.tmp" + std::to_string(currentPrefabIndex_) + ".prefab";
     return currentPrefabPath_.empty() or currentPrefabPath_ == prefabTmpPath;
 }
 

@@ -92,6 +92,23 @@ void EditorSceneManager::ParseComponentJson(json& componentJson, neko::Entity en
     }
 }
 
+void EditorSceneManager::ParseSceneJson(json& sceneJson)
+{
+	//Loading all the scene prefabs
+	auto& prefabManager = nekoEditor_.GetPrefabManager();
+	prefabManager.ClearPrefabs();
+	if (neko::CheckJsonParameter(sceneJson, "prefabPaths", json::value_t::array))
+	{
+		for (auto& prefabPath : sceneJson["prefabPaths"])
+		{
+			prefabManager.LoadPrefab(prefabPath);
+		}
+	}
+	neko::SceneManager::ParseSceneJson(sceneJson);
+
+	
+}
+
 void EditorSceneManager::ParseEntityJson(json& entityJson)
 {
     neko::Entity entity = neko::INVALID_ENTITY;
@@ -104,25 +121,41 @@ void EditorSceneManager::ParseEntityJson(json& entityJson)
         logDebug("[Error] Scene loader entity with no entity nmb");
         return;
     }
-    auto& entityManager = nekoEditor_.GetEntityManager();
+	if (neko::CheckJsonNumber(entityJson, "parent"))
+	{
+		const int parentEntity = entityJson["parent"];
+
+		logDebug("Parsing entity: " + std::to_string(entity) + " with parent: " + std::to_string(parentEntity));
+		if (parentEntity >= 0)
+		{
+			auto& transformManager = nekoEditor_.GetTransformManager();
+			transformManager.SetTransformParent(entity, neko::Entity(parentEntity));
+		}
+	}
+	if (neko::CheckJsonParameter(entityJson, "name", json::value_t::string))
+	{
+		ResizeIfNecessary(currentScene_.entitiesNames, entity, std::string());
+		currentScene_.entitiesNames[entity] = entityJson["name"];
+
+	}
+	auto& entityManager = nekoEditor_.GetEntityManager();
+	if (neko::CheckJsonParameter(entityJson, "prefab", json::value_t::boolean))
+	{
+		if (entityJson["prefab"])
+		{
+			auto& prefabManager = nekoEditor_.GetPrefabManager();
+			if (neko::CheckJsonNumber(entityJson, "prefabIndex"))
+			{
+				const neko::Index prefabIndex = entityJson["prefabIndex"];
+				prefabManager.InstantiatePrefab(prefabIndex, entityManager);
+			}
+			return;
+		}
+	}
     entityManager.CreateEntity(entity);
-    if (neko::CheckJsonNumber(entityJson, "parent"))
-    {
-        int parentEntity = entityJson["parent"];
+   
 
-        logDebug("Parsing entity: " + std::to_string(entity) + " with parent: " + std::to_string(parentEntity));
-        if (parentEntity >= 0)
-        {
-            auto& transformManager = nekoEditor_.GetTransformManager();
-            transformManager.SetTransformParent(entity, neko::Entity(parentEntity));
-        }
-    }
-    if (neko::CheckJsonParameter(entityJson, "name", json::value_t::string))
-    {
-        ResizeIfNecessary(currentScene_.entitiesNames, entity, std::string());
-        currentScene_.entitiesNames[entity] = entityJson["name"];
-
-    }
+	
 
     if (neko::CheckJsonParameter(entityJson, "components", json::value_t::array))
     {
@@ -201,7 +234,7 @@ json EditorSceneManager::SerializeEntity(neko::Entity entity)
     //parent entity
     {
         auto& transformManager = nekoEditor_.GetTransformManager();
-        auto parentEntity = transformManager.GetParentEntity(entity);
+        const auto parentEntity = transformManager.GetParentEntity(entity);
         if (parentEntity != neko::INVALID_ENTITY)
         {
             entityJson["parent"] = int(parentEntity);
@@ -211,6 +244,18 @@ json EditorSceneManager::SerializeEntity(neko::Entity entity)
             entityJson["parent"] = -1;
         }
     }
+	//prefab root entity
+    {
+		const bool isPrefab = entityManager.HasComponent(entity, neko::EntityMask(neko::NekoComponentType::PREFAB));
+		entityJson["prefab"] = isPrefab;
+		if(isPrefab)
+		{
+			const auto prefabIndex = GetConstComponent(entity);
+			entityJson["prefabIndex"] = prefabIndex;
+			return entityJson;
+		}
+    }
+	
     entityJson["components"] = json::array();
     for (auto componentType : neko::GetComponentTypeSet())
     {
@@ -237,6 +282,13 @@ json EditorSceneManager::SerializeScene()
             sceneJson["entities"].push_back(entityJson);
         }
     }
+	auto& prefabManager = nekoEditor_.GetPrefabManager();
+	json prefabPaths = json::array();
+	for(auto& prefabPath : prefabManager.GetConstPrefabPaths())
+	{
+		prefabPaths.push_back(prefabPath);
+	}
+	sceneJson["prefabPaths"] = prefabPaths;
     return sceneJson;
 }
 
@@ -245,7 +297,8 @@ void EditorSceneManager::SaveScene(std::string_view path)
     logDebug("Saving scene: "+std::string(path));
     auto sceneJson = SerializeScene();
     sceneJson["scenePath"] = path;
-    auto sceneTxt = sceneJson.dump(4);
+
+    const auto sceneTxt = sceneJson.dump(4);
     neko::WriteStringToFile(path.data(), sceneTxt);
     currentScene_.scenePath = path;
     currentScene_.sceneName = neko::GetFilename(path);

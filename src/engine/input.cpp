@@ -61,12 +61,16 @@ bool KeyboardManager::IsKeyUp(sf::Keyboard::Key key) const
 
 void KeyboardManager::AddPressKey(sf::Keyboard::Key key)
 {
+	if(key == -1)
+		return;
     keyStatusArray_[int(key)] = true;
     pressedKeys_.push_back(key);
 }
 
 void KeyboardManager::AddReleaseKey(sf::Keyboard::Key key)
 {
+	if (key == -1)
+		return;
     keyStatusArray_[int(key)] = false;
     releasedKeys_.push_back(key);
 }
