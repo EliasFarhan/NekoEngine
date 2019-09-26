@@ -327,6 +327,8 @@ include(cmake/neko_executable.cmake)
 add_neko_executable(SplashDebug ${CMAKE_SOURCE_DIR}/main/SplashDebug.cpp Neko_COMMON Network Splash engine2d)
 #NekoEditor
 add_neko_executable(NekoEditor2d ${CMAKE_SOURCE_DIR}/main/NekoEditor.cpp Neko_COMMON tools)
+#Network Prediction Simulation
+add_neko_executable(PredictionSimulation ${CMAKE_SOURCE_DIR}/main/PredictionSimulation.cpp Neko_COMMON Network)
 if(MSVC)
 if(NOT CMAKE_CL_64)
 file(COPY ${SFML_DIR}/extlibs/bin/x86/openal32.dll DESTINATION ${CMAKE_BINARY_DIR}/)
