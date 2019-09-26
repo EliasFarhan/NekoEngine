@@ -115,9 +115,19 @@ Vec2f pixel2unit(const sf::Vector2f& v)
     return Vec2f(pixel2meter(v.x), pixel2meter(v.y));
 }
 
+float pixel2unit(const float v)
+{
+	return pixel2meter(v);
+}
+
 sf::Vector2f unit2pixel(const Vec2f& v)
 {
     return sf::Vector2f(meter2pixel(v.x), meter2pixel(v.y));
+}
+
+float unit2pixel(float v)
+{
+	return meter2pixel(v);
 }
 
 

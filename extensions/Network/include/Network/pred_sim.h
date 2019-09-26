@@ -6,11 +6,19 @@
 #include <graphics/shape.h>
 namespace net
 {
-	struct Actor
+	struct ActorData
 	{
+		neko::Index tickIndex = neko::INVALID_INDEX;
 		neko::Vec2f position{};
 		neko::Vec2f velocity{};
 	};
+	const size_t serverActorDataBufferSize = 3;
+	const neko::EntityMask velocityMask = 1u << 15u;
+	class VelocityManager : public neko::ComponentManager<neko::Vec2f, velocityMask>
+	{
+		
+	};
+
 	class PredSimEngine;
 	class ServerSimSystem : public neko::System
 	{
@@ -21,7 +29,8 @@ namespace net
 		void Destroy() override;
 	private:
 		PredSimEngine& engine_;
-		std::vector<Actor> serverActors_;
+		std::vector<std::array<ActorData, serverActorDataBufferSize>> serverActorsDataBuffer_;
+		neko::Index tick_ = 0;
 	};
 
 	class ClientSimSystem : public  neko::System
@@ -32,8 +41,9 @@ namespace net
 		void Update(float dt) override;
 		void Destroy() override;
 	private:
+		std::vector<neko::Entity> entities_;
 		PredSimEngine& engine_;
-		std::vector<Actor> clientActors_;
+		neko::Index tick_ = 0;
 	};
 
 	enum class ServerPredictionType
@@ -59,6 +69,7 @@ namespace net
 		neko::GraphicsManager graphicsManager_;
 		neko::Transform2dManager transformManager_;
 		neko::ConvexShapeManager shapeManager_;
+		VelocityManager velocitiesManager_;
 	};
 
 }

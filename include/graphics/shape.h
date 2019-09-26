@@ -64,11 +64,12 @@ class ConvexShapeManager : public ComponentManager<sf::ConvexShape, ComponentTyp
 public:
     using ComponentManager::ComponentManager;
 
-    void AddBox(Entity entity, const sf::Vector2f& pos, const sf::Vector2f& halfSize, const ShapeDef& shapeDef);
+    void AddBox(Entity entity, const Vec2f& pos, const Vec2f& halfSize, const ShapeDef& shapeDef);
 
-    void AddPolygon(Entity entity, const sf::Vector2f& pos, const sf::Vector2f* points, size_t pointNmb, const ShapeDef& shapeDef);
+    void AddPolygon(Entity entity, const Vec2f& pos, const Vec2f* points, size_t pointNmb, const ShapeDef& shapeDef);
 
     void CopyTransformPosition(Position2dManager& positionManager, size_t start, size_t length);
+    void CopyTransformRotation(Rotation2dManager& rotationManager, size_t start, size_t length);
 
     void PushCommands(GraphicsManager* graphicsManager, size_t start, size_t length);
 

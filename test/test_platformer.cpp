@@ -180,7 +180,7 @@ public:
             platformShapeDef.outlineThickness = 1.0f;
             shapeManager_.AddComponent(entityManager_, platformEntity);
             shapeManager_.AddBox(platformEntity, platformPositions[i], neko::meter2pixel(
-                    b2Vec2(platformPhysicsSize.x / 2.0f, platformPhysicsSize.y / 2.0f)), platformShapeDef);
+	                                 b2Vec2(platformPhysicsSize.x / 2.0f, platformPhysicsSize.y / 2.0f)), platformShapeDef);
 
 #endif
             physicsManager_.AddCollider(platformCollider);

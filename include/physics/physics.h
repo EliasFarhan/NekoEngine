@@ -81,7 +81,9 @@ sf::Vector2f meter2pixel(const b2Vec2& v);
 
 b2Vec2 pixel2meter(const sf::Vector2f& v);
 Vec2f pixel2unit(const sf::Vector2f& v);
+float pixel2unit(const float v);
 sf::Vector2f unit2pixel(const Vec2f& v);
+float unit2pixel(float v);
 
 class Body2dManager : public ComponentManager <b2Body*,ComponentType(NekoComponentType::BODY2D)>
 {

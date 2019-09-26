@@ -30,27 +30,27 @@ namespace neko
 {
 
 
-void ConvexShapeManager::AddBox(Entity entity, const sf::Vector2f& pos, const sf::Vector2f& halfSize, const ShapeDef& shapeDef)
+void ConvexShapeManager::AddBox(Entity entity, const Vec2f& pos, const Vec2f& halfSize, const ShapeDef& shapeDef)
 {
-    sf::Vector2f points[4] =
-            {
-                    -halfSize,
-                    sf::Vector2f(-halfSize.x, halfSize.y),
-                    halfSize,
-                    sf::Vector2f(halfSize.x, -halfSize.y)
-            };
+    Vec2f points[4] =
+    {
+        Vec2f()-halfSize,
+        sf::Vector2f(-halfSize.x, halfSize.y),
+        halfSize,
+        sf::Vector2f(halfSize.x, -halfSize.y)
+    };
     AddPolygon(entity, pos, points, 4, shapeDef);
 }
 
-void ConvexShapeManager::AddPolygon(Entity entity, const sf::Vector2f& pos, const sf::Vector2f* points, size_t pointNmb,
-                                     const ShapeDef& shapeDef)
+void ConvexShapeManager::AddPolygon(Entity entity, const Vec2f& pos, const Vec2f* points, size_t pointNmb,
+                                    const ShapeDef& shapeDef)
 {
     sf::ConvexShape newPolygon;
     newPolygon.setPointCount(pointNmb);
-    newPolygon.setPosition(pos);
+    newPolygon.setPosition(unit2pixel(pos));
     for (auto i = 0u; i < pointNmb; i++)
     {
-        newPolygon.setPoint(i, points[i]);
+        newPolygon.setPoint(i, unit2pixel(points[i]));
     }
     newPolygon.setFillColor(shapeDef.fillColor);
     newPolygon.setOutlineColor(shapeDef.outlineColor);
@@ -61,10 +61,20 @@ void ConvexShapeManager::AddPolygon(Entity entity, const sf::Vector2f& pos, cons
 
 void ConvexShapeManager::CopyTransformPosition(Position2dManager& positionManager, size_t start, size_t length)
 {
+	const auto positions = positionManager.GetConstComponentsVector();
     for(auto i = start; i < start+length; i++)
     {
-        components_[i].setPosition(positionManager.GetConstComponentsVector()[i]);
+        components_[i].setPosition(neko::unit2pixel(positions[i]));
     }
+}
+
+void ConvexShapeManager::CopyTransformRotation(Rotation2dManager& rotationManager, size_t start, size_t length)
+{
+	const auto rotations = rotationManager.GetConstComponentsVector();
+	for (auto i = start; i < start + length; i++)
+	{
+		components_[i].setRotation(-rotations[i]); //counter clockwise rotation
+	}
 }
 
 void ConvexShapeManager::PushCommands(GraphicsManager* graphicsManager, size_t start, size_t length)
