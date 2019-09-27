@@ -50,7 +50,7 @@ float Vec2f::GetMagnitude() const
     return sqrtf(x * x + y * y);
 }
 
-Vec2f Vec2f::Normalized()
+Vec2f Vec2f::Normalized() const
 {
     return (*this) / (*this).GetMagnitude();
 }
@@ -134,5 +134,12 @@ Vec2f Vec2f::Rotate(float angle) const
     float radianAngle = glm::radians(angle);
     return Vec2f(cosf(radianAngle) * x - sinf(radianAngle) * y,
                  sinf(radianAngle) * x + cosf(radianAngle) * y);
+}
+
+Vec2f& Vec2f::operator/=(float rhs)
+{
+    this->x /= rhs;
+    this->y /= rhs;
+    return *this;
 }
 }
