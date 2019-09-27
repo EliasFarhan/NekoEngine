@@ -4,11 +4,14 @@
 #include <engine/engine.h>
 #include <engine/transform.h>
 #include <graphics/shape.h>
+#include <random>
+
 namespace net
 {
 	struct ActorData
 	{
 		neko::Index tickIndex = neko::INVALID_INDEX;
+		neko::Entity entity = neko::INVALID_ENTITY;
 		neko::Vec2f position{};
 		neko::Vec2f velocity{};
 	};
@@ -20,6 +23,12 @@ namespace net
 	};
 
 	class PredSimEngine;
+	enum class ServerPredictionType
+	{
+		None,
+		Interpolation,
+		Extrapolation
+	};
 	class ServerSimSystem : public neko::System
 	{
 	public:
@@ -27,12 +36,25 @@ namespace net
 		void Init() override;
 		void Update(float dt) override;
 		void Destroy() override;
+		void PushClientData(const ActorData& data);
 	private:
 		PredSimEngine& engine_;
 		std::vector<std::array<ActorData, serverActorDataBufferSize>> serverActorsDataBuffer_;
+		std::vector<neko::Entity> serverEntities_;
+		std::unordered_map<neko::Entity, neko::Entity> entitiesTranslateTable_;
 		neko::Index tick_ = 0;
+		size_t dataSent_ = 0;
+		float currentSecondBandwidth_ = 0.0f;
+		std::random_device rd;
+		std::mt19937 eng;
+		ServerPredictionType serverPredictionType_ = ServerPredictionType::Interpolation;
 	};
-
+	enum class ClientMovementType
+	{
+		Linear,
+		Planet,
+		Boids
+	};
 	class ClientSimSystem : public  neko::System
 	{
 	public:
@@ -41,17 +63,18 @@ namespace net
 		void Update(float dt) override;
 		void Destroy() override;
 	private:
+		friend class ServerSimSystem;
+		std::vector<neko::Index> randomDirectionChangePeriods_;
+		std::vector<std::pair<ActorData, neko::Index>> dataDelayQueue_;
 		std::vector<neko::Entity> entities_;
 		PredSimEngine& engine_;
 		neko::Index tick_ = 0;
+		ClientMovementType clientMovementType_ = ClientMovementType::Planet;
+		std::random_device rd; // obtain a random number from hardware
+		
 	};
 
-	enum class ServerPredictionType
-	{
-		None,
-		Interpolation,
-		Extrapolation
-	};
+	
 	class PredSimEngine : public neko::BasicEngine
 	{
 	public:
@@ -64,6 +87,7 @@ namespace net
 		friend class ClientSimSystem;
 		ServerSimSystem server_;
 		ClientSimSystem client_;
+
 
 		neko::EntityManager entityManager_;
 		neko::GraphicsManager graphicsManager_;
