@@ -398,8 +398,9 @@ void ClientSimSystem::Update(float dt)
                 const float localCohesionRadius = 1.0f;
                 const float localAlignementRadius = 1.0f;
                 const float centerPullFactor = 2.0f;
-                const float separationFactor = 1.0f/float(actorNmb);
-                const float cohesionFactor = 1.0f/float(actorNmb);
+                const float separationFactor = 2.0f / float(actorNmb);
+                const float cohesionFactor = 1.0f / float(actorNmb);
+				const float alignementFactor = 2.0f / float(actorNmb);
                 neko::Vec2f totalDeltaPos = neko::Vec2f();
                 neko::Vec2f totalVel = neko::Vec2f();
                 neko::Vec2f totalSeparate = neko::Vec2f();
@@ -452,7 +453,7 @@ void ClientSimSystem::Update(float dt)
                 if(alignementActorNmb > 0)
                 {
                     totalVel /= float(alignementActorNmb);
-                    acceleration += totalVel-vel;
+                    acceleration += (totalVel-vel)*alignementFactor;
                 }
                 //Pull by center
                 if((centerPos-pos).GetMagnitude() > localCohesionRadius)

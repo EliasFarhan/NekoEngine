@@ -68,7 +68,7 @@ namespace net
 		std::vector<neko::Entity> entities_;
 		PredSimEngine& engine_;
 		neko::Index tick_ = 0;
-		ClientMovementType clientMovementType_ = ClientMovementType::Planet;
+		ClientMovementType clientMovementType_ = ClientMovementType::Boids;
         std::default_random_engine eng_;
 	};
 
