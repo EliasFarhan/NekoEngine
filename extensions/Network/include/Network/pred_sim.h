@@ -45,7 +45,8 @@ namespace net
 		neko::Index tick_ = 0;
 		size_t dataSent_ = 0;
 		float currentSecondBandwidth_ = 0.0f;
-        std::default_random_engine eng_;
+        std::random_device rd{};
+        std::mt19937 eng_{rd()};
 		ServerPredictionType serverPredictionType_ = ServerPredictionType::Interpolation;
 	};
 	enum class ClientMovementType
@@ -69,7 +70,8 @@ namespace net
 		PredSimEngine& engine_;
 		neko::Index tick_ = 0;
 		ClientMovementType clientMovementType_ = ClientMovementType::Boids;
-        std::default_random_engine eng_;
+        std::random_device rd{};
+        std::mt19937 eng_{rd()};
 	};
 
 	
