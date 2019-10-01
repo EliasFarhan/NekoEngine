@@ -15,7 +15,7 @@ namespace net
 		neko::Vec2f position{};
 		neko::Vec2f velocity{};
 	};
-	const size_t serverActorDataBufferSize = 3;
+	const size_t serverActorDataBufferSize = 4;
 	const neko::EntityMask velocityMask = 1u << 15u;
 	class VelocityManager : public neko::ComponentManager<neko::Vec2f, velocityMask>
 	{
@@ -27,7 +27,8 @@ namespace net
 	{
 		None,
 		Interpolation,
-		Extrapolation
+		Extrapolation,
+		Catmull_Interpolation
 	};
 	class ServerSimSystem : public neko::System
 	{

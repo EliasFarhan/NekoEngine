@@ -10,6 +10,7 @@
 namespace net
 {
 const size_t actorNmb = 100;
+size_t shownActorNmb = 100;
 const float linearSpeed = 2.0f;
 const neko::Vec2f points[] = {
         neko::Vec2f(0.0f, -0.2f),
@@ -87,9 +88,9 @@ void ServerSimSystem::Update([[maybe_unused]] float dt)
     }
     ImGui::Begin("Server Control");
     ImGui::LabelText("Bandwidth", "%f bytes/s", currentSecondBandwidth_);
-    const char* serverPredictionName[] = {"None", "Interpolation", "Extrapolation"};
+    const char* serverPredictionName[] = {"None", "Interpolation", "Extrapolation", "Catmull Interpolation"};
     static int serverComboIndex = int(serverPredictionType_);
-    if (ImGui::Combo("Prediction", &serverComboIndex, serverPredictionName, 3))
+    if (ImGui::Combo("Prediction", &serverComboIndex, serverPredictionName, 4))
     {
         serverPredictionType_ = ServerPredictionType(serverComboIndex);
     }
@@ -110,6 +111,11 @@ void ServerSimSystem::Update([[maybe_unused]] float dt)
     if (ImGui::DragInt("Server Interpolation Delay", &tmpInterpolationPeriod, 1, 0, 60))
     {
         serverDelayPeriod = tmpInterpolationPeriod;
+    }
+    int tmpShownActorNmb = shownActorNmb;
+    if(ImGui::DragInt("Shown Actor Nmb", &tmpShownActorNmb, 1, 0, int(actorNmb)))
+    {
+        shownActorNmb = tmpShownActorNmb;
     }
     ImGui::DragFloat("Data Loss Probability", &dataLossProb, 0.1f, 0.0f, 1.0f);
     ImGui::Checkbox("Hide Client", &hideClient);
@@ -143,7 +149,7 @@ void ServerSimSystem::Update([[maybe_unused]] float dt)
                 const auto index = neko::Index(
                         std::find(serverEntities_.cbegin(), serverEntities_.cend(), entity) - serverEntities_.cbegin());
                 const auto lastActorData = serverActorsDataBuffer_[index].back();
-                const auto previousActorData = serverActorsDataBuffer_[index][1];
+                const auto previousActorData = serverActorsDataBuffer_[index][serverActorDataBufferSize-2];
                 const auto previousTick = previousActorData.tickIndex;
                 const auto lastTick = lastActorData.tickIndex;
                 if (lastTick > previousTick)
@@ -184,7 +190,7 @@ void ServerSimSystem::Update([[maybe_unused]] float dt)
                 const auto index = neko::Index(
                         std::find(serverEntities_.cbegin(), serverEntities_.cend(), entity) - serverEntities_.cbegin());
                 const auto lastActorData = serverActorsDataBuffer_[index].back();
-                const auto previousActorData = serverActorsDataBuffer_[index][1];
+                const auto previousActorData = serverActorsDataBuffer_[index][serverActorDataBufferSize-2];
                 const auto previousTick = previousActorData.tickIndex;
                 const auto lastTick = lastActorData.tickIndex;
                 if (lastTick > previousTick)
@@ -213,6 +219,59 @@ void ServerSimSystem::Update([[maybe_unused]] float dt)
                     rotationManager.SetComponent(entity, newAngle);
                 }
 
+            }
+            break;
+        }
+        case ServerPredictionType::Catmull_Interpolation:
+        {
+            neko::Index lastGlobalTick = tick_ > serverDelayPeriod ? tick_ - serverDelayPeriod : 0;
+
+            for (auto& entity : serverEntities_)
+            {
+                const auto index = neko::Index(
+                        std::find(serverEntities_.cbegin(), serverEntities_.cend(), entity) - serverEntities_.cbegin());
+                if(index >= shownActorNmb)
+                    continue;
+                const auto& actorDataArray = serverActorsDataBuffer_[index];
+                const auto t0 = actorDataArray[0].tickIndex;
+                const auto t1 = actorDataArray[1].tickIndex;
+                const auto t2 = actorDataArray[2].tickIndex;
+                const auto t3 = actorDataArray[3].tickIndex;
+                const auto t = lastGlobalTick;
+                if (t3 > t2 and t2 > t1 and t1 > t0)
+                {
+                    const auto framePeriod = float(t2-t1);
+                    const float currentTime = (float(lastGlobalTick) - float(t1)) / framePeriod;
+
+                    const auto& p0 = actorDataArray[0].position;
+                    const auto& p1 = actorDataArray[1].position;
+                    const auto& p2 = actorDataArray[2].position;
+                    const auto& p3 = actorDataArray[3].position;
+                    const auto A1 = p0*float(t1-t)/float(t1-t0) + p1*float(t-t0)/float(t1-t0);
+                    const auto A2 = p1*float(t2-t)/float(t2-t1) + p2*float(t-t1)/float(t2-t1);
+                    const auto A3 = p2*float(t3-t)/float(t3-t2) + p3*float(t-t2)/float(t3-t2);
+
+                    const auto B1 = A1*float(t2-t)/float(t2-t0) + A2*float(t-t0)/float(t2-t0);
+                    const auto B2 = A2*float(t3-t)/float(t3-t1) + A3*float(t-t1)/float(t3-t1);
+
+                    const auto position = B1*float(t2-t)/float(t2-t1) + B2*float(t-t1)/float(t2-t1);
+                    positionManager.SetComponent(entity, position);
+
+                    const auto velocity = neko::Vec2f::Lerp(actorDataArray[2].velocity, actorDataArray[1].velocity, currentTime);
+                    velocityManager.SetComponent(entity, velocity);
+
+                    const float newAngle = neko::Vec2f::AngleBetween(velocity, neko::Vec2f(0.0f, -1.0f));
+                    rotationManager.SetComponent(entity, newAngle);
+                }
+                else
+                {
+                    const auto position = actorDataArray[2].position;
+                    positionManager.SetComponent(entity, position);
+                    const auto velocity = actorDataArray[2].velocity;
+                    velocityManager.SetComponent(entity, velocity);
+                    const float newAngle = neko::Vec2f::AngleBetween(velocity, neko::Vec2f(0.0f, -1.0f));
+                    rotationManager.SetComponent(entity, newAngle);
+                }
             }
             break;
         }
@@ -512,7 +571,11 @@ void PredSimEngine::Update(float dt)
 
     shapeManager_.CopyTransformPosition(transformManager_.GetPositionManager(), 0, actorNmb * 2);
     shapeManager_.CopyTransformRotation(transformManager_.GetRotationManager(), 0, actorNmb * 2);
-    shapeManager_.PushCommands(&graphicsManager_, hideClient ? actorNmb : 0, hideClient ? actorNmb : (actorNmb * 2));
+    if(!hideClient)
+    {
+        shapeManager_.PushCommands(&graphicsManager_, 0, shownActorNmb);
+    }
+    shapeManager_.PushCommands(&graphicsManager_, actorNmb, shownActorNmb);
 
     graphicsManager_.Render(*renderWindow);
 }
