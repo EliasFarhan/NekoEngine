@@ -497,6 +497,7 @@ PredSimEngine::PredSimEngine() : server_(*this), client_(*this)
 void PredSimEngine::Init()
 {
     config.framerateLimit = 60u;
+    config.vSync = false;
     BasicEngine::Init();
 
     client_.Init();
