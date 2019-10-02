@@ -15,7 +15,7 @@ namespace net
 		neko::Vec2f position{};
 		neko::Vec2f velocity{};
 	};
-	const size_t serverActorDataBufferSize = 3;
+	const size_t serverActorDataBufferSize = 4;
 	const neko::EntityMask velocityMask = 1u << 15u;
 	class VelocityManager : public neko::ComponentManager<neko::Vec2f, velocityMask>
 	{
@@ -27,7 +27,8 @@ namespace net
 	{
 		None,
 		Interpolation,
-		Extrapolation
+		Extrapolation,
+		Catmull_Interpolation
 	};
 	class ServerSimSystem : public neko::System
 	{
@@ -45,7 +46,8 @@ namespace net
 		neko::Index tick_ = 0;
 		size_t dataSent_ = 0;
 		float currentSecondBandwidth_ = 0.0f;
-        std::default_random_engine eng_;
+        std::random_device rd{};
+        std::mt19937 eng_{rd()};
 		ServerPredictionType serverPredictionType_ = ServerPredictionType::Interpolation;
 	};
 	enum class ClientMovementType
@@ -68,8 +70,9 @@ namespace net
 		std::vector<neko::Entity> entities_;
 		PredSimEngine& engine_;
 		neko::Index tick_ = 0;
-		ClientMovementType clientMovementType_ = ClientMovementType::Planet;
-        std::default_random_engine eng_;
+		ClientMovementType clientMovementType_ = ClientMovementType::Boids;
+        std::random_device rd{};
+        std::mt19937 eng_{rd()};
 	};
 
 	
