@@ -29,7 +29,7 @@
 #include "globals.h"
 #include <engine/entity.h>
 #include "engine/component.h"
-#include "engine/vector.h"
+#include "mathematics/vector.h"
 #include <SFML/Graphics/Transform.hpp>
 
 namespace neko

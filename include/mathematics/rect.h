@@ -1,9 +1,8 @@
 #pragma once
-
 /*
  MIT License
 
- Copyright (c) 2017 SAE Institute Switzerland AG
+ Copyright (c) 2019 SAE Institute Switzerland AG
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -24,33 +23,7 @@
  SOFTWARE.
  */
 
-#include <string>
-#include <memory>
- //Externals includes
-#include <json.hpp>
-
-using json = nlohmann::json;
-
-#ifdef USE_SFML
-#include <SFML/System/Vector2.hpp>
-#include <SFML/Graphics/Rect.hpp>
-#endif
-
 namespace neko
 {
-bool IsJsonValueNumeric(const json::value_type& jsonValue);
-
-bool CheckJsonExists(const json& jsonObject, std::string parameterName);
-
-bool CheckJsonParameter(const json& jsonObject, std::string parameterName, json::value_t expectedType);
-
-bool CheckJsonNumber(const json& jsonObject, std::string parameterName);
-#ifdef USE_SFML
-sf::Vector2f GetVectorFromJson(const json& jsonObject, std::string parameterName);
-
-sf::IntRect GetIntRectFromJson(const json& jsonObject, std::string parameterName);
-
-sf::FloatRect GetFloatRectFromJson(const json& jsonObject, std::string parameterName);
-#endif
-json LoadJson(const std::string_view jsonPath);
+	
 }

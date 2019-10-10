@@ -24,7 +24,6 @@
  SOFTWARE.
  */
 
-#include <SFML/Graphics/RenderWindow.hpp>
 #include <condition_variable>
 #include <array>
 #include "tilemap.h"

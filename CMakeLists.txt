@@ -1,43 +1,34 @@
 cmake_minimum_required(VERSION 3.10)
 project(Neko)
 
+if(WIN32)
+add_compile_definitions(NOMINMAX)
+endif(WIN32)
+
 
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
 
-if(UNIX AND NOT APPLE)
-	MESSAGE("Linux Compiler ${CMAKE_CXX_COMPILER_ID}")
-	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-		MESSAGE("LLVM_ROOT ${LLVM_ROOT}")
-		# using Clang
-
-		if(LLVM_ROOT)
-			set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}  --stdlib=libc++ -L${LLVM_ROOT}/lib -Wl,-rpath,${LLVM_ROOT}/lib  -lc++ -lc++abi ")#-fsanitize=thread
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -nostdinc++")
-
-			include_directories(${LLVM_ROOT}/include/c++/v1/)
-			if("${CMAKE_CXX_COMPILER_VERSION}" STREQUAL "9.0.0")
-			else()
-				LIST(APPEND Neko_LIBRARIES
-						c++fs)
-			endif()
-			SET (CMAKE_AR      "${LLVM_ROOT}/bin/llvm-ar")
-			SET (CMAKE_LINKER  "${LLVM_ROOT}/bin/llvm-ld")
-			SET (CMAKE_NM      "${LLVM_ROOT}/bin/llvm-nm")
-			SET (CMAKE_OBJDUMP "${LLVM_ROOT}/bin/llvm-objdump")
-			SET (CMAKE_RANLIB  "${LLVM_ROOT}/bin/llvm-ranlib")
-		else()
-			LIST(APPEND Neko_LIBRARIES
-					stdc++fs)
-			set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")# -fsanitize=address")
-		endif()
-
-	elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-        # using GCC
-		LIST(APPEND Neko_LIBRARIES
-				stdc++fs)
+if(MSVC)
+    add_compile_options(
+        $<$<CONFIG:>:/MT> #---------|
+        $<$<CONFIG:Debug>:/MTd> #---|-- Statically link the runtime libraries
+        $<$<CONFIG:Release>:/MT> #--|
+		$<$<CONFIG:RelWithDebInfo>:/MT>
+    )
+	if (${CMAKE_HOST_SYSTEM_PROCESSOR} STREQUAL "AMD64")
+		set(GLSL_VALIDATOR "$ENV{VULKAN_SDK}/Bin/glslangValidator.exe")
+	else()
+		set(GLSL_VALIDATOR "$ENV{VULKAN_SDK}/Bin32/glslangValidator.exe")
 	endif()
-endif(UNIX AND NOT APPLE)
+elseif(UNIX)
+	set(GLSL_VALIDATOR "glslangValidator")
+endif()
+
+find_program(GLSL_VALIDATOR_FOUND ${GLSL_VALIDATOR})
+IF(NOT GLSL_VALIDATOR_FOUND)
+	MESSAGE(FATAL_ERROR "Please install VulkanSDK and put it in path (current path: $ENV{VULKAN_SDK})")
+ENDIF()
 
 if (APPLE)
 	find_package(Boost 1.66.0 REQUIRED COMPONENTS
@@ -72,6 +63,10 @@ file(GLOB_RECURSE TEXT_FILES
 "${PROJECT_SOURCE_DIR}/data/*.txt"
 "${PROJECT_SOURCE_DIR}/data/*.scene"
 )
+file(GLOB_RECURSE SHADER_FILES
+"${PROJECT_SOURCE_DIR}/data/*.vert"
+"${PROJECT_SOURCE_DIR}/data/*.frag"
+)
 file(GLOB_RECURSE IMG_FILES
 		"${PROJECT_SOURCE_DIR}/data/*.jpg"
 		"${PROJECT_SOURCE_DIR}/data/*.png"
@@ -89,7 +84,7 @@ file(GLOB_RECURSE SND_FILES
 		)
 find_package (Python3 COMPONENTS Interpreter)
 MESSAGE("Python Interpreter: ${Python3_EXECUTABLE}")
-LIST(APPEND DATA_FILES ${IMG_FILES} ${SND_FILES} ${TEXT_FILES})
+LIST(APPEND DATA_FILES ${IMG_FILES} ${SND_FILES} ${TEXT_FILES} ${SHADER_FILES})
 foreach(DATA ${DATA_FILES})
 	get_filename_component(FILE_NAME ${DATA} NAME)
 	get_filename_component(PATH_NAME ${DATA} DIRECTORY)
@@ -110,6 +105,13 @@ foreach(DATA ${DATA_FILES})
 				DEPENDS ${DATA} "${CMAKE_SOURCE_DIR}/scripts/spine_validator.py"
 				COMMAND ${CMAKE_COMMAND} -E make_directory "${PROJECT_BINARY_DIR}/${PATH_NAME}"
 				COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/scripts/spine_validator.py"  "${DATA}" "${PROJECT_SOURCE_DIR}/${PATH_NAME}/" "${PROJECT_BINARY_DIR}/${PATH_NAME}/"
+				COMMAND ${CMAKE_COMMAND} -E copy ${DATA} "${PROJECT_BINARY_DIR}/${PATH_NAME}/${FILE_NAME}")
+	elseif(${EXTENSION} STREQUAL ".vert" OR ${EXTENSION} STREQUAL ".frag")
+		add_custom_command(
+				OUTPUT ${DATA_OUTPUT}
+				DEPENDS ${DATA}
+				COMMAND ${CMAKE_COMMAND} -E make_directory "${PROJECT_BINARY_DIR}/${PATH_NAME}"
+				COMMAND "${GLSL_VALIDATOR}" "${DATA}" 
 				COMMAND ${CMAKE_COMMAND} -E copy ${DATA} "${PROJECT_BINARY_DIR}/${PATH_NAME}/${FILE_NAME}")
 	else()
 	add_custom_command(
@@ -132,6 +134,7 @@ file(GLOB_RECURSE Neko_GRAPHICS_SRC src/graphics/*.cpp include/graphics/*.h)
 file(GLOB_RECURSE Neko_UTILITY_SRC src/utilities/*.cpp include/utilities/*.h)
 file(GLOB_RECURSE Neko_PHYSICS_SRC src/physics/*.cpp include/physics/*.h)
 file(GLOB_RECURSE Neko_SOUND_SRC src/sound/*.cpp include/sound/*.h)
+file(GLOB_RECURSE Neko_MATH_SRC src/mathematics/*.cpp include/mathematics/*.h)
 file(GLOB_RECURSE Neko_EXTENSIONS_SRC extensions/src/*.cpp extensions/include/*.h)
 file(GLOB_RECURSE SCRIPT_FILES scripts/*.py)
 
@@ -145,10 +148,12 @@ source_group("Engine"				FILES ${Neko_ENGINE_SRC})
 source_group("Utility"				FILES ${Neko_UTILITY_SRC})
 source_group("Physics"				FILES ${Neko_PHYSICS_SRC})
 source_group("Sound"				FILES ${Neko_SOUND_SRC})
+source_group("Maths"			FILES ${Neko_MATH_SRC})
 source_group("Data\\Text"           FILES ${TEXT_FILES})
 source_group("Data\\Img"            FILES ${IMG_FILES})
 source_group("Data\\Snd"			FILES ${SND_FILES})
-source_group("Scripts"			FILES ${SCRIPT_FILES})
+source_group("Data\\Shaders"		FILES ${SHADER_FILES})
+source_group("Scripts"				FILES ${SCRIPT_FILES})
 
 List(APPEND Neko_SRC 
 	${Neko_ENGINE_SRC} 
@@ -156,9 +161,11 @@ List(APPEND Neko_SRC
 	${Neko_UTILITY_SRC} 
 	${Neko_PHYSICS_SRC}
 	${Neko_SOUND_SRC}
+	${Neko_MATH_SRC}
 	${TEXT_FILES} 
 	${IMG_FILES}
 	${SND_FILES}
+	${SHADER_FILES}
 	${SCRIPT_FILES})
 
 if(MSVC)
@@ -171,17 +178,7 @@ if(MSVC)
 endif()
 
 
-#SFML
-set(SFML_DIR ${EXTERNAL_DIR}/SFML-2.5.1)
-set(SFML_BUILD_EXAMPLES FALSE)
-set(BUILD_SHARED_LIBS FALSE)
-set(SFML_STATIC_LIBRARIES TRUE)
-add_subdirectory(${SFML_DIR})
-include_directories(${SFML_DIR}/include ${SFML_DIR}/src)
 
-LIST(APPEND Neko_LIBRARIES
-		sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
-		
 #Google Test
 enable_testing()
 set(GOOGLE_TEST_DIR ${EXTERNAL_DIR}/googletest-1.8.1)
@@ -198,38 +195,80 @@ add_subdirectory(${GOOGLE_BENCH_DIR})
 include_directories(${GOOGLE_BENCH_DIR}/include)
 set_target_properties (benchmark benchmark_main PROPERTIES
 		FOLDER Externals\\GTest)
-#SFML Imgui
-set(SFML_IMGUI ${EXTERNAL_DIR}/imgui-sfml-2.0.1/)
-set(IMGUI_ROOT ${EXTERNAL_DIR}/imgui-1.70/ CACHE INTERNAL "")
-set(IMGUI_DIR ${EXTERNAL_DIR}/imgui-1.70/ CACHE INTERNAL "")
-set(IMGUI_SFML_FIND_SFML OFF CACHE INTERNAL "")
-set(SFML_ROOT ${SFML_DIR})
-add_subdirectory(${SFML_IMGUI})
-include_directories(${IMGUI_ROOT} ${SFML_IMGUI})
-LIST(APPEND Neko_LIBRARIES
-	ImGui-SFML)
+#sdl2 
+set(SDL_VERSION 2.0.9)
+set(SDL_DIR ${EXTERNAL_DIR}/SDL2-${SDL_VERSION}/)
+set(SDL_STATIC ON)
+set(SDL_SHARED OFF)
+add_subdirectory(${SDL_DIR})
+include_directories(${SDL2_DIR}/include ${SDL2_DIR}/src)
+LIST(APPEND NEKO_LIBRARIES
+		SDL2-static)
+		set_target_properties (SDL2-static PROPERTIES FOLDER Externals)
+if(MSVC)
+	LIST(APPEND NEKO_LIBRARIES
+		SDL2main)
+		set_target_properties (SDL2main PROPERTIES FOLDER Externals)
+endif(MSVC)
+#sfml network
+set(SFML_DIR "${EXTERNAL_DIR}/SFML-2.5.1/")
+include_directories("${SFML_DIR}/include/" "${SFML_DIR}/src/")
+file(GLOB SFML_NETWORK_SRC ${SFML_DIR}/src/SFML/Network/*.cpp ${SFML_DIR}/src/SFML/Network/*.hpp)
+if(MSVC)
+	add_compile_definitions(SFML_STATIC=1)
+    set(SFML_NETWORK_SRC
+        ${SFML_NETWORK_SRC}
+        ${SFML_DIR}/src/SFML/Network//Win32/SocketImpl.cpp
+        ${SFML_DIR}/src/SFML/Network//Win32/SocketImpl.hpp
+    )
+else()
+    set(SFML_NETWORK_SRC
+        ${SFML_NETWORK_SRC}
+        ${SFML_DIR}/src/SFML/Network//Unix/SocketImpl.cpp
+        ${SFML_DIR}/src/SFML/Network//Unix/SocketImpl.hpp
+    )
+endif()
+add_library(sfml-network STATIC ${SFML_NETWORK_SRC})
+LIST(APPEND NEKO_LIBRARIES
+		sfml-network)
+set_target_properties (sfml-network PROPERTIES FOLDER Externals)
+#opengl
+set(OpenGL_GL_PREFERENCE GLVND)
+find_package(OpenGL REQUIRED)
+include_directories(${OPENGL_INCLUDE_DIR})
+LIST(APPEND NEKO_LIBRARIES
+		${OPENGL_LIBRARIES})
+	message("OpenGL Libraries: ${OPENGL_LIBRARIES}")
+#glew
+set(GLEW_DIR ${EXTERNAL_DIR}/glew)
+add_compile_definitions(GLEW_STATIC)
+include_directories(${GLEW_DIR}/include)
+add_subdirectory(${GLEW_DIR})
+LIST(APPEND NEKO_LIBRARIES
+	glew)
+set_target_properties (glew PROPERTIES FOLDER Externals)
 	
-set_target_properties (ImGui-SFML PROPERTIES FOLDER Externals)
-#Spine sfml
-set(SPINE_SFML_DIR ${EXTERNAL_DIR}/spine-3.6/)
-add_subdirectory(${SPINE_SFML_DIR})
-include_directories(${SPINE_SFML_DIR}/spine-sfml/src ${SPINE_SFML_DIR}/spine-c/src)
-LIST(APPEND Neko_LIBRARIES spine-c spine-sfml)
+set(IMGUI_ROOT ${EXTERNAL_DIR}/imgui/)
+set(SDL2_IMGUI ${EXTERNAL_DIR}/imgui-sdl/)
+add_subdirectory(${SDL2_IMGUI})
+include_directories(${IMGUI_ROOT} ${SDL2_IMGUI})
+LIST(APPEND NEKO_LIBRARIES
+	imgui-sdl)
+set_target_properties (imgui-sdl PROPERTIES FOLDER Externals)
 
-set_target_properties (spine-c spine-sfml PROPERTIES FOLDER Externals)
+
 #BOX2D
 set(BOX2D_DIR ${EXTERNAL_DIR}/Box2D-2.3.1)
 set(BOX2D_BUILD_EXAMPLES OFF CACHE INTERNAL "")
 SET(BOX2D_INSTALL ON CACHE INTERNAL "")
 SET(BOX2D_BUILD_STATIC ON  CACHE INTERNAL "")
-
 add_subdirectory(${BOX2D_DIR})
 include_directories(${BOX2D_DIR}/)
 LIST(APPEND Neko_LIBRARIES
 	Box2D)
 	
 set_target_properties (Box2D PROPERTIES FOLDER Externals)
-	#glm
+#glm
 set(GLM_DIR ${EXTERNAL_DIR}/glm)
 include_directories(${GLM_DIR})
 #Utility
@@ -249,7 +288,7 @@ set_target_properties (Remotery PROPERTIES FOLDER Externals)
 include_directories(include/)
 
 add_library(Neko_COMMON STATIC ${Neko_SRC})
-target_compile_options(Neko_COMMON PRIVATE $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
+	target_compile_options(Neko_COMMON PRIVATE $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
 		-Wall -Wextra>
 		$<$<CXX_COMPILER_ID:MSVC>:
 		/W4>)
@@ -279,6 +318,7 @@ foreach(EXTENSION_FOLDER ${EXTENSIONS_FOLDERS})
 		add_dependencies(${EXTENSION_DIR} DataTarget)
 	endif()
 endforeach()
+
 #Neko TEST
 SET(Neko_TEST_DIR ${CMAKE_SOURCE_DIR}/test)
 file(GLOB TEST_FILES ${Neko_TEST_DIR}/*.cpp)
@@ -329,10 +369,3 @@ add_neko_executable(SplashDebug ${CMAKE_SOURCE_DIR}/main/SplashDebug.cpp Neko_CO
 add_neko_executable(NekoEditor2d ${CMAKE_SOURCE_DIR}/main/NekoEditor.cpp Neko_COMMON tools)
 #Network Prediction Simulation
 add_neko_executable(PredictionSimulation ${CMAKE_SOURCE_DIR}/main/PredictionSimulation.cpp Neko_COMMON Network)
-if(MSVC)
-if(NOT CMAKE_CL_64)
-file(COPY ${SFML_DIR}/extlibs/bin/x86/openal32.dll DESTINATION ${CMAKE_BINARY_DIR}/)
-else()
-file(COPY ${SFML_DIR}/extlibs/bin/x64/openal32.dll DESTINATION ${CMAKE_BINARY_DIR}/)
-endif()
-endif()

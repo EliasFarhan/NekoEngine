@@ -25,7 +25,7 @@
  */
 #include <SFML/Graphics/RenderTexture.hpp>
 
-#include <graphics/spine.h>
+#include <spine.h>
 
 
 namespace neko

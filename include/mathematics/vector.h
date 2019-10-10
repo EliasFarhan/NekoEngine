@@ -1,9 +1,8 @@
 #pragma once
-
 /*
  MIT License
 
- Copyright (c) 2017 SAE Institute Switzerland AG
+ Copyright (c) 2019 SAE Institute Switzerland AG
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -23,34 +22,36 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-
-#include <string>
-#include <memory>
- //Externals includes
-#include <json.hpp>
-
-using json = nlohmann::json;
-
-#ifdef USE_SFML
-#include <SFML/System/Vector2.hpp>
-#include <SFML/Graphics/Rect.hpp>
-#endif
-
 namespace neko
 {
-bool IsJsonValueNumeric(const json::value_type& jsonValue);
 
-bool CheckJsonExists(const json& jsonObject, std::string parameterName);
+class Vec2f
+{
+ public:
+  float x;
+  float y;
 
-bool CheckJsonParameter(const json& jsonObject, std::string parameterName, json::value_t expectedType);
+  Vec2f(float x, float y);
+  Vec2f();
+  float GetMagnitude() const;
+  Vec2f Normalized() const;
+  Vec2f Rotate(float angle) const;
+  static Vec2f Lerp(const Vec2f& v1, const Vec2f& v2, float t);
+  static float AngleBetween(const Vec2f& v1, const Vec2f& v2);
+  static float Dot(const Vec2f& v1, const Vec2f& v2);
 
-bool CheckJsonNumber(const json& jsonObject, std::string parameterName);
-#ifdef USE_SFML
-sf::Vector2f GetVectorFromJson(const json& jsonObject, std::string parameterName);
+  bool operator==(const Vec2f &rhs) const;
+  bool operator!=(const Vec2f &rhs) const;
 
-sf::IntRect GetIntRectFromJson(const json& jsonObject, std::string parameterName);
+  Vec2f operator+(const Vec2f& rhs) const;
+  Vec2f& operator+=(const Vec2f& rhs);
+  Vec2f operator-(const Vec2f& rhs) const;
 
-sf::FloatRect GetFloatRectFromJson(const json& jsonObject, std::string parameterName);
-#endif
-json LoadJson(const std::string_view jsonPath);
+  Vec2f& operator-=(const Vec2f& rhs);
+  Vec2f operator*(float rhs) const;
+  Vec2f operator/(float rhs) const;
+  Vec2f& operator/=(float rhs) ;
+
+};
+
 }
