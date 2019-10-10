@@ -27,82 +27,143 @@
 #include <engine/engine.h>
 #include "engine/globals.h"
 #include <Remotery.h>
-#include <SFML/Graphics/Texture.hpp>
+#include <graphics/texture.h>
 
 namespace neko
 {
-SpriteManager::SpriteManager()
-{
-    sprites_[0].reserve(INIT_ENTITY_NMB);
-    sprites_[1].reserve(INIT_ENTITY_NMB);
-}
 
-Index SpriteManager::AddSprite(const std::shared_ptr<sf::Texture> texture)
+void SpriteManager::CopySpriteOrigin(const sf::Vector2f& origin, size_t start, size_t length)
 {
-    sf::Sprite sprite;
-    if (texture.get() != nullptr)
+    for (size_t i = start; i < start + length; i++)
     {
-        sprite.setTexture(*texture);
-        sprite.setOrigin(sf::Vector2f(texture->getSize()) / 2.0f);
+        const auto localBounds = components_[i].sprite.getLocalBounds();
+        components_[i].origin = origin;
+        components_[i].sprite.setOrigin(sf::Vector2f(localBounds.width * origin.x, localBounds.height * origin.y));
     }
-    const Index index = Index(sprites_[0].size());
-    sprites_[0].push_back(sprite);
-    sprites_[1].push_back(sprite);
-    return index;
 }
 
-void SpriteManager::CopyTransformPosition(Transform2dManager& transformManager, size_t start, size_t length)
+void SpriteManager::CopyTexture(const Index textureId, size_t start, size_t length)
 {
-    rmt_ScopedCPUSample(CopySpritePositions, 0);
-    const int frameIndex = MainEngine::GetInstance()->frameIndex % 2;
+
+    auto* texture = textureManager_.GetTexture(textureId);
     for (auto i = start; i < start + length; i++)
     {
-        sprites_[frameIndex][i].setPosition(transformManager.positions_[i]);
+        components_[i].textureId = textureId;
+        if(textureId != INVALID_INDEX)
+        {
+            components_[i].sprite.setTexture( *texture, true);
+        }
+        else
+        {
+            components_[i].sprite.setTexture( sf::Texture(), true);
+        }
+
     }
 }
 
-void SpriteManager::CopyTransformScales(Transform2dManager& transformManager, size_t start, size_t length)
+void SpriteManager::CopyLayer(int layer, size_t start, size_t length)
 {
-    rmt_ScopedCPUSample(CopySpriteScales, 0);
-    const int frameIndex = MainEngine::GetInstance()->frameIndex % 2;
     for (auto i = start; i < start + length; i++)
     {
-        sprites_[frameIndex][i].setScale(transformManager.scales_[i]);
+        components_[i].layer = layer;
     }
 }
 
-void SpriteManager::CopyTransformAngles(Transform2dManager& transformManager, size_t start, size_t length)
+SpriteManager::SpriteManager(TextureManager& textureManager) :
+        ComponentManager::ComponentManager(),
+        textureManager_(textureManager)
 {
-    rmt_ScopedCPUSample(CopySpriteAngles, 0);
-    const int frameIndex = MainEngine::GetInstance()->frameIndex % 2;
-    for (auto i = start; i < start + length; i++)
-    {
-        sprites_[frameIndex][i].setRotation(transformManager.angles_[i]);
-    }
+
 }
 
-void SpriteManager::PushCommands(MultiThreadGraphicsManager* graphicsManager, size_t start, size_t length)
+void SpriteManager::CopyAllTransformPositions(EntityManager& entityManager, Position2dManager& positionManager)
 {
-    rmt_ScopedCPUSample(PushSpriteCommands, 0);
-    const int frameIndex = MainEngine::GetInstance()->frameIndex % 2;
-    for (auto i = start; i < start + length; i++)
+    const auto entityMask = EntityMask(NekoComponentType::POSITION2D) | EntityMask(NekoComponentType::SPRITE2D);
+    for(Entity entity = 0; entity < entityManager.GetEntitiesSize();entity++)
     {
-        graphicsManager->Draw(sprites_[frameIndex][i]);
+        if(entityManager.HasComponent(entity, entityMask) and
+        !entityManager.HasComponent(entity, neko::EntityMask(neko::NekoComponentType::TRANSFORM2D)))
+        {
+            components_[entity].sprite.setPosition(positionManager.GetConstComponent(entity));
+        }
     }
 }
 
-sf::Sprite* SpriteManager::GetSpriteAt(unsigned int spriteIndex)
+void SpriteManager::CopyAllTransformScales(EntityManager& entityManager, Scale2dManager& scaleManager)
 {
-    const int frameIndex = MainEngine::GetInstance()->frameIndex % 2;
-    if (spriteIndex >= sprites_[frameIndex].size())
+    const auto entityMask = EntityMask(NekoComponentType::SCALE2D) | EntityMask(NekoComponentType::SPRITE2D);
+    for(Entity entity = 0; entity < entityManager.GetEntitiesSize();entity++)
     {
-        return nullptr;
-    }
-    else
-    {
-        return &sprites_[frameIndex][spriteIndex];
+        if(entityManager.HasComponent(entity, entityMask)and
+           !entityManager.HasComponent(entity, neko::EntityMask(neko::NekoComponentType::TRANSFORM2D)))
+        {
+            components_[entity].sprite.setScale(scaleManager.GetConstComponent(entity));
+        }
     }
 }
 
+void SpriteManager::CopyAllTransformRotations(EntityManager& entityManager, Rotation2dManager& angleManager)
+{
+    const auto entityMask = EntityMask(NekoComponentType::ROTATION2D) | EntityMask(NekoComponentType::SPRITE2D);
+    for(Entity entity = 0; entity < entityManager.GetEntitiesSize();entity++)
+    {
+        if(entityManager.HasComponent(entity, entityMask)and
+           !entityManager.HasComponent(entity, neko::EntityMask(neko::NekoComponentType::TRANSFORM2D)))
+        {
+            components_[entity].sprite.setRotation(angleManager.GetConstComponent(entity));
+        }
+    }
+}
+
+void SpriteManager::PushAllCommands(EntityManager& entityManager, GraphicsManager& graphicsManager)
+{
+    const auto entityMask = EntityMask(NekoComponentType::SPRITE2D);
+    for(Entity entity = 0; entity < entityManager.GetEntitiesSize();entity++)
+    {
+        if(entityManager.HasComponent(entity, entityMask))
+        {
+            auto spriteSize = components_[entity].sprite.getLocalBounds();
+            auto origin = components_[entity].origin;
+            components_[entity].sprite.setOrigin(origin.x*spriteSize.width, origin.y*spriteSize.height);
+
+            sf::RenderStates states;
+            states.transform = components_[entity].transform;
+            graphicsManager.Draw(components_[entity].sprite, components_[entity].layer, states);
+        }
+    }
+}
+
+void SpriteManager::ParseComponentJson(json& componentJson, Entity entity)
+{
+    std::string textureName = componentJson["texture"];
+    const auto textureId = textureManager_.LoadTexture(textureName);
+    CopyTexture(textureId, entity, 1);
+    CopyLayer(componentJson["layer"], entity, 1);
+    const auto origin = neko::GetVectorFromJson(componentJson, "origin");
+    CopySpriteOrigin(origin, entity, 1);
+}
+
+json SpriteManager::SerializeComponentJson(Entity entity)
+{
+    const auto& sprite = GetConstComponent(entity);
+    json componentJson;
+    componentJson["texture"] = textureManager_.GetTexturePath(sprite.textureId);
+    componentJson["layer"] = sprite.layer;
+    componentJson["origin"] = {sprite.origin.x, sprite.origin.y};
+    return componentJson;
+}
+
+void SpriteManager::CopyAllTransforms(EntityManager& entityManager, Transform2dManager& transformManager)
+{
+    const auto entityMask = EntityMask(NekoComponentType::TRANSFORM2D) | EntityMask(NekoComponentType::SPRITE2D);
+    for(Entity entity = 0; entity < entityManager.GetEntitiesSize(); entity++)
+    {
+        if(entityManager.HasComponent(entity, entityMask))
+        {
+            const auto transform = transformManager.CalculateTransform(entity);
+            components_[entity].transform = transform;
+        }
+    }
+}
 
 }

@@ -75,7 +75,7 @@ bool IsDirectory(const std::string_view filename)
     return fs::is_directory(p);
 }
 
-void IterateDirectory(const std::string_view dirname, std::function<void(const std::string_view)> func)
+void IterateDirectory(const std::string_view dirname, std::function<void(const std::string_view)> func, bool recursive)
 {
 
     if (IsDirectory(dirname))
@@ -86,7 +86,14 @@ void IterateDirectory(const std::string_view dirname, std::function<void(const s
         for (auto& p : fs::directory_iterator(dirname))
 #endif
         {
-            func(p.path().generic_string());
+            if(IsRegularFile(p.path().generic_string()))
+            {
+                func(p.path().generic_string());
+            }
+            else if(recursive && IsDirectory(p.path().generic_string()))
+            {
+                IterateDirectory(p.path().generic_string(), func, recursive);
+            }
         }
     }
 }
@@ -172,5 +179,18 @@ std::string LinkFolderAndFile(const std::string_view folderPath, const std::stri
 #endif
     fs::path l = f / p;
     return l.string();
+}
+
+void WriteStringToFile(const std::string& path, const std::string_view content)
+{
+    std::ofstream t(path);
+    t << content;
+
+}
+
+std::string GetFilename(const std::string_view path)
+{
+	const fs::path p = path;
+    return p.filename().string();
 }
 }

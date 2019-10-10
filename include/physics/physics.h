@@ -29,7 +29,9 @@
 #include <Box2D/Box2D.h>
 #include "SFML/System/Vector2.hpp"
 #include <vector>
-#include "collider.h"
+#include <engine/vector.h>
+#include "physics/collider.h"
+#include "engine/component.h"
 
 namespace neko
 {
@@ -60,9 +62,10 @@ public:
 
     b2Body* GetBodyAt(Index i);
 
+    std::vector<Collider>& GetColliderVector(){ return colliders_;}
+
 private:
     friend class Transform2dManager;
-    friend class TiledMap;
     std::unique_ptr<b2World> world_ = nullptr;
     std::vector<b2Body*> bodies_;
     std::vector<Collider> colliders_;
@@ -77,5 +80,28 @@ float pixel2meter(float v);
 sf::Vector2f meter2pixel(const b2Vec2& v);
 
 b2Vec2 pixel2meter(const sf::Vector2f& v);
+Vec2f pixel2unit(const sf::Vector2f& v);
+float pixel2unit(const float v);
+sf::Vector2f unit2pixel(const Vec2f& v);
+float unit2pixel(float v);
+
+class Body2dManager : public ComponentManager <b2Body*,ComponentType(NekoComponentType::BODY2D)>
+{
+};
+
+class BodyDef2dManager : public ComponentManager<b2BodyDef, ComponentType(NekoComponentType::BODY2D)>
+{
+public:
+    void ParseComponentJson(json& componentJson, Entity entity) override;
+
+    json SerializeComponentJson(Entity entity) override;
+
+public:
+
+};
+
+class Collider2dManager : public ComponentManager<Collider, ComponentType(NekoComponentType::BOX_COLLIDER2D)>
+{
+};
 
 }

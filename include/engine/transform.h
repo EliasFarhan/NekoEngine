@@ -28,10 +28,38 @@
 #include "SFML/System/Vector2.hpp"
 #include "globals.h"
 #include <engine/entity.h>
+#include "engine/component.h"
+#include "engine/vector.h"
+#include <SFML/Graphics/Transform.hpp>
 
 namespace neko
 {
+class Body2dManager;
 class Physics2dManager;
+
+
+class Position2dManager : public ComponentManager<Vec2f, ComponentType(NekoComponentType::POSITION2D)>
+{
+public:
+    Position2dManager();
+    void CopyAllPositionsFromBody2d(EntityManager& entityManager, Body2dManager& body2dManager);
+
+};
+
+class Scale2dManager : public ComponentManager<sf::Vector2f, ComponentType(NekoComponentType::SCALE2D)>
+{
+public:
+    using ComponentManager::ComponentManager;
+    Index AddComponent(EntityManager& entityManager, Entity entity) override;
+
+};
+
+class Rotation2dManager : public ComponentManager<float, ComponentType(NekoComponentType::ROTATION2D)>
+{
+public:
+    using ComponentManager::ComponentManager;
+    void CopyAnglesFromBody2d(EntityManager& entityManager, Body2dManager& body2dManager);
+};
 
 /**
  * \brief manage the graphic transform of any kind of objects in a SOA fashions
@@ -41,24 +69,22 @@ class Transform2dManager
 public:
     Transform2dManager();
 
-    void
-    CopyPositionsFromPhysics2d(Physics2dManager& physics2dManager, size_t start = 0, size_t length = INIT_ENTITY_NMB);
+    Position2dManager& GetPositionManager(){ return positionManager_;}
+    Scale2dManager& GetScaleManager() { return scaleManager_; }
+    Rotation2dManager& GetRotationManager() { return rotationManager_;}
+    bool CanParentTransform(Entity entity, Entity parentEntity);
+    bool SetTransformParent(Entity entity, Entity parentEntity);
+    Entity GetParentEntity(Entity entity);
+    Entity FindNextChild(Entity parentEntity, Entity entityChild=neko::INVALID_ENTITY);
 
-    void CopyAnglesFromPhysics2d(Physics2dManager& physics2dManager, size_t start = 0, size_t length = INIT_ENTITY_NMB);
-
-    Index AddPosition(sf::Vector2f position, Entity entity = INVALID_ENTITY);
-    Index AddScale(sf::Vector2f scale, Entity entity = INVALID_ENTITY);
-    Index AddAngle(float angle, Entity entity = INVALID_ENTITY);
-
-    sf::Vector2f GetPosition(Index i) const;
-	void SetPosition(const sf::Vector2f& position, Index i);
-
+    sf::Transform CalculateTransform(Entity entity);
 private:
-    friend class SpriteManager;
-    friend class ShapeManager;
+    Position2dManager positionManager_;
+    Scale2dManager scaleManager_{sf::Vector2f(1.0f,1.0f)};
+    Rotation2dManager rotationManager_;
 
-    std::vector<sf::Vector2f> positions_;
-    std::vector<sf::Vector2f> scales_;
-    std::vector<float> angles_;
+	std::vector<Entity> transformHierarchy_;
+	std::vector<char> dirtyFlags_;
 };
+
 }

@@ -51,5 +51,5 @@ sf::IntRect GetIntRectFromJson(const json& jsonObject, std::string parameterName
 
 sf::FloatRect GetFloatRectFromJson(const json& jsonObject, std::string parameterName);
 
-std::unique_ptr<json> LoadJson(const std::string& jsonPath);
+json LoadJson(const std::string_view jsonPath);
 }

@@ -3,7 +3,7 @@
 /*
  MIT License
 
- Copyright (c) 2017 SAE Institute Switzerland AG
+ Copyright (c) 2019 SAE Institute Switzerland AG
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,7 @@
 
 namespace neko
 {
-class MultiThreadGraphicsManager;
+class GraphicsManager;
 
 struct ShapeDef
 {
@@ -43,24 +43,39 @@ struct ShapeDef
 /**
  * \brief managing graphic shape from the SFML API
  */
-class ShapeManager
+class BadShapeManager
 {
 public:
-    ShapeManager();
+    BadShapeManager() = default;
 
-    Index AddBox(const sf::Vector2f& pos, const sf::Vector2f& halfSize, const ShapeDef& shapeDef);
+    virtual Index AddBox(const sf::Vector2f& pos, const sf::Vector2f& halfSize, const ShapeDef& shapeDef) = 0;
 
-    Index AddPolygon(const sf::Vector2f& pos, const sf::Vector2f* points, size_t pointNmb, const ShapeDef& shapeDef);
+    virtual Index AddPolygon(const sf::Vector2f& pos, const sf::Vector2f* points, size_t pointNmb, const ShapeDef& shapeDef) = 0;
 
 
-    void CopyTransformPosition(Transform2dManager& transformManager, size_t start = 0, size_t length = INIT_ENTITY_NMB);
-    void PushCommands(MultiThreadGraphicsManager* graphicsManager, size_t start = 0, size_t length = INIT_ENTITY_NMB);
+    virtual void CopyTransformPosition(Position2dManager& positionManager, size_t start = 0,
+                                       size_t length = neko::INIT_ENTITY_NMB) = 0;
+    virtual void PushCommands(GraphicsManager* graphicsManager, size_t start = 0, size_t length = INIT_ENTITY_NMB) = 0;
 
-private:
-    /**
-     * \brief storing the shape and putting two vectors for double buffering with the render thread
-     */
-    std::vector<sf::ConvexShape> convexShape_[2];
 };
+
+class ConvexShapeManager : public ComponentManager<sf::ConvexShape, ComponentType(NekoComponentType::CONVEX_SHAPE2D)>
+{
+public:
+    using ComponentManager::ComponentManager;
+
+    void AddBox(Entity entity, const Vec2f& pos, const Vec2f& halfSize, const ShapeDef& shapeDef);
+
+    void AddPolygon(Entity entity, const Vec2f& pos, const Vec2f* points, size_t pointNmb, const ShapeDef& shapeDef);
+
+    void CopyTransformPosition(Position2dManager& positionManager, size_t start, size_t length);
+    void CopyTransformRotation(Rotation2dManager& rotationManager, size_t start, size_t length);
+
+    void PushCommands(GraphicsManager* graphicsManager, size_t start, size_t length);
+
+
+};
+
+
 
 }

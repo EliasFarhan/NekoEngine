@@ -23,7 +23,7 @@ SOFTWARE.
 */
 
 #include <utilities/json_utility.h>
-
+#include <utilities/file_utility.h>
 #include <fstream>
 #include <string>
 #include "engine/log.h"
@@ -89,31 +89,28 @@ sf::Vector2f GetVectorFromJson(const json & jsonObject, std::string parameterNam
 	return vector;
 }
 
-std::unique_ptr<json> LoadJson(const std::string& jsonPath)
+json LoadJson(const std::string_view jsonPath)
 {
-	std::ifstream jsonFile(jsonPath.c_str());
-	if (jsonFile.peek() == std::ifstream::traits_type::eof())
+
+    json jsonContent;
+	if (!neko::FileExists(jsonPath))
 	{
-		{
-			std::ostringstream oss;
-			oss << "[JSON ERROR] EMPTY JSON FILE at: " << jsonPath;
-			logDebug(oss.str());
-		}
-		return nullptr;
+		logDebug("[Error] File does not exist: " + std::string(jsonPath));
+		return jsonContent;
 	}
-	std::unique_ptr<json> jsonContent = std::make_unique<json>();
+	
 	try
 	{
-		jsonFile >> *jsonContent;
+		const auto jsonStrContent = LoadFile(jsonPath.data());
+		jsonContent = json::parse(jsonStrContent, nullptr, false);
 	}
 	catch (json::parse_error& e)
 	{
-		{
-			std::ostringstream oss;
-			oss << "THE FILE: " << jsonPath << " IS NOT JSON\n" << e.what();
-			logDebug(oss.str());
-		}
-		return nullptr;
+		
+		std::ostringstream oss;
+		oss << "[Error] File: " << jsonPath << " is not json\n" << e.what();
+		logDebug(oss.str());
+		
 	}
 	return jsonContent;
 }

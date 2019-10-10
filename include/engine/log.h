@@ -46,3 +46,5 @@ void logDebug(std::string msg);
  * it is called by MainEngine destructor
  */
 void destroyLog();
+
+std::vector<std::string>& getLog();

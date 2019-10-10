@@ -539,7 +539,7 @@ void Image(const sf::Texture& texture, const sf::Vector2f& size,
            const sf::Color& tintColor, const sf::Color& borderColor) {
     ImTextureID textureID =
         convertGLTextureHandleToImTextureID(texture.getNativeHandle());
-    ImGui::Image(textureID, size, ImVec2(0, 0), ImVec2(1, 1), tintColor,
+    ImGui::Image(textureID, size, ImVec2(0, 1), ImVec2(1, 0), tintColor,
                  borderColor);
 }
 

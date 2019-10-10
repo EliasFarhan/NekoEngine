@@ -74,8 +74,8 @@ public:
 		skeleton->flipY = false;
 		Skeleton_setToSetupPose(skeleton);
 
-		skeleton->x = float(config.screenSize.x/2);
-		skeleton->y = float(config.screenSize.y);
+		skeleton->x = float(config.realWindowSize.x/2);
+		skeleton->y = float(config.realWindowSize.y);
 		Skeleton_updateWorldTransform(skeleton);
 		AnimationState_setAnimation(catBody->state, 0, catBodyData->animations[0], 1);
 	}

@@ -70,6 +70,7 @@ set(EXTERNAL_DIR ${CMAKE_SOURCE_DIR}/externals)
 file(GLOB_RECURSE TEXT_FILES 
 "${PROJECT_SOURCE_DIR}/data/*.json" 
 "${PROJECT_SOURCE_DIR}/data/*.txt"
+"${PROJECT_SOURCE_DIR}/data/*.scene"
 )
 file(GLOB_RECURSE IMG_FILES
 		"${PROJECT_SOURCE_DIR}/data/*.jpg"
@@ -86,26 +87,42 @@ file(GLOB_RECURSE SND_FILES
 		"${PROJECT_SOURCE_DIR}/data/*.wav"
 		"${PROJECT_SOURCE_DIR}/data/*.ogg"
 		)
+find_package (Python3 COMPONENTS Interpreter)
+MESSAGE("Python Interpreter: ${Python3_EXECUTABLE}")
 LIST(APPEND DATA_FILES ${IMG_FILES} ${SND_FILES} ${TEXT_FILES})
 foreach(DATA ${DATA_FILES})
 	get_filename_component(FILE_NAME ${DATA} NAME)
 	get_filename_component(PATH_NAME ${DATA} DIRECTORY)
 	get_filename_component(EXTENSION ${DATA} EXT)
-	file(RELATIVE_PATH PATH_NAME "${PROJECT_SOURCE_DIR}/shaders/" ${PATH_NAME})
-	#MESSAGE("GLSL PATH: ${PATH_NAME} NAME: ${FILE_NAME}")
-	set(DATA_OUTPUT "${PROJECT_BINARY_DIR}/data/${PATH_NAME}/${FILE_NAME}")
-
+	file(RELATIVE_PATH PATH_NAME "${PROJECT_SOURCE_DIR}" ${PATH_NAME})
+	MESSAGE("DATA: ${FILE_NAME} ${PATH_NAME} ${EXTENSION}")
+	set(DATA_OUTPUT "${PROJECT_BINARY_DIR}/${PATH_NAME}/${FILE_NAME}")
+	if(${EXTENSION} STREQUAL ".scene")
+		add_custom_command(
+				OUTPUT ${DATA_OUTPUT}
+				DEPENDS ${DATA}
+				COMMAND ${CMAKE_COMMAND} -E make_directory "${PROJECT_BINARY_DIR}/${PATH_NAME}"
+				COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/scripts/scene_validator.py"  "${DATA}"
+				COMMAND ${CMAKE_COMMAND} -E copy ${DATA} "${PROJECT_BINARY_DIR}/${PATH_NAME}/${FILE_NAME}")
+	elseif(${EXTENSION} STREQUAL ".atlas.txt")
+		add_custom_command(
+				OUTPUT ${DATA_OUTPUT}
+				DEPENDS ${DATA} "${CMAKE_SOURCE_DIR}/scripts/spine_validator.py"
+				COMMAND ${CMAKE_COMMAND} -E make_directory "${PROJECT_BINARY_DIR}/${PATH_NAME}"
+				COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/scripts/spine_validator.py"  "${DATA}" "${PROJECT_SOURCE_DIR}/${PATH_NAME}/" "${PROJECT_BINARY_DIR}/${PATH_NAME}/"
+				COMMAND ${CMAKE_COMMAND} -E copy ${DATA} "${PROJECT_BINARY_DIR}/${PATH_NAME}/${FILE_NAME}")
+	else()
 	add_custom_command(
 			OUTPUT ${DATA_OUTPUT}
-			COMMAND ${CMAKE_COMMAND} -E make_directory "${PROJECT_BINARY_DIR}/data/"
-			COMMAND ${CMAKE_COMMAND} -E make_directory "${PROJECT_BINARY_DIR}/data/${PATH_NAME}"
-			COMMAND ${CMAKE_COMMAND} -E copy ${DATA} "${PROJECT_BINARY_DIR}/data/${PATH_NAME}/${FILE_NAME}")
+			DEPENDS ${DATA}
+			COMMAND ${CMAKE_COMMAND} -E make_directory "${PROJECT_BINARY_DIR}/${PATH_NAME}"
+			COMMAND ${CMAKE_COMMAND} -E copy ${DATA} "${PROJECT_BINARY_DIR}/${PATH_NAME}/${FILE_NAME}")
+	endif()
 	list(APPEND DATA_BINARY_FILES ${DATA_OUTPUT})
 endforeach(DATA)
 add_custom_target(
 		DataTarget
-		DEPENDS ${DATA_BINARY_FILES}
-)
+		DEPENDS ${DATA_BINARY_FILES})
 
 set_target_properties (DataTarget PROPERTIES FOLDER Neko)
 
@@ -116,6 +133,7 @@ file(GLOB_RECURSE Neko_UTILITY_SRC src/utilities/*.cpp include/utilities/*.h)
 file(GLOB_RECURSE Neko_PHYSICS_SRC src/physics/*.cpp include/physics/*.h)
 file(GLOB_RECURSE Neko_SOUND_SRC src/sound/*.cpp include/sound/*.h)
 file(GLOB_RECURSE Neko_EXTENSIONS_SRC extensions/src/*.cpp extensions/include/*.h)
+file(GLOB_RECURSE SCRIPT_FILES scripts/*.py)
 
 include_directories(include ${CMAKE_SOURCE_DIR}/include)
 set_property(GLOBAL PROPERTY USE_FOLDERS On)
@@ -130,6 +148,7 @@ source_group("Sound"				FILES ${Neko_SOUND_SRC})
 source_group("Data\\Text"           FILES ${TEXT_FILES})
 source_group("Data\\Img"            FILES ${IMG_FILES})
 source_group("Data\\Snd"			FILES ${SND_FILES})
+source_group("Scripts"			FILES ${SCRIPT_FILES})
 
 List(APPEND Neko_SRC 
 	${Neko_ENGINE_SRC} 
@@ -139,7 +158,8 @@ List(APPEND Neko_SRC
 	${Neko_SOUND_SRC}
 	${TEXT_FILES} 
 	${IMG_FILES}
-	${SND_FILES})
+	${SND_FILES}
+	${SCRIPT_FILES})
 
 if(MSVC)
     add_compile_options(
@@ -172,7 +192,12 @@ include_directories(${GOOGLE_TEST_DIR}/include)
 
 set_target_properties (gtest gtest_main PROPERTIES
 		FOLDER Externals\\GTest)
-		
+#Google benchmark
+set(GOOGLE_BENCH_DIR ${EXTERNAL_DIR}/benchmark-1.5.0)
+add_subdirectory(${GOOGLE_BENCH_DIR})
+include_directories(${GOOGLE_BENCH_DIR}/include)
+set_target_properties (benchmark benchmark_main PROPERTIES
+		FOLDER Externals\\GTest)
 #SFML Imgui
 set(SFML_IMGUI ${EXTERNAL_DIR}/imgui-sfml-2.0.1/)
 set(IMGUI_ROOT ${EXTERNAL_DIR}/imgui-1.70/ CACHE INTERNAL "")
@@ -221,51 +246,89 @@ LIST(APPEND Neko_LIBRARIES Remotery)
 set_target_properties (Remotery PROPERTIES FOLDER Externals)
 #Neko_COMMON
 
-include_directories(include/ extensions/include/)
+include_directories(include/)
 
 add_library(Neko_COMMON STATIC ${Neko_SRC})
+target_compile_options(Neko_COMMON PRIVATE $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
+		-Wall -Wextra>
+		$<$<CXX_COMPILER_ID:MSVC>:
+		/W4>)
 target_link_libraries(Neko_COMMON PUBLIC ${Neko_LIBRARIES})
 add_dependencies(Neko_COMMON DataTarget)
 set_property(TARGET Neko_COMMON PROPERTY CXX_STANDARD 17)
 target_compile_definitions(Neko_COMMON PUBLIC $<$<CONFIG:Debug>:__neko_dbg__>)
 target_compile_definitions(Neko_COMMON PUBLIC $<$<CONFIG:RelWithDebInfo>:__neko_dbg__>)
+target_compile_definitions(Neko_COMMON PUBLIC SOURCE_PATH="${CMAKE_SOURCE_DIR}")
 
 set_target_properties (Neko_COMMON PROPERTIES FOLDER Neko)
-#Neko TEST
-SET(Neko_TEST_DIR ${CMAKE_SOURCE_DIR}/test)
-file(GLOB TEST_FILES ${Neko_TEST_DIR}/*.cpp )
-add_executable(Neko_TEST ${TEST_FILES})
-if (APPLE)
-	target_link_libraries(Neko_TEST gtest gtest_main ${Boost_LIBRARIES} Neko_COMMON City)
-else()
-	target_link_libraries(Neko_TEST gtest gtest_main Neko_COMMON City)
-endif(APPLE)
-
-set_target_properties (Neko_TEST PROPERTIES FOLDER Neko)
 #extensions
-file(GLOB EXTENSIONS_FOLDERS extensions/src/* extensions/include/*)
+file(GLOB EXTENSIONS_FOLDERS extensions/*)
 foreach(EXTENSION_FOLDER ${EXTENSIONS_FOLDERS})
 	if(IS_DIRECTORY ${EXTENSION_FOLDER})
 		get_filename_component(EXTENSION_DIR ${EXTENSION_FOLDER} NAME)
 		file(GLOB_RECURSE  EXTENSION_FILES ${EXTENSION_FOLDER}/*.h ${EXTENSION_FOLDER}/*.cpp)
-		source_group("Extensions\\${EXTENSION_DIR}"            FILES ${EXTENSION_FILES})
-		if(NOT TARGET ${EXTENSION_DIR})
-			add_library(${EXTENSION_DIR} STATIC ${EXTENSION_FILES})
-			set_target_properties (${EXTENSION_DIR} PROPERTIES FOLDER Neko\\ExtensionsLibs)
-			target_link_libraries(${EXTENSION_DIR} PUBLIC Neko_COMMON)
-		else()
-			target_sources(${EXTENSION_DIR} PRIVATE ${EXTENSION_FILES})
-		endif()
+		include_directories("${EXTENSION_FOLDER}/include/")
+		add_library(${EXTENSION_DIR} STATIC ${EXTENSION_FILES})
+		target_compile_options(${EXTENSION_DIR} PRIVATE $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
+				-Wall -Wextra>
+				$<$<CXX_COMPILER_ID:MSVC>:
+				/W4>)
+		LIST(APPEND EXTENSIONS_LIBS ${EXTENSION_DIR})
+		set_target_properties (${EXTENSION_DIR} PROPERTIES FOLDER Neko\\ExtensionsLibs)
+		target_link_libraries(${EXTENSION_DIR} PUBLIC Neko_COMMON)
+		add_dependencies(${EXTENSION_DIR} DataTarget)
 	endif()
 endforeach()
+#Neko TEST
+SET(Neko_TEST_DIR ${CMAKE_SOURCE_DIR}/test)
+file(GLOB TEST_FILES ${Neko_TEST_DIR}/*.cpp)
+add_executable(Neko_TEST ${TEST_FILES})
 
-#City Builder
-add_executable(CityBuilder ${CMAKE_SOURCE_DIR}/main/CityBuilder.cpp)
-target_link_libraries(CityBuilder PUBLIC Neko_COMMON City)
-set_property(TARGET CityBuilder PROPERTY CXX_STANDARD 17)
-set_target_properties (CityBuilder PROPERTIES FOLDER Main)
+target_link_libraries(Neko_TEST gtest gtest_main Neko_COMMON ${EXTENSIONS_LIBS})
+if (APPLE)
+	target_link_libraries(Neko_TEST ${Boost_LIBRARIES})
+else()
+endif(APPLE)
+add_dependencies(Neko_TEST DataTarget)
 
+set_target_properties (Neko_TEST PROPERTIES FOLDER Neko)
 
+#Benchmarks
+
+SET(COURSE_DIR ${CMAKE_SOURCE_DIR}/benchmark)
+file(GLOB COURSE_FILES ${COURSE_DIR}/*.cpp)
+
+foreach(course_file ${COURSE_FILES} )
+    # I used a simple string replace, to cut off .cpp.
+    file(RELATIVE_PATH course_relative_path ${COURSE_DIR} ${course_file})
+    string( REPLACE ".cpp" "" course_name ${course_relative_path} )
+    add_executable(${course_name} ${course_file})
+    # Make sure YourLib is linked to each app
+    target_link_libraries(${course_name} PUBLIC benchmark benchmark_main Neko_COMMON ${EXTENSIONS_LIBS} )
+    set_property(TARGET ${course_name} PROPERTY CXX_STANDARD 17)
+	add_dependencies(${course_name} DataTarget)
+
+	IF(MSVC)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Oi")#not forcing avx2 uhuh
+    elseif(UNIX)
+    set_target_properties(${course_name} PROPERTIES COMPILE_FLAGS "-save-temps -march=native")
+    ENDIF(MSVC)
+    set_target_properties (${course_name} PROPERTIES
+        FOLDER Courses)
+    IF(APPLE)
+        set_target_properties(${course_name} PROPERTIES
+                RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}
+                RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR})
+    ENDIF()
+endforeach()
+
+include(cmake/neko_executable.cmake)
+#Splash
+add_neko_executable(SplashDebug ${CMAKE_SOURCE_DIR}/main/SplashDebug.cpp Neko_COMMON Network Splash engine2d)
+#NekoEditor
+add_neko_executable(NekoEditor2d ${CMAKE_SOURCE_DIR}/main/NekoEditor.cpp Neko_COMMON tools)
+#Network Prediction Simulation
+add_neko_executable(PredictionSimulation ${CMAKE_SOURCE_DIR}/main/PredictionSimulation.cpp Neko_COMMON Network)
 if(MSVC)
 if(NOT CMAKE_CL_64)
 file(COPY ${SFML_DIR}/extlibs/bin/x86/openal32.dll DESTINATION ${CMAKE_BINARY_DIR}/)

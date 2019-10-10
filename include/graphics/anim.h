@@ -28,14 +28,15 @@
 #include <map>
 #include <SFML/Graphics/Sprite.hpp>
 #include "SFML/Graphics/Texture.hpp"
-#include "texture.h"
+#include "graphics/texture.h"
+#include "graphics/sprite.h"
 #include <utilities/time_utility.h>
 #include <utilities/json_utility.h>
 #include <engine/system.h>
 
 namespace neko
 {
-class SpriteManager;
+class MultiThreadSpriteManager;
 /**
  * \brief 2d animation data used to switch between the textures at the given frequency, used in Init and Update
  */
@@ -52,7 +53,7 @@ struct SpriteAnimDef
 struct SpriteAnimatorDef
 {
     int spriteIndex = -1;
-    std::vector<std::shared_ptr<sf::Texture>> textures;
+    std::vector<sf::Texture> textures;
 };
 /**
  * \brief manage an animator with several animations (SpriteAnimDef)
@@ -76,7 +77,7 @@ private:
     SpriteAnimDef* currentAnim_ = nullptr;
     Timer animTimer_ = {0.0f, 0.0f};
     Index currentIndex_ = 0u;
-    std::vector<std::shared_ptr<sf::Texture>> textures_;
+    std::vector<sf::Texture> textures_;
 };
 /**
  * \brief manages animators

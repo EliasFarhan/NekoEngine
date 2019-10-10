@@ -28,66 +28,60 @@
 
 namespace neko
 {
-ShapeManager::ShapeManager()
-{
-    convexShape_[0].reserve(INIT_ENTITY_NMB);
-    convexShape_[1].reserve(INIT_ENTITY_NMB);
-}
 
 
-uint32_t ShapeManager::AddBox(const sf::Vector2f& pos, const sf::Vector2f& halfSize, const ShapeDef& shapeDef)
+void ConvexShapeManager::AddBox(Entity entity, const Vec2f& pos, const Vec2f& halfSize, const ShapeDef& shapeDef)
 {
-    sf::Vector2f points[4] =
+    Vec2f points[4] =
     {
-        -halfSize,
+        Vec2f()-halfSize,
         sf::Vector2f(-halfSize.x, halfSize.y),
         halfSize,
         sf::Vector2f(halfSize.x, -halfSize.y)
     };
-    return AddPolygon(pos, points, 4, shapeDef);
-
+    AddPolygon(entity, pos, points, 4, shapeDef);
 }
 
-uint32_t
-ShapeManager::AddPolygon(const sf::Vector2f& pos, const sf::Vector2f* points, size_t pointNmb, const ShapeDef& shapeDef)
+void ConvexShapeManager::AddPolygon(Entity entity, const Vec2f& pos, const Vec2f* points, size_t pointNmb,
+                                    const ShapeDef& shapeDef)
 {
     sf::ConvexShape newPolygon;
     newPolygon.setPointCount(pointNmb);
-    newPolygon.setPosition(pos);
+    newPolygon.setPosition(unit2pixel(pos));
     for (auto i = 0u; i < pointNmb; i++)
     {
-        newPolygon.setPoint(i, points[i]);
+        newPolygon.setPoint(i, unit2pixel(points[i]));
     }
     newPolygon.setFillColor(shapeDef.fillColor);
     newPolygon.setOutlineColor(shapeDef.outlineColor);
     newPolygon.setOutlineThickness(shapeDef.outlineThickness);
-
-    const Index index = Index(convexShape_[0].size());
-    convexShape_[0].push_back(newPolygon);
-    convexShape_[1].push_back(newPolygon);
-    return index;
+    ResizeIfNecessary(components_, entity, sf::ConvexShape());
+    components_[entity] = newPolygon;
 }
 
-
-
-void ShapeManager::PushCommands(MultiThreadGraphicsManager* graphicsManager, size_t start, size_t length)
+void ConvexShapeManager::CopyTransformPosition(Position2dManager& positionManager, size_t start, size_t length)
 {
-    rmt_ScopedCPUSample(PushShapeCommands, 0);
-    const int frameIndex = MainEngine::GetInstance()->frameIndex % 2;
-    for (auto i = start; i < start + length; i++)
+	const auto positions = positionManager.GetConstComponentsVector();
+    for(auto i = start; i < start+length; i++)
     {
-        graphicsManager->Draw(convexShape_[frameIndex][i]);
+        components_[i].setPosition(neko::unit2pixel(positions[i]));
     }
 }
 
-void ShapeManager::CopyTransformPosition(Transform2dManager& transformManager, size_t start, size_t length)
+void ConvexShapeManager::CopyTransformRotation(Rotation2dManager& rotationManager, size_t start, size_t length)
 {
-    rmt_ScopedCPUSample(CopySpritePositions, 0);
-    const int frameIndex = MainEngine::GetInstance()->frameIndex % 2;
-    for (auto i = start; i < start + length; i++)
-    {
-        convexShape_[frameIndex][i].setPosition(transformManager.positions_[i]);
-    }
+	const auto rotations = rotationManager.GetConstComponentsVector();
+	for (auto i = start; i < start + length; i++)
+	{
+		components_[i].setRotation(-rotations[i]); //counter clockwise rotation
+	}
 }
 
+void ConvexShapeManager::PushCommands(GraphicsManager* graphicsManager, size_t start, size_t length)
+{
+    for(auto i = start; i < start+length;i++)
+    {
+        graphicsManager->Draw(components_[i]);
+    }
+}
 }

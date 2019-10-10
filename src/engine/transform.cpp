@@ -31,85 +31,128 @@ namespace neko
 
 Transform2dManager::Transform2dManager()
 {
-	positions_.resize(INIT_ENTITY_NMB);
-	scales_.resize(INIT_ENTITY_NMB);
-	angles_.resize(INIT_ENTITY_NMB);
+    transformHierarchy_.resize(INIT_ENTITY_NMB, INVALID_ENTITY);
 }
 
-void Transform2dManager::CopyPositionsFromPhysics2d(Physics2dManager& physics2dManager, size_t start, size_t length)
+bool Transform2dManager::SetTransformParent(Entity entity, Entity parentEntity)
 {
-	for (auto i = start; i < start + length; i++)
-	{
-		positions_[i] = meter2pixel(physics2dManager.bodies_[i]->GetPosition());
-	}
+    //Check if not creating circuit
+    if(!CanParentTransform(entity, parentEntity))
+        return false;
+    transformHierarchy_[entity] = parentEntity;
+    return true;
 }
 
-void Transform2dManager::CopyAnglesFromPhysics2d(Physics2dManager& physics2dManager, size_t start, size_t length)
+bool Transform2dManager::CanParentTransform(Entity entity, Entity parentEntity)
 {
-	for (auto i = start; i < start + length; i++)
-	{
-		angles_[i] = meter2pixel(glm::radians(physics2dManager.bodies_[i]->GetAngle()));
-	}
+    if(entity == neko::INVALID_ENTITY)
+    {
+        return false;
+    }
+    if(parentEntity == neko::INVALID_ENTITY)
+    {
+        return true;
+    }
+    ResizeIfNecessary(transformHierarchy_, entity, INVALID_ENTITY);
+    ResizeIfNecessary(transformHierarchy_, parentEntity, INVALID_ENTITY);
+    Entity currentCheckedEntity = parentEntity;
+    do
+    {
+        currentCheckedEntity = transformHierarchy_[currentCheckedEntity];
+        if(currentCheckedEntity == entity)
+        {
+            return false;
+        }
+    } while(currentCheckedEntity != INVALID_ENTITY);
+    return true;
 }
 
-Index Transform2dManager::AddPosition(sf::Vector2f position, Entity entity)
+Entity
+Transform2dManager::FindNextChild(Entity parentEntity, Entity entityChild)
 {
-	if (entity == INVALID_ENTITY)
+    auto begin = transformHierarchy_.cbegin();
+
+    if(entityChild != INVALID_ENTITY)
+    {
+        begin += entityChild+1;
+    }
+
+    auto it = std::find_if(begin, transformHierarchy_.cend(), [&parentEntity](const Entity& entity){
+        return parentEntity == entity;
+    });
+    if(it == transformHierarchy_.cend())
+        return INVALID_ENTITY;
+    return Entity(it-transformHierarchy_.cbegin());
+
+}
+
+Entity Transform2dManager::GetParentEntity(Entity entity)
+{
+    ResizeIfNecessary(transformHierarchy_, entity, INVALID_ENTITY);
+    return transformHierarchy_[entity];
+}
+
+sf::Transform Transform2dManager::CalculateTransform(Entity entity)
+{
+    sf::Transform transform = sf::Transform::Identity;
+    sf::Transform parentTransform = sf::Transform::Identity;
+
+    auto parentEntity = GetParentEntity(entity);
+    if(parentEntity != INVALID_ENTITY)
+    {
+        parentTransform = CalculateTransform(parentEntity);
+    }
+    auto point = unit2pixel(positionManager_.GetConstComponent(entity));
+
+    transform = transform.translate(point);
+    transform = transform.scale(scaleManager_.GetConstComponent(entity));
+    transform = transform.rotate(rotationManager_.GetConstComponent(entity));
+
+    transform = parentTransform.combine(transform);
+    return transform;
+}
+
+void Rotation2dManager::CopyAnglesFromBody2d(EntityManager& entityManager, Body2dManager& body2dManager)
+{
+	const auto entityNmb = entityManager.GetEntitiesSize();
+	const auto& bodies = body2dManager.GetConstComponentsVector();
+
+	for (Index i = 0; i < entityNmb; i++)
 	{
-		positions_.push_back(position);
-		return Index(positions_.size());
-	}
-	
-	size_t futureSize = positions_.size();
-	if (futureSize <= entity)
-	{
-		while (futureSize <= entity)
+		if (
+			entityManager.HasComponent(i, EntityMask(NekoComponentType::BODY2D)) &&
+			entityManager.HasComponent(i, EntityMask(NekoComponentType::ROTATION2D))
+			)
 		{
-			futureSize *= 2;
+			components_[i] = glm::degrees(bodies[i]->GetAngle());
 		}
-		positions_.resize(futureSize);
 	}
-	positions_[entity] = position;
-	return entity;
 }
 
-Index Transform2dManager::AddScale(sf::Vector2f scale, Entity entity)
+void Position2dManager::CopyAllPositionsFromBody2d(EntityManager& entityManager, Body2dManager& body2dManager)
 {
-	if (entity == INVALID_ENTITY)
+	const auto entityNmb = entityManager.GetEntitiesSize();
+	const auto& bodies = body2dManager.GetConstComponentsVector();
+	for(Index i = 0; i < entityNmb;i++)
 	{
-		scales_.push_back(scale);
-		return Index(scales_.size());
+		if(
+			entityManager.HasComponent(i, EntityMask(NekoComponentType::BODY2D)) &&
+			entityManager.HasComponent(i, EntityMask(NekoComponentType::POSITION2D)) 
+			)
+		{
+			components_[i] = meter2pixel(bodies[i]->GetPosition());
+		}
 	}
-	if(scales_.size() <= entity)
-	{
-		scales_.resize(size_t(entity) + 1);
-	}
-	scales_[entity] = scale;
-	return entity;
 }
 
-Index Transform2dManager::AddAngle(float angle, Entity entity)
+Position2dManager::Position2dManager() : ComponentManager::ComponentManager()
 {
-	if (entity == INVALID_ENTITY)
-	{
-		angles_.push_back(angle);
-		return Index(angles_.size());
-	}
-	if(angles_.size() <= entity)
-	{
-		angles_.resize(size_t(entity) + 1);
-	}
-	angles_[entity] = angle;
-	return entity;
 }
 
-sf::Vector2f Transform2dManager::GetPosition(Index i) const
+Index Scale2dManager::AddComponent(EntityManager& entityManager, Entity entity)
 {
-	return positions_[i];
+    ResizeIfNecessary(components_, entity, sf::Vector2f(1.0f,1.0f));
+    return ComponentManager::AddComponent(entityManager, entity);
 }
 
-void Transform2dManager::SetPosition(const sf::Vector2f& position, Index i)
-{
-	positions_[i] = position;
-}
 }

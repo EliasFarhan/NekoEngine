@@ -39,7 +39,7 @@ bool IsRegularFile(const std::string_view filename);
 
 bool IsDirectory(const std::string_view filename);
 
-void IterateDirectory(const std::string_view dirname, std::function<void(const std::string_view)> func);
+void IterateDirectory(const std::string_view dirname, std::function<void(const std::string_view)> func, bool recursive=false);
 
 std::ifstream::pos_type CalculateFileSize(const std::string& filename);
 
@@ -54,4 +54,7 @@ std::string LinkFolderAndFile(const std::string_view folderPath, const std::stri
 std::string GetFilenameExtension(const std::string_view path);
 
 std::string GetFileParentPath(const std::string_view path);
+std::string GetFilename(const std::string_view path);
+
+void WriteStringToFile(const std::string& path, const std::string_view content);
 }

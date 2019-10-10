@@ -35,7 +35,7 @@ float Physics2dManager::pixelPerMeter = 100.0f;
 
 void Physics2dManager::Init()
 {
-	MainEngine* engine = MainEngine::GetInstance();
+	auto* engine = BasicEngine::GetInstance();
 	config_ = &engine->config;
 	pixelPerMeter = config_->pixelPerMeter;
 	world_ = std::make_unique<b2World>(config_->gravity);
@@ -45,6 +45,7 @@ void Physics2dManager::Init()
 
 void Physics2dManager::Update(float dt)
 {
+    (void)dt;//TODO put physics clock here
 	world_->Step(config_->physicsTimeStep, config_->velocityIterations, config_->positionIterations);
 }
 
@@ -109,5 +110,49 @@ sf::Vector2f meter2pixel(const b2Vec2& meter)
 	return sf::Vector2f(meter2pixel(meter.x), meter2pixel(meter.y));
 }
 
+Vec2f pixel2unit(const sf::Vector2f& v)
+{
+    return Vec2f(pixel2meter(v.x), pixel2meter(v.y));
+}
 
+float pixel2unit(const float v)
+{
+	return pixel2meter(v);
+}
+
+sf::Vector2f unit2pixel(const Vec2f& v)
+{
+    return sf::Vector2f(meter2pixel(v.x), meter2pixel(v.y));
+}
+
+float unit2pixel(float v)
+{
+	return meter2pixel(v);
+}
+
+
+void BodyDef2dManager::ParseComponentJson(json& componentJson, Entity entity)
+{
+    b2BodyDef bodyDef;
+    bodyDef.gravityScale = componentJson["gravityScale"];
+    bodyDef.type = componentJson["type"];
+    bodyDef.angularDamping = componentJson["angularDamping"];
+    bodyDef.linearDamping = componentJson["linearDamping"];
+    bodyDef.fixedRotation = componentJson["fixedRotation"];
+    bodyDef.allowSleep = componentJson["allowSleep"];
+    components_[entity] = bodyDef;
+}
+
+json BodyDef2dManager::SerializeComponentJson(Entity entity)
+{
+    const auto& bodyDef = GetConstComponent(entity);
+    json componentJson;
+    componentJson["gravityScale"] = bodyDef.gravityScale;
+    componentJson["type"] = bodyDef.type;
+    componentJson["angularDamping"] = bodyDef.angularDamping;
+    componentJson["linearDamping"] = bodyDef.linearDamping;
+    componentJson["fixedRotation"] = bodyDef.fixedRotation;
+    componentJson["allowSleep"] = bodyDef.allowSleep;
+    return ComponentManager::SerializeComponentJson(entity);
+}
 }

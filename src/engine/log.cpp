@@ -39,6 +39,10 @@ public:
 
     void logLoop();
 
+    std::vector<std::string>& GetMsgHistory()
+    {
+        return msgHistory_;
+    }
     std::atomic<bool> isRunning = true;
     std::condition_variable newMsgSync;
 
@@ -47,7 +51,7 @@ public:
 private:
     std::thread logThread_;
     std::vector<std::string> msgQueue_;
-
+    std::vector<std::string> msgHistory_;
 };
 
 
@@ -67,6 +71,7 @@ DebugLogger::DebugLogger()
 
 void DebugLogger::write(std::string msg)
 {
+    msgHistory_.push_back(msg);
     {
         std::unique_lock<std::mutex> lock(msgMutex);
         msgQueue_.push_back(msg);
@@ -122,9 +127,8 @@ void initLog()
 
 void logDebug(std::string msg)
 {
-#ifdef __neko_dbg__
     debugLogger->write(msg);
-#endif
+
 }
 
 void destroyLog()
@@ -138,4 +142,9 @@ void destroyLog()
 		debugLogger->newMsgSync.wait_for(lock, 5ms);
     }
 	debugLogger = nullptr;
+}
+
+std::vector<std::string>& getLog()
+{
+    return debugLogger->GetMsgHistory();
 }

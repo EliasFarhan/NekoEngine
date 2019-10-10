@@ -28,44 +28,52 @@
 #include <memory>
 #include <SFML/Graphics/Sprite.hpp>
 #include <engine/globals.h>
+#include "engine/component.h"
+#include <engine/transform.h>
 
 
 namespace neko
 {
-class Transform2dManager;
+class TextureManager;
+class GraphicsManager;
 
-class MultiThreadGraphicsManager;
+struct Sprite
+{
+    sf::Sprite sprite;
+    int layer = 0;
+    sf::Vector2f origin = sf::Vector2f(0.0f,0.0f);
+    Index textureId = INVALID_INDEX;
+    sf::Transform transform = sf::Transform::Identity;
+};
 
-/**
- * \brief store the sfml sprite and allow to copy transform from Transform2dManager,
- * but transform need to be at the same index as sprite in an Entity Component System way
- */
-class SpriteManager
+class SpriteManager :
+        public ComponentManager<Sprite, ComponentType(NekoComponentType::SPRITE2D)>
 {
 public:
-    SpriteManager();
+    explicit SpriteManager(TextureManager& textureManager);
 
-    Index AddSprite(const std::shared_ptr<sf::Texture> texture);
+    void CopySpriteOrigin(const sf::Vector2f& origin, size_t start, size_t length=1);
 
-    sf::Sprite* GetSpriteAt(unsigned int spriteIndex);
+    void CopyTexture(const Index textureId, size_t start, size_t length=1);
 
-    void CopyTransformPosition(Transform2dManager& transformManager, size_t start = 0, size_t length = INIT_ENTITY_NMB);
+    void CopyLayer(int layer, size_t start, size_t length=1);
 
-    void CopyTransformScales(Transform2dManager& transformManager, size_t start = 0, size_t length = INIT_ENTITY_NMB);
+    void CopyAllTransforms(EntityManager& entityManager, Transform2dManager& transformManager);
+    void CopyAllTransformPositions(EntityManager& entityManager, Position2dManager& positionManager);
 
-    void CopyTransformAngles(Transform2dManager& transformManager, size_t start = 0, size_t length = INIT_ENTITY_NMB);
-/**
- * \brief push basic graphic command to the render thread to be processed next frame
- * @param graphicsManager
- * @param start
- * @param length
- */
-    void PushCommands(MultiThreadGraphicsManager* graphicsManager, size_t start = 0, size_t length = INIT_ENTITY_NMB);
+    void CopyAllTransformScales(EntityManager& entityManager, Scale2dManager& scaleManager);
 
-private:
-    /**
-     * \brief store the sfml sprites with two vectors for double buffering with the render thread
-     */
-    std::vector<sf::Sprite> sprites_[2];
+    void CopyAllTransformRotations(EntityManager& entityManager, Rotation2dManager& angleManager);
+
+    void PushAllCommands(EntityManager& entityManager, GraphicsManager& graphicsManager);
+
+    void ParseComponentJson(json& componentJson, Entity entity) override;
+
+    json SerializeComponentJson(Entity entity) override;
+
+
+protected:
+    TextureManager& textureManager_;
 };
+
 }

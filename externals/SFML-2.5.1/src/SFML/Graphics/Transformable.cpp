@@ -216,4 +216,17 @@ const Transform& Transformable::getInverseTransform() const
     return m_inverseTransform;
 }
 
+void Transformable::resetTransform()
+{
+    m_position = sf::Vector2f();
+    m_scale = sf::Vector2f(1,1);
+    //m_origin = sf::Vector2f(0,0);
+    m_rotation = 0.0f;
+    m_transform = sf::Transform::Identity;
+    m_inverseTransform = sf::Transform::Identity;
+    m_transformNeedUpdate = true;
+    m_inverseTransformNeedUpdate = true;
+}
+
+
 } // namespace sf

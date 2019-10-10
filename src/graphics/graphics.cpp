@@ -31,148 +31,54 @@
 
 namespace neko
 {
-void SfmlCommand::Draw(sf::RenderTarget* renderTarget)
+void SfmlCommand::Draw(sf::RenderTarget& renderTarget)
 {
-    renderTarget->draw(*drawable);
-}
-
-MultiThreadGraphicsManager::MultiThreadGraphicsManager()
-{
-	commandBuffers_[0].fill(nullptr);
-	commandBuffers_[1].fill(nullptr);
-	editor = std::make_unique<Editor>();
-}
-
-void MultiThreadGraphicsManager::Draw(sf::Drawable& drawable)
-{
-    if (nextRenderLength_ >= MAX_COMMAND_NMB)
-    {
-        logDebug("[Error] Too many draw calls compare to MAX_COMMAND_NMB");
-        return;
-    }
-    const Index index = MainEngine::GetInstance()->frameIndex % 2;
-    /*{
-        std::ostringstream oss;
-        oss << "Graphics Command On Engine Frame: " << MainEngine::GetInstance()->frameIndex <<" and Graphics frame: "<<frameIndex<<" with render length: "<< nextRenderLength_;
-        logDebug(oss.str());
-    }*/
-    SfmlCommand command;
-    command.drawable = &drawable;
-    commands_[index][nextRenderLength_] = command;
-    commandBuffers_[index][nextRenderLength_] = &commands_[index][nextRenderLength_];
-
-    nextRenderLength_++;
+    renderTarget.draw(*drawable, states);
 }
 
 
-void TilemapCommand::Draw(sf::RenderTarget* renderTarget)
+void TilemapCommand::Draw(sf::RenderTarget& renderTarget)
 {
-    sf::RenderStates states;
     states.texture = texture;
-    renderTarget->draw(*vertexArray, states);
+    renderTarget.draw(*vertexArray, states);
 }
 
-
-void MultiThreadGraphicsManager::Draw(sf::VertexArray* vertexArray, sf::Texture* texture)
+GraphicsManager::GraphicsManager()
 {
-    const int index = MainEngine::GetInstance()->frameIndex % 2;
-    TilemapCommand tilemapCommand;
-    tilemapCommand.vertexArray = vertexArray;
-    tilemapCommand.texture = texture;
-
-    tileCommands_[index][nextRenderLength_] = tilemapCommand;
-    commandBuffers_[index][nextRenderLength_] = &tileCommands_[index][nextRenderLength_];
-
-    nextRenderLength_++;
+	commandBuffer_.resize(MAX_COMMAND_NMB);
+	sfmlCommands.resize(MAX_COMMAND_NMB);
 }
 
-void MultiThreadGraphicsManager::SetView(sf::View view)
+void GraphicsManager::Draw(sf::Drawable& drawable, int layer, const sf::RenderStates& states)
 {
-    const int index = MainEngine::GetInstance()->frameIndex % 2;
-    views_[index] = view;
+	SfmlCommand sfmlCommand;
+	sfmlCommand.drawable = &drawable;
+	sfmlCommand.layer = layer;
+    sfmlCommand.states = states;
+	sfmlCommands[renderLength] = sfmlCommand;
+	commandBuffer_[renderLength] = &sfmlCommands[renderLength];
+	renderLength++;
 }
-
-void MultiThreadGraphicsManager::RenderLoop()
+//TODO Generate render command
+void GraphicsManager::Draw(sf::VertexArray* vertexArray, sf::Texture* texture, int layer, const sf::RenderStates& states)
 {
-    auto* engine = MainEngine::GetInstance();
-
-    renderWindow_ = engine->renderWindow.get();
-    renderWindow_->setActive(true);
-    views_[0] = renderWindow_->getView();
-    views_[1] = views_[0];
-    editor->graphicsManager_ = this;
-    editor->renderWindow_ = renderWindow_;
-    renderWindow_->setActive(false);
-
-    do
-    {
-        rmt_ScopedCPUSample(RenderLoop, 0);
-
-        {
-            /*{
-                std::ostringstream oss;
-                oss << "Graphics Frame Start: " << MainEngine::GetInstance()->frameIndex << " and Graphics frame: " << frameIndex;
-                logDebug(oss.str());
-            }*/
-            std::unique_lock<std::mutex> lock(engine->renderStartMutex);
-
-			isRendering_ = true;
-            engine->condSyncRender.wait(lock);
-            renderLength_ = nextRenderLength_;
-            nextRenderLength_ = 0;
-            frameIndex = engine->frameIndex - 1;
-        }
-        //We only start the new graphics frame if the engine had time to loop
-        if (engine->isRunning)
-        {
-
-            rmt_ScopedCPUSample(ActiveRenderLoop, 0);
-            std::unique_lock<std::mutex> lock(renderingMutex);
-            renderWindow_->setActive(true);
-            renderWindow_->setView(views_[frameIndex % 2]);
-
-
-            renderWindow_->clear(engine->config.bgColor);
-
-            //manage command buffers
-            auto& commandBuffer = commandBuffers_[frameIndex % 2];
-#ifdef __neko_dbg__
-            {
-                std::ostringstream oss;
-                oss << "Command Buffers length: " << renderLength_ << "\n";
-                oss << "Engine frame: " << engine->frameIndex << " Graphics Frame: " << frameIndex;
-                logDebug(oss.str());
-
-            }
-#endif
-			for (auto i = 0u; i < renderLength_; i++)
-			{
-				std::unique_lock<std::mutex> renderLock(engine->renderStartMutex);
-				auto* command = commandBuffer[i];
-				if (command != nullptr)
-				{
-					command->Draw(renderWindow_);
-				}
-			}
-            editor->Update(engine->clockDeltatime.asSeconds());
-            renderWindow_->display();
-            renderWindow_->setActive(false);
-        }
-
-    }
-    while (engine->isRunning);
-
-    renderWindow_->setActive(true);
-    logDebug("Graphics Loop Destroy");
-    renderWindow_->setActive(false);
-
-
+    (void)vertexArray;
+    (void)texture;
+    (void)layer;
+    (void)states;
 }
 
-bool MultiThreadGraphicsManager::DidRenderingStart() const
+void GraphicsManager::Render(sf::RenderTarget& renderTarget)
 {
-	return isRendering_;
+    std::sort(commandBuffer_.begin(), commandBuffer_.begin() + renderLength, [](Command* c1, Command* c2)
+	{
+		return c1->layer < c2->layer;
+	});
+	for (size_t i = 0; i < renderLength; i++)
+	{
+		commandBuffer_[i]->Draw(renderTarget);
+	}
+	renderLength = 0;
 }
-
 
 }
