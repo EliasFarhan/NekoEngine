@@ -21,7 +21,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-#include <graphics/shape.h>
+#include "../../extensions/sfml_engine/include/sfml_engine/shape.h"
 #include <engine/globals.h>
 #include <engine/engine.h>
 #include <Remotery.h>

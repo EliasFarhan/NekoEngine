@@ -29,6 +29,8 @@
 #include <ctime>
 #include <vector>
 #include <string>
+#include <thread>
+#include <fstream>
 
 class DebugLogger
 {
@@ -108,7 +110,7 @@ void DebugLogger::logLoop()
 						msgQueue_.erase(msgQueue_.begin());
 					}
 					logFile << msg << "\n";
-					if (msg.find("[Error]") != std::string::nops)
+					if (msg.find("[Error]") != std::string::npos)
 					{
 						std::cerr << msg << std::endl;
 					}

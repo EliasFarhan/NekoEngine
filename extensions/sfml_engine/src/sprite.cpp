@@ -21,13 +21,13 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-#include <graphics/sprite.h>
+#include "../../extensions/sfml_engine/include/sfml_engine/sprite.h"
 #include <engine/transform.h>
 #include <graphics/graphics.h>
 #include <engine/engine.h>
 #include "engine/globals.h"
 #include <Remotery.h>
-#include <graphics/texture.h>
+#include "../../extensions/sfml_engine/include/sfml_engine/texture.h"
 
 namespace neko
 {

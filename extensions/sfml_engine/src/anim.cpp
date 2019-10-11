@@ -21,11 +21,11 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-#include <graphics/anim.h>
+#include "../../extensions/sfml_engine/include/sfml_engine/anim.h"
 #include <cstring>
 #include <engine/log.h>
 #include <engine/engine.h>
-#include <graphics/sprite.h>
+#include "../../extensions/sfml_engine/include/sfml_engine/sprite.h"
 
 namespace neko
 {

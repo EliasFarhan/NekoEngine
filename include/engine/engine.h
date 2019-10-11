@@ -54,6 +54,7 @@ struct Configuration
     std::string dataRootPath = "data/";
 	int glMajorVersion = 4;
 	int glMinorVersion = 5;
+
 };
 
 /**

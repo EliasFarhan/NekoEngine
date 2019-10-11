@@ -38,7 +38,7 @@ void Physics2dManager::Init()
 	auto* engine = BasicEngine::GetInstance();
 	config_ = &engine->config;
 	pixelPerMeter = config_->pixelPerMeter;
-	world_ = std::make_unique<b2World>(config_->gravity);
+	world_ = std::make_unique<b2World>(b2Vec2(config_->gravityX, config_->gravityY));
 	world_->SetContactListener(&collisionListener_);
 	colliders_.reserve(INIT_ENTITY_NMB);
 }

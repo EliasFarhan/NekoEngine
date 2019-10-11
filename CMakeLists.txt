@@ -202,11 +202,11 @@ set(SDL_STATIC ON)
 set(SDL_SHARED OFF)
 add_subdirectory(${SDL_DIR})
 include_directories(${SDL_DIR}/include ${SDL_DIR}/src)
-LIST(APPEND NEKO_LIBRARIES
+LIST(APPEND Neko_LIBRARIES
 		SDL2-static)
 		set_target_properties (SDL2-static PROPERTIES FOLDER Externals)
 if(MSVC)
-	LIST(APPEND NEKO_LIBRARIES
+	LIST(APPEND Neko_LIBRARIES
 		SDL2main)
 		set_target_properties (SDL2main PROPERTIES FOLDER Externals)
 endif(MSVC)
@@ -229,14 +229,15 @@ else()
     )
 endif()
 add_library(sfml-network STATIC ${SFML_NETWORK_SRC})
-LIST(APPEND NEKO_LIBRARIES
+LIST(APPEND Neko_LIBRARIES
 		sfml-network)
 set_target_properties (sfml-network PROPERTIES FOLDER Externals)
 #opengl
 set(OpenGL_GL_PREFERENCE GLVND)
+add_compile_definitions(USE_OPENGL=1)
 find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
-LIST(APPEND NEKO_LIBRARIES
+LIST(APPEND Neko_LIBRARIES
 		${OPENGL_LIBRARIES})
 	message("OpenGL Libraries: ${OPENGL_LIBRARIES}")
 #glew
@@ -244,15 +245,16 @@ set(GLEW_DIR ${EXTERNAL_DIR}/glew)
 add_compile_definitions(GLEW_STATIC)
 include_directories(${GLEW_DIR}/include)
 add_subdirectory(${GLEW_DIR})
-LIST(APPEND NEKO_LIBRARIES
+LIST(APPEND Neko_LIBRARIES
 	glew)
 set_target_properties (glew PROPERTIES FOLDER Externals)
-	
+
+add_compile_definitions(IMGUI_IMPL_OPENGL_LOADER_GLEW=1)
 set(IMGUI_ROOT ${EXTERNAL_DIR}/imgui/)
 set(SDL2_IMGUI ${EXTERNAL_DIR}/imgui-sdl/)
 add_subdirectory(${SDL2_IMGUI})
 include_directories(${IMGUI_ROOT} ${SDL2_IMGUI})
-LIST(APPEND NEKO_LIBRARIES
+LIST(APPEND Neko_LIBRARIES
 	imgui-sdl)
 set_target_properties (imgui-sdl PROPERTIES FOLDER Externals)
 
@@ -292,6 +294,7 @@ add_library(Neko_COMMON STATIC ${Neko_SRC})
 		-Wall -Wextra>
 		$<$<CXX_COMPILER_ID:MSVC>:
 		/W4>)
+message("Neko Libraries:  ${Neko_LIBRARIES}")
 target_link_libraries(Neko_COMMON PUBLIC ${Neko_LIBRARIES})
 add_dependencies(Neko_COMMON DataTarget)
 set_property(TARGET Neko_COMMON PROPERTY CXX_STANDARD 17)
@@ -364,7 +367,7 @@ endforeach()
 
 include(cmake/neko_executable.cmake)
 #Hello Triangle
-add_neko_executable(HelloTriangle ${CMAKE_SOURCE_DIR}/main/HelloTriangle.cpp Neko_COMMON sdl_engine)
+add_neko_executable(HelloTriangle ${CMAKE_SOURCE_DIR}/main/HelloTriangle.cpp Neko_COMMON sdl_engine gl_engine)
 #Splash
 add_neko_executable(SplashDebug ${CMAKE_SOURCE_DIR}/main/SplashDebug.cpp Neko_COMMON Network Splash engine2d)
 #NekoEditor

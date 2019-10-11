@@ -24,20 +24,20 @@
  */
 #include "engine/engine.h"
 #include <SDL.h>
+#include <SDL_main.h>
 
-namespace neko
+namespace neko::sdl
 {
-namespace sdl
-{
-class SdlEngine : public BasicEngine
+class SdlGlEngine : public BasicEngine
 {
 public:
 	void Init() override;
 	void Update(float dt) override;
 	void Destroy() override;
 protected:
-	SDL_Window* window = nullptr;
-	SDL_GLContext glContext;
+	SDL_Window* window_ = nullptr;
+	SDL_GLContext glContext_;
+    bool wireframeMode_ = false;
 };
 }
-}
+

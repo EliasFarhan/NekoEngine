@@ -94,7 +94,7 @@ Entity Transform2dManager::GetParentEntity(Entity entity)
 
 sf::Transform Transform2dManager::CalculateTransform(Entity entity)
 {
-    sf::Transform transform = sf::Transform::Identity;
+    /*sf::Transform transform = sf::Transform::Identity;
     sf::Transform parentTransform = sf::Transform::Identity;
 
     auto parentEntity = GetParentEntity(entity);
@@ -102,14 +102,14 @@ sf::Transform Transform2dManager::CalculateTransform(Entity entity)
     {
         parentTransform = CalculateTransform(parentEntity);
     }
-    auto point = unit2pixel(positionManager_.GetConstComponent(entity));
+    sf::Vector2f point = positionManager_.GetConstComponent(entity);
 
     transform = transform.translate(point);
     transform = transform.scale(scaleManager_.GetConstComponent(entity));
     transform = transform.rotate(rotationManager_.GetConstComponent(entity));
 
     transform = parentTransform.combine(transform);
-    return transform;
+    return transform;*/
 }
 
 void Rotation2dManager::CopyAnglesFromBody2d(EntityManager& entityManager, Body2dManager& body2dManager)
@@ -140,7 +140,7 @@ void Position2dManager::CopyAllPositionsFromBody2d(EntityManager& entityManager,
 			entityManager.HasComponent(i, EntityMask(NekoComponentType::POSITION2D)) 
 			)
 		{
-			components_[i] = meter2pixel(bodies[i]->GetPosition());
+			//components_[i] = meter2pixel(bodies[i]->GetPosition());
 		}
 	}
 }

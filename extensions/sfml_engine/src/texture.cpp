@@ -21,7 +21,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-#include <graphics/texture.h>
+#include "../../extensions/sfml_engine/include/sfml_engine/texture.h"
 #include <set>
 #include <sstream>
 #include "engine/log.h"

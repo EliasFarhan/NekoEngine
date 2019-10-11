@@ -1,7 +1,9 @@
+#pragma once
+
 /*
  MIT License
 
- Copyright (c) 2019 SAE Institute Switzerland AG
+ Copyright (c) 2017 SAE Institute Switzerland AG
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -21,15 +23,23 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-#include <graphics/tilemap.h>
-#include <utilities/json_utility.h>
-#include <utilities/file_utility.h>
-#include <graphics/texture.h>
-#include <engine/engine.h>
+
+#include <vector>
+#include <memory>
+#include <SFML/Graphics/VertexArray.hpp>
+#include <SFML/Graphics/Texture.hpp>
 #include <physics/physics.h>
-#include <Remotery.h>
+#include "texture.h"
 
 namespace neko
 {
+class GraphicsManager;
+
+
+class Tilemap
+{
+public:
+    virtual void PushCommand(GraphicsManager* graphicsManager) = 0;
+};
 
 }

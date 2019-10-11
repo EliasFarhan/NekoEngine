@@ -35,13 +35,13 @@ void CollisionListener::BeginContact(b2Contact* contact)
 {
 	const auto* colliderA = static_cast<Collider*>(contact->GetFixtureA()->GetUserData());
 	const auto* colliderB = static_cast<Collider*>(contact->GetFixtureB()->GetUserData());
-	BasicEngine::GetInstance()->OnBeginContact(colliderA, colliderB);
+	//BasicEngine::GetInstance()->OnBeginContact(colliderA, colliderB);
 }
 
 void CollisionListener::EndContact(b2Contact* contact)
 {
 	const auto* colliderA = static_cast<Collider*>(contact->GetFixtureA()->GetUserData());
 	const auto* colliderB = static_cast<Collider*>(contact->GetFixtureB()->GetUserData());
-	BasicEngine::GetInstance()->OnEndContact(colliderA, colliderB);
+	//BasicEngine::GetInstance()->OnEndContact(colliderA, colliderB);
 }
 }

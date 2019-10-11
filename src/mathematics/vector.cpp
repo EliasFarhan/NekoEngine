@@ -141,4 +141,10 @@ Vec2f& Vec2f::operator/=(float rhs)
     this->y /= rhs;
     return *this;
 }
+
+std::ostream& operator<<(std::ostream& os, const Vec2f& dt)
+{
+    os << "Vec2f(" << dt.x << "," << dt.y << ")";
+    return os;
+}
 }

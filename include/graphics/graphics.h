@@ -40,6 +40,7 @@ struct Command
 {
     virtual ~Command() = default;
     int layer = 0;
+    virtual void Init() = 0;
     virtual void Draw() = 0;
 };
 

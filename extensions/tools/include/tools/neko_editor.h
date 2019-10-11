@@ -37,7 +37,7 @@
 
 #include <imgui.h>
 #include <imfilebrowser.h>
-#include <graphics/sprite.h>
+#include "../../../sfml_engine/include/sfml_engine/sprite.h"
 #include <engine/prefab.h>
 
 namespace editor

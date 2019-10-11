@@ -28,8 +28,8 @@
 #include <map>
 #include <SFML/Graphics/Sprite.hpp>
 #include "SFML/Graphics/Texture.hpp"
-#include "graphics/texture.h"
-#include "graphics/sprite.h"
+#include "texture.h"
+#include "sprite.h"
 #include <utilities/time_utility.h>
 #include <utilities/json_utility.h>
 #include <engine/system.h>

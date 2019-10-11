@@ -22,35 +22,52 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
+
+#include <ostream>
 namespace neko
 {
 
 class Vec2f
 {
- public:
-  float x;
-  float y;
+public:
+    float x;
+    float y;
 
-  Vec2f(float x, float y);
-  Vec2f();
-  float GetMagnitude() const;
-  Vec2f Normalized() const;
-  Vec2f Rotate(float angle) const;
-  static Vec2f Lerp(const Vec2f& v1, const Vec2f& v2, float t);
-  static float AngleBetween(const Vec2f& v1, const Vec2f& v2);
-  static float Dot(const Vec2f& v1, const Vec2f& v2);
+    Vec2f(float x, float y);
 
-  bool operator==(const Vec2f &rhs) const;
-  bool operator!=(const Vec2f &rhs) const;
+    Vec2f();
 
-  Vec2f operator+(const Vec2f& rhs) const;
-  Vec2f& operator+=(const Vec2f& rhs);
-  Vec2f operator-(const Vec2f& rhs) const;
+    float GetMagnitude() const;
 
-  Vec2f& operator-=(const Vec2f& rhs);
-  Vec2f operator*(float rhs) const;
-  Vec2f operator/(float rhs) const;
-  Vec2f& operator/=(float rhs) ;
+    Vec2f Normalized() const;
+
+    Vec2f Rotate(float angle) const;
+
+    static Vec2f Lerp(const Vec2f& v1, const Vec2f& v2, float t);
+
+    static float AngleBetween(const Vec2f& v1, const Vec2f& v2);
+
+    static float Dot(const Vec2f& v1, const Vec2f& v2);
+
+    bool operator==(const Vec2f& rhs) const;
+
+    bool operator!=(const Vec2f& rhs) const;
+
+    Vec2f operator+(const Vec2f& rhs) const;
+
+    Vec2f& operator+=(const Vec2f& rhs);
+
+    Vec2f operator-(const Vec2f& rhs) const;
+
+    Vec2f& operator-=(const Vec2f& rhs);
+
+    Vec2f operator*(float rhs) const;
+
+    Vec2f operator/(float rhs) const;
+
+    Vec2f& operator/=(float rhs);
+
+    friend std::ostream& operator<<(std::ostream& os, const Vec2f& dt);
 
 };
 
