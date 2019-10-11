@@ -1,8 +1,11 @@
 #include "sdl_engine/sdl_engine.h"
 
-int main(int argc, char** argv)
+int main([[maybe_unused]]int argc, [[maybe_unused]]char** argv)
 {
-    neko::sdl::SdlGlEngine engine;
+    neko::Configuration config;
+    config.fullscreen = true;
+
+    neko::sdl::SdlGlEngine engine(&config);
     engine.Init();
     engine.EngineLoop();
 	return EXIT_SUCCESS;

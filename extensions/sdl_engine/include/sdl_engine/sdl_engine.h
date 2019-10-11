@@ -25,16 +25,27 @@
 #include "engine/engine.h"
 #include <SDL.h>
 #include <SDL_main.h>
+#include <graphics/graphics.h>
+#include <optional>
 
 namespace neko::sdl
 {
+
+struct SdlGlEngineSystemInterface
+{
+    std::optional<std::reference_wrapper<GraphicsManager>> graphicsManager;
+};
+
 class SdlGlEngine : public BasicEngine
 {
 public:
+    using BasicEngine::BasicEngine;
 	void Init() override;
 	void Update(float dt) override;
 	void Destroy() override;
 protected:
+    GraphicsManager graphicsManager_;
+
 	SDL_Window* window_ = nullptr;
 	SDL_GLContext glContext_;
     bool wireframeMode_ = false;

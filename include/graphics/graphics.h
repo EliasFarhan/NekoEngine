@@ -28,6 +28,8 @@
 #include <array>
 #include <vector>
 
+#include "engine/system.h"
+
 namespace neko
 {
 
@@ -36,12 +38,23 @@ const size_t MAX_COMMAND_NMB = 8'192;
 /**
  * \brief abstraction of a graphic command send to the render thread
  */
-struct Command
+class GraphicsCommand
 {
-    virtual ~Command() = default;
-    int layer = 0;
+public:
+    GraphicsCommand() = default;
+    virtual ~GraphicsCommand() = default;
     virtual void Init() = 0;
-    virtual void Draw() = 0;
+
+    virtual void Update(float dt) = 0;
+
+    virtual void Destroy() = 0;
+    virtual void Render() = 0;
+
+    int GetLayer() const;
+    void SetLayer(int layer);
+private:
+    int layer_ = 0;
+
 };
 
 
@@ -49,12 +62,11 @@ class GraphicsManager
 {
 public:
 	GraphicsManager();
-   
-	virtual void Render() = 0;
+	virtual void Draw(GraphicsCommand* command);
+	virtual void Render();
 protected:
-	
-    std::vector<Command*> commandBuffer_ = {};
-	size_t renderLength = 0;
+    std::vector<GraphicsCommand*> commandBuffer_ = {};
+	size_t renderLength_ = 0;
 };
 
 }

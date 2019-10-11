@@ -40,12 +40,31 @@ GraphicsManager::GraphicsManager()
 
 void GraphicsManager::Render()
 {
-    std::sort(commandBuffer_.begin(), commandBuffer_.begin() + renderLength, [](Command* c1, Command* c2)
-	{
-		return c1->layer < c2->layer;
-	});
-	//Actual rendering should occur here
-	renderLength = 0;
+    std::sort(commandBuffer_.begin(), commandBuffer_.begin() + renderLength_, [](GraphicsCommand* c1, GraphicsCommand* c2)
+    {
+        return c1->GetLayer() < c2->GetLayer();
+    });
+    for(auto* graphicsCommand : commandBuffer_)
+    {
+        graphicsCommand->Render();
+    }
+    commandBuffer_.clear();
+    renderLength_ = 0;
 }
 
+void GraphicsManager::Draw(GraphicsCommand* command)
+{
+    commandBuffer_.push_back(command);
+    renderLength_++;
+}
+
+int GraphicsCommand::GetLayer() const
+{
+    return layer_;
+}
+
+void GraphicsCommand::SetLayer(int layer)
+{
+    layer_ = layer;
+}
 }

@@ -57,6 +57,8 @@ struct Configuration
 
 };
 
+
+
 /**
  * \brief basic engine class with no graphics manager implementation
  */

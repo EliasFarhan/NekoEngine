@@ -60,15 +60,20 @@ void SdlGlEngine::Init()
     auto windowSize = config.realWindowSize;
     if(config.fullscreen)
     {
+        int windowSizeW = 0;
+        int windowSizeH = 0;
+        SDL_GetWindowSize(window_, &windowSizeW , &windowSizeH);
+        windowSize.x = windowSizeW;
+        windowSize.y = windowSizeH;
         flags |= SDL_WINDOW_FULLSCREEN;
     }
     window_ = SDL_CreateWindow(
             config.windowName.c_str(),
             SDL_WINDOWPOS_CENTERED,
             SDL_WINDOWPOS_CENTERED,
-            config.realWindowSize.x,
-            config.realWindowSize.y,
-            SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE
+            windowSize.x,
+            windowSize.y,
+            flags
     );
 
     // Check that everything worked out okay
@@ -170,7 +175,7 @@ void SdlGlEngine::Update([[maybe_unused]]float dt)
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     }
 
-    //TODO draw everthing
+    graphicsManager_.Render();
 
     if (wireframeMode_)
     {
