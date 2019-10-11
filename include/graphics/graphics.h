@@ -26,13 +26,12 @@
 
 #include <condition_variable>
 #include <array>
-#include "tilemap.h"
+#include <vector>
 
 namespace neko
 {
 
 const size_t MAX_COMMAND_NMB = 8'192;
-
 
 /**
  * \brief abstraction of a graphic command send to the render thread
@@ -41,30 +40,7 @@ struct Command
 {
     virtual ~Command() = default;
     int layer = 0;
-    virtual void Draw(sf::RenderTarget& renderTarget) = 0;
-};
-
-/**
- * \brief specialization for SFML basic drawable type
- */
-struct SfmlCommand : public Command
-{
-    /**
-     * \brief non owning raw pointer of an SFML Drawable stored in a graphic class
-     */
-    sf::Drawable* drawable = nullptr;
-    sf::RenderStates states = sf::RenderStates::Default;
-    void Draw(sf::RenderTarget& renderTarget) override;
-};
-/**
- * \brief specialization for SFML vertex array drawing type
- */
-struct TilemapCommand : public Command
-{
-    sf::Texture* texture = nullptr;
-    sf::VertexArray* vertexArray = nullptr;
-    sf::RenderStates states = sf::RenderStates::Default;
-    void Draw(sf::RenderTarget& renderTarget) override;
+    virtual void Draw() = 0;
 };
 
 
@@ -72,15 +48,11 @@ class GraphicsManager
 {
 public:
 	GraphicsManager();
-    virtual void Draw(sf::Drawable& drawable, int layer = 0, const sf::RenderStates& states = sf::RenderStates::Default);
-
-    virtual void Draw(sf::VertexArray* vertexArray, sf::Texture* texture, int layer = 0, const sf::RenderStates& states = sf::RenderStates::Default);
-
-	void Render(sf::RenderTarget& renderTarget);
+   
+	virtual void Render() = 0;
 protected:
-
+	
     std::vector<Command*> commandBuffer_ = {};
-	std::vector<SfmlCommand> sfmlCommands = {};
 	size_t renderLength = 0;
 };
 

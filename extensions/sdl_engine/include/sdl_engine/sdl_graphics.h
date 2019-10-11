@@ -1,3 +1,5 @@
+#pragma once
+
 /*
  MIT License
 
@@ -22,52 +24,12 @@
  SOFTWARE.
  */
 
-#include <chrono>
-
-#include <engine/engine.h>
-#include <engine/log.h>
+#include <graphics/graphics.h>
 
 namespace neko
 {
-BasicEngine* BasicEngine::instance_ = nullptr;
-BasicEngine::BasicEngine(Configuration* config)
+namespace sdl
 {
-    if (config != nullptr)
-    {
-        this->config = *config;
-    }
-    initLog();
 
 }
-
-BasicEngine::~BasicEngine()
-{
-    logDebug("Destroy Basic Engine");
-    destroyLog();
-}
-
-void BasicEngine::Init()
-{
-    instance_ = this;
-}
-
-void BasicEngine::Destroy()
-{
-    instance_ = nullptr;
-}
-
-void BasicEngine::EngineLoop()
-{
-    isRunning_ = true;
-	std::chrono::time_point<std::chrono::system_clock> clock = std::chrono::system_clock::now();
-    while (isRunning_)
-    {
-	    const auto start = std::chrono::system_clock::now();
-	    const auto dt = std::chrono::duration_cast<std::chrono::duration<float>>(start - clock).count();
-		clock = start;
-		Update(dt);
-    }
-    Destroy();
-}
-
 }

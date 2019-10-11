@@ -201,7 +201,7 @@ set(SDL_DIR ${EXTERNAL_DIR}/SDL2-${SDL_VERSION}/)
 set(SDL_STATIC ON)
 set(SDL_SHARED OFF)
 add_subdirectory(${SDL_DIR})
-include_directories(${SDL2_DIR}/include ${SDL2_DIR}/src)
+include_directories(${SDL_DIR}/include ${SDL_DIR}/src)
 LIST(APPEND NEKO_LIBRARIES
 		SDL2-static)
 		set_target_properties (SDL2-static PROPERTIES FOLDER Externals)
@@ -363,6 +363,8 @@ foreach(course_file ${COURSE_FILES} )
 endforeach()
 
 include(cmake/neko_executable.cmake)
+#Hello Triangle
+add_neko_executable(HelloTriangle ${CMAKE_SOURCE_DIR}/main/HelloTriangle.cpp Neko_COMMON sdl_engine)
 #Splash
 add_neko_executable(SplashDebug ${CMAKE_SOURCE_DIR}/main/SplashDebug.cpp Neko_COMMON Network Splash engine2d)
 #NekoEditor

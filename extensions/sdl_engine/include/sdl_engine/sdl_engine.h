@@ -1,3 +1,4 @@
+#pragma once
 /*
  MIT License
 
@@ -21,53 +22,22 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-
-#include <chrono>
-
-#include <engine/engine.h>
-#include <engine/log.h>
+#include "engine/engine.h"
+#include <SDL.h>
 
 namespace neko
 {
-BasicEngine* BasicEngine::instance_ = nullptr;
-BasicEngine::BasicEngine(Configuration* config)
+namespace sdl
 {
-    if (config != nullptr)
-    {
-        this->config = *config;
-    }
-    initLog();
-
-}
-
-BasicEngine::~BasicEngine()
+class SdlEngine : public BasicEngine
 {
-    logDebug("Destroy Basic Engine");
-    destroyLog();
+public:
+	void Init() override;
+	void Update(float dt) override;
+	void Destroy() override;
+protected:
+	SDL_Window* window = nullptr;
+	SDL_GLContext glContext;
+};
 }
-
-void BasicEngine::Init()
-{
-    instance_ = this;
-}
-
-void BasicEngine::Destroy()
-{
-    instance_ = nullptr;
-}
-
-void BasicEngine::EngineLoop()
-{
-    isRunning_ = true;
-	std::chrono::time_point<std::chrono::system_clock> clock = std::chrono::system_clock::now();
-    while (isRunning_)
-    {
-	    const auto start = std::chrono::system_clock::now();
-	    const auto dt = std::chrono::duration_cast<std::chrono::duration<float>>(start - clock).count();
-		clock = start;
-		Update(dt);
-    }
-    Destroy();
-}
-
 }
