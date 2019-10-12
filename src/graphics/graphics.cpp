@@ -24,6 +24,7 @@
 #include <graphics/graphics.h>
 #include <algorithm>
 #include <engine/globals.h>
+#include "engine/log.h"
 
 
 namespace neko
@@ -51,7 +52,12 @@ void GraphicsManager::Render()
 
 void GraphicsManager::Draw(GraphicsCommand* command)
 {
-    commandBuffer_.push_back(command);
+	if(renderLength_ >= MAX_COMMAND_NMB)
+	{
+		logDebug("[Error] Max Number of Graphics Command");
+		return;
+	}
+    commandBuffer_[renderLength_] = command;
     renderLength_++;
 }
 

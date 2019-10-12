@@ -1,4 +1,7 @@
 #pragma once
+#include <vector>
+#include <functional>
+
 /*
  MIT License
 
@@ -22,35 +25,36 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-#include "engine/engine.h"
-#include <SDL.h>
-#include <SDL_main.h>
-#include <graphics/graphics.h>
-#include <optional>
-#include "utilities/delegate_utility.h"
 
-namespace neko::sdl
+namespace neko
 {
 
-class SdlGlEngine : public BasicEngine
+template<class ... Ts>
+class Delegate
 {
 public:
-    using BasicEngine::BasicEngine;
-	void Init() override;
-	void Update(float dt) override;
-	void Destroy() override;
-protected:
-    GraphicsManager graphicsManager_;
-	
-	Delegate<> initDelegate_;
-	Delegate<float> updateDelegate_;
-	Delegate<> drawUiDelegate_;
-	Delegate<> drawDelegate_;
-	Delegate<> destroyDelegate_;
+	Delegate() = default;
+	virtual ~Delegate() = default;
 
-	SDL_Window* window_ = nullptr;
-	SDL_GLContext glContext_;
-    bool wireframeMode_ = false;
+	void RegisterCallback(const std::function<void(Ts ...)>& callback)
+	{
+		callbacks_.push_back(callback);
+		
+	}
+	void UnregisterCallback(const std::function<void(Ts ...)>& callback)
+	{
+		callbacks_.erase(std::remove(callbacks_.begin(), callbacks_.end(), callback));
+	}
+
+	void Execute(Ts ... args)
+	{
+		for(auto& callback : callbacks_)
+		{
+			callback(args...);
+		}
+	}
+
+private:
+	std::vector<std::function<void(Ts...)>> callbacks_;
 };
 }
-

@@ -65,6 +65,7 @@ class BasicEngine : public System
 {
 public:
     explicit BasicEngine(Configuration* config = nullptr);
+	BasicEngine() = delete;
     ~BasicEngine() override;
     void Init() override;
 

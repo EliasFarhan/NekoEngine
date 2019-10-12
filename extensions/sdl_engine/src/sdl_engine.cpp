@@ -110,6 +110,8 @@ void SdlGlEngine::Init()
 
 
     SDL_GL_SetSwapInterval(config.vSync);
+
+	initDelegate_.Execute();
 }
 
 void SdlGlEngine::Update([[maybe_unused]]float dt)
@@ -159,14 +161,8 @@ void SdlGlEngine::Update([[maybe_unused]]float dt)
             }
         }
     }
-    // Start the Dear ImGui frame
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplSDL2_NewFrame(window_);
-    ImGui::NewFrame();
 
-    //TODO update imgui here
-
-    ImGui::Render();
+	updateDelegate_.Execute(dt);
 
     SDL_GL_MakeCurrent(window_, glContext_);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -174,13 +170,21 @@ void SdlGlEngine::Update([[maybe_unused]]float dt)
     {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     }
-
+	drawDelegate_.Execute();
     graphicsManager_.Render();
 
     if (wireframeMode_)
     {
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
+	// Start the Dear ImGui frame
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplSDL2_NewFrame(window_);
+	ImGui::NewFrame();
+
+	drawUiDelegate_.Execute();
+
+	ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     if (wireframeMode_)
     {
@@ -192,6 +196,7 @@ void SdlGlEngine::Update([[maybe_unused]]float dt)
 
 void SdlGlEngine::Destroy()
 {
+	destroyDelegate_.Execute();
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL2_Shutdown();
     ImGui::DestroyContext();
