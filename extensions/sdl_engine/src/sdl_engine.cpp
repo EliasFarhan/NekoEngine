@@ -63,16 +63,16 @@ void SdlGlEngine::Init()
         int windowSizeW = 0;
         int windowSizeH = 0;
         SDL_GetWindowSize(window_, &windowSizeW , &windowSizeH);
-        windowSize.x = windowSizeW;
-        windowSize.y = windowSizeH;
+        windowSize.first = windowSizeW;
+        windowSize.second = windowSizeH;
         flags |= SDL_WINDOW_FULLSCREEN;
     }
     window_ = SDL_CreateWindow(
             config.windowName.c_str(),
             SDL_WINDOWPOS_CENTERED,
             SDL_WINDOWPOS_CENTERED,
-            windowSize.x,
-            windowSize.y,
+            windowSize.first,
+            windowSize.second,
             flags
     );
 
@@ -140,8 +140,8 @@ void SdlGlEngine::Update([[maybe_unused]]float dt)
                     logDebug(oss.str());
                 }
                 glViewport(0, 0, newWindowSize.x, newWindowSize.y);
-                config.realWindowSize.x = event.window.data1;
-                config.realWindowSize.y = event.window.data2;
+                config.realWindowSize.first = event.window.data1;
+                config.realWindowSize.second = event.window.data2;
             }
         }
         if (event.type == SDL_KEYDOWN)

@@ -3,7 +3,6 @@
 int main([[maybe_unused]]int argc, [[maybe_unused]]char** argv)
 {
     neko::Configuration config;
-    config.fullscreen = true;
 
     neko::sdl::SdlGlEngine engine(&config);
     engine.Init();

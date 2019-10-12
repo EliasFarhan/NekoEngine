@@ -22,12 +22,9 @@
  SOFTWARE.
  */
 #include <graphics/graphics.h>
-#include <engine/engine.h>
-#include "SFML/Graphics/RenderTexture.hpp"
-#include "engine/log.h"
-#include <sstream>
-#include <Remotery.h>
-#include "engine/globals.h"
+#include <algorithm>
+#include <engine/globals.h>
+
 
 namespace neko
 {
@@ -44,9 +41,9 @@ void GraphicsManager::Render()
     {
         return c1->GetLayer() < c2->GetLayer();
     });
-    for(auto* graphicsCommand : commandBuffer_)
+    for(Index i = 0; i < renderLength_;i++)
     {
-        graphicsCommand->Render();
+        commandBuffer_[i]->Render();
     }
     commandBuffer_.clear();
     renderLength_ = 0;

@@ -24,9 +24,8 @@
  SOFTWARE.
  */
 
+#include <string>
 #include <engine/system.h>
-#include "engine/input.h"
-
 
 struct Remotery;
 
@@ -40,8 +39,8 @@ struct Collider;
 struct Configuration
 {
 	std::string windowName = "NekoEngine 0.1";
-    sf::Vector2u realWindowSize = sf::Vector2u(1280, 720);
-    sf::Vector2u gameWindowSize = sf::Vector2u(1280, 720);
+    std::pair<unsigned, unsigned> realWindowSize = std::pair<unsigned, unsigned>(1280, 720);
+    std::pair<unsigned, unsigned> gameWindowSize = std::pair<unsigned, unsigned>(1280, 720);
     bool fullscreen = false;
 	float gravityX = 0.0f;
 	float gravityY = 9.81f;
@@ -66,8 +65,7 @@ class BasicEngine : public System
 {
 public:
     explicit BasicEngine(Configuration* config = nullptr);
-
-    virtual ~BasicEngine();
+    ~BasicEngine() override;
     void Init() override;
 
     void Destroy() override;

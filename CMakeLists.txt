@@ -226,7 +226,7 @@ else()
         ${SFML_NETWORK_SRC}
         ${SFML_DIR}/src/SFML/Network//Unix/SocketImpl.cpp
         ${SFML_DIR}/src/SFML/Network//Unix/SocketImpl.hpp
-    )
+			main/hello_triangle/include/hello_triangle/engine.h main/hello_triangle/src/engine.cpp)
 endif()
 add_library(sfml-network STATIC ${SFML_NETWORK_SRC})
 LIST(APPEND Neko_LIBRARIES
@@ -367,7 +367,7 @@ endforeach()
 
 include(cmake/neko_executable.cmake)
 #Hello Triangle
-add_neko_executable(HelloTriangle ${CMAKE_SOURCE_DIR}/main/HelloTriangle.cpp Neko_COMMON sdl_engine gl_engine)
+add_neko_application(HelloTriangle ${CMAKE_SOURCE_DIR}/main/hello_triangle/ Neko_COMMON sdl_engine gl_engine)
 #Splash
 add_neko_executable(SplashDebug ${CMAKE_SOURCE_DIR}/main/SplashDebug.cpp Neko_COMMON Network Splash engine2d)
 #NekoEditor

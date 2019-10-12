@@ -23,7 +23,7 @@
  */
 
 #include <sstream>
-#include <engine/input.h>
+#include <sfml_engine/input.h>
 #include <engine/log.h>
 #include <engine/engine.h>
 #include <SFML/Window/Mouse.hpp>
