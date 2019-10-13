@@ -46,11 +46,7 @@ bool CheckJsonParameter(const json& jsonObject, std::string parameterName, json:
 
 bool CheckJsonNumber(const json& jsonObject, std::string parameterName);
 #ifdef USE_SFML
-sf::Vector2f GetVectorFromJson(const json& jsonObject, std::string parameterName);
 
-sf::IntRect GetIntRectFromJson(const json& jsonObject, std::string parameterName);
-
-sf::FloatRect GetFloatRectFromJson(const json& jsonObject, std::string parameterName);
 #endif
 json LoadJson(const std::string_view jsonPath);
 }

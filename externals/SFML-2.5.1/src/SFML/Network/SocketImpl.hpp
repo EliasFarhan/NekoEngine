@@ -28,7 +28,7 @@
 #include <SFML/Config.hpp>
 
 
-#if WIN32
+#if defined(SFML_SYSTEM_WINDOWS)
 
     #include <SFML/Network/Win32/SocketImpl.hpp>
 

@@ -5,6 +5,8 @@ if(WIN32)
 add_compile_definitions(NOMINMAX)
 endif(WIN32)
 
+include(cmake/neko_executable.cmake)
+
 
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -135,7 +137,7 @@ file(GLOB_RECURSE Neko_UTILITY_SRC src/utilities/*.cpp include/utilities/*.h)
 file(GLOB_RECURSE Neko_PHYSICS_SRC src/physics/*.cpp include/physics/*.h)
 file(GLOB_RECURSE Neko_SOUND_SRC src/sound/*.cpp include/sound/*.h)
 file(GLOB_RECURSE Neko_MATH_SRC src/mathematics/*.cpp include/mathematics/*.h)
-file(GLOB_RECURSE Neko_EXTENSIONS_SRC extensions/src/*.cpp extensions/include/*.h)
+file(GLOB_RECURSE Neko_EXTENSIONS_SRC main/city_builder/src/*.cpp main/city_builder/include/*.h)
 file(GLOB_RECURSE SCRIPT_FILES scripts/*.py)
 
 include_directories(include ${CMAKE_SOURCE_DIR}/include)
@@ -202,15 +204,15 @@ set(SDL_STATIC ON)
 set(SDL_SHARED OFF)
 add_subdirectory(${SDL_DIR})
 include_directories(${SDL_DIR}/include ${SDL_DIR}/src)
-LIST(APPEND Neko_LIBRARIES
+LIST(APPEND engine3d_lib
 		SDL2-static)
 		set_target_properties (SDL2-static PROPERTIES FOLDER Externals)
 if(MSVC)
-	LIST(APPEND Neko_LIBRARIES
+	LIST(APPEND engine3d_lib
 		SDL2main)
 		set_target_properties (SDL2main PROPERTIES FOLDER Externals)
 endif(MSVC)
-#sfml network
+#sfml network platform independent
 set(SFML_DIR "${EXTERNAL_DIR}/SFML-2.5.1/")
 include_directories("${SFML_DIR}/include/" "${SFML_DIR}/src/")
 file(GLOB SFML_NETWORK_SRC ${SFML_DIR}/src/SFML/Network/*.cpp ${SFML_DIR}/src/SFML/Network/*.hpp)
@@ -228,16 +230,15 @@ else()
         ${SFML_DIR}/src/SFML/Network//Unix/SocketImpl.hpp
 			main/hello_triangle/include/hello_triangle/engine.h main/hello_triangle/src/engine.cpp)
 endif()
-add_library(sfml-network STATIC ${SFML_NETWORK_SRC})
-LIST(APPEND Neko_LIBRARIES
-		sfml-network)
-set_target_properties (sfml-network PROPERTIES FOLDER Externals)
+add_library(sfml-network-independent STATIC ${SFML_NETWORK_SRC})
+
+
 #opengl
 set(OpenGL_GL_PREFERENCE GLVND)
 add_compile_definitions(USE_OPENGL=1)
 find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
-LIST(APPEND Neko_LIBRARIES
+LIST(APPEND engine3d_lib
 		${OPENGL_LIBRARIES})
 	message("OpenGL Libraries: ${OPENGL_LIBRARIES}")
 #glew
@@ -245,20 +246,47 @@ set(GLEW_DIR ${EXTERNAL_DIR}/glew)
 add_compile_definitions(GLEW_STATIC)
 include_directories(${GLEW_DIR}/include)
 add_subdirectory(${GLEW_DIR})
-LIST(APPEND Neko_LIBRARIES
+LIST(APPEND engine3d_lib
 	glew)
 set_target_properties (glew PROPERTIES FOLDER Externals)
-
+#imgui sdl
 add_compile_definitions(IMGUI_IMPL_OPENGL_LOADER_GLEW=1)
-set(IMGUI_ROOT ${EXTERNAL_DIR}/imgui/)
+set(IMGUI_ROOT ${EXTERNAL_DIR}/imgui-1.70/)
 set(SDL2_IMGUI ${EXTERNAL_DIR}/imgui-sdl/)
 add_subdirectory(${SDL2_IMGUI})
 include_directories(${IMGUI_ROOT} ${SDL2_IMGUI})
-LIST(APPEND Neko_LIBRARIES
+LIST(APPEND engine3d_lib
 	imgui-sdl)
 set_target_properties (imgui-sdl PROPERTIES FOLDER Externals)
+#SFML
+set(SFML_DIR ${EXTERNAL_DIR}/SFML-2.5.1)
+set(SFML_BUILD_EXAMPLES FALSE)
+set(BUILD_SHARED_LIBS FALSE)
+set(SFML_STATIC_LIBRARIES TRUE)
+add_subdirectory(${SFML_DIR})
+include_directories(${SFML_DIR}/include ${SFML_DIR}/src)
 
+LIST(APPEND engine2d_lib
+		sfml-audio sfml-graphics sfml-window sfml-system)
 
+set_target_properties (sfml-network PROPERTIES FOLDER Externals)
+#imgui sfml
+set(SFML_IMGUI ${EXTERNAL_DIR}/imgui-sfml-2.0.1/)
+set(IMGUI_ROOT ${EXTERNAL_DIR}/imgui-1.70/ CACHE INTERNAL "")
+set(IMGUI_DIR ${EXTERNAL_DIR}/imgui-1.70/ CACHE INTERNAL "")
+set(IMGUI_SFML_FIND_SFML OFF CACHE INTERNAL "")
+set(SFML_ROOT ${SFML_DIR})
+add_subdirectory(${SFML_IMGUI})
+include_directories(${IMGUI_ROOT} ${SFML_IMGUI})
+
+LIST(APPEND engine2d_lib imgui-sfml)
+#spine sfml
+set(SPINE_SFML_DIR ${EXTERNAL_DIR}/spine-3.6/)
+add_subdirectory(${SPINE_SFML_DIR})
+include_directories(${SPINE_SFML_DIR}/spine-sfml/src ${SPINE_SFML_DIR}/spine-c/include/)
+LIST(APPEND engine2d_lib spine-c spine-sfml)
+
+set_target_properties (spine-c spine-sfml PROPERTIES FOLDER Externals)
 #BOX2D
 set(BOX2D_DIR ${EXTERNAL_DIR}/Box2D-2.3.1)
 set(BOX2D_BUILD_EXAMPLES OFF CACHE INTERNAL "")
@@ -266,8 +294,7 @@ SET(BOX2D_INSTALL ON CACHE INTERNAL "")
 SET(BOX2D_BUILD_STATIC ON  CACHE INTERNAL "")
 add_subdirectory(${BOX2D_DIR})
 include_directories(${BOX2D_DIR}/)
-LIST(APPEND Neko_LIBRARIES
-	Box2D)
+LIST(APPEND engine2d_lib Box2D)
 	
 set_target_properties (Box2D PROPERTIES FOLDER Externals)
 #glm
@@ -321,6 +348,10 @@ foreach(EXTENSION_FOLDER ${EXTENSIONS_FOLDERS})
 		add_dependencies(${EXTENSION_DIR} DataTarget)
 	endif()
 endforeach()
+#components
+add_neko_library(sdl_gl_engine "${CMAKE_SOURCE_DIR}/components/sdl_gl_engine/" Neko_COMMON ${engine3d_lib})
+add_neko_library(sfml_engine "${CMAKE_SOURCE_DIR}/components/sfml_engine/" Neko_COMMON ${engine2d_lib})
+add_neko_library(network "${CMAKE_SOURCE_DIR}/components/network/" sfml-network-independent)
 
 #Neko TEST
 SET(Neko_TEST_DIR ${CMAKE_SOURCE_DIR}/test)
@@ -365,12 +396,13 @@ foreach(course_file ${COURSE_FILES} )
     ENDIF()
 endforeach()
 
-include(cmake/neko_executable.cmake)
 #Hello Triangle
-add_neko_application(HelloTriangle ${CMAKE_SOURCE_DIR}/main/hello_triangle/ Neko_COMMON sdl_engine gl_engine)
+add_neko_application(HelloTriangle ${CMAKE_SOURCE_DIR}/main/hello_triangle/ Neko_COMMON sdl_gl_engine)
+#city Builder
+add_neko_application(CityBuilder ${CMAKE_SOURCE_DIR}/main/city_builder/ Neko_COMMON sfml_engine)
 #Splash
 add_neko_executable(SplashDebug ${CMAKE_SOURCE_DIR}/main/SplashDebug.cpp Neko_COMMON Network Splash engine2d)
 #NekoEditor
-add_neko_executable(NekoEditor2d ${CMAKE_SOURCE_DIR}/main/NekoEditor.cpp Neko_COMMON tools)
+add_neko_executable(NekoEditor2d ${CMAKE_SOURCE_DIR}/main/neko_editor2d Neko_COMMON sfml_engine)
 #Network Prediction Simulation
 add_neko_application(NetPredictionSimulation ${CMAKE_SOURCE_DIR}/main/net_prediction_simulation Neko_COMMON sfml_engine)

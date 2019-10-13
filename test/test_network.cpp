@@ -3,9 +3,9 @@
 //
 
 #include <gtest/gtest.h>
-#include <Network/net_server.h>
-#include <Network/net_client.h>
-#include <Network/net_command.h>
+#include "../components/network/include/network/net_server.h"
+#include "../components/network/include/network/net_client.h"
+#include "../components/network/include/network/net_command.h"
 #include "engine/log.h"
 #include "SFML/Window/Keyboard.hpp"
 
