@@ -373,4 +373,4 @@ add_neko_executable(SplashDebug ${CMAKE_SOURCE_DIR}/main/SplashDebug.cpp Neko_CO
 #NekoEditor
 add_neko_executable(NekoEditor2d ${CMAKE_SOURCE_DIR}/main/NekoEditor.cpp Neko_COMMON tools)
 #Network Prediction Simulation
-add_neko_executable(PredictionSimulation ${CMAKE_SOURCE_DIR}/main/PredictionSimulation.cpp Neko_COMMON Network)
+add_neko_application(NetPredictionSimulation ${CMAKE_SOURCE_DIR}/main/net_prediction_simulation Neko_COMMON sfml_engine)

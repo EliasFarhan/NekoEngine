@@ -3,7 +3,7 @@
 
 #include <engine/engine.h>
 #include <engine/transform.h>
-#include "../../../sfml_engine/include/sfml_engine/shape.h"
+#include "sfml_engine/shape.h"
 #include <random>
 
 namespace net
