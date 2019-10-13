@@ -24,15 +24,8 @@
  SOFTWARE.
  */
 
-#include <thread>
+#include <string>
 #include <engine/system.h>
-#include <graphics/graphics.h>
-#include <ctpl_stl.h>
-#include <SFML/Graphics/RenderWindow.hpp>
-#include <Box2D/Common/b2Math.h>
-#include "engine/input.h"
-#include <SFML/Window/WindowStyle.hpp>
-
 
 struct Remotery;
 
@@ -45,62 +38,50 @@ struct Collider;
  */
 struct Configuration
 {
-    sf::Vector2u realWindowSize = sf::Vector2u(1280, 720);
-    sf::Vector2u gameWindowSize = sf::Vector2u(1280, 720);
+	std::string windowName = "NekoEngine 0.1";
+    std::pair<unsigned, unsigned> realWindowSize = std::pair<unsigned, unsigned>(1280, 720);
+    std::pair<unsigned, unsigned> gameWindowSize = std::pair<unsigned, unsigned>(1280, 720);
     bool fullscreen = false;
-    b2Vec2 gravity = b2Vec2(0.0f, 9.81f);
+	float gravityX = 0.0f;
+	float gravityY = 9.81f;
     float physicsTimeStep = 1.0f / 50.0f;
     int velocityIterations = 8;
     int positionIterations = 3;
     float pixelPerMeter = 100.0f;
-    sf::Color bgColor = sf::Color::Black;
     bool vSync = true;
     unsigned int framerateLimit = 0u;
-    int windowStyle = sf::Style::Default;
     std::string dataRootPath = "data/";
+	int glMajorVersion = 4;
+	int glMinorVersion = 5;
+
 };
+
+
 
 /**
  * \brief basic engine class with no graphics manager implementation
  */
-class BasicEngine : public sf::NonCopyable, public System
+class BasicEngine : public System
 {
 public:
     explicit BasicEngine(Configuration* config = nullptr);
-
-    virtual ~BasicEngine();
+	BasicEngine() = delete;
+    ~BasicEngine() override;
     void Init() override;
-
-    void Update(float dt) override;
 
     void Destroy() override;
 
     virtual void EngineLoop();
 
 
-    virtual void OnEvent(sf::Event& event);
-
     Configuration config;
-    bool isRunning = false;
-    std::unique_ptr<sf::RenderWindow> renderWindow = nullptr;
-	MouseManager& GetMouseManager();
-    sf::Time clockDeltatime;
-
-    virtual void OnBeginContact([[maybe_unused]]const neko::Collider* colliderA, [[maybe_unused]]const neko::Collider* colliderB)
-    {}
-
-    virtual void OnEndContact([[maybe_unused]]const neko::Collider* colliderA, [[maybe_unused]]const neko::Collider* colliderB)
-    {}
-
 
     template <typename T = BasicEngine>
     static T* GetInstance(){ return dynamic_cast<T*>(instance_);};
 protected:
     static BasicEngine* instance_;
-    sf::Clock engineClock_;
-    Remotery* rmt_ = nullptr;
-    KeyboardManager keyboardManager_;
-    MouseManager mouseManager_;
+	float isRunning_;
+
 };
 
 }

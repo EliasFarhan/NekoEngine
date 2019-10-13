@@ -21,20 +21,11 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
+
+#include <chrono>
+
 #include <engine/engine.h>
-#include <SFML/Window/Event.hpp>
-
-#ifdef __linux__
-
-#include <X11/Xlib.h>
-
-#endif //__linux__
-
 #include <engine/log.h>
-#include <sstream>
-#include <Remotery.h>
-#include "imgui.h"
-#include "imgui-SFML.h"
 
 namespace neko
 {
@@ -47,122 +38,36 @@ BasicEngine::BasicEngine(Configuration* config)
     }
     initLog();
 
-    rmt_CreateGlobalInstance(&rmt_);
 }
 
 BasicEngine::~BasicEngine()
 {
     logDebug("Destroy Basic Engine");
     destroyLog();
-    rmt_DestroyGlobalInstance(rmt_);
-}
-
-void BasicEngine::Update([[maybe_unused]]float dt)
-{
-
 }
 
 void BasicEngine::Init()
 {
     instance_ = this;
-    renderWindow = std::make_unique<sf::RenderWindow>(
-		sf::VideoMode(config.realWindowSize.x, config.realWindowSize.y), "Neko Engine", config.windowStyle);
-    if (config.vSync)
-    {
-        renderWindow->setVerticalSyncEnabled(config.vSync);
-    }
-    else
-    {
-        renderWindow->setFramerateLimit(config.framerateLimit);
-    }
-    ImGui::SFML::Init(*renderWindow);
-    mouseManager_.SetWindow(renderWindow.get());
 }
 
 void BasicEngine::Destroy()
 {
     instance_ = nullptr;
-    renderWindow->close();
-    ImGui::SFML::Shutdown();
-    renderWindow = nullptr;
 }
 
 void BasicEngine::EngineLoop()
 {
-    isRunning = true;
-    while (isRunning)
+    isRunning_ = true;
+	std::chrono::time_point<std::chrono::system_clock> clock = std::chrono::system_clock::now();
+    while (isRunning_)
     {
-
-        rmt_ScopedCPUSample(EngineLoop, 0);
-        clockDeltatime = engineClock_.restart();
-
-        keyboardManager_.ClearKeys();
-        mouseManager_.ClearFrameData();
-        sf::Event event{};
-        while (renderWindow->pollEvent(event))
-        {
-            OnEvent(event);
-            ImGui::SFML::ProcessEvent(event);
-        }
-
-        {
-            rmt_ScopedCPUSample(Draw, 0);
-            renderWindow->clear(config.bgColor);
-            ImGui::SFML::Update(*renderWindow, clockDeltatime);
-            Update(clockDeltatime.asSeconds());
-            ImGui::SFML::Render(*renderWindow);
-            renderWindow->display();
-        }
+	    const auto start = std::chrono::system_clock::now();
+	    const auto dt = std::chrono::duration_cast<std::chrono::duration<float>>(start - clock).count();
+		clock = start;
+		Update(dt);
     }
-
     Destroy();
 }
-
-void BasicEngine::OnEvent(sf::Event& event)
-{
-    switch (event.type)
-    {
-        case sf::Event::Closed:
-        {
-            isRunning = false;
-            break;
-        }
-        case sf::Event::KeyPressed:
-        {
-
-            keyboardManager_.AddPressKey(event.key.code);
-            break;
-        }
-        case sf::Event::KeyReleased:
-        {
-            if (event.key.code == sf::Keyboard::Escape)
-            {
-                isRunning = false;
-            }
-            keyboardManager_.AddReleaseKey(event.key.code);
-            break;
-        }
-        case sf::Event::MouseWheelScrolled:
-        {
-            mouseManager_.OnWheelScrolled(event);
-            break;
-        }
-        case sf::Event::Resized:
-        {
-            config.realWindowSize = sf::Vector2u(event.size.width, event.size.height);
-            break;
-        }
-        default:
-        {
-            break;
-        }
-    }
-}
-
-MouseManager& BasicEngine::GetMouseManager()
-{
-	return mouseManager_;
-}
-
 
 }

@@ -25,9 +25,7 @@
  */
 
 #include <string>
-#include <thread>
-#include <fstream>
-#include <queue>
+#include <vector>
 #include <condition_variable>
 
 /**
@@ -40,7 +38,7 @@ void initLog();
  * \brief log a msg to cout and a log file to the log thread
  * @param msg
  */
-void logDebug(std::string msg);
+void logDebug(const std::string& msg);
 /**
  * \brief must be called at destroy
  * it is called by MainEngine destructor

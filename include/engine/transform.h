@@ -26,11 +26,11 @@
 
 #include <vector>
 #include "SFML/System/Vector2.hpp"
+
 #include "globals.h"
 #include <engine/entity.h>
 #include "engine/component.h"
-#include "engine/vector.h"
-#include <SFML/Graphics/Transform.hpp>
+#include "mathematics/vector.h"
 
 namespace neko
 {
@@ -77,7 +77,7 @@ public:
     Entity GetParentEntity(Entity entity);
     Entity FindNextChild(Entity parentEntity, Entity entityChild=neko::INVALID_ENTITY);
 
-    sf::Transform CalculateTransform(Entity entity);
+    //sf::Transform CalculateTransform(Entity entity);
 private:
     Position2dManager positionManager_;
     Scale2dManager scaleManager_{sf::Vector2f(1.0f,1.0f)};

@@ -22,63 +22,52 @@
  SOFTWARE.
  */
 #include <graphics/graphics.h>
-#include <engine/engine.h>
-#include "SFML/Graphics/RenderTexture.hpp"
+#include <algorithm>
+#include <engine/globals.h>
 #include "engine/log.h"
-#include <sstream>
-#include <Remotery.h>
-#include "engine/globals.h"
+
 
 namespace neko
 {
-void SfmlCommand::Draw(sf::RenderTarget& renderTarget)
-{
-    renderTarget.draw(*drawable, states);
-}
-
-
-void TilemapCommand::Draw(sf::RenderTarget& renderTarget)
-{
-    states.texture = texture;
-    renderTarget.draw(*vertexArray, states);
-}
-
 GraphicsManager::GraphicsManager()
 {
 	commandBuffer_.resize(MAX_COMMAND_NMB);
-	sfmlCommands.resize(MAX_COMMAND_NMB);
 }
 
-void GraphicsManager::Draw(sf::Drawable& drawable, int layer, const sf::RenderStates& states)
+
+
+void GraphicsManager::Render()
 {
-	SfmlCommand sfmlCommand;
-	sfmlCommand.drawable = &drawable;
-	sfmlCommand.layer = layer;
-    sfmlCommand.states = states;
-	sfmlCommands[renderLength] = sfmlCommand;
-	commandBuffer_[renderLength] = &sfmlCommands[renderLength];
-	renderLength++;
-}
-//TODO Generate render command
-void GraphicsManager::Draw(sf::VertexArray* vertexArray, sf::Texture* texture, int layer, const sf::RenderStates& states)
-{
-    (void)vertexArray;
-    (void)texture;
-    (void)layer;
-    (void)states;
+    std::sort(commandBuffer_.begin(), commandBuffer_.begin() + renderLength_, [](GraphicsCommand* c1, GraphicsCommand* c2)
+    {
+        return c1->GetLayer() < c2->GetLayer();
+    });
+    for(Index i = 0; i < renderLength_;i++)
+    {
+        commandBuffer_[i]->Render();
+    }
+    commandBuffer_.clear();
+    renderLength_ = 0;
 }
 
-void GraphicsManager::Render(sf::RenderTarget& renderTarget)
+void GraphicsManager::Draw(GraphicsCommand* command)
 {
-    std::sort(commandBuffer_.begin(), commandBuffer_.begin() + renderLength, [](Command* c1, Command* c2)
+	if(renderLength_ >= MAX_COMMAND_NMB)
 	{
-		return c1->layer < c2->layer;
-	});
-	for (size_t i = 0; i < renderLength; i++)
-	{
-		commandBuffer_[i]->Draw(renderTarget);
+		logDebug("[Error] Max Number of Graphics Command");
+		return;
 	}
-	renderLength = 0;
+    commandBuffer_[renderLength_] = command;
+    renderLength_++;
 }
 
+int GraphicsCommand::GetLayer() const
+{
+    return layer_;
+}
+
+void GraphicsCommand::SetLayer(int layer)
+{
+    layer_ = layer;
+}
 }

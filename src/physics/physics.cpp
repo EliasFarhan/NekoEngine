@@ -38,7 +38,7 @@ void Physics2dManager::Init()
 	auto* engine = BasicEngine::GetInstance();
 	config_ = &engine->config;
 	pixelPerMeter = config_->pixelPerMeter;
-	world_ = std::make_unique<b2World>(config_->gravity);
+	world_ = std::make_unique<b2World>(b2Vec2(config_->gravityX, config_->gravityY));
 	world_->SetContactListener(&collisionListener_);
 	colliders_.reserve(INIT_ENTITY_NMB);
 }
@@ -88,48 +88,6 @@ b2Body* Physics2dManager::GetBodyAt(Index i)
 {
     return bodies_[i];
 }
-
-float pixel2meter(float pixel)
-{
-	return pixel / Physics2dManager::pixelPerMeter;
-}
-
-b2Vec2 pixel2meter(const sf::Vector2f& pixel)
-{
-	return b2Vec2(pixel2meter(pixel.x), pixel2meter(pixel.y));
-}
-
-
-float meter2pixel(float meter)
-{
-	return meter * Physics2dManager::pixelPerMeter;
-}
-
-sf::Vector2f meter2pixel(const b2Vec2& meter)
-{
-	return sf::Vector2f(meter2pixel(meter.x), meter2pixel(meter.y));
-}
-
-Vec2f pixel2unit(const sf::Vector2f& v)
-{
-    return Vec2f(pixel2meter(v.x), pixel2meter(v.y));
-}
-
-float pixel2unit(const float v)
-{
-	return pixel2meter(v);
-}
-
-sf::Vector2f unit2pixel(const Vec2f& v)
-{
-    return sf::Vector2f(meter2pixel(v.x), meter2pixel(v.y));
-}
-
-float unit2pixel(float v)
-{
-	return meter2pixel(v);
-}
-
 
 void BodyDef2dManager::ParseComponentJson(json& componentJson, Entity entity)
 {

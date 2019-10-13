@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 #include "engine/engine.h"
-#include <graphics/sprite.h>
+#include "../extensions/sfml_engine/include/sfml_engine/sprite.h"
 #include <random>
 
 namespace neko

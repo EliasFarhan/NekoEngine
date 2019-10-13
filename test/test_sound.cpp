@@ -27,7 +27,7 @@
 #include <engine/log.h>
 #include <engine/globals.h>
 #include <utilities/time_utility.h>
-#include <sound/sound.h>
+#include <sfml_engine/sound.h>
 
 class SoundTest : public ::testing::Test, public neko::BasicEngine
 {

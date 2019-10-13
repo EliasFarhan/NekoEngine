@@ -27,7 +27,6 @@
 #include <cstdint>
 #include <cstdlib>
 #include <limits>
-#include <SFML/System/Vector2.hpp>
 
 namespace neko 
 {
@@ -37,7 +36,6 @@ namespace neko
 	using ComponentType = uint32_t;
 	const ComponentType INVALID_COMPONENT_TYPE = 0u;
 	const Index INVALID_INDEX = std::numeric_limits<uint32_t>::max();
-	const sf::Vector2i INVALID_TILE_POS = sf::Vector2i(-1, -1);
 
 
 } // end namespace neko

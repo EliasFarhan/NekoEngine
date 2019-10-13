@@ -27,9 +27,8 @@
 #include <vector>
 #include "engine/system.h"
 #include <Box2D/Box2D.h>
-#include "SFML/System/Vector2.hpp"
 #include <vector>
-#include <engine/vector.h>
+#include <mathematics/vector.h>
 #include "physics/collider.h"
 #include "engine/component.h"
 
@@ -73,17 +72,6 @@ private:
     CollisionListener collisionListener_;
 };
 
-float meter2pixel(float v);
-
-float pixel2meter(float v);
-
-sf::Vector2f meter2pixel(const b2Vec2& v);
-
-b2Vec2 pixel2meter(const sf::Vector2f& v);
-Vec2f pixel2unit(const sf::Vector2f& v);
-float pixel2unit(const float v);
-sf::Vector2f unit2pixel(const Vec2f& v);
-float unit2pixel(float v);
 
 class Body2dManager : public ComponentManager <b2Body*,ComponentType(NekoComponentType::BODY2D)>
 {
