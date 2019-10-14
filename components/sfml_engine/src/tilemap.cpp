@@ -21,12 +21,12 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-#include "../../extensions/sfml_engine/include/sfml_engine/tilemap.h"
+#include "sfml_engine/tilemap.h"
 #include <utilities/json_utility.h>
 #include <utilities/file_utility.h>
-#include "../../extensions/sfml_engine/include/sfml_engine/texture.h"
+#include "sfml_engine/texture.h"
 #include <engine/engine.h>
-#include <physics/physics.h>
+#include <sfml_engine/physics.h>
 #include <Remotery.h>
 
 namespace neko

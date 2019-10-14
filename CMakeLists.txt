@@ -10,7 +10,39 @@ include(cmake/neko_executable.cmake)
 
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
+if(UNIX AND NOT APPLE)
+	MESSAGE("Linux Compiler ${CMAKE_CXX_COMPILER_ID}")
+	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+		MESSAGE("LLVM_ROOT ${LLVM_ROOT}")
+		# using Clang
 
+		if(LLVM_ROOT)
+			set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}  --stdlib=libc++ -L${LLVM_ROOT}/lib -Wl,-rpath,${LLVM_ROOT}/lib  -lc++ -lc++abi ")#-fsanitize=thread
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -nostdinc++")
+
+			include_directories(${LLVM_ROOT}/include/c++/v1/)
+			if("${CMAKE_CXX_COMPILER_VERSION}" STREQUAL "9.0.0")
+			else()
+				LIST(APPEND Neko_LIBRARIES
+						c++fs)
+			endif()
+			SET (CMAKE_AR      "${LLVM_ROOT}/bin/llvm-ar")
+			SET (CMAKE_LINKER  "${LLVM_ROOT}/bin/llvm-ld")
+			SET (CMAKE_NM      "${LLVM_ROOT}/bin/llvm-nm")
+			SET (CMAKE_OBJDUMP "${LLVM_ROOT}/bin/llvm-objdump")
+			SET (CMAKE_RANLIB  "${LLVM_ROOT}/bin/llvm-ranlib")
+		else()
+			LIST(APPEND Neko_LIBRARIES
+					stdc++fs)
+			set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")# -fsanitize=address")
+		endif()
+
+	elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+		# using GCC
+		LIST(APPEND Neko_LIBRARIES
+				stdc++fs)
+	endif()
+endif(UNIX AND NOT APPLE)
 if(MSVC)
     add_compile_options(
         $<$<CONFIG:>:/MT> #---------|
@@ -227,8 +259,7 @@ else()
     set(SFML_NETWORK_SRC
         ${SFML_NETWORK_SRC}
         ${SFML_DIR}/src/SFML/Network//Unix/SocketImpl.cpp
-        ${SFML_DIR}/src/SFML/Network//Unix/SocketImpl.hpp
-			main/hello_triangle/include/hello_triangle/engine.h main/hello_triangle/src/engine.cpp)
+        ${SFML_DIR}/src/SFML/Network//Unix/SocketImpl.hpp)
 endif()
 add_library(sfml-network-independent STATIC ${SFML_NETWORK_SRC})
 
@@ -279,7 +310,7 @@ set(SFML_ROOT ${SFML_DIR})
 add_subdirectory(${SFML_IMGUI})
 include_directories(${IMGUI_ROOT} ${SFML_IMGUI})
 
-LIST(APPEND engine2d_lib imgui-sfml)
+LIST(APPEND engine2d_lib ImGui-SFML)
 #spine sfml
 set(SPINE_SFML_DIR ${EXTERNAL_DIR}/spine-3.6/)
 add_subdirectory(${SPINE_SFML_DIR})
@@ -397,12 +428,12 @@ foreach(course_file ${COURSE_FILES} )
 endforeach()
 
 #Hello Triangle
-add_neko_application(HelloTriangle ${CMAKE_SOURCE_DIR}/main/hello_triangle/ Neko_COMMON sdl_gl_engine)
+add_neko_application(HelloTriangle ${CMAKE_SOURCE_DIR}/main/hello_triangle/ sdl_gl_engine)
 #city Builder
-add_neko_application(CityBuilder ${CMAKE_SOURCE_DIR}/main/city_builder/ Neko_COMMON sfml_engine)
+add_neko_application(CityBuilder ${CMAKE_SOURCE_DIR}/main/city_builder/ sfml_engine)
 #Splash
-add_neko_executable(SplashDebug ${CMAKE_SOURCE_DIR}/main/SplashDebug.cpp Neko_COMMON Network Splash engine2d)
+add_neko_executable(SplashDebug ${CMAKE_SOURCE_DIR}/main/SplashDebug.cpp sfml_engine)
 #NekoEditor
-add_neko_executable(NekoEditor2d ${CMAKE_SOURCE_DIR}/main/neko_editor2d Neko_COMMON sfml_engine)
+add_neko_executable(NekoEditor2d ${CMAKE_SOURCE_DIR}/main/neko_editor2d sfml_engine)
 #Network Prediction Simulation
-add_neko_application(NetPredictionSimulation ${CMAKE_SOURCE_DIR}/main/net_prediction_simulation Neko_COMMON sfml_engine)
+add_neko_application(NetPredictionSimulation ${CMAKE_SOURCE_DIR}/main/net_prediction_simulation sfml_engine)

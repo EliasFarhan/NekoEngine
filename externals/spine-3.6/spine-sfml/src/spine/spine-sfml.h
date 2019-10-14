@@ -32,6 +32,7 @@
 #define SPINE_SFML_H_
 
 #define SPINE_SHORT_NAMES
+
 #include <spine/spine.h>
 #include <spine/extension.h>
 #include <SFML/Graphics/Vertex.hpp>
@@ -42,32 +43,38 @@
 
 _SP_ARRAY_DECLARE_TYPE(spColorArray, spColor)
 
-namespace spine {
+namespace spine
+{
 
-class SkeletonDrawable: public sf::Drawable {
+class SkeletonDrawable : public sf::Drawable
+{
 public:
-	Skeleton* skeleton;
-	AnimationState* state;
-	float timeScale;
-	sf::VertexArray* vertexArray;
-	spVertexEffect* vertexEffect;
+    Skeleton* skeleton;
+    AnimationState* state;
+    float timeScale;
+    sf::VertexArray* vertexArray;
+    spVertexEffect* vertexEffect;
 
-	SkeletonDrawable (SkeletonData* skeleton, AnimationStateData* stateData = 0);
-	~SkeletonDrawable ();
+    SkeletonDrawable(SkeletonData* skeleton, AnimationStateData* stateData = 0);
 
-	void update (float deltaTime);
+    ~SkeletonDrawable();
 
-	virtual void draw (sf::RenderTarget& target, sf::RenderStates states) const;
+    void update(float deltaTime);
 
-	void setUsePremultipliedAlpha(bool usePMA) { usePremultipliedAlpha = usePMA; };
-	bool getUsePremultipliedAlpha() { return usePremultipliedAlpha; };
+    virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
+
+    void setUsePremultipliedAlpha(bool usePMA)
+    { usePremultipliedAlpha = usePMA; };
+
+    bool getUsePremultipliedAlpha()
+    { return usePremultipliedAlpha; };
 private:
-	bool ownsAnimationStateData;
-	float* worldVertices;
-	spFloatArray* tempUvs;
-	spColorArray* tempColors;
-	spSkeletonClipping* clipper;
-	bool usePremultipliedAlpha;
+    bool ownsAnimationStateData;
+    float* worldVertices;
+    spFloatArray* tempUvs;
+    spColorArray* tempColors;
+    spSkeletonClipping* clipper;
+    bool usePremultipliedAlpha;
 };
 
 } /* namespace spine */

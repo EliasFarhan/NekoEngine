@@ -21,14 +21,15 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-#include "../../extensions/sfml_engine/include/sfml_engine/texture.h"
 #include <set>
 #include <sstream>
+#include "sfml_engine/texture.h"
+
 #include "engine/log.h"
 #include "engine/globals.h"
 #include "utilities/file_utility.h"
 
-namespace neko
+namespace neko::sfml
 {
 
 static std::set<std::string_view> imgExtensionSet

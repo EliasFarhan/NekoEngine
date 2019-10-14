@@ -29,7 +29,7 @@
 #include <SFML/Graphics/Texture.hpp>
 #include "engine/globals.h"
 
-namespace neko
+namespace neko::sfml
 {
 class TextureManager
 {

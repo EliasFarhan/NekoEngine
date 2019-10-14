@@ -1,4 +1,4 @@
-#include "hello_triangle/triangle_command.h"
+#include "hello_triangle/triangle_program.h"
 #include "engine/log.h"
 
 namespace neko

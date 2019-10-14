@@ -28,7 +28,7 @@
 #include <memory>
 #include <SFML/Graphics/VertexArray.hpp>
 #include <SFML/Graphics/Texture.hpp>
-#include <physics/physics.h>
+#include <sfml_engine/physics.h>
 #include "texture.h"
 
 namespace neko

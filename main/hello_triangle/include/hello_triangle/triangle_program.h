@@ -1,3 +1,4 @@
+#pragma once
 /*
  MIT License
 
@@ -21,27 +22,41 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-#include <physics/collider.h>
-#include <Box2D/Box2D.h>
-#include <engine/engine.h>
+#include "graphics/graphics.h"
+#include "gl/shader.h"
 
 namespace neko
 {
-CollisionListener::~CollisionListener()
+class HelloTriangleCommand : public RenderProgram
 {
-}
+public:
+	void Init() override;
+	void Update(float dt) override;
+	void Destroy() override;
+	void Render() override;
+private:
+	float vertices[12] = {
+		 0.5f,  0.5f, 0.0f,  // top right
+		 0.5f, -0.5f, 0.0f,  // bottom right
+		-0.5f, -0.5f, 0.0f,  // bottom left
+		-0.5f,  0.5f, 0.0f   // top left 
+	};
+	float colors[12] = {
+		1.0f, 0.0f, 1.0f,
+		0.0f, 1.0f, 0.0f,
+		0.0f, 0.0f, 1.0f,
+		0.5f, 0.0f, 0.5f
+	};
+	unsigned int indices[6] = {
+		// note that we start from 0!
+		0, 1, 3,   // first triangle
+		1, 2, 3    // second triangle
+	};
 
-void CollisionListener::BeginContact(b2Contact* contact)
-{
-	const auto* colliderA = static_cast<Collider*>(contact->GetFixtureA()->GetUserData());
-	const auto* colliderB = static_cast<Collider*>(contact->GetFixtureB()->GetUserData());
-	//BasicEngine::GetInstance()->OnBeginContact(colliderA, colliderB);
-}
-
-void CollisionListener::EndContact(b2Contact* contact)
-{
-	const auto* colliderA = static_cast<Collider*>(contact->GetFixtureA()->GetUserData());
-	const auto* colliderB = static_cast<Collider*>(contact->GetFixtureB()->GetUserData());
-	//BasicEngine::GetInstance()->OnEndContact(colliderA, colliderB);
-}
+	unsigned int EBO = 0; // Element Buffer Object
+	unsigned int VBO[2] = {}; //Vertex Buffer Object
+	unsigned int VAO = 0; //Vertex Array Object
+	float timeSinceInit_ = 0.0f;
+	gl::Shader shader_;
+};
 }

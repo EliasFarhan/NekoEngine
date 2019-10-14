@@ -29,7 +29,7 @@
 #include "sfml_engine/sprite.h"
 #include "sfml_engine/json_utility.h"
 
-namespace neko
+namespace neko::sfml
 {
 
 void SpriteAnimator::Init(json& animatorJson, TextureManager& textureManager, int spriteIndex)
@@ -148,8 +148,8 @@ void AnimatorManager::Update(SpriteManager& spriteManager, float dt)
 
     for (auto& animator : animators_)
     {
-        auto sprite = spriteManager.GetComponent(animator.spriteIndex);
-		animator.Update(&sprite.sprite, dt);
+        const auto sprite = spriteManager.GetComponent(animator.spriteIndex);
+		//animator.Update(&sprite.sprite, dt);
 
     }
 }

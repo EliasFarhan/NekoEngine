@@ -38,16 +38,11 @@ const size_t MAX_COMMAND_NMB = 8'192;
 /**
  * \brief abstraction of a graphic command send to the render thread
  */
-class GraphicsCommand
+class RenderCommand
 {
 public:
-    GraphicsCommand() = default;
-    virtual ~GraphicsCommand() = default;
-    virtual void Init() = 0;
-
-    virtual void Update(float dt) = 0;
-
-    virtual void Destroy() = 0;
+    RenderCommand() = default;
+    virtual ~RenderCommand() = default;
     virtual void Render() = 0;
 
     int GetLayer() const;
@@ -57,15 +52,23 @@ private:
 
 };
 
+class RenderProgram : public RenderCommand
+{
+public:
+    virtual void Init() = 0;
+    virtual void Update(float dt) = 0;
+    virtual void Destroy() = 0;
+};
+
 
 class GraphicsManager
 {
 public:
 	GraphicsManager();
-	virtual void Draw(GraphicsCommand* command);
+	virtual void Draw(RenderCommand* command);
 	virtual void Render();
 protected:
-    std::vector<GraphicsCommand*> commandBuffer_ = {};
+    std::vector<RenderCommand*> commandBuffer_ = {};
 	size_t renderLength_ = 0;
 };
 

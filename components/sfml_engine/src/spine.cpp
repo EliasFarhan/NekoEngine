@@ -1,9 +1,10 @@
 #include <sfml_engine/spine.h>
 #include "engine/log.h"
 #include <graphics/graphics.h>
-#include <engine/transform.h>
+#include <sfml_engine/transform.h>
 
-namespace neko
+/*
+namespace neko::sfml
 {
 
 
@@ -108,7 +109,7 @@ bool SpineManager::AddSpineDrawable(Entity entity,
                                     const std::string_view atlasFilename,
                                     const std::string_view skeletonFilename)
 {
-    auto& spineAnimation = GetComponent(entity);
+    auto& spineAnimation = components_[entity];
     if (spineAnimation.atlas)
     {
         Atlas_dispose(spineAnimation.atlas);
@@ -145,7 +146,7 @@ void SpineManager::ParseComponentJson(json& componentJson, Entity entity)
 
 }
 
-void SpineManager::CopyAllTransformPositions(EntityManager& entityManager, Position2dManager& position2Manager)
+void SpineManager::CopyAllTransformPositions(EntityManager& entityManager, SfmlPosition2dManager& position2Manager)
 {
     EntityMask entityMask = EntityMask(NekoComponentType::POSITION2D) | EntityMask(NekoComponentType::SPINE_ANIMATION);
 
@@ -153,7 +154,7 @@ void SpineManager::CopyAllTransformPositions(EntityManager& entityManager, Posit
     {
         if (entityManager.HasComponent(entity, entityMask))
         {
-            const auto& pos = position2Manager.GetConstComponent(entity);
+            const auto& pos = position2Manager.GetComponent(entity);
             components_[entity].SetPosition(pos);
         }
     }
@@ -168,13 +169,13 @@ void SpineManager::CopyAllTransformScales(EntityManager& entityManager, Scale2dM
     {
         if (entityManager.HasComponent(entity, entityMask))
         {
-            const auto& scale = scale2DManager.GetConstComponent(entity);
+            const auto& scale = scale2DManager.GetComponent(entity);
             components_[entity].transform = components_[entity].transform.scale(scale, components_[entity].GetPosition());
         }
     }
 }
 
-void SpineManager::CopyAllTransformAngles(EntityManager& entityManager, Rotation2dManager& angle2DManager)
+void SpineManager::CopyAllTransformAngles(EntityManager& entityManager, SfmlRotation2dManager& angle2DManager)
 {
     EntityMask entityMask = EntityMask(NekoComponentType::ROTATION2D) |
                             EntityMask(NekoComponentType::SPINE_ANIMATION);
@@ -183,14 +184,14 @@ void SpineManager::CopyAllTransformAngles(EntityManager& entityManager, Rotation
     {
         if (entityManager.HasComponent(entity, entityMask))
         {
-            const auto& angle = angle2DManager.GetConstComponent(entity);
+            const auto& angle = angle2DManager.GetComponent(entity);
             components_[entity].transform = components_[entity].transform.rotate(angle, components_[entity].GetPosition());
         }
     }
 }
 
 
-void SpineManager::PushAllCommands(EntityManager& entityManager, GraphicsManager& graphicsManager)
+void SpineManager::PushAllCommands(EntityManager& entityManager, SfmlGraphicsManager& graphicsManager)
 {
     EntityMask entityMask = EntityMask(NekoComponentType::SPINE_ANIMATION);
 
@@ -201,7 +202,7 @@ void SpineManager::PushAllCommands(EntityManager& entityManager, GraphicsManager
             if (components_[entity].skeletonDrawable != nullptr)
             {
                 sf::RenderStates states(components_[entity].transform);
-                graphicsManager.Draw(*components_[entity].skeletonDrawable, components_[entity].layer, states);
+                graphicsManager.Draw(&components_[entity]);
             }
         }
     }
@@ -227,7 +228,7 @@ SpineDrawableInfo& SpineManager::GetInfo(Entity entity)
     return infos_[entity];
 }
 
-void SpineManager::CopyAllTransforms(EntityManager& entityManager, Transform2dManager& transformManager)
+void SpineManager::CopyAllTransforms(EntityManager& entityManager, SfmlTransform2dManager& transformManager)
 {
     const auto entityMask = EntityMask(NekoComponentType::TRANSFORM2D) | EntityMask(NekoComponentType::SPINE_ANIMATION);
     for(Entity entity = 0; entity < entityManager.GetEntitiesSize(); entity++)
@@ -255,3 +256,4 @@ void SpineManager::CopyLayer(int layer, size_t start, size_t length)
 }
 
 }
+*/

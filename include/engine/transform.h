@@ -25,7 +25,6 @@
  */
 
 #include <vector>
-#include "SFML/System/Vector2.hpp"
 
 #include "globals.h"
 #include <engine/entity.h>
@@ -34,19 +33,17 @@
 
 namespace neko
 {
-class Body2dManager;
-class Physics2dManager;
 
 
 class Position2dManager : public ComponentManager<Vec2f, ComponentType(NekoComponentType::POSITION2D)>
 {
 public:
     Position2dManager();
-    void CopyAllPositionsFromBody2d(EntityManager& entityManager, Body2dManager& body2dManager);
+
 
 };
 
-class Scale2dManager : public ComponentManager<sf::Vector2f, ComponentType(NekoComponentType::SCALE2D)>
+class Scale2dManager : public ComponentManager<Vec2f, ComponentType(NekoComponentType::SCALE2D)>
 {
 public:
     using ComponentManager::ComponentManager;
@@ -58,33 +55,9 @@ class Rotation2dManager : public ComponentManager<float, ComponentType(NekoCompo
 {
 public:
     using ComponentManager::ComponentManager;
-    void CopyAnglesFromBody2d(EntityManager& entityManager, Body2dManager& body2dManager);
+
 };
 
-/**
- * \brief manage the graphic transform of any kind of objects in a SOA fashions
- */
-class Transform2dManager
-{
-public:
-    Transform2dManager();
 
-    Position2dManager& GetPositionManager(){ return positionManager_;}
-    Scale2dManager& GetScaleManager() { return scaleManager_; }
-    Rotation2dManager& GetRotationManager() { return rotationManager_;}
-    bool CanParentTransform(Entity entity, Entity parentEntity);
-    bool SetTransformParent(Entity entity, Entity parentEntity);
-    Entity GetParentEntity(Entity entity);
-    Entity FindNextChild(Entity parentEntity, Entity entityChild=neko::INVALID_ENTITY);
-
-    //sf::Transform CalculateTransform(Entity entity);
-private:
-    Position2dManager positionManager_;
-    Scale2dManager scaleManager_{sf::Vector2f(1.0f,1.0f)};
-    Rotation2dManager rotationManager_;
-
-	std::vector<Entity> transformHierarchy_;
-	std::vector<char> dirtyFlags_;
-};
 
 }

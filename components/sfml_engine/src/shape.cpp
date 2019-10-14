@@ -22,11 +22,13 @@
  SOFTWARE.
  */
 #include "sfml_engine/shape.h"
+#include "sfml_engine/physics.h"
 #include <engine/globals.h>
 #include <engine/engine.h>
 #include <Remotery.h>
+#include "sfml_engine/graphics.h"
 
-namespace neko
+namespace neko::sfml
 {
 
 
@@ -55,33 +57,38 @@ void ConvexShapeManager::AddPolygon(Entity entity, const Vec2f& pos, const Vec2f
     newPolygon.setFillColor(shapeDef.fillColor);
     newPolygon.setOutlineColor(shapeDef.outlineColor);
     newPolygon.setOutlineThickness(shapeDef.outlineThickness);
-    ResizeIfNecessary(components_, entity, sf::ConvexShape());
-    components_[entity] = newPolygon;
+    ResizeIfNecessary(components_, entity, {});
+    components_[entity].shape_ = newPolygon;
 }
 
 void ConvexShapeManager::CopyTransformPosition(Position2dManager& positionManager, size_t start, size_t length)
 {
-	const auto positions = positionManager.GetConstComponentsVector();
+	const auto& positions = positionManager.GetComponentsVector();
     for(auto i = start; i < start+length; i++)
     {
-        components_[i].setPosition(neko::unit2pixel(positions[i]));
+        components_[i].shape_.setPosition(neko::unit2pixel(positions[i]));
     }
 }
 
 void ConvexShapeManager::CopyTransformRotation(Rotation2dManager& rotationManager, size_t start, size_t length)
 {
-	const auto rotations = rotationManager.GetConstComponentsVector();
+	const auto& rotations = rotationManager.GetComponentsVector();
 	for (auto i = start; i < start + length; i++)
 	{
-		components_[i].setRotation(-rotations[i]); //counter clockwise rotation
+		components_[i].shape_.setRotation(-rotations[i]); //counter clockwise rotation
 	}
 }
 
-void ConvexShapeManager::PushCommands(GraphicsManager* graphicsManager, size_t start, size_t length)
+void ConvexShapeManager::PushCommands(SfmlGraphicsManager& graphicsManager, size_t start, size_t length)
 {
     for(auto i = start; i < start+length;i++)
     {
-        graphicsManager->Draw(components_[i]);
+        graphicsManager.Draw(&components_[i]);
     }
+}
+
+void ConvexShape::Render()
+{
+
 }
 }

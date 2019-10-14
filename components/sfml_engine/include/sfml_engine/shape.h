@@ -28,10 +28,11 @@
 #include <SFML/Graphics/ConvexShape.hpp>
 #include <engine/globals.h>
 #include <engine/transform.h>
+#include <sfml_engine/graphics.h>
 
-namespace neko
+namespace neko::sfml
 {
-class GraphicsManager;
+class SfmlGraphicsManager;
 
 struct ShapeDef
 {
@@ -40,26 +41,14 @@ struct ShapeDef
     float outlineThickness = 0.0f;
 };
 
-/**
- * \brief managing graphic shape from the SFML API
- */
-class BadShapeManager
+struct ConvexShape : public SfmlRenderCommand
 {
-public:
-    BadShapeManager() = default;
-
-    virtual Index AddBox(const sf::Vector2f& pos, const sf::Vector2f& halfSize, const ShapeDef& shapeDef) = 0;
-
-    virtual Index AddPolygon(const sf::Vector2f& pos, const sf::Vector2f* points, size_t pointNmb, const ShapeDef& shapeDef) = 0;
-
-
-    virtual void CopyTransformPosition(Position2dManager& positionManager, size_t start = 0,
-                                       size_t length = neko::INIT_ENTITY_NMB) = 0;
-    virtual void PushCommands(GraphicsManager* graphicsManager, size_t start = 0, size_t length = INIT_ENTITY_NMB) = 0;
-
+    void Render() override;
+    sf::ConvexShape shape_;
 };
 
-class ConvexShapeManager : public ComponentManager<sf::ConvexShape, ComponentType(NekoComponentType::CONVEX_SHAPE2D)>
+
+class ConvexShapeManager : public ComponentManager<ConvexShape, ComponentType(NekoComponentType::CONVEX_SHAPE2D)>
 {
 public:
     using ComponentManager::ComponentManager;
@@ -71,7 +60,7 @@ public:
     void CopyTransformPosition(Position2dManager& positionManager, size_t start, size_t length);
     void CopyTransformRotation(Rotation2dManager& rotationManager, size_t start, size_t length);
 
-    void PushCommands(GraphicsManager* graphicsManager, size_t start, size_t length);
+    void PushCommands(SfmlGraphicsManager& graphicsManager, size_t start, size_t length);
 
 
 };

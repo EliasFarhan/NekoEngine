@@ -29,12 +29,21 @@
 #include <Box2D/Box2D.h>
 #include <vector>
 #include <mathematics/vector.h>
-#include "physics/collider.h"
+#include <SFML/Audio.hpp>
+#include "collider.h"
 #include "engine/component.h"
 
 namespace neko
 {
+float pixel2unit(float f);
+Vec2f pixel2unit(sf::Vector2f v);
+
+float unit2pixel(float f);
+sf::Vector2f unit2pixel(Vec2f v);
+
 struct Configuration;
+namespace box2d
+{
 
 /**
  * \brief system using box2d to manage physics
@@ -56,15 +65,17 @@ public:
      * \brief value used to define how many pixels per meter to translate from graphics to physics
      */
     static float pixelPerMeter;
-
+    static float pixelPerUnit;
     void AddCollider(const Collider& collider);
 
     b2Body* GetBodyAt(Index i);
 
-    std::vector<Collider>& GetColliderVector(){ return colliders_;}
+    std::vector<Collider>& GetColliderVector()
+    { return colliders_; }
 
 private:
     friend class Transform2dManager;
+
     std::unique_ptr<b2World> world_ = nullptr;
     std::vector<b2Body*> bodies_;
     std::vector<Collider> colliders_;
@@ -73,7 +84,7 @@ private:
 };
 
 
-class Body2dManager : public ComponentManager <b2Body*,ComponentType(NekoComponentType::BODY2D)>
+class Body2dManager : public ComponentManager<b2Body*, ComponentType(NekoComponentType::BODY2D)>
 {
 };
 
@@ -92,4 +103,18 @@ class Collider2dManager : public ComponentManager<Collider, ComponentType(NekoCo
 {
 };
 
+float pixel2meter(float f);
+
+b2Vec2 pixel2meter(sf::Vector2f v);
+
+
+float meter2pixel(float f);
+
+sf::Vector2f meter2pixel(b2Vec2 v);
+
+
+
+
+
+}
 }

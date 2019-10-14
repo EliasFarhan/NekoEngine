@@ -21,15 +21,17 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-#include "../../extensions/sfml_engine/include/sfml_engine/sprite.h"
+#include "sfml_engine/sprite.h"
 #include <engine/transform.h>
 #include <graphics/graphics.h>
 #include <engine/engine.h>
 #include "engine/globals.h"
 #include <Remotery.h>
-#include "../../extensions/sfml_engine/include/sfml_engine/texture.h"
+#include <sfml_engine/graphics.h>
+#include "sfml_engine/texture.h"
+#include "sfml_engine/json_utility.h"
 
-namespace neko
+namespace neko::sfml
 {
 
 void SpriteManager::CopySpriteOrigin(const sf::Vector2f& origin, size_t start, size_t length)
@@ -84,7 +86,7 @@ void SpriteManager::CopyAllTransformPositions(EntityManager& entityManager, Posi
         if(entityManager.HasComponent(entity, entityMask) and
         !entityManager.HasComponent(entity, neko::EntityMask(neko::NekoComponentType::TRANSFORM2D)))
         {
-            components_[entity].sprite.setPosition(positionManager.GetConstComponent(entity));
+            components_[entity].sprite.setPosition(positionManager.GetComponent(entity));
         }
     }
 }
@@ -97,7 +99,7 @@ void SpriteManager::CopyAllTransformScales(EntityManager& entityManager, Scale2d
         if(entityManager.HasComponent(entity, entityMask)and
            !entityManager.HasComponent(entity, neko::EntityMask(neko::NekoComponentType::TRANSFORM2D)))
         {
-            components_[entity].sprite.setScale(scaleManager.GetConstComponent(entity));
+            components_[entity].sprite.setScale(scaleManager.GetComponent(entity));
         }
     }
 }
@@ -110,12 +112,12 @@ void SpriteManager::CopyAllTransformRotations(EntityManager& entityManager, Rota
         if(entityManager.HasComponent(entity, entityMask)and
            !entityManager.HasComponent(entity, neko::EntityMask(neko::NekoComponentType::TRANSFORM2D)))
         {
-            components_[entity].sprite.setRotation(angleManager.GetConstComponent(entity));
+            components_[entity].sprite.setRotation(angleManager.GetComponent(entity));
         }
     }
 }
 
-void SpriteManager::PushAllCommands(EntityManager& entityManager, GraphicsManager& graphicsManager)
+void SpriteManager::PushAllCommands(EntityManager& entityManager, SfmlGraphicsManager& graphicsManager)
 {
     const auto entityMask = EntityMask(NekoComponentType::SPRITE2D);
     for(Entity entity = 0; entity < entityManager.GetEntitiesSize();entity++)
@@ -128,7 +130,7 @@ void SpriteManager::PushAllCommands(EntityManager& entityManager, GraphicsManage
 
             sf::RenderStates states;
             states.transform = components_[entity].transform;
-            graphicsManager.Draw(components_[entity].sprite, components_[entity].layer, states);
+            graphicsManager.Draw(&components_[entity]);
         }
     }
 }
@@ -139,13 +141,13 @@ void SpriteManager::ParseComponentJson(json& componentJson, Entity entity)
     const auto textureId = textureManager_.LoadTexture(textureName);
     CopyTexture(textureId, entity, 1);
     CopyLayer(componentJson["layer"], entity, 1);
-    const auto origin = neko::GetVectorFromJson(componentJson, "origin");
+    const auto origin = GetVectorFromJson(componentJson, "origin");
     CopySpriteOrigin(origin, entity, 1);
 }
 
 json SpriteManager::SerializeComponentJson(Entity entity)
 {
-    const auto& sprite = GetConstComponent(entity);
+    const auto& sprite = GetComponent(entity);
     json componentJson;
     componentJson["texture"] = textureManager_.GetTexturePath(sprite.textureId);
     componentJson["layer"] = sprite.layer;
@@ -153,7 +155,7 @@ json SpriteManager::SerializeComponentJson(Entity entity)
     return componentJson;
 }
 
-void SpriteManager::CopyAllTransforms(EntityManager& entityManager, Transform2dManager& transformManager)
+void SpriteManager::CopyAllTransforms(EntityManager& entityManager, SfmlTransform2dManager& transformManager)
 {
     const auto entityMask = EntityMask(NekoComponentType::TRANSFORM2D) | EntityMask(NekoComponentType::SPRITE2D);
     for(Entity entity = 0; entity < entityManager.GetEntitiesSize(); entity++)
@@ -166,4 +168,8 @@ void SpriteManager::CopyAllTransforms(EntityManager& entityManager, Transform2dM
     }
 }
 
+void Sprite::Render()
+{
+
+}
 }

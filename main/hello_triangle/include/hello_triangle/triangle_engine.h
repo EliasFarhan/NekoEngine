@@ -1,7 +1,7 @@
 #pragma once
 
 #include "sdl_engine/sdl_engine.h"
-#include "triangle_command.h"
+#include "triangle_program.h"
 
 namespace neko
 {

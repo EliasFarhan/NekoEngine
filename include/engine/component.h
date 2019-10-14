@@ -90,23 +90,17 @@ public:
     virtual void SetComponent(Entity entity, T component)
     { components_[entity] = component; }
 
-    const T& GetConstComponent(Entity entity) const
+    const T& GetComponent(Entity entity) const
     { return components_[entity]; }
 
-    T& GetComponent(Entity entity)
-    { return components_[entity]; }
 
-    const T* GetConstComponentPtr(Entity entity) const
+    const T* GetComponentPtr(Entity entity) const
     { return &components_[entity]; }
 
-    T* GetComponentPtr(Entity entity)
-    { return &components_[entity]; }
 
-    const std::vector<T>& GetConstComponentsVector() const
+    const std::vector<T>& GetComponentsVector() const
     { return components_; }
 
-    std::vector<T>& GetComponentsVector()
-    { return components_; }
 
     virtual void ParseComponentJson([[maybe_unused]]json& componentJson, [[maybe_unused]]Entity entity)
     {};

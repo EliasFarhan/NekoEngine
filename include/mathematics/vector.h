@@ -66,7 +66,10 @@ public:
     Vec2f operator/(float rhs) const;
 
     Vec2f& operator/=(float rhs);
-
+    template <typename T>
+    explicit Vec2f(const T& v);
+    template <typename T>
+    operator T() const;
     friend std::ostream& operator<<(std::ostream& os, const Vec2f& dt);
 
 };

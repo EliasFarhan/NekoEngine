@@ -34,7 +34,7 @@
 #include <utilities/json_utility.h>
 #include <engine/system.h>
 
-namespace neko
+namespace neko::sfml
 {
 class MultiThreadSpriteManager;
 /**

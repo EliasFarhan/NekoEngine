@@ -26,6 +26,9 @@
 
 #include <string>
 #include <engine/system.h>
+#include <sfml_engine/physics.h>
+#include <utilities/delegate_utility.h>
+
 
 struct Remotery;
 
@@ -57,7 +60,6 @@ struct Configuration
 };
 
 
-
 /**
  * \brief basic engine class with no graphics manager implementation
  */
@@ -81,6 +83,11 @@ public:
 protected:
     static BasicEngine* instance_;
 	float isRunning_;
+    Delegate<> initDelegate_;
+    Delegate<float> updateDelegate_;
+    Delegate<> drawUiDelegate_;
+    Delegate<> drawDelegate_;
+    Delegate<> destroyDelegate_;
 
 };
 

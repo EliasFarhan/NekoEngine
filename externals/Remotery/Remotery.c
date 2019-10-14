@@ -4777,6 +4777,8 @@ static void Remotery_FlushMessageQueue(Remotery* rmt)
                 FreeSampleTree(sample_tree->root_sample, sample_tree->allocator);
                 break;
             }
+            default:
+                break;
         }
 
         rmtMessageQueue_ConsumeNextMessage(rmt->mq_to_rmt_thread, message);

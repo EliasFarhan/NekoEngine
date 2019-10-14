@@ -22,7 +22,7 @@
  SOFTWARE.
  */
 
-#include <physics/physics.h>
+#include <sfml_engine/physics.h>
 #include <engine/engine.h>
 #include "engine/globals.h"
 #include "engine/log.h"
@@ -31,52 +31,72 @@
 namespace neko
 {
 
+float pixel2unit(float f)
+{
+    return f/box2d::Physics2dManager::pixelPerUnit;
+}
+Vec2f pixel2unit(sf::Vector2f v)
+{
+    return Vec2f(pixel2unit(v.x), pixel2unit(v.y));
+}
+
+float unit2pixel(float f)
+{
+    return f * box2d::Physics2dManager::pixelPerUnit;
+}
+sf::Vector2f unit2pixel(Vec2f v)
+{
+    return sf::Vector2f(unit2pixel(v.x), unit2pixel(v.y));
+}
+namespace box2d
+{
+float box2d::Physics2dManager::pixelPerUnit = 100.0f;
 float Physics2dManager::pixelPerMeter = 100.0f;
 
 void Physics2dManager::Init()
 {
-	auto* engine = BasicEngine::GetInstance();
-	config_ = &engine->config;
-	pixelPerMeter = config_->pixelPerMeter;
-	world_ = std::make_unique<b2World>(b2Vec2(config_->gravityX, config_->gravityY));
-	world_->SetContactListener(&collisionListener_);
-	colliders_.reserve(INIT_ENTITY_NMB);
+    auto* engine = BasicEngine::GetInstance();
+    config_ = &engine->config;
+    pixelPerMeter = config_->pixelPerMeter;
+    world_ = std::make_unique<b2World>(b2Vec2(config_->gravityX, config_->gravityY));
+    world_->SetContactListener(&collisionListener_);
+    colliders_.reserve(INIT_ENTITY_NMB);
 }
 
 void Physics2dManager::Update(float dt)
 {
-    (void)dt;//TODO put physics clock here
-	world_->Step(config_->physicsTimeStep, config_->velocityIterations, config_->positionIterations);
+    (void) dt;//TODO put physics clock here
+    world_->Step(config_->physicsTimeStep, config_->velocityIterations, config_->positionIterations);
 }
 
 void Physics2dManager::Destroy()
 {
-	world_ = nullptr;
+    world_ = nullptr;
 }
 
 b2Body* Physics2dManager::CreateBody(b2BodyDef& bodyDef, b2FixtureDef* fixturesDef, size_t fixturesNmb)
 {
-	auto* body = world_->CreateBody(&bodyDef);
-	bodies_.push_back(body);
-	const auto colliderOffset = colliders_.size() - fixturesNmb;
-	for(auto i = 0u; i < fixturesNmb;i++)
-	{
-		auto* collider = &colliders_[colliderOffset+i];
-		collider->body = body;
-		fixturesDef[i].userData = collider;
-		auto* fixture = body->CreateFixture(&fixturesDef[i]);
-		collider->fixture = fixture;
-	}
+    auto* body = world_->CreateBody(&bodyDef);
+    bodies_.push_back(body);
+    const auto colliderOffset = colliders_.size() - fixturesNmb;
+    for (auto i = 0u; i < fixturesNmb; i++)
+    {
+        auto* collider = &colliders_[colliderOffset + i];
+        collider->body = body;
+        fixturesDef[i].userData = collider;
+        auto* fixture = body->CreateFixture(&fixturesDef[i]);
+        collider->fixture = fixture;
+    }
 #ifdef __neko_dbg__
-	{
-		std::ostringstream oss;
-		oss << "Body initialization: (" << body->GetPosition().x << ", " << body->GetPosition().y << "),\n("<<
-			body->GetLinearVelocity().x<<", "<<body->GetLinearVelocity().y<<")";
-		logDebug(oss.str());
+    {
+        std::ostringstream oss;
+        oss << "Body initialization: (" << body->GetPosition().x << ", " << body->GetPosition().y << "),\n("<<
+            body->GetLinearVelocity().x<<", "<<body->GetLinearVelocity().y<<")";
+        logDebug(oss.str());
 
-	}
+    }
 #endif
-	return body;
+    return body;
 }
 
 void Physics2dManager::AddCollider(const Collider& collider)
@@ -103,7 +123,7 @@ void BodyDef2dManager::ParseComponentJson(json& componentJson, Entity entity)
 
 json BodyDef2dManager::SerializeComponentJson(Entity entity)
 {
-    const auto& bodyDef = GetConstComponent(entity);
+    const auto& bodyDef = GetComponent(entity);
     json componentJson;
     componentJson["gravityScale"] = bodyDef.gravityScale;
     componentJson["type"] = bodyDef.type;
@@ -112,5 +132,26 @@ json BodyDef2dManager::SerializeComponentJson(Entity entity)
     componentJson["fixedRotation"] = bodyDef.fixedRotation;
     componentJson["allowSleep"] = bodyDef.allowSleep;
     return ComponentManager::SerializeComponentJson(entity);
+}
+float pixel2meter(float f)
+{
+    return f/Physics2dManager::pixelPerMeter;
+}
+
+b2Vec2 pixel2meter(sf::Vector2f v)
+{
+    return b2Vec2(pixel2meter(v.x), pixel2meter(v.y));
+}
+
+
+float meter2pixel(float f)
+{
+    return f * Physics2dManager::pixelPerMeter;
+}
+
+sf::Vector2f meter2pixel(b2Vec2 v)
+{
+    return sf::Vector2f(meter2pixel(v.x), meter2pixel(v.y));
+}
 }
 }

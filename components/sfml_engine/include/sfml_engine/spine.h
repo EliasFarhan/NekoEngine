@@ -28,17 +28,25 @@
 #include <spine/spine-sfml.h>
 #include "engine/entity.h"
 #include "engine/component.h"
+#include "sfml_engine/graphics.h"
 
-
+/*
 namespace neko
 {
-class GraphicsManager;
-class Position2dManager;
-class Scale2dManager;
-class Rotation2dManager;
-class Transform2dManager;
 
-struct BasicSpineDrawable : Component
+class Scale2dManager;
+
+namespace sfml
+{
+class SfmlGraphicsManager;
+
+class SfmlPosition2dManager;
+
+class SfmlRotation2dManager;
+
+class SfmlTransform2dManager;
+
+struct BasicSpineDrawable : public SfmlRenderCommand
 {
     BasicSpineDrawable();
 
@@ -51,9 +59,11 @@ struct BasicSpineDrawable : Component
     sf::Transform transform{};
 
     void SetAnimationByName(std::string_view animName);
+
     void SetSkinByName(std::string_view skinName);
 
     void SetPosition(const sf::Vector2f& position);
+
     sf::Vector2f GetPosition();
 };
 
@@ -65,12 +75,13 @@ struct SpineBoneFollower
 
 struct SpineDrawableInfo
 {
-	std::string spinePath = "";
+    std::string spinePath = "";
     std::string atlasPath = "";
     std::string skeletonDataPath = "";
 };
 
-class SpineBoneFollowerManager : public ComponentManager<SpineBoneFollower, EntityMask(NekoComponentType::SPINE_FOLLOW_BONE)>
+class SpineBoneFollowerManager : public ComponentManager<SpineBoneFollower, EntityMask(
+        NekoComponentType::SPINE_FOLLOW_BONE)>
 {
 
 };
@@ -79,6 +90,7 @@ class SpineManager : public ComponentManager<BasicSpineDrawable, EntityMask(Neko
 {
 public:
     SpineManager();
+
     void Update(EntityManager& entityManager, float dt);
 
     bool AddSpineDrawable(Entity entity,
@@ -86,11 +98,16 @@ public:
                           const std::string_view skeletonFilename);
 
     void ParseComponentJson(json& componentJson, Entity entity) override;
-    void CopyAllTransforms(EntityManager& entityManager, Transform2dManager& transformManager);
-    void CopyAllTransformPositions(EntityManager& entityManager, Position2dManager& position2Manager);
+
+    void CopyAllTransforms(EntityManager& entityManager, SfmlTransform2dManager& transformManager);
+
+    void CopyAllTransformPositions(EntityManager& entityManager, SfmlPosition2dManager& position2Manager);
+
     void CopyAllTransformScales(EntityManager& entityManager, Scale2dManager& scale2DManager);
-    void CopyAllTransformAngles(EntityManager& entityManager, Rotation2dManager& angle2DManager);
-    void PushAllCommands(EntityManager& entityManager, GraphicsManager& graphicsManager);
+
+    void CopyAllTransformAngles(EntityManager& entityManager, SfmlRotation2dManager& angle2DManager);
+
+    void PushAllCommands(EntityManager& entityManager, SfmlGraphicsManager& graphicsManager);
 
     void CopyLayer(int layer, size_t start, size_t length);
 
@@ -112,3 +129,5 @@ SkeletonData* readSkeletonJsonData(const char* filename, Atlas* atlas, float sca
 
 SkeletonData* readSkeletonBinaryData(const char* filename, Atlas* atlas, float scale);
 }
+}
+ */

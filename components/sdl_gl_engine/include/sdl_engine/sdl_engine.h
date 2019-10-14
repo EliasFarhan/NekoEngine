@@ -42,11 +42,7 @@ public:
 protected:
     GraphicsManager graphicsManager_;
 	
-	Delegate<> initDelegate_;
-	Delegate<float> updateDelegate_;
-	Delegate<> drawUiDelegate_;
-	Delegate<> drawDelegate_;
-	Delegate<> destroyDelegate_;
+
 
 	SDL_Window* window_ = nullptr;
 	SDL_GLContext glContext_;

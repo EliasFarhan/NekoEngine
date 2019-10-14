@@ -38,7 +38,7 @@ GraphicsManager::GraphicsManager()
 
 void GraphicsManager::Render()
 {
-    std::sort(commandBuffer_.begin(), commandBuffer_.begin() + renderLength_, [](GraphicsCommand* c1, GraphicsCommand* c2)
+    std::sort(commandBuffer_.begin(), commandBuffer_.begin() + renderLength_, [](RenderCommand* c1, RenderCommand* c2)
     {
         return c1->GetLayer() < c2->GetLayer();
     });
@@ -50,7 +50,7 @@ void GraphicsManager::Render()
     renderLength_ = 0;
 }
 
-void GraphicsManager::Draw(GraphicsCommand* command)
+void GraphicsManager::Draw(RenderCommand* command)
 {
 	if(renderLength_ >= MAX_COMMAND_NMB)
 	{
@@ -61,13 +61,14 @@ void GraphicsManager::Draw(GraphicsCommand* command)
     renderLength_++;
 }
 
-int GraphicsCommand::GetLayer() const
+int RenderCommand::GetLayer() const
 {
     return layer_;
 }
 
-void GraphicsCommand::SetLayer(int layer)
+void RenderCommand::SetLayer(int layer)
 {
     layer_ = layer;
 }
 }
+
