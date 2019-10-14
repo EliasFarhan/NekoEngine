@@ -33,6 +33,10 @@
 
 namespace neko::sdl
 {
+SdlGlEngine::SdlGlEngine(Configuration* config) : BasicEngine(config), glContext_()
+{
+}
+
 void SdlGlEngine::Init()
 {
     BasicEngine::Init();

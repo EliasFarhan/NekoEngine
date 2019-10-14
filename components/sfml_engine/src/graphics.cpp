@@ -14,7 +14,7 @@ void SfmlGraphicsManager::SetRenderTarget(sf::RenderTarget* renderTarget)
 
 void SfmlGraphicsManager::Render(RenderCommand* command)
 {
-    if(command == nullptr or renderTarget_ == nullptr)
+    if(command == nullptr || renderTarget_ == nullptr)
         return;
     auto* sfmlRenderCommand = dynamic_cast<SfmlRenderCommand*>(command);
     if(sfmlRenderCommand)

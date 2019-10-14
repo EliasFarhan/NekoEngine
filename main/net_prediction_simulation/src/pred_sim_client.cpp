@@ -6,7 +6,11 @@
 #include "sfml_engine/physics.h"
 #include "sfml_engine/shape.h"
 #include "net_prediction_simulation/pred_sim_engine.h"
+#include <cmath>
 
+#ifdef WIN32
+#include <corecrt_math_defines.h>
+#endif
 namespace neko::net
 {
 

@@ -25,9 +25,7 @@
 #include "engine/engine.h"
 #include <SDL.h>
 #include <SDL_main.h>
-#include <graphics/graphics.h>
-#include <optional>
-#include "utilities/delegate_utility.h"
+#include "gl/graphics.h"
 
 namespace neko::sdl
 {
@@ -35,12 +33,13 @@ namespace neko::sdl
 class SdlGlEngine : public BasicEngine
 {
 public:
-    using BasicEngine::BasicEngine;
+	explicit SdlGlEngine(Configuration* config = nullptr);
+	SdlGlEngine() = delete;
 	void Init() override;
 	void Update(float dt) override;
 	void Destroy() override;
 protected:
-    GraphicsManager graphicsManager_;
+    gl::GlGraphicsManager graphicsManager_;
 	
 
 

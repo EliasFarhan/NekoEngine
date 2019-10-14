@@ -64,7 +64,9 @@ public:
 class GraphicsManager
 {
 public:
+
 	GraphicsManager();
+	virtual ~GraphicsManager() = default;
 	virtual void Draw(RenderCommand* command);
 	virtual void RenderAll();
 protected:

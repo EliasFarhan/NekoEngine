@@ -262,7 +262,7 @@ else()
         ${SFML_DIR}/src/SFML/Network//Unix/SocketImpl.hpp)
 endif()
 add_library(sfml-network-independent STATIC ${SFML_NETWORK_SRC})
-
+set_target_properties (sfml-network-independent PROPERTIES FOLDER Externals)
 
 #opengl
 set(OpenGL_GL_PREFERENCE GLVND)
@@ -309,7 +309,7 @@ set(IMGUI_SFML_FIND_SFML OFF CACHE INTERNAL "")
 set(SFML_ROOT ${SFML_DIR})
 add_subdirectory(${SFML_IMGUI})
 include_directories(${IMGUI_ROOT} ${SFML_IMGUI})
-
+set_target_properties (ImGui-SFML PROPERTIES FOLDER Externals)
 LIST(APPEND engine2d_lib ImGui-SFML)
 #spine sfml
 set(SPINE_SFML_DIR ${EXTERNAL_DIR}/spine-3.6/)
