@@ -83,12 +83,9 @@ void ConvexShapeManager::PushCommands(SfmlGraphicsManager& graphicsManager, size
 {
     for(auto i = start; i < start+length;i++)
     {
+
+        components_[i].SetDrawable(&components_[i].shape_);
         graphicsManager.Draw(&components_[i]);
     }
-}
-
-void ConvexShape::Render()
-{
-
 }
 }

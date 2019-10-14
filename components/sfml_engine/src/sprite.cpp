@@ -130,6 +130,8 @@ void SpriteManager::PushAllCommands(EntityManager& entityManager, SfmlGraphicsMa
 
             sf::RenderStates states;
             states.transform = components_[entity].transform;
+            components_[entity].SetStates(states);
+            components_[entity].SetDrawable(&components_[entity].sprite);
             graphicsManager.Draw(&components_[entity]);
         }
     }
@@ -168,8 +170,4 @@ void SpriteManager::CopyAllTransforms(EntityManager& entityManager, SfmlTransfor
     }
 }
 
-void Sprite::Render()
-{
-
-}
 }

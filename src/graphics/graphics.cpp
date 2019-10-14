@@ -36,7 +36,7 @@ GraphicsManager::GraphicsManager()
 
 
 
-void GraphicsManager::Render()
+void GraphicsManager::RenderAll()
 {
     std::sort(commandBuffer_.begin(), commandBuffer_.begin() + renderLength_, [](RenderCommand* c1, RenderCommand* c2)
     {
@@ -44,7 +44,10 @@ void GraphicsManager::Render()
     });
     for(Index i = 0; i < renderLength_;i++)
     {
-        commandBuffer_[i]->Render();
+        if(commandBuffer_[i])
+        {
+            Render(commandBuffer_[i]);
+        }
     }
     commandBuffer_.clear();
     renderLength_ = 0;
@@ -70,5 +73,7 @@ void RenderCommand::SetLayer(int layer)
 {
     layer_ = layer;
 }
+
+
 }
 

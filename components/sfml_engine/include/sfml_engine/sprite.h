@@ -41,7 +41,6 @@ class SfmlGraphicsManager;
 
 struct Sprite : public SfmlRenderCommand
 {
-    void Render() override;
 
     sf::Sprite sprite;
     int layer = 0;

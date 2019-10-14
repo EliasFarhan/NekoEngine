@@ -15,14 +15,16 @@ public:
     void SetDrawable(sf::Drawable* drawable);
 private:
     sf::Drawable* drawable_;
-    sf::RenderStates states_;
+    sf::RenderStates states_ = sf::RenderStates::Default;
 };
 
 class SfmlGraphicsManager : public GraphicsManager
 {
 public:
     void SetRenderTarget(sf::RenderTarget* renderTarget);
-private:
+
+protected:
+    void Render(RenderCommand* command) override;
     sf::RenderTarget* renderTarget_ = nullptr;
 
 };

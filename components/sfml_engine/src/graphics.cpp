@@ -12,6 +12,21 @@ void SfmlGraphicsManager::SetRenderTarget(sf::RenderTarget* renderTarget)
 
 }
 
+void SfmlGraphicsManager::Render(RenderCommand* command)
+{
+    if(command == nullptr or renderTarget_ == nullptr)
+        return;
+    auto* sfmlRenderCommand = dynamic_cast<SfmlRenderCommand*>(command);
+    if(sfmlRenderCommand)
+    {
+        auto* drawable = sfmlRenderCommand->GetDrawable();
+        if(drawable == nullptr)
+            return;
+        renderTarget_->draw(*drawable, sfmlRenderCommand->GetStates());
+    }
+}
+
+
 const sf::RenderStates& SfmlRenderCommand::GetStates() const
 {
     return states_;

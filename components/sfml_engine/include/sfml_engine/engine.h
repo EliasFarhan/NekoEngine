@@ -3,6 +3,7 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include "engine/engine.h"
 #include "sfml_engine/input.h"
+#include "sfml_engine/graphics.h"
 namespace sf
 {
 class Event;
@@ -25,5 +26,7 @@ protected:
     std::unique_ptr<sf::RenderWindow> window_ = nullptr;
     MouseManager mouseManager_;
     KeyboardManager keyboardManager_;
+
+    SfmlGraphicsManager graphicsManager_;
 };
 }

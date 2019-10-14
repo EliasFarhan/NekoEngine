@@ -43,7 +43,6 @@ struct ShapeDef
 
 struct ConvexShape : public SfmlRenderCommand
 {
-    void Render() override;
     sf::ConvexShape shape_;
 };
 

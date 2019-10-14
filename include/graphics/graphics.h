@@ -43,7 +43,6 @@ class RenderCommand
 public:
     RenderCommand() = default;
     virtual ~RenderCommand() = default;
-    virtual void Render() = 0;
 
     int GetLayer() const;
     void SetLayer(int layer);
@@ -58,6 +57,7 @@ public:
     virtual void Init() = 0;
     virtual void Update(float dt) = 0;
     virtual void Destroy() = 0;
+    virtual void Render() = 0;
 };
 
 
@@ -66,8 +66,9 @@ class GraphicsManager
 public:
 	GraphicsManager();
 	virtual void Draw(RenderCommand* command);
-	virtual void Render();
+	virtual void RenderAll();
 protected:
+    virtual void Render(RenderCommand* command) = 0;
     std::vector<RenderCommand*> commandBuffer_ = {};
 	size_t renderLength_ = 0;
 };

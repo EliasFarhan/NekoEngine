@@ -171,7 +171,7 @@ void SdlGlEngine::Update([[maybe_unused]]float dt)
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     }
 	drawDelegate_.Execute();
-    graphicsManager_.Render();
+    graphicsManager_.RenderAll();
 
     if (wireframeMode_)
     {
