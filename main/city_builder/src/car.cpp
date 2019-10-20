@@ -21,11 +21,12 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-#include <City/city_car.h>
+#include <city/car.h>
 #include "engine/engine.h"
-#include "City/city_engine.h"
-#include <City/city_map.h>
+#include "city/engine.h"
+#include <city/map.h>
 #include <Remotery.h>
+#include "sfml_engine/transform.h"
 
 namespace neko
 {
@@ -42,7 +43,7 @@ void CityCarManager::Init()
 void CityCarManager::Update(float dt)
 {
 	rmt_ScopedCPUSample(UpdateCars, 0);
-	/*
+
 	{
 		const auto position = roadGraphPtr_->GetNodesVector()[rand() % roadGraphPtr_->GetNodesVector().size()].position;
 		const auto carType = CarType((rand() % (Index(CarType::LENGTH) - Index(CarType::BUS))) + Index(CarType::BUS));
@@ -125,7 +126,7 @@ void CityCarManager::Update(float dt)
 			}
 		}
 
-	}*/
+	}
 
 }
 
@@ -141,7 +142,7 @@ Entity CityCarManager::SpawnCar(sf::Vector2i position, CarType carType)
 	auto& car = cars_[newCarEntity];
 	car.entity = newCarEntity;
 	const auto tileSize = cityMap_->city.tileSize;
-	transformManagerPtr_->AddPosition(sf::Vector2f(car.position.x * float(tileSize.x), car.position.y * float(tileSize.y)), newCarEntity);
+	transformManagerPtr_->SetComponent (sf::Vector2f(car.position.x * float(tileSize.x), car.position.y * float(tileSize.y)), newCarEntity);
 	entityManagerPtr_->AddComponentType(newCarEntity, EntityMask(CityComponentType::TRANSFORM));
 	return newCarEntity;
 }

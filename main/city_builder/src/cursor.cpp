@@ -22,10 +22,10 @@
  SOFTWARE.
  */
 #include <cmath>
-#include <City/city_cursor.h>
+#include <city/cursor.h>
 #include "engine/globals.h"
 #include "engine/engine.h"
-#include <City/city_engine.h>
+#include <city/engine.h>
 
 namespace neko
 {

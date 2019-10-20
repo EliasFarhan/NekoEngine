@@ -26,20 +26,20 @@
 
 #include <thread>
 #include <engine/engine.h>
-#include <City/city_tilemap.h>
-#include <City/city_map.h>
-#include "engine/input.h"
+#include <city/tilemap.h>
+#include <city/map.h>
+#include "sfml_engine/input.h"
 
 #include <SFML/Window/Event.hpp>
-#include "City/city_command.h"
-#include <City/city_cursor.h>
+#include "city/command.h"
+#include <city/cursor.h>
 #include <engine/transform.h>
 #include <core/executor.hpp>
-#include "City/city_car.h"
-#include "City/city_zone.h"
-#include <City/city_building.h>
-#include "city_behavior_tree_manager.h"
-#include "city_person.h"
+#include "city/car.h"
+#include "city/zone.h"
+#include <city/building.h>
+#include "behavior_tree_manager.h"
+#include "person.h"
 
 namespace neko
 {

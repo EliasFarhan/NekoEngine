@@ -28,7 +28,7 @@
 #include <map>
 #include <limits>
 #include <chrono>
-#include "City/city_function_map.h"
+#include "city/function_map.h"
 #include "utilities/time_utility.h"
 #include "utilities/json_utility.h"
 

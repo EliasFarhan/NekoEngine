@@ -28,6 +28,8 @@
 #include "engine/system.h"
 #include "utilities/time_utility.h"
 #include "engine/entity.h"
+#include "engine/component.h"
+#include "city/globals.h"
 
 namespace neko
 {

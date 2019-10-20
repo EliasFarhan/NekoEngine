@@ -22,7 +22,7 @@
  SOFTWARE.
  */
 
-#include <City/city_graph.h>
+#include <city/graph.h>
 #include <unordered_map>
 #include <queue>
 #include <sstream>

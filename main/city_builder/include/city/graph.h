@@ -30,6 +30,7 @@
 #include <vector>
 #include <map>
 #include "engine/globals.h"
+#include "globals.h"
 
 namespace neko
 {

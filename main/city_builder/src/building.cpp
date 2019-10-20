@@ -22,10 +22,10 @@
  SOFTWARE.
  */
 
-#include <City/city_building.h>
+#include <city/building.h>
 #include <engine/engine.h>
-#include <City/city_engine.h>
-#include <City/city_zone.h>
+#include <city/engine.h>
+#include <city/zone.h>
 
 namespace neko
 {
