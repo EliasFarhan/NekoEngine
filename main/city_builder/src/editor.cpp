@@ -22,11 +22,11 @@
  SOFTWARE.
  */
 
-#include <City/city_editor.h>
+#include <city/editor.h>
 #include <imgui-SFML.h>
 #include <imgui.h>
 #include "engine/engine.h"
-#include <City/city_engine.h>
+#include <city/engine.h>
 
 namespace neko
 {

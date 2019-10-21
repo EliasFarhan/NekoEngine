@@ -1,8 +1,8 @@
-#include <City/city_map.h>
+#include <city/map.h>
 #include <PerlinNoise.hpp>
 #include "engine/log.h"
 #include <engine/engine.h>
-#include <City/city_engine.h>
+#include <city/engine.h>
 #include <sstream>
 #include <cstring>
 #include <iterator>

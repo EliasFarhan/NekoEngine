@@ -1,3 +1,4 @@
+#pragma once
 /*
  MIT License
 
@@ -22,45 +23,31 @@
  SOFTWARE.
  */
 
-#include <City/city_function_map.h>
-#include <engine/log.h>
+#include <functional>
+#include <map>
+#include <string>
+#include <engine/globals.h>
+#include "city/globals.h"
 
 namespace neko {
 
-	std::map<
-		std::string, 
-		std::function<bool(Index, const std::vector<double>&)>>
-		FunctionMap::staticNameFunctionMap_;
+	class FunctionMap {
+	public:
+		FunctionMap(Index componentId = INVALID_INDEX) : comp_(componentId) {}
+		void SetFunction(
+			const std::string_view name, 
+			std::function<bool(Index, const std::vector<double>&)> func);
+		bool CallFunction(const std::string_view name, double value);
+		bool CallFunction(
+			const std::string_view name, 
+			const std::vector<double>& vecDouble);
 
-	void FunctionMap::SetFunction(
-		const std::string_view name,
-		std::function<bool(Index, const std::vector<double>&)> func)
-	{
-		staticNameFunctionMap_.insert(std::make_pair(std::string(name), func));
-	}
-
-	bool FunctionMap::CallFunction(const std::string_view name, double value)
-	{
-		auto it = staticNameFunctionMap_.find(std::string(name));
-		if (it != staticNameFunctionMap_.end())
-		{
-			return it->second(comp_, { value });
-		}
-		logDebug("ERROR executing : " + std::string(name));
-		return false;
-	}
-
-	bool FunctionMap::CallFunction(
-		const std::string_view name, 
-		const std::vector<double>& values)
-	{
-		auto it = staticNameFunctionMap_.find(std::string(name));
-		if (it != staticNameFunctionMap_.end())
-		{
-			return it->second(comp_, values);
-		}
-		logDebug("ERROR executing : " + std::string(name));
-		return false;
-	}
+	protected:
+		Index comp_;
+		static std::map<
+			std::string, 
+			std::function<bool(Index, const std::vector<double>&)>>
+			staticNameFunctionMap_;
+	};
 
 } // end namespace neko

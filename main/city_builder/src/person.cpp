@@ -1,6 +1,6 @@
-#include <City/city_person.h>
-#include "City/city_engine.h"
-#include <City/city_building.h>
+#include <city/person.h>
+#include "city/engine.h"
+#include <city/building.h>
 #include <engine/transform.h>
 #include "engine/log.h"
 

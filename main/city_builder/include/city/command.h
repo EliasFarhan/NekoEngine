@@ -1,5 +1,4 @@
 #pragma once
-
 /*
  MIT License
 
@@ -23,30 +22,55 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-#include <SFML/Graphics/RectangleShape.hpp>
+
+#include <queue>
+#include <memory>
 #include "engine/system.h"
-#include "City/city_editor.h"
+#include "engine/globals.h"
 
 namespace neko
 {
 class CityBuilderEngine;
-
-class CityCursor : public System
+enum class CityCommandType
 {
+	CHANGE_CURSOR_MODE,
+	CHANGE_TAX,
+	CREATE_CITY_ELEMENT,
+	DELETE_CITY_ELEMENT,
+	ADD_CITY_ZONE,
+	REMOVE_CITY_ZONE,
+	NONE
+};
+
+struct CityCommand
+{
+	CityCommand() = default;
+	virtual ~CityCommand() = default;
+	CityCommandType commandType = CityCommandType::NONE;
+};
+
+class CityCommandManager : public System
+{
+	
 public:
 	void Init() override;
+	void ExecuteCommand(const std::shared_ptr<CityCommand>& command) const;
 	void Update(float dt) override;
 	void Destroy() override;
-	void OnEvent(sf::Event& event);
-	void SetCursorMode(ButtonIconType cursorMode);
-	sf::Vector2i GetMouseWorldPos() const;
-	sf::Vector2i GetMouseTilePos() const;
-	CityBuilderEngine* engine_;
-protected:
+	void AddCommand(std::unique_ptr<CityCommand> command, bool fromRenderThread = false);
 
-	ButtonIconType cursorMode_ = ButtonIconType::NONE;
-	//for double buffering
-	sf::RectangleShape cursorRect_[2];
-	sf::Vector2i originPos_ =sf::Vector2i(-1,-1);
+protected:
+	std::vector<std::shared_ptr<CityCommand>>commandQueue_[2];
+	CityBuilderEngine* engine_ = nullptr;
+	Index soundErase_ = INVALID_INDEX;
+	Index soundBuild_ = INVALID_INDEX;
+	Index soundRoad_ = INVALID_INDEX;
+	Index soundSelect_ = INVALID_INDEX;
+	Index soundBufferOut_ = INVALID_INDEX;
+	Index soundBufferErase_ = INVALID_INDEX;
+	Index soundBufferBuild_ = INVALID_INDEX;
+	Index soundBufferRoad_ = INVALID_INDEX;
+	Index soundBufferSelect_ = INVALID_INDEX;
+	Index soundOut_ = INVALID_INDEX;
 };
 }

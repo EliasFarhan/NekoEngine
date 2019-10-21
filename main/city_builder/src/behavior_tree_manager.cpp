@@ -23,7 +23,7 @@
  */
 
 #include <sstream>
-#include <City/city_behavior_tree_manager.h>
+#include <city/behavior_tree_manager.h>
 #include <engine/log.h>
 
 namespace neko {
