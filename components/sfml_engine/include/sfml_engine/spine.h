@@ -30,7 +30,7 @@
 #include "engine/component.h"
 #include "sfml_engine/graphics.h"
 
-/*
+
 namespace neko
 {
 
@@ -130,4 +130,3 @@ SkeletonData* readSkeletonJsonData(const char* filename, Atlas* atlas, float sca
 SkeletonData* readSkeletonBinaryData(const char* filename, Atlas* atlas, float scale);
 }
 }
- */

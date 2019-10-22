@@ -52,6 +52,7 @@ set(IMGUI_PUBLIC_HEADERS
   ${IMGUI_INCLUDE_DIR}/imstb_rectpack.h
   ${IMGUI_INCLUDE_DIR}/imstb_textedit.h
   ${IMGUI_INCLUDE_DIR}/imstb_truetype.h
+  ${IMGUI_INCLUDE_DIR}/imguibrowser.h
   ${IMGUI_INCLUDE_DIR}/misc/cpp/imgui_stdlib.h
 )
 

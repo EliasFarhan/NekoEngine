@@ -3,7 +3,7 @@
 #include <graphics/graphics.h>
 #include <sfml_engine/transform.h>
 
-/*
+
 namespace neko::sfml
 {
 
@@ -256,4 +256,3 @@ void SpineManager::CopyLayer(int layer, size_t start, size_t length)
 }
 
 }
-*/

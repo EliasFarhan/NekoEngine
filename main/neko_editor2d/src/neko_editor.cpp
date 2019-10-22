@@ -319,7 +319,7 @@ void NekoEditor::Destroy()
     BasicEngine::Destroy();
 }
 
-neko::BodyDef2dManager& NekoEditor::GetBodyDefManager()
+neko::box2d::BodyDef2dManager& NekoEditor::GetBodyDefManager()
 {
     return bodyDefManager_;
 }
@@ -331,17 +331,17 @@ neko::EntityManager& NekoEditor::GetEntityManager()
 
 neko::Position2dManager& NekoEditor::GetPositionManager()
 {
-    return transformManager_.GetPositionManager();
+    return transformManager_.positionManager_;
 }
 
 neko::Scale2dManager& NekoEditor::GetScaleManager()
 {
-    return transformManager_.GetScaleManager();
+    return transformManager_.scaleManager_;
 }
 
 neko::Rotation2dManager& NekoEditor::GetRotationManager()
 {
-    return transformManager_.GetRotationManager();
+    return transformManager_.rotationManager_;
 }
 
 EditorSceneManager& NekoEditor::GetSceneManager()
@@ -349,12 +349,12 @@ EditorSceneManager& NekoEditor::GetSceneManager()
     return sceneManager_;
 }
 
-neko::SpriteManager& NekoEditor::GetSpriteManager()
+neko::sfml::SpriteManager& NekoEditor::GetSpriteManager()
 {
     return spriteManager_;
 }
 
-neko::TextureManager& NekoEditor::GetTextureManager()
+neko::sfml::TextureManager& NekoEditor::GetTextureManager()
 {
     return textureManager_;
 }
@@ -364,12 +364,12 @@ Previewer& NekoEditor::GetPreviewer()
     return previewer_;
 }
 
-neko::SpineManager& NekoEditor::GetSpineManager()
+neko::sfml::SpineManager& NekoEditor::GetSpineManager()
 {
     return spineManager_;
 }
 
-neko::Transform2dManager& NekoEditor::GetTransformManager()
+neko::sfml::SfmlTransform2dManager& NekoEditor::GetTransformManager()
 {
     return transformManager_;
 }

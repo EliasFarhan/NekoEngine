@@ -80,7 +80,7 @@ private:
     std::vector<b2Body*> bodies_;
     std::vector<Collider> colliders_;
     Configuration* config_ = nullptr;
-    CollisionListener collisionListener_;
+    ContactListener collisionListener_;
 };
 
 

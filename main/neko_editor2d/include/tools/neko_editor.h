@@ -36,9 +36,14 @@
 #include "editor_prefab.h"
 
 #include <imgui.h>
-#include <imfilebrowser.h>
-#include "../../../sfml_engine/include/sfml_engine/sprite.h"
+#include "imfilebrowser.h"
+#include "sfml_engine/sprite.h"
+#include "sfml_engine/texture.h"
 #include <engine/prefab.h>
+
+namespace sf {
+class Event;
+}
 
 namespace editor
 {
@@ -72,36 +77,36 @@ public:
     neko::Scale2dManager& GetScaleManager();
     neko::Rotation2dManager& GetRotationManager();
     EditorSceneManager& GetSceneManager();
-    neko::BodyDef2dManager& GetBodyDefManager();
-    neko::SpriteManager& GetSpriteManager();
-    neko::TextureManager& GetTextureManager();
-    neko::SpineManager& GetSpineManager();
-    neko::Transform2dManager& GetTransformManager();
+    neko::box2d::BodyDef2dManager& GetBodyDefManager();
+    neko::sfml::SpriteManager& GetSpriteManager();
+    neko::sfml::TextureManager& GetTextureManager();
+    neko::sfml::SpineManager& GetSpineManager();
+    neko::sfml::SfmlTransform2dManager& GetTransformManager();
     ColliderDefManager& GetColliderDefManager();
     EditorPrefabManager& GetPrefabManager();
 
     Previewer& GetPreviewer();
 
-    void OnEvent(sf::Event& event) override;
+    void OnEvent(sf::Event& event);
     void SaveSceneEvent();
     void SavePrefabEvent();
 
 private:
     neko::EntityManager entityManager_;
     EntityViewer entityViewer_;
-    neko::TextureManager textureManager_;
+    neko::sfml::TextureManager textureManager_;
     EditorPrefabManager prefabManager_;
 
-    neko::SpineManager spineManager_;
-    neko::SpriteManager spriteManager_;
+    neko::sfml::SpineManager spineManager_;
+    neko::sfml::SpriteManager spriteManager_;
 
-    neko::GraphicsManager graphicsManager_;
+    neko::sfml::SfmlGraphicsManager graphicsManager_;
     sf::RenderTexture sceneRenderTexture_;
     SceneViewer sceneViewer_;
 
     EditorSceneManager sceneManager_;
 
-    neko::BodyDef2dManager bodyDefManager_;
+    neko::box2d::BodyDef2dManager bodyDefManager_;
     ColliderDefManager colliderDefManager_;
 
 
@@ -112,7 +117,7 @@ private:
     ImGui::FileBrowser fileDialog_;
     FileOperation fileOperationStatus_ = FileOperation::NONE;
     EditorMode editorMode_ = EditorMode::SceneMode;
-    neko::Transform2dManager transformManager_;
+    neko::sfml::SfmlTransform2dManager transformManager_;
 };
 
 }

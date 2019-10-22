@@ -434,6 +434,6 @@ add_neko_application(CityBuilder ${CMAKE_SOURCE_DIR}/main/city_builder/ sfml_eng
 #Splash
 add_neko_executable(SplashDebug ${CMAKE_SOURCE_DIR}/main/SplashDebug.cpp sfml_engine)
 #NekoEditor
-add_neko_executable(NekoEditor2d ${CMAKE_SOURCE_DIR}/main/neko_editor2d sfml_engine)
+add_neko_application(NekoEditor2d ${CMAKE_SOURCE_DIR}/main/neko_editor2d sfml_engine)
 #Network Prediction Simulation
 add_neko_application(NetPredictionSimulation ${CMAKE_SOURCE_DIR}/main/net_prediction_simulation sfml_engine)

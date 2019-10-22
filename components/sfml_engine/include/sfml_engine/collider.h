@@ -28,7 +28,7 @@
 #include "engine/entity.h"
 #include "Box2D/Dynamics/b2WorldCallbacks.h"
 
-namespace neko
+namespace neko::box2d
 {
 
 class MainEngine;
@@ -46,10 +46,10 @@ struct Collider
 /**
  * \brief override the default box2d contact listener and communicate directly to the MainEngine
  */
-class CollisionListener : public b2ContactListener
+class ContactListener : public b2ContactListener
 {
 public:
-    ~CollisionListener() override;
+    ~ContactListener() = default;
 
     void BeginContact(b2Contact* contact) override;
 

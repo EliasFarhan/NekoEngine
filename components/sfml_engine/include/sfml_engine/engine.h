@@ -4,6 +4,11 @@
 #include "engine/engine.h"
 #include "sfml_engine/input.h"
 #include "sfml_engine/graphics.h"
+
+namespace neko::box2d
+{
+struct Collider;
+}
 namespace sf
 {
 class Event;
@@ -13,20 +18,32 @@ namespace neko::sfml
 class SfmlBasicEngine : public BasicEngine
 {
 public:
-    using BasicEngine::BasicEngine;
+	using BasicEngine::BasicEngine;
 
-    void Init() override;
+	void Init() override;
 
-    void Update(float dt) override;
+	void Update(float dt) override;
 
-    void Destroy() override;
+	void Destroy() override;
 
-    void OnEvent(sf::Event& event);
+	void OnEvent(sf::Event& event);
 protected:
-    std::unique_ptr<sf::RenderWindow> window_ = nullptr;
-    MouseManager mouseManager_;
-    KeyboardManager keyboardManager_;
+	std::unique_ptr<sf::RenderWindow> window_ = nullptr;
+	MouseManager mouseManager_;
+	KeyboardManager keyboardManager_;
 
-    SfmlGraphicsManager graphicsManager_;
+	SfmlGraphicsManager graphicsManager_;
+	Delegate<const box2d::Collider*, const box2d::Collider*> contactBeginDelegate_;
+	Delegate<const box2d::Collider*, const box2d::Collider*> contactEndDelegate_;
+};
+
+class SfmlFullEngine : public SfmlBasicEngine
+{
+public:
+	void OnBeginContact(const box2d::Collider* collider1, const box2d::Collider* collider2);
+	void OnEndContact(const box2d::Collider* collider1, const box2d::Collider* collider2);
+protected:
+	box2d::Physics2dManager physics2dManager_;
+	box2d::ContactListener contactListener_;
 };
 }

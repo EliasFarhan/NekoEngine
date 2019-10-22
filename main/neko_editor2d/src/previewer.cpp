@@ -23,7 +23,7 @@
  SOFTWARE.
  */
 #include <tools/previewer.h>
-#include <graphics/spine.h>
+#include <sfml_engine/spine.h>
 #include <imgui.h>
 #include <imgui-SFML.h>
 
@@ -107,7 +107,7 @@ void Previewer::Update(float dt)
 	}
 }
 
-void Previewer::SetSpineAnimation(neko::BasicSpineDrawable* spineDrawablePtr)
+void Previewer::SetSpineAnimation(neko::sfml::BasicSpineDrawable* spineDrawablePtr)
 {
 	spineDrawable_.atlas = spineDrawablePtr->atlas;
 	spineDrawable_.skeletonData = spineDrawablePtr->skeletonData;

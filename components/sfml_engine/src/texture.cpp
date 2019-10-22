@@ -137,7 +137,7 @@ const sf::Texture* TextureManager::GetTexture(const Index index) const
     return &textures_[index];
 }
 
-std::string TextureManager::GetTexturePath(const Index index) const
+const std::string_view TextureManager::GetTexturePath(const Index index) const
 {
     if(index == INVALID_INDEX)
         return "None";

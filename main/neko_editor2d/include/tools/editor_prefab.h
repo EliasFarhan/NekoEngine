@@ -25,6 +25,7 @@
  */
 
 #include <engine/prefab.h>
+#include "SFML/Graphics/Rect.hpp"
 
 namespace editor
 {

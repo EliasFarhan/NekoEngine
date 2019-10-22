@@ -28,7 +28,7 @@
 #include <sfml_engine/spine.h>
 
 
-namespace neko
+namespace neko::sfml
 {
 struct BasicSpineDrawable;
 }
@@ -45,12 +45,12 @@ class Previewer
 public:
     void Update(float dt);
 
-    void SetSpineAnimation(neko::BasicSpineDrawable* spineDrawablePtr);
+    void SetSpineAnimation(neko::sfml::BasicSpineDrawable* spineDrawablePtr);
 
     virtual ~Previewer();
 
 private:
-    neko::BasicSpineDrawable spineDrawable_;
+    neko::sfml::BasicSpineDrawable spineDrawable_;
     PreviewStatus status_ = PreviewStatus::None;
     sf::RenderTexture previewTexture_;
 };

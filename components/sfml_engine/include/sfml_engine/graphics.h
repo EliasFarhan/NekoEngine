@@ -14,7 +14,7 @@ public:
     const sf::Drawable* GetDrawable() const;
     void SetDrawable(sf::Drawable* drawable);
 private:
-    sf::Drawable* drawable_;
+    sf::Drawable* drawable_ = nullptr;
     sf::RenderStates states_ = sf::RenderStates::Default;
 };
 

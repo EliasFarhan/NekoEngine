@@ -96,4 +96,13 @@ void SfmlBasicEngine::OnEvent(sf::Event& event)
     }
 }
 
+void SfmlFullEngine::OnBeginContact(const box2d::Collider* collider1, const box2d::Collider* collider2)
+{
+	contactBeginDelegate_.Execute(collider1, collider2);
+}
+
+void SfmlFullEngine::OnEndContact(const box2d::Collider* collider1, const box2d::Collider* collider2)
+{
+	contactEndDelegate_.Execute(collider1, collider2);
+}
 }

@@ -22,26 +22,25 @@
  SOFTWARE.
  */
 #include <sfml_engine/collider.h>
+#include <sfml_engine/engine.h>
 #include <Box2D/Box2D.h>
 #include <engine/engine.h>
 
-namespace neko
+namespace neko::box2d
 {
-CollisionListener::~CollisionListener()
-{
-}
 
-void CollisionListener::BeginContact(b2Contact* contact)
+
+void ContactListener::BeginContact(b2Contact* contact)
 {
 	const auto* colliderA = static_cast<Collider*>(contact->GetFixtureA()->GetUserData());
 	const auto* colliderB = static_cast<Collider*>(contact->GetFixtureB()->GetUserData());
-	//BasicEngine::GetInstance()->OnBeginContact(colliderA, colliderB);
+	BasicEngine::GetInstance<sfml::SfmlFullEngine>()->OnBeginContact(colliderA, colliderB);
 }
 
-void CollisionListener::EndContact(b2Contact* contact)
+void ContactListener::EndContact(b2Contact* contact)
 {
 	const auto* colliderA = static_cast<Collider*>(contact->GetFixtureA()->GetUserData());
 	const auto* colliderB = static_cast<Collider*>(contact->GetFixtureB()->GetUserData());
-	//BasicEngine::GetInstance()->OnEndContact(colliderA, colliderB);
+	BasicEngine::GetInstance<sfml::SfmlFullEngine>()->OnEndContact(colliderA, colliderB);
 }
 }
