@@ -369,7 +369,7 @@ neko::sfml::SpineManager& NekoEditor::GetSpineManager()
     return spineManager_;
 }
 
-neko::sfml::SfmlTransform2dManager& NekoEditor::GetTransformManager()
+neko::sfml::Transform2dManager& NekoEditor::GetTransformManager()
 {
     return transformManager_;
 }

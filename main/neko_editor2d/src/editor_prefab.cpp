@@ -197,7 +197,7 @@ sf::FloatRect EditorPrefabManager::CalculatePrefabBound()
     if (entityManager.HasComponent(0u,
                                    neko::EntityMask(neko::NekoComponentType::POSITION2D)))
     {
-        const auto pos = neko::unit2pixel(transformManager.GetPositionManager().GetConstComponent(0u));
+        const auto pos = neko::unit2pixel(positionManager_.GetComponent(0u));
         entityRect.left = pos.x;
         entityRect.top = pos.y;
     }
@@ -233,7 +233,7 @@ sf::FloatRect EditorPrefabManager::CalculatePrefabBound()
         if (entityManager.HasComponent(entity, spriteEntityMask))
         {
             auto& spriteManager = nekoEditor_.GetSpriteManager();
-            auto& sprite = spriteManager.GetConstComponent(entity).sprite;
+            auto& sprite = spriteManager.GetComponent(entity).sprite;
             const auto rect = transform.transformRect(sprite.getGlobalBounds());
             updateEntityRect(rect);
 
@@ -241,21 +241,21 @@ sf::FloatRect EditorPrefabManager::CalculatePrefabBound()
         if (entityManager.HasComponent(entity, boxEntityMask))
         {
             auto& boxColliderManager = nekoEditor_.GetColliderDefManager().GetBoxColliderDefManager();
-            const auto& box = boxColliderManager.GetConstComponent(entity);
+            const auto& box = boxColliderManager.GetComponent(entity);
             const auto rect = transform.transformRect(box.shape.getGlobalBounds());
             updateEntityRect(rect);
         }
         if (entityManager.HasComponent(entity, circleEntityMask))
         {
             auto& circleColliderDefManager = nekoEditor_.GetColliderDefManager().GetCircleColliderDefManager();
-            const auto& circleCollider = circleColliderDefManager.GetConstComponent(entity);
+            const auto& circleCollider = circleColliderDefManager.GetComponent(entity);
             const auto rect = transform.transformRect(circleCollider.shape.getGlobalBounds());
             updateEntityRect(rect);
         }
         if (entityManager.HasComponent(entity, spineEntityMask))
         {
             auto& spineManager = nekoEditor_.GetSpineManager();
-            const auto& spineComp = spineManager.GetConstComponent(entity);
+            const auto& spineComp = spineManager.GetComponent(entity);
             if (spineComp.skeletonDrawable != nullptr)
             {
                 const auto rect = transform.transformRect(

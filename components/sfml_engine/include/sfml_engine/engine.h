@@ -4,6 +4,7 @@
 #include "engine/engine.h"
 #include "sfml_engine/input.h"
 #include "sfml_engine/graphics.h"
+#include "transform.h"
 
 namespace neko::box2d
 {
@@ -40,10 +41,17 @@ protected:
 class SfmlFullEngine : public SfmlBasicEngine
 {
 public:
+	explicit SfmlFullEngine(Configuration* config = nullptr);
 	void OnBeginContact(const box2d::Collider* collider1, const box2d::Collider* collider2);
 	void OnEndContact(const box2d::Collider* collider1, const box2d::Collider* collider2);
 protected:
+	Position2dManager position2dManager_;
+	Scale2dManager scale2dManager_;
+	Rotation2dManager rotation2dManager_;
+	Transform2dManager transform2dManager_;
+	
 	box2d::Physics2dManager physics2dManager_;
+	box2d::Body2dManager body2dManager_;
 	box2d::ContactListener contactListener_;
 };
 }

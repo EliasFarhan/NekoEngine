@@ -99,6 +99,11 @@ b2Body* Physics2dManager::CreateBody(b2BodyDef& bodyDef, b2FixtureDef* fixturesD
     return body;
 }
 
+void Physics2dManager::DestroyBody(b2Body* body) const
+{
+	world_->DestroyBody(body);
+}
+
 void Physics2dManager::AddCollider(const Collider& collider)
 {
     colliders_.push_back(collider);
@@ -107,6 +112,17 @@ void Physics2dManager::AddCollider(const Collider& collider)
 b2Body* Physics2dManager::GetBodyAt(Index i)
 {
     return bodies_[i];
+}
+
+Body2dManager::Body2dManager(Physics2dManager& physics2dManager) : 
+physics2dManager_(physics2dManager)
+{
+}
+
+void Body2dManager::DestroyComponent(EntityManager& entityManager, Entity entity)
+{
+	ComponentManager<b2Body*, ComponentType(NekoComponentType::BODY2D)>::DestroyComponent(entityManager, entity);
+	physics2dManager_.DestroyBody(components_[entity]);
 }
 
 void BodyDef2dManager::ParseComponentJson(json& componentJson, Entity entity)

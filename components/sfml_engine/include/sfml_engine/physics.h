@@ -59,6 +59,7 @@ public:
 
 
     b2Body* CreateBody(b2BodyDef& bodyDef, b2FixtureDef* fixturesDef, size_t fixturesNmb);
+    void DestroyBody(b2Body* body) const;
 
 
     /**
@@ -86,6 +87,12 @@ private:
 
 class Body2dManager : public ComponentManager<b2Body*, ComponentType(NekoComponentType::BODY2D)>
 {
+public:
+	Body2dManager(Physics2dManager& physics2dManager);
+
+	void DestroyComponent(EntityManager& entityManager, Entity entity) override;
+private:
+	Physics2dManager& physics2dManager_;
 };
 
 class BodyDef2dManager : public ComponentManager<b2BodyDef, ComponentType(NekoComponentType::BODY2D)>

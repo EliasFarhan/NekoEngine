@@ -25,5 +25,8 @@
 
 namespace neko
 {
-	
+	class Rect
+	{
+		
+	};
 }

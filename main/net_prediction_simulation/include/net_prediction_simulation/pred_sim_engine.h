@@ -53,7 +53,7 @@ private:
     ClientSimSystem client_;
     Globals globals_;
     neko::EntityManager entityManager_;
-    neko::sfml::SfmlTransform2dManager transformManager_;
+    neko::sfml::Transform2dManager transformManager_;
     neko::sfml::ConvexShapeManager shapeManager_;
     VelocityManager velocitiesManager_;
 };

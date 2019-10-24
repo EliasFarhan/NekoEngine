@@ -26,6 +26,7 @@
 #include <engine/log.h>
 #include <tools/neko_editor.h>
 #include <utilities/file_utility.h>
+#include "utilities//json_utility.h"
 
 
 namespace editor

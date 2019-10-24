@@ -40,6 +40,7 @@
 #include "sfml_engine/sprite.h"
 #include "sfml_engine/texture.h"
 #include <engine/prefab.h>
+#include "sfml_engine/engine.h"
 
 namespace sf {
 class Event;
@@ -60,7 +61,7 @@ enum class EditorMode : std::uint8_t
     SceneMode,
     PrefabMode
 };
-class NekoEditor : public neko::BasicEngine
+class NekoEditor : public neko::sfml::SfmlBasicEngine
 {
 public:
     NekoEditor();
@@ -81,7 +82,7 @@ public:
     neko::sfml::SpriteManager& GetSpriteManager();
     neko::sfml::TextureManager& GetTextureManager();
     neko::sfml::SpineManager& GetSpineManager();
-    neko::sfml::SfmlTransform2dManager& GetTransformManager();
+    neko::sfml::Transform2dManager& GetTransformManager();
     ColliderDefManager& GetColliderDefManager();
     EditorPrefabManager& GetPrefabManager();
 
@@ -117,7 +118,7 @@ private:
     ImGui::FileBrowser fileDialog_;
     FileOperation fileOperationStatus_ = FileOperation::NONE;
     EditorMode editorMode_ = EditorMode::SceneMode;
-    neko::sfml::SfmlTransform2dManager transformManager_;
+    neko::sfml::Transform2dManager transformManager_;
 };
 
 }

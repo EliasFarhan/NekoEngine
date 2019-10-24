@@ -96,6 +96,13 @@ void SfmlBasicEngine::OnEvent(sf::Event& event)
     }
 }
 
+SfmlFullEngine::SfmlFullEngine(Configuration* config) :
+SfmlBasicEngine(config),
+transform2dManager_(position2dManager_, scale2dManager_, rotation2dManager_),
+body2dManager_(physics2dManager_)
+{
+}
+
 void SfmlFullEngine::OnBeginContact(const box2d::Collider* collider1, const box2d::Collider* collider2)
 {
 	contactBeginDelegate_.Execute(collider1, collider2);

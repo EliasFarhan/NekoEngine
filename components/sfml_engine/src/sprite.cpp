@@ -86,7 +86,7 @@ void SpriteManager::CopyAllTransformPositions(EntityManager& entityManager, Posi
         if(entityManager.HasComponent(entity, entityMask) and
         !entityManager.HasComponent(entity, neko::EntityMask(neko::NekoComponentType::TRANSFORM2D)))
         {
-            components_[entity].sprite.setPosition(positionManager.GetComponent(entity));
+            components_[entity].sprite.setPosition(unit2pixel(positionManager.GetComponent(entity)));
         }
     }
 }
@@ -157,7 +157,7 @@ json SpriteManager::SerializeComponentJson(Entity entity)
     return componentJson;
 }
 
-void SpriteManager::CopyAllTransforms(EntityManager& entityManager, SfmlTransform2dManager& transformManager)
+void SpriteManager::CopyAllTransforms(EntityManager& entityManager, Transform2dManager& transformManager)
 {
     const auto entityMask = EntityMask(NekoComponentType::TRANSFORM2D) | EntityMask(NekoComponentType::SPRITE2D);
     for(Entity entity = 0; entity < entityManager.GetEntitiesSize(); entity++)

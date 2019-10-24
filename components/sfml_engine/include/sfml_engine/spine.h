@@ -33,6 +33,8 @@
 
 namespace neko
 {
+class Rotation2dManager;
+class Position2dManager;
 
 class Scale2dManager;
 
@@ -40,11 +42,7 @@ namespace sfml
 {
 class SfmlGraphicsManager;
 
-class SfmlPosition2dManager;
-
-class SfmlRotation2dManager;
-
-class SfmlTransform2dManager;
+class Transform2dManager;
 
 struct BasicSpineDrawable : public SfmlRenderCommand
 {
@@ -99,13 +97,13 @@ public:
 
     void ParseComponentJson(json& componentJson, Entity entity) override;
 
-    void CopyAllTransforms(EntityManager& entityManager, SfmlTransform2dManager& transformManager);
+    void CopyAllTransforms(EntityManager& entityManager, Transform2dManager& transformManager);
 
-    void CopyAllTransformPositions(EntityManager& entityManager, SfmlPosition2dManager& position2Manager);
+    void CopyAllTransformPositions(EntityManager& entityManager, Position2dManager& position2Manager);
 
     void CopyAllTransformScales(EntityManager& entityManager, Scale2dManager& scale2DManager);
 
-    void CopyAllTransformAngles(EntityManager& entityManager, SfmlRotation2dManager& angle2DManager);
+    void CopyAllTransformAngles(EntityManager& entityManager, Rotation2dManager& angle2DManager);
 
     void PushAllCommands(EntityManager& entityManager, SfmlGraphicsManager& graphicsManager);
 

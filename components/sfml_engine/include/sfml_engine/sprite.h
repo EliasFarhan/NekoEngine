@@ -61,7 +61,7 @@ public:
 
     void CopyLayer(int layer, size_t start, size_t length=1);
 
-    void CopyAllTransforms(EntityManager& entityManager, SfmlTransform2dManager& transformManager);
+    void CopyAllTransforms(EntityManager& entityManager, Transform2dManager& transformManager);
     void CopyAllTransformPositions(EntityManager& entityManager, Position2dManager& positionManager);
 
     void CopyAllTransformScales(EntityManager& entityManager, Scale2dManager& scaleManager);

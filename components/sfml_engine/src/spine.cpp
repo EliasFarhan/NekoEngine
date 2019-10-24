@@ -2,6 +2,7 @@
 #include "engine/log.h"
 #include <graphics/graphics.h>
 #include <sfml_engine/transform.h>
+#include "engine/engine.h"
 
 
 namespace neko::sfml
@@ -146,7 +147,7 @@ void SpineManager::ParseComponentJson(json& componentJson, Entity entity)
 
 }
 
-void SpineManager::CopyAllTransformPositions(EntityManager& entityManager, SfmlPosition2dManager& position2Manager)
+void SpineManager::CopyAllTransformPositions(EntityManager& entityManager, Position2dManager& position2Manager)
 {
     EntityMask entityMask = EntityMask(NekoComponentType::POSITION2D) | EntityMask(NekoComponentType::SPINE_ANIMATION);
 
@@ -155,7 +156,7 @@ void SpineManager::CopyAllTransformPositions(EntityManager& entityManager, SfmlP
         if (entityManager.HasComponent(entity, entityMask))
         {
             const auto& pos = position2Manager.GetComponent(entity);
-            components_[entity].SetPosition(pos);
+            components_[entity].SetPosition(unit2pixel(pos));
         }
     }
 }
@@ -170,12 +171,12 @@ void SpineManager::CopyAllTransformScales(EntityManager& entityManager, Scale2dM
         if (entityManager.HasComponent(entity, entityMask))
         {
             const auto& scale = scale2DManager.GetComponent(entity);
-            components_[entity].transform = components_[entity].transform.scale(scale, components_[entity].GetPosition());
+            components_[entity].transform = components_[entity].transform.scale(sf::Vector2f(scale), sf::Vector2f(components_[entity].GetPosition()));
         }
     }
 }
 
-void SpineManager::CopyAllTransformAngles(EntityManager& entityManager, SfmlRotation2dManager& angle2DManager)
+void SpineManager::CopyAllTransformAngles(EntityManager& entityManager, Rotation2dManager& angle2DManager)
 {
     EntityMask entityMask = EntityMask(NekoComponentType::ROTATION2D) |
                             EntityMask(NekoComponentType::SPINE_ANIMATION);
@@ -185,7 +186,7 @@ void SpineManager::CopyAllTransformAngles(EntityManager& entityManager, SfmlRota
         if (entityManager.HasComponent(entity, entityMask))
         {
             const auto& angle = angle2DManager.GetComponent(entity);
-            components_[entity].transform = components_[entity].transform.rotate(angle, components_[entity].GetPosition());
+            components_[entity].transform = components_[entity].transform.rotate(angle, sf::Vector2f(components_[entity].GetPosition()));
         }
     }
 }
@@ -228,7 +229,7 @@ SpineDrawableInfo& SpineManager::GetInfo(Entity entity)
     return infos_[entity];
 }
 
-void SpineManager::CopyAllTransforms(EntityManager& entityManager, SfmlTransform2dManager& transformManager)
+void SpineManager::CopyAllTransforms(EntityManager& entityManager, Transform2dManager& transformManager)
 {
     const auto entityMask = EntityMask(NekoComponentType::TRANSFORM2D) | EntityMask(NekoComponentType::SPINE_ANIMATION);
     for(Entity entity = 0; entity < entityManager.GetEntitiesSize(); entity++)

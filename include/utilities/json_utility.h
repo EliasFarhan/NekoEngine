@@ -28,13 +28,10 @@
 #include <memory>
  //Externals includes
 #include <json.hpp>
+#include "mathematics/vector.h"
+#include "mathematics/rect.h"
 
 using json = nlohmann::json;
-
-#ifdef USE_SFML
-#include <SFML/System/Vector2.hpp>
-#include <SFML/Graphics/Rect.hpp>
-#endif
 
 namespace neko
 {
@@ -45,8 +42,9 @@ bool CheckJsonExists(const json& jsonObject, std::string parameterName);
 bool CheckJsonParameter(const json& jsonObject, std::string parameterName, json::value_t expectedType);
 
 bool CheckJsonNumber(const json& jsonObject, std::string parameterName);
-#ifdef USE_SFML
+Vec2f GetVectorFromJson(const json& jsonObject, std::string parameterName);
 
-#endif
+
+Rect GetRectFromJson(const json& jsonObject, std::string parameterName);
 json LoadJson(const std::string_view jsonPath);
 }

@@ -63,8 +63,6 @@ namespace ImGui
         // set selected filename to empty
         void ClearSelected();
 
-        void SetTypeFilters(const std::vector<const char*> &typeFilters);
-
     private:
 
         class ScopeGuard
@@ -80,10 +78,6 @@ namespace ImGui
 
         void SetPwdUncatched(const std::filesystem::path &pwd);
 
-#ifdef _WIN32
-        static std::uint32_t GetDrivesBitMask();
-#endif
-
         ImGuiFileBrowserFlags flags_;
 
         std::string title_;
@@ -96,18 +90,14 @@ namespace ImGui
 
         std::string statusStr_;
 
-        std::vector<const char*> typeFilters_;
-        int typeFilterIndex_;
-
         std::filesystem::path pwd_;
         std::string selectedFilename_;
 
         struct FileRecord
         {
-            bool isDir = false;
+            bool isDir;
             std::string name;
             std::string showName;
-            std::string extension;
         };
         std::vector<FileRecord> fileRecords_;
 
@@ -117,10 +107,6 @@ namespace ImGui
 
         std::string openNewDirLabel_;
         std::unique_ptr<std::array<char, INPUT_NAME_BUF_SIZE>> newDirNameBuf_;
-
-#ifdef _WIN32
-        uint32_t drives_;
-#endif
     };
 } // namespace ImGui
 
@@ -135,13 +121,6 @@ inline ImGui::FileBrowser::FileBrowser(ImGuiFileBrowserFlags flags)
     inputNameBuf_->at(0) = '\0';
     SetTitle("file browser");
     SetPwd(std::filesystem::current_path());
-
-    typeFilters_.clear();
-    typeFilterIndex_ = 0;
-
-#ifdef _WIN32
-    drives_ = GetDrivesBitMask();
-#endif
 }
 
 inline ImGui::FileBrowser::FileBrowser(const FileBrowser &copyFrom)
@@ -190,7 +169,6 @@ inline void ImGui::FileBrowser::Open()
     statusStr_ = std::string();
     openFlag_ = true;
     closeFlag_ = false;
-    GetDrivesBitMask();
 }
 
 inline void ImGui::FileBrowser::Close()
@@ -235,33 +213,6 @@ inline void ImGui::FileBrowser::Display()
     ScopeGuard endPopup([] { EndPopup(); });
 
     // display elements in pwd
-
-#ifdef _WIN32
-    char currentDrive = static_cast<char>(pwd_.c_str()[0]);
-    char driveStr[] = { currentDrive, ':', '\0' };
-
-    PushItemWidth(4 * GetFontSize());
-    if(BeginCombo("##SelectDrive", driveStr))
-    {
-        ScopeGuard guard([&] { ImGui::EndCombo(); });
-        for(int i = 0; i < 26; ++i)
-        {
-            if(!(drives_ & (1 << i)))
-                continue;
-            char driveCh = static_cast<char>('A' + i);
-            char selectableStr[] = { driveCh, ':', '\0' };
-            bool selected = currentDrive == driveCh;
-            if(Selectable(selectableStr, selected) && !selected)
-            {
-                char newPwd[] = { driveCh, ':', '\\', '\0' };
-                SetPwd(newPwd);
-            }
-        }
-    }
-    PopItemWidth();
-
-    SameLine();
-#endif
 
     int secIdx = 0, newPwdLastSecIdx = -1;
     for(auto &sec : pwd_)
@@ -342,14 +293,6 @@ inline void ImGui::FileBrowser::Display()
 
         for(auto &rsc : fileRecords_)
         {
-            if (!rsc.isDir && typeFilters_.size() > 0 &&
-                typeFilterIndex_ < typeFilters_.size() &&
-                !(rsc.extension == typeFilters_[typeFilterIndex_]))
-                continue;
-
-            if(!rsc.name.empty() && rsc.name[0] == '$')
-                continue;
-
             const bool selected = selectedFilename_ == rsc.name;
             if(Selectable(rsc.showName.c_str(), selected, ImGuiSelectableFlags_DontClosePopups))
             {
@@ -426,14 +369,6 @@ inline void ImGui::FileBrowser::Display()
         SameLine();
         Text("%s", statusStr_.c_str());
     }
-
-    if (!typeFilters_.empty())
-    {
-        SameLine();
-        PushItemWidth(8 * GetFontSize());
-        Combo("##Filters", &typeFilterIndex_, typeFilters_.data(), int(typeFilters_.size()));
-        PopItemWidth();
-    }
 }
 
 inline bool ImGui::FileBrowser::HasSelected() const noexcept
@@ -473,12 +408,6 @@ inline void ImGui::FileBrowser::ClearSelected()
     ok_ = false;
 }
 
-inline void ImGui::FileBrowser::SetTypeFilters(const std::vector<const char*> &typeFilters)
-{
-    typeFilters_ = typeFilters;
-    typeFilterIndex_ = 0;
-}
-
 inline void ImGui::FileBrowser::SetPwdUncatched(const std::filesystem::path &pwd)
 {
     fileRecords_ = { FileRecord{ true, "..", "[D] .." } };
@@ -498,8 +427,6 @@ inline void ImGui::FileBrowser::SetPwdUncatched(const std::filesystem::path &pwd
         if(rcd.name.empty())
             continue;
 
-        rcd.extension = p.path().filename().extension().string();
-
         rcd.showName = (rcd.isDir ? "[D] " : "[F] ") + p.path().filename().u8string();
         fileRecords_.push_back(rcd);
     }
@@ -514,24 +441,3 @@ inline void ImGui::FileBrowser::SetPwdUncatched(const std::filesystem::path &pwd
     selectedFilename_ = std::string();
     (*inputNameBuf_)[0] = '\0';
 }
-
-#ifdef _WIN32
-
-inline std::uint32_t ImGui::FileBrowser::GetDrivesBitMask()
-{
-    char rootName[10];
-    DWORD mask = GetLogicalDrives();
-    uint32_t ret = 0;
-    for(int i = 0; i < 26; ++i)
-    {
-        if(!(mask & (1 << i)))
-            continue;
-        sprintf(rootName, "%c:\\", 'A' + i);
-        UINT type = GetDriveTypeA(rootName);
-        if(type == DRIVE_REMOVABLE || type == DRIVE_FIXED)
-            ret |= (1 << i);
-    }
-    return ret;
-}
-
-#endif
