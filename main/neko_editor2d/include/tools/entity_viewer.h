@@ -30,14 +30,15 @@
 #include <engine/transform.h>
 #include "editor_scene.h"
 
-namespace editor
+namespace neko::editor
 {
+class EditorPrefabManager;
 class NekoEditor;
 enum class EditorMode : std::uint8_t;
 class EntityViewer
 {
 public:
-    EntityViewer(NekoEditor& editor);
+    EntityViewer(NekoEditorExport& editorExport);
     void Update(EditorMode editorMode);
 
     void Reset()
@@ -50,9 +51,13 @@ private:
     void DrawEntityHierarchy(neko::Entity entity, size_t index, std::set<neko::Entity>& entitySet, bool draw,
                              bool destroy);
 
-    std::vector<neko::Entity> entities_;
+    std::vector<Entity> entities_;
     std::vector<std::string> entitiesName_;
+    Entity selectedEntity_ = neko::INVALID_ENTITY;
+    sfml::Transform2dManager& transformManager_;
+    EntityManager& entityManager_;
+    EditorSceneManager& sceneManager_;
+    EditorPrefabManager& prefabManager_;
     NekoEditor& nekoEditor_;
-    neko::Entity selectedEntity_ = neko::INVALID_ENTITY;
 };
 }

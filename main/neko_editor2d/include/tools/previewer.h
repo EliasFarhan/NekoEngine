@@ -32,7 +32,7 @@ namespace neko::sfml
 {
 struct BasicSpineDrawable;
 }
-namespace editor
+namespace neko::editor
 {
 enum class PreviewStatus
 {
@@ -45,7 +45,7 @@ class Previewer
 public:
     void Update(float dt);
 
-    void SetSpineAnimation(neko::sfml::BasicSpineDrawable* spineDrawablePtr);
+    void SetSpineAnimation(const sfml::BasicSpineDrawable* spineDrawablePtr);
 
     virtual ~Previewer();
 

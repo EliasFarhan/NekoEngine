@@ -25,7 +25,7 @@
  */
 #include <SFML/Graphics/RenderTexture.hpp>
 
-namespace editor
+namespace neko::editor
 {
 class SceneViewer
 {

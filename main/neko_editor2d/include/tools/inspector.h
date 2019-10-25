@@ -26,18 +26,55 @@
 #include <engine/entity.h>
 
 
-namespace editor
+namespace neko {
+namespace box2d {
+class BodyDef2dManager;
+}
+
+class Rotation2dManager;
+class Scale2dManager;
+class Position2dManager;
+}
+
+namespace neko {
+namespace sfml {
+class SpineManager;
+class TextureManager;
+class SpriteManager;
+struct Transform2dManager;
+}
+}
+
+namespace neko::editor
 {
+class CircleColliderDefManager;
+class PolygonColldierDefManager;
+class BoxColliderDefManager;
+class EditorSceneManager;
+struct NekoEditorExport;
 class NekoEditor;
 class Inspector
 {
 public:
-    explicit Inspector(NekoEditor& nekoEditor) : nekoEditor_(nekoEditor){ }
+	explicit Inspector(NekoEditorExport& nekoEditorExport);
 
     void BeginWindow();
     void ShowEntityInfo(neko::Entity entity) const;
     void EndWindow();
 private:
-    NekoEditor& nekoEditor_;
+    sfml::Transform2dManager& transformManager_;
+	EditorSceneManager& sceneManager_;
+	EntityManager& entityManager_;
+	Position2dManager& positionManager_;
+	Scale2dManager& scaleManager_;
+	Rotation2dManager& rotationManager_;
+	sfml::SpriteManager& spriteManager_;
+	sfml::TextureManager& textureManager_;
+	sfml::SpineManager& spineManager_;
+	NekoEditor& nekoEditor_;
+	box2d::BodyDef2dManager& bodyDefManager_;
+	BoxColliderDefManager& boxColliderDefManager_;
+	CircleColliderDefManager& circleColliderDefManager_;
+	PolygonColldierDefManager& polygonColliderDefManager_;
 };
 }

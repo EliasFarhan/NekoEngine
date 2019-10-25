@@ -27,7 +27,7 @@ public:
 
 	void Destroy() override;
 
-	void OnEvent(sf::Event& event);
+	virtual void OnEvent(sf::Event& event);
 protected:
 	std::unique_ptr<sf::RenderWindow> window_ = nullptr;
 	MouseManager mouseManager_;

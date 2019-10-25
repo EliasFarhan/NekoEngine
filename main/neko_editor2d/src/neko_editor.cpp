@@ -27,7 +27,7 @@
 #include <engine/log.h>
 #include <SFML/Window/Event.hpp>
 
-namespace editor
+namespace neko::editor
 {
 void NekoEditor::Init()
 {
@@ -319,71 +319,23 @@ void NekoEditor::Destroy()
     BasicEngine::Destroy();
 }
 
-neko::box2d::BodyDef2dManager& NekoEditor::GetBodyDefManager()
-{
-    return bodyDefManager_;
-}
-
-neko::EntityManager& NekoEditor::GetEntityManager()
-{
-    return entityManager_;
-}
-
-neko::Position2dManager& NekoEditor::GetPositionManager()
-{
-    return transformManager_.positionManager_;
-}
-
-neko::Scale2dManager& NekoEditor::GetScaleManager()
-{
-    return transformManager_.scaleManager_;
-}
-
-neko::Rotation2dManager& NekoEditor::GetRotationManager()
-{
-    return transformManager_.rotationManager_;
-}
-
-EditorSceneManager& NekoEditor::GetSceneManager()
-{
-    return sceneManager_;
-}
-
-neko::sfml::SpriteManager& NekoEditor::GetSpriteManager()
-{
-    return spriteManager_;
-}
-
-neko::sfml::TextureManager& NekoEditor::GetTextureManager()
-{
-    return textureManager_;
-}
-
 Previewer& NekoEditor::GetPreviewer()
 {
     return previewer_;
 }
 
-neko::sfml::SpineManager& NekoEditor::GetSpineManager()
-{
-    return spineManager_;
-}
 
-neko::sfml::Transform2dManager& NekoEditor::GetTransformManager()
-{
-    return transformManager_;
-}
 
 NekoEditor::NekoEditor()
-        : BasicEngine(),
-          entityViewer_(*this),
-          prefabManager_(*this),
-          spriteManager_(textureManager_),
-          sceneManager_(*this),
-          colliderDefManager_(*this),
-          inspector_(*this)
+	: SfmlBasicEngine(nullptr),
+	  entityViewer_(*this),
+	  prefabManager_(*this),
+	  spriteManager_(textureManager_),
+	  sceneManager_(*this),
+	  colliderDefManager_(*this),
+	  inspector_(*this),
+transformManager_(position2dManager_, scale2dManager_, rotation2dManager_)
 {
-
 }
 
 ColliderDefManager& NekoEditor::GetColliderDefManager()
@@ -449,7 +401,7 @@ EditorPrefabManager& NekoEditor::GetPrefabManager()
 
 void NekoEditor::OnEvent(sf::Event& event)
 {
-    BasicEngine::OnEvent(event);
+    SfmlBasicEngine::OnEvent(event);
     if (event.type != sf::Event::KeyPressed)
         return;
     switch (editorMode_)

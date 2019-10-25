@@ -46,7 +46,7 @@ namespace sf {
 class Event;
 }
 
-namespace editor
+namespace neko::editor
 {
 enum class FileOperation
 {
@@ -61,6 +61,28 @@ enum class EditorMode : std::uint8_t
     SceneMode,
     PrefabMode
 };
+
+struct NekoEditorExport
+{
+	EntityManager& entityManager;
+	Position2dManager& position2dManager;
+	Scale2dManager& scale2dManager;
+	Rotation2dManager& rotation2dManager;
+	sfml::Transform2dManager& transform2dManager;
+	EditorSceneManager& sceneManager;
+	box2d::BodyDef2dManager& bodyDef2dManager;
+	sfml::SpriteManager& spriteManager;
+	sfml::TextureManager& textureManager;
+	sfml::SpineManager& spineManager;
+	BoxColliderDefManager& boxColliderDefManager_;
+	CircleColliderDefManager& circleColliderDefManager_;
+	PolygonColldierDefManager& polygonColldierDefManager_;
+	ColliderDefManager& coll;
+	EditorPrefabManager& prefabManager;
+	NekoEditor& editor;
+};
+
+
 class NekoEditor : public neko::sfml::SfmlBasicEngine
 {
 public:
@@ -73,22 +95,11 @@ public:
 
     void SwitchEditorMode(EditorMode editorMode);
 
-    neko::EntityManager& GetEntityManager();
-    neko::Position2dManager& GetPositionManager();
-    neko::Scale2dManager& GetScaleManager();
-    neko::Rotation2dManager& GetRotationManager();
-    EditorSceneManager& GetSceneManager();
-    neko::box2d::BodyDef2dManager& GetBodyDefManager();
-    neko::sfml::SpriteManager& GetSpriteManager();
-    neko::sfml::TextureManager& GetTextureManager();
-    neko::sfml::SpineManager& GetSpineManager();
-    neko::sfml::Transform2dManager& GetTransformManager();
-    ColliderDefManager& GetColliderDefManager();
-    EditorPrefabManager& GetPrefabManager();
 
+    EditorPrefabManager& GetPrefabManager();
     Previewer& GetPreviewer();
 
-    void OnEvent(sf::Event& event);
+    void OnEvent(sf::Event& event) override;
     void SaveSceneEvent();
     void SavePrefabEvent();
 
@@ -98,16 +109,19 @@ private:
     neko::sfml::TextureManager textureManager_;
     EditorPrefabManager prefabManager_;
 
-    neko::sfml::SpineManager spineManager_;
-    neko::sfml::SpriteManager spriteManager_;
+    sfml::SpineManager spineManager_;
+    sfml::SpriteManager spriteManager_;
 
-    neko::sfml::SfmlGraphicsManager graphicsManager_;
+    sfml::SfmlGraphicsManager graphicsManager_;
     sf::RenderTexture sceneRenderTexture_;
     SceneViewer sceneViewer_;
 
     EditorSceneManager sceneManager_;
 
-    neko::box2d::BodyDef2dManager bodyDefManager_;
+    box2d::BodyDef2dManager bodyDefManager_;
+	BoxColliderDefManager boxColliderDefManager_;
+	CircleColliderDefManager circleColliderDefManager_;
+	PolygonColldierDefManager polygonColldierDefManager_;
     ColliderDefManager colliderDefManager_;
 
 
@@ -118,7 +132,31 @@ private:
     ImGui::FileBrowser fileDialog_;
     FileOperation fileOperationStatus_ = FileOperation::NONE;
     EditorMode editorMode_ = EditorMode::SceneMode;
-    neko::sfml::Transform2dManager transformManager_;
+
+	Position2dManager position2dManager_;
+	Scale2dManager scale2dManager_;
+	Rotation2dManager rotation2dManager_;
+    sfml::Transform2dManager transformManager_;
+
+	NekoEditorExport editorExport_
+	{
+		entityManager_,
+		position2dManager_,
+		scale2dManager_,
+		rotation2dManager_,
+		transformManager_,
+		sceneManager_,
+		bodyDefManager_,
+		spriteManager_,
+		textureManager_,
+		spineManager_,
+		boxColliderDefManager_,
+		circleColliderDefManager_,
+		polygonColldierDefManager_,
+		colliderDefManager_,
+		prefabManager_,
+		*this
+	};
 };
 
 }

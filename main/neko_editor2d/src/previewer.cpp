@@ -27,7 +27,7 @@
 #include <imgui.h>
 #include <imgui-SFML.h>
 
-namespace editor
+namespace neko::editor
 {
 
 void Previewer::Update(float dt)
@@ -107,7 +107,7 @@ void Previewer::Update(float dt)
 	}
 }
 
-void Previewer::SetSpineAnimation(neko::sfml::BasicSpineDrawable* spineDrawablePtr)
+void Previewer::SetSpineAnimation(const sfml::BasicSpineDrawable* spineDrawablePtr)
 {
 	spineDrawable_.atlas = spineDrawablePtr->atlas;
 	spineDrawable_.skeletonData = spineDrawablePtr->skeletonData;

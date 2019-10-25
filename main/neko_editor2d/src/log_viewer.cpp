@@ -26,7 +26,7 @@
 #include <engine/log.h>
 #include <imgui.h>
 
-namespace editor
+namespace neko::editor
 {
 
 void LogViewer::Update()

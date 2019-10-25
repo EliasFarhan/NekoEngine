@@ -7,11 +7,11 @@
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/ConvexShape.hpp>
 
-namespace neko
+namespace neko::sfml
 {
 class GraphicsManager;
 }
-namespace editor
+namespace neko::editor
 {
 class NekoEditor;
 template<class TDef, class TShape>
@@ -55,7 +55,8 @@ public:
 class PolygonColldierDefManager : public neko::ComponentManager
         <PolygonCollider, neko::ComponentType(neko::NekoComponentType::POLYGON_COLLIDER2D)>
 {
-
+public:
+	Index AddComponent(EntityManager& entityManager, Entity entity) override;
 };
 
 class ColliderDefManager
@@ -64,15 +65,13 @@ public:
     explicit ColliderDefManager(NekoEditor& nekoEditor);
     void PushAllCommands(neko::GraphicsManager& graphicsManager);
 
-    BoxColliderDefManager& GetBoxColliderDefManager();
-    CircleColliderDefManager& GetCircleColliderDefManager();
-    PolygonColldierDefManager& GetPolygonColliderDefManager();
+    
 private:
-    NekoEditor& nekoEditor_;
+   
 
-    BoxColliderDefManager boxColliderDefManager_;
-    CircleColliderDefManager circleColliderDefManager_;
-    PolygonColldierDefManager polygonColldierDefManager_;
+    BoxColliderDefManager& boxColliderDefManager_;
+    CircleColliderDefManager& circleColliderDefManager_;
+    PolygonColldierDefManager& polygonColldierDefManager_;
 
 
 

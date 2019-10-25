@@ -3,7 +3,7 @@
 #include <tools/neko_editor.h>
 #include <engine/transform.h>
 
-namespace editor
+namespace neko::editor
 {
 const static int physicsLayer = 100;
 const static float outlineThickness = 2.0f;
@@ -84,5 +84,9 @@ neko::Index CircleColliderDefManager::AddComponent(neko::EntityManager& entityMa
     auto& circleColliderDef = GetComponent(entity);
     circleColliderDef.shapeDef.m_radius = 1.0f;
     return index;
+}
+
+Index PolygonColldierDefManager::AddComponent(EntityManager& entityManager, Entity entity)
+{
 }
 }

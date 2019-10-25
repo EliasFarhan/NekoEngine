@@ -31,231 +31,226 @@
 #include <tools/neko_editor.h>
 #include <tools/editor_prefab.h>
 
-namespace editor
+namespace neko::editor
 {
 void EntityViewer::Update(EditorMode editorMode)
 {
-    auto& sceneManager = nekoEditor_.GetSceneManager();
-    auto& entityManager = nekoEditor_.GetEntityManager();
-    auto& transformManager = nekoEditor_.GetTransformManager();
-    entities_.clear();
-    entitiesName_.clear();
 
-    ImGui::Begin("Entity Viewer", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+	entities_.clear();
+	entitiesName_.clear();
 
-    const bool sceneOpen = ImGui::CollapsingHeader(editorMode == EditorMode::PrefabMode?"Prefab Edition Mode":"Scene", ImGuiTreeNodeFlags_DefaultOpen);
-    if (ImGui::BeginDragDropTarget())
-    {
-        ImGuiDragDropFlags target_flags = 0;
-        //target_flags |= ImGuiDragDropFlags_AcceptBeforeDelivery;    // Don't wait until the delivery (release mouse button on a target) to do something
-        target_flags |= ImGuiDragDropFlags_AcceptNoDrawDefaultRect; // Don't display the yellow rectangle
-        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DND_DEMO_NAME", target_flags))
-        {
-	        const neko::Entity moveFrom = *static_cast<const neko::Entity*>(payload->Data);
-	        const neko::Entity moveTo = neko::INVALID_ENTITY;
-            transformManager.SetTransformParent(moveFrom, moveTo);
-        }
-        ImGui::EndDragDropTarget();
-    }
+	ImGui::Begin("Entity Viewer", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 
-    for (neko::Entity entity = 0; entity < entityManager.GetEntitiesSize(); entity++)
-    {
-        if (entityManager.EntityExists(entity))
-        {
-            entities_.push_back(entity);
-            entitiesName_.push_back(sceneManager.GetCurrentScene().entitiesNames[entity]);
-        }
-    }
+	const bool sceneOpen = ImGui::CollapsingHeader(editorMode == EditorMode::PrefabMode ? "Prefab Edition Mode" : "Scene", ImGuiTreeNodeFlags_DefaultOpen);
+	if (ImGui::BeginDragDropTarget())
+	{
+		ImGuiDragDropFlags target_flags = 0;
+		//target_flags |= ImGuiDragDropFlags_AcceptBeforeDelivery;    // Don't wait until the delivery (release mouse button on a target) to do something
+		target_flags |= ImGuiDragDropFlags_AcceptNoDrawDefaultRect; // Don't display the yellow rectangle
+		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DND_DEMO_NAME", target_flags))
+		{
+			const neko::Entity moveFrom = *static_cast<const neko::Entity*>(payload->Data);
+			const neko::Entity moveTo = neko::INVALID_ENTITY;
+			transformManager_.SetTransformParent(moveFrom, moveTo);
+		}
+		ImGui::EndDragDropTarget();
+	}
 
-    std::set<neko::Entity> entitiesSet;
-    for (size_t i = 0; i < entities_.size(); i++)
-    {
+	for (neko::Entity entity = 0; entity < entityManager_.GetEntitiesSize(); entity++)
+	{
+		if (entityManager_.EntityExists(entity))
+		{
+			entities_.push_back(entity);
+			entitiesName_.push_back(sceneManager_.GetCurrentScene().entitiesNames[entity]);
+		}
+	}
 
-        if(transformManager.GetParentEntity(entities_[i]) == neko::INVALID_ENTITY and
+	std::set<neko::Entity> entitiesSet;
+	for (size_t i = 0; i < entities_.size(); i++)
+	{
+
+		if (transformManager_.GetParentEntity(entities_[i]) == neko::INVALID_ENTITY and
 			std::find(entitiesSet.cbegin(), entitiesSet.cend(), entities_[i]) == entitiesSet.end())
-        {
-            DrawEntityHierarchy(entities_[i], i, entitiesSet, sceneOpen, false);
-        }
-    }
+		{
+			DrawEntityHierarchy(entities_[i], i, entitiesSet, sceneOpen, false);
+		}
+	}
 
-    if (ImGui::Button("Add Entity"))
-    {
-        auto entity = entityManager.CreateEntity();
-        auto& entitiesName = sceneManager.GetCurrentScene().entitiesNames;
-        ResizeIfNecessary(entitiesName, entity, std::string());
-        entitiesName[entity] = std::string("Entity ") + std::to_string(entity);
-        transformManager.SetTransformParent(entity,
-                editorMode == EditorMode::SceneMode?neko::INVALID_ENTITY:0);
-    }
+	if (ImGui::Button("Add Entity"))
+	{
+		auto entity = entityManager_.CreateEntity();
+		auto& entitiesName = sceneManager_.GetCurrentScene().entitiesNames;
+		ResizeIfNecessary(entitiesName, entity, std::string());
+		entitiesName[entity] = std::string("Entity ") + std::to_string(entity);
+		transformManager_.SetTransformParent(entity,
+			editorMode == EditorMode::SceneMode ? neko::INVALID_ENTITY : 0);
+	}
 
-    ImGui::End();
+	ImGui::End();
 }
 
 void EntityViewer::DrawEntityHierarchy(neko::Entity entity,
-        size_t index,
-        std::set<neko::Entity>& entitySet,
-        bool draw,
-        bool destroy)
+	size_t index,
+	std::set<neko::Entity>& entitySet,
+	bool draw,
+	bool destroy)
 {
-    auto& transformManager = nekoEditor_.GetTransformManager();
-    bool nodeOpen = draw;
-    bool destroyEntity = destroy;
-    bool createEntity = false;
-    bool leaf = transformManager.FindNextChild(entity) == neko::INVALID_ENTITY;
+	bool nodeOpen = draw;
+	bool destroyEntity = destroy;
+	bool createEntity = false;
+	bool leaf = transformManager_.FindNextChild(entity) == neko::INVALID_ENTITY;
 
-    if(draw)
-    {
-        ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_DefaultOpen;
-        if(!leaf)
-        {
-            nodeFlags |= ImGuiTreeNodeFlags_OpenOnArrow;
-        }
-        else
-        {
-            nodeFlags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
-        }
-        if (entity == selectedEntity_)
-        {
-            nodeFlags |= ImGuiTreeNodeFlags_Selected;
-        }
-        ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.7f);
-        nodeOpen = ImGui::TreeNodeEx((void*) (intptr_t) entities_[index], nodeFlags, "%s",
-                                     entitiesName_[index].c_str());
-        ImGui::PopItemWidth();
-        if (ImGui::IsItemClicked())
-            selectedEntity_ = entity;
+	if (draw)
+	{
+		ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_DefaultOpen;
+		if (!leaf)
+		{
+			nodeFlags |= ImGuiTreeNodeFlags_OpenOnArrow;
+		}
+		else
+		{
+			nodeFlags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+		}
+		if (entity == selectedEntity_)
+		{
+			nodeFlags |= ImGuiTreeNodeFlags_Selected;
+		}
+		ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.7f);
+		nodeOpen = ImGui::TreeNodeEx((void*)(intptr_t)entities_[index], nodeFlags, "%s",
+			entitiesName_[index].c_str());
+		ImGui::PopItemWidth();
+		if (ImGui::IsItemClicked())
+			selectedEntity_ = entity;
 
-        const std::string entityPopupName = "Entity Popup "+std::to_string(entity);
-        if(ImGui::IsItemClicked(1))
-        {
-            logDebug("Left Clicked on Entity: "+std::to_string(entity));
+		const std::string entityPopupName = "Entity Popup " + std::to_string(entity);
+		if (ImGui::IsItemClicked(1))
+		{
+			logDebug("Left Clicked on Entity: " + std::to_string(entity));
 
-            ImGui::OpenPopup(entityPopupName.c_str());
-        }
+			ImGui::OpenPopup(entityPopupName.c_str());
+		}
 
-        if(ImGui::BeginPopup(entityPopupName.c_str()))
-        {
-            const std::string entityMenuName = "Entity Menu "+std::to_string(entity);
-            enum class EntityMenuComboItem
-            {
-                ADD_EMPTY_ENTITY,
-                DELETE_ENTITY,
-                MAKE_PREFAB,
-                LENGTH
-            };
-            const char* entityMenuComboItemName[int(EntityMenuComboItem::LENGTH)] = {
-                    "Add Empty Entity",
-                    "Delete Entity",
-                    "Make Prefab"
-            };
+		if (ImGui::BeginPopup(entityPopupName.c_str()))
+		{
+			const std::string entityMenuName = "Entity Menu " + std::to_string(entity);
+			enum class EntityMenuComboItem
+			{
+				ADD_EMPTY_ENTITY,
+				DELETE_ENTITY,
+				MAKE_PREFAB,
+				LENGTH
+			};
+			const char* entityMenuComboItemName[int(EntityMenuComboItem::LENGTH)] = {
+					"Add Empty Entity",
+					"Delete Entity",
+					"Make Prefab"
+			};
 
-            const auto entityComboName = entityMenuName + " Combo";
-            for(int i = 0 ; i < int(EntityMenuComboItem::LENGTH);i++)
-            {
-                const auto key = entityComboName+" "+entityMenuComboItemName[i];
-                ImGui::PushID(key.c_str());
-                if(ImGui::Selectable(entityMenuComboItemName[i]))
-                {
-                    const auto item = EntityMenuComboItem(i);
-                    switch (item)
-                    {
-                        case EntityMenuComboItem::ADD_EMPTY_ENTITY:
-                        {
-                            createEntity = true;
-                            break;
-                        }
-                        case EntityMenuComboItem::DELETE_ENTITY:
-                        {
-                            destroyEntity = true;
-                            break;
-                        }
-                        case EntityMenuComboItem::MAKE_PREFAB:
-                        {
-                            auto& prefabManager = nekoEditor_.GetPrefabManager();
-							auto& sceneManager = nekoEditor_.GetSceneManager();
-							auto& entityManager = nekoEditor_.GetEntityManager();
-                        	const auto newIndex = prefabManager.CreatePrefabFromEntity(entity);
-							sceneManager.AddComponent(entityManager, entity); //adding prefab
-							sceneManager.SetComponent(entity, newIndex);
-                            nekoEditor_.SwitchEditorMode(EditorMode::PrefabMode);
-                            prefabManager.SetCurrentPrefabIndex(newIndex);
-                            nekoEditor_.GetSceneManager().ClearScene();
-                            prefabManager.InstantiatePrefab(newIndex, nekoEditor_.GetEntityManager());
-                            break;
-                        }
-                        default:
-                            break;
-                    }
-                    ImGui::CloseCurrentPopup();
-                }
-                ImGui::PopID();
-            }
+			const auto entityComboName = entityMenuName + " Combo";
+			for (int i = 0; i < int(EntityMenuComboItem::LENGTH); i++)
+			{
+				const auto key = entityComboName + " " + entityMenuComboItemName[i];
+				ImGui::PushID(key.c_str());
+				if (ImGui::Selectable(entityMenuComboItemName[i]))
+				{
+					const auto item = EntityMenuComboItem(i);
+					switch (item)
+					{
+					case EntityMenuComboItem::ADD_EMPTY_ENTITY:
+					{
+						createEntity = true;
+						break;
+					}
+					case EntityMenuComboItem::DELETE_ENTITY:
+					{
+						destroyEntity = true;
+						break;
+					}
+					case EntityMenuComboItem::MAKE_PREFAB:
+					{
 
-            ImGui::EndPopup();
-        }
-        ImGuiDragDropFlags srcFlags = 0;
-        srcFlags |= ImGuiDragDropFlags_SourceNoDisableHover;     // Keep the source displayed as hovered
-        srcFlags |= ImGuiDragDropFlags_SourceNoHoldToOpenOthers; // Because our dragging is local, we disable the feature of opening foreign treenodes/tabs while dragging
+						const auto newIndex = prefabManager_.CreatePrefabFromEntity(entity);
+						sceneManager_.AddComponent(entityManager_, entity); //adding prefab
+						sceneManager_.SetComponent(entity, newIndex);
+						nekoEditor_.SwitchEditorMode(EditorMode::PrefabMode);
+						prefabManager_.SetCurrentPrefabIndex(newIndex);
+						sceneManager_.ClearScene();
+						prefabManager_.InstantiatePrefab(newIndex, entityManager_);
+						break;
+					}
+					default:
+						break;
+					}
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::PopID();
+			}
 
-        if (ImGui::BeginDragDropSource(srcFlags))
-        {
-            if (!(srcFlags & ImGuiDragDropFlags_SourceNoPreviewTooltip))
-            {
-                ImGui::Text("Moving Entity \"%s\"", entitiesName_[index].c_str());
-            }
-            ImGui::SetDragDropPayload("DND_DEMO_NAME", &entities_[index], sizeof(neko::Entity));
-            ImGui::EndDragDropSource();
-        }
-        if (ImGui::BeginDragDropTarget())
-        {
-            ImGuiDragDropFlags targetFlags = 0;
-            //target_flags |= ImGuiDragDropFlags_AcceptBeforeDelivery;    // Don't wait until the delivery (release mouse button on a target) to do something
-            targetFlags |= ImGuiDragDropFlags_AcceptNoDrawDefaultRect; // Don't display the yellow rectangle
-            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DND_DEMO_NAME", targetFlags))
-            {
-                neko::Entity moveFrom = *(const neko::Entity*) payload->Data;
-                neko::Entity moveTo = entities_[index];
-                transformManager.SetTransformParent(moveFrom, moveTo);
-            }
-            ImGui::EndDragDropTarget();
-        }
-    }
-    entitySet.emplace(entity);
-    if(destroyEntity)
-    {
-        auto& entityManager = nekoEditor_.GetEntityManager();
-        entityManager.DestroyEntity(entity);
-    }
-    auto entityChild = neko::INVALID_ENTITY;
-    do
-    {
-        auto& entityManager = nekoEditor_.GetEntityManager();
-        entityChild = transformManager.FindNextChild(entity, entityChild);
-        if(entityChild != neko::INVALID_ENTITY and entityManager.EntityExists(entityChild))
-        {
-            size_t childIndex = std::find(entities_.cbegin(), entities_.cend(), entityChild) - entities_.begin();
-            DrawEntityHierarchy(entityChild, childIndex, entitySet, nodeOpen, destroyEntity);
-        }
-    }
-    while (entityChild != neko::INVALID_ENTITY);
+			ImGui::EndPopup();
+		}
+		ImGuiDragDropFlags srcFlags = 0;
+		srcFlags |= ImGuiDragDropFlags_SourceNoDisableHover;     // Keep the source displayed as hovered
+		srcFlags |= ImGuiDragDropFlags_SourceNoHoldToOpenOthers; // Because our dragging is local, we disable the feature of opening foreign treenodes/tabs while dragging
 
-    if(createEntity)
-    {
-        auto& sceneManager = nekoEditor_.GetSceneManager();
-        auto& entityManager = nekoEditor_.GetEntityManager();
+		if (ImGui::BeginDragDropSource(srcFlags))
+		{
+			if (!(srcFlags & ImGuiDragDropFlags_SourceNoPreviewTooltip))
+			{
+				ImGui::Text("Moving Entity \"%s\"", entitiesName_[index].c_str());
+			}
+			ImGui::SetDragDropPayload("DND_DEMO_NAME", &entities_[index], sizeof(neko::Entity));
+			ImGui::EndDragDropSource();
+		}
+		if (ImGui::BeginDragDropTarget())
+		{
+			ImGuiDragDropFlags targetFlags = 0;
+			//target_flags |= ImGuiDragDropFlags_AcceptBeforeDelivery;    // Don't wait until the delivery (release mouse button on a target) to do something
+			targetFlags |= ImGuiDragDropFlags_AcceptNoDrawDefaultRect; // Don't display the yellow rectangle
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DND_DEMO_NAME", targetFlags))
+			{
+				neko::Entity moveFrom = *(const neko::Entity*) payload->Data;
+				neko::Entity moveTo = entities_[index];
+				transformManager_.SetTransformParent(moveFrom, moveTo);
+			}
+			ImGui::EndDragDropTarget();
+		}
+	}
+	entitySet.emplace(entity);
+	if (destroyEntity)
+	{
+		entityManager_.DestroyEntity(entity);
+	}
+	auto entityChild = neko::INVALID_ENTITY;
+	do
+	{
+		entityChild = transformManager_.FindNextChild(entity, entityChild);
+		if (entityChild != neko::INVALID_ENTITY and entityManager_.EntityExists(entityChild))
+		{
+			size_t childIndex = std::find(entities_.cbegin(), entities_.cend(), entityChild) - entities_.begin();
+			DrawEntityHierarchy(entityChild, childIndex, entitySet, nodeOpen, destroyEntity);
+		}
+	} while (entityChild != neko::INVALID_ENTITY);
 
-        auto newEntity = entityManager.CreateEntity();
-        auto& entitiesName = sceneManager.GetCurrentScene().entitiesNames;
-        ResizeIfNecessary(entitiesName, newEntity, std::string());
-        entitiesName[newEntity] = std::string("Entity ") + std::to_string(newEntity);
-        transformManager.SetTransformParent(newEntity, entity);
-    }
-    if(nodeOpen and !leaf)
-        ImGui::TreePop();
+	if (createEntity)
+	{
+
+
+		auto newEntity = entityManager_.CreateEntity();
+		auto& entitiesName = sceneManager_.GetCurrentScene().entitiesNames;
+		ResizeIfNecessary(entitiesName, newEntity, std::string());
+		entitiesName[newEntity] = std::string("Entity ") + std::to_string(newEntity);
+		transformManager_.SetTransformParent(newEntity, entity);
+	}
+	if (nodeOpen and !leaf)
+		ImGui::TreePop();
 }
 
-EntityViewer::EntityViewer(NekoEditor& editor) : nekoEditor_(editor)
+EntityViewer::EntityViewer(NekoEditorExport& editorExport) :
+	transformManager_(editorExport.transform2dManager),
+	entityManager_(editorExport.entityManager),
+	sceneManager_(editorExport.sceneManager),
+	prefabManager_(editorExport.prefabManager),
+	nekoEditor_(editorExport.editor)
 {
-
 }
 }

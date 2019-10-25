@@ -27,14 +27,26 @@
 #include <engine/prefab.h>
 #include "SFML/Graphics/Rect.hpp"
 
-namespace editor
+namespace neko {
+class Position2dManager;
+}
+
+namespace neko::sfml
 {
-class NekoEditor;
+class SpineManager;
+class Transform2dManager;
+class SpriteManager;
+}
+namespace neko::editor
+{
+class CircleColliderDefManager;
+class BoxColliderDefManager;
+struct NekoEditorExport;
 
 class EditorPrefabManager : public neko::PrefabManager
 {
 public:
-    explicit EditorPrefabManager(NekoEditor& editor);
+    explicit EditorPrefabManager(NekoEditorExport& editorExport);
     const std::string& GetCurrentPrefabPath() const;
     void SetCurrentPrefabPath(const std::string& currentPrefabPath);
     neko::Index GetCurrentPrefabIndex() const;
@@ -47,7 +59,14 @@ protected:
     void SavePrefab(const std::string_view path);
     std::string currentPrefabPath_ = "";
     neko::Index currentPrefabIndex_ = neko::INVALID_INDEX;
-    NekoEditor& nekoEditor_;
+    EntityManager& entityManager_;
+	sfml::Transform2dManager& transformManager_;
+	Position2dManager& position2dManager_;
+	sfml::SpriteManager& spriteManager_;
+
+	BoxColliderDefManager& boxColliderDefManager_;
+	CircleColliderDefManager& circleColliderDefManager_;
+	sfml::SpineManager& spineManager_;
 };
 
 }

@@ -27,7 +27,7 @@
 #include <imgui-SFML.h>
 #include <tools/neko_editor.h>
 
-namespace editor
+namespace neko::editor
 {
 
 

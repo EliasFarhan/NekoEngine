@@ -25,13 +25,34 @@
  */
 #include <engine/scene.h>
 #include <engine/component.h>
-namespace editor
+
+namespace neko
 {
-class NekoEditor;
+namespace box2d {
+class BodyDef2dManager;
+}
+
+class Scale2dManager;
+class PrefabManager;
+
+namespace sfml
+{
+struct Transform2dManager;
+class SpriteManager;
+class SpineManager;
+}
+
+class Rotation2dManager;
+class Position2dManager;
+}
+
+namespace neko::editor
+{
+class NekoEditorExport;
 class EditorSceneManager : public neko::SceneManager
 {
 public:
-    explicit EditorSceneManager(NekoEditor& nekoEditor) : nekoEditor_(nekoEditor){}
+	explicit EditorSceneManager(NekoEditorExport& editorExport);
 
     void ParseEntityJson(json& entityJson) override;
     void ParseComponentJson(json& componentJson, neko::Entity entity) override;
@@ -41,7 +62,7 @@ public:
     virtual json SerializeEntity(neko::Entity entity);
     virtual json SerializeScene();
 
-    void ClearScene();
+    void ClearScene() const;
     bool IsCurrentSceneTmp();
     void SaveCurrentScene();
     void LoadScene(std::string_view path);
@@ -50,9 +71,15 @@ public:
 protected:
 
     void SaveScene(std::string_view path);
-    NekoEditor& nekoEditor_;
-
-
+    Position2dManager& position2dManager_;
+	Rotation2dManager& rotation2dManager_;
+	EntityManager& entityManager_;
+	sfml::SpriteManager& spriteManager_;
+	sfml::SpineManager& spineManager_;
+	sfml::Transform2dManager& transformManager_;
+	PrefabManager& prefabManager_;
+	Scale2dManager& scaleManager_;
+	box2d::BodyDef2dManager& bodyDefManager_;
 };
 
 }

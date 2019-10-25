@@ -29,99 +29,104 @@
 #include "utilities//json_utility.h"
 
 
-namespace editor
+namespace neko::editor
 {
 
 const char* sceneTmpPath = "data/.tmp.scene";
 
 void EditorSceneManager::ParseComponentJson(json& componentJson, neko::Entity entity)
 {
-    auto& entityManager = nekoEditor_.GetEntityManager();
-    neko::NekoComponentType componentType = componentJson["component"];
-    switch (componentType)
-    {
-        case neko::NekoComponentType::POSITION2D:
-        {
-            auto& positionManager = nekoEditor_.GetPositionManager();
-            auto pos = neko::GetVectorFromJson(componentJson, "position");
-            positionManager.AddComponent(entityManager, entity);
-            positionManager.SetComponent(entity, pos);
-            break;
-        }
-        case neko::NekoComponentType::SCALE2D:
-        {
-            auto& scaleManager = nekoEditor_.GetScaleManager();
-            auto scale = neko::GetVectorFromJson(componentJson, "scale");
-            scaleManager.AddComponent(entityManager, entity);
-            scaleManager.SetComponent(entity, scale);
-            break;
-        }
-        case neko::NekoComponentType::ROTATION2D:
-        {
-            auto& angleManager = nekoEditor_.GetRotationManager();
-            angleManager.AddComponent(entityManager, entity);
-            angleManager.SetComponent(entity, componentJson["angle"]);
-            break;
-        }
-        case neko::NekoComponentType::SPRITE2D:
-        {
-            auto& spriteManager = nekoEditor_.GetSpriteManager();
-            spriteManager.AddComponent(entityManager, entity);
-            spriteManager.ParseComponentJson(componentJson, entity);
-            break;
-        }
-        case neko::NekoComponentType::SPINE_ANIMATION:
-        {
-            auto& spineManager = nekoEditor_.GetSpineManager();
-            spineManager.AddComponent(entityManager, entity);
-            spineManager.ParseComponentJson(componentJson, entity);
-            break;
-        }
-        case neko::NekoComponentType::BODY2D:
-        {
-            auto& bodyDefManager = nekoEditor_.GetBodyDefManager();
-            bodyDefManager.AddComponent(entityManager, entity);
-            bodyDefManager.ParseComponentJson(componentJson, entity);
-            break;
-        }
-        case neko::NekoComponentType::BOX_COLLIDER2D:
-            break;
-        case neko::NekoComponentType::CONVEX_SHAPE2D:
-            break;
-        default:
-            break;
-    }
+	const NekoComponentType componentType = componentJson["component"];
+	switch (componentType)
+	{
+	case NekoComponentType::POSITION2D:
+	{
+		auto pos = GetVectorFromJson(componentJson, "position");
+		position2dManager_.AddComponent(entityManager_, entity);
+		position2dManager_.SetComponent(entity, pos);
+		break;
+	}
+	case neko::NekoComponentType::SCALE2D:
+	{
+		auto scale = neko::GetVectorFromJson(componentJson, "scale");
+		scaleManager_.AddComponent(entityManager_, entity);
+		scaleManager_.SetComponent(entity, scale);
+		break;
+	}
+	case neko::NekoComponentType::ROTATION2D:
+	{
+		rotation2dManager_.AddComponent(entityManager_, entity);
+		rotation2dManager_.SetComponent(entity, componentJson["angle"]);
+		break;
+	}
+	case neko::NekoComponentType::SPRITE2D:
+	{
+		spriteManager_.AddComponent(entityManager_, entity);
+		spriteManager_.ParseComponentJson(componentJson, entity);
+		break;
+	}
+	case neko::NekoComponentType::SPINE_ANIMATION:
+	{
+		spineManager_.AddComponent(entityManager_, entity);
+		spineManager_.ParseComponentJson(componentJson, entity);
+		break;
+	}
+	case neko::NekoComponentType::BODY2D:
+	{
+		bodyDefManager_.AddComponent(entityManager_, entity);
+		bodyDefManager_.ParseComponentJson(componentJson, entity);
+		break;
+	}
+	case neko::NekoComponentType::BOX_COLLIDER2D:
+		break;
+	case neko::NekoComponentType::CONVEX_SHAPE2D:
+		break;
+	default:
+		break;
+	}
 }
 
 void EditorSceneManager::ParseSceneJson(json& sceneJson)
 {
 	//Loading all the scene prefabs
-	auto& prefabManager = nekoEditor_.GetPrefabManager();
-	prefabManager.ClearPrefabs();
+	prefabManager_.ClearPrefabs();
 	if (neko::CheckJsonParameter(sceneJson, "prefabPaths", json::value_t::array))
 	{
-		for (const std::string& prefabPath : sceneJson["prefabPaths"])
+		for (const std::string_view prefabPath : sceneJson["prefabPaths"])
 		{
-			prefabManager.LoadPrefab(prefabPath);
+			prefabManager_.LoadPrefab(prefabPath);
 		}
 	}
 	neko::SceneManager::ParseSceneJson(sceneJson);
 
-	
+
+}
+
+EditorSceneManager::EditorSceneManager(NekoEditorExport& editorExport) :
+	position2dManager_(editorExport.position2dManager),
+	rotation2dManager_(editorExport.rotation2dManager),
+	entityManager_(editorExport.entityManager),
+	spriteManager_(editorExport.spriteManager),
+	spineManager_(editorExport.spineManager),
+	transformManager_(editorExport.transform2dManager),
+	prefabManager_(editorExport.prefabManager),
+	scaleManager_(editorExport.scale2dManager),
+	bodyDefManager_(editorExport.bodyDef2dManager)
+{
 }
 
 void EditorSceneManager::ParseEntityJson(json& entityJson)
 {
-    neko::Entity entity = neko::INVALID_ENTITY;
-    if (neko::CheckJsonExists(entityJson, "entity") and neko::IsJsonValueNumeric(entityJson["entity"]))
-    {
-        entity = entityJson["entity"];
-    }
-    if (entity == neko::INVALID_ENTITY)
-    {
-        logDebug("[Error] Scene loader entity with no entity nmb");
-        return;
-    }
+	neko::Entity entity = neko::INVALID_ENTITY;
+	if (neko::CheckJsonExists(entityJson, "entity") and neko::IsJsonValueNumeric(entityJson["entity"]))
+	{
+		entity = entityJson["entity"];
+	}
+	if (entity == neko::INVALID_ENTITY)
+	{
+		logDebug("[Error] Scene loader entity with no entity nmb");
+		return;
+	}
 	if (neko::CheckJsonNumber(entityJson, "parent"))
 	{
 		const int parentEntity = entityJson["parent"];
@@ -129,8 +134,7 @@ void EditorSceneManager::ParseEntityJson(json& entityJson)
 		logDebug("Parsing entity: " + std::to_string(entity) + " with parent: " + std::to_string(parentEntity));
 		if (parentEntity >= 0)
 		{
-			auto& transformManager = nekoEditor_.GetTransformManager();
-			transformManager.SetTransformParent(entity, neko::Entity(parentEntity));
+			transformManager_.SetTransformParent(entity, neko::Entity(parentEntity));
 		}
 	}
 	if (neko::CheckJsonParameter(entityJson, "name", json::value_t::string))
@@ -139,210 +143,197 @@ void EditorSceneManager::ParseEntityJson(json& entityJson)
 		currentScene_.entitiesNames[entity] = entityJson["name"];
 
 	}
-	auto& entityManager = nekoEditor_.GetEntityManager();
 	if (neko::CheckJsonParameter(entityJson, "prefab", json::value_t::boolean))
 	{
 		if (entityJson["prefab"])
 		{
-			auto& prefabManager = nekoEditor_.GetPrefabManager();
 			if (neko::CheckJsonNumber(entityJson, "prefabIndex"))
 			{
 				const neko::Index prefabIndex = entityJson["prefabIndex"];
-				prefabManager.InstantiatePrefab(prefabIndex, entityManager);
+				prefabManager_.InstantiatePrefab(prefabIndex, entityManager_);
 			}
 			return;
 		}
 	}
-    entityManager.CreateEntity(entity);
-   
+	entityManager_.CreateEntity(entity);
 
-	
 
-    if (neko::CheckJsonParameter(entityJson, "components", json::value_t::array))
-    {
-        for (auto& componentJson : entityJson["components"])
-        {
-            ParseComponentJson(componentJson, entity);
-        }
-    }
+
+
+	if (neko::CheckJsonParameter(entityJson, "components", json::value_t::array))
+	{
+		for (auto& componentJson : entityJson["components"])
+		{
+			ParseComponentJson(componentJson, entity);
+		}
+	}
 }
 
 
 json EditorSceneManager::SerializeComponent(neko::Entity entity, neko::NekoComponentType componentType)
 {
-    json componentJson;
-    switch (componentType)
-    {
+	json componentJson;
+	switch (componentType)
+	{
 
-        case neko::NekoComponentType::POSITION2D:
-        {
-            auto& positionManager = nekoEditor_.GetPositionManager();
-            const auto& pos = positionManager.GetConstComponent(entity);
-            componentJson["position"] = {pos.x, pos.y};
-            break;
-        }
-        case neko::NekoComponentType::SCALE2D:
-        {
-            auto& scaleManager = nekoEditor_.GetScaleManager();
-            const auto& scale = scaleManager.GetConstComponent(entity);
-            componentJson["scale"] = {scale.x, scale.y};
-            break;
-        }
-        case neko::NekoComponentType::ROTATION2D:
-        {
-            auto& angleManager = nekoEditor_.GetRotationManager();
-            componentJson["angle"] = angleManager.GetComponent(entity);
-            break;
-        }
-        case neko::NekoComponentType::SPRITE2D:
-        {
-            auto& spriteManager = nekoEditor_.GetSpriteManager();
-            componentJson = spriteManager.SerializeComponentJson(entity);
-            break;
-        }
-        case neko::NekoComponentType::SPINE_ANIMATION:
-        {
-            auto& spineManager = nekoEditor_.GetSpineManager();
-            componentJson = spineManager.SerializeComponentJson(entity);
-            break;
-        }
-        case neko::NekoComponentType::BODY2D:
-            break;
-        case neko::NekoComponentType::BOX_COLLIDER2D:
-            break;
-        case neko::NekoComponentType::CONVEX_SHAPE2D:
-            break;
-        default:
-            break;
-    }
+	case neko::NekoComponentType::POSITION2D:
+	{
+		const auto& pos = position2dManager_.GetComponent(entity);
+		componentJson["position"] = { pos.x, pos.y };
+		break;
+	}
+	case neko::NekoComponentType::SCALE2D:
+	{
+		const auto& scale = scaleManager_.GetComponent(entity);
+		componentJson["scale"] = { scale.x, scale.y };
+		break;
+	}
+	case neko::NekoComponentType::ROTATION2D:
+	{
+		componentJson["angle"] = rotation2dManager_.GetComponent(entity);
+		break;
+	}
+	case neko::NekoComponentType::SPRITE2D:
+	{
+		componentJson = spriteManager_.SerializeComponentJson(entity);
+		break;
+	}
+	case neko::NekoComponentType::SPINE_ANIMATION:
+	{
+		componentJson = spineManager_.SerializeComponentJson(entity);
+		break;
+	}
+	case neko::NekoComponentType::BODY2D:
+		break;
+	case neko::NekoComponentType::BOX_COLLIDER2D:
+		break;
+	case neko::NekoComponentType::CONVEX_SHAPE2D:
+		break;
+	default:
+		break;
+	}
 
-    componentJson["component"] = int(componentType);
-    return componentJson;
+	componentJson["component"] = int(componentType);
+	return componentJson;
 }
 
 json EditorSceneManager::SerializeEntity(neko::Entity entity)
 {
 
-    auto& entityManager = nekoEditor_.GetEntityManager();
 
-    json entityJson;
-    if (!entityManager.EntityExists(entity))
-    {
-        return entityJson;
-    }
-    entityJson["name"] = currentScene_.entitiesNames[entity];
-    entityJson["entity"] = entity;
-    //parent entity
-    {
-        auto& transformManager = nekoEditor_.GetTransformManager();
-        const auto parentEntity = transformManager.GetParentEntity(entity);
-        if (parentEntity != neko::INVALID_ENTITY)
-        {
-            entityJson["parent"] = int(parentEntity);
-        }
-        else
-        {
-            entityJson["parent"] = -1;
-        }
-    }
-	//prefab root entity
-    {
-		const bool isPrefab = entityManager.HasComponent(entity, neko::EntityMask(neko::NekoComponentType::PREFAB));
-		entityJson["prefab"] = isPrefab;
-		if(isPrefab)
+	json entityJson;
+	if (!entityManager_.EntityExists(entity))
+	{
+		return entityJson;
+	}
+	entityJson["name"] = currentScene_.entitiesNames[entity];
+	entityJson["entity"] = entity;
+	//parent entity
+	{
+		const auto parentEntity = transformManager_.GetParentEntity(entity);
+		if (parentEntity != neko::INVALID_ENTITY)
 		{
-			const auto prefabIndex = GetConstComponent(entity);
+			entityJson["parent"] = int(parentEntity);
+		}
+		else
+		{
+			entityJson["parent"] = -1;
+		}
+	}
+	//prefab root entity
+	{
+		const bool isPrefab = entityManager_.HasComponent(entity, neko::EntityMask(neko::NekoComponentType::PREFAB));
+		entityJson["prefab"] = isPrefab;
+		if (isPrefab)
+		{
+			const auto prefabIndex = GetComponent(entity);
 			entityJson["prefabIndex"] = prefabIndex;
 			return entityJson;
 		}
-    }
-	
-    entityJson["components"] = json::array();
-    for (auto componentType : neko::GetComponentTypeSet())
-    {
-        if (entityManager.HasComponent(entity, neko::EntityMask(componentType)))
-        {
-            entityJson["components"].push_back(SerializeComponent(entity, componentType));
-        }
-    }
-    return entityJson;
+	}
+
+	entityJson["components"] = json::array();
+	for (auto componentType : neko::GetComponentTypeSet())
+	{
+		if (entityManager_.HasComponent(entity, neko::EntityMask(componentType)))
+		{
+			entityJson["components"].push_back(SerializeComponent(entity, componentType));
+		}
+	}
+	return entityJson;
 }
 
 json EditorSceneManager::SerializeScene()
 {
-    json sceneJson;
-    sceneJson["entities"] = json::array();
-    sceneJson["sceneName"] = currentScene_.sceneName;
-    auto& entityManager = nekoEditor_.GetEntityManager();
+	json sceneJson;
+	sceneJson["entities"] = json::array();
+	sceneJson["sceneName"] = currentScene_.sceneName;
 
-    for (neko::Entity entity = 0; entity < entityManager.GetEntitiesSize(); entity++)
-    {
-        if (entityManager.EntityExists(entity))
-        {
-            auto entityJson = SerializeEntity(entity);
-            sceneJson["entities"].push_back(entityJson);
-        }
-    }
-	auto& prefabManager = nekoEditor_.GetPrefabManager();
+	for (neko::Entity entity = 0; entity < entityManager_.GetEntitiesSize(); entity++)
+	{
+		if (entityManager_.EntityExists(entity))
+		{
+			auto entityJson = SerializeEntity(entity);
+			sceneJson["entities"].push_back(entityJson);
+		}
+	}
 	json prefabPaths = json::array();
-	for(auto& prefabPath : prefabManager.GetConstPrefabPaths())
+	for (auto& prefabPath : prefabManager_.GetConstPrefabPaths())
 	{
 		prefabPaths.push_back(prefabPath);
 	}
 	sceneJson["prefabPaths"] = prefabPaths;
-    return sceneJson;
+	return sceneJson;
 }
 
 void EditorSceneManager::SaveScene(std::string_view path)
 {
-    logDebug("Saving scene: "+std::string(path));
-    auto sceneJson = SerializeScene();
-    sceneJson["scenePath"] = path;
+	logDebug("Saving scene: " + std::string(path));
+	auto sceneJson = SerializeScene();
+	sceneJson["scenePath"] = path;
 
-    const auto sceneTxt = sceneJson.dump(4);
-    neko::WriteStringToFile(path.data(), sceneTxt);
-    currentScene_.scenePath = path;
-    currentScene_.sceneName = neko::GetFilename(path);
+	const auto sceneTxt = sceneJson.dump(4);
+	neko::WriteStringToFile(path.data(), sceneTxt);
+	currentScene_.scenePath = path;
+	currentScene_.sceneName = neko::GetFilename(path);
 }
 
 void EditorSceneManager::LoadScene(std::string_view path)
 {
-    auto sceneJson = neko::LoadJson(path);
-    ParseSceneJson(sceneJson);
+	auto sceneJson = neko::LoadJson(path);
+	ParseSceneJson(sceneJson);
 }
 
-void EditorSceneManager::ClearScene()
+void EditorSceneManager::ClearScene() const
 {
-    auto& entityManager = nekoEditor_.GetEntityManager();
-    auto& transformManager = nekoEditor_.GetTransformManager();
-    for (neko::Entity entity = 0; entity < entityManager.GetEntitiesSize(); entity++)
-    {
-        transformManager.SetTransformParent(entity, neko::INVALID_ENTITY);
-        entityManager.DestroyEntity(entity);
-    }
+	for (neko::Entity entity = 0; entity < entityManager_.GetEntitiesSize(); entity++)
+	{
+		transformManager_.SetTransformParent(entity, neko::INVALID_ENTITY);
+		entityManager_.DestroyEntity(entity);
+	}
 }
 
 void EditorSceneManager::SaveCurrentScene()
 {
-    if(IsCurrentSceneTmp())
-    {
-        currentScene_.scenePath = sceneTmpPath;
-        SaveScene(sceneTmpPath);
-    }
-    else
-    {
-        SaveScene(currentScene_.scenePath);
-    }
+	if (IsCurrentSceneTmp())
+	{
+		currentScene_.scenePath = sceneTmpPath;
+		SaveScene(sceneTmpPath);
+	}
+	else
+	{
+		SaveScene(currentScene_.scenePath);
+	}
 }
 
 bool EditorSceneManager::IsCurrentSceneTmp()
 {
-    return currentScene_.scenePath.empty() or currentScene_.scenePath == sceneTmpPath;
+	return currentScene_.scenePath.empty() or currentScene_.scenePath == sceneTmpPath;
 }
 
 const std::string_view EditorSceneManager::GetSceneTmpPath()
 {
-    return sceneTmpPath;
+	return sceneTmpPath;
 }
 
 
