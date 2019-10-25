@@ -204,7 +204,7 @@ sf::FloatRect EditorPrefabManager::CalculatePrefabBound()
 		entityRect.left = pos.x;
 		entityRect.top = pos.y;
 	}
-	auto updateEntityRect = [&](const sf::FloatRect& rect)
+	auto updateEntityRect = [&entityRect](const sf::FloatRect& rect)
 	{
 		if (rect.left < entityRect.left)
 		{
@@ -231,7 +231,7 @@ sf::FloatRect EditorPrefabManager::CalculatePrefabBound()
 	};
 	auto includeEntityRect = [&](neko::Entity entity)
 	{
-
+        const auto pos = unit2pixel(position2dManager_.GetComponent(entity));
 		auto transform = transformManager_.CalculateTransform(entity);
 		if (entityManager_.HasComponent(entity, spriteEntityMask))
 		{
@@ -243,14 +243,17 @@ sf::FloatRect EditorPrefabManager::CalculatePrefabBound()
 		if (entityManager_.HasComponent(entity, boxEntityMask))
 		{
 			const auto& box = boxColliderDefManager_.GetComponent(entity);
-			const auto rect = transform.transformRect(box.shape.getGlobalBounds());
-			updateEntityRect(rect);
+			sf::FloatRect rect(pos+unit2pixel(box.size/2.0f), unit2pixel(box.size));
+			const auto globalRect = transform.transformRect(rect);
+			updateEntityRect(globalRect);
 		}
 		if (entityManager_.HasComponent(entity, circleEntityMask))
 		{
 			const auto& circleCollider = circleColliderDefManager_.GetComponent(entity);
-			const auto rect = transform.transformRect(circleCollider.shape.getGlobalBounds());
-			updateEntityRect(rect);
+			const auto size = box2d::meter2pixel(b2Vec2(circleCollider.shapeDef.m_radius, circleCollider.shapeDef.m_radius));
+            sf::FloatRect rect(pos+size/2.0f, size);
+			const auto globalRect = transform.transformRect(rect);
+			updateEntityRect(globalRect);
 		}
 		if (entityManager_.HasComponent(entity, spineEntityMask))
 		{

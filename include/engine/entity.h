@@ -46,7 +46,7 @@ const EntityMask INVALID_ENTITY_MASK = 0u;
 class EntityManager
 {
 public:
-	EntityManager();
+	explicit EntityManager();
 
 	EntityMask GetMask(Entity entity);
 

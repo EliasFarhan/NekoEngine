@@ -26,6 +26,8 @@
 #include <algorithm>
 #include <utilities/vector_utility.h>
 #include <engine/component.h>
+#include <sstream>
+#include <engine/log.h>
 
 namespace neko
 {
@@ -86,7 +88,12 @@ void EntityManager::DestroyEntity(Entity entity)
 bool EntityManager::HasComponent(Entity entity, EntityMask componentType) const
 {
 	if (entity >= entityMaskArray_.size())
-		return false;
+    {
+	    std::ostringstream oss;
+	    oss << "[Error] Accessing entity: "<<entity<<" while entity mask array is of size: "<<entityMaskArray_.size();
+	    logDebug(oss.str());
+	    return false;
+    }
     return (entityMaskArray_[entity] & EntityMask(componentType)) == EntityMask(componentType);
 }
 

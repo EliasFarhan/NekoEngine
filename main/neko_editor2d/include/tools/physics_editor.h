@@ -31,13 +31,13 @@ struct Collider
 
 struct BoxCollider : Collider<b2PolygonShape>
 {
-    sf::Vector2f size = sf::Vector2f(1.0f,1.0f);
-    sf::Vector2f offset = sf::Vector2f();
+    Vec2f size = Vec2f(1.0f,1.0f);
+    Vec2f offset = Vec2f();
 };
 
 struct CircleCollider : Collider<b2CircleShape>
 {
-    sf::Vector2f offset = sf::Vector2f();
+    Vec2f offset = Vec2f();
 };
 
 struct PolygonCollider : Collider<b2PolygonShape>
@@ -69,7 +69,7 @@ template<class TShape>
 struct DebugShapeCommand
 {
 	TShape shape;
-	sf::RenderStates states;
+	sf::RenderStates states = sf::RenderStates::Default;
 };
 
 class ColliderDefManager

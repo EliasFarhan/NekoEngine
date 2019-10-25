@@ -55,9 +55,38 @@ bool CheckJsonNumber(const json& jsonObject, std::string parameterName)
 		   CheckJsonParameter(jsonObject, parameterName, json::value_t::number_integer) or
 		   CheckJsonParameter(jsonObject, parameterName, json::value_t::number_unsigned);
 }
-#ifdef USE_SFML
-
-#endif
+Vec2f GetVectorFromJson(const json& jsonObject, std::string parameterName)
+{
+    Vec2f vector = Vec2f();
+    if (CheckJsonParameter(jsonObject, parameterName, json::value_t::array))
+    {
+        if (jsonObject[parameterName].size() == 2)
+        {
+            auto vectorJson = jsonObject[parameterName];
+            if (IsJsonValueNumeric(vectorJson[0]))
+            {
+                vector.x = vectorJson[0];
+            }
+            if (IsJsonValueNumeric(vectorJson[1]))
+            {
+                vector.y = vectorJson[1];
+            }
+        }
+    }
+    else if (CheckJsonParameter(jsonObject, parameterName, json::value_t::object))
+    {
+        auto vectorJson = jsonObject[parameterName];
+        if (IsJsonValueNumeric(vectorJson["x"]))
+        {
+            vector.x = vectorJson["x"];
+        }
+        if (IsJsonValueNumeric(vectorJson["y"]))
+        {
+            vector.y = vectorJson["y"];
+        }
+    }
+    return vector;
+}
 
 json LoadJson(const std::string_view jsonPath)
 {

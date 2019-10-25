@@ -21,10 +21,11 @@ struct Color
 	}
 
 	template <typename U>
-	Color(const U& v);
+	explicit Color(const U& v);
 	
 	template <typename U>
-	operator U() const;
+	explicit operator U() const;
 };
+
 
 }

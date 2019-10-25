@@ -23,9 +23,9 @@ void ColliderDefManager::PushAllCommands(GraphicsManager& graphicsManager)
 			//Draw box
 			const auto& boxColliderDef = boxColliderDefManager_.GetComponent(entity);
 			sf::RectangleShape shape;
-			shape.setSize(neko::unit2pixel(boxColliderDef.size));
+			shape.setSize(unit2pixel(boxColliderDef.size));
 			shape.setOrigin(shape.getSize() / 2.0f);
-			shape.setPosition(neko::unit2pixel(boxColliderDef.offset));
+			shape.setPosition(unit2pixel(boxColliderDef.offset));
 			shape.setOutlineColor(sf::Color::Green);
 			shape.setOutlineThickness(outlineThickness);
 			shape.setFillColor(sf::Color::Transparent);
@@ -86,18 +86,28 @@ void ColliderDefManager::PushAllCommands(GraphicsManager& graphicsManager)
 		command.SetLayer(physicsLayer);
 		commands_.push_back(command);
 	}
+
+	for(auto& command : commands_)
+    {
+	    graphicsManager.Draw(&command);
+    }
 }
 
 neko::Index CircleColliderDefManager::AddComponent(neko::EntityManager& entityManager, neko::Entity entity)
 {
 	auto index = ComponentManager::AddComponent(entityManager, entity);
-	auto& circleColliderDef = GetComponent(entity);
-	circleColliderDef.shapeDef.m_radius = 1.0f;
+	auto tmpCircleColliderDef = GetComponent(entity);
+    tmpCircleColliderDef.shapeDef.m_radius = 1.0f;
+    SetComponent(entity, tmpCircleColliderDef);
 	return index;
 }
 
 Index PolygonColldierDefManager::AddComponent(EntityManager& entityManager, Entity entity)
 {
+    //TODO Implement for polygon
+    (void)entityManager;
+    (void)entity;
+    return INVALID_INDEX;
 }
 
 ColliderDefManager::ColliderDefManager(NekoEditorExport& editorExport) :

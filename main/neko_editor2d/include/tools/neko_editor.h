@@ -89,7 +89,7 @@ public:
     NekoEditor();
     void Init() override;
 
-    void Update(float dt) override;
+    void EditorUpdate(float dt);
 
     void Destroy() override;
 
@@ -103,7 +103,9 @@ public:
     void SaveSceneEvent();
     void SavePrefabEvent();
 
-private:
+protected:
+
+    NekoEditorExport editorExport_;
     neko::EntityManager entityManager_;
     EntityViewer entityViewer_;
     neko::sfml::TextureManager textureManager_;
@@ -112,7 +114,6 @@ private:
     sfml::SpineManager spineManager_;
     sfml::SpriteManager spriteManager_;
 
-    sfml::SfmlGraphicsManager graphicsManager_;
     sf::RenderTexture sceneRenderTexture_;
     SceneViewer sceneViewer_;
 
@@ -138,25 +139,6 @@ private:
 	Rotation2dManager rotation2dManager_;
     sfml::Transform2dManager transformManager_;
 
-	NekoEditorExport editorExport_
-	{
-		entityManager_,
-		position2dManager_,
-		scale2dManager_,
-		rotation2dManager_,
-		transformManager_,
-		sceneManager_,
-		bodyDefManager_,
-		spriteManager_,
-		textureManager_,
-		spineManager_,
-		boxColliderDefManager_,
-		circleColliderDefManager_,
-		polygonColldierDefManager_,
-		colliderDefManager_,
-		prefabManager_,
-		*this
-	};
 };
 
 }

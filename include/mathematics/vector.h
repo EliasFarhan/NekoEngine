@@ -66,7 +66,7 @@ public:
 
 	Vec2<T> operator -(const Vec2<T>& rhs)
 	{
-		return Vec2f(x - rhs.x, y - rhs.y);
+		return Vec2<T>(x - rhs.x, y - rhs.y);
 	}
 	Vec2<T>& operator -=(const Vec2<T>& rhs)
 	{
@@ -132,9 +132,9 @@ public:
 	}
 
 	template <typename U>
-	Vec2(const U& v);
+	explicit Vec2(const U& v);
 	template <typename U>
-	operator U() const;
+	explicit operator U() const;
 
 	T x; ///< X coordinate of the vector
 	T y; ///< Y coordinate of the vector

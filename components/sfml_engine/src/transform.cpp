@@ -4,6 +4,7 @@
 #include <SFML/Graphics/Transform.hpp>
 #include "sfml_engine/transform.h"
 #include "sfml_engine/physics.h"
+#include "sfml_engine/vector.h"
 #include <glm/glm.hpp>
 
 namespace neko::sfml
@@ -110,7 +111,7 @@ sf::Transform Transform2dManager::CalculateTransform(Entity entity)
 	sf::Vector2f point = unit2pixel(positionManager_.GetComponent(entity));
 
 	transform = transform.translate(point);
-	transform = transform.scale(scaleManager_.GetComponent(entity));
+	transform = transform.scale(sf::Vector2f(scaleManager_.GetComponent(entity)));
 	transform = transform.rotate(rotationManager_.GetComponent(entity));
 
 	transform = parentTransform.combine(transform);

@@ -41,7 +41,7 @@ namespace sfml {
 class SpineManager;
 class TextureManager;
 class SpriteManager;
-struct Transform2dManager;
+class Transform2dManager;
 }
 }
 

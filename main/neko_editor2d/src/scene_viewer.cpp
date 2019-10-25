@@ -42,7 +42,9 @@ void SceneViewer::Update(sf::RenderTexture& sceneTexture)
     const auto ratio = sf::Vector2f(windowSize.x / sceneTexture.getSize().x,
                                     windowSize.y / sceneTexture.getSize().y);
     windowSize = sf::Vector2f(sceneTexture.getSize()) * (ratio.x < ratio.y ? ratio.x : ratio.y);
-    ImGui::Image(sceneTexture.getTexture(), sf::Vector2f(windowSize.x - 25.f, windowSize.y - 40.f), tintColor,
+    sf::Sprite windowSprite;
+    windowSprite.setTexture(sceneTexture.getTexture());
+    ImGui::Image(windowSprite, sf::Vector2f(windowSize.x - 25.f, windowSize.y - 40.f), tintColor,
                  borderColor);
 
 }

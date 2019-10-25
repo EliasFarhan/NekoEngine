@@ -3,6 +3,7 @@
 #include <graphics/graphics.h>
 #include <sfml_engine/transform.h>
 #include "engine/engine.h"
+#include "sfml_engine/vector.h"
 
 
 namespace neko::sfml
@@ -171,7 +172,9 @@ void SpineManager::CopyAllTransformScales(EntityManager& entityManager, Scale2dM
         if (entityManager.HasComponent(entity, entityMask))
         {
             const auto& scale = scale2DManager.GetComponent(entity);
-            components_[entity].transform = components_[entity].transform.scale(sf::Vector2f(scale), sf::Vector2f(components_[entity].GetPosition()));
+            components_[entity].transform = components_[entity].transform.scale(
+                    sf::Vector2f(scale),
+                    components_[entity].GetPosition());
         }
     }
 }

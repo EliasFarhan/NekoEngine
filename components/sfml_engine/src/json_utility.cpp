@@ -6,9 +6,7 @@
 #include "utilities/json_utility.h"
 #include "sfml_engine/json_utility.h"
 
-namespace neko
-{
-namespace sfml
+namespace neko::sfml
 {
 sf::Vector2f GetVectorFromJson(const json & jsonObject, std::string parameterName)
 {
@@ -85,6 +83,5 @@ sf::FloatRect GetFloatRectFromJson(const json& jsonObject, std::string parameter
         logDebug(oss.str());
     }
     return rect;
-}
 }
 }

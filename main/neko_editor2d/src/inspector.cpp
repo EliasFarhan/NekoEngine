@@ -42,7 +42,7 @@ void Inspector::ShowEntityInfo(neko::Entity entity) const
 			float posRaw[2] = { pos.x, pos.y };
 			if (ImGui::InputFloat2("Position", posRaw))
 			{
-				positionManager_.SetComponent(entity, sf::Vector2f(posRaw[0], posRaw[1]));
+				positionManager_.SetComponent(entity, Vec2f(posRaw[0], posRaw[1]));
 			}
 		}
 
@@ -63,7 +63,7 @@ void Inspector::ShowEntityInfo(neko::Entity entity) const
 			float scaleRaw[2] = { scale.x, scale.y };
 			if (ImGui::InputFloat2("Scale", scaleRaw))
 			{
-				scaleManager_.SetComponent(entity, sf::Vector2f(scaleRaw[0], scaleRaw[1]));
+				scaleManager_.SetComponent(entity, Vec2f(scaleRaw[0], scaleRaw[1]));
 			}
 		}
 
@@ -303,13 +303,13 @@ void Inspector::ShowEntityInfo(neko::Entity entity) const
 			if (ImGui::InputFloat2("Box Size", size))
 			{
 				dirty = true;
-				tmpBoxColliderDef.size = sf::Vector2f(size[0], size[1]);
+				tmpBoxColliderDef.size = Vec2f(size[0], size[1]);
 			}
 			float offset[2] = { tmpBoxColliderDef.offset.x, tmpBoxColliderDef.offset.y };
 			if (ImGui::InputFloat2("Box Offset", offset))
 			{
 				dirty = true;
-				tmpBoxColliderDef.offset = sf::Vector2f(offset[0], offset[1]);
+				tmpBoxColliderDef.offset = Vec2f(offset[0], offset[1]);
 			}
 			if(dirty)
 			{

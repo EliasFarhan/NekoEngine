@@ -37,10 +37,11 @@ void SfmlBasicEngine::Update(float dt)
 
     window_->clear(sf::Color::Black);
     updateDelegate_.Execute(dt);
+    graphicsManager_.SetRenderTarget(window_.get());
     graphicsManager_.RenderAll();
     ImGui::SFML::Update(*window_, sf::seconds(dt));
     //update Ui
-    drawUiDelegate_.Execute();
+    drawUiDelegate_.Execute(dt);
     ImGui::SFML::Render(*window_);
     window_->display();
 }

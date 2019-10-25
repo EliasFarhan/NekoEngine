@@ -14,6 +14,13 @@ inline Color::Color(const sf::Color& color)
 	b = color.b;
 	a = color.a;
 }
+
+template<>
+inline Color::operator sf::Color() const
+{
+    return sf::Color(r,g,b,a);
+}
+
 }
 
 namespace neko::sfml

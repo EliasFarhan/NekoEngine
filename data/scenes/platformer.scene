@@ -32,41 +32,15 @@
             ],
             "entity": 0,
             "name": "Background",
-            "parent": -1
+            "parent": -1,
+            "prefab": false
         },
         {
-            "components": [
-                {
-                    "component": 2,
-                    "position": [
-                        3.0,
-                        2.0
-                    ]
-                },
-                {
-                    "component": 4,
-                    "scale": [
-                        2.0,
-                        2.0
-                    ]
-                },
-                {
-                    "angle": 0.0,
-                    "component": 8
-                },
-                {
-                    "component": 128,
-                    "layer": 1,
-                    "origin": [
-                        0.5,
-                        0.5
-                    ],
-                    "texture": "data/sprites/hero/jump/hero1.png"
-                }
-            ],
             "entity": 1,
             "name": "Player",
-            "parent": -1
+            "parent": -1,
+            "prefab": true,
+            "prefabIndex": 1
         },
         {
             "components": [
@@ -100,7 +74,8 @@
             ],
             "entity": 2,
             "name": "Platform 1",
-            "parent": -1
+            "parent": -1,
+            "prefab": false
         },
         {
             "components": [
@@ -134,7 +109,8 @@
             ],
             "entity": 3,
             "name": "Platform 2",
-            "parent": -1
+            "parent": -1,
+            "prefab": false
         },
         {
             "components": [
@@ -168,33 +144,13 @@
             ],
             "entity": 4,
             "name": "Platform 3",
-            "parent": -1
-        },
-        {
-            "components": [
-                {
-                    "component": 2,
-                    "position": [
-                        0.0,
-                        0.14000000059604645
-                    ]
-                },
-                {
-                    "component": 4,
-                    "scale": [
-                        1.0,
-                        1.0
-                    ]
-                },
-                {
-                    "angle": 0.0,
-                    "component": 8
-                }
-            ],
-            "entity": 5,
-            "name": "Foot",
-            "parent": 1
+            "parent": -1,
+            "prefab": false
         }
+    ],
+    "prefabPaths": [
+        "data/.tmp0.prefab",
+        ""
     ],
     "sceneName": "New Scene",
     "scenePath": "/home/efarhan/Development/NekoEngine/cmake-build-debug/../data/scenes/platformer.scene"

@@ -85,7 +85,7 @@ protected:
 	float isRunning_;
     Delegate<> initDelegate_;
     Delegate<float> updateDelegate_;
-    Delegate<> drawUiDelegate_;
+    Delegate<float> drawUiDelegate_;
     Delegate<> drawDelegate_;
     Delegate<> destroyDelegate_;
 

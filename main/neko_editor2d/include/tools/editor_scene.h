@@ -37,7 +37,7 @@ class PrefabManager;
 
 namespace sfml
 {
-struct Transform2dManager;
+class Transform2dManager;
 class SpriteManager;
 class SpineManager;
 }
@@ -48,7 +48,7 @@ class Position2dManager;
 
 namespace neko::editor
 {
-class NekoEditorExport;
+struct NekoEditorExport;
 class EditorSceneManager : public neko::SceneManager
 {
 public:
