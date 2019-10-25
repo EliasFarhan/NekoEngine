@@ -6,35 +6,41 @@
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/ConvexShape.hpp>
+#include "sfml_engine/graphics.h"
+
+namespace neko {
+class GraphicsManager;
+}
 
 namespace neko::sfml
 {
-class GraphicsManager;
+class Transform2dManager;
+
 }
 namespace neko::editor
 {
+struct NekoEditorExport;
 class NekoEditor;
-template<class TDef, class TShape>
+template<class TDef>
 struct Collider
 {
     b2FixtureDef fixtureDef;
     TDef shapeDef{};
-    TShape shape{};
 
 };
 
-struct BoxCollider : Collider<b2PolygonShape, sf::RectangleShape>
+struct BoxCollider : Collider<b2PolygonShape>
 {
     sf::Vector2f size = sf::Vector2f(1.0f,1.0f);
     sf::Vector2f offset = sf::Vector2f();
 };
 
-struct CircleCollider : Collider<b2CircleShape, sf::CircleShape>
+struct CircleCollider : Collider<b2CircleShape>
 {
     sf::Vector2f offset = sf::Vector2f();
 };
 
-struct PolygonCollider : Collider<b2PolygonShape, sf::ConvexShape>
+struct PolygonCollider : Collider<b2PolygonShape>
 {
 
 };
@@ -59,21 +65,28 @@ public:
 	Index AddComponent(EntityManager& entityManager, Entity entity) override;
 };
 
+template<class TShape>
+struct DebugShapeCommand
+{
+	TShape shape;
+	sf::RenderStates states;
+};
+
 class ColliderDefManager
 {
 public:
-    explicit ColliderDefManager(NekoEditor& nekoEditor);
-    void PushAllCommands(neko::GraphicsManager& graphicsManager);
-
-    
+    explicit ColliderDefManager(NekoEditorExport& editorExport);
+    void PushAllCommands(GraphicsManager& graphicsManager);
 private:
-   
-
+	std::vector<sfml::SfmlRenderCommand> commands_;
+	std::vector<DebugShapeCommand<sf::RectangleShape>> rectShapes_;
+	std::vector<DebugShapeCommand<sf::CircleShape>> circleShapes_;
+	std::vector<DebugShapeCommand<sf::ConvexShape>> convexShapes_;
+	
     BoxColliderDefManager& boxColliderDefManager_;
     CircleColliderDefManager& circleColliderDefManager_;
     PolygonColldierDefManager& polygonColldierDefManager_;
-
-
-
+    EntityManager& entityManager_;
+    sfml::Transform2dManager& transformManager_;
 };
 }

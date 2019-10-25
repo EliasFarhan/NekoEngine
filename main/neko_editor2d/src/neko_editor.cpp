@@ -25,6 +25,8 @@
 #include <tools/neko_editor.h>
 #include <utilities/file_utility.h>
 #include <engine/log.h>
+#include "sfml_engine/graphics.h"
+
 #include <SFML/Window/Event.hpp>
 
 namespace neko::editor
@@ -32,7 +34,7 @@ namespace neko::editor
 void NekoEditor::Init()
 {
     BasicEngine::Init();
-    sceneRenderTexture_.create(config.gameWindowSize.x, config.gameWindowSize.y);
+    sceneRenderTexture_.create(config.gameWindowSize.first, config.gameWindowSize.second);
     neko::IterateDirectory(config.dataRootPath, [this](std::string_view path)
     {
         if (!neko::IsRegularFile(path))
@@ -52,7 +54,7 @@ void NekoEditor::Init()
 void NekoEditor::Update(float dt)
 {
     BasicEngine::Update(dt);
-    const ImVec2 windowSize = ImVec2(float(config.realWindowSize.x), float(config.realWindowSize.y));
+    const ImVec2 windowSize = ImVec2(float(config.realWindowSize.first), float(config.realWindowSize.second));
     const static float yOffset = 20.0f;
     ImGui::SetNextWindowPos(ImVec2(0.0f, windowSize.y * 0.7f), ImGuiCond_Always);
     ImGui::SetNextWindowSize(ImVec2(windowSize.x * 0.8f, windowSize.y * 0.3f), ImGuiCond_Always);
@@ -248,9 +250,14 @@ void NekoEditor::Update(float dt)
     {
         case EditorMode::SceneMode:
         {
-            const auto screenRect = sf::FloatRect(0, 0, float(config.gameWindowSize.x), float(config.gameWindowSize.y));
+            const auto screenRect = sf::FloatRect(
+				0, 
+				0, 
+				float(config.gameWindowSize.first), 
+				float(config.gameWindowSize.second));
             sceneRenderTexture_.setView(sf::View(screenRect));
-            graphicsManager_.Render(sceneRenderTexture_);
+            graphicsManager_.SetRenderTarget(&sceneRenderTexture_);
+			graphicsManager_.RenderAll();
             break;
         }
         case EditorMode::PrefabMode:
@@ -260,9 +267,10 @@ void NekoEditor::Update(float dt)
             const auto rectRatio = rect.width / rect.height;
             const auto screenRatio = float(screenRect.width) / screenRect.height;
             rect.width *= screenRatio / rectRatio;
-            sf::View renderView(rect);
+            const sf::View renderView(rect);
             sceneRenderTexture_.setView(renderView);
-            graphicsManager_.Render(sceneRenderTexture_);
+			graphicsManager_.SetRenderTarget(&sceneRenderTexture_);
+			graphicsManager_.RenderAll();
             break;
         }
     }
@@ -328,19 +336,14 @@ Previewer& NekoEditor::GetPreviewer()
 
 NekoEditor::NekoEditor()
 	: SfmlBasicEngine(nullptr),
-	  entityViewer_(*this),
-	  prefabManager_(*this),
+	  entityViewer_(editorExport_),
+	  prefabManager_(editorExport_),
 	  spriteManager_(textureManager_),
-	  sceneManager_(*this),
+	  sceneManager_(editorExport_),
 	  colliderDefManager_(*this),
-	  inspector_(*this),
+	  inspector_(editorExport_),
 transformManager_(position2dManager_, scale2dManager_, rotation2dManager_)
 {
-}
-
-ColliderDefManager& NekoEditor::GetColliderDefManager()
-{
-    return colliderDefManager_;
 }
 
 void NekoEditor::SwitchEditorMode(EditorMode editorMode)

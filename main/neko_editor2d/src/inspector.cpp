@@ -98,9 +98,9 @@ void Inspector::ShowEntityInfo(neko::Entity entity) const
 		bool keepComponent = true;
 		if (ImGui::CollapsingHeader("Sprite2d Component", &keepComponent, ImGuiTreeNodeFlags_DefaultOpen))
 		{
-
-			auto& sprite = spriteManager_.GetComponent(entity);
-			const auto& textureName = textureManager_.GetTexturePath(sprite.textureId);
+			bool dirty = false;
+			auto tmpSprite = spriteManager_.GetComponent(entity);
+			const auto& textureName = textureManager_.GetTexturePath(tmpSprite.textureId);
 			if (ImGui::Button(textureName.data()))
 			{
 				ImGui::OpenPopup("Texture Popup");
@@ -115,28 +115,38 @@ void Inspector::ShowEntityInfo(neko::Entity entity) const
 				ImGui::Separator();
 				if (ImGui::Selectable("No Texture"))
 				{
+					dirty = true;
 					spriteManager_.CopyTexture(neko::INVALID_INDEX, entity, 1);
 				}
 				for (neko::Index i = 0; i < textureManager_.GetTextureCount(); i++)
 				{
 					if (ImGui::Selectable(textureManager_.GetTexturePath(i).data()))
 					{
+						dirty = true;
 						spriteManager_.CopyTexture(i, entity, 1);
 					}
 				}
 				ImGui::EndPopup();
 			}
-			auto& origin = sprite.origin;
+			auto& origin = tmpSprite.origin;
 
 			float originRaw[2] = { origin.x, origin.y };
 
 			if (ImGui::InputFloat2("Origin", originRaw))
 			{
+				dirty = true;
 				origin.x = originRaw[0];
 				origin.y = originRaw[1];
 			}
 			ImGui::PushID("Sprite Layer");
-			ImGui::InputInt("Layer", &sprite.layer, 1);
+			if(ImGui::InputInt("Layer", &tmpSprite.layer, 1))
+			{
+				dirty = true;
+			}
+			if(dirty)
+			{
+				spriteManager_.SetComponent(entity, tmpSprite);
+			}
 			ImGui::PopID();
 		}
 
@@ -244,17 +254,18 @@ void Inspector::ShowEntityInfo(neko::Entity entity) const
 		bool keepComponent = true;
 		if (ImGui::CollapsingHeader("Body2d Component", &keepComponent, ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			auto& bodyDef = bodyDefManager_.GetComponent(entity);
+			bool dirty = false;
+			auto tmpBodyDef = bodyDefManager_.GetComponent(entity);
 			const char* bodyTypeMap[3] =
 			{
 					"Static",
 					"Kinematic",
 					"Dynamic"
 			};
-			ImGui::Combo("Body Type", (int*)(&bodyDef.type), bodyTypeMap, 3);
-			ImGui::InputFloat("Gravity Scale", &bodyDef.gravityScale);
-			ImGui::Checkbox("Fixed Rotation", &bodyDef.fixedRotation);
-			if (!bodyDef.fixedRotation &&
+			ImGui::Combo("Body Type", reinterpret_cast<int*>(&tmpBodyDef.type), bodyTypeMap, 3);
+			dirty = ImGui::InputFloat("Gravity Scale", &tmpBodyDef.gravityScale) or dirty;
+			dirty = ImGui::Checkbox("Fixed Rotation", &tmpBodyDef.fixedRotation) or dirty;
+			if (!tmpBodyDef.fixedRotation &&
 				!entityManager_.HasComponent(entity, neko::EntityMask(neko::NekoComponentType::ROTATION2D)))
 			{
 				ImGui::SameLine();
@@ -265,6 +276,10 @@ void Inspector::ShowEntityInfo(neko::Entity entity) const
 					ImGui::TextColored(ImColor(255, 0, 0), "[Warning] Rotation without Angle component");
 					ImGui::EndTooltip();
 				}
+			}
+			if(dirty)
+			{
+				bodyDefManager_.SetComponent(entity, tmpBodyDef);
 			}
 		}
 
@@ -278,20 +293,27 @@ void Inspector::ShowEntityInfo(neko::Entity entity) const
 		bool keepComponent = true;
 		if (ImGui::CollapsingHeader("Box Collider 2D Component", &keepComponent, ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			auto& boxColliderDef = boxColliderDefManager_.GetComponent(entity);
+			bool dirty = false;
+			auto tmpBoxColliderDef = boxColliderDefManager_.GetComponent(entity);
 
-			auto& isSensor = boxColliderDef.fixtureDef.isSensor;
-			ImGui::Checkbox("Is Sensor", &isSensor);
+			auto& isSensor = tmpBoxColliderDef.fixtureDef.isSensor;
+			dirty = ImGui::Checkbox("Is Sensor", &isSensor) or dirty;
 
-			float size[2] = { boxColliderDef.size.x, boxColliderDef.size.y };
+			float size[2] = { tmpBoxColliderDef.size.x, tmpBoxColliderDef.size.y };
 			if (ImGui::InputFloat2("Box Size", size))
 			{
-				boxColliderDef.size = sf::Vector2f(size[0], size[1]);
+				dirty = true;
+				tmpBoxColliderDef.size = sf::Vector2f(size[0], size[1]);
 			}
-			float offset[2] = { boxColliderDef.offset.x, boxColliderDef.offset.y };
+			float offset[2] = { tmpBoxColliderDef.offset.x, tmpBoxColliderDef.offset.y };
 			if (ImGui::InputFloat2("Box Offset", offset))
 			{
-				boxColliderDef.offset = sf::Vector2f(offset[0], offset[1]);
+				dirty = true;
+				tmpBoxColliderDef.offset = sf::Vector2f(offset[0], offset[1]);
+			}
+			if(dirty)
+			{
+				boxColliderDefManager_.SetComponent(entity, tmpBoxColliderDef);
 			}
 
 		}
@@ -301,17 +323,26 @@ void Inspector::ShowEntityInfo(neko::Entity entity) const
 		bool keepComponent = true;
 		if (ImGui::CollapsingHeader("Circle Collider 2D Component", &keepComponent, ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			auto& circleColliderDef = circleColliderDefManager_.GetComponent(entity);
+			bool dirty = false;
+			auto tmpCircleColliderDef = circleColliderDefManager_.GetComponent(entity);
 
-			auto& isSensor = circleColliderDef.fixtureDef.isSensor;
-			ImGui::Checkbox("Is Sensor", &isSensor);
+			auto& isSensor = tmpCircleColliderDef.fixtureDef.isSensor;
+			dirty = ImGui::Checkbox("Is Sensor", &isSensor) or dirty;
 
-			ImGui::InputFloat("Circle Radius", &circleColliderDef.shapeDef.m_radius);
+			if(ImGui::InputFloat("Circle Radius", &tmpCircleColliderDef.shapeDef.m_radius))
+			{
+				dirty = true;
+			}
 
-			float offset[2] = { circleColliderDef.shapeDef.m_p.x, circleColliderDef.shapeDef.m_p.y };
+			float offset[2] = { tmpCircleColliderDef.shapeDef.m_p.x, tmpCircleColliderDef.shapeDef.m_p.y };
 			if (ImGui::InputFloat2("Circle Offset", offset))
 			{
-				circleColliderDef.shapeDef.m_p = b2Vec2(offset[0], offset[1]);
+				dirty = true;
+				tmpCircleColliderDef.shapeDef.m_p = b2Vec2(offset[0], offset[1]);
+			}
+			if(dirty)
+			{
+				circleColliderDefManager_.SetComponent(entity, tmpCircleColliderDef);
 			}
 		}
 	}

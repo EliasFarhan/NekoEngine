@@ -28,7 +28,7 @@
 #include <engine/system.h>
 #include <sfml_engine/physics.h>
 #include <utilities/delegate_utility.h>
-
+#include <graphics/color.h>
 
 struct Remotery;
 
@@ -56,7 +56,7 @@ struct Configuration
     std::string dataRootPath = "data/";
 	int glMajorVersion = 4;
 	int glMinorVersion = 5;
-
+	Color bgColor;
 };
 
 

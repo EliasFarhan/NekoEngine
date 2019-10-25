@@ -1,7 +1,20 @@
 #pragma once
 
 #include <graphics/graphics.h>
+#include <graphics/color.h>
 #include <SFML/Graphics/RenderTarget.hpp>
+
+namespace neko
+{
+template<>
+inline Color::Color(const sf::Color& color)
+{
+	r = color.r;
+	g = color.g;
+	b = color.b;
+	a = color.a;
+}
+}
 
 namespace neko::sfml
 {

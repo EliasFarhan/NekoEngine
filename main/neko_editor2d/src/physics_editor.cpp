@@ -9,84 +9,103 @@ const static int physicsLayer = 100;
 const static float outlineThickness = 2.0f;
 
 
-ColliderDefManager::ColliderDefManager(NekoEditor& nekoEditor) : nekoEditor_(nekoEditor)
+
+void ColliderDefManager::PushAllCommands(GraphicsManager& graphicsManager)
 {
+	const auto boxEntityMask = neko::EntityMask(neko::NekoComponentType::BOX_COLLIDER2D);
+	const auto circleEntityMask = neko::EntityMask(neko::NekoComponentType::CIRCLE_COLLIDER2D);
+	const auto polygonEntityMask = neko::EntityMask(neko::NekoComponentType::POLYGON_COLLIDER2D);
 
-}
+	for (neko::Entity entity = 0; entity < entityManager_.GetEntitiesSize(); entity++)
+	{
+		if (entityManager_.HasComponent(entity, boxEntityMask))
+		{
+			//Draw box
+			const auto& boxColliderDef = boxColliderDefManager_.GetComponent(entity);
+			sf::RectangleShape shape;
+			shape.setSize(neko::unit2pixel(boxColliderDef.size));
+			shape.setOrigin(shape.getSize() / 2.0f);
+			shape.setPosition(neko::unit2pixel(boxColliderDef.offset));
+			shape.setOutlineColor(sf::Color::Green);
+			shape.setOutlineThickness(outlineThickness);
+			shape.setFillColor(sf::Color::Transparent);
 
-void ColliderDefManager::PushAllCommands(neko::GraphicsManager& graphicsManager)
-{
-    const auto boxEntityMask = neko::EntityMask(neko::NekoComponentType::BOX_COLLIDER2D);
-    const auto circleEntityMask = neko::EntityMask(neko::NekoComponentType::CIRCLE_COLLIDER2D);
-    const auto polygonEntityMask = neko::EntityMask(neko::NekoComponentType::POLYGON_COLLIDER2D);
-    const auto& entityManager = nekoEditor_.GetEntityManager();
-    auto& transformManager = nekoEditor_.GetTransformManager();
-    for(neko::Entity entity = 0; entity < entityManager.GetEntitiesSize();entity++)
-    {
-        if(entityManager.HasComponent(entity, boxEntityMask))
-        {
-            //Draw box
-            auto& boxColliderDef = boxColliderDefManager_.GetComponent(entity);
-            boxColliderDef.shape.setSize(neko::unit2pixel(boxColliderDef.size));
-            boxColliderDef.shape.setOrigin(boxColliderDef.shape.getSize()/2.0f);
-            boxColliderDef.shape.setPosition(neko::unit2pixel(boxColliderDef.offset));
-            boxColliderDef.shape.setOutlineColor(sf::Color::Green);
-            boxColliderDef.shape.setOutlineThickness(outlineThickness);
-            boxColliderDef.shape.setFillColor(sf::Color::Transparent);
+			
+			
+			sf::RenderStates states;
+			auto transform = transformManager_.CalculateTransform(entity);
+			states.transform = transform;
+			rectShapes_.push_back({ shape, states });
+		}
+		if (entityManager_.HasComponent(entity, circleEntityMask))
+		{
+			//Draw circle
+			const auto& circleColliderDef = circleColliderDefManager_.GetComponent(entity);
+			sf::CircleShape shape;
+			const float radius = box2d::meter2pixel(circleColliderDef.shapeDef.m_radius);
+			shape.setRadius(radius);
+			shape.setOrigin(sf::Vector2f(radius, radius));
+			shape.setPosition(neko::unit2pixel(circleColliderDef.offset));
+			shape.setOutlineColor(sf::Color::Green);
+			shape.setOutlineThickness(outlineThickness);
+			shape.setFillColor(sf::Color::Transparent);
+			sf::RenderStates states;
+			const auto transform = transformManager_.CalculateTransform(entity);
+			states.transform = transform;
+			circleShapes_.push_back({ shape, states });
+		}
+		if (entityManager_.HasComponent(entity, polygonEntityMask))
+		{
+			//Draw polygon
+		}
+	}
 
-            sf::RenderStates states;
-            auto transform = transformManager.CalculateTransform(entity);
-            states.transform = transform;
-            graphicsManager.Draw(boxColliderDef.shape, physicsLayer, states);
-        }
-        if(entityManager.HasComponent(entity, circleEntityMask))
-        {
-            //Draw circle
-            auto& circleColliderDef = circleColliderDefManager_.GetComponent(entity);
-            const float radius = neko::meter2pixel(circleColliderDef.shapeDef.m_radius);
-            circleColliderDef.shape.setRadius(radius);
-            circleColliderDef.shape.setOrigin(sf::Vector2f(radius, radius));
-            circleColliderDef.shape.setPosition(neko::unit2pixel(circleColliderDef.offset));
-            circleColliderDef.shape.setOutlineColor(sf::Color::Green);
-            circleColliderDef.shape.setOutlineThickness(outlineThickness);
-            circleColliderDef.shape.setFillColor(sf::Color::Transparent);
-
-            sf::RenderStates states;
-            auto transform = transformManager.CalculateTransform(entity);
-            states.transform = transform;
-            graphicsManager.Draw(circleColliderDef.shape, physicsLayer, states);
-        }
-        if(entityManager.HasComponent(entity, polygonEntityMask))
-        {
-            //Draw polygon
-        }
-    }
-}
-
-BoxColliderDefManager& ColliderDefManager::GetBoxColliderDefManager()
-{
-    return boxColliderDefManager_;
-}
-
-CircleColliderDefManager& ColliderDefManager::GetCircleColliderDefManager()
-{
-    return circleColliderDefManager_;
-}
-
-PolygonColldierDefManager& ColliderDefManager::GetPolygonColliderDefManager()
-{
-    return polygonColldierDefManager_;
+	commands_.clear();
+	commands_.reserve(rectShapes_.size() + circleShapes_.size() + convexShapes_.size());
+	for(auto& rectShape : rectShapes_)
+	{
+		sfml::SfmlRenderCommand command;
+		command.SetDrawable(&rectShape.shape);
+		command.SetStates(rectShape.states);
+		command.SetLayer(physicsLayer);
+		commands_.push_back(command);
+	}
+	for(auto& circleShape : circleShapes_)
+	{
+		sfml::SfmlRenderCommand command;
+		command.SetDrawable(&circleShape.shape);
+		command.SetStates(circleShape.states);
+		command.SetLayer(physicsLayer);
+		commands_.push_back(command);
+	}
+	for(auto& convexShape : convexShapes_)
+	{
+		sfml::SfmlRenderCommand command;
+		command.SetDrawable(&convexShape.shape);
+		command.SetStates(convexShape.states);
+		command.SetLayer(physicsLayer);
+		commands_.push_back(command);
+	}
 }
 
 neko::Index CircleColliderDefManager::AddComponent(neko::EntityManager& entityManager, neko::Entity entity)
 {
-    auto index = ComponentManager::AddComponent(entityManager, entity);
-    auto& circleColliderDef = GetComponent(entity);
-    circleColliderDef.shapeDef.m_radius = 1.0f;
-    return index;
+	auto index = ComponentManager::AddComponent(entityManager, entity);
+	auto& circleColliderDef = GetComponent(entity);
+	circleColliderDef.shapeDef.m_radius = 1.0f;
+	return index;
 }
 
 Index PolygonColldierDefManager::AddComponent(EntityManager& entityManager, Entity entity)
+{
+}
+
+ColliderDefManager::ColliderDefManager(NekoEditorExport& editorExport) :
+	boxColliderDefManager_(editorExport.boxColliderDefManager_),
+	circleColliderDefManager_(editorExport.circleColliderDefManager_),
+	polygonColldierDefManager_(editorExport.polygonColldierDefManager_),
+	entityManager_(editorExport.entityManager),
+	transformManager_(editorExport.transform2dManager)
 {
 }
 }

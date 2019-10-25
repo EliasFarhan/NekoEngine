@@ -9,12 +9,7 @@ class Body2dManager;
 }
 namespace sfml
 {
-
-
-/**
- * \brief manage the graphic transform of any kind of objects in a SOA fashions
- */
-struct Transform2dManager
+class Transform2dManager
 {
 public:
 	Transform2dManager() = delete;
