@@ -7,6 +7,7 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
+#include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/OpenGL.hpp>
 #include <SFML/Window/Clipboard.hpp>
 #include <SFML/Window/Cursor.hpp>
@@ -554,10 +555,10 @@ void Image(const sf::Texture& texture, const sf::FloatRect& textureRect,
 void Image(const sf::Texture& texture, const sf::Vector2f& size,
            const sf::FloatRect& textureRect, const sf::Color& tintColor,
            const sf::Color& borderColor) {
-    sf::Vector2f textureSize = static_cast<sf::Vector2f>(texture.getSize());
-    ImVec2 uv0(textureRect.left / textureSize.x,
+	const sf::Vector2f textureSize = static_cast<sf::Vector2f>(texture.getSize());
+    const ImVec2 uv0(textureRect.left / textureSize.x,
                textureRect.top / textureSize.y);
-    ImVec2 uv1((textureRect.left + textureRect.width) / textureSize.x,
+	const ImVec2 uv1((textureRect.left + textureRect.width) / textureSize.x,
                (textureRect.top + textureRect.height) / textureSize.y);
 
     ImTextureID textureID =
@@ -583,6 +584,15 @@ void Image(const sf::Sprite& sprite, const sf::Vector2f& size,
     Image(*texturePtr, size,
           static_cast<sf::FloatRect>(sprite.getTextureRect()), tintColor,
           borderColor);
+}
+
+void Image(const sf::RenderTexture& texture, const sf::Vector2f& size, const sf::FloatRect& textureRect,
+	const sf::Color& tintColor, const sf::Color& borderColor)
+{
+	sf::Vector2f textureSize = static_cast<sf::Vector2f>(texture.getSize());
+	const ImVec2 uv0(textureRect.left / textureSize.x, (textureRect.top + textureRect.height) / textureSize.y);
+	const ImVec2 uv1((textureRect.left + textureRect.width) / textureSize.x, textureRect.top / textureSize.y);
+	ImGui::Image(texture.getTexture().getNativeHandle(), size, uv0, uv1, tintColor, borderColor);
 }
 
 /////////////// Image Button Overloads

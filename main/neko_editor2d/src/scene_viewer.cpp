@@ -33,8 +33,8 @@ namespace neko::editor
 
 void SceneViewer::Update(sf::RenderTexture& sceneTexture)
 {
-    auto tintColor = sf::Color::White;
-    auto borderColor = sf::Color::White;
+	const auto tintColor = sf::Color::White;
+	const auto borderColor = sf::Color::White;
     
 
     const auto imWindowSize = ImGui::GetWindowSize();
@@ -42,10 +42,11 @@ void SceneViewer::Update(sf::RenderTexture& sceneTexture)
     const auto ratio = sf::Vector2f(windowSize.x / sceneTexture.getSize().x,
                                     windowSize.y / sceneTexture.getSize().y);
     windowSize = sf::Vector2f(sceneTexture.getSize()) * (ratio.x < ratio.y ? ratio.x : ratio.y);
-    sf::Sprite windowSprite;
-    windowSprite.setTexture(sceneTexture.getTexture());
-    ImGui::Image(windowSprite, sf::Vector2f(windowSize.x - 25.f, windowSize.y - 40.f), tintColor,
-                 borderColor);
+    
+   
+    ImGui::Image(sceneTexture.getTexture(), 
+		sf::Vector2f(windowSize.x - 25.f, windowSize.y - 40.f),
+		tintColor, borderColor);
 
 }
 

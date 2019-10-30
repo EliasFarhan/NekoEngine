@@ -14,6 +14,7 @@ namespace sf
     class Event;
     class RenderTarget;
     class RenderWindow;
+	class RenderTexture;
     class Sprite;
     class Texture;
     class Window;
@@ -73,6 +74,9 @@ namespace ImGui
     IMGUI_SFML_API void Image(const sf::Sprite& sprite, const sf::Vector2f& size,
         const sf::Color& tintColor = sf::Color::White,
         const sf::Color& borderColor = sf::Color::Transparent);
+	IMGUI_SFML_API void Image(const sf::RenderTexture& texture, const sf::Vector2f& size, const sf::FloatRect& textureRect,
+		const sf::Color& tintColor = sf::Color::White, 
+		const sf::Color& borderColor = sf::Color::Transparent);
 
     // ImageButton overloads
     IMGUI_SFML_API bool ImageButton(const sf::Texture& texture, const int framePadding = -1,

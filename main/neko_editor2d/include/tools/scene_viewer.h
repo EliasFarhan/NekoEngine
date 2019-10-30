@@ -24,6 +24,7 @@
  SOFTWARE.
  */
 #include <SFML/Graphics/RenderTexture.hpp>
+#include "SFML/Graphics/Sprite.hpp"
 
 namespace neko::editor
 {
