@@ -349,7 +349,7 @@ void NekoEditor::EditorUpdate(float dt)
 	{
 		if (fileDialog_.HasSelected())
 		{
-			auto sceneJsonPath = fileDialog_.GetSelected().string();
+			const auto sceneJsonPath = fileDialog_.GetSelected().string();
 			sceneManager_.GetCurrentScene().scenePath = sceneJsonPath;
 			sceneManager_.SaveCurrentScene();
 			fileDialog_.ClearSelected();

@@ -302,7 +302,7 @@ LIST(APPEND engine2d_lib
 
 set_target_properties (sfml-network PROPERTIES FOLDER Externals)
 #imgui sfml
-set(SFML_IMGUI ${EXTERNAL_DIR}/imgui-sfml-2.0.1/)
+set(SFML_IMGUI ${EXTERNAL_DIR}/imgui-sfml-2.1/)
 set(IMGUI_ROOT ${EXTERNAL_DIR}/imgui-1.70/ CACHE INTERNAL "")
 set(IMGUI_DIR ${EXTERNAL_DIR}/imgui-1.70/ CACHE INTERNAL "")
 set(IMGUI_SFML_FIND_SFML OFF CACHE INTERNAL "")

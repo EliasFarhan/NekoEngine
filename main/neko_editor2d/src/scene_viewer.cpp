@@ -35,18 +35,17 @@ void SceneViewer::Update(sf::RenderTexture& sceneTexture)
 {
 	const auto tintColor = sf::Color::White;
 	const auto borderColor = sf::Color::White;
-    
 
-    const auto imWindowSize = ImGui::GetWindowSize();
-    auto windowSize = sf::Vector2f(imWindowSize.x, imWindowSize.y);
-    const auto ratio = sf::Vector2f(windowSize.x / sceneTexture.getSize().x,
-                                    windowSize.y / sceneTexture.getSize().y);
-    windowSize = sf::Vector2f(sceneTexture.getSize()) * (ratio.x < ratio.y ? ratio.x : ratio.y);
-    
-   
-    ImGui::Image(sceneTexture.getTexture(), 
-		sf::Vector2f(windowSize.x - 25.f, windowSize.y - 40.f),
-		tintColor, borderColor);
+
+	const auto imWindowSize = ImGui::GetWindowSize();
+	auto windowSize = sf::Vector2f(imWindowSize.x, imWindowSize.y);
+	const auto ratio = sf::Vector2f(windowSize.x / sceneTexture.getSize().x,
+		windowSize.y / sceneTexture.getSize().y);
+	windowSize = sf::Vector2f(sceneTexture.getSize()) * (ratio.x < ratio.y ? ratio.x : ratio.y);
+
+
+	ImGui::Image(sceneTexture, sf::Vector2f(windowSize.x - 25.f, windowSize.y - 40.f),
+		sf::FloatRect(sf::Vector2f(), sf::Vector2f(sceneTexture.getSize())), tintColor, borderColor);
 
 }
 

@@ -5,9 +5,9 @@
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
-#include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/OpenGL.hpp>
 #include <SFML/Window/Clipboard.hpp>
 #include <SFML/Window/Cursor.hpp>
@@ -194,6 +194,10 @@ void Init(sf::RenderWindow& window, bool loadDefaultFont) {
 }
 
 void Init(sf::Window& window, sf::RenderTarget& target, bool loadDefaultFont) {
+    Init(window, static_cast<sf::Vector2f>(target.getSize()), loadDefaultFont);
+}
+
+void Init(sf::Window& window, const sf::Vector2f& displaySize, bool loadDefaultFont) {
 #if __cplusplus < 201103L  // runtime assert when using earlier than C++11 as no
                            // static_assert support
     assert(
@@ -246,7 +250,7 @@ void Init(sf::Window& window, sf::RenderTarget& target, bool loadDefaultFont) {
     initDefaultJoystickMapping();
 
     // init rendering
-    io.DisplaySize = static_cast<sf::Vector2f>(target.getSize());
+    io.DisplaySize = displaySize;
 
     // clipboard
     io.SetClipboardTextFn = setClipboardText;
@@ -306,8 +310,14 @@ void ProcessEvent(const sf::Event& event) {
                     s_touchDown[event.touch.finger] = true;
                 }
             } break;
-            case sf::Event::MouseWheelMoved:
-                io.MouseWheel += static_cast<float>(event.mouseWheel.delta);
+            case sf::Event::MouseWheelScrolled:
+                if (event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel ||
+                    (event.mouseWheelScroll.wheel == sf::Mouse::HorizontalWheel &&
+                    io.KeyShift)) {
+                    io.MouseWheel += event.mouseWheelScroll.delta;
+                } else if (event.mouseWheelScroll.wheel == sf::Mouse::HorizontalWheel) {
+                    io.MouseWheelH += event.mouseWheelScroll.delta;
+                }
                 break;
             case sf::Event::KeyPressed:  // fall-through
             case sf::Event::KeyReleased:
@@ -315,10 +325,11 @@ void ProcessEvent(const sf::Event& event) {
                     (event.type == sf::Event::KeyPressed);
                 break;
             case sf::Event::TextEntered:
-                if (event.text.unicode > 0 && event.text.unicode < 0x10000) {
-                    io.AddInputCharacter(
-                        static_cast<ImWchar>(event.text.unicode));
+                // Don't handle the event for unprintable characters
+                if (event.text.unicode < ' ' || event.text.unicode == 127) {
+                    break;
                 }
+                io.AddInputCharacter(event.text.unicode);
                 break;
             case sf::Event::JoystickConnected:
                 if (s_joystickId == NULL_JOYSTICK_ID) {
@@ -396,13 +407,15 @@ void Update(const sf::Vector2i& mousePos, const sf::Vector2f& displaySize,
         }
     }
 
-    // Update Ctrl, Shift, Alt state
+    // Update Ctrl, Shift, Alt, Super state
     io.KeyCtrl = io.KeysDown[sf::Keyboard::LControl] ||
                  io.KeysDown[sf::Keyboard::RControl];
     io.KeyAlt =
         io.KeysDown[sf::Keyboard::LAlt] || io.KeysDown[sf::Keyboard::RAlt];
     io.KeyShift =
         io.KeysDown[sf::Keyboard::LShift] || io.KeysDown[sf::Keyboard::RShift];
+    io.KeySuper = io.KeysDown[sf::Keyboard::LSystem] ||
+                  io.KeysDown[sf::Keyboard::RSystem];
 
 #ifdef ANDROID
 #ifdef USE_JNI
@@ -444,6 +457,11 @@ void Update(const sf::Vector2i& mousePos, const sf::Vector2f& displaySize,
 
 void Render(sf::RenderTarget& target) {
     target.resetGLStates();
+    ImGui::Render();
+    RenderDrawLists(ImGui::GetDrawData());
+}
+
+void Render() {
     ImGui::Render();
     RenderDrawLists(ImGui::GetDrawData());
 }
@@ -555,10 +573,10 @@ void Image(const sf::Texture& texture, const sf::FloatRect& textureRect,
 void Image(const sf::Texture& texture, const sf::Vector2f& size,
            const sf::FloatRect& textureRect, const sf::Color& tintColor,
            const sf::Color& borderColor) {
-	const sf::Vector2f textureSize = static_cast<sf::Vector2f>(texture.getSize());
-    const ImVec2 uv0(textureRect.left / textureSize.x,
+    sf::Vector2f textureSize = static_cast<sf::Vector2f>(texture.getSize());
+    ImVec2 uv0(textureRect.left / textureSize.x,
                textureRect.top / textureSize.y);
-	const ImVec2 uv1((textureRect.left + textureRect.width) / textureSize.x,
+    ImVec2 uv1((textureRect.left + textureRect.width) / textureSize.x,
                (textureRect.top + textureRect.height) / textureSize.y);
 
     ImTextureID textureID =
@@ -590,8 +608,8 @@ void Image(const sf::RenderTexture& texture, const sf::Vector2f& size, const sf:
 	const sf::Color& tintColor, const sf::Color& borderColor)
 {
 	sf::Vector2f textureSize = static_cast<sf::Vector2f>(texture.getSize());
-	const ImVec2 uv0(textureRect.left / textureSize.x, (textureRect.top + textureRect.height) / textureSize.y);
-	const ImVec2 uv1((textureRect.left + textureRect.width) / textureSize.x, textureRect.top / textureSize.y);
+	ImVec2 uv0(textureRect.left / textureSize.x, (textureRect.top + textureRect.height) / textureSize.y);
+	ImVec2 uv1((textureRect.left + textureRect.width) / textureSize.x, textureRect.top / textureSize.y);
 	ImGui::Image(texture.getTexture().getNativeHandle(), size, uv0, uv1, tintColor, borderColor);
 }
 
@@ -886,11 +904,12 @@ void updateJoystickLStickState(ImGuiIO& io) {
 }
 
 void setClipboardText(void* /*userData*/, const char* text) {
-    sf::Clipboard::setString(text);
+    sf::Clipboard::setString(sf::String::fromUtf8(text, text + std::strlen(text)));
 }
 
 const char* getClipboadText(void* /*userData*/) {
-    s_clipboardText = sf::Clipboard::getString().toAnsiString();
+    std::basic_string<sf::Uint8> tmp = sf::Clipboard::getString().toUtf8();
+    s_clipboardText = std::string(tmp.begin(), tmp.end());
     return s_clipboardText.c_str();
 }
 

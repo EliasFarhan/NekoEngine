@@ -4,6 +4,7 @@
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/Color.hpp>
+
 #include <SFML/System/Time.hpp>
 #include <SFML/Window/Joystick.hpp>
 
@@ -13,8 +14,8 @@ namespace sf
 {
     class Event;
     class RenderTarget;
+    class RenderTexture;
     class RenderWindow;
-	class RenderTexture;
     class Sprite;
     class Texture;
     class Window;
@@ -26,6 +27,7 @@ namespace ImGui
     {
         IMGUI_SFML_API void Init(sf::RenderWindow& window, bool loadDefaultFont = true);
         IMGUI_SFML_API void Init(sf::Window& window, sf::RenderTarget& target, bool loadDefaultFont = true);
+        IMGUI_SFML_API void Init(sf::Window& window, const sf::Vector2f& displaySize, bool loadDefaultFont = true);
 
         IMGUI_SFML_API void ProcessEvent(const sf::Event& event);
 
@@ -34,6 +36,7 @@ namespace ImGui
         IMGUI_SFML_API void Update(const sf::Vector2i& mousePos, const sf::Vector2f& displaySize, sf::Time dt);
 
         IMGUI_SFML_API void Render(sf::RenderTarget& target);
+        IMGUI_SFML_API void Render();
 
         IMGUI_SFML_API void Shutdown();
 
@@ -74,9 +77,9 @@ namespace ImGui
     IMGUI_SFML_API void Image(const sf::Sprite& sprite, const sf::Vector2f& size,
         const sf::Color& tintColor = sf::Color::White,
         const sf::Color& borderColor = sf::Color::Transparent);
+
 	IMGUI_SFML_API void Image(const sf::RenderTexture& texture, const sf::Vector2f& size, const sf::FloatRect& textureRect,
-		const sf::Color& tintColor = sf::Color::White, 
-		const sf::Color& borderColor = sf::Color::Transparent);
+		const sf::Color& tintColor = sf::Color::White, const sf::Color& borderColor = sf::Color::Transparent);
 
     // ImageButton overloads
     IMGUI_SFML_API bool ImageButton(const sf::Texture& texture, const int framePadding = -1,

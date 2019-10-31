@@ -116,14 +116,14 @@ void Inspector::ShowEntityInfo(neko::Entity entity) const
 				if (ImGui::Selectable("No Texture"))
 				{
 					dirty = true;
-					spriteManager_.CopyTexture(neko::INVALID_INDEX, entity, 1);
+					tmpSprite.sprite.setTexture(sf::Texture());
 				}
 				for (neko::Index i = 0; i < textureManager_.GetTextureCount(); i++)
 				{
 					if (ImGui::Selectable(textureManager_.GetTexturePath(i).data()))
 					{
 						dirty = true;
-						spriteManager_.CopyTexture(i, entity, 1);
+						tmpSprite.sprite.setTexture(*textureManager_.GetTexture(i));
 					}
 				}
 				ImGui::EndPopup();

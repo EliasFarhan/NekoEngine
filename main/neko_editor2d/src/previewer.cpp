@@ -24,8 +24,11 @@
  */
 #include <tools/previewer.h>
 #include <sfml_engine/spine.h>
+#include <SFML/Graphics/Sprite.hpp>
 #include <imgui.h>
 #include <imgui-SFML.h>
+#include "engine/log.h"
+#include <sstream>
 
 namespace neko::editor
 {
@@ -40,16 +43,21 @@ void Previewer::Update(float dt)
 	{
 	    if(spineDrawable_.skeletonData != nullptr)
         {
-	        auto animations = spineDrawable_.skeletonData->animations;
-            static const char* currentAnim = spineDrawable_.skeletonData->animations[0]->name;            // Here our selection is a single pointer stored outside the object.
+	        const auto animations = spineDrawable_.skeletonData->animations;
+			static Index currentAnimIndex = 0;
+	    	if(currentAnimIndex >= spineDrawable_.skeletonData->animationsCount)
+	    	{
+				currentAnimIndex = 0;
+	    	}
+	    	const char* currentAnim = spineDrawable_.skeletonData->animations[currentAnimIndex]->name;            // Here our selection is a single pointer stored outside the object.
             if (ImGui::BeginCombo("Animation", currentAnim)) // The second parameter is the label previewed before opening the combo.
             {
                 for (int n = 0; n < spineDrawable_.skeletonData->animationsCount; n++)
                 {
-                    bool isSelected = (currentAnim == animations[n]->name);
+	                const bool isSelected = (currentAnim == animations[n]->name);
                     if (ImGui::Selectable(animations[n]->name, isSelected))
                     {
-                        currentAnim = animations[n]->name;
+                        currentAnimIndex = n;
                         if (spineDrawable_.skeletonDrawable != nullptr)
                         {
                             spineDrawable_.SetAnimationByName(animations[n]->name);
@@ -61,15 +69,20 @@ void Previewer::Update(float dt)
                 ImGui::EndCombo();
             }
             auto skins = spineDrawable_.skeletonData->skins;
-            static const char* currentSkin = spineDrawable_.skeletonData->skins[0]->name;            // Here our selection is a single pointer stored outside the object.
+			static Index currentSkinIndex = 0;
+	    	if(currentSkinIndex >= spineDrawable_.skeletonData->skinsCount)
+	    	{
+				currentSkinIndex = 0;
+	    	}
+            const char* currentSkin = spineDrawable_.skeletonData->skins[0]->name;            // Here our selection is a single pointer stored outside the object.
             if (ImGui::BeginCombo("Skin", currentSkin)) // The second parameter is the label previewed before opening the combo.
             {
                 for (int n = 0; n < spineDrawable_.skeletonData->skinsCount; n++)
                 {
-                    bool isSelected = (currentSkin == skins[n]->name);
+	                const bool isSelected = (currentSkin == skins[n]->name);
                     if (ImGui::Selectable(skins[n]->name, isSelected))
                     {
-                        currentSkin = skins[n]->name;
+                        currentSkinIndex = n;
                         if (spineDrawable_.skeletonDrawable != nullptr)
                         {
                             spineDrawable_.SetSkinByName(skins[n]->name);
@@ -96,10 +109,19 @@ void Previewer::Update(float dt)
 			const auto skeletonBound = spineDrawable_.skeletonDrawable->vertexArray->getBounds();
 			const sf::Vector2f ratio = sf::Vector2f(float(skeletonBound.width) * 2.0f / view.getSize().x, float(skeletonBound.height) * 2.0f / view.getSize().y);
 			view.setSize(view.getSize() * (ratio.x > ratio.y ? ratio.x : ratio.y));
+		    {
+			    //Debug view
+				std::ostringstream oss;
+				oss << "Preview RenderTexture View: (" << view.getSize().x<<","<<view.getSize().y << ")";
+				logDebug(oss.str());
+		    }
 			previewTexture_.setView(view);
 		}
 		previewTexture_.display();
-		ImGui::Image(previewTexture_.getTexture());
+		
+		
+		ImGui::Image(previewTexture_, sf::Vector2f(previewTexture_.getSize()),
+			sf::FloatRect(sf::Vector2f(), sf::Vector2f(previewTexture_.getSize())));
 		break;
 	}
 	default:
