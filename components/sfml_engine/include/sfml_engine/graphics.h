@@ -25,7 +25,10 @@ inline Color::operator sf::Color() const
 
 namespace neko::sfml
 {
-
+struct SfmlRenderTarget : public RenderTarget
+{
+	sf::RenderTarget* sfmlRenderTarget;
+};
 class SfmlRenderCommand : public RenderCommand
 {
 public:
@@ -33,20 +36,10 @@ public:
     void SetStates(const sf::RenderStates& states);
     const sf::Drawable* GetDrawable() const;
     void SetDrawable(sf::Drawable* drawable);
+	void Render(RenderTarget* renderTarget) override;
 private:
     sf::Drawable* drawable_ = nullptr;
     sf::RenderStates states_ = sf::RenderStates::Default;
-};
-
-class SfmlGraphicsManager : public GraphicsManager
-{
-public:
-    void SetRenderTarget(sf::RenderTarget* renderTarget);
-
-protected:
-    void Render(RenderCommand* command) override;
-    sf::RenderTarget* renderTarget_ = nullptr;
-
 };
 
 }

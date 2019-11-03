@@ -32,6 +32,7 @@
 #include "graphics.h"
 #include <sfml_engine/transform.h>
 #include <graphics/graphics.h>
+#include "texture.h"
 
 
 namespace neko::sfml
@@ -45,7 +46,7 @@ struct Sprite : public SfmlRenderCommand
     sf::Sprite sprite;
     int layer = 0;
     sf::Vector2f origin = sf::Vector2f(0.0f,0.0f);
-    Index textureId = INVALID_INDEX;
+    TextureId textureId = INVALID_TEXTURE_ID;
     sf::Transform transform = sf::Transform::Identity;
 };
 
@@ -57,7 +58,7 @@ public:
 
     void CopySpriteOrigin(const sf::Vector2f& origin, size_t start, size_t length=1);
 
-    void CopyTexture(const Index textureId, size_t start, size_t length=1);
+    void CopyTexture(const TextureId textureId, size_t start, size_t length=1);
 
     void CopyLayer(int layer, size_t start, size_t length=1);
 
@@ -68,7 +69,7 @@ public:
 
     void CopyAllTransformRotations(EntityManager& entityManager, Rotation2dManager& angleManager);
 
-    void PushAllCommands(EntityManager& entityManager, SfmlGraphicsManager& graphicsManager);
+    void PushAllCommands(EntityManager& entityManager, GraphicsManager& graphicsManager);
 
     void ParseComponentJson(json& componentJson, Entity entity) override;
 

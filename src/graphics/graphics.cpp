@@ -36,8 +36,18 @@ GraphicsManager::GraphicsManager()
 }
 
 
+void GraphicsManager::Render(RenderCommand* command)
+{
+	if (renderLength_ >= MAX_COMMAND_NMB)
+	{
+		logDebug("[Error] Max Number of Graphics Command");
+		return;
+	}
+	commandBuffer_[renderLength_] = command;
+	renderLength_++;
+}
 
-void GraphicsManager::RenderAll()
+void GraphicsManager::RenderAll(RenderTarget* renderTarget)
 {
     std::sort(commandBuffer_.begin(), commandBuffer_.begin() + renderLength_, [](RenderCommand* c1, RenderCommand* c2)
     {
@@ -47,22 +57,13 @@ void GraphicsManager::RenderAll()
     {
         if(commandBuffer_[i])
         {
-            Render(commandBuffer_[i]);
+            commandBuffer_[i]->Render(renderTarget);
         }
     }
     renderLength_ = 0;
 }
 
-void GraphicsManager::Draw(RenderCommand* command)
-{
-	if(renderLength_ >= MAX_COMMAND_NMB)
-	{
-		logDebug("[Error] Max Number of Graphics Command");
-		return;
-	}
-    commandBuffer_[renderLength_] = command;
-    renderLength_++;
-}
+
 
 int RenderCommand::GetLayer() const
 {

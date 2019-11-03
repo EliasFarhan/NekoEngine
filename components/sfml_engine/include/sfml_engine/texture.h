@@ -23,14 +23,24 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-#include <vector>
-#include <limits>
-#include <memory>
 #include <SFML/Graphics/Texture.hpp>
-#include "engine/globals.h"
+#include "mathematics/vector.h"
+#include <xxhash.hpp>
+#include <unordered_map>
+#include "utilities/json_utility.h"
 
 namespace neko::sfml
 {
+
+struct Texture
+{
+	Vec2f origin{};
+	sf::Texture texture;
+};
+
+using TextureId = xxh::hash_t<64>;
+const TextureId INVALID_TEXTURE_ID = TextureId(0);
+
 class TextureManager
 {
 public:
@@ -39,14 +49,15 @@ public:
 
     bool HasValidExtension(const std::string_view filename);
 	//Return an index to avoid pointer invalidation
-	Index LoadTexture(const std::string_view filename);
-	const sf::Texture* GetTexture(const Index index) const;
-    const std::string_view GetTexturePath(const Index index) const;
-
-    size_t GetTextureCount() const;
+	TextureId LoadTexture(const std::string& filename);
+	const Texture* GetTexture(const TextureId textureId) const;
+	std::string GetTexturePath(TextureId textureId)const;
+	const std::unordered_map<TextureId, std::string>& GetTextureNameMap();
 private:
-    std::vector<std::string> texturePaths_;
-    std::vector<sf::Texture> textures_;
+    static void LoadMetadata(const std::string& metadataPath, Texture& texture);
+    static void CreateEmptyMetaFile(const std::string& filename);
+	std::unordered_map<TextureId, Texture> textures_;
+	std::unordered_map<TextureId, std::string> textureNames_;
 };
 
 }

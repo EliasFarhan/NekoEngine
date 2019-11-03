@@ -3,28 +3,10 @@
 //
 
 #include "sfml_engine/graphics.h"
+#include "engine/globals.h"
 
 namespace neko::sfml
 {
-void SfmlGraphicsManager::SetRenderTarget(sf::RenderTarget* renderTarget)
-{
-    renderTarget_ = renderTarget;
-
-}
-
-void SfmlGraphicsManager::Render(RenderCommand* command)
-{
-    if(command == nullptr || renderTarget_ == nullptr)
-        return;
-    auto* sfmlRenderCommand = dynamic_cast<SfmlRenderCommand*>(command);
-    if(sfmlRenderCommand)
-    {
-        auto* drawable = sfmlRenderCommand->GetDrawable();
-        if(drawable == nullptr)
-            return;
-        renderTarget_->draw(*drawable, sfmlRenderCommand->GetStates());
-    }
-}
 
 
 const sf::RenderStates& SfmlRenderCommand::GetStates() const
@@ -45,5 +27,13 @@ const sf::Drawable* SfmlRenderCommand::GetDrawable() const
 void SfmlRenderCommand::SetDrawable(sf::Drawable* drawable)
 {
     drawable_ = drawable;
+}
+
+void SfmlRenderCommand::Render(RenderTarget* renderTarget)
+{
+	auto* renderTargetPtr = static_cast<sf::RenderTarget*>(renderTarget->renderTargetPtr);
+	if(drawable_ == nullptr || renderTargetPtr == nullptr)
+		return;
+	renderTargetPtr->draw(*drawable_, states_);
 }
 }

@@ -36,7 +36,7 @@ void HelloTriangleCommand::Update(float dt)
 	timeSinceInit_ += dt;
 }
 
-void HelloTriangleCommand::Render()
+void HelloTriangleCommand::Render(RenderTarget* renderTarget)
 {
 
 	shader_.Bind();

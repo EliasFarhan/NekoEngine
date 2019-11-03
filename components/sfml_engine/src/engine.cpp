@@ -11,7 +11,7 @@ void SfmlBasicEngine::Init()
     window_ = std::make_unique<sf::RenderWindow>(
             sf::VideoMode(config.realWindowSize.first, config.realWindowSize.second),
             config.windowName, config.fullscreen?sf::Style::Fullscreen:sf::Style::Default);
-    graphicsManager_.SetRenderTarget(window_.get());
+
     if (config.vSync)
     {
         window_->setVerticalSyncEnabled(config.vSync);
@@ -37,8 +37,8 @@ void SfmlBasicEngine::Update(float dt)
 
     window_->clear(sf::Color::Black);
     updateDelegate_.Execute(dt);
-    graphicsManager_.SetRenderTarget(window_.get());
-    graphicsManager_.RenderAll();
+	RenderTarget renderTarget{ window_.get() };
+    graphicsManager_.RenderAll(&renderTarget);
     ImGui::SFML::Update(*window_, sf::seconds(dt));
     //update Ui
     drawUiDelegate_.Execute(dt);
@@ -98,10 +98,12 @@ void SfmlBasicEngine::OnEvent(sf::Event& event)
 }
 
 SfmlFullEngine::SfmlFullEngine(Configuration* config) :
-SfmlBasicEngine(config),
-transform2dManager_(position2dManager_, scale2dManager_, rotation2dManager_),
-body2dManager_(physics2dManager_)
+	SfmlBasicEngine(config),
+	transform2dManager_(position2dManager_, scale2dManager_, rotation2dManager_),
+	physics2dManager_(contactListener_),
+	body2dManager_(physics2dManager_), contactListener_(*this)
 {
+	physics2dManager_.SetConfiguration(config);
 }
 
 void SfmlFullEngine::OnBeginContact(const box2d::Collider* collider1, const box2d::Collider* collider2)

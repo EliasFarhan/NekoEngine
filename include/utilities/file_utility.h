@@ -55,6 +55,7 @@ std::string GetFilenameExtension(const std::string_view path);
 
 std::string GetFileParentPath(const std::string_view path);
 std::string GetFilename(const std::string_view path);
+std::string GetStem(const std::string_view path);
 
 void WriteStringToFile(const std::string& path, const std::string_view content);
 }

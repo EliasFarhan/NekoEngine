@@ -78,8 +78,8 @@ public:
 
     Configuration config;
 
-    template <typename T = BasicEngine>
-    static T* GetInstance(){ return dynamic_cast<T*>(instance_);};
+    //template <typename T = BasicEngine>
+    //static T* GetInstance(){ return dynamic_cast<T*>(instance_);};
 protected:
     static BasicEngine* instance_;
 	float isRunning_;

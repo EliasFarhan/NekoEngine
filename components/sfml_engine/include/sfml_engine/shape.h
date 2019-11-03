@@ -59,7 +59,7 @@ public:
     void CopyTransformPosition(Position2dManager& positionManager, size_t start, size_t length);
     void CopyTransformRotation(Rotation2dManager& rotationManager, size_t start, size_t length);
 
-    void PushCommands(SfmlGraphicsManager& graphicsManager, size_t start, size_t length);
+    void PushCommands(GraphicsManager& graphicsManager, size_t start, size_t length);
 
 
 };

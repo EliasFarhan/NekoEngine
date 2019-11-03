@@ -33,7 +33,7 @@ protected:
 	MouseManager mouseManager_;
 	KeyboardManager keyboardManager_;
 
-	SfmlGraphicsManager graphicsManager_;
+	GraphicsManager graphicsManager_;
 	Delegate<const box2d::Collider*, const box2d::Collider*> contactBeginDelegate_;
 	Delegate<const box2d::Collider*, const box2d::Collider*> contactEndDelegate_;
 };

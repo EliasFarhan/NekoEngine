@@ -20,7 +20,7 @@ void ColliderDefManager::PushAllCommands(GraphicsManager& graphicsManager)
 	{
 		if (entityManager_.HasComponent(entity, boxEntityMask))
 		{
-			//Draw box
+			//Render box
 			const auto& boxColliderDef = boxColliderDefManager_.GetComponent(entity);
 			sf::RectangleShape shape;
 			shape.setSize(unit2pixel(boxColliderDef.size));
@@ -39,7 +39,7 @@ void ColliderDefManager::PushAllCommands(GraphicsManager& graphicsManager)
 		}
 		if (entityManager_.HasComponent(entity, circleEntityMask))
 		{
-			//Draw circle
+			//Render circle
 			const auto& circleColliderDef = circleColliderDefManager_.GetComponent(entity);
 			sf::CircleShape shape;
 			const float radius = box2d::meter2pixel(circleColliderDef.shapeDef.m_radius);
@@ -56,7 +56,7 @@ void ColliderDefManager::PushAllCommands(GraphicsManager& graphicsManager)
 		}
 		if (entityManager_.HasComponent(entity, polygonEntityMask))
 		{
-			//Draw polygon
+			//Render polygon
 		}
 	}
 
@@ -89,7 +89,7 @@ void ColliderDefManager::PushAllCommands(GraphicsManager& graphicsManager)
 
 	for(auto& command : commands_)
     {
-	    graphicsManager.Draw(&command);
+	    graphicsManager.Render(&command);
     }
 }
 

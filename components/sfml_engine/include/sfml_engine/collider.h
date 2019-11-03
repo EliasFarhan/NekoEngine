@@ -28,6 +28,10 @@
 #include "engine/entity.h"
 #include "Box2D/Dynamics/b2WorldCallbacks.h"
 
+namespace neko::sfml
+{
+class SfmlFullEngine;
+}
 namespace neko::box2d
 {
 
@@ -49,10 +53,13 @@ struct Collider
 class ContactListener : public b2ContactListener
 {
 public:
+	explicit ContactListener(sfml::SfmlFullEngine& engine);
     ~ContactListener() = default;
 
     void BeginContact(b2Contact* contact) override;
 
     void EndContact(b2Contact* contact) override;
+private:
+	sfml::SfmlFullEngine& engine_;
 };
 }

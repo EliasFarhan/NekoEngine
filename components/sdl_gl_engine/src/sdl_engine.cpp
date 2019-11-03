@@ -186,7 +186,7 @@ void SdlGlEngine::Update([[maybe_unused]]float dt)
 	ImGui_ImplSDL2_NewFrame(window_);
 	ImGui::NewFrame();
 
-	drawUiDelegate_.Execute();
+	drawUiDelegate_.Execute(dt);
 
 	ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

@@ -100,8 +100,8 @@ void Inspector::ShowEntityInfo(neko::Entity entity) const
 		{
 			bool dirty = false;
 			auto tmpSprite = spriteManager_.GetComponent(entity);
-			const auto& textureName = textureManager_.GetTexturePath(tmpSprite.textureId);
-			if (ImGui::Button(textureName.data()))
+			const auto textureName = textureManager_.GetTexturePath(tmpSprite.textureId);
+			if (ImGui::Button(textureName.c_str()))
 			{
 				ImGui::OpenPopup("Texture Popup");
 
@@ -118,12 +118,13 @@ void Inspector::ShowEntityInfo(neko::Entity entity) const
 					dirty = true;
 					tmpSprite.sprite.setTexture(sf::Texture());
 				}
-				for (neko::Index i = 0; i < textureManager_.GetTextureCount(); i++)
+				for (auto& textureNamePair : textureManager_.GetTextureNameMap())
 				{
-					if (ImGui::Selectable(textureManager_.GetTexturePath(i).data()))
+					if (ImGui::Selectable(textureNamePair.second.c_str()))
 					{
 						dirty = true;
-						tmpSprite.sprite.setTexture(*textureManager_.GetTexture(i));
+						tmpSprite.textureId = textureNamePair.first;
+						tmpSprite.sprite.setTexture(textureManager_.GetTexture(textureNamePair.first)->texture);
 					}
 				}
 				ImGui::EndPopup();

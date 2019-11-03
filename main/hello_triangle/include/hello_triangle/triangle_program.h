@@ -33,7 +33,7 @@ public:
 	void Init() override;
 	void Update(float dt) override;
 	void Destroy() override;
-	void Render() override;
+	void Render(RenderTarget* renderTarget) override;
 private:
 	float vertices[12] = {
 		 0.5f,  0.5f, 0.0f,  // top right

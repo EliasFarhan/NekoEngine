@@ -45,7 +45,7 @@ void SpriteManager::CopySpriteOrigin(const sf::Vector2f& origin, size_t start, s
     }
 }
 
-void SpriteManager::CopyTexture(const Index textureId, size_t start, size_t length)
+void SpriteManager::CopyTexture(const TextureId textureId, size_t start, size_t length)
 {
 
     auto* texture = textureManager_.GetTexture(textureId);
@@ -54,7 +54,7 @@ void SpriteManager::CopyTexture(const Index textureId, size_t start, size_t leng
         components_[i].textureId = textureId;
         if(textureId != INVALID_INDEX)
         {
-            components_[i].sprite.setTexture( *texture, true);
+            components_[i].sprite.setTexture( texture->texture, true);
         }
         else
         {
@@ -118,7 +118,7 @@ void SpriteManager::CopyAllTransformRotations(EntityManager& entityManager, Rota
     }
 }
 
-void SpriteManager::PushAllCommands(EntityManager& entityManager, SfmlGraphicsManager& graphicsManager)
+void SpriteManager::PushAllCommands(EntityManager& entityManager, GraphicsManager& graphicsManager)
 {
     const auto entityMask = EntityMask(NekoComponentType::SPRITE2D);
     for(Entity entity = 0; entity < entityManager.GetEntitiesSize();entity++)
@@ -133,7 +133,7 @@ void SpriteManager::PushAllCommands(EntityManager& entityManager, SfmlGraphicsMa
             states.transform = components_[entity].transform;
             components_[entity].SetStates(states);
             components_[entity].SetDrawable(&components_[entity].sprite);
-            graphicsManager.Draw(&components_[entity]);
+            graphicsManager.Render(&components_[entity]);
         }
     }
 }
@@ -152,7 +152,6 @@ json SpriteManager::SerializeComponentJson(Entity entity)
 {
     const auto& sprite = GetComponent(entity);
     json componentJson;
-    componentJson["texture"] = textureManager_.GetTexturePath(sprite.textureId);
     componentJson["layer"] = sprite.layer;
     componentJson["origin"] = {sprite.origin.x, sprite.origin.y};
     return componentJson;

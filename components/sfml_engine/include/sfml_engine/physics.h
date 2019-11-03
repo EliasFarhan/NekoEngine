@@ -51,6 +51,8 @@ namespace box2d
 class Physics2dManager : public System
 {
 public:
+	Physics2dManager(ContactListener& contactListener);
+	void SetConfiguration(Configuration* config);
     void Init() override;
 
     void Update(float dt) override;
@@ -81,7 +83,7 @@ private:
     std::vector<b2Body*> bodies_;
     std::vector<Collider> colliders_;
     Configuration* config_ = nullptr;
-    ContactListener collisionListener_;
+    ContactListener& collisionListener_;
 };
 
 

@@ -18,7 +18,7 @@ HelloTriangleEngine::HelloTriangleEngine(Configuration* config) : SdlGlEngine(co
 		});
 	drawDelegate_.RegisterCallback([this]()
 		{
-			graphicsManager_.Draw(&helloTriangleCommand_);
+			graphicsManager_.Render(&helloTriangleCommand_);
 		});
 }
 }

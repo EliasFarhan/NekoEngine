@@ -76,7 +76,7 @@ void CityZoneManager::UpdateZoneTilemap(const CityBuilderMap& cityMap, CityBuild
 void CityZoneManager::PushCommand(GraphicsManager* graphicsManager)
 {
     const auto frameIndex = MainEngine::GetInstance()->frameIndex % 2;
-    graphicsManager->Draw(zoneVertexArray_[frameIndex]);
+    graphicsManager->Render(zoneVertexArray_[frameIndex]);
 }
 
 void CityZoneManager::AddZone(sf::Vector2i position, ZoneType zoneType, CityBuilderMap& cityMap)

@@ -105,7 +105,7 @@ public:
 
     void CopyAllTransformAngles(EntityManager& entityManager, Rotation2dManager& angle2DManager);
 
-    void PushAllCommands(EntityManager& entityManager, SfmlGraphicsManager& graphicsManager);
+    void PushAllCommands(EntityManager& entityManager, GraphicsManager& graphicsManager);
 
     void CopyLayer(int layer, size_t start, size_t length);
 

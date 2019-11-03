@@ -73,7 +73,7 @@ void NekoEditor::Init()
 				return;
 			if (textureManager_.HasValidExtension(path))
 			{
-				textureManager_.LoadTexture(path);
+				textureManager_.LoadTexture(path.data());
 			}
 			if (neko::GetFilenameExtension(path) == ".prefab")
 			{
@@ -441,7 +441,7 @@ void NekoEditor::EditorUpdate(float dt)
 	ImGui::End();
 
 
-	//Draw things into the graphics manager
+	//Render things into the graphics manager
 	sceneRenderTexture_.clear(sf::Color(config.bgColor));
 
 	spriteManager_.CopyAllTransforms(entityManager_, transformManager_);
@@ -462,8 +462,8 @@ void NekoEditor::EditorUpdate(float dt)
 			float(config.gameWindowSize.first),
 			float(config.gameWindowSize.second));
 		sceneRenderTexture_.setView(sf::View(screenRect));
-		graphicsManager_.SetRenderTarget(&sceneRenderTexture_);
-		graphicsManager_.RenderAll();
+		RenderTarget renderTarget{ &sceneRenderTexture_ };
+		graphicsManager_.RenderAll(&renderTarget);
 		break;
 	}
 	case EditorMode::PrefabMode:
@@ -475,8 +475,8 @@ void NekoEditor::EditorUpdate(float dt)
 		rect.width *= screenRatio / rectRatio;
 		const sf::View renderView(rect);
 		sceneRenderTexture_.setView(renderView);
-		graphicsManager_.SetRenderTarget(&sceneRenderTexture_);
-		graphicsManager_.RenderAll();
+		RenderTarget renderTarget{ &sceneRenderTexture_ };
+		graphicsManager_.RenderAll(&renderTarget);
 		break;
 	}
 	}

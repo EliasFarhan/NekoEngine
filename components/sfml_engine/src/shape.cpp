@@ -79,13 +79,13 @@ void ConvexShapeManager::CopyTransformRotation(Rotation2dManager& rotationManage
 	}
 }
 
-void ConvexShapeManager::PushCommands(SfmlGraphicsManager& graphicsManager, size_t start, size_t length)
+void ConvexShapeManager::PushCommands(GraphicsManager& graphicsManager, size_t start, size_t length)
 {
     for(auto i = start; i < start+length;i++)
     {
 
         components_[i].SetDrawable(&components_[i].shape_);
-        graphicsManager.Draw(&components_[i]);
+        graphicsManager.Render(&components_[i]);
     }
 }
 }

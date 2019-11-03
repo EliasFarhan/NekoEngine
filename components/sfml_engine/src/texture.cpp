@@ -28,125 +28,158 @@
 #include "engine/log.h"
 #include "engine/globals.h"
 #include "utilities/file_utility.h"
+#include "utilities/json_utility.h"
 
 namespace neko::sfml
 {
-
+static auto textureMetadataExtension = ".ntx_meta";
 static std::set<std::string_view> imgExtensionSet
-        {
-                ".png",
-                ".jpg",
-                ".jpeg",
-                ".bmp",
-                ".tga",
-                ".gif",
-                ".psd",
-                ".hdr",
-                ".pic"
-        };
+{
+		".png",
+		".jpg",
+		".jpeg",
+		".bmp",
+		".tga",
+		".gif",
+		".psd",
+		".hdr",
+		".pic"
+};
 
 
 TextureManager::TextureManager()
 {
-    texturePaths_.reserve(INIT_ENTITY_NMB);
-    textures_.reserve(INIT_ENTITY_NMB);
 }
 
 bool TextureManager::HasValidExtension(const std::string_view filename)
 {
-    const auto filenameExtensionIndex = filename.find_last_of('.');
-    if (filenameExtensionIndex >= filename.size())
-    {
-        return false;
-    }
+	const auto filenameExtensionIndex = filename.find_last_of('.');
+	if (filenameExtensionIndex >= filename.size())
+	{
+		return false;
+	}
 
-    //Check extension first
-    const std::string_view extension(&filename.at(filenameExtensionIndex));
-    return imgExtensionSet.find(extension) != imgExtensionSet.end();
+	//Check extension first
+	const std::string_view extension(&filename.at(filenameExtensionIndex));
+	return imgExtensionSet.find(extension) != imgExtensionSet.end();
 }
 
-Index TextureManager::LoadTexture(const std::string_view filename)
+TextureId TextureManager::LoadTexture(const std::string& filename)
 {
-    if (!HasValidExtension(filename))
-    {
-        std::ostringstream oss;
-        oss << "[ERROR] Texture path: " << filename << " has invalid extension";
-        logDebug(oss.str());
-        return INVALID_INDEX;
-    }
-    Index textureIndex = INVALID_INDEX;
-    for (auto i = 0u; i < texturePaths_.size(); i++)
-    {
-        if (filename == texturePaths_[i])
-        {
-            textureIndex = i;
-            break;
-        }
-    }
-    //Was or still is loaded
-    if (textureIndex != INVALID_INDEX)
-    {
-        //Check if the texture was destroyed
-        if (textures_[textureIndex].getNativeHandle() != 0U)
-        {
-            return textureIndex;
-        }
-        else
-        {
-            if (!textures_[textureIndex].loadFromFile(filename.data()))
-            {
-                std::ostringstream oss;
-                oss << "[ERROR] Could not load texture file: " << filename;
-                logDebug(oss.str());
-                return INVALID_INDEX;
-            }
-            return textureIndex;
-        }
-    }
-    //Texture was never loaded
-    if (FileExists(filename))
-    {
-        auto texture = sf::Texture();
-        if (!texture.loadFromFile(filename.data()))
-        {
-            std::ostringstream oss;
-            oss << "[ERROR] Could not load texture file: " << filename;
-            logDebug(oss.str());
-            return INVALID_INDEX;
-        }
-        textures_.emplace_back(sf::Texture(texture));
-        texturePaths_.emplace_back(filename.data());
-
-        return static_cast<Index>(textures_.size() - 1);
-    }
-    else
-    {
-        std::ostringstream oss;
-        oss << "[ERROR] Could not load texture file: " << filename;
-        logDebug(oss.str());
-    }
-    return INVALID_INDEX;
+	if (!HasValidExtension(filename))
+	{
+		std::ostringstream oss;
+		oss << "[ERROR] Texture path: " << filename << " has invalid extension";
+		logDebug(oss.str());
+		return INVALID_INDEX;
+	}
+	xxh::hash_state_t<64> hash_stream(0);
+	hash_stream.update(filename);
+	TextureId textureId = hash_stream.digest();
+	auto textureMapKey = textures_.find(textureId);
+	//Was or still is loaded
+	if (textureMapKey != textures_.end())
+	{
+		sf::Texture& texture = textureMapKey->second.texture;
+		//Check if the texture was destroyed
+		if (texture.getNativeHandle() != 0U)
+		{
+			return textureId;
+		}
+		else
+		{
+			if (!texture.loadFromFile(filename))
+			{
+				std::ostringstream oss;
+				oss << "[ERROR] Could not load texture file: " << filename;
+				logDebug(oss.str());
+				return INVALID_INDEX;
+			}
+			return textureId;
+		}
+	}
+	//Texture was never loaded
+	if (FileExists(filename))
+	{
+		textures_[textureId] = Texture{};
+		auto& texture = textures_[textureId];
+		auto& sfTexture = texture.texture;
+		if (!sfTexture.loadFromFile(filename))
+		{
+			std::ostringstream oss;
+			oss << "[ERROR] Could not load texture file: " << filename;
+			logDebug(oss.str());
+			return textureId;
+		}
+		//TODO Read meta file or create one
+		const std::string metaPath = filename + textureMetadataExtension;
+		LoadMetadata(metaPath, texture);
+		textureNames_[textureId] = filename;
+		return textureId;
+	}
+	else
+	{
+		std::ostringstream oss;
+		oss << "[ERROR] Could not load texture file: " << filename;
+		logDebug(oss.str());
+	}
+	return INVALID_TEXTURE_ID;
 }
 
-const sf::Texture* TextureManager::GetTexture(const Index index) const
+const Texture* TextureManager::GetTexture(const TextureId textureId) const
 {
-    if (index == INVALID_INDEX || index >= textures_.size())
-    {
-        return {}; // Same as return nullptr.
-    }
-    return &textures_[index];
+	const auto textureMapKey = textures_.find(textureId);
+	if (textureMapKey != textures_.end())
+	{
+		return &textureMapKey->second; // Same as return nullptr.
+	}
+	return nullptr;
 }
 
-const std::string_view TextureManager::GetTexturePath(const Index index) const
+std::string TextureManager::GetTexturePath(TextureId textureId) const
 {
-    if(index == INVALID_INDEX)
-        return "None";
-    return texturePaths_[index];
+	const auto keyTextureName = textureNames_.find(textureId);
+	if(keyTextureName == textureNames_.end())
+	{
+		std::ostringstream oss;
+		oss << "[Error] No texture path for id: " << textureId;
+		logDebug(oss.str());
+		return "";
+	}
+	return keyTextureName->second;
 }
 
-size_t TextureManager::GetTextureCount() const
+const std::unordered_map<TextureId, std::string>& TextureManager::GetTextureNameMap()
 {
-    return textures_.size();
+	return textureNames_;
 }
 
+void TextureManager::LoadMetadata(const std::string& metadataPath, Texture& texture)
+{
+	if (!FileExists(metadataPath))
+	{
+		CreateEmptyMetaFile(metadataPath);
+	}
+	else
+	{
+		auto metadataJson = LoadJson(metadataPath);
+		texture.origin = GetVectorFromJson(metadataJson, "origin");
+		texture.texture.setSmooth(metadataJson["smooth"]);
+
+	}
+}
+
+void TextureManager::CreateEmptyMetaFile(const std::string& metaPath)
+{
+	//TODO Check if folder exists
+
+	
+	json metaDataJson;
+	metaDataJson["origin"] = { 0,0 };
+	metaDataJson["smooth"] = false;
+	const std::string metaDataStr = metaDataJson.dump(4);
+	WriteStringToFile(metaPath, metaDataStr);
+
+
+}
 } // namespace neko

@@ -677,7 +677,7 @@ void CityBuilderTilemap::PushCommand(GraphicsManager* graphicsManager)
 			float(tileSize_.x * city.mapSize.x - tileSize_.x / 2),
 			float(tileSize_.y * city.mapSize.y - tileSize_.y / 2)));
 		rect.setFillColor(sf::Color(191, 206, 30));
-		graphicsManager->Draw(rect);
+		graphicsManager->Render(rect);
 	}
 
 	graphicsManager->Draw(&tilesheets_[Index(CityTilesheetType::ENVIRONMENT)].tilemap[frameIndex],

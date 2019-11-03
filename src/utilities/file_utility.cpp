@@ -193,4 +193,10 @@ std::string GetFilename(const std::string_view path)
 	const fs::path p = path;
     return p.filename().string();
 }
+
+std::string GetStem(const std::string_view path)
+{
+	const fs::path p = path;
+	return p.stem().string();
+}
 }

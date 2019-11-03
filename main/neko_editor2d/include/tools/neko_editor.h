@@ -106,6 +106,7 @@ public:
 protected:
 
     NekoEditorExport editorExport_;
+	
     neko::EntityManager entityManager_;
     EntityViewer entityViewer_;
     neko::sfml::TextureManager textureManager_;

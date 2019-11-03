@@ -45,7 +45,7 @@ void CityEditor::Update(float dt)
 	ImGui::SFML::Update(*renderWindow_, engine_->clockDeltatime);
 
 	ImGui::Begin("Inspector");
-	//Draw inspector data
+	//Render inspector data
 	for (auto& inspectorData : inspectorValues_[frameIndex])
 	{
 		ImGui::LabelText(inspectorData.first.c_str(), "%s", inspectorData.second.c_str());

@@ -79,6 +79,10 @@ public:
 	{
 		return Vec2<T>(x * rhs, y * rhs);
 	}
+	Vec2<T> operator *(const Vec2<T>& rhs) const
+	{
+		return Vec2<T>(x * rhs.x, y * rhs.y);
+	}
 
 	
 

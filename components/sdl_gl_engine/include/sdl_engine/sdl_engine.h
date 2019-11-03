@@ -39,7 +39,7 @@ public:
 	void Update(float dt) override;
 	void Destroy() override;
 protected:
-    gl::GlGraphicsManager graphicsManager_;
+    GraphicsManager graphicsManager_;
 	
 
 

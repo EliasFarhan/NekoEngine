@@ -28,19 +28,21 @@
 
 namespace neko::box2d
 {
-
+ContactListener::ContactListener(sfml::SfmlFullEngine& engine) : engine_(engine)
+{
+}
 
 void ContactListener::BeginContact(b2Contact* contact)
 {
 	const auto* colliderA = static_cast<Collider*>(contact->GetFixtureA()->GetUserData());
 	const auto* colliderB = static_cast<Collider*>(contact->GetFixtureB()->GetUserData());
-	BasicEngine::GetInstance<sfml::SfmlFullEngine>()->OnBeginContact(colliderA, colliderB);
+	engine_.OnBeginContact(colliderA, colliderB);
 }
 
 void ContactListener::EndContact(b2Contact* contact)
 {
 	const auto* colliderA = static_cast<Collider*>(contact->GetFixtureA()->GetUserData());
 	const auto* colliderB = static_cast<Collider*>(contact->GetFixtureB()->GetUserData());
-	BasicEngine::GetInstance<sfml::SfmlFullEngine>()->OnEndContact(colliderA, colliderB);
+	engine_.OnEndContact(colliderA, colliderB);
 }
 }

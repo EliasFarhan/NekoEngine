@@ -57,9 +57,9 @@ void SpriteAnimator::Init(json& animatorJson, TextureManager& textureManager, in
     for (auto& texturePath : animatorJson["textures"])
     {
         std::string pathName = texturePath;
-        auto textureIndex = textureManager.LoadTexture(pathName);
+        const auto textureIndex = textureManager.LoadTexture(pathName);
 		auto* texture = textureManager.GetTexture(textureIndex);
-        spriteAnimatorDef.textures.push_back(*texture);
+        spriteAnimatorDef.textures.push_back(texture);
     }
     spriteAnimatorDef.spriteIndex = spriteIndex;
     Init(spriteAnimatorDef, &spriteAnimDefs[0], spriteAnimDefs.size());
@@ -122,10 +122,10 @@ void SpriteAnimator::Update(sf::Sprite* sprite, float dt)
             animTimer_.Reset();
         }
 
-        auto& texture = textures_[currentAnim_->imgIndexes[currentIndex_]];
-        sprite->setTexture(texture);
+        auto* texture = textures_[currentAnim_->imgIndexes[currentIndex_]];
+        sprite->setTexture(texture->texture);
         sprite->setTextureRect(currentAnim_->imgRect[currentIndex_]);
-        sprite->setOrigin(sf::Vector2f(texture.getSize()) / 2.0f);
+        sprite->setOrigin(sf::Vector2f(texture->origin * Vec2f(texture->texture.getSize())));
 
     }
 }

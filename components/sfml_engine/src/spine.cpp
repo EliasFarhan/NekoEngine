@@ -195,7 +195,7 @@ void SpineManager::CopyAllTransformAngles(EntityManager& entityManager, Rotation
 }
 
 
-void SpineManager::PushAllCommands(EntityManager& entityManager, SfmlGraphicsManager& graphicsManager)
+void SpineManager::PushAllCommands(EntityManager& entityManager, GraphicsManager& graphicsManager)
 {
     EntityMask entityMask = EntityMask(NekoComponentType::SPINE_ANIMATION);
 
@@ -206,7 +206,7 @@ void SpineManager::PushAllCommands(EntityManager& entityManager, SfmlGraphicsMan
             if (components_[entity].skeletonDrawable != nullptr)
             {
                 sf::RenderStates states(components_[entity].transform);
-                graphicsManager.Draw(&components_[entity]);
+                graphicsManager.Render(&components_[entity]);
             }
         }
     }
