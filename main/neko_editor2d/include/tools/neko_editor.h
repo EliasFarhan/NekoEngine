@@ -41,6 +41,7 @@
 #include "sfml_engine/texture.h"
 #include <engine/prefab.h>
 #include "sfml_engine/engine.h"
+#include "engine_export.h"
 
 namespace sf {
 class Event;
@@ -59,28 +60,10 @@ enum class FileOperation
 enum class EditorMode : std::uint8_t
 {
     SceneMode,
-    PrefabMode
+    PrefabMode,
+    TextureMode
 };
 
-struct NekoEditorExport
-{
-	EntityManager& entityManager;
-	Position2dManager& position2dManager;
-	Scale2dManager& scale2dManager;
-	Rotation2dManager& rotation2dManager;
-	sfml::Transform2dManager& transform2dManager;
-	EditorSceneManager& sceneManager;
-	box2d::BodyDef2dManager& bodyDef2dManager;
-	sfml::SpriteManager& spriteManager;
-	sfml::TextureManager& textureManager;
-	sfml::SpineManager& spineManager;
-	BoxColliderDefManager& boxColliderDefManager_;
-	CircleColliderDefManager& circleColliderDefManager_;
-	PolygonColldierDefManager& polygonColldierDefManager_;
-	ColliderDefManager& coll;
-	EditorPrefabManager& prefabManager;
-	NekoEditor& editor;
-};
 
 
 class NekoEditor : public neko::sfml::SfmlBasicEngine

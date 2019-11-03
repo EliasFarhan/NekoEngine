@@ -29,7 +29,7 @@ SOFTWARE.
 
 TEST(Engine, TestAssetImport)
 {
-	sole::uuid id;
+	sole::uuid id = sole::uuid0();
 	auto idStr = id.str();
 	auto convertId = sole::rebuild(idStr);
 	EXPECT_TRUE(id == convertId);

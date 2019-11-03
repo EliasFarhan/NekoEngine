@@ -437,7 +437,7 @@ void NekoEditor::EditorUpdate(float dt)
 
 		ImGuiWindowFlags_NoResize |
 		ImGuiWindowFlags_NoCollapse);
-	previewer_.Update(dt);
+	previewer_.UpdaUpte(dt);
 	ImGui::End();
 
 

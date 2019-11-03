@@ -59,4 +59,9 @@ void PrefabManager::InstantiatePrefab(Index prefabIndex, EntityManager& entityMa
         sceneManager_.ParseEntityJson(entityJson);
     }
 }
+
+Prefab::Prefab() : id(sole::uuid0())
+{
+
+}
 }

@@ -28,11 +28,22 @@
 #include <engine/globals.h>
 #include <utilities/json_utility.h>
 #include "entity.h"
+#include <sole.hpp>
 
 namespace neko
 {
 
 class SceneManager;
+using PrefabId = sole::uuid;
+const PrefabId INVALID_PREFAB_ID = sole::uuid ();
+struct Prefab
+{
+    Prefab();
+
+    PrefabId id = INVALID_PREFAB_ID;
+    json prefabJson{};
+};
+
 class PrefabManager
 {
 public:
