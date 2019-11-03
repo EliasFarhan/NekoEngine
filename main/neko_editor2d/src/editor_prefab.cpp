@@ -55,7 +55,7 @@ void EditorPrefabManager::SetCurrentPrefabIndex(neko::Index currentPrefabIndex)
 void EditorPrefabManager::SavePrefab(const std::string_view path)
 {
 	logDebug("Save Current Prefab at: " + std::string(path));
-	auto& sceneManager = dynamic_cast<EditorSceneManager&>(sceneManager_);
+	/*auto& sceneManager = dynamic_cast<EditorSceneManager&>(sceneManager_);
 	json prefabJson = sceneManager.SerializeScene();
 	prefabJson.erase("sceneName");
 	for (auto& entityJson : prefabJson["entities"])
@@ -78,12 +78,13 @@ void EditorPrefabManager::SavePrefab(const std::string_view path)
 		prefabPaths_.push_back(path.data());
 	}
 	neko::WriteStringToFile(path.data(), prefabTxt);
+	 */
 }
 
 neko::Index EditorPrefabManager::CreatePrefabFromEntity(neko::Entity entity)
 {
 	const auto newIndex = neko::Index(prefabJsons_.size());
-	auto& sceneManager = dynamic_cast<EditorSceneManager&>(sceneManager_);
+	/*auto& sceneManager = dynamic_cast<EditorSceneManager&>(sceneManager_);
 
 	json prefabJson;
 	prefabJson["entities"] = json::array();
@@ -126,6 +127,7 @@ neko::Index EditorPrefabManager::CreatePrefabFromEntity(neko::Entity entity)
 	prefabJsons_.push_back(prefabJson);
 	prefabPaths_.push_back("");
 	currentPrefabIndex_ = prefabJsons_.size() - 1;
+*/
 	return newIndex;
 
 }

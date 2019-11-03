@@ -45,7 +45,6 @@ struct Sprite : public SfmlRenderCommand
 
     sf::Sprite sprite;
     int layer = 0;
-    sf::Vector2f origin = sf::Vector2f(0.0f,0.0f);
     TextureId textureId = INVALID_TEXTURE_ID;
     sf::Transform transform = sf::Transform::Identity;
 };
@@ -55,8 +54,6 @@ class SpriteManager :
 {
 public:
     explicit SpriteManager(TextureManager& textureManager);
-
-    void CopySpriteOrigin(const sf::Vector2f& origin, size_t start, size_t length=1);
 
     void CopyTexture(const TextureId textureId, size_t start, size_t length=1);
 

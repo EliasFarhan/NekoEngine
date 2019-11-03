@@ -36,13 +36,6 @@
             "prefab": false
         },
         {
-            "entity": 1,
-            "name": "Player",
-            "parent": -1,
-            "prefab": true,
-            "prefabIndex": 1
-        },
-        {
             "components": [
                 {
                     "component": 2,
@@ -149,7 +142,6 @@
         }
     ],
     "prefabPaths": [
-        "data/.tmp0.prefab",
         ""
     ],
     "sceneName": "New Scene",

@@ -35,16 +35,6 @@
 namespace neko::sfml
 {
 
-void SpriteManager::CopySpriteOrigin(const sf::Vector2f& origin, size_t start, size_t length)
-{
-    for (size_t i = start; i < start + length; i++)
-    {
-        const auto localBounds = components_[i].sprite.getLocalBounds();
-        components_[i].origin = origin;
-        components_[i].sprite.setOrigin(sf::Vector2f(localBounds.width * origin.x, localBounds.height * origin.y));
-    }
-}
-
 void SpriteManager::CopyTexture(const TextureId textureId, size_t start, size_t length)
 {
 
@@ -54,6 +44,8 @@ void SpriteManager::CopyTexture(const TextureId textureId, size_t start, size_t 
         components_[i].textureId = textureId;
         if(textureId != INVALID_INDEX)
         {
+            components_[i].sprite.setOrigin(sf::Vector2f(texture->origin *
+            Vec2f(sf::Vector2f(texture->texture.getSize()))));
             components_[i].sprite.setTexture( texture->texture, true);
         }
         else
@@ -125,10 +117,6 @@ void SpriteManager::PushAllCommands(EntityManager& entityManager, GraphicsManage
     {
         if(entityManager.HasComponent(entity, entityMask))
         {
-            auto spriteSize = components_[entity].sprite.getLocalBounds();
-            auto origin = components_[entity].origin;
-            components_[entity].sprite.setOrigin(origin.x*spriteSize.width, origin.y*spriteSize.height);
-
             sf::RenderStates states = sf::RenderStates::Default;
             states.transform = components_[entity].transform;
             components_[entity].SetStates(states);
@@ -144,8 +132,6 @@ void SpriteManager::ParseComponentJson(json& componentJson, Entity entity)
     const auto textureId = textureManager_.LoadTexture(textureName);
     CopyTexture(textureId, entity, 1);
     CopyLayer(componentJson["layer"], entity, 1);
-    const auto origin = GetVectorFromJson(componentJson, "origin");
-    CopySpriteOrigin(origin, entity, 1);
 }
 
 json SpriteManager::SerializeComponentJson(Entity entity)
@@ -153,7 +139,6 @@ json SpriteManager::SerializeComponentJson(Entity entity)
     const auto& sprite = GetComponent(entity);
     json componentJson;
     componentJson["layer"] = sprite.layer;
-    componentJson["origin"] = {sprite.origin.x, sprite.origin.y};
     return componentJson;
 }
 

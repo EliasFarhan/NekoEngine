@@ -4,6 +4,7 @@
 #include <misc/cpp/imgui_stdlib.h>
 #include <utilities/file_utility.h>
 #include <engine/log.h>
+#include "sfml_engine/texture.h"
 
 namespace neko::editor
 {
@@ -116,7 +117,7 @@ void Inspector::ShowEntityInfo(neko::Entity entity) const
 				if (ImGui::Selectable("No Texture"))
 				{
 					dirty = true;
-					tmpSprite.sprite.setTexture(sf::Texture());
+					tmpSprite.textureId = sfml::INVALID_TEXTURE_ID;
 				}
 				for (auto& textureNamePair : textureManager_.GetTextureNameMap())
 				{
@@ -124,21 +125,13 @@ void Inspector::ShowEntityInfo(neko::Entity entity) const
 					{
 						dirty = true;
 						tmpSprite.textureId = textureNamePair.first;
-						tmpSprite.sprite.setTexture(textureManager_.GetTexture(textureNamePair.first)->texture);
+						//spriteManager_.CopyTexture(tmpSprite.textureId, entity, 1);
+						//tmpSprite.sprite.setTexture(textureManager_.GetTexture(textureNamePair.first)->texture);
 					}
 				}
 				ImGui::EndPopup();
 			}
-			auto& origin = tmpSprite.origin;
 
-			float originRaw[2] = { origin.x, origin.y };
-
-			if (ImGui::InputFloat2("Origin", originRaw))
-			{
-				dirty = true;
-				origin.x = originRaw[0];
-				origin.y = originRaw[1];
-			}
 			ImGui::PushID("Sprite Layer");
 			if(ImGui::InputInt("Layer", &tmpSprite.layer, 1))
 			{
@@ -146,7 +139,10 @@ void Inspector::ShowEntityInfo(neko::Entity entity) const
 			}
 			if(dirty)
 			{
-				spriteManager_.SetComponent(entity, tmpSprite);
+                if(tmpSprite.textureId != spriteManager_.GetComponent(entity).textureId)
+                {
+                    spriteManager_.CopyTexture(tmpSprite.textureId, entity, 1);
+                }
 			}
 			ImGui::PopID();
 		}
