@@ -44,7 +44,7 @@ void Previewer::Update(float dt)
 	    if(spineDrawable_.skeletonData != nullptr)
         {
 	        const auto animations = spineDrawable_.skeletonData->animations;
-			static Index currentAnimIndex = 0;
+			static int currentAnimIndex = 0;
 	    	if(currentAnimIndex >= spineDrawable_.skeletonData->animationsCount)
 	    	{
 				currentAnimIndex = 0;
@@ -69,7 +69,7 @@ void Previewer::Update(float dt)
                 ImGui::EndCombo();
             }
             auto skins = spineDrawable_.skeletonData->skins;
-			static Index currentSkinIndex = 0;
+			static int currentSkinIndex = 0;
 	    	if(currentSkinIndex >= spineDrawable_.skeletonData->skinsCount)
 	    	{
 				currentSkinIndex = 0;

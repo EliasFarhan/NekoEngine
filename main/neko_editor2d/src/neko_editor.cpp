@@ -146,6 +146,10 @@ void NekoEditor::SwitchEditorMode(EditorMode editorMode)
 		}
 		break;
 	}
+        case EditorMode::TextureMode :
+            break;
+	    case EditorMode::AnimMode:
+	        break;
 	}
 }
 
@@ -437,7 +441,7 @@ void NekoEditor::EditorUpdate(float dt)
 
 		ImGuiWindowFlags_NoResize |
 		ImGuiWindowFlags_NoCollapse);
-	previewer_.UpdaUpte(dt);
+	previewer_.Update(dt);
 	ImGui::End();
 
 
@@ -479,6 +483,10 @@ void NekoEditor::EditorUpdate(float dt)
 		graphicsManager_.RenderAll(&renderTarget);
 		break;
 	}
+	    case EditorMode::TextureMode:
+	        break;
+	    case EditorMode::AnimMode:
+	        break;
 	}
 
 	sceneRenderTexture_.display();

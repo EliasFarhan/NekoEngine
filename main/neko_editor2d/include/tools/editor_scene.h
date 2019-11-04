@@ -25,6 +25,15 @@
  */
 #include <engine/scene.h>
 #include <engine/component.h>
+#include <engine/system.h>
+#include <tools/engine_export.h>
+#include <SFML/Graphics/RenderTexture.hpp>
+#include <sfml_engine/transform.h>
+#include <sfml_engine/sprite.h>
+#include <sfml_engine/spine.h>
+#include <tools/physics_editor.h>
+#include <sfml_engine/physics.h>
+#include "editor_prefab.h"
 
 namespace neko
 {
@@ -81,5 +90,6 @@ protected:
 	Scale2dManager& scaleManager_;
 	box2d::BodyDef2dManager& bodyDefManager_;
 };
+
 
 }

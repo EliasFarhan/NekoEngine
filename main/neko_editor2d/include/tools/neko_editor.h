@@ -61,7 +61,8 @@ enum class EditorMode : std::uint8_t
 {
     SceneMode,
     PrefabMode,
-    TextureMode
+    TextureMode,
+    AnimMode
 };
 
 
