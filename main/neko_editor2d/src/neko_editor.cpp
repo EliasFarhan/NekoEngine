@@ -32,34 +32,7 @@
 namespace neko::editor
 {
 
-NekoEditor::NekoEditor()
-	: SfmlBasicEngine(nullptr),
-	editorExport_
-	{
-		entityManager_,
-		position2dManager_,
-		scale2dManager_,
-		rotation2dManager_,
-		transformManager_,
-		sceneManager_,
-		bodyDefManager_,
-		spriteManager_,
-		textureManager_,
-		spineManager_,
-		boxColliderDefManager_,
-		circleColliderDefManager_,
-		polygonColldierDefManager_,
-		colliderDefManager_,
-		prefabManager_,
-		*this
-	},
-	entityViewer_(editorExport_),
-	prefabManager_(editorExport_),
-	spriteManager_(textureManager_),
-	sceneManager_(editorExport_),
-	colliderDefManager_(editorExport_),
-	inspector_(editorExport_),
-	transformManager_(position2dManager_, scale2dManager_, rotation2dManager_)
+NekoEditor::NekoEditor() : SfmlBasicEngine(nullptr)
 {
 }
 
@@ -92,10 +65,6 @@ void NekoEditor::Destroy()
 	SfmlBasicEngine::Destroy();
 }
 
-Previewer& NekoEditor::GetPreviewer()
-{
-	return previewer_;
-}
 
 
 void NekoEditor::SwitchEditorMode(EditorMode editorMode)
@@ -146,17 +115,13 @@ void NekoEditor::SwitchEditorMode(EditorMode editorMode)
 		}
 		break;
 	}
-        case EditorMode::TextureMode :
-            break;
-	    case EditorMode::AnimMode:
-	        break;
+	case EditorMode::TextureMode:
+		break;
+	case EditorMode::AnimMode:
+		break;
 	}
 }
 
-EditorPrefabManager& NekoEditor::GetPrefabManager()
-{
-	return prefabManager_;
-}
 
 void NekoEditor::OnEvent(sf::Event& event)
 {
@@ -201,7 +166,7 @@ void NekoEditor::OnEvent(sf::Event& event)
 			case sf::Keyboard::N:
 			{
 				sceneManager_.ClearScene();
-				auto rootEntity = entityManager_.CreateEntity();
+				const auto rootEntity = entityManager_.CreateEntity();
 				auto& entitiesName = sceneManager_.GetCurrentScene().entitiesNames;
 				ResizeIfNecessary(entitiesName, rootEntity, std::string());
 				entitiesName[rootEntity] = "Root Entity";
@@ -261,6 +226,7 @@ void NekoEditor::SavePrefabEvent()
 	}
 }
 
+
 void NekoEditor::EditorUpdate(float dt)
 {
 	const ImVec2 windowSize = ImVec2(float(config.realWindowSize.first), float(config.realWindowSize.second));
@@ -271,8 +237,6 @@ void NekoEditor::EditorUpdate(float dt)
 		ImGuiWindowFlags_NoTitleBar |
 		ImGuiWindowFlags_NoResize |
 		ImGuiWindowFlags_NoCollapse);
-
-
 
 	//Log tab
 	if (ImGui::BeginTabBar("Lower Tab", ImGuiTabBarFlags_None))
@@ -292,18 +256,7 @@ void NekoEditor::EditorUpdate(float dt)
 			{
 			case EditorMode::SceneMode:
 			{
-				if (ImGui::MenuItem("New Scene", "CTRL+N"))
-				{
-					sceneManager_.ClearScene();
-				}
-				if (ImGui::MenuItem("Open Scene", "CTRL+O"))
-				{
-					fileOperationStatus_ = FileOperation::OPEN_SCENE;
-				}
-				if (ImGui::MenuItem("Save Scene", "CTRL+S"))
-				{
-					SaveSceneEvent();
-				}
+				
 				break;
 			}
 			case EditorMode::PrefabMode:
@@ -441,33 +394,16 @@ void NekoEditor::EditorUpdate(float dt)
 
 		ImGuiWindowFlags_NoResize |
 		ImGuiWindowFlags_NoCollapse);
-	previewer_.Update(dt);
 	ImGui::End();
 
 
 	//Render things into the graphics manager
-	sceneRenderTexture_.clear(sf::Color(config.bgColor));
-
-	spriteManager_.CopyAllTransforms(entityManager_, transformManager_);
-	spriteManager_.PushAllCommands(entityManager_, graphicsManager_);
-
-	spineManager_.Update(entityManager_, dt);
-	spineManager_.CopyAllTransforms(entityManager_, transformManager_);
-	spineManager_.PushAllCommands(entityManager_, graphicsManager_);
-
-	colliderDefManager_.PushAllCommands(graphicsManager_);
+	
 	switch (editorMode_)
 	{
 	case EditorMode::SceneMode:
 	{
-		const auto screenRect = sf::FloatRect(
-			0,
-			0,
-			float(config.gameWindowSize.first),
-			float(config.gameWindowSize.second));
-		sceneRenderTexture_.setView(sf::View(screenRect));
-		RenderTarget renderTarget{ &sceneRenderTexture_ };
-		graphicsManager_.RenderAll(&renderTarget);
+		
 		break;
 	}
 	case EditorMode::PrefabMode:
@@ -483,16 +419,17 @@ void NekoEditor::EditorUpdate(float dt)
 		graphicsManager_.RenderAll(&renderTarget);
 		break;
 	}
-	    case EditorMode::TextureMode:
-	        break;
-	    case EditorMode::AnimMode:
-	        break;
+	case EditorMode::TextureMode:
+		break;
+	case EditorMode::AnimMode:
+		break;
 	}
 
 	sceneRenderTexture_.display();
 
 	ImGui::SetNextWindowPos(ImVec2(0.0f, yOffset), ImGuiCond_Always);
 	ImGui::SetNextWindowSize(ImVec2(windowSize.x * 0.2f, windowSize.y * 0.7f - yOffset), ImGuiCond_Always);
+
 	entityViewer_.Update(editorMode_);
 
 	ImGui::SetNextWindowPos(ImVec2(windowSize.x * 0.2f, yOffset), ImGuiCond_Always);
@@ -501,6 +438,8 @@ void NekoEditor::EditorUpdate(float dt)
 		ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 	if (ImGui::BeginTabBar("Central Tab"))
 	{
+		
+		
 		const bool sceneViewerOpen = editorMode_ == EditorMode::SceneMode;
 		if (ImGui::BeginTabItem("Scene Viewer", nullptr,
 			sceneViewerOpen ? ImGuiTabItemFlags_SetSelected : ImGuiTabItemFlags_None))
@@ -512,7 +451,7 @@ void NekoEditor::EditorUpdate(float dt)
 		{
 			SwitchEditorMode(EditorMode::SceneMode);
 		}
-		bool prefabViewerOpen = editorMode_ == EditorMode::PrefabMode;
+		const bool prefabViewerOpen = editorMode_ == EditorMode::PrefabMode;
 		if (ImGui::BeginTabItem("Prefab Viewer", nullptr,
 			prefabViewerOpen ? ImGuiTabItemFlags_SetSelected : ImGuiTabItemFlags_None))
 		{
@@ -528,12 +467,39 @@ void NekoEditor::EditorUpdate(float dt)
 
 	ImGui::End();
 
-	ImGui::SetNextWindowPos(ImVec2(windowSize.x * 0.8f, yOffset), ImGuiCond_Always);
-	ImGui::SetNextWindowSize(ImVec2(windowSize.x * 0.2f, windowSize.y * 0.7f - yOffset), ImGuiCond_Always);
-	inspector_.BeginWindow();
-
-	inspector_.ShowEntityInfo(entityViewer_.GetSelectedEntity());
-	inspector_.EndWindow();
+	
 }
 
+BasicEditorSystem::BasicEditorSystem(EntityViewer& entityViewer, Inspector& inspector, SceneViewer& sceneViewer) :
+entityViewer(entityViewer),
+inspector(inspector),
+sceneViewer(sceneViewer)
+{
+}
+
+NekoEditorSystem::NekoEditorSystem(EntityViewer& entityViewer, Inspector& inspector, SceneViewer& sceneViewer) :
+BasicEditorSystem(entityViewer, inspector, sceneViewer),
+editorExport_{
+		 entityManager_,
+		position2dManager_,
+		scale2dManager_,
+		rotation2dManager_,
+		transform2dManager_,
+		sceneManager_,
+		bodyDef2DManager_,
+		spriteManager_,
+		textureManager_,
+		spineManager_,
+		boxColliderDefManager_,
+		circleColliderDefManager_,
+		polygonColldierDefManager_,
+		colliderManagerDefManager_,
+		prefabManager_,
+	}, transform2dManager_(position2dManager_, scale2dManager_, rotation2dManager_),
+	sceneManager_(editorExport_),
+	spriteManager_(textureManager_),
+	colliderManagerDefManager_(editorExport_),
+	prefabManager_(editorExport_)
+{
+}
 }

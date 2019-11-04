@@ -229,8 +229,7 @@ void Inspector::ShowEntityInfo(neko::Entity entity) const
 			{
 				if (spineDrawable.skeletonDrawable != nullptr)
 				{
-					auto& previewer = nekoEditor_.GetPreviewer();
-					previewer.SetSpineAnimation(&spineDrawable);
+					//TODO Set Spine Animation Mode into NekoEditor with this animation
 				}
 				else
 				{

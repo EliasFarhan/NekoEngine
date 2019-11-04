@@ -25,14 +25,7 @@
  */
 
 #include <engine/prefab.h>
-#include <sfml_engine/engine.h>
-#include <SFML/Graphics/RenderTexture.hpp>
-#include <sfml_engine/sprite.h>
-#include <sfml_engine/spine.h>
 #include "SFML/Graphics/Rect.hpp"
-#include "engine_export.h"
-#include "editor_scene.h"
-#include "tools/physics_editor.h"
 
 namespace neko {
 class Position2dManager;

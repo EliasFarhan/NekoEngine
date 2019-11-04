@@ -35,6 +35,8 @@ namespace neko::editor
 {
 void EntityViewer::Update(EditorMode editorMode)
 {
+	ImGui::SetNextWindowPos(ImVec2(0.0f, yOffset), ImGuiCond_Always);
+	ImGui::SetNextWindowSize(ImVec2(windowSize.x * 0.2f, windowSize.y * 0.7f - yOffset), ImGuiCond_Always);
 
 	entities_.clear();
 	entitiesName_.clear();

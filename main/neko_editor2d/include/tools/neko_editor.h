@@ -41,7 +41,7 @@
 #include "sfml_engine/texture.h"
 #include <engine/prefab.h>
 #include "sfml_engine/engine.h"
-#include "engine_export.h"
+#include "tools/engine_export.h"
 
 namespace sf {
 class Event;
@@ -49,6 +49,7 @@ class Event;
 
 namespace neko::editor
 {
+class BasicEditorSystem;
 enum class FileOperation
 {
     OPEN_SCENE,
@@ -79,51 +80,61 @@ public:
 
     void SwitchEditorMode(EditorMode editorMode);
 
-
-    EditorPrefabManager& GetPrefabManager();
-    Previewer& GetPreviewer();
-
     void OnEvent(sf::Event& event) override;
     void SaveSceneEvent();
     void SavePrefabEvent();
 
 protected:
 
-    NekoEditorExport editorExport_;
-	
-    neko::EntityManager entityManager_;
-    EntityViewer entityViewer_;
-    neko::sfml::TextureManager textureManager_;
-    EditorPrefabManager prefabManager_;
-
-    sfml::SpineManager spineManager_;
-    sfml::SpriteManager spriteManager_;
-
     sf::RenderTexture sceneRenderTexture_;
-    SceneViewer sceneViewer_;
-
-    EditorSceneManager sceneManager_;
-
-    box2d::BodyDef2dManager bodyDefManager_;
-	BoxColliderDefManager boxColliderDefManager_;
-	CircleColliderDefManager circleColliderDefManager_;
-	PolygonColldierDefManager polygonColldierDefManager_;
-    ColliderDefManager colliderDefManager_;
-
-
-    Inspector inspector_;
     LogViewer logViewer_;
-    Previewer previewer_;
 
     ImGui::FileBrowser fileDialog_;
-    FileOperation fileOperationStatus_ = FileOperation::NONE;
     EditorMode editorMode_ = EditorMode::SceneMode;
+	std::vector<std::unique_ptr<BasicEditorSystem>> editorSystems_;
 
+	sfml::TextureManager textureManager_;
+};
+
+class BasicEditorSystem : public System
+{
+public:
+	using System::System;
+	const std::string& GetSystemName() const { return editorSystemName_; }
+	void SetSystemName(const std::string& name) { editorSystemName_ = name; }
+protected:
+	std::string editorSystemName_;
+};
+
+class NekoEditorSystem : public BasicEditorSystem
+{
+public:
+	explicit NekoEditorSystem(EntityViewer& entityViewer, 
+		Inspector& inspector,
+		SceneViewer& sceneViewer);
+protected:
+	sf::RenderTexture screenRenderTexture_;
+	NekoEditorExport editorExport_;
+	EntityManager entityManager_;
 	Position2dManager position2dManager_;
 	Scale2dManager scale2dManager_;
 	Rotation2dManager rotation2dManager_;
-    sfml::Transform2dManager transformManager_;
-
+	sfml::Transform2dManager transform2dManager_;
+	EditorSceneManager sceneManager_;
+	box2d::BodyDef2dManager bodyDef2DManager_;
+	sfml::SpriteManager spriteManager_;
+	sfml::SpineManager spineManager_;
+	BoxColliderDefManager boxColliderDefManager_;
+	CircleColliderDefManager circleColliderDefManager_;
+	PolygonColldierDefManager polygonColldierDefManager_;
+	ColliderDefManager colliderManagerDefManager_;
+	EditorPrefabManager prefabManager_;
+	GraphicsManager graphicsManager_;
+	EntityViewer& entityViewer;
+	Inspector& inspector;
+	SceneViewer& sceneViewer;
+	
+	FileOperation fileOperationStatus_ = FileOperation::NONE;
 };
 
 }

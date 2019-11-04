@@ -1,8 +1,5 @@
 #pragma once
 
-
-
-
 namespace neko
 {
     class EntityManager;
@@ -31,6 +28,9 @@ class BoxColliderDefManager;
 class CircleColliderDefManager;
 class PolygonColldierDefManager;
 class ColliderDefManager;
+class EntityViewer;
+class Inspector;
+class SceneViewer;
 
 struct NekoEditorExport
 {
@@ -49,6 +49,5 @@ struct NekoEditorExport
     PolygonColldierDefManager& polygonColldierDefManager_;
     ColliderDefManager& coll;
     EditorPrefabManager& prefabManager;
-    NekoEditor& editor;
 };
 }

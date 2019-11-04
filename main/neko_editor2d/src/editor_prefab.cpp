@@ -21,12 +21,16 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
+#include <tools/engine_export.h>
+#include <sfml_engine/physics.h>
+#include <tools/physics_editor.h>
 #include <tools/editor_prefab.h>
 #include <tools/editor_scene.h>
 #include <utilities/file_utility.h>
 #include <engine/log.h>
-#include <tools/neko_editor.h>
 #include "sfml_engine/transform.h"
+#include "sfml_engine/sprite.h"
+#include "sfml_engine/spine.h"
 
 namespace neko::editor
 {

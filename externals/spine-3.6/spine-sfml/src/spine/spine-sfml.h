@@ -30,9 +30,6 @@
 
 #ifndef SPINE_SFML_H_
 #define SPINE_SFML_H_
-
-#define SPINE_SHORT_NAMES
-
 #include <spine/spine.h>
 #include <spine/extension.h>
 #include <SFML/Graphics/Vertex.hpp>
@@ -41,40 +38,43 @@
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/RenderStates.hpp>
 
+
+typedef spAnimation Animation;
+typedef spSkeleton Skeleton;
+typedef spAnimationState AnimationState;
+typedef spSkeletonData SkeletonData;
+typedef spAnimationStateData AnimationStateData;
+typedef spAtlasPage AtlasPage;
+typedef spAtlas Atlas;
+typedef spBone Bone;
 _SP_ARRAY_DECLARE_TYPE(spColorArray, spColor)
 
-namespace spine
-{
+namespace spine {
 
-class SkeletonDrawable : public sf::Drawable
-{
+class SkeletonDrawable: public sf::Drawable {
 public:
-    Skeleton* skeleton;
-    AnimationState* state;
-    float timeScale;
-    sf::VertexArray* vertexArray;
-    spVertexEffect* vertexEffect;
+	Skeleton* skeleton;
+	AnimationState* state;
+	float timeScale;
+	sf::VertexArray* vertexArray;
+	spVertexEffect* vertexEffect;
 
-    SkeletonDrawable(SkeletonData* skeleton, AnimationStateData* stateData = 0);
+	SkeletonDrawable (SkeletonData* skeleton, AnimationStateData* stateData = 0);
+	~SkeletonDrawable ();
 
-    ~SkeletonDrawable();
+	void update (float deltaTime);
 
-    void update(float deltaTime);
+	virtual void draw (sf::RenderTarget& target, sf::RenderStates states) const;
 
-    virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
-
-    void setUsePremultipliedAlpha(bool usePMA)
-    { usePremultipliedAlpha = usePMA; };
-
-    bool getUsePremultipliedAlpha()
-    { return usePremultipliedAlpha; };
+	void setUsePremultipliedAlpha(bool usePMA) { usePremultipliedAlpha = usePMA; };
+	bool getUsePremultipliedAlpha() { return usePremultipliedAlpha; };
 private:
-    bool ownsAnimationStateData;
-    float* worldVertices;
-    spFloatArray* tempUvs;
-    spColorArray* tempColors;
-    spSkeletonClipping* clipper;
-    bool usePremultipliedAlpha;
+	bool ownsAnimationStateData;
+	float* worldVertices;
+	spFloatArray* tempUvs;
+	spColorArray* tempColors;
+	spSkeletonClipping* clipper;
+	bool usePremultipliedAlpha;
 };
 
 } /* namespace spine */

@@ -1,6 +1,8 @@
 #pragma once
 
 #include "engine/transform.h"
+#include "SFML/Graphics/Transform.hpp"
+
 namespace neko
 {
 namespace box2d

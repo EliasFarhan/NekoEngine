@@ -60,7 +60,7 @@ void PrefabManager::InstantiatePrefab(Index prefabIndex, EntityManager& entityMa
     }
 }
 
-Prefab::Prefab() : id(sole::uuid0())
+Prefab::Prefab() : id(0)
 {
 
 }

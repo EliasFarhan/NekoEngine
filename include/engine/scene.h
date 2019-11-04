@@ -27,6 +27,7 @@
 #include <utilities/json_utility.h>
 #include "entity.h"
 #include <engine/component.h>
+#include "graphics/color.h"
 
 namespace neko
 {
@@ -36,6 +37,7 @@ struct Scene
     std::string sceneName = "New Scene";
     std::string scenePath = "";
     std::vector<std::string> entitiesNames;
+	Color bgColor;
 };
 
 class SceneManager : public ComponentManager<Index, neko::EntityMask(neko::NekoComponentType::PREFAB)>
@@ -46,7 +48,7 @@ public:
     virtual void ParseEntityJson(json& entityJson) = 0;
     virtual void ParseSceneJson(json& sceneJson);
 
-    Scene& GetCurrentScene(){ return currentScene_;}
+    const Scene& GetCurrentScene(){ return currentScene_;}
 protected:
     Scene currentScene_;
 };

@@ -1,4 +1,6 @@
+#define SPINE_SHORT_NAMES
 #include <sfml_engine/spine.h>
+
 #include "engine/log.h"
 #include <graphics/graphics.h>
 #include <sfml_engine/transform.h>
@@ -150,7 +152,7 @@ void SpineManager::ParseComponentJson(json& componentJson, Entity entity)
 
 void SpineManager::CopyAllTransformPositions(EntityManager& entityManager, Position2dManager& position2Manager)
 {
-    EntityMask entityMask = EntityMask(NekoComponentType::POSITION2D) | EntityMask(NekoComponentType::SPINE_ANIMATION);
+	const EntityMask entityMask = EntityMask(NekoComponentType::POSITION2D) | EntityMask(NekoComponentType::SPINE_ANIMATION);
 
     for (Entity entity = 0; entity < entityManager.GetEntitiesSize(); entity++)
     {
@@ -164,7 +166,7 @@ void SpineManager::CopyAllTransformPositions(EntityManager& entityManager, Posit
 
 void SpineManager::CopyAllTransformScales(EntityManager& entityManager, Scale2dManager& scale2DManager)
 {
-    EntityMask entityMask = EntityMask(NekoComponentType::SCALE2D) |
+	const EntityMask entityMask = EntityMask(NekoComponentType::SCALE2D) |
             EntityMask(NekoComponentType::SPINE_ANIMATION);
 
     for (Entity entity = 0; entity < entityManager.GetEntitiesSize(); entity++)
@@ -181,7 +183,7 @@ void SpineManager::CopyAllTransformScales(EntityManager& entityManager, Scale2dM
 
 void SpineManager::CopyAllTransformAngles(EntityManager& entityManager, Rotation2dManager& angle2DManager)
 {
-    EntityMask entityMask = EntityMask(NekoComponentType::ROTATION2D) |
+	const EntityMask entityMask = EntityMask(NekoComponentType::ROTATION2D) |
                             EntityMask(NekoComponentType::SPINE_ANIMATION);
 
     for (Entity entity = 0; entity < entityManager.GetEntitiesSize(); entity++)
@@ -197,7 +199,7 @@ void SpineManager::CopyAllTransformAngles(EntityManager& entityManager, Rotation
 
 void SpineManager::PushAllCommands(EntityManager& entityManager, GraphicsManager& graphicsManager)
 {
-    EntityMask entityMask = EntityMask(NekoComponentType::SPINE_ANIMATION);
+	const EntityMask entityMask = EntityMask(NekoComponentType::SPINE_ANIMATION);
 
     for (Entity entity = 0; entity < entityManager.GetEntitiesSize(); entity++)
     {
