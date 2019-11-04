@@ -109,9 +109,7 @@ protected:
 class NekoEditorSystem : public BasicEditorSystem
 {
 public:
-	explicit NekoEditorSystem(EntityViewer& entityViewer, 
-		Inspector& inspector,
-		SceneViewer& sceneViewer);
+	explicit NekoEditorSystem(sfml::TextureManager& textureManager);
 protected:
 	sf::RenderTexture screenRenderTexture_;
 	NekoEditorExport editorExport_;
@@ -130,9 +128,9 @@ protected:
 	ColliderDefManager colliderManagerDefManager_;
 	EditorPrefabManager prefabManager_;
 	GraphicsManager graphicsManager_;
-	EntityViewer& entityViewer;
-	Inspector& inspector;
-	SceneViewer& sceneViewer;
+	EntityViewer entityViewer_;
+	Inspector inspector_;
+	SceneViewer sceneViewer_;
 	
 	FileOperation fileOperationStatus_ = FileOperation::NONE;
 };

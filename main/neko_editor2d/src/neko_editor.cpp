@@ -470,15 +470,9 @@ void NekoEditor::EditorUpdate(float dt)
 	
 }
 
-BasicEditorSystem::BasicEditorSystem(EntityViewer& entityViewer, Inspector& inspector, SceneViewer& sceneViewer) :
-entityViewer(entityViewer),
-inspector(inspector),
-sceneViewer(sceneViewer)
-{
-}
 
-NekoEditorSystem::NekoEditorSystem(EntityViewer& entityViewer, Inspector& inspector, SceneViewer& sceneViewer) :
-BasicEditorSystem(entityViewer, inspector, sceneViewer),
+NekoEditorSystem::NekoEditorSystem(sfml::TextureManager& textureManager) :
+BasicEditorSystem(),
 editorExport_{
 		 entityManager_,
 		position2dManager_,
@@ -488,7 +482,7 @@ editorExport_{
 		sceneManager_,
 		bodyDef2DManager_,
 		spriteManager_,
-		textureManager_,
+		textureManager,
 		spineManager_,
 		boxColliderDefManager_,
 		circleColliderDefManager_,
@@ -497,9 +491,11 @@ editorExport_{
 		prefabManager_,
 	}, transform2dManager_(position2dManager_, scale2dManager_, rotation2dManager_),
 	sceneManager_(editorExport_),
-	spriteManager_(textureManager_),
+	spriteManager_(textureManager),
 	colliderManagerDefManager_(editorExport_),
-	prefabManager_(editorExport_)
+	prefabManager_(editorExport_),
+	inspector_(editorExport_),
+	entityViewer_(editorExport_)
 {
 }
 }
