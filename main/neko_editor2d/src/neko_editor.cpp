@@ -38,35 +38,36 @@ NekoEditor::NekoEditor() : SfmlBasicEngine(nullptr)
 
 void NekoEditor::Init()
 {
-	SfmlBasicEngine::Init();
-	sceneRenderTexture_.create(config.gameWindowSize.first, config.gameWindowSize.second);
-	neko::IterateDirectory(config.dataRootPath, [this](std::string_view path)
-		{
-			if (!neko::IsRegularFile(path))
-				return;
-			if (textureManager_.HasValidExtension(path))
-			{
-				textureManager_.LoadTexture(path.data());
-			}
-			if (neko::GetFilenameExtension(path) == ".prefab")
-			{
-				prefabManager_.LoadPrefab(path, false);
-			}
-		}, true);
-	const std::function<void(float)> editorUiFunc = [this](float dt)
-	{
-		EditorUpdate(dt);
-	};
-	drawUiDelegate_.RegisterCallback(editorUiFunc);
+    SfmlBasicEngine::Init();
+    sceneRenderTexture_.create(config.gameWindowSize.first, config.gameWindowSize.second);
+    neko::IterateDirectory(config.dataRootPath, [this](std::string_view path)
+    {
+        if (!neko::IsRegularFile(path))
+            return;
+        if (textureManager_.HasValidExtension(path))
+        {
+            textureManager_.LoadTexture(path.data());
+        }
+        if (neko::GetFilenameExtension(path) == ".prefab")
+        {
+            //TODO have own prefabmanager for all
+            //prefabManager_.LoadPrefab(path, false);
+        }
+    }, true);
+    const std::function<void(float)> editorUiFunc = [this](float dt)
+    {
+        EditorUpdate(dt);
+    };
+    drawUiDelegate_.RegisterCallback(editorUiFunc);
 }
 
 void NekoEditor::Destroy()
 {
-	SfmlBasicEngine::Destroy();
+    SfmlBasicEngine::Destroy();
 }
 
 
-
+/*
 void NekoEditor::SwitchEditorMode(EditorMode editorMode)
 {
 	if (editorMode == editorMode_)
@@ -121,79 +122,85 @@ void NekoEditor::SwitchEditorMode(EditorMode editorMode)
 		break;
 	}
 }
-
+*/
 
 void NekoEditor::OnEvent(sf::Event& event)
 {
-	SfmlBasicEngine::OnEvent(event);
-	if (event.type != sf::Event::KeyPressed)
-		return;
-	switch (editorMode_)
-	{
-	case EditorMode::SceneMode:
-	{
-		if (event.key.control)
-		{
-			switch (event.key.code)
-			{
-			case sf::Keyboard::N:
-			{
-				sceneManager_.ClearScene();
-				sceneManager_.GetCurrentScene().scenePath = "";
-				break;
-			}
-			case sf::Keyboard::O:
-			{
-				fileOperationStatus_ = FileOperation::OPEN_SCENE;
-				break;
-			}
-			case sf::Keyboard::S:
-			{
-				SaveSceneEvent();
-				break;
-			}
-			default:
-				break;
-			}
-		}
-		break;
-	}
-	case EditorMode::PrefabMode:
-		if (event.key.control)
-		{
-			switch (event.key.code)
-			{
-			case sf::Keyboard::N:
-			{
-				sceneManager_.ClearScene();
-				const auto rootEntity = entityManager_.CreateEntity();
-				auto& entitiesName = sceneManager_.GetCurrentScene().entitiesNames;
-				ResizeIfNecessary(entitiesName, rootEntity, std::string());
-				entitiesName[rootEntity] = "Root Entity";
-				break;
-			}
-			case sf::Keyboard::O:
-			{
-				fileOperationStatus_ = FileOperation::OPEN_PREFAB;
-				break;
-			}
-			case sf::Keyboard::S:
-			{
-				SavePrefabEvent();
-				break;
-			}
-			default:
-				break;
-			}
-		}
-		break;
-	default:
-		break;
-	}
+    SfmlBasicEngine::OnEvent(event);
+    if (event.type != sf::Event::KeyPressed)
+        return;
+    switch (editorMode_)
+    {
+        case EditorMode::SceneMode:
+        {
+            if (event.key.control)
+            {
+                switch (event.key.code)
+                {
+                    /*
+                case sf::Keyboard::N:
+                {
+                    sceneManager_.ClearScene();
+                    sceneManager_.GetCurrentScene().scenePath = "";
+                    break;
+                }
+                case sf::Keyboard::O:
+                {
+                    fileOperationStatus_ = FileOperation::OPEN_SCENE;
+                    break;
+                }
+                case sf::Keyboard::S:
+                {
+                    SaveSceneEvent();
+                    break;
+                }
+                     */
+                    default:
+                        break;
+                }
+            }
+            break;
+        }
+        case EditorMode::PrefabMode:
+            if (event.key.control)
+            {
+                switch (event.key.code)
+                {
+                    /*
+                case sf::Keyboard::N:
+                {
+                    sceneManager_.ClearScene();
+                    const auto rootEntity = entityManager_.CreateEntity();
+                    auto& entitiesName = sceneManager_.GetCurrentScene().entitiesNames;
+                    ResizeIfNecessary(entitiesName, rootEntity, std::string());
+                    entitiesName[rootEntity] = "Root Entity";
+                    break;
+                }
+                case sf::Keyboard::O:
+                {
+                    fileOperationStatus_ = FileOperation::OPEN_PREFAB;
+                    break;
+                }
+                case sf::Keyboard::S:
+                {
+                    SavePrefabEvent();
+                    break;
+                }
+                     */
+                    default:
+                        break;
+                }
+            }
+            break;
+        default:
+            break;
+    }
 }
 
+/*
 void NekoEditor::SaveSceneEvent()
 {
+
 	auto& path = sceneManager_.GetCurrentScene().scenePath;
 	if (sceneManager_.IsCurrentSceneTmp() or !neko::FileExists(path))
 	{
@@ -207,6 +214,7 @@ void NekoEditor::SaveSceneEvent()
 	{
 		sceneManager_.SaveCurrentScene();
 	}
+
 }
 
 void NekoEditor::SavePrefabEvent()
@@ -224,278 +232,326 @@ void NekoEditor::SavePrefabEvent()
 	{
 		prefabManager_.SaveCurrentPrefab();
 	}
-}
 
+}
+*/
 
 void NekoEditor::EditorUpdate(float dt)
 {
-	const ImVec2 windowSize = ImVec2(float(config.realWindowSize.first), float(config.realWindowSize.second));
-	const static float yOffset = 20.0f;
-	ImGui::SetNextWindowPos(ImVec2(0.0f, windowSize.y * 0.7f), ImGuiCond_Always);
-	ImGui::SetNextWindowSize(ImVec2(windowSize.x * 0.8f, windowSize.y * 0.3f), ImGuiCond_Always);
-	ImGui::Begin("Debug Window", nullptr,
-		ImGuiWindowFlags_NoTitleBar |
-		ImGuiWindowFlags_NoResize |
-		ImGuiWindowFlags_NoCollapse);
+    const ImVec2 windowSize = ImVec2(float(config.realWindowSize.first), float(config.realWindowSize.second));
+    const static float yOffset = 20.0f;
+    ImGui::SetNextWindowPos(ImVec2(0.0f, windowSize.y * 0.7f), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(windowSize.x * 0.8f, windowSize.y * 0.3f), ImGuiCond_Always);
+    ImGui::Begin("Debug Window", nullptr,
+                 ImGuiWindowFlags_NoTitleBar |
+                 ImGuiWindowFlags_NoResize |
+                 ImGuiWindowFlags_NoCollapse);
 
-	//Log tab
-	if (ImGui::BeginTabBar("Lower Tab", ImGuiTabBarFlags_None))
-	{
-		if (ImGui::BeginTabItem("Debug Log"))
-		{
-			logViewer_.Update();
-			ImGui::EndTabItem();
-		}
-		ImGui::EndTabBar();
-	}
-	if (ImGui::BeginMainMenuBar())
-	{
-		if (ImGui::BeginMenu("File"))
-		{
-			switch (editorMode_)
-			{
-			case EditorMode::SceneMode:
-			{
-				
-				break;
-			}
-			case EditorMode::PrefabMode:
-			{
-				if (ImGui::MenuItem("New Prefab", "CTRL+N"))
-				{
-					sceneManager_.ClearScene();
-				}
-				if (ImGui::MenuItem("Open Prefab", "CTRL+O"))
-				{
-					fileOperationStatus_ = FileOperation::OPEN_PREFAB;
-				}
+    //Log tab
+    if (ImGui::BeginTabBar("Lower Tab", ImGuiTabBarFlags_None))
+    {
+        if (ImGui::BeginTabItem("Debug Log"))
+        {
+            logViewer_.Update();
+            ImGui::EndTabItem();
+        }
+        ImGui::EndTabBar();
+    }
+    ImGui::End();
 
-				if (ImGui::MenuItem("Save Prefab", "CTRL+S"))
-				{
-					SavePrefabEvent();
-				}
-				break;
-			}
-			}
+    ImGui::SetNextWindowPos(ImVec2(windowSize.x * 0.2f, yOffset), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(windowSize.x * 0.6f, windowSize.y * 0.7f - yOffset), ImGuiCond_Always);
+    ImGui::Begin("Central Viewer", nullptr,
+                 ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 
+    if (ImGui::BeginMainMenuBar())
+    {
+        if (ImGui::BeginMenu("File"))
+        {
+            if (ImGui::MenuItem("New Scene", "CTRL+N"))
+            {
+                //sceneManager_.ClearScene();
+            }
+            if (ImGui::MenuItem("Open Scene", "CTRL+O"))
+            {
+                //fileOperationStatus_ = FileOperation::OPEN_SCENE;
+            }
+            if (ImGui::MenuItem("Save Scene", "CTRL+S"))
+            {
+                //TODO save the scene
+                //SaveSceneEvent();
+            }
+            ImGui::EndMenu();
+        }
+    }
 
-			ImGui::EndMenu();
-		}
-		ImGui::EndMainMenuBar();
-	}
+    if (ImGui::BeginTabBar("Central Tab"))
+    {
+        for (Index i = 0; i < editorSystems_.size(); i++)
+        {
+            auto* editorSystem = editorSystems_[i].get();
+            //Show main view tabs
+            if (ImGui::BeginTabItem(editorSystem->GetSystemName().c_str(), nullptr,
+                                    currentSystemIndex == i ? ImGuiTabItemFlags_SetSelected : ImGuiTabItemFlags_None))
+            {
+                editorSystem->OnMainView();
+                ImGui::EndTabItem();
+            }
+            if (ImGui::IsItemClicked(0))
+            {
+                if (currentSystemIndex < editorSystems_.size())
+                {
+                    editorSystems_[i].get()->OnLostFocus();
+                }
+                currentSystemIndex = i;
+            }
+        }
 
+        ImGui::EndTabBar();
+    }
+    ImGui::End();
 
-	fileDialog_.Display();
+    BasicEditorSystem* currentEditorSystem = nullptr;
+    //TODO Set the selected system depending on the index
+    if (currentSystemIndex < editorSystems_.size())
+    {
+        currentEditorSystem = editorSystems_[currentSystemIndex].get();
+    }
 
+    ImGui::SetNextWindowPos(ImVec2(0.0f, yOffset), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(windowSize.x * 0.2f, windowSize.y * 0.7f - yOffset), ImGuiCond_Always);
+    ImGui::Begin("Listing Viewer", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+    if (currentEditorSystem != nullptr)
+    {
+        currentEditorSystem->OnListingView();
+    }
+    ImGui::End();
+    ImGui::SetNextWindowPos(ImVec2(windowSize.x * 0.8f, yOffset), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(windowSize.x * 0.2f, windowSize.y - yOffset), ImGuiCond_Always);
+    ImGui::Begin("Inspector", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 
-	switch (fileOperationStatus_)
-	{
-	case FileOperation::OPEN_SCENE:
-	{
-		ImGui::OpenPopup("Scene Open Popup");
-		fileOperationStatus_ = FileOperation::NONE;
-		break;
-	}
-	case FileOperation::OPEN_PREFAB:
-	{
-		ImGui::OpenPopup("Prefab Open Popup");
-		fileOperationStatus_ = FileOperation::NONE;
-		break;
-	}
-	case FileOperation::SAVE_SCENE:
-	{
-		if (fileDialog_.HasSelected())
-		{
-			const auto sceneJsonPath = fileDialog_.GetSelected().string();
-			sceneManager_.GetCurrentScene().scenePath = sceneJsonPath;
-			sceneManager_.SaveCurrentScene();
-			fileDialog_.ClearSelected();
-			fileDialog_.Close();
-		}
-		break;
-	}
-	case FileOperation::SAVE_PREFAB:
-	{
-		if (fileDialog_.HasSelected())
-		{
-			const auto prefabJsonPath = fileDialog_.GetSelected().string();
-			prefabManager_.SetCurrentPrefabPath(prefabJsonPath);
-			prefabManager_.SaveCurrentPrefab();
-			fileDialog_.ClearSelected();
-			fileDialog_.Close();
-		}
-		break;
-	}
-	default:
-		break;
-	}
+    if (currentEditorSystem != nullptr)
+    {
+        currentEditorSystem->OnInspectorView();
+    }
+    ImGui::End();
 
-	if (ImGui::BeginPopup("Scene Open Popup"))
-	{
-		static std::vector<std::string> sceneFileList;
-		if (sceneFileList.empty())
-		{
-			neko::IterateDirectory(neko::LinkFolderAndFile("..", config.dataRootPath),
-				[](const std::string_view filename)
-				{
-					if (filename.find(".scene") != std::string_view::npos)
-					{
-						sceneFileList.push_back(filename.data());
-					}
-				}, true);
-		}
-		ImGui::Selectable("Cancel Open Scene...");
-		for (const auto& sceneFilename : sceneFileList)
-		{
-			if (ImGui::Selectable(sceneFilename.c_str()))
-			{
-				sceneManager_.ClearScene();
-				sceneManager_.LoadScene(sceneFilename);
-				sceneFileList.clear();
-			}
+    /*
+    if (ImGui::BeginMainMenuBar())
+    {
+        if (ImGui::BeginMenu("File"))
+        {
+            switch (editorMode_)
+            {
+            case EditorMode::SceneMode:
+            {
 
-		}
-		ImGui::EndPopup();
-	}
+                break;
+            }
+            case EditorMode::PrefabMode:
+            {
+                if (ImGui::MenuItem("New Prefab", "CTRL+N"))
+                {
+                    sceneManager_.ClearScene();
+                }
+                if (ImGui::MenuItem("Open Prefab", "CTRL+O"))
+                {
+                    fileOperationStatus_ = FileOperation::OPEN_PREFAB;
+                }
 
-	if (ImGui::BeginPopup("Prefab Open Popup"))
-	{
-		static std::vector<std::string> prefabFileList;
-		if (prefabFileList.empty())
-		{
-			neko::IterateDirectory("../" + config.dataRootPath, [](const std::string_view filename)
-				{
-					if (filename.find(".prefab") != std::string_view::npos)
-					{
-						prefabFileList.push_back(filename.data());
-					}
-				}, true);
-		}
-		ImGui::Selectable("Cancel Open Prefab...");
-		for (auto& prefabFilename : prefabFileList)
-		{
-			if (ImGui::Selectable(prefabFilename.c_str()))
-			{
-				sceneManager_.ClearScene();
-				const auto prefabIndex = prefabManager_.LoadPrefab(prefabFilename, true);
-				prefabManager_.InstantiatePrefab(prefabIndex, entityManager_);
-				prefabFileList.clear();
-			}
-
-		}
-		ImGui::EndPopup();
-	}
+                if (ImGui::MenuItem("Save Prefab", "CTRL+S"))
+                {
+                    SavePrefabEvent();
+                }
+                break;
+            }
+            }
 
 
-	ImGui::End();
-	ImGui::SetNextWindowPos(ImVec2(windowSize.x * 0.8f, windowSize.y * 0.7f), ImGuiCond_Always);
-	ImGui::SetNextWindowSize(ImVec2(windowSize.x * 0.2f, windowSize.y * 0.3f), ImGuiCond_Always);
-	ImGui::Begin("Previewer", nullptr,
-
-		ImGuiWindowFlags_NoResize |
-		ImGuiWindowFlags_NoCollapse);
-	ImGui::End();
+            ImGui::EndMenu();
+        }
+        ImGui::EndMainMenuBar();
+    }
 
 
-	//Render things into the graphics manager
-	
-	switch (editorMode_)
-	{
-	case EditorMode::SceneMode:
-	{
-		
-		break;
-	}
-	case EditorMode::PrefabMode:
-	{
-		auto rect = prefabManager_.CalculatePrefabBound();
-		const auto screenRect = sf::FloatRect(sf::Vector2f(), sf::Vector2f(sceneRenderTexture_.getSize()));
-		const auto rectRatio = rect.width / rect.height;
-		const auto screenRatio = float(screenRect.width) / screenRect.height;
-		rect.width *= screenRatio / rectRatio;
-		const sf::View renderView(rect);
-		sceneRenderTexture_.setView(renderView);
-		RenderTarget renderTarget{ &sceneRenderTexture_ };
-		graphicsManager_.RenderAll(&renderTarget);
-		break;
-	}
-	case EditorMode::TextureMode:
-		break;
-	case EditorMode::AnimMode:
-		break;
-	}
+    fileDialog_.Display();
 
-	sceneRenderTexture_.display();
 
-	ImGui::SetNextWindowPos(ImVec2(0.0f, yOffset), ImGuiCond_Always);
-	ImGui::SetNextWindowSize(ImVec2(windowSize.x * 0.2f, windowSize.y * 0.7f - yOffset), ImGuiCond_Always);
+    switch (fileOperationStatus_)
+    {
+    case FileOperation::OPEN_SCENE:
+    {
+        ImGui::OpenPopup("Scene Open Popup");
+        fileOperationStatus_ = FileOperation::NONE;
+        break;
+    }
+    case FileOperation::OPEN_PREFAB:
+    {
+        ImGui::OpenPopup("Prefab Open Popup");
+        fileOperationStatus_ = FileOperation::NONE;
+        break;
+    }
+    case FileOperation::SAVE_SCENE:
+    {
+        if (fileDialog_.HasSelected())
+        {
+            const auto sceneJsonPath = fileDialog_.GetSelected().string();
+            sceneManager_.GetCurrentScene().scenePath = sceneJsonPath;
+            sceneManager_.SaveCurrentScene();
+            fileDialog_.ClearSelected();
+            fileDialog_.Close();
+        }
+        break;
+    }
+    case FileOperation::SAVE_PREFAB:
+    {
+        if (fileDialog_.HasSelected())
+        {
+            const auto prefabJsonPath = fileDialog_.GetSelected().string();
+            prefabManager_.SetCurrentPrefabPath(prefabJsonPath);
+            prefabManager_.SaveCurrentPrefab();
+            fileDialog_.ClearSelected();
+            fileDialog_.Close();
+        }
+        break;
+    }
+    default:
+        break;
+    }
 
-	entityViewer_.Update(editorMode_);
+    if (ImGui::BeginPopup("Scene Open Popup"))
+    {
+        static std::vector<std::string> sceneFileList;
+        if (sceneFileList.empty())
+        {
+            neko::IterateDirectory(neko::LinkFolderAndFile("..", config.dataRootPath),
+                [](const std::string_view filename)
+                {
+                    if (filename.find(".scene") != std::string_view::npos)
+                    {
+                        sceneFileList.push_back(filename.data());
+                    }
+                }, true);
+        }
+        ImGui::Selectable("Cancel Open Scene...");
+        for (const auto& sceneFilename : sceneFileList)
+        {
+            if (ImGui::Selectable(sceneFilename.c_str()))
+            {
+                sceneManager_.ClearScene();
+                sceneManager_.LoadScene(sceneFilename);
+                sceneFileList.clear();
+            }
 
-	ImGui::SetNextWindowPos(ImVec2(windowSize.x * 0.2f, yOffset), ImGuiCond_Always);
-	ImGui::SetNextWindowSize(ImVec2(windowSize.x * 0.6f, windowSize.y * 0.7f - yOffset), ImGuiCond_Always);
-	ImGui::Begin("Central Viewer", nullptr,
-		ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
-	if (ImGui::BeginTabBar("Central Tab"))
-	{
-		
-		
-		const bool sceneViewerOpen = editorMode_ == EditorMode::SceneMode;
-		if (ImGui::BeginTabItem("Scene Viewer", nullptr,
-			sceneViewerOpen ? ImGuiTabItemFlags_SetSelected : ImGuiTabItemFlags_None))
-		{
-			sceneViewer_.Update(sceneRenderTexture_);
-			ImGui::EndTabItem();
-		}
-		if (ImGui::IsItemClicked(0))
-		{
-			SwitchEditorMode(EditorMode::SceneMode);
-		}
-		const bool prefabViewerOpen = editorMode_ == EditorMode::PrefabMode;
-		if (ImGui::BeginTabItem("Prefab Viewer", nullptr,
-			prefabViewerOpen ? ImGuiTabItemFlags_SetSelected : ImGuiTabItemFlags_None))
-		{
-			sceneViewer_.Update(sceneRenderTexture_);
-			ImGui::EndTabItem();
-		}
-		if (ImGui::IsItemClicked(0))
-		{
-			SwitchEditorMode(EditorMode::PrefabMode);
-		}
-		ImGui::EndTabBar();
-	}
+        }
+        ImGui::EndPopup();
+    }
 
-	ImGui::End();
+    if (ImGui::BeginPopup("Prefab Open Popup"))
+    {
+        static std::vector<std::string> prefabFileList;
+        if (prefabFileList.empty())
+        {
+            neko::IterateDirectory("../" + config.dataRootPath, [](const std::string_view filename)
+                {
+                    if (filename.find(".prefab") != std::string_view::npos)
+                    {
+                        prefabFileList.push_back(filename.data());
+                    }
+                }, true);
+        }
+        ImGui::Selectable("Cancel Open Prefab...");
+        for (auto& prefabFilename : prefabFileList)
+        {
+            if (ImGui::Selectable(prefabFilename.c_str()))
+            {
+                sceneManager_.ClearScene();
+                const auto prefabIndex = prefabManager_.LoadPrefab(prefabFilename, true);
+                prefabManager_.InstantiatePrefab(prefabIndex, entityManager_);
+                prefabFileList.clear();
+            }
 
-	
+        }
+        ImGui::EndPopup();
+    }
+
+
+    ImGui::End();
+    ImGui::SetNextWindowPos(ImVec2(windowSize.x * 0.8f, windowSize.y * 0.7f), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(windowSize.x * 0.2f, windowSize.y * 0.3f), ImGuiCond_Always);
+    ImGui::Begin("Previewer", nullptr,
+
+        ImGuiWindowFlags_NoResize |
+        ImGuiWindowFlags_NoCollapse);
+    ImGui::End();
+
+
+    //Render things into the graphics manager
+
+    switch (editorMode_)
+    {
+    case EditorMode::SceneMode:
+    {
+
+        break;
+    }
+    case EditorMode::PrefabMode:
+    {
+        auto rect = prefabManager_.CalculatePrefabBound();
+        const auto screenRect = sf::FloatRect(sf::Vector2f(), sf::Vector2f(sceneRenderTexture_.getSize()));
+        const auto rectRatio = rect.width / rect.height;
+        const auto screenRatio = float(screenRect.width) / screenRect.height;
+        rect.width *= screenRatio / rectRatio;
+        const sf::View renderView(rect);
+        sceneRenderTexture_.setView(renderView);
+        RenderTarget renderTarget{ &sceneRenderTexture_ };
+        graphicsManager_.RenderAll(&renderTarget);
+        break;
+    }
+    case EditorMode::TextureMode:
+        break;
+    case EditorMode::AnimMode:
+        break;
+    }
+
+*/
+    ImGui::End();
+
+
 }
 
 
-NekoEditorSystem::NekoEditorSystem(sfml::TextureManager& textureManager) :
-BasicEditorSystem(),
-editorExport_{
-		 entityManager_,
-		position2dManager_,
-		scale2dManager_,
-		rotation2dManager_,
-		transform2dManager_,
-		sceneManager_,
-		bodyDef2DManager_,
-		spriteManager_,
-		textureManager,
-		spineManager_,
-		boxColliderDefManager_,
-		circleColliderDefManager_,
-		polygonColldierDefManager_,
-		colliderManagerDefManager_,
-		prefabManager_,
-	}, transform2dManager_(position2dManager_, scale2dManager_, rotation2dManager_),
-	sceneManager_(editorExport_),
-	spriteManager_(textureManager),
-	colliderManagerDefManager_(editorExport_),
-	prefabManager_(editorExport_),
-	inspector_(editorExport_),
-	entityViewer_(editorExport_)
+NekoEditorSystem::NekoEditorSystem(Configuration& config, sfml::TextureManager& textureManager) :
+        BasicEditorSystem(config),
+        editorExport_{
+                entityManager_,
+                position2dManager_,
+                scale2dManager_,
+                rotation2dManager_,
+                transform2dManager_,
+                sceneManager_,
+                bodyDef2DManager_,
+                spriteManager_,
+                textureManager,
+                spineManager_,
+                boxColliderDefManager_,
+                circleColliderDefManager_,
+                polygonColldierDefManager_,
+                colliderManagerDefManager_,
+                prefabManager_,
+                config
+        }, transform2dManager_(position2dManager_, scale2dManager_, rotation2dManager_),
+        sceneManager_(editorExport_),
+        spriteManager_(textureManager),
+        colliderManagerDefManager_(editorExport_),
+        prefabManager_(editorExport_),
+        inspector_(editorExport_),
+        entityViewer_(editorExport_)
 {
+}
+
+BasicEditorSystem::BasicEditorSystem(Configuration& config) : config_(config)
+{
+
 }
 }

@@ -24,6 +24,7 @@
  SOFTWARE.
  */
 #include <engine/entity.h>
+#include <engine/engine.h>
 
 
 namespace neko {
@@ -36,14 +37,13 @@ class Scale2dManager;
 class Position2dManager;
 }
 
-namespace neko {
-namespace sfml {
+namespace neko::sfml {
 class SpineManager;
 class TextureManager;
 class SpriteManager;
 class Transform2dManager;
 }
-}
+
 
 namespace neko::editor
 {
@@ -71,7 +71,7 @@ private:
 	sfml::SpriteManager& spriteManager_;
 	sfml::TextureManager& textureManager_;
 	sfml::SpineManager& spineManager_;
-	NekoEditor& nekoEditor_;
+	Configuration& config_;
 	box2d::BodyDef2dManager& bodyDefManager_;
 	BoxColliderDefManager& boxColliderDefManager_;
 	CircleColliderDefManager& circleColliderDefManager_;

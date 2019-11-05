@@ -58,6 +58,5 @@ private:
     EntityManager& entityManager_;
     EditorSceneManager& sceneManager_;
     EditorPrefabManager& prefabManager_;
-    NekoEditor& nekoEditor_;
 };
 }

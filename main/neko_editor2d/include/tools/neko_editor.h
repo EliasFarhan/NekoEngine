@@ -78,11 +78,12 @@ public:
 
     void Destroy() override;
 
-    void SwitchEditorMode(EditorMode editorMode);
+    //void SwitchEditorMode(EditorMode editorMode);
+    //void SaveSceneEvent();
+    //void SavePrefabEvent();
 
     void OnEvent(sf::Event& event) override;
-    void SaveSceneEvent();
-    void SavePrefabEvent();
+
 
 protected:
 
@@ -92,24 +93,32 @@ protected:
     ImGui::FileBrowser fileDialog_;
     EditorMode editorMode_ = EditorMode::SceneMode;
 	std::vector<std::unique_ptr<BasicEditorSystem>> editorSystems_;
-
+	Index currentSystemIndex = INVALID_INDEX;
 	sfml::TextureManager textureManager_;
 };
 
 class BasicEditorSystem : public System
 {
 public:
-	using System::System;
+	explicit BasicEditorSystem(Configuration& config);
 	const std::string& GetSystemName() const { return editorSystemName_; }
 	void SetSystemName(const std::string& name) { editorSystemName_ = name; }
+
+	virtual void OnListingView() = 0;
+	virtual void OnMainView() = 0;
+	virtual void OnInspectorView() = 0;
+
+	virtual void OnEvent(sf::Event& event){};
+	virtual void OnLostFocus(){};
 protected:
 	std::string editorSystemName_;
+	Configuration& config_;
 };
 
 class NekoEditorSystem : public BasicEditorSystem
 {
 public:
-	explicit NekoEditorSystem(sfml::TextureManager& textureManager);
+	explicit NekoEditorSystem(Configuration& config, sfml::TextureManager& textureManager);
 protected:
 	sf::RenderTexture screenRenderTexture_;
 	NekoEditorExport editorExport_;

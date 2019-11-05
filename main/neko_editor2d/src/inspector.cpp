@@ -14,8 +14,8 @@ void Inspector::ShowEntityInfo(neko::Entity entity) const
 	if (entity == neko::INVALID_ENTITY)
 		return;
 
-
-	ImGui::InputText("Entity Name: ", &sceneManager_.GetCurrentScene().entitiesNames[entity]);
+    //TODO Have own entity name manager
+    //ImGui::InputText("Entity Name: ", &sceneManager_.GetCurrentScene().entitiesNames[entity]);
 	ImGui::LabelText("Entity Value: ", "%u", entity);
 	{
 		const auto parentEntity = transformManager_.GetParentEntity(entity);
@@ -180,7 +180,7 @@ void Inspector::ShowEntityInfo(neko::Entity entity) const
 			{
 				if (spineFileList.empty())
 				{
-					neko::IterateDirectory(nekoEditor_.config.dataRootPath, [](const std::string_view filename)
+					neko::IterateDirectory(config_.dataRootPath, [](const std::string_view filename)
 						{
 							if (filename.find(".spine") != std::string_view::npos)
 							{
@@ -451,6 +451,8 @@ void Inspector::ShowEntityInfo(neko::Entity entity) const
 		}
 		ImGui::EndPopup();
 	}
+
+
 }
 
 Inspector::Inspector(NekoEditorExport& nekoEditorExport) :
@@ -463,21 +465,20 @@ Inspector::Inspector(NekoEditorExport& nekoEditorExport) :
 	spriteManager_(nekoEditorExport.spriteManager),
 	textureManager_(nekoEditorExport.textureManager),
 	spineManager_(nekoEditorExport.spineManager),
-	nekoEditor_(nekoEditorExport.editor),
 	bodyDefManager_(nekoEditorExport.bodyDef2dManager),
 	boxColliderDefManager_(nekoEditorExport.boxColliderDefManager_),
 	circleColliderDefManager_(nekoEditorExport.circleColliderDefManager_),
-	polygonColliderDefManager_(nekoEditorExport.polygonColldierDefManager_)
+	polygonColliderDefManager_(nekoEditorExport.polygonColldierDefManager_),
+	config_(nekoEditorExport.config)
 {
 }
 
 void Inspector::BeginWindow()
 {
-	ImGui::Begin("Inspector", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+
 }
 
 void Inspector::EndWindow()
 {
-	ImGui::End();
 }
 }

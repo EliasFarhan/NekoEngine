@@ -2,6 +2,7 @@
 
 namespace neko
 {
+    class Configuration;
     class EntityManager;
     class Position2dManager;
     class Scale2dManager;
@@ -47,7 +48,8 @@ struct NekoEditorExport
     BoxColliderDefManager& boxColliderDefManager_;
     CircleColliderDefManager& circleColliderDefManager_;
     PolygonColldierDefManager& polygonColldierDefManager_;
-    ColliderDefManager& coll;
+    ColliderDefManager& colliderDefManager_;
     EditorPrefabManager& prefabManager;
+    Configuration& config;
 };
 }
