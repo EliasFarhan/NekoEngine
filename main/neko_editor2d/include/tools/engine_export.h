@@ -1,8 +1,11 @@
 #pragma once
 
+#include <engine/engine_export.h>
+#include <sfml_engine/engine_export.h>
+
 namespace neko
 {
-    class Configuration;
+    struct Configuration;
     class EntityManager;
     class Position2dManager;
     class Scale2dManager;
@@ -33,18 +36,11 @@ class EntityViewer;
 class Inspector;
 class SceneViewer;
 
-struct NekoEditorExport
+struct NekoEditorExport : sfml::SfmlBasicEngineExport
 {
-    EntityManager& entityManager;
-    Position2dManager& position2dManager;
-    Scale2dManager& scale2dManager;
-    Rotation2dManager& rotation2dManager;
-    sfml::Transform2dManager& transform2dManager;
     EditorSceneManager& sceneManager;
     box2d::BodyDef2dManager& bodyDef2dManager;
-    sfml::SpriteManager& spriteManager;
     sfml::TextureManager& textureManager;
-    sfml::SpineManager& spineManager;
     BoxColliderDefManager& boxColliderDefManager_;
     CircleColliderDefManager& circleColliderDefManager_;
     PolygonColldierDefManager& polygonColldierDefManager_;

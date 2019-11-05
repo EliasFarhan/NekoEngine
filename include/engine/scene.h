@@ -35,25 +35,31 @@ namespace neko
 
 using SceneId = sole::uuid;
 const SceneId INVALID_SCENE_ID = sole::uuid();
-
+struct EngineExport;
 struct Scene
 {
     std::string sceneName = "New Scene";
     std::string scenePath = "";
 	Color bgColor;
+	SceneId sceneId = INVALID_SCENE_ID;
 };
 
 class SceneManager 
 {
 public:
+    explicit SceneManager(EngineExport& engineExport);
 	virtual ~SceneManager() = default;
     virtual void ParseComponentJson(json& componentJson, Entity entity) = 0;
     virtual void ParseEntityJson(json& entityJson) = 0;
     virtual void ParseSceneJson(json& sceneJson);
 
     const Scene& GetCurrentScene(){ return currentScene_;}
+    void SetCurrentScene(const Scene& currentScene);
 protected:
+    std::map<NekoComponentType, std::function<void(Entity, json&)>> componentParsingFuncMap_;
     Scene currentScene_;
+
+    EntityManager& entityManager_;
 };
 
 }

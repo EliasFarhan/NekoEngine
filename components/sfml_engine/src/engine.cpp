@@ -101,7 +101,8 @@ SfmlFullEngine::SfmlFullEngine(Configuration* config) :
 	SfmlBasicEngine(config),
 	transform2dManager_(position2dManager_, scale2dManager_, rotation2dManager_),
 	physics2dManager_(contactListener_),
-	body2dManager_(physics2dManager_), contactListener_(*this)
+	body2dManager_(physics2dManager_), contactListener_(*this),
+	spriteManager_(textureManager_)
 {
 	physics2dManager_.SetConfiguration(config);
 }

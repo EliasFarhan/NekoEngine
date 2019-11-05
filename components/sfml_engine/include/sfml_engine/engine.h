@@ -4,7 +4,9 @@
 #include "engine/engine.h"
 #include "sfml_engine/input.h"
 #include "sfml_engine/graphics.h"
-#include "transform.h"
+#include "sfml_engine/transform.h"
+#include "sfml_engine/sprite.h"
+#include "sfml_engine/spine.h"
 
 namespace neko::box2d
 {
@@ -49,9 +51,14 @@ protected:
 	Scale2dManager scale2dManager_;
 	Rotation2dManager rotation2dManager_;
 	Transform2dManager transform2dManager_;
+
+	TextureManager textureManager_;
+	SpriteManager spriteManager_;
+	SpineManager spineManager_;
 	
 	box2d::Physics2dManager physics2dManager_;
 	box2d::Body2dManager body2dManager_;
 	box2d::ContactListener contactListener_;
 };
+
 }

@@ -108,7 +108,7 @@ public:
 	virtual void OnMainView() = 0;
 	virtual void OnInspectorView() = 0;
 
-	virtual void OnEvent(sf::Event& event){};
+	virtual void OnEvent([[maybe_unused]]sf::Event& event){};
 	virtual void OnLostFocus(){};
 protected:
 	std::string editorSystemName_;

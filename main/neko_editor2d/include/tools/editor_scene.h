@@ -26,6 +26,7 @@
 #include <engine/scene.h>
 #include <engine/component.h>
 #include <sfml_engine/transform.h>
+#include <sfml_engine/scene.h>
 
 namespace neko
 {
@@ -50,14 +51,11 @@ class Position2dManager;
 namespace neko::editor
 {
 struct NekoEditorExport;
-class EditorSceneManager : public neko::SceneManager
+class EditorSceneManager : public sfml::SfmlBasicSceneManager
 {
 public:
 	explicit EditorSceneManager(NekoEditorExport& editorExport);
 
-    void ParseEntityJson(json& entityJson) override;
-    void ParseComponentJson(json& componentJson, neko::Entity entity) override;
-	void ParseSceneJson(json& sceneJson) override;
 
     virtual json SerializeComponent(neko::Entity entity, neko::NekoComponentType componentType);
     virtual json SerializeEntity(neko::Entity entity);
@@ -72,14 +70,11 @@ public:
 protected:
 
     void SaveScene(std::string_view path);
-    Position2dManager& position2dManager_;
-	Rotation2dManager& rotation2dManager_;
-	EntityManager& entityManager_;
-	sfml::SpriteManager& spriteManager_;
-	sfml::SpineManager& spineManager_;
-	sfml::Transform2dManager& transformManager_;
-	PrefabManager& prefabManager_;
-	Scale2dManager& scaleManager_;
+
+    std::map<NekoComponentType, std::function<json(Entity)>> componentSerializeFuncMap_;
+
+
+    PrefabManager& prefabManager_;
 	box2d::BodyDef2dManager& bodyDefManager_;
 };
 

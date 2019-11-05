@@ -90,7 +90,7 @@ private:
 class Body2dManager : public ComponentManager<b2Body*, ComponentType(NekoComponentType::BODY2D)>
 {
 public:
-	Body2dManager(Physics2dManager& physics2dManager);
+	explicit Body2dManager(Physics2dManager& physics2dManager);
 
 	void DestroyComponent(EntityManager& entityManager, Entity entity) override;
 private:

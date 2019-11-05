@@ -236,7 +236,7 @@ void NekoEditor::SavePrefabEvent()
 }
 */
 
-void NekoEditor::EditorUpdate(float dt)
+void NekoEditor::EditorUpdate([[maybe_unused]]float dt)
 {
     const ImVec2 windowSize = ImVec2(float(config.realWindowSize.first), float(config.realWindowSize.second));
     const static float yOffset = 20.0f;
@@ -320,7 +320,8 @@ void NekoEditor::EditorUpdate(float dt)
 
     ImGui::SetNextWindowPos(ImVec2(0.0f, yOffset), ImGuiCond_Always);
     ImGui::SetNextWindowSize(ImVec2(windowSize.x * 0.2f, windowSize.y * 0.7f - yOffset), ImGuiCond_Always);
-    ImGui::Begin("Listing Viewer", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+    ImGui::Begin("Listing Viewer", nullptr,
+                 ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
     if (currentEditorSystem != nullptr)
     {
         currentEditorSystem->OnListingView();
@@ -328,7 +329,8 @@ void NekoEditor::EditorUpdate(float dt)
     ImGui::End();
     ImGui::SetNextWindowPos(ImVec2(windowSize.x * 0.8f, yOffset), ImGuiCond_Always);
     ImGui::SetNextWindowSize(ImVec2(windowSize.x * 0.2f, windowSize.y - yOffset), ImGuiCond_Always);
-    ImGui::Begin("Inspector", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+    ImGui::Begin("Inspector", nullptr,
+                 ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 
     if (currentEditorSystem != nullptr)
     {
@@ -524,16 +526,18 @@ void NekoEditor::EditorUpdate(float dt)
 NekoEditorSystem::NekoEditorSystem(Configuration& config, sfml::TextureManager& textureManager) :
         BasicEditorSystem(config),
         editorExport_{
-                entityManager_,
+                {{entityManager_,
+                prefabManager_,
+                sceneManager_},
                 position2dManager_,
                 scale2dManager_,
                 rotation2dManager_,
                 transform2dManager_,
+                spriteManager_,
+                spineManager_},
                 sceneManager_,
                 bodyDef2DManager_,
-                spriteManager_,
                 textureManager,
-                spineManager_,
                 boxColliderDefManager_,
                 circleColliderDefManager_,
                 polygonColldierDefManager_,
@@ -545,8 +549,8 @@ NekoEditorSystem::NekoEditorSystem(Configuration& config, sfml::TextureManager& 
         spriteManager_(textureManager),
         colliderManagerDefManager_(editorExport_),
         prefabManager_(editorExport_),
-        inspector_(editorExport_),
-        entityViewer_(editorExport_)
+        entityViewer_(editorExport_),
+        inspector_(editorExport_)
 {
 }
 

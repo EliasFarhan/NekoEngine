@@ -3,8 +3,17 @@
 //
 
 #include <engine/scene.h>
+#include <engine/engine_export.h>
 
-void neko::SceneManager::ParseSceneJson(json& sceneJson)
+namespace neko
+{
+
+neko::SceneManager::SceneManager(neko::EngineExport& engineExport) :
+entityManager_(engineExport.entityManager)
+{
+
+}
+void SceneManager::ParseSceneJson(json& sceneJson)
 {
     if (CheckJsonParameter(sceneJson, "sceneName", json::value_t::string))
     {
@@ -14,7 +23,7 @@ void neko::SceneManager::ParseSceneJson(json& sceneJson)
     {
         currentScene_.sceneName = "New Scene";
     }
-    if(CheckJsonParameter(sceneJson, "scenePath", json::value_t::string))
+    if (CheckJsonParameter(sceneJson, "scenePath", json::value_t::string))
     {
         currentScene_.scenePath = sceneJson["scenePath"];
     }
@@ -27,4 +36,9 @@ void neko::SceneManager::ParseSceneJson(json& sceneJson)
     }
 }
 
+void SceneManager::SetCurrentScene(const Scene& currentScene)
+{
+    currentScene_ = currentScene;
+}
 
+}
