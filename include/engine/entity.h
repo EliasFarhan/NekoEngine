@@ -26,6 +26,7 @@
 
 #include <vector>
 #include <engine/globals.h>
+#include <xxhash.hpp>
 
 namespace neko
 {
@@ -34,11 +35,16 @@ namespace neko
  */
 using Entity = Index;
 /**
+ * Use to find a specific entity
+ */
+using EntityHash = xxh::hash_t<64>;
+/**
  * \brief EntityMask is a bitmask representation of the activated components
  */
 using EntityMask = std::uint32_t;
 const Entity INVALID_ENTITY = std::numeric_limits<Index>::max();
 const EntityMask INVALID_ENTITY_MASK = 0u;
+const EntityHash INVALID_ENTITY_HASH = EntityHash(0);
 
 /**
  * \brief Used in an Entity-Component-System to store all entities and what components they have
@@ -63,15 +69,17 @@ public:
 	size_t GetEntitiesNmb(EntityMask filterComponents = INVALID_ENTITY_MASK);
 	size_t GetEntitiesSize() const;
 
-	std::vector<Entity> FilterEntities(EntityMask filterComponents = INVALID_ENTITY_MASK);
+	std::vector<Entity> FilterEntities(EntityMask filterComponents = INVALID_ENTITY_MASK) const;
 
 	void AddComponentType(Entity entity, EntityMask componentType);
 
 	void RemoveComponentType(Entity entity, EntityMask componentType);
-
-
+	void SetEntityName(Entity entity, const std::string& entityName);
+	Entity FindEntityByName(const std::string& entityName);
+	static EntityHash HashEntityName(const std::string& entityName);
 private:
 	std::vector<EntityMask> entityMaskArray_;
+	std::vector<EntityHash> entityHashArray_;
 };
 
 }

@@ -26,11 +26,13 @@ void Inspector::ShowEntityInfo(neko::Entity entity) const
 	}
 	if (entityManager_.HasComponent(entity, neko::EntityMask(neko::NekoComponentType::PREFAB)))
 	{
-		const auto index = sceneManager_.GetComponent(entity);
+		/*
+		 *const auto index = sceneManager_.GetComponent(entity);
 		if (index != neko::INVALID_INDEX)
 		{
 			ImGui::LabelText("Prefab Index", "%u", index);
 		}
+		*/
 	}
 	if (entityManager_.HasComponent(entity, neko::EntityMask(neko::NekoComponentType::POSITION2D)))
 	{

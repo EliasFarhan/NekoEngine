@@ -29,32 +29,32 @@
 #include <utilities/json_utility.h>
 #include "entity.h"
 #include <sole.hpp>
+#include "component.h"
 
 namespace neko
 {
 
 class SceneManager;
-using PrefabId = Index;
-const PrefabId INVALID_PREFAB_ID = INVALID_INDEX;
+using PrefabId = sole::uuid;
+const PrefabId INVALID_PREFAB_ID = sole::uuid();
 struct Prefab
 {
     Prefab();
 
     PrefabId id = INVALID_PREFAB_ID;
+	std::string prefabPath = "";
     json prefabJson{};
 };
 
-class PrefabManager
+class PrefabManager : public ComponentManager<PrefabId, EntityMask(NekoComponentType::PREFAB)>
 {
 public:
     explicit PrefabManager(SceneManager& sceneManager);
-    void InstantiatePrefab(Index prefabIndex, EntityManager& entityManager);
-    Index LoadPrefab(std::string_view prefabPath, bool forceReload=false);
+    void InstantiatePrefab(PrefabId prefabIndex, EntityManager& entityManager);
+    PrefabId LoadPrefab(std::string_view prefabPath, bool forceReload=false);
 	void ClearPrefabs();
-    const std::vector<std::string>& GetConstPrefabPaths() const;
 protected:
-    std::vector<std::string> prefabPaths_;
-    std::vector<json> prefabJsons_;
     SceneManager& sceneManager_;
+	std::unordered_map<PrefabId, Prefab> prefabMap_;
 };
 }

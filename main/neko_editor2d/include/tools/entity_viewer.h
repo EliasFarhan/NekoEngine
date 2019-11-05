@@ -38,25 +38,37 @@ enum class EditorMode : std::uint8_t;
 class EntityViewer
 {
 public:
-    EntityViewer(NekoEditorExport& editorExport);
-    void Update(EditorMode editorMode);
+	EntityViewer(NekoEditorExport& editorExport);
+	void Update(EditorMode editorMode);
 
-    void Reset()
-    { selectedEntity_ = neko::INVALID_ENTITY; }
+	void Reset()
+	{
+		selectedEntity_ = neko::INVALID_ENTITY;
+	}
 
-    neko::Entity GetSelectedEntity()
-    { return selectedEntity_; }
+	Entity GetSelectedEntity() const
+	{
+		return selectedEntity_;
+	}
+	
+	void SetSelectedEntity(Entity entity)
+	{
+		selectedEntity_ = entity;
+	}
 
 private:
-    void DrawEntityHierarchy(neko::Entity entity, size_t index, std::set<neko::Entity>& entitySet, bool draw,
-                             bool destroy);
+	void DrawEntityHierarchy(Entity entity,
+		size_t index,
+		std::set<Entity>& entitySet,
+		bool draw,
+		bool destroy);
 
-    std::vector<Entity> entities_;
-    std::vector<std::string> entitiesName_;
-    Entity selectedEntity_ = neko::INVALID_ENTITY;
-    sfml::Transform2dManager& transformManager_;
-    EntityManager& entityManager_;
-    EditorSceneManager& sceneManager_;
-    EditorPrefabManager& prefabManager_;
+	std::vector<Entity> entities_;
+	std::vector<std::string> entitiesName_;
+	Entity selectedEntity_ = INVALID_ENTITY;
+	sfml::Transform2dManager& transformManager_;
+	EntityManager& entityManager_;
+	EditorSceneManager& sceneManager_;
+	EditorPrefabManager& prefabManager_;
 };
 }

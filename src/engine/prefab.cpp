@@ -10,8 +10,9 @@ PrefabManager::PrefabManager(SceneManager& sceneManager) : sceneManager_(sceneMa
 
 }
 
-Index PrefabManager::LoadPrefab(std::string_view prefabPath, bool forceReload)
+PrefabId PrefabManager::LoadPrefab(std::string_view prefabPath, bool forceReload)
 {
+	/*
     const auto prefabIt = std::find(prefabPaths_.begin(), prefabPaths_.end(), prefabPath);
     if (prefabIt != prefabPaths_.end())
     {
@@ -29,23 +30,19 @@ Index PrefabManager::LoadPrefab(std::string_view prefabPath, bool forceReload)
         prefabJsons_.push_back(prefabFileJson);
         prefabPaths_.push_back(prefabPath.data());
         return Index(prefabJsons_.size() - 1);
-    }
+    }*/
+	return INVALID_PREFAB_ID;
 }
 
 void PrefabManager::ClearPrefabs()
 {
-	prefabPaths_.clear();
-	prefabJsons_.clear();
+	prefabMap_.clear();
 }
 
-const std::vector<std::string>& PrefabManager::GetConstPrefabPaths() const
-{
-	return prefabPaths_;
-}
 
-void PrefabManager::InstantiatePrefab(Index prefabIndex, EntityManager& entityManager)
+void PrefabManager::InstantiatePrefab(PrefabId prefabIndex, EntityManager& entityManager)
 {
-    auto prefabJson = prefabJsons_[prefabIndex];
+    /*auto prefabJson = prefabJsons_[prefabIndex];
     const auto entityBase = entityManager.GetLastEntity() + 1;
     for (auto& entityJson: prefabJson["entities"])
     {
@@ -58,9 +55,10 @@ void PrefabManager::InstantiatePrefab(Index prefabIndex, EntityManager& entityMa
         }
         sceneManager_.ParseEntityJson(entityJson);
     }
+	*/
 }
 
-Prefab::Prefab() : id(0)
+Prefab::Prefab() : id(sole::uuid0())
 {
 
 }

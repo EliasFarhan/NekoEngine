@@ -35,6 +35,7 @@ namespace neko
 EntityManager::EntityManager()
 {
     entityMaskArray_.resize(INIT_ENTITY_NMB);
+	entityHashArray_.resize(INIT_ENTITY_NMB);
 }
 
 EntityMask EntityManager::GetMask(Entity entity)
@@ -55,7 +56,8 @@ Entity EntityManager::CreateEntity(Entity entity)
         {
             const auto newEntity = entityMaskArray_.size();
             ResizeIfNecessary(entityMaskArray_, newEntity, INVALID_ENTITY_MASK);
-            AddComponentType(Entity(newEntity), EntityMask(NekoComponentType::EMPTY));
+			ResizeIfNecessary(entityHashArray_, newEntity, INVALID_ENTITY_HASH);
+        	AddComponentType(Entity(newEntity), EntityMask(NekoComponentType::EMPTY));
             return Entity(newEntity);
         }
         else
@@ -68,7 +70,8 @@ Entity EntityManager::CreateEntity(Entity entity)
     else
     {
         ResizeIfNecessary(entityMaskArray_, entity, INVALID_ENTITY_MASK);
-        if(!EntityExists(entity))
+		ResizeIfNecessary(entityHashArray_, entity, INVALID_ENTITY_HASH);
+    	if(!EntityExists(entity))
         {
             AddComponentType(entity, EntityMask(NekoComponentType::EMPTY));
             return entity;
@@ -83,6 +86,7 @@ Entity EntityManager::CreateEntity(Entity entity)
 void EntityManager::DestroyEntity(Entity entity)
 {
     entityMaskArray_[entity] = INVALID_ENTITY_MASK;
+	entityHashArray_[entity] = INVALID_ENTITY_HASH;
 }
 
 bool EntityManager::HasComponent(Entity entity, EntityMask componentType) const
@@ -107,6 +111,31 @@ void EntityManager::RemoveComponentType(Entity entity, EntityMask componentType)
     entityMaskArray_[entity] &= ~EntityMask(componentType);
 }
 
+void EntityManager::SetEntityName(Entity entity, const std::string& entityName)
+{
+	const auto entityHash = HashEntityName(entityName);
+	entityHashArray_[entity] = entityHash;
+}
+
+Entity EntityManager::FindEntityByName(const std::string& entityName)
+{
+	const auto entityHash = HashEntityName(entityName);
+	const auto index = std::find(entityHashArray_.begin(), entityHashArray_.end(), entityHash);
+	if(index != entityHashArray_.end())
+	{
+		return index - entityHashArray_.begin();
+	}
+	return INVALID_ENTITY;
+}
+
+EntityHash EntityManager::HashEntityName(const std::string& entityName)
+{
+	xxh::hash_state_t<64> hash_stream(0);
+	hash_stream.update(entityName);
+	const EntityHash entityHash = hash_stream.digest();
+	return entityHash;
+}
+
 size_t EntityManager::GetEntitiesNmb(EntityMask filterComponents)
 {
     return std::count_if(entityMaskArray_.begin(), entityMaskArray_.end(),[&filterComponents](EntityMask entityMask){
@@ -119,7 +148,7 @@ size_t EntityManager::GetEntitiesSize() const
 	return entityMaskArray_.size();
 }
 
-std::vector<Entity> EntityManager::FilterEntities(EntityMask filterComponents)
+std::vector<Entity> EntityManager::FilterEntities(EntityMask filterComponents) const
 {
 	std::vector<Entity> entities;
 	entities.reserve(entityMaskArray_.size());

@@ -87,7 +87,7 @@ void EditorPrefabManager::SavePrefab(const std::string_view path)
 
 neko::Index EditorPrefabManager::CreatePrefabFromEntity(neko::Entity entity)
 {
-    const auto newIndex = neko::Index(prefabJsons_.size());
+    //const auto newIndex = neko::Index(prefabJsons_.size());
     /*auto& sceneManager = dynamic_cast<EditorSceneManager&>(sceneManager_);
 
     json prefabJson;
@@ -132,7 +132,7 @@ neko::Index EditorPrefabManager::CreatePrefabFromEntity(neko::Entity entity)
     prefabPaths_.push_back("");
     currentPrefabIndex_ = prefabJsons_.size() - 1;
 */
-    return newIndex;
+    return INVALID_INDEX;
 
 }
 

@@ -28,19 +28,22 @@
 #include "entity.h"
 #include <engine/component.h>
 #include "graphics/color.h"
+#include <sole.hpp>
 
 namespace neko
 {
+
+using SceneId = sole::uuid;
+const SceneId INVALID_SCENE_ID = sole::uuid();
 
 struct Scene
 {
     std::string sceneName = "New Scene";
     std::string scenePath = "";
-    std::vector<std::string> entitiesNames;
 	Color bgColor;
 };
 
-class SceneManager : public ComponentManager<Index, neko::EntityMask(neko::NekoComponentType::PREFAB)>
+class SceneManager 
 {
 public:
 	virtual ~SceneManager() = default;

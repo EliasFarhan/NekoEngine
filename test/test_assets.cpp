@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2017 SAE Institute Switzerland AG
+Copyright (c) 2019 SAE Institute Switzerland AG
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -63,7 +63,7 @@ TEST(Engine, TestAssetImport)
 		{
 			std::cerr << "Could not open filename: " << filename << "\n";
 		}
-		xxh::hash_t<64> final_hash = hash_stream.digest();
+		const xxh::hash_t<64> final_hash = hash_stream.digest();
 		std::cout << "Filename: " << filename << " Hash: " << final_hash << "\n";
 	}
 

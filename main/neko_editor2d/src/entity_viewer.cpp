@@ -57,7 +57,7 @@ void EntityViewer::Update(EditorMode editorMode)
 		if (entityManager_.EntityExists(entity))
 		{
 			entities_.push_back(entity);
-			entitiesName_.push_back(sceneManager_.GetCurrentScene().entitiesNames[entity]);
+			//entitiesName_.push_back(sceneManager_.GetCurrentScene().entitiesNames[entity]);
 		}
 	}
 
@@ -74,8 +74,8 @@ void EntityViewer::Update(EditorMode editorMode)
 
 	if (ImGui::Button("Add Entity"))
 	{
-		auto entity = entityManager_.CreateEntity();
-		auto& entitiesName = sceneManager_.GetCurrentScene().entitiesNames;
+		const auto entity = entityManager_.CreateEntity();
+		//auto& entitiesName = sceneManager_.GetCurrentScene().entitiesNames;
 		//TODO Add own entityEditorName
 		//ResizeIfNecessary(entitiesName, entity, std::string());
 		//entitiesName[entity] = std::string("Entity ") + std::to_string(entity);
@@ -166,12 +166,13 @@ void EntityViewer::DrawEntityHierarchy(neko::Entity entity,
 					{
 
 						const auto newIndex = prefabManager_.CreatePrefabFromEntity(entity);
-						sceneManager_.AddComponent(entityManager_, entity); //adding prefab
+						/*sceneManager_.AddComponent(entityManager_, entity); //adding prefab
 						sceneManager_.SetComponent(entity, newIndex);
 						prefabManager_.SetCurrentPrefabIndex(newIndex);
 						sceneManager_.ClearScene();
 						prefabManager_.InstantiatePrefab(newIndex, entityManager_);
-						break;
+						*/
+							break;
 					}
 					default:
 						break;

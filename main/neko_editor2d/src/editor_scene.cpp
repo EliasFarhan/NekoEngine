@@ -139,8 +139,7 @@ void EditorSceneManager::ParseEntityJson(json& entityJson)
 	}
 	if (neko::CheckJsonParameter(entityJson, "name", json::value_t::string))
 	{
-		ResizeIfNecessary(currentScene_.entitiesNames, entity, std::string());
-		currentScene_.entitiesNames[entity] = entityJson["name"];
+		//TODO scene entity name manager
 
 	}
 	if (neko::CheckJsonParameter(entityJson, "prefab", json::value_t::boolean))
@@ -149,8 +148,8 @@ void EditorSceneManager::ParseEntityJson(json& entityJson)
 		{
 			if (neko::CheckJsonNumber(entityJson, "prefabIndex"))
 			{
-				const neko::Index prefabIndex = entityJson["prefabIndex"];
-				prefabManager_.InstantiatePrefab(prefabIndex, entityManager_);
+				//const neko::Index prefabIndex = entityJson["prefabIndex"];
+				//prefabManager_.InstantiatePrefab(prefabIndex, entityManager_);
 			}
 			return;
 		}
@@ -226,7 +225,8 @@ json EditorSceneManager::SerializeEntity(neko::Entity entity)
 	{
 		return entityJson;
 	}
-	entityJson["name"] = currentScene_.entitiesNames[entity];
+	//TODO scene entity name editor
+	//entityJson["name"] = currentScene_.entitiesNames[entity];
 	entityJson["entity"] = entity;
 	//parent entity
 	{
@@ -246,8 +246,9 @@ json EditorSceneManager::SerializeEntity(neko::Entity entity)
 		entityJson["prefab"] = isPrefab;
 		if (isPrefab)
 		{
-			const auto prefabIndex = GetComponent(entity);
-			entityJson["prefabIndex"] = prefabIndex;
+			//TODO use prefab Id
+			//const auto prefabIndex = GetComponent(entity);
+			//entityJson["prefabIndex"] = prefabIndex;
 			return entityJson;
 		}
 	}
@@ -277,12 +278,12 @@ json EditorSceneManager::SerializeScene()
 			sceneJson["entities"].push_back(entityJson);
 		}
 	}
-	json prefabPaths = json::array();
+	/*json prefabPaths = json::array();
 	for (auto& prefabPath : prefabManager_.GetConstPrefabPaths())
 	{
 		prefabPaths.push_back(prefabPath);
 	}
-	sceneJson["prefabPaths"] = prefabPaths;
+	sceneJson["prefabPaths"] = prefabPaths;*/
 	return sceneJson;
 }
 
