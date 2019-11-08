@@ -28,6 +28,7 @@
 #include "sfml_engine/graphics.h"
 
 #include <SFML/Window/Event.hpp>
+#include "tools/scene_system.h"
 
 namespace neko::editor
 {
@@ -270,7 +271,11 @@ void NekoEditor::EditorUpdate([[maybe_unused]]float dt)
         {
             if (ImGui::MenuItem("New Scene", "CTRL+N"))
             {
-                //sceneManager_.ClearScene();
+				std::unique_ptr<EditorSceneSystem> newSceneSystem = std::make_unique<EditorSceneSystem>(config, textureManager_);
+				newSceneSystem->SetSceneId(SceneManager::GenerateSceneId());
+				editorSystems_.push_back(std::move(newSceneSystem));
+				editorMode_ = EditorMode::SceneMode;
+				currentSystemIndex = editorSystems_.size()-1;
             }
             if (ImGui::MenuItem("Open Scene", "CTRL+O"))
             {

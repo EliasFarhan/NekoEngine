@@ -41,4 +41,28 @@ void EditorSceneSystem::Destroy()
 
 }
 
+void EditorSceneSystem::SetSceneId(SceneId sceneId)
+{
+	auto scene = sceneManager_.GetCurrentScene();
+	scene.sceneId = sceneId;
+	sceneManager_.SetCurrentScene(scene);
+}
+
+void EditorSceneSystem::OnListingView()
+{
+	entityViewer_.Update(EditorMode::SceneMode);
+}
+
+void EditorSceneSystem::OnMainView()
+{
+	sceneViewer_.Update(screenRenderTexture_);
+}
+
+void EditorSceneSystem::OnInspectorView()
+{
+	if(entityViewer_.GetSelectedEntity() != INVALID_ENTITY)
+	{
+		inspector_.ShowEntityInfo(entityViewer_.GetSelectedEntity());
+	}
+}
 }

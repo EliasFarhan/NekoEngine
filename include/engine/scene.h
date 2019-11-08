@@ -53,8 +53,9 @@ public:
     virtual void ParseEntityJson(json& entityJson) = 0;
     virtual void ParseSceneJson(json& sceneJson);
 
-    const Scene& GetCurrentScene(){ return currentScene_;}
+    const Scene& GetCurrentScene() const { return currentScene_;}
     void SetCurrentScene(const Scene& currentScene);
+	static SceneId GenerateSceneId() { return sole::uuid0(); };
 protected:
     std::map<NekoComponentType, std::function<void(Entity, json&)>> componentParsingFuncMap_;
     Scene currentScene_;

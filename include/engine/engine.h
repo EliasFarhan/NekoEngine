@@ -30,7 +30,6 @@
 #include <utilities/delegate_utility.h>
 #include <graphics/color.h>
 
-struct Remotery;
 
 namespace neko
 {

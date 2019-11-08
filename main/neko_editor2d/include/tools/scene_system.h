@@ -12,6 +12,11 @@ public:
 
     void Destroy() override;
 
+	void SetSceneId(SceneId sceneId);
 
+
+	void OnListingView() override;
+	void OnMainView() override;
+	void OnInspectorView() override;
 };
 }
