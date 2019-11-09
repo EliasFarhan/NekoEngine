@@ -32,6 +32,7 @@
 
 namespace neko::editor
 {
+class EntityNameManager;
 class EditorPrefabManager;
 class NekoEditor;
 enum class EditorMode : std::uint8_t;
@@ -58,17 +59,14 @@ public:
 
 private:
 	void DrawEntityHierarchy(Entity entity,
-		size_t index,
 		std::set<Entity>& entitySet,
 		bool draw,
 		bool destroy);
-
-	std::vector<Entity> entities_;
-	std::vector<std::string> entitiesName_;
 	Entity selectedEntity_ = INVALID_ENTITY;
 	sfml::Transform2dManager& transformManager_;
 	EntityManager& entityManager_;
 	EditorSceneManager& sceneManager_;
 	EditorPrefabManager& prefabManager_;
+	EntityNameManager& entityNameManager_;
 };
 }

@@ -87,7 +87,7 @@ public:
 
     virtual void DestroyComponent(EntityManager& entityManager, Entity entity);
 
-    virtual void SetComponent(Entity entity, T component)
+    virtual void SetComponent(Entity entity, const T& component)
     { components_[entity] = component; }
 
     const T& GetComponent(Entity entity) const

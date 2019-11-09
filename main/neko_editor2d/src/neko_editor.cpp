@@ -258,7 +258,7 @@ void NekoEditor::EditorUpdate([[maybe_unused]]float dt)
         }
         ImGui::EndTabBar();
     }
-    ImGui::End();
+    ImGui::End(); //Debug Window
 
     ImGui::SetNextWindowPos(ImVec2(windowSize.x * 0.2f, yOffset), ImGuiCond_Always);
     ImGui::SetNextWindowSize(ImVec2(windowSize.x * 0.6f, windowSize.y * 0.7f - yOffset), ImGuiCond_Always);
@@ -288,6 +288,7 @@ void NekoEditor::EditorUpdate([[maybe_unused]]float dt)
             }
             ImGui::EndMenu();
         }
+        ImGui::EndMainMenuBar();
     }
 
     if (ImGui::BeginTabBar("Central Tab"))
@@ -314,7 +315,7 @@ void NekoEditor::EditorUpdate([[maybe_unused]]float dt)
 
         ImGui::EndTabBar();
     }
-    ImGui::End();
+    ImGui::End(); //Central viewer
 
     BasicEditorSystem* currentEditorSystem = nullptr;
     //TODO Set the selected system depending on the index
@@ -331,7 +332,7 @@ void NekoEditor::EditorUpdate([[maybe_unused]]float dt)
     {
         currentEditorSystem->OnListingView();
     }
-    ImGui::End();
+    ImGui::End();//Listing
     ImGui::SetNextWindowPos(ImVec2(windowSize.x * 0.8f, yOffset), ImGuiCond_Always);
     ImGui::SetNextWindowSize(ImVec2(windowSize.x * 0.2f, windowSize.y - yOffset), ImGuiCond_Always);
     ImGui::Begin("Inspector", nullptr,
@@ -341,7 +342,7 @@ void NekoEditor::EditorUpdate([[maybe_unused]]float dt)
     {
         currentEditorSystem->OnInspectorView();
     }
-    ImGui::End();
+    ImGui::End(); //Inspector
 
     /*
     if (ImGui::BeginMainMenuBar())
@@ -522,7 +523,6 @@ void NekoEditor::EditorUpdate([[maybe_unused]]float dt)
     }
 
 */
-    ImGui::End();
 
 
 }
@@ -548,14 +548,16 @@ NekoEditorSystem::NekoEditorSystem(Configuration& config, sfml::TextureManager& 
                 polygonColldierDefManager_,
                 colliderManagerDefManager_,
                 prefabManager_,
-                config
+                config,
+                entityNameManager_
         }, transform2dManager_(position2dManager_, scale2dManager_, rotation2dManager_),
         sceneManager_(editorExport_),
         spriteManager_(textureManager),
         colliderManagerDefManager_(editorExport_),
         prefabManager_(editorExport_),
         entityViewer_(editorExport_),
-        inspector_(editorExport_)
+        inspector_(editorExport_),
+        entityNameManager_(entityManager_)
 {
 }
 

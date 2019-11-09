@@ -30,13 +30,13 @@
 #include <engine/log.h>
 #include <tools/neko_editor.h>
 #include <tools/editor_prefab.h>
+#include "tools/editor_entity_name.h"
 
 namespace neko::editor
 {
 void EntityViewer::Update(EditorMode editorMode)
 {
-	entities_.clear();
-	entitiesName_.clear();
+
 	const bool sceneOpen = ImGui::CollapsingHeader(editorMode == EditorMode::PrefabMode ? "Prefab Edition Mode" : "Scene", ImGuiTreeNodeFlags_DefaultOpen);
 	if (ImGui::BeginDragDropTarget())
 	{
@@ -52,33 +52,25 @@ void EntityViewer::Update(EditorMode editorMode)
 		ImGui::EndDragDropTarget();
 	}
 
-	for (neko::Entity entity = 0; entity < entityManager_.GetEntitiesSize(); entity++)
-	{
-		if (entityManager_.EntityExists(entity))
-		{
-			entities_.push_back(entity);
-			//entitiesName_.push_back(sceneManager_.GetCurrentScene().entitiesNames[entity]);
-		}
-	}
 
 	std::set<neko::Entity> entitiesSet;
-	for (size_t i = 0; i < entities_.size(); i++)
+	for (Entity entity = 0; entity < Entity(entityManager_.GetEntitiesSize()); entity++)
 	{
-
-		if (transformManager_.GetParentEntity(entities_[i]) == neko::INVALID_ENTITY and
-			std::find(entitiesSet.cbegin(), entitiesSet.cend(), entities_[i]) == entitiesSet.end())
+        if(!entityManager_.EntityExists(entity))
+        {
+            continue;
+        }
+		if (transformManager_.GetParentEntity(entity) == neko::INVALID_ENTITY and
+            std::find(entitiesSet.cbegin(), entitiesSet.cend(), entity) == entitiesSet.end())
 		{
-			DrawEntityHierarchy(entities_[i], i, entitiesSet, sceneOpen, false);
+			DrawEntityHierarchy(entity, entitiesSet, sceneOpen, false);
 		}
 	}
 
 	if (ImGui::Button("Add Entity"))
 	{
 		const auto entity = entityManager_.CreateEntity();
-		//auto& entitiesName = sceneManager_.GetCurrentScene().entitiesNames;
-		//TODO Add own entityEditorName
-		//ResizeIfNecessary(entitiesName, entity, std::string());
-		//entitiesName[entity] = std::string("Entity ") + std::to_string(entity);
+		entityNameManager_.AddComponent(entityManager_, entity);
 		transformManager_.SetTransformParent(entity,
 			editorMode == EditorMode::SceneMode ? neko::INVALID_ENTITY : 0);
 	}
@@ -86,7 +78,6 @@ void EntityViewer::Update(EditorMode editorMode)
 }
 
 void EntityViewer::DrawEntityHierarchy(neko::Entity entity,
-	size_t index,
 	std::set<neko::Entity>& entitySet,
 	bool draw,
 	bool destroy)
@@ -112,8 +103,8 @@ void EntityViewer::DrawEntityHierarchy(neko::Entity entity,
 			nodeFlags |= ImGuiTreeNodeFlags_Selected;
 		}
 		ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.7f);
-		nodeOpen = ImGui::TreeNodeEx((void*)(intptr_t)entities_[index], nodeFlags, "%s",
-			entitiesName_[index].c_str());
+		nodeOpen = ImGui::TreeNodeEx((void*)(intptr_t)entity, nodeFlags, "%s",
+			entityNameManager_.GetComponent(entity).c_str());
 		ImGui::PopItemWidth();
 		if (ImGui::IsItemClicked())
 			selectedEntity_ = entity;
@@ -192,9 +183,9 @@ void EntityViewer::DrawEntityHierarchy(neko::Entity entity,
 		{
 			if (!(srcFlags & ImGuiDragDropFlags_SourceNoPreviewTooltip))
 			{
-				ImGui::Text("Moving Entity \"%s\"", entitiesName_[index].c_str());
+				ImGui::Text("Moving Entity \"%s\"", entityNameManager_.GetComponent(entity).c_str());
 			}
-			ImGui::SetDragDropPayload("DND_DEMO_NAME", &entities_[index], sizeof(neko::Entity));
+			ImGui::SetDragDropPayload("DND_DEMO_NAME", &entity, sizeof(neko::Entity));
 			ImGui::EndDragDropSource();
 		}
 		if (ImGui::BeginDragDropTarget())
@@ -205,7 +196,7 @@ void EntityViewer::DrawEntityHierarchy(neko::Entity entity,
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DND_DEMO_NAME", targetFlags))
 			{
 				neko::Entity moveFrom = *(const neko::Entity*) payload->Data;
-				neko::Entity moveTo = entities_[index];
+				neko::Entity moveTo = entity;
 				transformManager_.SetTransformParent(moveFrom, moveTo);
 			}
 			ImGui::EndDragDropTarget();
@@ -222,19 +213,14 @@ void EntityViewer::DrawEntityHierarchy(neko::Entity entity,
 		entityChild = transformManager_.FindNextChild(entity, entityChild);
 		if (entityChild != neko::INVALID_ENTITY and entityManager_.EntityExists(entityChild))
 		{
-			size_t childIndex = std::find(entities_.cbegin(), entities_.cend(), entityChild) - entities_.begin();
-			DrawEntityHierarchy(entityChild, childIndex, entitySet, nodeOpen, destroyEntity);
+			DrawEntityHierarchy(entityChild,  entitySet, nodeOpen, destroyEntity);
 		}
 	} while (entityChild != neko::INVALID_ENTITY);
 
 	if (createEntity)
 	{
-
-        //TODO Set new name with an entityNameManager
 		auto newEntity = entityManager_.CreateEntity();
-		//auto& entitiesName = sceneManager_.GetCurrentScene().entitiesNames;
-		//ResizeIfNecessary(entitiesName, newEntity, std::string());
-		//entitiesName[newEntity] = std::string("Entity ") + std::to_string(newEntity);
+		entityNameManager_.AddComponent(entityManager_, newEntity);
 		transformManager_.SetTransformParent(newEntity, entity);
 	}
 	if (nodeOpen and !leaf)
@@ -245,7 +231,8 @@ EntityViewer::EntityViewer(NekoEditorExport& editorExport) :
 	transformManager_(editorExport.transform2dManager),
 	entityManager_(editorExport.entityManager),
 	sceneManager_(editorExport.sceneManager),
-	prefabManager_(editorExport.prefabManager)
+	prefabManager_(editorExport.prefabManager),
+	entityNameManager_(editorExport.entityNameManager_)
 {
 }
 }

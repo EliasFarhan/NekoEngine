@@ -42,6 +42,7 @@
 #include <engine/prefab.h>
 #include "sfml_engine/engine.h"
 #include "tools/engine_export.h"
+#include "tools/editor_entity_name.h"
 
 namespace sf {
 class Event;
@@ -124,7 +125,7 @@ protected:
 	NekoEditorExport editorExport_;
 	EntityManager entityManager_;
 	Position2dManager position2dManager_;
-	Scale2dManager scale2dManager_;
+	Scale2dManager scale2dManager_{Vec2f(1.0f,1.0f)};
 	Rotation2dManager rotation2dManager_;
 	sfml::Transform2dManager transform2dManager_;
 	EditorSceneManager sceneManager_;
@@ -140,6 +141,7 @@ protected:
 	EntityViewer entityViewer_;
 	Inspector inspector_;
 	SceneViewer sceneViewer_;
+	EntityNameManager entityNameManager_;
 	
 	FileOperation fileOperationStatus_ = FileOperation::NONE;
 };
