@@ -32,7 +32,7 @@
 
 namespace neko::sfml
 {
-static auto textureMetadataExtension = ".ntx_meta";
+static const std::string_view textureMetadataExtension = ".ntx_meta";
 static std::set<std::string_view> imgExtensionSet
 {
 		".png",
@@ -112,7 +112,7 @@ TextureId TextureManager::LoadTexture(const std::string& filename)
 			return textureId;
 		}
 		//TODO Read meta file or create one
-		const std::string metaPath = filename + textureMetadataExtension;
+		const std::string metaPath = filename + textureMetadataExtension.data();
 		LoadMetadata(metaPath, texture);
 		textureNames_[textureId] = filename;
 		return textureId;
@@ -181,5 +181,10 @@ void TextureManager::CreateEmptyMetaFile(const std::string& metaPath)
 	WriteStringToFile(metaPath, metaDataStr);
 
 
+}
+
+std::string_view TextureManager::GetMetaExtension()
+{
+    return textureMetadataExtension;
 }
 } // namespace neko

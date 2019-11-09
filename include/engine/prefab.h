@@ -53,6 +53,8 @@ public:
     void InstantiatePrefab(PrefabId prefabIndex, EntityManager& entityManager);
     PrefabId LoadPrefab(std::string_view prefabPath, bool forceReload=false);
 	void ClearPrefabs();
+
+	static std::string_view GetExtension();
 protected:
     SceneManager& sceneManager_;
 	std::unordered_map<PrefabId, Prefab> prefabMap_;

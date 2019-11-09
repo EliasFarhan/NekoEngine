@@ -73,6 +73,9 @@ void SfmlBasicSceneManager::ParseEntityJson(json& entityJson)
         logDebug("[Error] Scene loader entity with no entity nmb");
         return;
     }
+
+
+
     if (neko::CheckJsonNumber(entityJson, "parent"))
     {
         const int parentEntity = entityJson["parent"];
@@ -101,7 +104,11 @@ void SfmlBasicSceneManager::ParseEntityJson(json& entityJson)
         }
     }
     entityManager_.CreateEntity(entity);
-
+    if(neko::CheckJsonExists(entityJson, "entityNameHash") and neko::IsJsonValueNumeric(entityJson["entityNameHash"]))
+    {
+        const EntityHash entityHash = entityJson["entityNameHash"];
+        entityManager_.SetEntityNameHash(entity, entityHash);
+    }
 
     if (neko::CheckJsonParameter(entityJson, "components", json::value_t::array))
     {

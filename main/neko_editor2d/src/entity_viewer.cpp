@@ -34,10 +34,10 @@
 
 namespace neko::editor
 {
-void EntityViewer::Update(EditorMode editorMode)
+void EntityViewer::Update(EditorSystemMode editorMode)
 {
 
-	const bool sceneOpen = ImGui::CollapsingHeader(editorMode == EditorMode::PrefabMode ? "Prefab Edition Mode" : "Scene", ImGuiTreeNodeFlags_DefaultOpen);
+	const bool sceneOpen = ImGui::CollapsingHeader(editorMode == EditorSystemMode::PrefabMode ? "Prefab Edition Mode" : "Scene", ImGuiTreeNodeFlags_DefaultOpen);
 	if (ImGui::BeginDragDropTarget())
 	{
 		ImGuiDragDropFlags target_flags = 0;
@@ -72,7 +72,7 @@ void EntityViewer::Update(EditorMode editorMode)
 		const auto entity = entityManager_.CreateEntity();
 		entityNameManager_.AddComponent(entityManager_, entity);
 		transformManager_.SetTransformParent(entity,
-			editorMode == EditorMode::SceneMode ? neko::INVALID_ENTITY : 0);
+                                             editorMode == EditorSystemMode::SceneMode ? neko::INVALID_ENTITY : 0);
 	}
 
 }

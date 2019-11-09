@@ -92,6 +92,8 @@ public:
 
     SpriteAnimator* GetAnimatorAt(unsigned int i);
 
+    static std::string_view GetExtension();
+
 private:
     std::vector<SpriteAnimator> animators_;
 };

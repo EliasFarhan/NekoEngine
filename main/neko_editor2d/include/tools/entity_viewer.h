@@ -35,12 +35,12 @@ namespace neko::editor
 class EntityNameManager;
 class EditorPrefabManager;
 class NekoEditor;
-enum class EditorMode : std::uint8_t;
+enum class EditorSystemMode : std::uint8_t;
 class EntityViewer
 {
 public:
 	EntityViewer(NekoEditorExport& editorExport);
-	void Update(EditorMode editorMode);
+	void Update(EditorSystemMode editorMode);
 
 	void Reset()
 	{

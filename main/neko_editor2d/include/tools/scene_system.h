@@ -14,9 +14,12 @@ public:
 
 	void SetSceneId(SceneId sceneId);
 
+    void OpenScene(std::string_view scenePath);
 
 	void OnListingView() override;
 	void OnMainView() override;
 	void OnInspectorView() override;
+
+    void OnSave() override;
 };
 }

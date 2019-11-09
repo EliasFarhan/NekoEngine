@@ -1,11 +1,12 @@
 #include <tools/neko_editor.h>
 #include "tools/scene_system.h"
+#include "utilities/json_utility.h"
 
 namespace neko::editor
 {
 void EditorSceneSystem::Init()
 {
-
+    editorMode_ = EditorSystemMode::SceneMode;
 }
 
 void EditorSceneSystem::Update(float dt)
@@ -50,7 +51,7 @@ void EditorSceneSystem::SetSceneId(SceneId sceneId)
 
 void EditorSceneSystem::OnListingView()
 {
-	entityViewer_.Update(EditorMode::SceneMode);
+	entityViewer_.Update(EditorSystemMode::SceneMode);
 }
 
 void EditorSceneSystem::OnMainView()
@@ -64,5 +65,16 @@ void EditorSceneSystem::OnInspectorView()
 	{
 		inspector_.ShowEntityInfo(entityViewer_.GetSelectedEntity());
 	}
+}
+
+void EditorSceneSystem::OnSave()
+{
+    sceneManager_.SaveCurrentScene();
+}
+
+void EditorSceneSystem::OpenScene(const std::string_view scenePath)
+{
+    auto sceneJson = LoadJson(scenePath);
+    sceneManager_.ParseSceneJson(sceneJson);
 }
 }

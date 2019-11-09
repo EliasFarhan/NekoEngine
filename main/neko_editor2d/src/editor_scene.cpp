@@ -122,6 +122,8 @@ json EditorSceneManager::SerializeEntity(neko::Entity entity)
     //TODO scene entity name editor
     //entityJson["name"] = currentScene_.entitiesNames[entity];
     entityJson["entity"] = entity;
+    const auto entityHash = entityManager_.GetEntityNameHash(entity);
+    entityJson["entityNameHash"] = entityHash;
     //parent entity
     {
         const auto parentEntity = transformManager_.GetParentEntity(entity);
@@ -162,6 +164,7 @@ json EditorSceneManager::SerializeScene()
 {
     json sceneJson;
     sceneJson["entities"] = json::array();
+    sceneJson["sceneId"] = currentScene_.sceneId.str();
     sceneJson["sceneName"] = currentScene_.sceneName;
 
     for (neko::Entity entity = 0; entity < entityManager_.GetEntitiesSize(); entity++)

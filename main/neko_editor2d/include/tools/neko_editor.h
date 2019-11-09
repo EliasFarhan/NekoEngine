@@ -53,18 +53,17 @@ namespace neko::editor
 class BasicEditorSystem;
 enum class FileOperation
 {
-    OPEN_SCENE,
-    OPEN_PREFAB,
-    SAVE_SCENE,
-    SAVE_PREFAB,
+    OPEN,
+    SAVE,
     NONE,
 };
-enum class EditorMode : std::uint8_t
+enum class EditorSystemMode  : std::uint8_t
 {
     SceneMode,
     PrefabMode,
     TextureMode,
-    AnimMode
+    AnimMode,
+    None
 };
 
 
@@ -88,14 +87,18 @@ public:
 
 protected:
 
-    sf::RenderTexture sceneRenderTexture_;
+    static EditorSystemMode GetEditorSystemModeFrom(const std::string_view extension);
+    void CreateNewScene();
+
     LogViewer logViewer_;
 
     ImGui::FileBrowser fileDialog_;
-    EditorMode editorMode_ = EditorMode::SceneMode;
+    EditorSystemMode editorMode_ = EditorSystemMode::SceneMode;
 	std::vector<std::unique_ptr<BasicEditorSystem>> editorSystems_;
 	Index currentSystemIndex = INVALID_INDEX;
 	sfml::TextureManager textureManager_;
+    FileOperation currentFileOperation = FileOperation::NONE;
+
 };
 
 class BasicEditorSystem : public System
@@ -109,17 +112,29 @@ public:
 	virtual void OnMainView() = 0;
 	virtual void OnInspectorView() = 0;
 
+	virtual void OnSave() = 0;
+
 	virtual void OnEvent([[maybe_unused]]sf::Event& event){};
 	virtual void OnLostFocus(){};
+
+    EditorSystemMode GetEditorMode() const
+    {
+        return editorMode_;
+    }
+
+
 protected:
-	std::string editorSystemName_;
+
+
+    EditorSystemMode editorMode_ = EditorSystemMode::None;
+    std::string editorSystemName_;
 	Configuration& config_;
 };
 
 class NekoEditorSystem : public BasicEditorSystem
 {
 public:
-	explicit NekoEditorSystem(Configuration& config, sfml::TextureManager& textureManager);
+	explicit NekoEditorSystem(NekoEditor& nekoEditor, sfml::TextureManager& textureManager);
 protected:
 	sf::RenderTexture screenRenderTexture_;
 	NekoEditorExport editorExport_;
@@ -142,8 +157,7 @@ protected:
 	Inspector inspector_;
 	SceneViewer sceneViewer_;
 	EntityNameManager entityNameManager_;
-	
-	FileOperation fileOperationStatus_ = FileOperation::NONE;
+
 };
 
 }

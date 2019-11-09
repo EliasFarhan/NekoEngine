@@ -8,6 +8,8 @@
 namespace neko
 {
 
+static const std::string_view sceneExtension = ".scene";
+
 neko::SceneManager::SceneManager(neko::EngineExport& engineExport) :
 entityManager_(engineExport.entityManager)
 {
@@ -22,6 +24,11 @@ void SceneManager::ParseSceneJson(json& sceneJson)
     else
     {
         currentScene_.sceneName = "New Scene";
+    }
+    if(CheckJsonParameter(sceneJson, "sceneId", json::value_t::string))
+    {
+        SceneId sceneId = sole::rebuild(sceneJson["sceneId"]);
+        currentScene_.sceneId = sceneId;
     }
     if (CheckJsonParameter(sceneJson, "scenePath", json::value_t::string))
     {
@@ -39,6 +46,11 @@ void SceneManager::ParseSceneJson(json& sceneJson)
 void SceneManager::SetCurrentScene(const Scene& currentScene)
 {
     currentScene_ = currentScene;
+}
+
+std::string_view SceneManager::GetExtension()
+{
+    return sceneExtension;
 }
 
 }

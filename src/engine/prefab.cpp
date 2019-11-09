@@ -4,7 +4,7 @@
 
 namespace neko
 {
-
+static const std::string_view prefabExtension = ".prefab";
 PrefabManager::PrefabManager(SceneManager& sceneManager) : sceneManager_(sceneManager)
 {
 
@@ -56,6 +56,11 @@ void PrefabManager::InstantiatePrefab(PrefabId prefabIndex, EntityManager& entit
         sceneManager_.ParseEntityJson(entityJson);
     }
 	*/
+}
+
+std::string_view PrefabManager::GetExtension()
+{
+    return prefabExtension;
 }
 
 Prefab::Prefab() : id(sole::uuid0())

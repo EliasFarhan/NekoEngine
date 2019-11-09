@@ -28,6 +28,7 @@
 #include "sfml_engine/graphics.h"
 
 #include <SFML/Window/Event.hpp>
+#include <sfml_engine/anim.h>
 #include "tools/scene_system.h"
 
 namespace neko::editor
@@ -40,7 +41,7 @@ NekoEditor::NekoEditor() : SfmlBasicEngine(nullptr)
 void NekoEditor::Init()
 {
     SfmlBasicEngine::Init();
-    sceneRenderTexture_.create(config.gameWindowSize.first, config.gameWindowSize.second);
+    //sceneRenderTexture_.create(config.gameWindowSize.first, config.gameWindowSize.second);
     neko::IterateDirectory(config.dataRootPath, [this](std::string_view path)
     {
         if (!neko::IsRegularFile(path))
@@ -128,41 +129,65 @@ void NekoEditor::SwitchEditorMode(EditorMode editorMode)
 void NekoEditor::OnEvent(sf::Event& event)
 {
     SfmlBasicEngine::OnEvent(event);
+    BasicEditorSystem* editorSystem = nullptr;
+    if (currentSystemIndex < editorSystems_.size())
+    {
+        editorSystem = editorSystems_[currentSystemIndex].get();
+        editorSystem->OnEvent(event);
+    }
+
     if (event.type != sf::Event::KeyPressed)
         return;
+
+    if (event.key.control)
+    {
+        switch (event.key.code)
+        {
+            case sf::Keyboard::S:
+            {
+                if (editorSystem != nullptr)
+                {
+                    editorSystem->OnSave();
+                }
+                break;
+            }
+            case sf::Keyboard::N:
+            {
+                CreateNewScene();
+                break;
+            }
+            case sf::Keyboard::O:
+            {
+                fileDialog_ = ImGui::FileBrowser(
+                        ImGuiFileBrowserFlags_EnterNewFilename | ImGuiFileBrowserFlags_CreateNewDir);
+                fileDialog_.SetPwd("../" + config.dataRootPath);
+                fileDialog_.Open();
+                currentFileOperation = FileOperation::OPEN;
+                break;
+            }
+            default:
+            {
+                break;
+            }
+        }
+    }
+
     switch (editorMode_)
     {
-        case EditorMode::SceneMode:
+        case EditorSystemMode::SceneMode:
         {
             if (event.key.control)
             {
                 switch (event.key.code)
                 {
-                    /*
-                case sf::Keyboard::N:
-                {
-                    sceneManager_.ClearScene();
-                    sceneManager_.GetCurrentScene().scenePath = "";
-                    break;
-                }
-                case sf::Keyboard::O:
-                {
-                    fileOperationStatus_ = FileOperation::OPEN_SCENE;
-                    break;
-                }
-                case sf::Keyboard::S:
-                {
-                    SaveSceneEvent();
-                    break;
-                }
-                     */
+
                     default:
                         break;
                 }
             }
             break;
         }
-        case EditorMode::PrefabMode:
+        case EditorSystemMode::PrefabMode:
             if (event.key.control)
             {
                 switch (event.key.code)
@@ -196,6 +221,7 @@ void NekoEditor::OnEvent(sf::Event& event)
         default:
             break;
     }
+
 }
 
 /*
@@ -205,10 +231,7 @@ void NekoEditor::SaveSceneEvent()
 	auto& path = sceneManager_.GetCurrentScene().scenePath;
 	if (sceneManager_.IsCurrentSceneTmp() or !neko::FileExists(path))
 	{
-		fileDialog_ = ImGui::FileBrowser(
-			ImGuiFileBrowserFlags_EnterNewFilename | ImGuiFileBrowserFlags_CreateNewDir);
-		fileDialog_.SetPwd("../" + config.dataRootPath);
-		fileDialog_.Open();
+
 		fileOperationStatus_ = FileOperation::SAVE_SCENE;
 	}
 	else
@@ -271,17 +294,14 @@ void NekoEditor::EditorUpdate([[maybe_unused]]float dt)
         {
             if (ImGui::MenuItem("New Scene", "CTRL+N"))
             {
-				std::unique_ptr<EditorSceneSystem> newSceneSystem = std::make_unique<EditorSceneSystem>(config, textureManager_);
-				newSceneSystem->SetSceneId(SceneManager::GenerateSceneId());
-				editorSystems_.push_back(std::move(newSceneSystem));
-				editorMode_ = EditorMode::SceneMode;
-				currentSystemIndex = editorSystems_.size()-1;
+                CreateNewScene();
             }
-            if (ImGui::MenuItem("Open Scene", "CTRL+O"))
+            ImGui::Separator();
+            if (ImGui::MenuItem("Open", "CTRL+O"))
             {
                 //fileOperationStatus_ = FileOperation::OPEN_SCENE;
             }
-            if (ImGui::MenuItem("Save Scene", "CTRL+S"))
+            if (ImGui::MenuItem("Save", "CTRL+S"))
             {
                 //TODO save the scene
                 //SaveSceneEvent();
@@ -317,6 +337,9 @@ void NekoEditor::EditorUpdate([[maybe_unused]]float dt)
     }
     ImGui::End(); //Central viewer
 
+
+
+
     BasicEditorSystem* currentEditorSystem = nullptr;
     //TODO Set the selected system depending on the index
     if (currentSystemIndex < editorSystems_.size())
@@ -343,6 +366,35 @@ void NekoEditor::EditorUpdate([[maybe_unused]]float dt)
         currentEditorSystem->OnInspectorView();
     }
     ImGui::End(); //Inspector
+
+
+    fileDialog_.Display();
+
+    switch (currentFileOperation)
+    {
+        case FileOperation::OPEN:
+        {
+            if (fileDialog_.HasSelected())
+            {
+                const auto assetPath = fileDialog_.GetSelected();
+                const auto extension = GetFilenameExtension(assetPath.string());
+                const auto editorMode = GetEditorSystemModeFrom(extension);
+
+                switch(editorMode)
+                {
+                    case EditorSystemMode::SceneMode:
+                    {
+
+                    }
+                }
+                fileDialog_.ClearSelected();
+                fileDialog_.Close();
+            }
+            break;
+        }
+        default:
+            break;
+    }
 
     /*
     if (ImGui::BeginMainMenuBar())
@@ -527,19 +579,32 @@ void NekoEditor::EditorUpdate([[maybe_unused]]float dt)
 
 }
 
+void NekoEditor::CreateNewScene()
+{
 
-NekoEditorSystem::NekoEditorSystem(Configuration& config, sfml::TextureManager& textureManager) :
-        BasicEditorSystem(config),
+    std::unique_ptr<EditorSceneSystem> newSceneSystem = std::make_unique<EditorSceneSystem>(*this,
+                                                                                            textureManager_);
+    newSceneSystem->SetSceneId(SceneManager::GenerateSceneId());
+    newSceneSystem->Init();
+    editorSystems_.push_back(std::move(newSceneSystem));
+    currentSystemIndex = editorSystems_.size() - 1;
+    editorMode_ = editorSystems_[currentSystemIndex]->GetEditorMode();
+
+}
+
+
+NekoEditorSystem::NekoEditorSystem(NekoEditor& nekoEditor, sfml::TextureManager& textureManager) :
+        BasicEditorSystem(nekoEditor.config),
         editorExport_{
                 {{entityManager_,
-                prefabManager_,
-                sceneManager_},
-                position2dManager_,
-                scale2dManager_,
-                rotation2dManager_,
-                transform2dManager_,
-                spriteManager_,
-                spineManager_},
+                  prefabManager_,
+                  sceneManager_},
+                 position2dManager_,
+                 scale2dManager_,
+                 rotation2dManager_,
+                 transform2dManager_,
+                 spriteManager_,
+                 spineManager_},
                 sceneManager_,
                 bodyDef2DManager_,
                 textureManager,
@@ -548,7 +613,8 @@ NekoEditorSystem::NekoEditorSystem(Configuration& config, sfml::TextureManager& 
                 polygonColldierDefManager_,
                 colliderManagerDefManager_,
                 prefabManager_,
-                config,
+                nekoEditor.config,
+                nekoEditor,
                 entityNameManager_
         }, transform2dManager_(position2dManager_, scale2dManager_, rotation2dManager_),
         sceneManager_(editorExport_),
@@ -565,4 +631,28 @@ BasicEditorSystem::BasicEditorSystem(Configuration& config) : config_(config)
 {
 
 }
+
+EditorSystemMode NekoEditor::GetEditorSystemModeFrom(const std::string_view extension)
+{
+    if (extension == SceneManager::GetExtension())
+    {
+        return EditorSystemMode::SceneMode;
+    }
+    else if (extension == PrefabManager::GetExtension())
+    {
+        return EditorSystemMode::PrefabMode;
+    }
+    else if (extension == sfml::TextureManager::GetMetaExtension() or
+             sfml::TextureManager::HasValidExtension(extension))
+    {
+        return EditorSystemMode::TextureMode;
+    }
+    else if (extension == sfml::AnimatorManager::GetExtension())
+    {
+        return EditorSystemMode::AnimMode;
+    }
+    return EditorSystemMode::None;
+}
+
+
 }

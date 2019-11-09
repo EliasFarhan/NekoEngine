@@ -36,7 +36,7 @@ class EntityViewer;
 class Inspector;
 class SceneViewer;
 class EntityNameManager;
-
+class NekoEditor;
 struct NekoEditorExport : sfml::SfmlBasicEngineExport
 {
     EditorSceneManager& sceneManager;
@@ -48,6 +48,7 @@ struct NekoEditorExport : sfml::SfmlBasicEngineExport
     ColliderDefManager& colliderDefManager_;
     EditorPrefabManager& prefabManager;
     Configuration& config;
+    NekoEditor& editor;
     EntityNameManager& entityNameManager_;
 };
 }

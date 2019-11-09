@@ -56,6 +56,7 @@ public:
     const Scene& GetCurrentScene() const { return currentScene_;}
     void SetCurrentScene(const Scene& currentScene);
 	static SceneId GenerateSceneId() { return sole::uuid0(); };
+	static std::string_view GetExtension();
 protected:
     std::map<NekoComponentType, std::function<void(Entity, json&)>> componentParsingFuncMap_;
     Scene currentScene_;

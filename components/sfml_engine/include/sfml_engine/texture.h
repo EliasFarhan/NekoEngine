@@ -47,7 +47,8 @@ public:
 
     TextureManager();
 
-    bool HasValidExtension(const std::string_view filename);
+    static bool HasValidExtension(std::string_view filename);
+    static std::string_view GetMetaExtension();
 	//Return an index to avoid pointer invalidation
 	TextureId LoadTexture(const std::string& filename);
 	const Texture* GetTexture(const TextureId textureId) const;

@@ -184,4 +184,14 @@ bool EntityManager::IsPrefab(Entity entity) const
     return HasComponent(entity, EntityMask(NekoComponentType::PREFAB));
 }
 
+EntityHash EntityManager::GetEntityNameHash(Entity entity)
+{
+    return entityHashArray_[entity];
+}
+
+void EntityManager::SetEntityNameHash(Entity entity, EntityHash entityHash)
+{
+    entityHashArray_[entity] = entityHash;
+}
+
 }

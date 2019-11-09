@@ -28,10 +28,11 @@
 #include <engine/engine.h>
 #include "sfml_engine/sprite.h"
 #include "sfml_engine/json_utility.h"
+#include "sfml_engine/vector.h"
 
 namespace neko::sfml
 {
-
+static const std::string_view animExtension = ".anim";
 void SpriteAnimator::Init(json& animatorJson, TextureManager& textureManager, int spriteIndex)
 {
     SpriteAnimatorDef spriteAnimatorDef{};
@@ -125,7 +126,7 @@ void SpriteAnimator::Update(sf::Sprite* sprite, float dt)
         auto* texture = textures_[currentAnim_->imgIndexes[currentIndex_]];
         sprite->setTexture(texture->texture);
         sprite->setTextureRect(currentAnim_->imgRect[currentIndex_]);
-        sprite->setOrigin(sf::Vector2f(texture->origin * Vec2f(texture->texture.getSize())));
+        sprite->setOrigin(sf::Vector2f(texture->origin * Vec2f(sf::Vector2f(texture->texture.getSize()))));
 
     }
 }
@@ -159,6 +160,11 @@ SpriteAnimator* AnimatorManager::GetAnimatorAt(unsigned int i)
     if (i >= animators_.size())
         return nullptr;
     return &animators_[i];
+}
+
+std::string_view AnimatorManager::GetExtension()
+{
+    return animExtension;
 }
 
 }
