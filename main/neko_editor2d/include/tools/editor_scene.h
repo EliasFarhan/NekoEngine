@@ -51,6 +51,7 @@ class Position2dManager;
 namespace neko::editor
 {
 struct NekoEditorExport;
+class EntityNameManager;
 class EditorSceneManager : public sfml::SfmlBasicSceneManager
 {
 public:
@@ -61,12 +62,16 @@ public:
     virtual json SerializeEntity(neko::Entity entity);
     virtual json SerializeScene();
 
+
     void ClearScene() const;
     bool IsCurrentSceneTmp();
     void SaveCurrentScene();
     void LoadScene(std::string_view path);
 
-    const std::string_view GetSceneTmpPath();
+    std::string_view GetSceneTmpPath();
+
+    void ParseEntityJson(json& entityJson) override;
+
 protected:
 
     void SaveScene(std::string_view path);
@@ -74,6 +79,7 @@ protected:
     std::map<NekoComponentType, std::function<json(Entity)>> componentSerializeFuncMap_;
 
 
+    EntityNameManager& entityNameManager_;
     PrefabManager& prefabManager_;
 	box2d::BodyDef2dManager& bodyDefManager_;
 };

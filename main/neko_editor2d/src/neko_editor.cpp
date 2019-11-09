@@ -158,11 +158,7 @@ void NekoEditor::OnEvent(sf::Event& event)
             }
             case sf::Keyboard::O:
             {
-                fileDialog_ = ImGui::FileBrowser(
-                        ImGuiFileBrowserFlags_EnterNewFilename | ImGuiFileBrowserFlags_CreateNewDir);
-                fileDialog_.SetPwd("../" + config.dataRootPath);
-                fileDialog_.Open();
-                currentFileOperation = FileOperation::OPEN;
+                OpenFileDialog();
                 break;
             }
             default:
@@ -299,7 +295,7 @@ void NekoEditor::EditorUpdate([[maybe_unused]]float dt)
             ImGui::Separator();
             if (ImGui::MenuItem("Open", "CTRL+O"))
             {
-                //fileOperationStatus_ = FileOperation::OPEN_SCENE;
+                OpenFileDialog();
             }
             if (ImGui::MenuItem("Save", "CTRL+S"))
             {
@@ -345,7 +341,10 @@ void NekoEditor::EditorUpdate([[maybe_unused]]float dt)
     if (currentSystemIndex < editorSystems_.size())
     {
         currentEditorSystem = editorSystems_[currentSystemIndex].get();
+
+        currentEditorSystem->Update(dt);
     }
+
 
     ImGui::SetNextWindowPos(ImVec2(0.0f, yOffset), ImGuiCond_Always);
     ImGui::SetNextWindowSize(ImVec2(windowSize.x * 0.2f, windowSize.y * 0.7f - yOffset), ImGuiCond_Always);
@@ -370,7 +369,7 @@ void NekoEditor::EditorUpdate([[maybe_unused]]float dt)
 
     fileDialog_.Display();
 
-    switch (currentFileOperation)
+    switch (currentFileOperation_)
     {
         case FileOperation::OPEN:
         {
@@ -380,11 +379,29 @@ void NekoEditor::EditorUpdate([[maybe_unused]]float dt)
                 const auto extension = GetFilenameExtension(assetPath.string());
                 const auto editorMode = GetEditorSystemModeFrom(extension);
 
-                switch(editorMode)
+                switch (editorMode)
                 {
                     case EditorSystemMode::SceneMode:
                     {
+                        //TODO Check if scene is already loaded
 
+                        //Open scene in new scene system
+                        auto newSceneSystem = std::make_unique<EditorSceneSystem>(*this, textureManager_);
+                        newSceneSystem->Init();
+
+                        newSceneSystem->OpenScene(assetPath.c_str());
+                        editorMode_ = newSceneSystem->GetEditorMode();
+
+                        editorSystems_.push_back(std::move(newSceneSystem));
+                        currentSystemIndex = editorSystems_.size() - 1;
+                        break;
+                    }
+                    default:
+                    {
+                        std::ostringstream oss;
+                        oss << "[Warning] Missing case for opening resource: " << Index(editorMode);
+                        logDebug(oss.str());
+                        break;
                     }
                 }
                 fileDialog_.ClearSelected();
@@ -652,6 +669,15 @@ EditorSystemMode NekoEditor::GetEditorSystemModeFrom(const std::string_view exte
         return EditorSystemMode::AnimMode;
     }
     return EditorSystemMode::None;
+}
+
+void NekoEditor::OpenFileDialog()
+{
+    fileDialog_ = ImGui::FileBrowser(
+            ImGuiFileBrowserFlags_EnterNewFilename | ImGuiFileBrowserFlags_CreateNewDir);
+    fileDialog_.SetPwd("../" + config.dataRootPath);
+    fileDialog_.Open();
+    currentFileOperation_ = FileOperation::OPEN;
 }
 
 

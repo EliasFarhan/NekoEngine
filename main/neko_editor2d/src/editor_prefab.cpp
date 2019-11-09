@@ -142,8 +142,8 @@ EditorPrefabManager::EditorPrefabManager(NekoEditorExport& editorExport) :
         transformManager_(editorExport.transform2dManager),
         position2dManager_(editorExport.position2dManager),
         spriteManager_(editorExport.spriteManager),
-        boxColliderDefManager_(editorExport.boxColliderDefManager_),
-        circleColliderDefManager_(editorExport.circleColliderDefManager_),
+        boxColliderDefManager_(editorExport.boxColliderDefManager),
+        circleColliderDefManager_(editorExport.circleColliderDefManager),
         spineManager_(editorExport.spineManager)
 {
 }

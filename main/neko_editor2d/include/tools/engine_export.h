@@ -42,13 +42,13 @@ struct NekoEditorExport : sfml::SfmlBasicEngineExport
     EditorSceneManager& sceneManager;
     box2d::BodyDef2dManager& bodyDef2dManager;
     sfml::TextureManager& textureManager;
-    BoxColliderDefManager& boxColliderDefManager_;
-    CircleColliderDefManager& circleColliderDefManager_;
-    PolygonColldierDefManager& polygonColldierDefManager_;
-    ColliderDefManager& colliderDefManager_;
+    BoxColliderDefManager& boxColliderDefManager;
+    CircleColliderDefManager& circleColliderDefManager;
+    PolygonColldierDefManager& polygonColldierDefManager;
+    ColliderDefManager& colliderDefManager;
     EditorPrefabManager& prefabManager;
     Configuration& config;
     NekoEditor& editor;
-    EntityNameManager& entityNameManager_;
+    EntityNameManager& entityNameManager;
 };
 }

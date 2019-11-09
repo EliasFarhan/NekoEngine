@@ -89,7 +89,7 @@ protected:
 
     static EditorSystemMode GetEditorSystemModeFrom(const std::string_view extension);
     void CreateNewScene();
-
+    void OpenFileDialog();
     LogViewer logViewer_;
 
     ImGui::FileBrowser fileDialog_;
@@ -97,7 +97,7 @@ protected:
 	std::vector<std::unique_ptr<BasicEditorSystem>> editorSystems_;
 	Index currentSystemIndex = INVALID_INDEX;
 	sfml::TextureManager textureManager_;
-    FileOperation currentFileOperation = FileOperation::NONE;
+    FileOperation currentFileOperation_ = FileOperation::NONE;
 
 };
 

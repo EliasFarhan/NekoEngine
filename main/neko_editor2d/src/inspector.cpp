@@ -103,12 +103,20 @@ void Inspector::ShowEntityInfo(neko::Entity entity) const
 		{
 			bool dirty = false;
 			auto tmpSprite = spriteManager_.GetComponent(entity);
-			const auto textureName = textureManager_.GetTexturePath(tmpSprite.textureId);
+
+			std::string textureName = "None";
+			if(tmpSprite.textureId != sfml::INVALID_TEXTURE_ID)
+            {
+                textureName = textureManager_.GetTexturePath(tmpSprite.textureId);
+            }
 			if (ImGui::Button(textureName.c_str()))
 			{
 				ImGui::OpenPopup("Texture Popup");
-
 			}
+			if(ImGui::IsItemClicked(1))
+            {
+			    //TODO Open texture mode
+            }
 			ImGui::SameLine();
 			ImGui::Text("Texture");
 
@@ -468,9 +476,9 @@ Inspector::Inspector(NekoEditorExport& nekoEditorExport) :
 	textureManager_(nekoEditorExport.textureManager),
 	spineManager_(nekoEditorExport.spineManager),
 	bodyDefManager_(nekoEditorExport.bodyDef2dManager),
-	boxColliderDefManager_(nekoEditorExport.boxColliderDefManager_),
-	circleColliderDefManager_(nekoEditorExport.circleColliderDefManager_),
-	polygonColliderDefManager_(nekoEditorExport.polygonColldierDefManager_),
+	boxColliderDefManager_(nekoEditorExport.boxColliderDefManager),
+	circleColliderDefManager_(nekoEditorExport.circleColliderDefManager),
+	polygonColliderDefManager_(nekoEditorExport.polygonColldierDefManager),
 	config_(nekoEditorExport.config)
 {
 }

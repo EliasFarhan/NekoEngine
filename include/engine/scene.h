@@ -60,7 +60,6 @@ public:
 protected:
     std::map<NekoComponentType, std::function<void(Entity, json&)>> componentParsingFuncMap_;
     Scene currentScene_;
-
     EntityManager& entityManager_;
 };
 

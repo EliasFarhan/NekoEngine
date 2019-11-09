@@ -7,6 +7,7 @@ namespace neko::editor
 void EditorSceneSystem::Init()
 {
     editorMode_ = EditorSystemMode::SceneMode;
+    screenRenderTexture_.create(config_.gameWindowSize.first, config_.gameWindowSize.second);
 }
 
 void EditorSceneSystem::Update(float dt)

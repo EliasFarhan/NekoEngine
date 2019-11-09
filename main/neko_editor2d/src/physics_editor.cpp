@@ -111,9 +111,9 @@ Index PolygonColldierDefManager::AddComponent(EntityManager& entityManager, Enti
 }
 
 ColliderDefManager::ColliderDefManager(NekoEditorExport& editorExport) :
-	boxColliderDefManager_(editorExport.boxColliderDefManager_),
-	circleColliderDefManager_(editorExport.circleColliderDefManager_),
-	polygonColldierDefManager_(editorExport.polygonColldierDefManager_),
+	boxColliderDefManager_(editorExport.boxColliderDefManager),
+	circleColliderDefManager_(editorExport.circleColliderDefManager),
+	polygonColldierDefManager_(editorExport.polygonColldierDefManager),
 	entityManager_(editorExport.entityManager),
 	transformManager_(editorExport.transform2dManager)
 {

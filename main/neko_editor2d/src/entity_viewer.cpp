@@ -232,7 +232,7 @@ EntityViewer::EntityViewer(NekoEditorExport& editorExport) :
 	entityManager_(editorExport.entityManager),
 	sceneManager_(editorExport.sceneManager),
 	prefabManager_(editorExport.prefabManager),
-	entityNameManager_(editorExport.entityNameManager_)
+	entityNameManager_(editorExport.entityNameManager)
 {
 }
 }

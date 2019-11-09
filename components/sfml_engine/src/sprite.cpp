@@ -139,6 +139,8 @@ json SpriteManager::SerializeComponentJson(Entity entity)
     const auto& sprite = GetComponent(entity);
     json componentJson;
     componentJson["layer"] = sprite.layer;
+    componentJson["textureId"] = sprite.textureId;
+    componentJson["texture"] = textureManager_.GetTexturePath(sprite.textureId);
     return componentJson;
 }
 

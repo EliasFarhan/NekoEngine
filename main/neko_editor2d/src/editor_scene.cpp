@@ -54,7 +54,8 @@ void EditorSceneManager::ParseSceneJson(json& sceneJson)
 EditorSceneManager::EditorSceneManager(NekoEditorExport& editorExport) :
         SfmlBasicSceneManager(editorExport),
         prefabManager_(editorExport.prefabManager),
-        bodyDefManager_(editorExport.bodyDef2dManager)
+        bodyDefManager_(editorExport.bodyDef2dManager),
+        entityNameManager_(editorExport.entityNameManager)
 {
     componentSerializeFuncMap_[NekoComponentType::POSITION2D] =
             [this](Entity entity)
@@ -120,7 +121,7 @@ json EditorSceneManager::SerializeEntity(neko::Entity entity)
         return entityJson;
     }
     //TODO scene entity name editor
-    //entityJson["name"] = currentScene_.entitiesNames[entity];
+    entityJson["name"] = entityNameManager_.GetComponent(entity);
     entityJson["entity"] = entity;
     const auto entityHash = entityManager_.GetEntityNameHash(entity);
     entityJson["entityNameHash"] = entityHash;
@@ -229,9 +230,20 @@ bool EditorSceneManager::IsCurrentSceneTmp()
     return currentScene_.scenePath.empty() or currentScene_.scenePath == sceneTmpPath;
 }
 
-const std::string_view EditorSceneManager::GetSceneTmpPath()
+std::string_view EditorSceneManager::GetSceneTmpPath()
 {
     return sceneTmpPath;
+}
+
+void EditorSceneManager::ParseEntityJson(json& entityJson)
+{
+    SfmlBasicSceneManager::ParseEntityJson(entityJson);
+    Entity entity = entityJson["entity"];
+    if(CheckJsonParameter(entityJson, "name", json::value_t::string))
+    {
+        entityNameManager_.AddComponent(entityManager_, entity);
+        entityNameManager_.SetComponent(entity, entityJson["name"]);
+    }
 }
 
 
