@@ -31,7 +31,6 @@ namespace neko
 {
 GraphicsManager::GraphicsManager()
 {
-	logDebug("Init Graphics Manager");
 	commandBuffer_.resize(MAX_COMMAND_NMB);
 }
 

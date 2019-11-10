@@ -138,6 +138,7 @@ bool SpineManager::AddSpineDrawable(Entity entity,
         return false;
     }
     spineAnimation.skeletonDrawable = std::make_shared<spine::SkeletonDrawable>(spineAnimation.skeletonData);
+    spineAnimation.SetDrawable(spineAnimation.skeletonDrawable.get());
     return true;
 }
 
@@ -199,15 +200,16 @@ void SpineManager::CopyAllTransformAngles(EntityManager& entityManager, Rotation
 
 void SpineManager::PushAllCommands(EntityManager& entityManager, GraphicsManager& graphicsManager)
 {
-	const EntityMask entityMask = EntityMask(NekoComponentType::SPINE_ANIMATION);
+	const auto entityMask = EntityMask(NekoComponentType::SPINE_ANIMATION);
 
-    for (Entity entity = 0; entity < entityManager.GetEntitiesSize(); entity++)
+    for (Entity entity = 0; entity < Entity(entityManager.GetEntitiesSize()); entity++)
     {
         if (entityManager.HasComponent(entity, entityMask))
         {
             if (components_[entity].skeletonDrawable != nullptr)
             {
                 sf::RenderStates states(components_[entity].transform);
+                components_[entity].SetStates(states);
                 graphicsManager.Render(&components_[entity]);
             }
         }
@@ -237,7 +239,7 @@ SpineDrawableInfo& SpineManager::GetInfo(Entity entity)
 void SpineManager::CopyAllTransforms(EntityManager& entityManager, Transform2dManager& transformManager)
 {
     const auto entityMask = EntityMask(NekoComponentType::TRANSFORM2D) | EntityMask(NekoComponentType::SPINE_ANIMATION);
-    for(Entity entity = 0; entity < entityManager.GetEntitiesSize(); entity++)
+    for(Entity entity = 0; entity < Entity(entityManager.GetEntitiesSize()); entity++)
     {
         if(entityManager.HasComponent(entity, entityMask))
         {
@@ -259,6 +261,16 @@ void SpineManager::CopyLayer(int layer, size_t start, size_t length)
     {
         components_[i].layer = layer;
     }
+}
+
+void SpineManager::SetAnimationByName(Entity entity, const std::string_view animName)
+{
+    components_[entity].SetAnimationByName(animName);
+}
+
+void SpineManager::SetSkinByName(Entity entity, const std::string_view skinName)
+{
+    components_[entity].SetSkinByName(skinName);
 }
 
 }

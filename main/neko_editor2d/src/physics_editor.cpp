@@ -16,6 +16,9 @@ void ColliderDefManager::PushAllCommands(GraphicsManager& graphicsManager)
 	const auto circleEntityMask = neko::EntityMask(neko::NekoComponentType::CIRCLE_COLLIDER2D);
 	const auto polygonEntityMask = neko::EntityMask(neko::NekoComponentType::POLYGON_COLLIDER2D);
 
+	rectShapes_.clear();
+	circleShapes_.clear();
+
 	for (neko::Entity entity = 0; entity < entityManager_.GetEntitiesSize(); entity++)
 	{
 		if (entityManager_.HasComponent(entity, boxEntityMask))
@@ -56,7 +59,7 @@ void ColliderDefManager::PushAllCommands(GraphicsManager& graphicsManager)
 		}
 		if (entityManager_.HasComponent(entity, polygonEntityMask))
 		{
-			//Render polygon
+			//TODO Render polygon
 		}
 	}
 

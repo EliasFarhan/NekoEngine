@@ -35,13 +35,10 @@ namespace neko
 {
 class Rotation2dManager;
 class Position2dManager;
-
 class Scale2dManager;
 
 namespace sfml
 {
-class SfmlGraphicsManager;
-
 class Transform2dManager;
 
 struct BasicSpineDrawable : public SfmlRenderCommand
@@ -116,6 +113,9 @@ public:
     SpineDrawableInfo& GetInfo(Entity entity);
 
     void DestroyComponent(EntityManager& entityManager, Entity entity) override;
+
+    void SetAnimationByName(Entity entity, std::string_view animName);
+    void SetSkinByName(Entity entity, std::string_view skinName);
 
 private:
     SpineBoneFollowerManager spineBoneFollowerManager_;

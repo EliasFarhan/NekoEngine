@@ -63,6 +63,7 @@ enum class EditorSystemMode  : std::uint8_t
     PrefabMode,
     TextureMode,
     AnimMode,
+    SpineMode,
     None
 };
 
@@ -93,7 +94,7 @@ protected:
     BasicEditorSystem* GetCurrentEditorSystem();
     void CreateNewScene();
     void OpenFileDialog();
-    void Save();
+    void Save(bool saveAs);
     void SaveAsset(std::string_view assetPath);
     LogViewer logViewer_;
 

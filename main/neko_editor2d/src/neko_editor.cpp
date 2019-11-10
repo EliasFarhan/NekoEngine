@@ -140,7 +140,7 @@ void NekoEditor::OnEvent(sf::Event& event)
         {
             case sf::Keyboard::S:
             {
-                Save();
+                Save(event.key.shift);
                 break;
             }
             case sf::Keyboard::N:
@@ -293,7 +293,11 @@ void NekoEditor::EditorUpdate([[maybe_unused]]float dt)
             }
             if (ImGui::MenuItem("Save", "CTRL+S"))
             {
-                Save();
+                Save(false);
+            }
+            if(ImGui::MenuItem("Save As...", "CTRL+SHIFT+S"))
+            {
+                Save(true);
             }
             ImGui::EndMenu();
         }
@@ -558,11 +562,7 @@ void NekoEditor::EditorUpdate([[maybe_unused]]float dt)
 
     switch (editorMode_)
     {
-    case EditorMode::SceneMode:
-    {
 
-        break;
-    }
     case EditorMode::PrefabMode:
     {
         auto rect = prefabManager_.CalculatePrefabBound();
@@ -715,6 +715,8 @@ void NekoEditor::OpenAsset(const std::string_view assetPath)
             newSceneSystem->OpenScene(assetPath);
             currentEditorMode_ = newSceneSystem->GetEditorMode();
             currentEditorSystemId_ = newSceneSystem->GetEditorSystemId();
+
+            editorSystemMap_[currentEditorSystemId_] = newSceneSystem.get();
             editorSystems_.push_back(std::move(newSceneSystem));
             break;
         }
@@ -740,8 +742,31 @@ BasicEditorSystem* NekoEditor::GetCurrentEditorSystem()
 
 void NekoEditor::SaveAsset(const std::string_view assetPath)
 {
+    auto* currentEditorSystem = GetCurrentEditorSystem();
     switch(currentEditorMode_)
     {
+        case EditorSystemMode::SceneMode:
+        {
+            if(currentEditorSystem->IsTmpResource() or currentEditorSystem->GetResourcePath() != assetPath)
+            {
+                if(assetPath.find(SceneManager::GetExtension()) == std::string::npos)
+                {
+                    std::string newResourcePath = assetPath.data();
+                    newResourcePath += SceneManager::GetExtension().data();
+                    currentEditorSystem->SetResourcePath(newResourcePath);
+
+                }
+                else
+                {
+                    currentEditorSystem->SetResourcePath(assetPath.data());
+                }
+                auto stem = GetStem(assetPath);
+                currentEditorSystem->SetSystemName(stem);
+            }
+
+            currentEditorSystem->OnSave();
+            break;
+        }
         default:
         {
             std::ostringstream oss;
@@ -752,12 +777,12 @@ void NekoEditor::SaveAsset(const std::string_view assetPath)
     }
 }
 
-void NekoEditor::Save()
+void NekoEditor::Save(bool saveAs)
 {
     auto* currentEditorSystem = GetCurrentEditorSystem();
     if(currentEditorSystem != nullptr)
     {
-        if(currentEditorSystem->IsTmpResource())
+        if(saveAs or currentEditorSystem->IsTmpResource())
         {
             OpenFileDialog();
             currentFileOperation_ = FileOperation::SAVE;

@@ -73,6 +73,10 @@ void EditorSceneSystem::OnInspectorView()
 
 void EditorSceneSystem::OnSave()
 {
+    Scene scene = sceneManager_.GetCurrentScene();
+    scene.scenePath = resourcePath_;
+    scene.sceneName = GetStem(resourcePath_);
+    sceneManager_.SetCurrentScene(scene);
     sceneManager_.SaveCurrentScene();
 }
 
