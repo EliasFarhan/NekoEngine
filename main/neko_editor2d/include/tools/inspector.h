@@ -57,10 +57,7 @@ class Inspector
 {
 public:
 	explicit Inspector(NekoEditorExport& nekoEditorExport);
-
-    void BeginWindow();
     void ShowEntityInfo(neko::Entity entity) const;
-    void EndWindow();
 private:
     sfml::Transform2dManager& transformManager_;
 	EditorSceneManager& sceneManager_;
@@ -76,5 +73,6 @@ private:
 	BoxColliderDefManager& boxColliderDefManager_;
 	CircleColliderDefManager& circleColliderDefManager_;
 	PolygonColldierDefManager& polygonColliderDefManager_;
+	NekoEditor& editor_;
 };
 }

@@ -116,6 +116,7 @@ void Inspector::ShowEntityInfo(neko::Entity entity) const
 			if(ImGui::IsItemClicked(1))
             {
 			    //TODO Open texture mode
+			    editor_.OpenAsset(textureName);
             }
 			ImGui::SameLine();
 			ImGui::Text("Texture");
@@ -479,16 +480,8 @@ Inspector::Inspector(NekoEditorExport& nekoEditorExport) :
 	boxColliderDefManager_(nekoEditorExport.boxColliderDefManager),
 	circleColliderDefManager_(nekoEditorExport.circleColliderDefManager),
 	polygonColliderDefManager_(nekoEditorExport.polygonColldierDefManager),
-	config_(nekoEditorExport.config)
-{
-}
-
-void Inspector::BeginWindow()
-{
-
-}
-
-void Inspector::EndWindow()
+	config_(nekoEditorExport.config),
+	editor_(nekoEditorExport.editor)
 {
 }
 }

@@ -19,4 +19,31 @@ void EditorPrefabSystem::Destroy()
 {
 
 }
+
+void EditorPrefabSystem::OnListingView()
+{
+
+}
+
+void EditorPrefabSystem::OnMainView()
+{
+
+}
+
+void EditorPrefabSystem::OnInspectorView()
+{
+
+}
+
+void EditorPrefabSystem::OnSave()
+{
+
+}
+
+EditorSystemId EditorPrefabSystem::GetEditorSystemId() const
+{
+    xxh::hash_state64_t prefabIdHashStream(0);
+    //TODO hash the prefabId
+    return prefabIdHashStream.digest();
+}
 }

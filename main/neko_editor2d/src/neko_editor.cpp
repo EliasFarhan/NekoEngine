@@ -129,12 +129,7 @@ void NekoEditor::SwitchEditorMode(EditorMode editorMode)
 void NekoEditor::OnEvent(sf::Event& event)
 {
     SfmlBasicEngine::OnEvent(event);
-    BasicEditorSystem* editorSystem = nullptr;
-    if (currentSystemIndex < editorSystems_.size())
-    {
-        editorSystem = editorSystems_[currentSystemIndex].get();
-        editorSystem->OnEvent(event);
-    }
+    BasicEditorSystem* editorSystem = GetCurrentEditorSystem();
 
     if (event.type != sf::Event::KeyPressed)
         return;
@@ -145,10 +140,7 @@ void NekoEditor::OnEvent(sf::Event& event)
         {
             case sf::Keyboard::S:
             {
-                if (editorSystem != nullptr)
-                {
-                    editorSystem->OnSave();
-                }
+                Save();
                 break;
             }
             case sf::Keyboard::N:
@@ -159,6 +151,7 @@ void NekoEditor::OnEvent(sf::Event& event)
             case sf::Keyboard::O:
             {
                 OpenFileDialog();
+                currentFileOperation_ = FileOperation::OPEN;
                 break;
             }
             default:
@@ -168,7 +161,7 @@ void NekoEditor::OnEvent(sf::Event& event)
         }
     }
 
-    switch (editorMode_)
+    switch (currentEditorMode_)
     {
         case EditorSystemMode::SceneMode:
         {
@@ -296,11 +289,11 @@ void NekoEditor::EditorUpdate([[maybe_unused]]float dt)
             if (ImGui::MenuItem("Open", "CTRL+O"))
             {
                 OpenFileDialog();
+                currentFileOperation_ = FileOperation::OPEN;
             }
             if (ImGui::MenuItem("Save", "CTRL+S"))
             {
-                //TODO save the scene
-                //SaveSceneEvent();
+                Save();
             }
             ImGui::EndMenu();
         }
@@ -312,21 +305,21 @@ void NekoEditor::EditorUpdate([[maybe_unused]]float dt)
         for (Index i = 0; i < editorSystems_.size(); i++)
         {
             auto* editorSystem = editorSystems_[i].get();
+            ImGui::PushID(editorSystem->GetEditorSystemId());
             //Show main view tabs
             if (ImGui::BeginTabItem(editorSystem->GetSystemName().c_str(), nullptr,
-                                    currentSystemIndex == i ? ImGuiTabItemFlags_SetSelected : ImGuiTabItemFlags_None))
+                                    editorSystem->GetEditorSystemId() == currentEditorSystemId_
+                                    ? ImGuiTabItemFlags_SetSelected : ImGuiTabItemFlags_None))
             {
                 editorSystem->OnMainView();
                 ImGui::EndTabItem();
             }
+
             if (ImGui::IsItemClicked(0))
             {
-                if (currentSystemIndex < editorSystems_.size())
-                {
-                    editorSystems_[i].get()->OnLostFocus();
-                }
-                currentSystemIndex = i;
+                currentEditorSystemId_ = editorSystem->GetEditorSystemId();
             }
+            ImGui::PopID();
         }
 
         ImGui::EndTabBar();
@@ -336,12 +329,10 @@ void NekoEditor::EditorUpdate([[maybe_unused]]float dt)
 
 
 
-    BasicEditorSystem* currentEditorSystem = nullptr;
-    //TODO Set the selected system depending on the index
-    if (currentSystemIndex < editorSystems_.size())
-    {
-        currentEditorSystem = editorSystems_[currentSystemIndex].get();
+    BasicEditorSystem* currentEditorSystem = GetCurrentEditorSystem();
 
+    if (currentEditorSystem != nullptr)
+    {
         currentEditorSystem->Update(dt);
     }
 
@@ -376,39 +367,39 @@ void NekoEditor::EditorUpdate([[maybe_unused]]float dt)
             if (fileDialog_.HasSelected())
             {
                 const auto assetPath = fileDialog_.GetSelected();
-                const auto extension = GetFilenameExtension(assetPath.string());
-                const auto editorMode = GetEditorSystemModeFrom(extension);
 
-                switch (editorMode)
-                {
-                    case EditorSystemMode::SceneMode:
-                    {
-                        //TODO Check if scene is already loaded
+                OpenAsset(assetPath.string());
+                fileDialog_.ClearSelected();
+                fileDialog_.Close();
 
-                        //Open scene in new scene system
-                        auto newSceneSystem = std::make_unique<EditorSceneSystem>(*this, textureManager_);
-                        newSceneSystem->Init();
+                currentFileOperation_ = FileOperation::NONE;
+            }
 
-                        newSceneSystem->OpenScene(assetPath.c_str());
-                        editorMode_ = newSceneSystem->GetEditorMode();
-
-                        editorSystems_.push_back(std::move(newSceneSystem));
-                        currentSystemIndex = editorSystems_.size() - 1;
-                        break;
-                    }
-                    default:
-                    {
-                        std::ostringstream oss;
-                        oss << "[Warning] Missing case for opening resource: " << Index(editorMode);
-                        logDebug(oss.str());
-                        break;
-                    }
-                }
+            if(!fileDialog_.IsOpened())
+            {
+                logDebug("[Warning] Opening file operation was canceled");
                 fileDialog_.ClearSelected();
                 fileDialog_.Close();
             }
             break;
         }
+        case FileOperation::SAVE:
+            if(fileDialog_.HasSelected())
+            {
+                const auto assetPath = fileDialog_.GetSelected();
+                SaveAsset(assetPath.string());
+                fileDialog_.ClearSelected();
+                fileDialog_.Close();
+
+                currentFileOperation_ = FileOperation::NONE;
+            }
+            if(!fileDialog_.IsOpened())
+            {
+                logDebug("[Warning] Saving file operation was canceled");
+                currentFileOperation_ = FileOperation::NONE;
+                fileDialog_.ClearSelected();
+                fileDialog_.Close();
+            }
         default:
             break;
     }
@@ -601,11 +592,11 @@ void NekoEditor::CreateNewScene()
 
     std::unique_ptr<EditorSceneSystem> newSceneSystem = std::make_unique<EditorSceneSystem>(*this,
                                                                                             textureManager_);
-    newSceneSystem->SetSceneId(SceneManager::GenerateSceneId());
     newSceneSystem->Init();
+    currentEditorSystemId_ = newSceneSystem->GetEditorSystemId();
+    currentEditorMode_ = newSceneSystem->GetEditorMode();
+    editorSystemMap_[currentEditorSystemId_] = newSceneSystem.get();
     editorSystems_.push_back(std::move(newSceneSystem));
-    currentSystemIndex = editorSystems_.size() - 1;
-    editorMode_ = editorSystems_[currentSystemIndex]->GetEditorMode();
 
 }
 
@@ -649,6 +640,21 @@ BasicEditorSystem::BasicEditorSystem(Configuration& config) : config_(config)
 
 }
 
+const std::string& BasicEditorSystem::GetResourcePath() const
+{
+    return resourcePath_;
+}
+
+void BasicEditorSystem::SetResourcePath(const std::string& resourcePath)
+{
+    resourcePath_ = resourcePath;
+}
+
+bool BasicEditorSystem::IsTmpResource() const
+{
+    return resourcePath_ == "";
+}
+
 EditorSystemMode NekoEditor::GetEditorSystemModeFrom(const std::string_view extension)
 {
     if (extension == SceneManager::GetExtension())
@@ -677,7 +683,95 @@ void NekoEditor::OpenFileDialog()
             ImGuiFileBrowserFlags_EnterNewFilename | ImGuiFileBrowserFlags_CreateNewDir);
     fileDialog_.SetPwd("../" + config.dataRootPath);
     fileDialog_.Open();
-    currentFileOperation_ = FileOperation::OPEN;
+}
+
+void NekoEditor::OpenAsset(const std::string_view assetPath)
+{
+    const auto extension = GetFilenameExtension(assetPath);
+    const auto editorMode = GetEditorSystemModeFrom(extension);
+
+    switch (editorMode)
+    {
+        case EditorSystemMode::SceneMode:
+        {
+            //Check if scene is already loaded
+            json sceneJson = LoadJson(assetPath);
+            if(CheckJsonParameter(sceneJson, "sceneId", json::value_t::string))
+            {
+                SceneId sceneId = sole::rebuild(sceneJson["sceneId"]);
+                EditorSystemId editorSystemId = EditorSceneSystem::GenerateEditorSystemIdFrom(sceneId);
+                auto editorSystemIt = editorSystemMap_.find(editorSystemId);
+                if(editorSystemIt != editorSystemMap_.end())
+                {
+                    currentEditorSystemId_ = editorSystemId;
+                    currentEditorMode_ = editorSystemIt->second->GetEditorMode();
+                    return;
+                }
+            }
+            //Open scene in new scene system
+            auto newSceneSystem = std::make_unique<EditorSceneSystem>(*this, textureManager_);
+            newSceneSystem->Init();
+
+            newSceneSystem->OpenScene(assetPath);
+            currentEditorMode_ = newSceneSystem->GetEditorMode();
+            currentEditorSystemId_ = newSceneSystem->GetEditorSystemId();
+            editorSystems_.push_back(std::move(newSceneSystem));
+            break;
+        }
+        default:
+        {
+            std::ostringstream oss;
+            oss << "[Warning] Missing case for opening resource: " << Index(editorMode);
+            logDebug(oss.str());
+            break;
+        }
+    }
+}
+
+BasicEditorSystem* NekoEditor::GetCurrentEditorSystem()
+{
+    BasicEditorSystem* currentEditorSystem = nullptr;
+    if (currentEditorSystemId_ != INVALID_EDITOR_SYSTEM_ID)
+    {
+        currentEditorSystem = editorSystemMap_[currentEditorSystemId_];
+    }
+    return currentEditorSystem;
+}
+
+void NekoEditor::SaveAsset(const std::string_view assetPath)
+{
+    switch(currentEditorMode_)
+    {
+        default:
+        {
+            std::ostringstream oss;
+            oss << "[Warning] Missing case for saving resource: " << Index(currentEditorMode_);
+            logDebug(oss.str());
+            break;
+        }
+    }
+}
+
+void NekoEditor::Save()
+{
+    auto* currentEditorSystem = GetCurrentEditorSystem();
+    if(currentEditorSystem != nullptr)
+    {
+        if(currentEditorSystem->IsTmpResource())
+        {
+            OpenFileDialog();
+            currentFileOperation_ = FileOperation::SAVE;
+        }
+        else
+        {
+            currentEditorSystem->OnSave();
+        }
+
+    }
+    else
+    {
+        logDebug("[Warning] Saving editor system, but there is none...");
+    }
 }
 
 

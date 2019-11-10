@@ -67,6 +67,8 @@ enum class EditorSystemMode  : std::uint8_t
 };
 
 
+using EditorSystemId = xxh::hash64_t;
+const EditorSystemId INVALID_EDITOR_SYSTEM_ID = EditorSystemId(0);
 
 class NekoEditor : public neko::sfml::SfmlBasicEngine
 {
@@ -83,29 +85,35 @@ public:
     //void SavePrefabEvent();
 
     void OnEvent(sf::Event& event) override;
-
+    void OpenAsset(std::string_view assetPath);
 
 protected:
 
-    static EditorSystemMode GetEditorSystemModeFrom(const std::string_view extension);
+    static EditorSystemMode GetEditorSystemModeFrom(std::string_view extension);
+    BasicEditorSystem* GetCurrentEditorSystem();
     void CreateNewScene();
     void OpenFileDialog();
+    void Save();
+    void SaveAsset(std::string_view assetPath);
     LogViewer logViewer_;
 
     ImGui::FileBrowser fileDialog_;
-    EditorSystemMode editorMode_ = EditorSystemMode::SceneMode;
+    EditorSystemMode currentEditorMode_ = EditorSystemMode::SceneMode;
 	std::vector<std::unique_ptr<BasicEditorSystem>> editorSystems_;
-	Index currentSystemIndex = INVALID_INDEX;
 	sfml::TextureManager textureManager_;
     FileOperation currentFileOperation_ = FileOperation::NONE;
 
+    EditorSystemId currentEditorSystemId_ = INVALID_EDITOR_SYSTEM_ID;
+    std::unordered_map<EditorSystemId, BasicEditorSystem*> editorSystemMap_;
+
 };
+
 
 class BasicEditorSystem : public System
 {
 public:
 	explicit BasicEditorSystem(Configuration& config);
-	const std::string& GetSystemName() const { return editorSystemName_; }
+	std::string GetSystemName() const { return editorSystemName_ + (IsTmpResource() ? "*" : ""); }
 	void SetSystemName(const std::string& name) { editorSystemName_ = name; }
 
 	virtual void OnListingView() = 0;
@@ -122,10 +130,13 @@ public:
         return editorMode_;
     }
 
+    virtual EditorSystemId GetEditorSystemId() const = 0;
 
+    const std::string& GetResourcePath() const;
+    void SetResourcePath(const std::string& resourcePath);
+    bool IsTmpResource() const;
 protected:
-
-
+    std::string resourcePath_;
     EditorSystemMode editorMode_ = EditorSystemMode::None;
     std::string editorSystemName_;
 	Configuration& config_;

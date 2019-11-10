@@ -12,8 +12,6 @@ public:
 
     void Destroy() override;
 
-	void SetSceneId(SceneId sceneId);
-
     void OpenScene(std::string_view scenePath);
 
 	void OnListingView() override;
@@ -21,5 +19,8 @@ public:
 	void OnInspectorView() override;
 
     void OnSave() override;
+
+    EditorSystemId GetEditorSystemId() const override;
+    static EditorSystemId GenerateEditorSystemIdFrom(SceneId sceneId);
 };
 }

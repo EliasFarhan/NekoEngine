@@ -66,8 +66,4 @@ TEST(Engine, TestAssetImport)
 		const xxh::hash_t<64> final_hash = hash_stream.digest();
 		std::cout << "Filename: " << filename << " Hash: " << final_hash << "\n";
 	}
-
-#ifdef WIN32
-	system("pause");
-#endif
 }

@@ -19,6 +19,16 @@ public:
 
     void Destroy() override;
 
-    
+    void OnListingView() override;
+
+    void OnMainView() override;
+
+    void OnInspectorView() override;
+
+    void OnSave() override;
+
+    EditorSystemId GetEditorSystemId() const override;
+
+
 };
 }

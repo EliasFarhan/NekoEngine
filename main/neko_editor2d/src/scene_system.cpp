@@ -1,4 +1,5 @@
 #include <tools/neko_editor.h>
+#include <utilities/file_utility.h>
 #include "tools/scene_system.h"
 #include "utilities/json_utility.h"
 
@@ -8,9 +9,18 @@ void EditorSceneSystem::Init()
 {
     editorMode_ = EditorSystemMode::SceneMode;
     screenRenderTexture_.create(config_.gameWindowSize.first, config_.gameWindowSize.second);
+    //We add a scene Id if the scene is new
+    Scene scene = sceneManager_.GetCurrentScene();
+    if(scene.sceneId == INVALID_SCENE_ID)
+    {
+        scene.sceneId = SceneManager::GenerateSceneId();
+        scene.sceneName = "Sample Scene";
+        editorSystemName_ = scene.sceneName;
+        sceneManager_.SetCurrentScene(scene);
+    }
 }
 
-void EditorSceneSystem::Update(float dt)
+void EditorSceneSystem::Update([[maybe_unused]]float dt)
 {
 
 	const auto& currentScene = sceneManager_.GetCurrentScene();
@@ -43,13 +53,6 @@ void EditorSceneSystem::Destroy()
 
 }
 
-void EditorSceneSystem::SetSceneId(SceneId sceneId)
-{
-	auto scene = sceneManager_.GetCurrentScene();
-	scene.sceneId = sceneId;
-	sceneManager_.SetCurrentScene(scene);
-}
-
 void EditorSceneSystem::OnListingView()
 {
 	entityViewer_.Update(EditorSystemMode::SceneMode);
@@ -77,5 +80,17 @@ void EditorSceneSystem::OpenScene(const std::string_view scenePath)
 {
     auto sceneJson = LoadJson(scenePath);
     sceneManager_.ParseSceneJson(sceneJson);
+}
+
+EditorSystemId EditorSceneSystem::GetEditorSystemId() const
+{
+    return GenerateEditorSystemIdFrom(sceneManager_.GetCurrentScene().sceneId);
+}
+
+EditorSystemId EditorSceneSystem::GenerateEditorSystemIdFrom(SceneId sceneId)
+{
+    xxh::hash_state64_t sceneIdHashStream(0);
+    sceneIdHashStream.update(sceneId.str());
+    return sceneIdHashStream.digest();
 }
 }
