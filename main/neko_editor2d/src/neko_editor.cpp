@@ -599,7 +599,9 @@ NekoEditorSystem::NekoEditorSystem(NekoEditor& nekoEditor, sfml::TextureManager&
 			 rotation2dManager_,
 			 transform2dManager_,
 			 spriteManager_,
-			 spineManager_},
+			 spineManager_,
+			 spineBoneFollowerManager_
+			},
 			sceneManager_,
 			bodyDef2DManager_,
 			textureManager,

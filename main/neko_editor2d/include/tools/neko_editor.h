@@ -161,6 +161,7 @@ protected:
 	box2d::BodyDef2dManager bodyDef2DManager_;
 	sfml::SpriteManager spriteManager_;
 	sfml::SpineManager spineManager_;
+	sfml::SpineBoneFollowerManager spineBoneFollowerManager_;
 	BoxColliderDefManager boxColliderDefManager_;
 	CircleColliderDefManager circleColliderDefManager_;
 	PolygonColldierDefManager polygonColldierDefManager_;

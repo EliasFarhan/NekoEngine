@@ -24,6 +24,7 @@ protected:
     Transform2dManager& transformManager_;
     SpriteManager& spriteManager_;
     SpineManager& spineManager_;
+	SpineBoneFollowerManager& spineBoneFollowerManager_;
 };
 class SfmlFullSceneManager : public SfmlBasicSceneManager
 {

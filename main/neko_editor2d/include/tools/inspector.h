@@ -39,6 +39,7 @@ class Position2dManager;
 
 namespace neko::sfml {
 class SpineManager;
+class SpineBoneFollowerManager;
 class TextureManager;
 class SpriteManager;
 class Transform2dManager;
@@ -53,6 +54,7 @@ class BoxColliderDefManager;
 class EditorSceneManager;
 struct NekoEditorExport;
 class NekoEditor;
+class EntityNameManager;
 class Inspector
 {
 public:
@@ -68,11 +70,13 @@ private:
 	sfml::SpriteManager& spriteManager_;
 	sfml::TextureManager& textureManager_;
 	sfml::SpineManager& spineManager_;
+	sfml::SpineBoneFollowerManager& spineBoneFollowerManager_;
 	Configuration& config_;
 	box2d::BodyDef2dManager& bodyDefManager_;
 	BoxColliderDefManager& boxColliderDefManager_;
 	CircleColliderDefManager& circleColliderDefManager_;
 	PolygonColldierDefManager& polygonColliderDefManager_;
 	NekoEditor& editor_;
+	EntityNameManager& entityNameManager_;
 };
 }

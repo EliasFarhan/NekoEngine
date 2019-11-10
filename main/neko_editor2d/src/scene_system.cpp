@@ -25,7 +25,7 @@ void EditorSceneSystem::Update([[maybe_unused]]float dt)
 
 	const auto& currentScene = sceneManager_.GetCurrentScene();
 	screenRenderTexture_.clear(sf::Color(currentScene.bgColor));
-
+	transform2dManager_.CopyAllFromSpineFollower(entityManager_, spineBoneFollowerManager_);
 	spriteManager_.CopyAllTransforms(entityManager_, transform2dManager_);
 	spriteManager_.PushAllCommands(entityManager_, graphicsManager_);
 

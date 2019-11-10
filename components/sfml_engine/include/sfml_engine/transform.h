@@ -11,6 +11,8 @@ class Body2dManager;
 }
 namespace sfml
 {
+class SpineBoneFollowerManager;
+
 class Transform2dManager
 {
 public:
@@ -22,6 +24,7 @@ public:
     Entity GetParentEntity(Entity entity);
     Entity FindNextChild(Entity parentEntity, Entity entityChild=neko::INVALID_ENTITY);
 	void CopyAllFromBody2d(EntityManager& entityManager, box2d::Body2dManager& body2dManager);
+	void CopyAllFromSpineFollower(EntityManager& entityManager, SpineBoneFollowerManager& spineBoneFollowerManager);
     sf::Transform CalculateTransform(Entity entity);
 
 	

@@ -5,6 +5,7 @@
 #include "sfml_engine/transform.h"
 #include "sfml_engine/physics.h"
 #include "sfml_engine/vector.h"
+#include "sfml_engine/spine.h"
 #include <glm/glm.hpp>
 
 namespace neko::sfml
@@ -92,6 +93,35 @@ void Transform2dManager::CopyAllFromBody2d(EntityManager& entityManager, box2d::
 	}
 }
 
+void Transform2dManager::CopyAllFromSpineFollower(EntityManager& entityManager,
+	SpineBoneFollowerManager& spineBoneFollowerManager)
+{
+	const Index entityNmb = entityManager.GetEntitiesSize();
+	for(Entity i = 0; i < entityNmb; i++)
+	{
+		if(!entityManager.HasComponent(i, EntityMask(NekoComponentType::SPINE_FOLLOW_BONE)))
+		{
+			continue;
+		}
+		const auto& spineBoneFollower = spineBoneFollowerManager.GetComponent(i);
+		if(spineBoneFollower.followingBone == nullptr)
+			continue;
+		const auto* bone = spineBoneFollower.followingBone;
+		if (entityManager.HasComponent(i, EntityMask(NekoComponentType::POSITION2D)))
+		{
+			positionManager_.SetComponent(i, pixel2unit(sf::Vector2f(bone->worldX, bone->worldY)));
+		}
+		if (entityManager.HasComponent(i, EntityMask(NekoComponentType::SCALE2D)))
+		{
+			scaleManager_.SetComponent(i, Vec2f(bone->ascaleX, bone->ascaleY));
+		}
+		if (entityManager.HasComponent(i, EntityMask(NekoComponentType::ROTATION2D)))
+		{
+			rotationManager_.SetComponent(i, bone->arotation);
+		}
+	}
+}
+
 Entity Transform2dManager::GetParentEntity(Entity entity)
 {
     ResizeIfNecessary(transformHierarchy_, entity, INVALID_ENTITY);
@@ -103,7 +133,7 @@ sf::Transform Transform2dManager::CalculateTransform(Entity entity)
 	sf::Transform transform = sf::Transform::Identity;
 	sf::Transform parentTransform = sf::Transform::Identity;
 
-	auto parentEntity = GetParentEntity(entity);
+	const auto parentEntity = GetParentEntity(entity);
 	if(parentEntity != INVALID_ENTITY)
 	{
 		parentTransform = CalculateTransform(parentEntity);

@@ -55,7 +55,7 @@ protected:
 	TextureManager textureManager_;
 	SpriteManager spriteManager_;
 	SpineManager spineManager_;
-	
+	SpineBoneFollowerManager spineBoneFollowerManager_;
 	box2d::Physics2dManager physics2dManager_;
 	box2d::Body2dManager body2dManager_;
 	box2d::ContactListener contactListener_;

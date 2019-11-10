@@ -87,7 +87,33 @@ SkeletonData* readSkeletonBinaryData(const char* filename, Atlas* atlas, float s
 }
 
 
-SpineManager::SpineManager() : ComponentManager::ComponentManager()
+sf::Transform SpineBoneFollowerManager::CalculateTransformFromBone(Bone* bone)
+{
+	sf::Transform transform = sf::Transform::Identity;
+	transform.translate(bone->x, bone->y);
+	transform.scale(bone->scaleX, bone->scaleY);
+	transform.rotate(bone->rotation);
+	return transform;
+}
+
+void SpineBoneFollowerManager::ParseComponentJson(json& componentJson, Entity entity)
+{
+	auto& boneFollower = components_[entity];
+	boneFollower.followingEntity = componentJson["followingEntity"];
+	boneFollower.boneName = componentJson["boneName"];
+	
+}
+
+json SpineBoneFollowerManager::SerializeComponentJson(Entity entity)
+{
+	auto& boneFollower = components_[entity];
+	json componentJson;
+	componentJson["followingEntity"] = boneFollower.followingEntity;
+	componentJson["boneName"] = boneFollower.boneName;
+	return componentJson;
+}
+
+SpineManager::SpineManager() 
 {
     ResizeIfNecessary(infos_, INIT_ENTITY_NMB - 1, {});
 };
@@ -146,9 +172,14 @@ void SpineManager::ParseComponentJson(json& componentJson, Entity entity)
 {
     const std::string atlasFilename = componentJson["atlas"];
     const std::string skeletonDataFilename = componentJson["skeletonData"];
+	const std::string spineFilename = componentJson["spine"];
     AddSpineDrawable(entity, atlasFilename, skeletonDataFilename);
-
-
+	ResizeIfNecessary(infos_, entity, {});
+	auto& spineInfo = infos_[entity];
+	spineInfo.atlasPath = atlasFilename;
+	spineInfo.skeletonDataPath = skeletonDataFilename;
+	spineInfo.spinePath = spineFilename;
+	
 }
 
 void SpineManager::CopyAllTransformPositions(EntityManager& entityManager, Position2dManager& position2Manager)
@@ -228,6 +259,7 @@ json SpineManager::SerializeComponentJson(Entity entity)
     const auto& componentInfo = infos_[entity];
     componentJson["atlas"] = componentInfo.atlasPath;
     componentJson["skeletonData"] = componentInfo.skeletonDataPath;
+	componentJson["spine"] = componentInfo.spinePath;
     return componentJson;
 }
 

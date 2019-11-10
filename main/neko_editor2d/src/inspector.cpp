@@ -14,8 +14,8 @@ void Inspector::ShowEntityInfo(neko::Entity entity) const
 	if (entity == neko::INVALID_ENTITY)
 		return;
 
-    //TODO Have own entity name manager
-    //ImGui::InputText("Entity Name: ", &sceneManager_.GetCurrentScene().entitiesNames[entity]);
+	//TODO Have own entity name manager
+	//ImGui::InputText("Entity Name: ", &sceneManager_.GetCurrentScene().entitiesNames[entity]);
 	ImGui::LabelText("Entity Value: ", "%u", entity);
 	{
 		const auto parentEntity = transformManager_.GetParentEntity(entity);
@@ -105,18 +105,18 @@ void Inspector::ShowEntityInfo(neko::Entity entity) const
 			auto tmpSprite = spriteManager_.GetComponent(entity);
 
 			std::string textureName = "None";
-			if(tmpSprite.textureId != sfml::INVALID_TEXTURE_ID)
-            {
-                textureName = textureManager_.GetTexturePath(tmpSprite.textureId);
-            }
+			if (tmpSprite.textureId != sfml::INVALID_TEXTURE_ID)
+			{
+				textureName = textureManager_.GetTexturePath(tmpSprite.textureId);
+			}
 			if (ImGui::Button(textureName.c_str()))
 			{
 				ImGui::OpenPopup("Texture Popup");
 			}
-			if(ImGui::IsItemClicked(1))
-            {
-			    editor_.OpenAsset(textureName);
-            }
+			if (ImGui::IsItemClicked(1))
+			{
+				editor_.OpenAsset(textureName);
+			}
 			ImGui::SameLine();
 			ImGui::Text("Texture");
 
@@ -143,19 +143,19 @@ void Inspector::ShowEntityInfo(neko::Entity entity) const
 			}
 
 			ImGui::PushID("Sprite Layer");
-			if(ImGui::InputInt("Layer", &tmpSprite.layer, 1))
+			if (ImGui::InputInt("Layer", &tmpSprite.layer, 1))
 			{
 				dirty = true;
 			}
 
 			ImGui::PopID();
-			if(dirty)
+			if (dirty)
 			{
 				spriteManager_.CopyLayer(tmpSprite.layer, entity, 1);
-                if(tmpSprite.textureId != spriteManager_.GetComponent(entity).textureId)
-                {
-                    spriteManager_.CopyTexture(tmpSprite.textureId, entity, 1);
-                }
+				if (tmpSprite.textureId != spriteManager_.GetComponent(entity).textureId)
+				{
+					spriteManager_.CopyTexture(tmpSprite.textureId, entity, 1);
+				}
 			}
 		}
 
@@ -173,10 +173,10 @@ void Inspector::ShowEntityInfo(neko::Entity entity) const
 		bool keepComponent = true;
 		if (ImGui::CollapsingHeader("Spine2d Component", &keepComponent, ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			std::string spineButtonName = spineDrawableInfo.spinePath;
-			if (spineButtonName.empty())
+			std::string spineButtonName = "None";
+			if (!spineDrawableInfo.spinePath.empty())
 			{
-				spineButtonName = "None";
+				spineButtonName = GetStem(spineDrawableInfo.spinePath);
 			}
 			if (ImGui::Button(spineButtonName.c_str()))
 			{
@@ -207,6 +207,7 @@ void Inspector::ShowEntityInfo(neko::Entity entity) const
 					if (ImGui::Selectable(spineFilename.c_str()))
 					{
 						auto spineJson = neko::LoadJson(spineFilename);
+						spineDrawableInfo.spinePath = spineFilename;
 						spineDrawableInfo.atlasPath = spineJson["atlas"];
 						spineDrawableInfo.skeletonDataPath = spineJson["skeleton"];
 						spineFileList.clear();
@@ -233,7 +234,7 @@ void Inspector::ShowEntityInfo(neko::Entity entity) const
 				if (spineManager_.AddSpineDrawable(entity, spineDrawableInfo.atlasPath,
 					spineDrawableInfo.skeletonDataPath))
 				{
-				    spineManager_.Update(entityManager_, 0.0f);
+					spineManager_.Update(entityManager_, 0.0f);
 					logDebug("Successfully load spine drawable");
 				}
 				else
@@ -252,61 +253,61 @@ void Inspector::ShowEntityInfo(neko::Entity entity) const
 				}
 			}
 			ImGui::PopID();
-			if(spineDrawable.skeletonDrawable != nullptr)
-            {
-			    //Show animation combo
-                const auto animations = spineDrawable.skeletonData->animations;
-                static int currentAnimIndex = 0;
-                if(currentAnimIndex >= spineDrawable.skeletonData->animationsCount)
-                {
-                    currentAnimIndex = 0;
-                }
-                const char* currentAnim = spineDrawable.skeletonData->animations[currentAnimIndex]->name;            // Here our selection is a single pointer stored outside the object.
-                if (ImGui::BeginCombo("Animation", currentAnim)) // The second parameter is the label previewed before opening the combo.
-                {
-                    for (int n = 0; n < spineDrawable.skeletonData->animationsCount; n++)
-                    {
-                        const bool isSelected = (currentAnim == animations[n]->name);
-                        if (ImGui::Selectable(animations[n]->name, isSelected))
-                        {
-                            currentAnimIndex = n;
-                            if (spineDrawable.skeletonDrawable != nullptr)
-                            {
-                                spineManager_.SetAnimationByName(entity, animations[n]->name);
-                            }
-                        };
-                        if (isSelected)
-                            ImGui::SetItemDefaultFocus();   // Set the initial focus when opening the combo (scrolling + for keyboard navigation support in the upcoming navigation branch)
-                    }
-                    ImGui::EndCombo();
-                }
-                //Show skin Name
-                auto skins = spineDrawable.skeletonData->skins;
-                static int currentSkinIndex = 0;
-                if(currentSkinIndex >= spineDrawable.skeletonData->skinsCount)
-                {
-                    currentSkinIndex = 0;
-                }
-                const char* currentSkin = spineDrawable.skeletonData->skins[0]->name;            // Here our selection is a single pointer stored outside the object.
-                if (ImGui::BeginCombo("Skin", currentSkin)) // The second parameter is the label previewed before opening the combo.
-                {
-                    for (int n = 0; n < spineDrawable.skeletonData->skinsCount; n++)
-                    {
-                        const bool isSelected = (currentSkin == skins[n]->name);
-                        if (ImGui::Selectable(skins[n]->name, isSelected))
-                        {
-                            currentSkinIndex = n;
-                            if (spineDrawable.skeletonDrawable != nullptr)
-                            {
-                                spineManager_.SetSkinByName(entity, skins[n]->name);
-                            }
-                        };
-                        if (isSelected)
-                            ImGui::SetItemDefaultFocus();   // Set the initial focus when opening the combo (scrolling + for keyboard navigation support in the upcoming navigation branch)
-                    }
-                    ImGui::EndCombo();
-                }
-            }
+			if (spineDrawable.skeletonDrawable != nullptr)
+			{
+				//Show animation combo
+				const auto animations = spineDrawable.skeletonData->animations;
+				static int currentAnimIndex = 0;
+				if (currentAnimIndex >= spineDrawable.skeletonData->animationsCount)
+				{
+					currentAnimIndex = 0;
+				}
+				const char* currentAnim = spineDrawable.skeletonData->animations[currentAnimIndex]->name;            // Here our selection is a single pointer stored outside the object.
+				if (ImGui::BeginCombo("Animation", currentAnim)) // The second parameter is the label previewed before opening the combo.
+				{
+					for (int n = 0; n < spineDrawable.skeletonData->animationsCount; n++)
+					{
+						const bool isSelected = (currentAnim == animations[n]->name);
+						if (ImGui::Selectable(animations[n]->name, isSelected))
+						{
+							currentAnimIndex = n;
+							if (spineDrawable.skeletonDrawable != nullptr)
+							{
+								spineManager_.SetAnimationByName(entity, animations[n]->name);
+							}
+						};
+						if (isSelected)
+							ImGui::SetItemDefaultFocus();   // Set the initial focus when opening the combo (scrolling + for keyboard navigation support in the upcoming navigation branch)
+					}
+					ImGui::EndCombo();
+				}
+				//Show skin Name
+				auto skins = spineDrawable.skeletonData->skins;
+				static int currentSkinIndex = 0;
+				if (currentSkinIndex >= spineDrawable.skeletonData->skinsCount)
+				{
+					currentSkinIndex = 0;
+				}
+				const char* currentSkin = spineDrawable.skeletonData->skins[0]->name;            // Here our selection is a single pointer stored outside the object.
+				if (ImGui::BeginCombo("Skin", currentSkin)) // The second parameter is the label previewed before opening the combo.
+				{
+					for (int n = 0; n < spineDrawable.skeletonData->skinsCount; n++)
+					{
+						const bool isSelected = (currentSkin == skins[n]->name);
+						if (ImGui::Selectable(skins[n]->name, isSelected))
+						{
+							currentSkinIndex = n;
+							if (spineDrawable.skeletonDrawable != nullptr)
+							{
+								spineManager_.SetSkinByName(entity, skins[n]->name);
+							}
+						};
+						if (isSelected)
+							ImGui::SetItemDefaultFocus();   // Set the initial focus when opening the combo (scrolling + for keyboard navigation support in the upcoming navigation branch)
+					}
+					ImGui::EndCombo();
+				}
+			}
 		}
 		if (!keepComponent)
 		{
@@ -343,7 +344,7 @@ void Inspector::ShowEntityInfo(neko::Entity entity) const
 					ImGui::EndTooltip();
 				}
 			}
-			if(dirty)
+			if (dirty)
 			{
 				bodyDefManager_.SetComponent(entity, tmpBodyDef);
 			}
@@ -377,18 +378,18 @@ void Inspector::ShowEntityInfo(neko::Entity entity) const
 				dirty = true;
 				tmpBoxColliderDef.offset = Vec2f(offset[0], offset[1]);
 			}
-			if(dirty)
+			if (dirty)
 			{
 				boxColliderDefManager_.SetComponent(entity, tmpBoxColliderDef);
 			}
 
 		}
-		if(!keepComponent)
-        {
-		    boxColliderDefManager_.DestroyComponent(entityManager_, entity);
-        }
+		if (!keepComponent)
+		{
+			boxColliderDefManager_.DestroyComponent(entityManager_, entity);
+		}
 	}
-	if (entityManager_.HasComponent(entity, neko::EntityMask(neko::NekoComponentType::CIRCLE_COLLIDER2D)))
+	if (entityManager_.HasComponent(entity, EntityMask(NekoComponentType::CIRCLE_COLLIDER2D)))
 	{
 		bool keepComponent = true;
 		if (ImGui::CollapsingHeader("Circle Collider 2D Component", &keepComponent, ImGuiTreeNodeFlags_DefaultOpen))
@@ -399,7 +400,7 @@ void Inspector::ShowEntityInfo(neko::Entity entity) const
 			auto& isSensor = tmpCircleColliderDef.fixtureDef.isSensor;
 			dirty = ImGui::Checkbox("Is Sensor", &isSensor) or dirty;
 
-			if(ImGui::InputFloat("Circle Radius", &tmpCircleColliderDef.shapeDef.m_radius))
+			if (ImGui::InputFloat("Circle Radius", &tmpCircleColliderDef.shapeDef.m_radius))
 			{
 				dirty = true;
 			}
@@ -410,15 +411,114 @@ void Inspector::ShowEntityInfo(neko::Entity entity) const
 				dirty = true;
 				tmpCircleColliderDef.shapeDef.m_p = b2Vec2(offset[0], offset[1]);
 			}
-			if(dirty)
+			if (dirty)
 			{
 				circleColliderDefManager_.SetComponent(entity, tmpCircleColliderDef);
 			}
 		}
+		if (!keepComponent)
+		{
+			circleColliderDefManager_.DestroyComponent(entityManager_, entity);
+		}
+	}
+	if (entityManager_.HasComponent(entity, EntityMask(NekoComponentType::SPINE_FOLLOW_BONE)))
+	{
+		bool keepComponent = true;
+		if (ImGui::CollapsingHeader("Spine Bone Follower Component", &keepComponent, ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			auto tmpSpineBoneFollower = spineBoneFollowerManager_.GetComponent(entity);
+			std::string entityName = "No Following Entity";
+			if (tmpSpineBoneFollower.followingEntity != INVALID_ENTITY)
+			{
+				entityName = entityNameManager_.GetComponent(tmpSpineBoneFollower.followingEntity);
+			}
+			if (ImGui::Button(entityName.c_str()))
+			{
+				ImGui::OpenPopup("Spine Entity Popup");
+			}
+
+			ImGui::SameLine();
+			ImGui::Text("Following Spine Entity");
+
+			if (ImGui::BeginPopup("Spine Entity Popup"))
+			{
+				bool dirty = false;
+				ImGui::Text("Spine Entity Browser");
+				ImGui::Separator();
+				if (ImGui::Selectable("No Entity"))
+				{
+					dirty = true;
+					tmpSpineBoneFollower.followingEntity = INVALID_ENTITY;
+				}
+				auto entities = entityManager_.FilterEntities(EntityMask(NekoComponentType::SPINE_ANIMATION));
+				for (auto spineEntity : entities)
+				{
+					auto spineEntityName = entityNameManager_.GetComponent(spineEntity);
+					if (ImGui::Selectable(spineEntityName.c_str()))
+					{
+						dirty = true;
+						tmpSpineBoneFollower.followingEntity = spineEntity;
+					}
+				}
+				ImGui::EndPopup();
+
+				if (dirty)
+				{
+					spineBoneFollowerManager_.SetComponent(entity, tmpSpineBoneFollower);
+				}
+			}
+
+			if(tmpSpineBoneFollower.followingEntity != INVALID_ENTITY)
+			{
+				std::string boneName = "No Bone";
+				if(tmpSpineBoneFollower.followingBone != nullptr)
+				{
+					boneName = tmpSpineBoneFollower.boneName;
+				}
+				if (ImGui::Button(boneName.c_str()))
+				{
+					ImGui::OpenPopup("Following Spine Bone Popup");
+				}
+				ImGui::SameLine();
+				ImGui::Text("Following Spine Bone");
+
+				if (ImGui::BeginPopup("Following Spine Bone Popup"))
+				{
+					auto& spineDrawable = spineManager_.GetComponent(tmpSpineBoneFollower.followingEntity);
+					bool dirty = false;
+					ImGui::Text("Spine Bone Browser");
+					ImGui::Separator();
+					if (ImGui::Selectable("No Bone"))
+					{
+						dirty = true;
+						tmpSpineBoneFollower.followingBone = nullptr;
+						tmpSpineBoneFollower.boneName = "";
+					}
+
+					for(int i = 0; i < spineDrawable.skeletonData->bonesCount; i++)
+					{
+						auto* tmpBoneName = spineDrawable.skeletonData->bones[i]->name;
+						if (ImGui::Selectable(tmpBoneName))
+						{
+							dirty = true;
+							tmpSpineBoneFollower.boneName = tmpBoneName;
+							tmpSpineBoneFollower.followingBone = spineDrawable.skeletonDrawable->skeleton->bones[i];
+						}
+					}
+					
+					ImGui::EndPopup();
+
+					if (dirty)
+					{
+						spineBoneFollowerManager_.SetComponent(entity, tmpSpineBoneFollower);
+					}
+				}
+			}
+		}
 		if(!keepComponent)
-        {
-		    circleColliderDefManager_.DestroyComponent(entityManager_, entity);
-        }
+		{
+			spineBoneFollowerManager_.DestroyComponent(entityManager_, entity);
+		}
 	}
 	/*if (entityManager_.HasComponent(entity, neko::EntityMask(neko::NekoComponentType::POLYGON_COLLIDER2D)))
 	{
@@ -434,16 +534,17 @@ void Inspector::ShowEntityInfo(neko::Entity entity) const
 		ImGui::OpenPopup("Component Popup");
 	const static std::map<neko::NekoComponentType, std::string> componentNameMap =
 	{
-			{neko::NekoComponentType::TRANSFORM2D,       "Transform 2D"},
-			{neko::NekoComponentType::POSITION2D,        "Position 2D"},
-			{neko::NekoComponentType::SCALE2D,            "Scale 2D"},
-			{neko::NekoComponentType::ROTATION2D,         "Angle 2D"},
-			{neko::NekoComponentType::SPRITE2D,           "Sprite 2D"},
-			{neko::NekoComponentType::BODY2D,             "Body 2D"},
-			{neko::NekoComponentType::BOX_COLLIDER2D,     "Box Collider 2D"},
-			{neko::NekoComponentType::CIRCLE_COLLIDER2D,  "Circle Collider 2D"},
+			{NekoComponentType::TRANSFORM2D,       "Transform 2D"},
+			{NekoComponentType::POSITION2D,        "Position 2D"},
+			{NekoComponentType::SCALE2D,            "Scale 2D"},
+			{NekoComponentType::ROTATION2D,         "Angle 2D"},
+			{NekoComponentType::SPRITE2D,           "Sprite 2D"},
+			{NekoComponentType::BODY2D,             "Body 2D"},
+			{NekoComponentType::BOX_COLLIDER2D,     "Box Collider 2D"},
+			{NekoComponentType::CIRCLE_COLLIDER2D,  "Circle Collider 2D"},
 			//{neko::NekoComponentType::POLYGON_COLLIDER2D, "Polygon Collider 2D"},
-			{neko::NekoComponentType::SPINE_ANIMATION,    "Spine Animation 2D"},
+			{NekoComponentType::SPINE_ANIMATION,    "Spine Animation 2D"},
+			{NekoComponentType::SPINE_FOLLOW_BONE, "Spine Bone Follower"}
 	};
 
 	ImGui::SameLine();
@@ -543,12 +644,14 @@ Inspector::Inspector(NekoEditorExport& nekoEditorExport) :
 	spriteManager_(nekoEditorExport.spriteManager),
 	textureManager_(nekoEditorExport.textureManager),
 	spineManager_(nekoEditorExport.spineManager),
+	spineBoneFollowerManager_(nekoEditorExport.spineBoneFollowerManager),
 	bodyDefManager_(nekoEditorExport.bodyDef2dManager),
 	boxColliderDefManager_(nekoEditorExport.boxColliderDefManager),
 	circleColliderDefManager_(nekoEditorExport.circleColliderDefManager),
 	polygonColliderDefManager_(nekoEditorExport.polygonColldierDefManager),
 	config_(nekoEditorExport.config),
-	editor_(nekoEditorExport.editor)
+	editor_(nekoEditorExport.editor),
+	entityNameManager_(nekoEditorExport.entityNameManager)
 {
 }
 }

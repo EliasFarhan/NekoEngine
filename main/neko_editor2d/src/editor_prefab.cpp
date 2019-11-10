@@ -238,7 +238,7 @@ sf::FloatRect EditorPrefabManager::CalculatePrefabBound()
     auto includeEntityRect = [&](neko::Entity entity)
     {
         const auto pos = unit2pixel(position2dManager_.GetComponent(entity));
-        auto transform = transformManager_.CalculateTransform(entity);
+        const auto transform = transformManager_.CalculateTransform(entity);
         if (entityManager_.HasComponent(entity, spriteEntityMask))
         {
             auto& sprite = spriteManager_.GetComponent(entity).sprite;

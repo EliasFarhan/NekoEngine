@@ -1,0 +1,78 @@
+{
+    "entities": [
+        {
+            "components": [
+                {
+                    "component": 2,
+                    "position": [
+                        5.0,
+                        5.0
+                    ]
+                },
+                {
+                    "component": 4,
+                    "scale": [
+                        1.0,
+                        1.0
+                    ]
+                },
+                {
+                    "angle": 0.0,
+                    "component": 8
+                },
+                {
+                    "atlas": "D:/Development/NekoEngine/Build/data/spine//cat_noarm.atlas.txt",
+                    "component": 256,
+                    "skeletonData": "D:/Development/NekoEngine/Build/data/spine//cat_noarm.json",
+                    "spine": "data/spine/cat_noarm.spine"
+                }
+            ],
+            "entity": 0,
+            "entityNameHash": 4832381126624565273,
+            "name": "Entity 0",
+            "parent": -1,
+            "prefab": false
+        },
+        {
+            "components": [
+                {
+                    "component": 2,
+                    "position": [
+                        -0.5732651948928833,
+                        -1.128129243850708
+                    ]
+                },
+                {
+                    "component": 4,
+                    "scale": [
+                        1.0,
+                        1.0
+                    ]
+                },
+                {
+                    "angle": 0.0,
+                    "component": 8
+                },
+                {
+                    "atlas": "D:/Development/NekoEngine/Build/data/spine//cat_arm.atlas.txt",
+                    "component": 256,
+                    "skeletonData": "D:/Development/NekoEngine/Build/data/spine//cat_arm.json",
+                    "spine": "data/spine/cat_arm.spine"
+                },
+                {
+                    "boneName": "BN_armright",
+                    "component": 16384,
+                    "followingEntity": 0
+                }
+            ],
+            "entity": 1,
+            "entityNameHash": 1563117477296825749,
+            "name": "Entity 1",
+            "parent": 0,
+            "prefab": false
+        }
+    ],
+    "sceneId": "50cf4f93-e626-0037-8e84-7824af33bc86",
+    "sceneName": "test",
+    "scenePath": "D:\\Development\\NekoEngine\\data\\scenes\\test.scene"
+}

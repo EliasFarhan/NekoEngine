@@ -120,12 +120,7 @@ void EntityManager::SetEntityName(Entity entity, const std::string& entityName)
 Entity EntityManager::FindEntityByName(const std::string& entityName)
 {
 	const auto entityHash = HashEntityName(entityName);
-	const auto index = std::find(entityHashArray_.begin(), entityHashArray_.end(), entityHash);
-	if(index != entityHashArray_.end())
-	{
-		return index - entityHashArray_.begin();
-	}
-	return INVALID_ENTITY;
+	return FindEntityByHash(entityHash);
 }
 
 EntityHash EntityManager::HashEntityName(const std::string& entityName)
@@ -187,6 +182,16 @@ bool EntityManager::IsPrefab(Entity entity) const
 EntityHash EntityManager::GetEntityNameHash(Entity entity)
 {
     return entityHashArray_[entity];
+}
+
+Entity EntityManager::FindEntityByHash(EntityHash entityHash)
+{
+	const auto index = std::find(entityHashArray_.begin(), entityHashArray_.end(), entityHash);
+	if (index != entityHashArray_.end())
+	{
+		return index - entityHashArray_.begin();
+	}
+	return INVALID_ENTITY;
 }
 
 void EntityManager::SetEntityNameHash(Entity entity, EntityHash entityHash)

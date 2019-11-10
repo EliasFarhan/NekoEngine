@@ -43,83 +43,86 @@ class Transform2dManager;
 
 struct BasicSpineDrawable : public SfmlRenderCommand
 {
-    BasicSpineDrawable();
+	BasicSpineDrawable();
 
-    virtual ~BasicSpineDrawable();
+	virtual ~BasicSpineDrawable();
 
-    Atlas* atlas = nullptr;
-    SkeletonData* skeletonData = nullptr;
-    std::shared_ptr<spine::SkeletonDrawable> skeletonDrawable = nullptr;
-    int layer = 0;
-    sf::Transform transform{};
+	Atlas* atlas = nullptr;
+	SkeletonData* skeletonData = nullptr;
+	std::shared_ptr<spine::SkeletonDrawable> skeletonDrawable = nullptr;
+	int layer = 0;
+	sf::Transform transform{};
 
-    void SetAnimationByName(std::string_view animName);
+	void SetAnimationByName(std::string_view animName);
 
-    void SetSkinByName(std::string_view skinName);
+	void SetSkinByName(std::string_view skinName);
 
-    void SetPosition(const sf::Vector2f& position);
+	void SetPosition(const sf::Vector2f& position);
 
-    sf::Vector2f GetPosition();
+	sf::Vector2f GetPosition();
 };
 
 struct SpineBoneFollower
 {
-    Entity followingEntity = INVALID_ENTITY;
-    Bone* followingBone = nullptr;
+	Entity followingEntity = INVALID_ENTITY;
+	std::string boneName = "";
+	Bone* followingBone = nullptr;
 };
 
 struct SpineDrawableInfo
 {
-    std::string spinePath = "";
-    std::string atlasPath = "";
-    std::string skeletonDataPath = "";
+	std::string spinePath = "";
+	std::string atlasPath = "";
+	std::string skeletonDataPath = "";
 };
 
 class SpineBoneFollowerManager : public ComponentManager<SpineBoneFollower, EntityMask(
-        NekoComponentType::SPINE_FOLLOW_BONE)>
+	NekoComponentType::SPINE_FOLLOW_BONE)>
 {
-
+public:
+	static sf::Transform CalculateTransformFromBone(Bone* bone);
+	void ParseComponentJson(json& componentJson, Entity entity) override;
+	json SerializeComponentJson(Entity entity) override;
 };
 
 class SpineManager : public ComponentManager<BasicSpineDrawable, EntityMask(NekoComponentType::SPINE_ANIMATION)>
 {
 public:
-    SpineManager();
+	SpineManager();
 
-    void Update(EntityManager& entityManager, float dt);
+	void Update(EntityManager& entityManager, float dt);
 
-    bool AddSpineDrawable(Entity entity,
-                          const std::string_view atlasFilename,
-                          const std::string_view skeletonFilename);
+	bool AddSpineDrawable(Entity entity,
+		const std::string_view atlasFilename,
+		const std::string_view skeletonFilename);
 
-    void ParseComponentJson(json& componentJson, Entity entity) override;
+	void ParseComponentJson(json& componentJson, Entity entity) override;
 
-    void CopyAllTransforms(EntityManager& entityManager, Transform2dManager& transformManager);
+	void CopyAllTransforms(EntityManager& entityManager, Transform2dManager& transformManager);
 
-    void CopyAllTransformPositions(EntityManager& entityManager, Position2dManager& position2Manager);
+	void CopyAllTransformPositions(EntityManager& entityManager, Position2dManager& position2Manager);
 
-    void CopyAllTransformScales(EntityManager& entityManager, Scale2dManager& scale2DManager);
+	void CopyAllTransformScales(EntityManager& entityManager, Scale2dManager& scale2DManager);
 
-    void CopyAllTransformAngles(EntityManager& entityManager, Rotation2dManager& angle2DManager);
+	void CopyAllTransformAngles(EntityManager& entityManager, Rotation2dManager& angle2DManager);
 
-    void PushAllCommands(EntityManager& entityManager, GraphicsManager& graphicsManager);
+	void PushAllCommands(EntityManager& entityManager, GraphicsManager& graphicsManager);
 
-    void CopyLayer(int layer, size_t start, size_t length);
+	void CopyLayer(int layer, size_t start, size_t length);
 
-    Index AddComponent(EntityManager& entityManager, Entity entity) override;
+	Index AddComponent(EntityManager& entityManager, Entity entity) override;
 
-    json SerializeComponentJson(Entity entity) override;
+	json SerializeComponentJson(Entity entity) override;
 
-    SpineDrawableInfo& GetInfo(Entity entity);
+	SpineDrawableInfo& GetInfo(Entity entity);
 
-    void DestroyComponent(EntityManager& entityManager, Entity entity) override;
+	void DestroyComponent(EntityManager& entityManager, Entity entity) override;
 
-    void SetAnimationByName(Entity entity, std::string_view animName);
-    void SetSkinByName(Entity entity, std::string_view skinName);
+	void SetAnimationByName(Entity entity, std::string_view animName);
+	void SetSkinByName(Entity entity, std::string_view skinName);
 
 private:
-    SpineBoneFollowerManager spineBoneFollowerManager_;
-    std::vector<SpineDrawableInfo> infos_;
+	std::vector<SpineDrawableInfo> infos_;
 };
 
 

@@ -15,6 +15,7 @@ class Transform2dManager;
 
 class SpriteManager;
 class SpineManager;
+class SpineBoneFollowerManager;
 }
 namespace box2d
 {
@@ -34,6 +35,7 @@ struct SfmlBasicEngineExport : EngineExport
 
     SpriteManager& spriteManager;
     SpineManager& spineManager;
+	SpineBoneFollowerManager& spineBoneFollowerManager;
 };
 struct SfmlFullEngineExport : SfmlBasicEngineExport
 {

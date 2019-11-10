@@ -77,6 +77,7 @@ public:
 	void SetEntityName(Entity entity, const std::string& entityName);
 	void SetEntityNameHash(Entity entity, EntityHash entityHash);
 	EntityHash GetEntityNameHash(Entity entity);
+	Entity FindEntityByHash(EntityHash entityHash);
 	Entity FindEntityByName(const std::string& entityName);
 	static EntityHash HashEntityName(const std::string& entityName);
 private:
