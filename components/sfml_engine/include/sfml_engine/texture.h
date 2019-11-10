@@ -54,6 +54,8 @@ public:
 	const Texture* GetTexture(const TextureId textureId) const;
 	std::string GetTexturePath(TextureId textureId)const;
 	const std::unordered_map<TextureId, std::string>& GetTextureNameMap();
+	void SetTextureOrigin(TextureId textureId, Vec2f origin);
+    void SetTextureSmooth(TextureId textureId, bool isSmooth);
 private:
     static void LoadMetadata(const std::string& metadataPath, Texture& texture);
     static void CreateEmptyMetaFile(const std::string& filename);

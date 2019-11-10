@@ -88,6 +88,8 @@ public:
     void OnEvent(sf::Event& event) override;
     void OpenAsset(std::string_view assetPath);
 
+	void RemoveEditorSystem(EditorSystemId editorSystemId, bool destroy);
+	void SetCurrentEditorSystem(BasicEditorSystem* editorSystem);
 protected:
 
     static EditorSystemMode GetEditorSystemModeFrom(std::string_view extension);

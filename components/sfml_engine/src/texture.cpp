@@ -154,6 +154,16 @@ const std::unordered_map<TextureId, std::string>& TextureManager::GetTextureName
 	return textureNames_;
 }
 
+void TextureManager::SetTextureOrigin(TextureId textureId, Vec2f origin)
+{
+	textures_[textureId].origin = origin;
+}
+
+void TextureManager::SetTextureSmooth(TextureId textureId, bool isSmooth)
+{
+	textures_[textureId].texture.setSmooth(isSmooth);
+}
+
 void TextureManager::LoadMetadata(const std::string& metadataPath, Texture& texture)
 {
 	if (!FileExists(metadataPath))
@@ -175,7 +185,7 @@ void TextureManager::CreateEmptyMetaFile(const std::string& metaPath)
 
 	
 	json metaDataJson;
-	metaDataJson["origin"] = { 0,0 };
+	metaDataJson["origin"] = { 0.5f,0.5f };
 	metaDataJson["smooth"] = false;
 	const std::string metaDataStr = metaDataJson.dump(4);
 	WriteStringToFile(metaPath, metaDataStr);

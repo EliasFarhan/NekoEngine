@@ -147,14 +147,16 @@ void Inspector::ShowEntityInfo(neko::Entity entity) const
 			{
 				dirty = true;
 			}
+
+			ImGui::PopID();
 			if(dirty)
 			{
+				spriteManager_.CopyLayer(tmpSprite.layer, entity, 1);
                 if(tmpSprite.textureId != spriteManager_.GetComponent(entity).textureId)
                 {
                     spriteManager_.CopyTexture(tmpSprite.textureId, entity, 1);
                 }
 			}
-			ImGui::PopID();
 		}
 
 		if (!keepComponent)
@@ -217,7 +219,13 @@ void Inspector::ShowEntityInfo(neko::Entity entity) const
 			{
 				spineFileList.clear();
 			}
-
+			ImGui::PushID("Spine Layer");
+			int layer = spineDrawable.layer;
+			if (ImGui::InputInt("Layer", &layer, 1))
+			{
+				spineManager_.CopyLayer(layer, entity, 1);
+			}
+			ImGui::PopID();
 
 			ImGui::PushID("Load Spine Component");
 			if (ImGui::Button("Load..."))
