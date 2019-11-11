@@ -126,7 +126,7 @@ void SpriteManager::PushAllCommands(EntityManager& entityManager, GraphicsManage
     }
 }
 
-void SpriteManager::ParseComponentJson(json& componentJson, Entity entity)
+void SpriteManager::ParseComponentJson(const json& componentJson, Entity entity)
 {
     std::string textureName = componentJson["texture"];
     const auto textureId = textureManager_.LoadTexture(textureName);

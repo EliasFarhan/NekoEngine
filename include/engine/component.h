@@ -102,7 +102,7 @@ public:
     { return components_; }
 
 
-    virtual void ParseComponentJson([[maybe_unused]]json& componentJson, [[maybe_unused]]Entity entity)
+    virtual void ParseComponentJson([[maybe_unused]]const json& componentJson, [[maybe_unused]]Entity entity)
     {};
 
     virtual json SerializeComponentJson([[maybe_unused]]Entity entity)

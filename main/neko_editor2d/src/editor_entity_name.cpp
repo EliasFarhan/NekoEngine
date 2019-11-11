@@ -20,7 +20,7 @@ void EntityNameManager::SetComponent(Entity entity, const std::string& component
     ComponentManager::SetComponent(entity, component);
 }
 
-void EntityNameManager::ParseComponentJson(json& componentJson, Entity entity)
+void EntityNameManager::ParseComponentJson(const json& componentJson, Entity entity)
 {
     ComponentManager::ParseComponentJson(componentJson, entity);
 }

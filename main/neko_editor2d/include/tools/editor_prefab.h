@@ -49,16 +49,16 @@ public:
     explicit EditorPrefabManager(NekoEditorExport& editorExport);
     const std::string& GetCurrentPrefabPath() const;
     void SetCurrentPrefabPath(const std::string& currentPrefabPath);
-    neko::Index GetCurrentPrefabIndex() const;
-    void SetCurrentPrefabIndex(neko::Index currentPrefabIndex);
-    bool IsCurrentPrefabTmp();
+
+
     void SaveCurrentPrefab();
     neko::Index CreatePrefabFromEntity(neko::Entity entity);
     sf::FloatRect CalculatePrefabBound();
 protected:
     void SavePrefab(const std::string_view path);
-    std::string currentPrefabPath_ = "";
-    neko::Index currentPrefabIndex_ = neko::INVALID_INDEX;
+
+    Prefab* currentPrefab_ = nullptr;
+
     EntityManager& entityManager_;
 	sfml::Transform2dManager& transformManager_;
 	Position2dManager& position2dManager_;

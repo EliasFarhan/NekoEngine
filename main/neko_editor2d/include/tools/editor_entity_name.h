@@ -13,7 +13,7 @@ public:
 
     void SetComponent(Entity entity, const std::string& component) override;
 
-    void ParseComponentJson(json& componentJson, Entity entity) override;
+    void ParseComponentJson(const json& componentJson, Entity entity) override;
 
     json SerializeComponentJson(Entity entity) override;
 

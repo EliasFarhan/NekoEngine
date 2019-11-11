@@ -17,7 +17,7 @@ entityManager_(engineExport.entityManager)
 {
 
 }
-void SceneManager::ParseSceneJson(json& sceneJson)
+void SceneManager::ParseSceneJson(const json& sceneJson)
 {
     if (CheckJsonParameter(sceneJson, "sceneName", json::value_t::string))
     {

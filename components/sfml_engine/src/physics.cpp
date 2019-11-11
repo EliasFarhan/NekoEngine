@@ -138,7 +138,7 @@ void Body2dManager::DestroyComponent(EntityManager& entityManager, Entity entity
 	physics2dManager_.DestroyBody(components_[entity]);
 }
 
-void BodyDef2dManager::ParseComponentJson(json& componentJson, Entity entity)
+void BodyDef2dManager::ParseComponentJson(const json& componentJson, Entity entity)
 {
 	b2BodyDef bodyDef;
 	bodyDef.gravityScale = componentJson["gravityScale"];

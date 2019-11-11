@@ -81,7 +81,7 @@ class SpineBoneFollowerManager : public ComponentManager<SpineBoneFollower, Enti
 {
 public:
 	static sf::Transform CalculateTransformFromBone(Bone* bone);
-	void ParseComponentJson(json& componentJson, Entity entity) override;
+	void ParseComponentJson(const json& componentJson, Entity entity) override;
 	json SerializeComponentJson(Entity entity) override;
 };
 
@@ -96,7 +96,7 @@ public:
 		const std::string_view atlasFilename,
 		const std::string_view skeletonFilename);
 
-	void ParseComponentJson(json& componentJson, Entity entity) override;
+	void ParseComponentJson(const json& componentJson, Entity entity) override;
 
 	void CopyAllTransforms(EntityManager& entityManager, Transform2dManager& transformManager);
 

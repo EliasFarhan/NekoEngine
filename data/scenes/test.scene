@@ -29,8 +29,8 @@
                 }
             ],
             "entity": 0,
-            "entityNameHash": 15240182709961203990,
-            "name": "Entity 0",
+            "entityNameHash": 14283152187571352318,
+            "name": "PlayerCharacter",
             "parent": -1,
             "prefab": false
         },
@@ -39,8 +39,8 @@
                 {
                     "component": 2,
                     "position": [
-                        -0.5732651948928833,
-                        -1.128129243850708
+                        0.0,
+                        0.0
                     ]
                 },
                 {
@@ -60,6 +60,26 @@
                     "layer": 1,
                     "skeletonData": "data/spine//cat_arm.json",
                     "spine": "data/spine/cat_arm.spine"
+                }
+            ],
+            "entity": 1,
+            "entityNameHash": 4341688754060118016,
+            "name": "Arm",
+            "parent": 2,
+            "prefab": false
+        },
+        {
+            "components": [
+                {
+                    "component": 2,
+                    "position": [
+                        -0.5732651948928833,
+                        -1.128129243850708
+                    ]
+                },
+                {
+                    "angle": 0.0,
+                    "component": 8
                 },
                 {
                     "boneName": "BN_armright",
@@ -67,9 +87,9 @@
                     "followingEntity": 0
                 }
             ],
-            "entity": 1,
-            "entityNameHash": 2758995536328139351,
-            "name": "Entity 1",
+            "entity": 2,
+            "entityNameHash": 2156079603342440690,
+            "name": "ArmRoot",
             "parent": 0,
             "prefab": false
         }

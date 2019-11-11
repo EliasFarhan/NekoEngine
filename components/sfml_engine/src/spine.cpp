@@ -96,7 +96,7 @@ sf::Transform SpineBoneFollowerManager::CalculateTransformFromBone(Bone* bone)
 	return transform;
 }
 
-void SpineBoneFollowerManager::ParseComponentJson(json& componentJson, Entity entity)
+void SpineBoneFollowerManager::ParseComponentJson(const json& componentJson, Entity entity)
 {
 	auto& boneFollower = components_[entity];
 	boneFollower.followingEntity = componentJson["followingEntity"];
@@ -168,7 +168,7 @@ bool SpineManager::AddSpineDrawable(Entity entity,
     return true;
 }
 
-void SpineManager::ParseComponentJson(json& componentJson, Entity entity)
+void SpineManager::ParseComponentJson(const json& componentJson, Entity entity)
 {
     const std::string atlasFilename = componentJson["atlas"];
     const std::string skeletonDataFilename = componentJson["skeletonData"];

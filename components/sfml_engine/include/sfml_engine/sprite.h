@@ -68,7 +68,7 @@ public:
 
     void PushAllCommands(EntityManager& entityManager, GraphicsManager& graphicsManager);
 
-    void ParseComponentJson(json& componentJson, Entity entity) override;
+    void ParseComponentJson(const json& componentJson, Entity entity) override;
 
     json SerializeComponentJson(Entity entity) override;
 

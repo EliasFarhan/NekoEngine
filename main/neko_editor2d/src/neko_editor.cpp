@@ -29,6 +29,7 @@
 
 #include <SFML/Window/Event.hpp>
 #include <sfml_engine/anim.h>
+#include <tools/prefab_system.h>
 #include "tools/scene_system.h"
 #include "tools/texture_editor.h"
 
@@ -277,6 +278,18 @@ void NekoEditor::EditorUpdate([[maybe_unused]] float dt)
 			}
 			ImGui::EndMenu();
 		}
+		if(ImGui::BeginMenu("Assets"))
+        {
+		    if(ImGui::MenuItem("New Prefab"))
+            {
+		        auto prefabSystem = std::make_unique<EditorPrefabSystem>(*this, textureManager_);
+		        prefabSystem->Init();
+                SetCurrentEditorSystem(prefabSystem.get());
+                editorSystems_.push_back(std::move(prefabSystem));
+
+            }
+		    ImGui::EndMenu();
+        }
 		if (ImGui::BeginMenu("Windows"))
 		{
 			if (ImGui::MenuItem("Texture Window"))
@@ -554,15 +567,7 @@ void NekoEditor::EditorUpdate([[maybe_unused]] float dt)
 
 	case EditorMode::PrefabMode:
 	{
-		auto rect = prefabManager_.CalculatePrefabBound();
-		const auto screenRect = sf::FloatRect(sf::Vector2f(), sf::Vector2f(sceneRenderTexture_.getSize()));
-		const auto rectRatio = rect.width / rect.height;
-		const auto screenRatio = float(screenRect.width) / screenRect.height;
-		rect.width *= screenRatio / rectRatio;
-		const sf::View renderView(rect);
-		sceneRenderTexture_.setView(renderView);
-		RenderTarget renderTarget{ &sceneRenderTexture_ };
-		graphicsManager_.RenderAll(&renderTarget);
+
 		break;
 	}
 	case EditorMode::TextureMode:

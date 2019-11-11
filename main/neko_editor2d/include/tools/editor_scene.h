@@ -70,7 +70,7 @@ public:
 
     std::string_view GetSceneTmpPath();
 
-    void ParseEntityJson(json& entityJson) override;
+    void ParseEntityJson(const json& entityJson) override;
 protected:
 
     void SaveScene(std::string_view path);

@@ -14,9 +14,14 @@ void Inspector::ShowEntityInfo(neko::Entity entity) const
 	if (entity == neko::INVALID_ENTITY)
 		return;
 
-	//TODO Have own entity name manager
-	//ImGui::InputText("Entity Name: ", &sceneManager_.GetCurrentScene().entitiesNames[entity]);
-	ImGui::LabelText("Entity Value: ", "%u", entity);
+    {
+        std::string tmpEntityName = entityNameManager_.GetComponent(entity);
+        if(ImGui::InputText("Entity Name: ", &tmpEntityName))
+        {
+            entityNameManager_.SetComponent(entity, tmpEntityName);
+        }
+    }
+    ImGui::LabelText("Entity Value: ", "%u", entity);
 	{
 		const auto parentEntity = transformManager_.GetParentEntity(entity);
 		if (parentEntity != neko::INVALID_ENTITY)

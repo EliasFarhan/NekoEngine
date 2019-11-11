@@ -13,8 +13,8 @@ class SfmlBasicSceneManager : public SceneManager
 {
 public:
     explicit SfmlBasicSceneManager(SfmlBasicEngineExport& engineExport);
-    void ParseComponentJson(json& componentJson, Entity entity) override;
-    void ParseEntityJson(json& entityJson) override;
+    void ParseComponentJson(const json& componentJson, Entity entity) override;
+    void ParseEntityJson(const json& entityJson) override;
 
 protected:
     Position2dManager& position2dManager_;

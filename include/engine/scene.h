@@ -49,16 +49,16 @@ class SceneManager
 public:
     explicit SceneManager(EngineExport& engineExport);
 	virtual ~SceneManager() = default;
-    virtual void ParseComponentJson(json& componentJson, Entity entity) = 0;
-    virtual void ParseEntityJson(json& entityJson) = 0;
-    virtual void ParseSceneJson(json& sceneJson);
+    virtual void ParseComponentJson(const json& componentJson, Entity entity) = 0;
+    virtual void ParseEntityJson(const json& entityJson) = 0;
+    virtual void ParseSceneJson(const json& sceneJson);
 
     const Scene& GetCurrentScene() const { return currentScene_;}
     void SetCurrentScene(const Scene& currentScene);
 	static SceneId GenerateSceneId() { return sole::uuid0(); };
 	static std::string_view GetExtension();
 protected:
-    std::map<NekoComponentType, std::function<void(Entity, json&)>> componentParsingFuncMap_;
+    std::map<NekoComponentType, std::function<void(Entity, const json&)>> componentParsingFuncMap_;
     Scene currentScene_;
     EntityManager& entityManager_;
 };

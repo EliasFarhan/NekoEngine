@@ -38,22 +38,12 @@ namespace neko::editor
 
 const std::string& EditorPrefabManager::GetCurrentPrefabPath() const
 {
-    return currentPrefabPath_;
+    return currentPrefab_->prefabPath;
 }
 
 void EditorPrefabManager::SetCurrentPrefabPath(const std::string& currentPrefabPath)
 {
-    currentPrefabPath_ = currentPrefabPath;
-}
-
-neko::Index EditorPrefabManager::GetCurrentPrefabIndex() const
-{
-    return currentPrefabIndex_;
-}
-
-void EditorPrefabManager::SetCurrentPrefabIndex(neko::Index currentPrefabIndex)
-{
-    currentPrefabIndex_ = currentPrefabIndex;
+    currentPrefab_->prefabPath = currentPrefabPath;
 }
 
 void EditorPrefabManager::SavePrefab(const std::string_view path)
@@ -150,10 +140,9 @@ EditorPrefabManager::EditorPrefabManager(NekoEditorExport& editorExport) :
 
 void EditorPrefabManager::SaveCurrentPrefab()
 {
+    /*
     if (IsCurrentPrefabTmp())
     {
-        if (currentPrefabIndex_ == neko::INVALID_INDEX)
-            currentPrefabIndex_ = 0;
         const std::string prefabTmpPath = "data/.tmp" + std::to_string(currentPrefabIndex_) + ".prefab";
 
         const auto& scene = sceneManager_.GetCurrentScene();
@@ -179,13 +168,9 @@ void EditorPrefabManager::SaveCurrentPrefab()
     {
         SavePrefab(currentPrefabPath_);
     }
+     */
 }
 
-bool EditorPrefabManager::IsCurrentPrefabTmp()
-{
-    const std::string prefabTmpPath = "data/.tmp" + std::to_string(currentPrefabIndex_) + ".prefab";
-    return currentPrefabPath_.empty() or currentPrefabPath_ == prefabTmpPath;
-}
 
 sf::FloatRect EditorPrefabManager::CalculatePrefabBound()
 {

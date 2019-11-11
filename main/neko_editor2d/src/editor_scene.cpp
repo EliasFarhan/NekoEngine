@@ -240,7 +240,7 @@ std::string_view EditorSceneManager::GetSceneTmpPath()
 	return sceneTmpPath;
 }
 
-void EditorSceneManager::ParseEntityJson(json& entityJson)
+void EditorSceneManager::ParseEntityJson(const json& entityJson)
 {
 	SfmlBasicSceneManager::ParseEntityJson(entityJson);
 	Entity entity = entityJson["entity"];

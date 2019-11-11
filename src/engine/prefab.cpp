@@ -63,6 +63,11 @@ std::string_view PrefabManager::GetExtension()
     return prefabExtension;
 }
 
+const Prefab& PrefabManager::GetPrefab(PrefabId prefabId)
+{
+    return prefabMap_[prefabId];
+}
+
 Prefab::Prefab() : id(sole::uuid0())
 {
 

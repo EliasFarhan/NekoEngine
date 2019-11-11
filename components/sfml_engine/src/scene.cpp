@@ -10,48 +10,48 @@ namespace neko::sfml
 {
 SfmlBasicSceneManager::SfmlBasicSceneManager(SfmlBasicEngineExport& engineExport) :
 	SceneManager(engineExport),
-	transformManager_(engineExport.transform2dManager),
-	spineManager_(engineExport.spineManager),
-	spineBoneFollowerManager_(engineExport.spineBoneFollowerManager),
-	spriteManager_(engineExport.spriteManager),
 	position2dManager_(engineExport.position2dManager),
-	scale2dManager_(engineExport.scale2dManager),
-	rotation2dManager_(engineExport.rotation2dManager)
+	rotation2dManager_(engineExport.rotation2dManager),
+    scale2dManager_(engineExport.scale2dManager),
+    transformManager_(engineExport.transform2dManager),
+    spriteManager_(engineExport.spriteManager),
+    spineManager_(engineExport.spineManager),
+    spineBoneFollowerManager_(engineExport.spineBoneFollowerManager)
 {
 	componentParsingFuncMap_[NekoComponentType::POSITION2D] =
-		[this](Entity entity, json& componentJson)
+		[this](Entity entity, const json& componentJson)
 	{
 		auto pos = GetVectorFromJson(componentJson, "position");
 		position2dManager_.AddComponent(entityManager_, entity);
 		position2dManager_.SetComponent(entity, pos);
 	};
 	componentParsingFuncMap_[NekoComponentType::SCALE2D] =
-		[this](Entity entity, json& componentJson)
+		[this](Entity entity, const json& componentJson)
 	{
 		auto scale = neko::GetVectorFromJson(componentJson, "scale");
 		scale2dManager_.AddComponent(entityManager_, entity);
 		scale2dManager_.SetComponent(entity, scale);
 	};
 	componentParsingFuncMap_[NekoComponentType::ROTATION2D] =
-		[this](Entity entity, json& componentJson)
+		[this](Entity entity, const json& componentJson)
 	{
 		rotation2dManager_.AddComponent(entityManager_, entity);
 		rotation2dManager_.SetComponent(entity, componentJson["angle"]);
 	};
 	componentParsingFuncMap_[NekoComponentType::SPRITE2D] =
-		[this](Entity entity, json& componentJson)
+		[this](Entity entity, const json& componentJson)
 	{
 		spriteManager_.AddComponent(entityManager_, entity);
 		spriteManager_.ParseComponentJson(componentJson, entity);
 	};
 	componentParsingFuncMap_[NekoComponentType::SPINE_ANIMATION] =
-		[this](Entity entity, json& componentJson)
+		[this](Entity entity, const json& componentJson)
 	{
 		spineManager_.AddComponent(entityManager_, entity);
 		spineManager_.ParseComponentJson(componentJson, entity);
 	};
 	componentParsingFuncMap_[NekoComponentType::SPINE_FOLLOW_BONE] =
-		[this](Entity entity, json& componentJson)
+		[this](Entity entity, const json& componentJson)
 	{
 		spineBoneFollowerManager_.AddComponent(entityManager_, entity);
 		spineBoneFollowerManager_.ParseComponentJson(componentJson, entity);
@@ -82,7 +82,7 @@ SfmlBasicSceneManager::SfmlBasicSceneManager(SfmlBasicEngineExport& engineExport
 	};
 }
 
-void SfmlBasicSceneManager::ParseComponentJson(json& componentJson, neko::Entity entity)
+void SfmlBasicSceneManager::ParseComponentJson(const json& componentJson, neko::Entity entity)
 {
 	const NekoComponentType componentType = componentJson["component"];
 	const auto parsingFunc = componentParsingFuncMap_.find(componentType);
@@ -92,7 +92,7 @@ void SfmlBasicSceneManager::ParseComponentJson(json& componentJson, neko::Entity
 	}
 }
 
-void SfmlBasicSceneManager::ParseEntityJson(json& entityJson)
+void SfmlBasicSceneManager::ParseEntityJson(const json& entityJson)
 {
 	neko::Entity entity = neko::INVALID_ENTITY;
 	if (neko::CheckJsonExists(entityJson, "entity") and neko::IsJsonValueNumeric(entityJson["entity"]))

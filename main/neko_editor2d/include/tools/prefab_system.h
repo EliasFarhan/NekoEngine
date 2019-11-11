@@ -29,6 +29,7 @@ public:
 
     EditorSystemId GetEditorSystemId() const override;
 
-
+protected:
+    Prefab currentPrefab_;
 };
 }

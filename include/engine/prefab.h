@@ -40,7 +40,6 @@ const PrefabId INVALID_PREFAB_ID = sole::uuid();
 struct Prefab
 {
     Prefab();
-
     PrefabId id = INVALID_PREFAB_ID;
 	std::string prefabPath = "";
     json prefabJson{};
@@ -53,7 +52,7 @@ public:
     void InstantiatePrefab(PrefabId prefabIndex, EntityManager& entityManager);
     PrefabId LoadPrefab(std::string_view prefabPath, bool forceReload=false);
 	void ClearPrefabs();
-
+    const Prefab& GetPrefab(PrefabId prefabId);
 	static std::string_view GetExtension();
 protected:
     SceneManager& sceneManager_;
