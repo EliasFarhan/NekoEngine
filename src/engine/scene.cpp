@@ -4,6 +4,8 @@
 
 #include <engine/scene.h>
 #include <engine/engine_export.h>
+#include <utilities/file_utility.h>
+#include <engine/log.h>
 
 namespace neko
 {
@@ -25,6 +27,22 @@ void SceneManager::ParseSceneJson(json& sceneJson)
     {
         currentScene_.sceneName = "New Scene";
     }
+
+    if(CheckJsonParameter(sceneJson, "scenePath", json::value_t::string))
+    {
+        std::string scenePath = sceneJson["scenePath"];
+        if(FileExists(scenePath))
+        {
+            currentScene_.scenePath = scenePath;
+        }
+        else
+        {
+            std::ostringstream oss;
+            oss << "[Warning] Scene Path in scene: "<<currentScene_.sceneName<<" contains a bad scene path";
+            logDebug(oss.str());
+        }
+    }
+
     if(CheckJsonParameter(sceneJson, "sceneId", json::value_t::string))
     {
         SceneId sceneId = sole::rebuild(sceneJson["sceneId"]);

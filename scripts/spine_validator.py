@@ -14,9 +14,10 @@ def validate_with_atlas(file: str):
     if not os.path.exists(data_source_dir + "/" + skeleton_json_file):
         sys.stderr.write("Skeleton does not exist: "+skeleton_json_file+"\n")
         return 1
+    data_substr_index = data_binary_dir.find('data')
     spine_json = {
-        "atlas": data_binary_dir+"/"+filename,
-        "skeleton": data_binary_dir+"/"+skeleton_json_file
+        "atlas": data_binary_dir[data_substr_index:]+"/"+filename,
+        "skeleton": data_binary_dir[data_substr_index:]+"/"+skeleton_json_file
     }
 
     spine_json_txt = json.dumps(spine_json, indent=4)

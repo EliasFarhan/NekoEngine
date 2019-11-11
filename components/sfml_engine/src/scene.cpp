@@ -58,8 +58,17 @@ SfmlBasicSceneManager::SfmlBasicSceneManager(SfmlBasicEngineExport& engineExport
 		//TODO check if the hierarchy is in a prefab
 
 		//Link bone
-		const auto& spineAnimation = spineManager_.GetComponent(entity);
-		auto tmpBoneFollower = spineBoneFollowerManager_.GetComponent(entity);
+
+        auto tmpBoneFollower = spineBoneFollowerManager_.GetComponent(entity);
+		const auto& spineAnimation = spineManager_.GetComponent(tmpBoneFollower.followingEntity);
+		if(spineAnimation.skeletonDrawable == nullptr or spineAnimation.skeletonData == nullptr)
+        {
+		    std::ostringstream oss;
+		    oss << "[Error] Could not link Spine Animation from entity " << tmpBoneFollower.followingEntity<<
+		    " through Spine Bone Follower on entity "<<entity;
+		    logDebug(oss.str());
+		    return;
+        }
 		for(int i = 0; i < spineAnimation.skeletonData->bonesCount;i++)
 		{
 			if(tmpBoneFollower.boneName == spineAnimation.skeletonData->bones[i]->name)
@@ -68,7 +77,7 @@ SfmlBasicSceneManager::SfmlBasicSceneManager(SfmlBasicEngineExport& engineExport
 				break;
 			}
 		}
-		spineBoneFollowerManager_.SetComponent(tmpBoneFollower);
+		spineBoneFollowerManager_.SetComponent(entity, tmpBoneFollower);
 		
 	};
 }

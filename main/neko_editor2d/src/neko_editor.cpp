@@ -805,17 +805,18 @@ void NekoEditor::SaveAsset(const std::string_view assetPath)
 	{
 		if (currentEditorSystem->IsTmpResource() or currentEditorSystem->GetResourcePath() != assetPath)
 		{
+            std::string newResourcePath = "";
 			if (assetPath.find(SceneManager::GetExtension()) == std::string::npos)
 			{
-				std::string newResourcePath = assetPath.data();
+				newResourcePath = assetPath;
 				newResourcePath += SceneManager::GetExtension().data();
-				currentEditorSystem->SetResourcePath(newResourcePath);
-
 			}
 			else
 			{
-				currentEditorSystem->SetResourcePath(assetPath.data());
+				newResourcePath = assetPath;
 			}
+            newResourcePath = "../"+config.dataRootPath+GetRelativePath(newResourcePath, "../"+config.dataRootPath);
+            currentEditorSystem->SetResourcePath(newResourcePath);
 			auto stem = GetStem(assetPath);
 			currentEditorSystem->SetSystemName(stem);
 		}

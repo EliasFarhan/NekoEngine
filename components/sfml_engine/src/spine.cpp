@@ -179,6 +179,8 @@ void SpineManager::ParseComponentJson(json& componentJson, Entity entity)
 	spineInfo.atlasPath = atlasFilename;
 	spineInfo.skeletonDataPath = skeletonDataFilename;
 	spineInfo.spinePath = spineFilename;
+
+	CopyLayer(componentJson["layer"], entity, 1);
 	
 }
 
@@ -260,6 +262,7 @@ json SpineManager::SerializeComponentJson(Entity entity)
     componentJson["atlas"] = componentInfo.atlasPath;
     componentJson["skeletonData"] = componentInfo.skeletonDataPath;
 	componentJson["spine"] = componentInfo.spinePath;
+	componentJson["layer"] = components_[entity].layer;
     return componentJson;
 }
 

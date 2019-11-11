@@ -199,4 +199,10 @@ std::string GetStem(const std::string_view path)
 	const fs::path p = path;
 	return p.stem().string();
 }
+
+std::string GetRelativePath(const std::string_view path, const std::string_view relative)
+{
+    const fs::path p = path;
+    return fs::relative(p, relative).string();
+}
 }

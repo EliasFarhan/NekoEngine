@@ -84,6 +84,7 @@ void EditorSceneSystem::OpenScene(const std::string_view scenePath)
 {
     auto sceneJson = LoadJson(scenePath);
     sceneManager_.ParseSceneJson(sceneJson);
+    resourcePath_ = sceneManager_.GetCurrentScene().scenePath;
 }
 
 EditorSystemId EditorSceneSystem::GetEditorSystemId() const

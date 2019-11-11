@@ -21,14 +21,15 @@
                     "component": 8
                 },
                 {
-                    "atlas": "D:/Development/NekoEngine/Build/data/spine//cat_noarm.atlas.txt",
+                    "atlas": "data/spine/cat_noarm.atlas.txt",
                     "component": 256,
-                    "skeletonData": "D:/Development/NekoEngine/Build/data/spine//cat_noarm.json",
+                    "layer": 0,
+                    "skeletonData": "data/spine/cat_noarm.json",
                     "spine": "data/spine/cat_noarm.spine"
                 }
             ],
             "entity": 0,
-            "entityNameHash": 4832381126624565273,
+            "entityNameHash": 15240182709961203990,
             "name": "Entity 0",
             "parent": -1,
             "prefab": false
@@ -54,9 +55,10 @@
                     "component": 8
                 },
                 {
-                    "atlas": "D:/Development/NekoEngine/Build/data/spine//cat_arm.atlas.txt",
+                    "atlas": "data/spine//cat_arm.atlas.txt",
                     "component": 256,
-                    "skeletonData": "D:/Development/NekoEngine/Build/data/spine//cat_arm.json",
+                    "layer": 1,
+                    "skeletonData": "data/spine//cat_arm.json",
                     "spine": "data/spine/cat_arm.spine"
                 },
                 {
@@ -66,7 +68,7 @@
                 }
             ],
             "entity": 1,
-            "entityNameHash": 1563117477296825749,
+            "entityNameHash": 2758995536328139351,
             "name": "Entity 1",
             "parent": 0,
             "prefab": false
@@ -74,5 +76,5 @@
     ],
     "sceneId": "50cf4f93-e626-0037-8e84-7824af33bc86",
     "sceneName": "test",
-    "scenePath": "D:\\Development\\NekoEngine\\data\\scenes\\test.scene"
+    "scenePath": "../data/scenes/test.scene"
 }
