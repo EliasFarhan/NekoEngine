@@ -52,7 +52,7 @@ void NekoEditor::Init()
 			{
 				textureManager_.LoadTexture(path.data());
 			}
-			if (neko::GetFilenameExtension(path) == ".prefab")
+			if (neko::GetFilenameExtension(path) == PrefabManager::GetExtension())
 			{
 				//TODO have own prefabmanager for all
 				//prefabManager_.LoadPrefab(path, false);
@@ -278,18 +278,18 @@ void NekoEditor::EditorUpdate([[maybe_unused]] float dt)
 			}
 			ImGui::EndMenu();
 		}
-		if(ImGui::BeginMenu("Assets"))
-        {
-		    if(ImGui::MenuItem("New Prefab"))
-            {
-		        auto prefabSystem = std::make_unique<EditorPrefabSystem>(*this, textureManager_);
-		        prefabSystem->Init();
-                SetCurrentEditorSystem(prefabSystem.get());
-                editorSystems_.push_back(std::move(prefabSystem));
+		if (ImGui::BeginMenu("Assets"))
+		{
+			if (ImGui::MenuItem("New Prefab"))
+			{
+				auto prefabSystem = std::make_unique<EditorPrefabSystem>(*this, textureManager_);
+				prefabSystem->Init();
+				SetCurrentEditorSystem(prefabSystem.get());
+				editorSystems_.push_back(std::move(prefabSystem));
 
-            }
-		    ImGui::EndMenu();
-        }
+			}
+			ImGui::EndMenu();
+		}
 		if (ImGui::BeginMenu("Windows"))
 		{
 			if (ImGui::MenuItem("Texture Window"))
@@ -308,9 +308,9 @@ void NekoEditor::EditorUpdate([[maybe_unused]] float dt)
 
 	if (ImGui::BeginTabBar("Central Tab"))
 	{
-		for (Index i = 0; i < editorSystems_.size(); i++)
+		for (auto& basicEditorSystem : editorSystems_)
 		{
-			auto* editorSystem = editorSystems_[i].get();
+			auto* editorSystem = basicEditorSystem.get();
 			ImGui::PushID(editorSystem->GetEditorSystemId());
 			//Show main view tabs
 			if (ImGui::BeginTabItem(editorSystem->GetSystemName().c_str(), nullptr,
@@ -386,6 +386,7 @@ void NekoEditor::EditorUpdate([[maybe_unused]] float dt)
 			logDebug("[Warning] Opening file operation was canceled");
 			fileDialog_.ClearSelected();
 			fileDialog_.Close();
+			currentFileOperation_ = FileOperation::NONE;
 		}
 		break;
 	}
@@ -698,8 +699,7 @@ void NekoEditor::OpenAsset(const std::string_view assetPath)
 			const auto editorSystemIt = editorSystemMap_.find(editorSystemId);
 			if (editorSystemIt != editorSystemMap_.end())
 			{
-				currentEditorSystemId_ = editorSystemId;
-				currentEditorMode_ = editorSystemIt->second->GetEditorMode();
+				SetCurrentEditorSystem(editorSystemIt->second);
 				return;
 			}
 		}
@@ -708,6 +708,30 @@ void NekoEditor::OpenAsset(const std::string_view assetPath)
 		newSceneSystem->Init();
 
 		newSceneSystem->OpenScene(assetPath);
+		SetCurrentEditorSystem(newSceneSystem.get());
+		editorSystems_.push_back(std::move(newSceneSystem));
+		break;
+	}
+	case EditorSystemMode::PrefabMode:
+	{
+		//Check if there is no other prefab scene system open
+		json prefabJson = LoadJson(assetPath);
+		if (CheckJsonParameter(prefabJson, "prefabId", json::value_t::string))
+		{
+			const PrefabId prefabId = sole::rebuild(prefabJson["prefabId"]);
+			const EditorSystemId editorSystemId = EditorSceneSystem::GenerateEditorSystemIdFrom(prefabId);
+			const auto editorSystemIt = editorSystemMap_.find(editorSystemId);
+			if (editorSystemIt != editorSystemMap_.end())
+			{
+				SetCurrentEditorSystem(editorSystemIt->second);
+				return;
+			}
+		}
+		//Open prefab scene in a new prefab system
+		auto newSceneSystem = std::make_unique<EditorPrefabSystem>(*this, textureManager_);
+		std::string resourcePath = MakeGeneric(assetPath);
+		newSceneSystem->SetResourcePath(resourcePath);
+		newSceneSystem->Init();
 		SetCurrentEditorSystem(newSceneSystem.get());
 		editorSystems_.push_back(std::move(newSceneSystem));
 		break;
@@ -722,7 +746,7 @@ void NekoEditor::OpenAsset(const std::string_view assetPath)
 		const auto textureId = textureManager_.LoadTexture(texturePath);
 		//Check if texture is already open in another tab
 		{
-			auto editorSystem = std::find_if(editorSystems_.begin(), editorSystems_.end(),
+			const auto editorSystem = std::find_if(editorSystems_.begin(), editorSystems_.end(),
 				[](const std::unique_ptr<BasicEditorSystem>& editorSystem)
 				{
 					return editorSystem->GetEditorMode() == EditorSystemMode::TextureMode;
@@ -804,28 +828,34 @@ BasicEditorSystem* NekoEditor::GetCurrentEditorSystem()
 void NekoEditor::SaveAsset(const std::string_view assetPath)
 {
 	auto* currentEditorSystem = GetCurrentEditorSystem();
+	const auto updateEditorName = [this, currentEditorSystem, &assetPath](std::string_view extension)
+	{
+		if (currentEditorSystem->IsTmpResource() or currentEditorSystem->GetResourcePath() != assetPath)
+		{
+			std::string newResourcePath = assetPath.data();
+			if (assetPath.find(extension) == std::string::npos)
+			{
+				newResourcePath += extension.data();
+			}
+			newResourcePath = MakeGeneric(newResourcePath);
+			newResourcePath = "../" + config.dataRootPath + GetRelativePath(newResourcePath, "../" + config.dataRootPath);
+			currentEditorSystem->SetResourcePath(newResourcePath);
+			const auto stem = GetStem(assetPath);
+			currentEditorSystem->SetSystemName(stem);
+		}
+	};
 	switch (currentEditorMode_)
 	{
 	case EditorSystemMode::SceneMode:
 	{
-		if (currentEditorSystem->IsTmpResource() or currentEditorSystem->GetResourcePath() != assetPath)
-		{
-            std::string newResourcePath = "";
-			if (assetPath.find(SceneManager::GetExtension()) == std::string::npos)
-			{
-				newResourcePath = assetPath;
-				newResourcePath += SceneManager::GetExtension().data();
-			}
-			else
-			{
-				newResourcePath = assetPath;
-			}
-            newResourcePath = "../"+config.dataRootPath+GetRelativePath(newResourcePath, "../"+config.dataRootPath);
-            currentEditorSystem->SetResourcePath(newResourcePath);
-			auto stem = GetStem(assetPath);
-			currentEditorSystem->SetSystemName(stem);
-		}
+		updateEditorName(SceneManager::GetExtension());
+		currentEditorSystem->OnSave();
+		break;
+	}
 
+	case EditorSystemMode::PrefabMode:
+	{
+		updateEditorName(PrefabManager::GetExtension());
 		currentEditorSystem->OnSave();
 		break;
 	}
@@ -858,7 +888,6 @@ void NekoEditor::Save(bool saveAs)
 		{
 			currentEditorSystem->OnSave();
 		}
-
 	}
 	else
 	{

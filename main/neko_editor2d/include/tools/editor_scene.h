@@ -25,7 +25,6 @@
  */
 #include <engine/scene.h>
 #include <engine/component.h>
-#include <sfml_engine/transform.h>
 #include <sfml_engine/scene.h>
 
 namespace neko

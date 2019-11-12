@@ -7,16 +7,18 @@ namespace neko::editor
 
 void EditorPrefabSystem::Init()
 {
+	editorMode_ = EditorSystemMode::PrefabMode;
     if (!resourcePath_.empty())
     {
         const auto prefabId = prefabManager_.LoadPrefab(resourcePath_);
-        const auto& prefab = prefabManager_.GetPrefab(neko::PrefabId());
+        const auto& prefab = prefabManager_.GetPrefab(prefabId);
         sceneManager_.ParseSceneJson(prefab.prefabJson);
-
-        currentPrefab_ = prefabManager_.GetPrefab(prefabId);
+		prefabManager_.SetCurrentPrefab(prefab);
     }
     else
     {
+	    const Prefab prefab;
+		prefabManager_.SetCurrentPrefab(prefab);
         entityManager_.CreateEntity();
         entityNameManager_.SetComponent(0, "Root Entity");
 
@@ -61,13 +63,24 @@ void EditorPrefabSystem::OnInspectorView()
 
 void EditorPrefabSystem::OnSave()
 {
+	prefabManager_.SaveCurrentPrefab();
+	auto& currentPrefab = prefabManager_.GetCurrentPrefab();
+	prefabManager_.LoadPrefab(currentPrefab.prefabPath);
+}
 
+void EditorPrefabSystem::SetResourcePath(const std::string& resourcePath)
+{
+	BasicEditorSystem::SetResourcePath(resourcePath);
+	auto currentPrefab = prefabManager_.GetCurrentPrefab();
+	currentPrefab.prefabPath = resourcePath_;
+	prefabManager_.SetCurrentPrefab(currentPrefab);
 }
 
 EditorSystemId EditorPrefabSystem::GetEditorSystemId() const
 {
+	auto& currentPrefab = prefabManager_.GetCurrentPrefab();
     xxh::hash_state64_t prefabIdHashStream(0);
-    prefabIdHashStream.update(currentPrefab_.id.str());
+    prefabIdHashStream.update(currentPrefab.id.str());
     return prefabIdHashStream.digest();
 }
 }

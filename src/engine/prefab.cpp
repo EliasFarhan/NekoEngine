@@ -10,39 +10,31 @@ PrefabManager::PrefabManager(SceneManager& sceneManager) : sceneManager_(sceneMa
 
 }
 
-PrefabId PrefabManager::LoadPrefab(std::string_view prefabPath, bool forceReload)
+PrefabId PrefabManager::LoadPrefab(const std::string_view prefabPath, bool forceReload)
 {
-	/*
-    const auto prefabIt = std::find(prefabPaths_.begin(), prefabPaths_.end(), prefabPath);
-    if (prefabIt != prefabPaths_.end())
-    {
-        const auto prefabIndex = Index(prefabIt - prefabPaths_.begin());
-        if (forceReload)
-        {
-            const auto prefabFileJson = LoadJson(prefabPath.data());
-            prefabJsons_[prefabIndex] = prefabFileJson;
-        }
-        return prefabIndex;
-    }
-    else
-    {
-        const auto prefabFileJson = LoadJson(prefabPath.data());
-        prefabJsons_.push_back(prefabFileJson);
-        prefabPaths_.push_back(prefabPath.data());
-        return Index(prefabJsons_.size() - 1);
-    }*/
-	return INVALID_PREFAB_ID;
+	for(auto& prefabPair : prefabMap_)
+	{
+		if(prefabPair.second.prefabPath == prefabPath)
+		{
+			if(forceReload)
+			{
+				prefabPair.second.prefabJson = LoadJson(prefabPath);
+			}
+			return prefabPair.first;
+		}
+	}
+	Prefab newPrefab;
+	newPrefab.prefabPath = prefabPath;
+	newPrefab.prefabJson = LoadJson(prefabPath);
+	prefabMap_[newPrefab.id] = newPrefab;
+	return newPrefab.id;
 }
 
-void PrefabManager::ClearPrefabs()
-{
-	prefabMap_.clear();
-}
 
 
 void PrefabManager::InstantiatePrefab(PrefabId prefabIndex, EntityManager& entityManager)
 {
-    /*auto prefabJson = prefabJsons_[prefabIndex];
+    auto prefabJson = prefabMap_[prefabIndex].prefabJson;
     const auto entityBase = entityManager.GetLastEntity() + 1;
     for (auto& entityJson: prefabJson["entities"])
     {
@@ -53,9 +45,23 @@ void PrefabManager::InstantiatePrefab(PrefabId prefabIndex, EntityManager& entit
         {
             entityJson["parent"] = Entity(parent) + entityBase;
         }
+    	//Correct spine bone follower entity number
+    	for(auto& componentJson : entityJson["components"])
+    	{
+	        const NekoComponentType componentType = componentJson["component"];
+			if (componentType == NekoComponentType::SPINE_FOLLOW_BONE)
+			{
+				Entity followingEntity = componentJson["followingEntity"];
+				if (followingEntity != INVALID_ENTITY)
+				{
+					followingEntity += entityBase;
+					componentJson["followingEntity"] = followingEntity;
+				}
+			}
+    	}
         sceneManager_.ParseEntityJson(entityJson);
     }
-	*/
+	
 }
 
 std::string_view PrefabManager::GetExtension()

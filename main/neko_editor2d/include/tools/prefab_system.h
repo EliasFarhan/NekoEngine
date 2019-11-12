@@ -1,8 +1,5 @@
 #pragma once
 
-#include <engine/system.h>
-#include <SFML/Graphics/RenderTexture.hpp>
-#include "engine_export.h"
 #include <tools/neko_editor.h>
 
 namespace neko::editor
@@ -27,9 +24,9 @@ public:
 
     void OnSave() override;
 
+	void SetResourcePath(const std::string& resourcePath) override;
+
     EditorSystemId GetEditorSystemId() const override;
 
-protected:
-    Prefab currentPrefab_;
 };
 }

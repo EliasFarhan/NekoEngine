@@ -1,63 +1,46 @@
 {
     "entities": [
         {
-            "components": [
-                {
-                    "component": 2,
-                    "position": [
-                        3.0,
-                        2.0
-                    ]
-                },
-                {
-                    "component": 4,
-                    "scale": [
-                        1.0,
-                        1.0
-                    ]
-                },
-                {
-                    "angle": 0.0,
-                    "component": 8
-                },
-                {
-                    "component": 128,
-                    "layer": 1,
-                    "origin": [
-                        0.5,
-                        0.5
-                    ],
-                    "texture": "data/sprites/hero/jump/hero1.png"
-                }
-            ],
+            "components": [],
             "entity": 0,
-            "name": "Player",
-            "parent": -1
+            "entityNameHash": 3296564462534507534,
+            "name": "Root Entity",
+            "parent": -1,
+            "prefab": false
         },
         {
-            "components": [
-                {
-                    "component": 2,
-                    "position": [
-                        0.0,
-                        0.14000000059604645
-                    ]
-                },
-                {
-                    "component": 4,
-                    "scale": [
-                        1.0,
-                        1.0
-                    ]
-                },
-                {
-                    "angle": 0.0,
-                    "component": 8
-                }
-            ],
+            "components": [],
+            "entity": 1,
+            "entityNameHash": 1563117477296825749,
+            "name": "Entity 1",
+            "parent": 0,
+            "prefab": false
+        },
+        {
+            "components": [],
+            "entity": 2,
+            "entityNameHash": 17141586233174215234,
+            "name": "Entity 2",
+            "parent": 0,
+            "prefab": false
+        },
+        {
+            "components": [],
+            "entity": 3,
+            "entityNameHash": 2041357330513233900,
+            "name": "Entity 3",
+            "parent": 0,
+            "prefab": false
+        },
+        {
+            "components": [],
             "entity": 4,
-            "name": "Foot",
-            "parent": 0
+            "entityNameHash": 13986254380971118585,
+            "name": "Entity 4",
+            "parent": 0,
+            "prefab": false
         }
-    ]
+    ],
+    "prefabId": "a98356cb-e774-0037-9180-00ffb6ae1bec",
+    "sceneId": "00000000-0000-0000-0000-000000000000"
 }

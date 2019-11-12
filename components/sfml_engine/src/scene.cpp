@@ -58,7 +58,6 @@ SfmlBasicSceneManager::SfmlBasicSceneManager(SfmlBasicEngineExport& engineExport
 		//TODO check if the hierarchy is in a prefab
 
 		//Link bone
-
         auto tmpBoneFollower = spineBoneFollowerManager_.GetComponent(entity);
 		const auto& spineAnimation = spineManager_.GetComponent(tmpBoneFollower.followingEntity);
 		if(spineAnimation.skeletonDrawable == nullptr or spineAnimation.skeletonData == nullptr)

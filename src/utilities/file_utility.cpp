@@ -143,19 +143,8 @@ const std::string LoadFile(const std::string& path)
 
 std::string GetFilenameExtension(const std::string_view path)
 {
-    std::string extension = "";
-    const auto folderLastIndex = path.find_last_of('/');
-    const auto filename = path.substr(folderLastIndex + 1, path.size());
-    const auto filenameExtensionIndex = filename.find_last_of('.');
-    if (filenameExtensionIndex > path.size())
-    {
-        std::ostringstream oss;
-        oss << "[Error] Path: " << path << " has not a correct extension";
-        logDebug(oss.str());
-        return extension;
-    }
-    extension = filename.substr(filenameExtensionIndex);
-    return extension;
+	const fs::path p = path;
+    return p.extension().string();
 }
 
 std::string GetFileParentPath(const std::string_view path)
@@ -163,22 +152,24 @@ std::string GetFileParentPath(const std::string_view path)
 #ifdef __APPLE__
     fs::path p = std::string(path);
 #else
-    fs::path p = path;
+    fs::path p = fs::path(path, fs::path::generic_format);
 #endif
     return p.parent_path().string();
 }
 
 std::string LinkFolderAndFile(const std::string_view folderPath, const std::string_view filePath)
 {
+	
 #ifdef __APPLE__
     fs::path f = std::string(folderPath);
     fs::path p = std::string(filePath);
 #else
-    fs::path f = folderPath;
-    fs::path p = filePath;
+	const fs::path f = fs::path(folderPath);
+	const fs::path p = fs::path(filePath);
 #endif
-    fs::path l = f / p;
-    return l.string();
+	const fs::path l = f / p;
+	
+    return MakeGeneric(l.string());
 }
 
 void WriteStringToFile(const std::string& path, const std::string_view content)
@@ -200,9 +191,18 @@ std::string GetStem(const std::string_view path)
 	return p.stem().string();
 }
 
+std::string MakeGeneric(const std::string_view path)
+{
+	std::string p = path.data();
+	std::replace_if(p.begin(), p.end(), 
+		[](char separator) {return separator == '\\'; }, '/');
+	return p;
+}
+
 std::string GetRelativePath(const std::string_view path, const std::string_view relative)
 {
-    const fs::path p = path;
-    return fs::relative(p, relative).string();
+    fs::path p = fs::path(path);
+	logDebug(std::string("Relative path from: ") + path.data() + " to: " + relative.data());
+    return MakeGeneric(fs::relative(p, relative).string());
 }
 }

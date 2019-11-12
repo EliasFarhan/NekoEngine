@@ -25,7 +25,6 @@
  */
 #include <engine/engine.h>
 #include <engine/transform.h>
-#include <engine/scene.h>
 #include "entity_viewer.h"
 #include "scene_viewer.h"
 #include "inspector.h"
@@ -34,12 +33,10 @@
 #include "previewer.h"
 #include "physics_editor.h"
 #include "editor_prefab.h"
-
-#include <imgui.h>
+#include "imgui.h"
 #include "imfilebrowser.h"
 #include "sfml_engine/sprite.h"
 #include "sfml_engine/texture.h"
-#include <engine/prefab.h>
 #include "sfml_engine/engine.h"
 #include "tools/engine_export.h"
 #include "tools/editor_entity_name.h"
@@ -136,7 +133,7 @@ public:
     virtual EditorSystemId GetEditorSystemId() const = 0;
 
     const std::string& GetResourcePath() const;
-    void SetResourcePath(const std::string& resourcePath);
+    virtual void SetResourcePath(const std::string& resourcePath);
     bool IsTmpResource() const;
 protected:
     std::string resourcePath_;

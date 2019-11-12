@@ -43,22 +43,19 @@ class CircleColliderDefManager;
 class BoxColliderDefManager;
 struct NekoEditorExport;
 
-class EditorPrefabManager : public neko::PrefabManager
+class EditorPrefabManager : public PrefabManager
 {
 public:
     explicit EditorPrefabManager(NekoEditorExport& editorExport);
-    const std::string& GetCurrentPrefabPath() const;
-    void SetCurrentPrefabPath(const std::string& currentPrefabPath);
-
-
-    void SaveCurrentPrefab();
+	void SetCurrentPrefab(const Prefab& prefab);
+    const Prefab& GetCurrentPrefab() const;
+    void SaveCurrentPrefab() const;
     neko::Index CreatePrefabFromEntity(neko::Entity entity);
     sf::FloatRect CalculatePrefabBound();
 protected:
-    void SavePrefab(const std::string_view path);
 
-    Prefab* currentPrefab_ = nullptr;
-
+	PrefabId currentPrefabId_ = INVALID_PREFAB_ID;
+	
     EntityManager& entityManager_;
 	sfml::Transform2dManager& transformManager_;
 	Position2dManager& position2dManager_;
@@ -67,6 +64,8 @@ protected:
 	BoxColliderDefManager& boxColliderDefManager_;
 	CircleColliderDefManager& circleColliderDefManager_;
 	sfml::SpineManager& spineManager_;
+
+	EditorSceneManager& editorSceneManager_;
 };
 
 
