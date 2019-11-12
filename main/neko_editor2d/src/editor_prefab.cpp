@@ -242,4 +242,8 @@ sf::FloatRect EditorPrefabManager::CalculatePrefabBound()
 
 }
 
+bool EditorPrefabManager::IsCurrentPrefabValid() const
+{
+	return currentPrefabId_ != INVALID_PREFAB_ID;
+}
 }

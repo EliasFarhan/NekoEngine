@@ -9,7 +9,32 @@
             "prefab": false
         },
         {
-            "components": [],
+            "components": [
+                {
+                    "component": 2,
+                    "position": [
+                        3.0,
+                        3.0
+                    ]
+                },
+                {
+                    "component": 4,
+                    "scale": [
+                        1.0,
+                        1.0
+                    ]
+                },
+                {
+                    "angle": 0.0,
+                    "component": 8
+                },
+                {
+                    "component": 128,
+                    "layer": 0,
+                    "texture": "data/spine/cat_noarm.png",
+                    "textureId": 5518045945526255673
+                }
+            ],
             "entity": 1,
             "entityNameHash": 1563117477296825749,
             "name": "Entity 1",
@@ -41,6 +66,6 @@
             "prefab": false
         }
     ],
-    "prefabId": "a98356cb-e774-0037-9180-00ffb6ae1bec",
+    "prefabId": "edead27f-e77f-0037-7c80-00ffb6ae1bec",
     "sceneId": "00000000-0000-0000-0000-000000000000"
 }

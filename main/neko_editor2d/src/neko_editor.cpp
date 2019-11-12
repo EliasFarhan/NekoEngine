@@ -728,12 +728,12 @@ void NekoEditor::OpenAsset(const std::string_view assetPath)
 			}
 		}
 		//Open prefab scene in a new prefab system
-		auto newSceneSystem = std::make_unique<EditorPrefabSystem>(*this, textureManager_);
+		auto newPrefabSystem = std::make_unique<EditorPrefabSystem>(*this, textureManager_);
 		std::string resourcePath = MakeGeneric(assetPath);
-		newSceneSystem->SetResourcePath(resourcePath);
-		newSceneSystem->Init();
-		SetCurrentEditorSystem(newSceneSystem.get());
-		editorSystems_.push_back(std::move(newSceneSystem));
+		newPrefabSystem->SetResourcePath(resourcePath);
+		newPrefabSystem->Init();
+		SetCurrentEditorSystem(newPrefabSystem.get());
+		editorSystems_.push_back(std::move(newPrefabSystem));
 		break;
 	}
 	case EditorSystemMode::TextureMode:

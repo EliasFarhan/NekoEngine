@@ -52,6 +52,7 @@ public:
     void SaveCurrentPrefab() const;
     neko::Index CreatePrefabFromEntity(neko::Entity entity);
     sf::FloatRect CalculatePrefabBound();
+    bool IsCurrentPrefabValid() const;;
 protected:
 
 	PrefabId currentPrefabId_ = INVALID_PREFAB_ID;
