@@ -21,8 +21,8 @@ void EditorPrefabSystem::Init()
 		prefabManager_.SetCurrentPrefab(prefab);
 		entityManager_.CreateEntity();
 		entityNameManager_.SetComponent(0, "Root Entity");
-
 	}
+	screenRenderTexture_.create(config_.gameWindowSize.first, config_.gameWindowSize.second);
 }
 
 void EditorPrefabSystem::Update(float dt)
@@ -40,6 +40,7 @@ void EditorPrefabSystem::Update(float dt)
 	colliderManagerDefManager_.PushAllCommands(graphicsManager_);
 
 	auto rect = prefabManager_.CalculatePrefabBound();
+
 	const auto screenRect = sf::FloatRect(sf::Vector2f(), sf::Vector2f(screenRenderTexture_.getSize()));
 	const auto rectRatio = rect.width / rect.height;
 	const auto screenRatio = float(screenRect.width) / screenRect.height;

@@ -70,64 +70,6 @@ void NekoEditor::Destroy()
 	SfmlBasicEngine::Destroy();
 }
 
-
-/*
-void NekoEditor::SwitchEditorMode(EditorMode editorMode)
-{
-	if (editorMode == editorMode_)
-	{
-		return;
-	}
-	switch (editorMode)
-	{
-	case EditorMode::SceneMode:
-	{
-		if (editorMode_ == EditorMode::PrefabMode)
-		{
-			prefabManager_.SaveCurrentPrefab();
-		}
-		entityViewer_.Reset();
-
-		sceneManager_.ClearScene();
-		auto& scenePathName = sceneManager_.GetCurrentScene().scenePath;
-		if (!scenePathName.empty())
-			sceneManager_.LoadScene(scenePathName);
-		editorMode_ = EditorMode::SceneMode;
-
-		break;
-	}
-	case EditorMode::PrefabMode:
-	{
-		if (editorMode_ == EditorMode::SceneMode)
-		{
-			sceneManager_.SaveCurrentScene();
-		}
-		entityViewer_.Reset();
-		sceneManager_.ClearScene();
-		editorMode_ = EditorMode::PrefabMode;
-		if (prefabManager_.GetCurrentPrefabIndex() != neko::INVALID_INDEX)
-		{
-			const auto prefabIndex = prefabManager_.LoadPrefab(prefabManager_.GetCurrentPrefabPath(), true);
-			prefabManager_.InstantiatePrefab(prefabIndex, entityManager_);
-		}
-		else
-		{
-			const auto rootEntity = entityManager_.CreateEntity();
-			auto& entitiesName = sceneManager_.GetCurrentScene().entitiesNames;
-			ResizeIfNecessary(entitiesName, rootEntity, std::string());
-			entitiesName[rootEntity] = "Root Entity";
-
-		}
-		break;
-	}
-	case EditorMode::TextureMode:
-		break;
-	case EditorMode::AnimMode:
-		break;
-	}
-}
-*/
-
 void NekoEditor::OnEvent(sf::Event& event)
 {
 	SfmlBasicEngine::OnEvent(event);
@@ -164,67 +106,6 @@ void NekoEditor::OnEvent(sf::Event& event)
 	}
 
 }
-
-/*
-case sf::Keyboard::N:
-{
-	sceneManager_.ClearScene();
-	const auto rootEntity = entityManager_.CreateEntity();
-	auto& entitiesName = sceneManager_.GetCurrentScene().entitiesNames;
-	ResizeIfNecessary(entitiesName, rootEntity, std::string());
-	entitiesName[rootEntity] = "Root Entity";
-	break;
-}
-case sf::Keyboard::O:
-{
-	fileOperationStatus_ = FileOperation::OPEN_PREFAB;
-	break;
-}
-case sf::Keyboard::S:
-{
-	SavePrefabEvent();
-	break;
-}
-	 */
-
-
-
-
-	 /*
-	 void NekoEditor::SaveSceneEvent()
-	 {
-
-		 auto& path = sceneManager_.GetCurrentScene().scenePath;
-		 if (sceneManager_.IsCurrentSceneTmp() or !neko::FileExists(path))
-		 {
-
-			 fileOperationStatus_ = FileOperation::SAVE_SCENE;
-		 }
-		 else
-		 {
-			 sceneManager_.SaveCurrentScene();
-		 }
-
-	 }
-
-	 void NekoEditor::SavePrefabEvent()
-	 {
-		 auto& path = prefabManager_.GetCurrentPrefabPath();
-		 if (prefabManager_.IsCurrentPrefabTmp() or !neko::FileExists(path))
-		 {
-			 fileDialog_ = ImGui::FileBrowser(
-				 ImGuiFileBrowserFlags_EnterNewFilename | ImGuiFileBrowserFlags_CreateNewDir);
-			 fileDialog_.SetPwd("../" + config.dataRootPath);
-			 fileDialog_.Open();
-			 fileOperationStatus_ = FileOperation::SAVE_PREFAB;
-		 }
-		 else
-		 {
-			 prefabManager_.SaveCurrentPrefab();
-		 }
-
-	 }
-	 */
 
 void NekoEditor::EditorUpdate([[maybe_unused]] float dt)
 {

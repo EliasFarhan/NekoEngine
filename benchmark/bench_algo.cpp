@@ -4,7 +4,7 @@
 #include <benchmark/benchmark.h>
 
 const unsigned long fromRange = 8;
-const unsigned long toRange = 512;
+const unsigned long toRange = 1<<15;
 
 const int maxNmb = 100'000;
 
