@@ -3,43 +3,17 @@
 #include <iostream>
 #include <random>
 #include <numeric>
-
-class Prout
-{
-private:
-    int foo = 3;
-    std::string hello = "Hello, World!";
-public:
-    const std::string& GetHello() const
-    {
-        return hello;
-    }
-
-    void SetHello(const std::string& hello)
-    {
-        Prout::hello = hello;
-    }
-
-    int GetFoo() const
-    {
-        return foo;
-    }
-
-    void SetFoo(int foo)
-    {
-        Prout::foo = foo;
-    }
-};
-
+#include <functional>
 
 int main(int argc, char** argv)
 {
     std::vector<int> numbers = {1, 2, 3, 4};
+    std::vector<int> numbersSame = {1, 2, 3, 4};
     std::vector<int> numbersPermutation = {4, 3, 2, 1};
     std::vector<int> otherNumbers = {5, 7, 9, 11};
 
     //Is any number even
-    const auto isEvenFunc = [](int n)
+    const std::function<bool(int)> isEvenFunc = [](int n)
     { return n % 2 == 0; };
     std::cout << "Is any of numbers even: " <<
               std::any_of(numbers.begin(), numbers.end(), isEvenFunc) << "\n";
@@ -73,7 +47,16 @@ int main(int argc, char** argv)
     //count the number of occurences
     std::cout << "There is exactly: " << std::count(numbers.begin(), numbers.end(), 3) << " number 3\n";
     std::cout << "There are exactly " << std::count_if(numbers.begin(), numbers.end(), isEvenFunc) << " even numbers\n";
-
+    //Find
+    {
+        auto it = std::find_if(numbers.begin(), numbers.end(), isEvenFunc);
+        auto itSecond = std::find_if(it + 1, numbers.end(), isEvenFunc);
+        std::cout << "First even: " << *it << " second even: " << *itSecond << "\n";
+    }
+    if (numbers == numbersSame)
+    {
+        std::cout << "Vectors are equal\n";
+    }
     //inner product
     std::cout << "The dot product of numbers and other numbers is: " <<
               std::inner_product(numbers.begin(), numbers.end(), otherNumbers.begin(), 0) << "\n";
@@ -82,8 +65,11 @@ int main(int argc, char** argv)
     std::mt19937 g(rd());
     std::shuffle(numbers.begin(), numbers.end(), g);
     std::cout << "After shuffle: ";
-    std::for_each(numbers.begin(), numbers.end(), [](int n)
-    { std::cout << n << ' '; });
+    std::for_each(numbers.begin(), numbers.end(),
+                  [](int n)
+                  {
+                      std::cout << n << ' ';
+                  });
     std::cout << "\n";
     //Sort
     std::sort(numbers.begin(), numbers.end());
@@ -119,6 +105,17 @@ int main(int argc, char** argv)
     std::for_each(numbers.begin(), numbers.end(), [](int n)
     { std::cout << n << ' '; });
     std::cout << "\n";
+    //sort on part
+    std::shuffle(numbers.begin(), numbers.end(), g);
+    std::cout << "After shuffle: ";
+    std::for_each(numbers.begin(), numbers.end(), [](int n)
+    { std::cout << n << ' '; });
+    std::cout << "\n";
+    std::sort(numbers.begin(), numbers.begin() + 5);
+    std::cout << "After sort on part: ";
+    std::for_each(numbers.begin(), numbers.end(), [](int n)
+    { std::cout << n << ' '; });
+    std::cout << "\n";
 
     //partitioning
     std::sort(numbers.begin(), numbers.end());
@@ -147,8 +144,9 @@ int main(int argc, char** argv)
               (std::min_element(numbers.begin(), numbers.end()) - numbers.begin()) << "\n";
     //Find the even numbers
     std::cout << "The first even number is at: " <<
-              (std::find_if(numbers.begin(), numbers.end(), isEvenFunc) - numbers.begin()) << " the last one at: " <<
-              (std::find_if(numbers.rbegin(), numbers.rend(), isEvenFunc) - numbers.rbegin()) << "\n";
+              (std::distance(numbers.begin(), std::find_if(numbers.begin(), numbers.end(), isEvenFunc)))
+              << " the last one at: " <<
+              (numbers.size()-1-std::distance(numbers.rbegin(), std::find_if(numbers.rbegin(), numbers.rend(), isEvenFunc))) << "\n";
     //Reverse
     std::sort(numbers.begin(), numbers.end());
     std::reverse(numbers.begin(), numbers.end());
