@@ -418,7 +418,7 @@ foreach(course_file ${COURSE_FILES} )
 	IF(MSVC)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Oi")#not forcing avx2 uhuh
     elseif(UNIX)
-    set_target_properties(${course_name} PROPERTIES COMPILE_FLAGS "-save-temps -march=native")
+    set_target_properties(${course_name} PROPERTIES COMPILE_FLAGS "-save-temps -march=native -fno-omit-frame-pointer")
     ENDIF(MSVC)
     set_target_properties (${course_name} PROPERTIES
         FOLDER Benchmark)
@@ -445,7 +445,7 @@ foreach(course_file ${COURSE_FILES} )
 	IF(MSVC)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Ox")#not forcing avx2 uhuh
     elseif(UNIX)
-    set_target_properties(${course_name} PROPERTIES COMPILE_FLAGS "-save-temps -march=native")
+    set_target_properties(${course_name} PROPERTIES COMPILE_FLAGS "-save-temps -march=native ")
     ENDIF(MSVC)
     set_target_properties (${course_name} PROPERTIES
         FOLDER Courses)

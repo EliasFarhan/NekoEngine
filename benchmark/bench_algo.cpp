@@ -3,43 +3,56 @@
 #include <random>
 #include <benchmark/benchmark.h>
 
-const unsigned long fromRange = 8;
-const unsigned long toRange = 1<<15;
+const unsigned long fromRange = 1<<10;
+const unsigned long toRange = 1<<20;
 
 const int maxNmb = 100'000;
 
-bool is_even(int a)
+int is_even(int a)
 {
-    return a % 2 == 0;
+    return a % 5 == 0;
 }
 
 // Type your code here, or load an example.
-int find_even_raw(const std::vector<int>& array)
+size_t find_even_raw(const std::vector<int>& array)
 {
-    int count = 0;
-    for(int i = 0; i < array.size();i++)
+    size_t count = 0;
+    for(size_t i = 0; i < array.size();i++)
     {
         if(is_even(array[i]))
-            count++;
+            ++count;
     }
     return count;
 }
 
 // Type your code here, or load an example.
-int find_even_ranges(const std::vector<int>& array)
+size_t find_even_ranges(const std::vector<int>& array)
 {
-    int count = 0;
-    for(auto a : array)
+    size_t count = 0;
+    for(auto& a : array)
     {
         if(is_even(a))
-            count++;
+            ++count;
     }
     return count;
 }
 
-bool find_even_algo(const std::vector<int>& array)
+// Type your code here, or load an example.
+size_t find_even_iterator(const std::vector<int>& array)
 {
-    return std::count_if(array.cbegin(), array.cend(), is_even);
+    size_t count = 0;
+
+    for(auto it = array.cbegin();it != array.cend();++it)
+    {
+        if(is_even(*it))
+            ++count;
+    }
+    return count;
+}
+
+size_t find_even_algo(const std::vector<int>& array)
+{
+    return std::count_if(array.begin(), array.end(), is_even);
 }
 
 static void RandomFill(std::vector<int>& numbers)
@@ -71,6 +84,16 @@ static void BM_Range(benchmark::State& state)
 }
 BENCHMARK(BM_Range)->Range(fromRange, toRange);
 
+static void BM_Iterator(benchmark::State& state)
+{
+    std::vector<int> local_numbers(state.range(0));
+    RandomFill(local_numbers);
+    for (auto _ : state)
+    {
+        benchmark::DoNotOptimize(find_even_iterator(local_numbers));
+    }
+}
+BENCHMARK(BM_Iterator)->Range(fromRange, toRange);
 static void BM_Algo(benchmark::State& state)
 {
     std::vector<int> local_numbers(state.range(0));
