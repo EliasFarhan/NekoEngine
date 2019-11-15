@@ -39,7 +39,7 @@ SOFTWARE.
 #endif
 
 const int fromRange = 8;
-const int toRange = 1 << 22;
+const int toRange = 1 << 10;
 
 #ifdef __AVX2__
 #define SIMD_REGISTER_SIZE 8

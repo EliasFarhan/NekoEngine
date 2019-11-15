@@ -10,7 +10,7 @@ const int maxNmb = 100'000;
 
 int is_even(int a)
 {
-    return a % 5 == 0;
+    return a % 2 == 0;
 }
 
 // Type your code here, or load an example.
