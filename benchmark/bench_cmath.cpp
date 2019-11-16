@@ -6,7 +6,9 @@
 #include <algorithm>
 #include <benchmark/benchmark.h>
 #include "mathematics/func_table.h"
-
+#ifdef WIN32
+#include <corecrt_math_defines.h>
+#endif
 const long fromRange = 2;
 const long toRange = 512;
 const float maxNmb = 100.0f;
