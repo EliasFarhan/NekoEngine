@@ -36,7 +36,10 @@ public:
 	Vec2() : x(0), y(0)
 	{
 	}
+    Vec2(T same) : x(same), y(same)
+    {
 
+    }
 	Vec2(T X, T Y) : x(X), y(Y)
 	{
 	}
@@ -142,6 +145,8 @@ public:
 
 	T x; ///< X coordinate of the vector
 	T y; ///< Y coordinate of the vector
+
+	const static Vec2 Zero;
 };
 template<typename T>
 Vec2<T> operator *(T lhs, const Vec2<T>& rhs)
@@ -150,6 +155,8 @@ Vec2<T> operator *(T lhs, const Vec2<T>& rhs)
 }
 
 using Vec2f = Vec2<float>;
+template <>
+Vec2f const Vec2f::Zero = Vec2f(0.0f,0.0f);
 
 template <>
 inline float Vec2f::GetMagnitude() const
@@ -170,5 +177,112 @@ inline Vec2<float> Vec2f::Rotate(float angle) const
 float AngleBetween(const Vec2f& v1, const Vec2f& v2);
 
 
+template <typename T>
+class Vec3
+{
+public:
+    T x, y, z;
+    const static Vec3 Zero;
+    Vec3() : x(0), y(0), z(0)
+    {
+    }
 
+    Vec3(T same) : x (same), y(same)
+    {
+
+    }
+
+    Vec3(T X, T Y, T Z) : x(X), y(Y), z(Z)
+    {
+
+    }
+
+    template <typename U>
+    explicit Vec3(const Vec3<U>& vector) : x(static_cast<T>(vector.x)), y(static_cast<T>(vector.y))
+    {
+    }
+
+    T GetSquareMagnitude() const { return x * x + y * y; }
+    T GetMagnitude() const;
+    static T Dot(const Vec2<T>& v1, const Vec2<T>& v2)
+    {
+        return v1.x*v2.x + v1.y*v2.y;
+    }
+
+    Vec3<T> operator +(const Vec3<T>& rhs)
+    {
+        return Vec3<T>(x + rhs.x, y + rhs.y, z + rhs.z);
+    }
+    Vec3<T>& operator +=(const Vec3<T>& rhs)
+    {
+        this->x += rhs.x;
+        this->y += rhs.y;
+        this->z += rhs.z;
+        return *this;
+    }
+
+    Vec3<T> operator -(const Vec3<T>& rhs)
+    {
+        return Vec3<T>(x - rhs.x, y - rhs.y, z - rhs.z);
+    }
+    Vec3<T>& operator -=(const Vec3<T>& rhs)
+    {
+        this->x -= rhs.x;
+        this->y -= rhs.y;
+        this->z -= rhs.z;
+        return *this;
+    }
+
+    Vec3<T> operator *(T rhs) const
+    {
+        return Vec3<T>(x * rhs, y * rhs, z * rhs);
+    }
+    Vec3<T> operator *(const Vec3<T>& rhs) const
+    {
+        return Vec3<T>(x * rhs.x, y * rhs.y, z * rhs.z);
+    }
+
+
+
+    Vec3<T>& operator *=(T rhs)
+    {
+        this->x *= rhs;
+        this->y *= rhs;
+        this->z *= rhs;
+        return *this;
+    }
+
+    Vec3<T> operator /( T rhs) const
+    {
+        return (*this) * (1.0f / rhs);
+    }
+
+    Vec3<T>& operator /=(T rhs)
+    {
+        *this = *this / rhs;
+        return *this;
+    }
+
+    bool operator ==( const Vec3<T>& right)
+    {
+        return x == right.x && y == right.y && z == right.z;
+    }
+
+    bool operator !=( const Vec3<T>& right)
+    {
+        return !(*this == right);
+    }
+
+
+};
+
+using Vec3f = Vec3<float>;
+template <>
+Vec3f const Vec3f::Zero = Vec3f(0.0f,0.0f, 0.0f);
+
+template <>
+inline float Vec3f::GetMagnitude() const
+{
+    return sqrtf(GetSquareMagnitude());
+}
 }

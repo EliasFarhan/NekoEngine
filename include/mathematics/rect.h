@@ -23,10 +23,29 @@
  SOFTWARE.
  */
 
+#include "mathematics/vector.h"
+
 namespace neko
 {
-	class Rect
-	{
-		
-	};
+template<class T = Vec2f>
+struct Rect
+{
+    explicit Rect(T Center, T HalfSize) : center(Center), halfSize(HalfSize)
+    {
+
+    }
+
+    template<typename U = float>
+    U GetRadius()
+    {
+        return halfSize.GetMagnitude();
+    }
+
+    T center;
+    T halfSize;
+};
+
+
+using Rect2f = Rect<Vec2f>;
+using Rect3f = Rect<Vec3f>;
 }

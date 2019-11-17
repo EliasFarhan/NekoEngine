@@ -45,6 +45,6 @@ bool CheckJsonNumber(const json& jsonObject, std::string parameterName);
 Vec2f GetVectorFromJson(const json& jsonObject, std::string parameterName);
 
 
-Rect GetRectFromJson(const json& jsonObject, std::string parameterName);
+Rect2f GetRectFromJson(const json& jsonObject, std::string parameterName);
 json LoadJson(const std::string_view jsonPath);
 }
