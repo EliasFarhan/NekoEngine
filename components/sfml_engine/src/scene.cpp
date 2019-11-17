@@ -36,7 +36,8 @@ SfmlBasicSceneManager::SfmlBasicSceneManager(SfmlBasicEngineExport& engineExport
 		[this](Entity entity, const json& componentJson)
 	{
 		rotation2dManager_.AddComponent(entityManager_, entity);
-		rotation2dManager_.SetComponent(entity, componentJson["angle"]);
+		float angle = componentJson["angle"];
+		rotation2dManager_.SetComponent(entity, angle);
 	};
 	componentParsingFuncMap_[NekoComponentType::SPRITE2D] =
 		[this](Entity entity, const json& componentJson)

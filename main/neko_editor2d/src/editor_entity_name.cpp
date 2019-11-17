@@ -30,7 +30,7 @@ json EntityNameManager::SerializeComponentJson(Entity entity)
     return ComponentManager::SerializeComponentJson(entity);
 }
 
-EntityNameManager::EntityNameManager(EntityManager& entityManager) : entityManager_(entityManager)
+EntityNameManager::EntityNameManager(EntityManager& entityManager) : ComponentManager(entityManager), entityManager_(entityManager)
 {
 
 }

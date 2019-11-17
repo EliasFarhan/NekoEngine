@@ -38,7 +38,7 @@ namespace neko
 class Position2dManager : public ComponentManager<Vec2f, ComponentType(NekoComponentType::POSITION2D)>
 {
 public:
-    Position2dManager();
+    explicit Position2dManager(EntityManager& entityManager);
 
 
 };

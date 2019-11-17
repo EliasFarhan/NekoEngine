@@ -64,8 +64,8 @@ void SpriteManager::CopyLayer(int layer, size_t start, size_t length)
     }
 }
 
-SpriteManager::SpriteManager(TextureManager& textureManager) :
-        ComponentManager::ComponentManager(),
+SpriteManager::SpriteManager(EntityManager& entityManager, TextureManager& textureManager) :
+        ComponentManager::ComponentManager(entityManager),
         textureManager_(textureManager)
 {
 

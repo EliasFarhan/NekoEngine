@@ -19,10 +19,21 @@ BasicSpineDrawable::BasicSpineDrawable() : skeletonDrawable(nullptr)
 
 BasicSpineDrawable::~BasicSpineDrawable()
 {
-    if (skeletonData)
-        SkeletonData_dispose(skeletonData);
-    if (atlas)
-        Atlas_dispose(atlas);
+	Destroy();
+}
+
+void BasicSpineDrawable::Destroy()
+{
+	if (skeletonData)
+	{
+		SkeletonData_dispose(skeletonData);
+		skeletonData = nullptr;
+	}
+	if (atlas)
+	{
+		Atlas_dispose(atlas);
+		atlas = nullptr;
+	}
 }
 
 void BasicSpineDrawable::SetPosition(const sf::Vector2f& position)
@@ -113,12 +124,6 @@ json SpineBoneFollowerManager::SerializeComponentJson(Entity entity)
 	return componentJson;
 }
 
-SpineManager::SpineManager() 
-{
-    ResizeIfNecessary(infos_, INIT_ENTITY_NMB - 1, {});
-};
-
-
 void SpineManager::Update(EntityManager& entityManager, float dt)
 {
     for (size_t i = 0; i < components_.size(); i++)
@@ -163,7 +168,7 @@ bool SpineManager::AddSpineDrawable(Entity entity,
         logDebug("[Error] while trying to load spine skeleton file");
         return false;
     }
-    spineAnimation.skeletonDrawable = std::make_shared<spine::SkeletonDrawable>(spineAnimation.skeletonData);
+    spineAnimation.skeletonDrawable = std::make_unique<spine::SkeletonDrawable>(spineAnimation.skeletonData);
     spineAnimation.SetDrawable(spineAnimation.skeletonDrawable.get());
     return true;
 }
@@ -287,7 +292,9 @@ void SpineManager::CopyAllTransforms(EntityManager& entityManager, Transform2dMa
 void SpineManager::DestroyComponent(EntityManager& entityManager, Entity entity)
 {
     ComponentManager::DestroyComponent(entityManager, entity);
-    components_[entity] = BasicSpineDrawable();
+    components_[entity].skeletonDrawable = nullptr;
+	components_[entity].Destroy();
+	
 }
 
 void SpineManager::CopyLayer(int layer, size_t start, size_t length)
@@ -307,5 +314,4 @@ void SpineManager::SetSkinByName(Entity entity, const std::string_view skinName)
 {
     components_[entity].SetSkinByName(skinName);
 }
-
 }

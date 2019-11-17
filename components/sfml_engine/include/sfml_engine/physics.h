@@ -90,7 +90,7 @@ private:
 class Body2dManager : public ComponentManager<b2Body*, ComponentType(NekoComponentType::BODY2D)>
 {
 public:
-	explicit Body2dManager(Physics2dManager& physics2dManager);
+	explicit Body2dManager(EntityManager& entityManager, Physics2dManager& physics2dManager);
 
 	void DestroyComponent(EntityManager& entityManager, Entity entity) override;
 private:
@@ -100,6 +100,7 @@ private:
 class BodyDef2dManager : public ComponentManager<b2BodyDef, ComponentType(NekoComponentType::BODY2D)>
 {
 public:
+	using ComponentManager::ComponentManager;
     void ParseComponentJson(const json& componentJson, Entity entity) override;
 
     json SerializeComponentJson(Entity entity) override;
@@ -110,6 +111,7 @@ public:
 
 class Collider2dManager : public ComponentManager<Collider, ComponentType(NekoComponentType::BOX_COLLIDER2D)>
 {
+	using ComponentManager::ComponentManager;
 };
 
 float pixel2meter(float f);

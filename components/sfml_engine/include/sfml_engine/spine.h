@@ -46,7 +46,7 @@ struct BasicSpineDrawable : public SfmlRenderCommand
 	BasicSpineDrawable();
 
 	virtual ~BasicSpineDrawable();
-
+	void Destroy();
 	Atlas* atlas = nullptr;
 	SkeletonData* skeletonData = nullptr;
 	std::shared_ptr<spine::SkeletonDrawable> skeletonDrawable = nullptr;
@@ -76,10 +76,11 @@ struct SpineDrawableInfo
 	std::string skeletonDataPath = "";
 };
 
-class SpineBoneFollowerManager : public ComponentManager<SpineBoneFollower, EntityMask(
-	NekoComponentType::SPINE_FOLLOW_BONE)>
+class SpineBoneFollowerManager : public ComponentManager<SpineBoneFollower, EntityMask(NekoComponentType::SPINE_FOLLOW_BONE)>
 {
 public:
+
+	using ComponentManager::ComponentManager;
 	static sf::Transform CalculateTransformFromBone(Bone* bone);
 	void ParseComponentJson(const json& componentJson, Entity entity) override;
 	json SerializeComponentJson(Entity entity) override;
@@ -88,7 +89,7 @@ public:
 class SpineManager : public ComponentManager<BasicSpineDrawable, EntityMask(NekoComponentType::SPINE_ANIMATION)>
 {
 public:
-	SpineManager();
+	using ComponentManager::ComponentManager;
 
 	void Update(EntityManager& entityManager, float dt);
 

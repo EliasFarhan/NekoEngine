@@ -53,7 +53,7 @@ class SpriteManager :
         public ComponentManager<Sprite, ComponentType(NekoComponentType::SPRITE2D)>
 {
 public:
-    explicit SpriteManager(TextureManager& textureManager);
+    explicit SpriteManager(EntityManager& entityManager, TextureManager& textureManager);
 
     void CopyTexture(const TextureId textureId, size_t start, size_t length=1);
 

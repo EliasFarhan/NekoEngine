@@ -27,6 +27,7 @@
 #include <vector>
 #include <engine/globals.h>
 #include <xxhash.hpp>
+#include "utilities/delegate_utility.h"
 
 namespace neko
 {
@@ -45,6 +46,9 @@ using EntityMask = std::uint32_t;
 const Entity INVALID_ENTITY = std::numeric_limits<Index>::max();
 const EntityMask INVALID_ENTITY_MASK = 0u;
 const EntityHash INVALID_ENTITY_HASH = EntityHash(0);
+
+template<typename T, ComponentType componentType>
+class ComponentManager;
 
 /**
  * \brief Used in an Entity-Component-System to store all entities and what components they have
@@ -79,8 +83,16 @@ public:
 	EntityHash GetEntityNameHash(Entity entity);
 	Entity FindEntityByHash(EntityHash entityHash);
 	Entity FindEntityByName(const std::string& entityName);
+	
+	template<typename T, ComponentType componentType>
+	void RegisterComponentManager(ComponentManager<T, componentType>& componentManager)
+	{
+		onDestroyEntity.RegisterCallback([this, &componentManager](Entity entity) {componentManager.DestroyComponent(*this, entity); });
+	}
+	
 	static EntityHash HashEntityName(const std::string& entityName);
 private:
+	Delegate<Entity> onDestroyEntity;
 	std::vector<EntityMask> entityMaskArray_;
 	std::vector<EntityHash> entityHashArray_;
 };

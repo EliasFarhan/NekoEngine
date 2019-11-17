@@ -1,12 +1,13 @@
 #pragma once
 
 #include <SFML/Graphics/RenderWindow.hpp>
+
+#include "sfml_engine/spine.h"
 #include "engine/engine.h"
 #include "sfml_engine/input.h"
 #include "sfml_engine/graphics.h"
 #include "sfml_engine/transform.h"
 #include "sfml_engine/sprite.h"
-#include "sfml_engine/spine.h"
 
 namespace neko::box2d
 {
@@ -47,6 +48,7 @@ public:
 	void OnBeginContact(const box2d::Collider* collider1, const box2d::Collider* collider2);
 	void OnEndContact(const box2d::Collider* collider1, const box2d::Collider* collider2);
 protected:
+	EntityManager entityManager_;
 	Position2dManager position2dManager_;
 	Scale2dManager scale2dManager_;
 	Rotation2dManager rotation2dManager_;

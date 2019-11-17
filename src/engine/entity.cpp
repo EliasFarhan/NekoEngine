@@ -87,6 +87,8 @@ void EntityManager::DestroyEntity(Entity entity)
 {
     entityMaskArray_[entity] = INVALID_ENTITY_MASK;
 	entityHashArray_[entity] = INVALID_ENTITY_HASH;
+
+	onDestroyEntity.Execute(entity);
 }
 
 bool EntityManager::HasComponent(Entity entity, EntityMask componentType) const

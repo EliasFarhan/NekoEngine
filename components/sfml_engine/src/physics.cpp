@@ -127,7 +127,8 @@ b2Body* Physics2dManager::GetBodyAt(Index i)
 	return bodies_[i];
 }
 
-Body2dManager::Body2dManager(Physics2dManager& physics2dManager) :
+Body2dManager::Body2dManager(EntityManager& entityManager, Physics2dManager& physics2dManager) :
+	ComponentManager(entityManager),
 	physics2dManager_(physics2dManager)
 {
 }

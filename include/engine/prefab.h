@@ -48,7 +48,7 @@ struct Prefab
 class PrefabManager : public ComponentManager<PrefabId, EntityMask(NekoComponentType::PREFAB)>
 {
 public:
-    explicit PrefabManager(SceneManager& sceneManager);
+    explicit PrefabManager(EntityManager& entityManager, SceneManager& sceneManager);
     void InstantiatePrefab(PrefabId prefabIndex, EntityManager& entityManager);
     PrefabId LoadPrefab(std::string_view prefabPath, bool forceReload=false);
     const Prefab& GetPrefab(PrefabId prefabId);

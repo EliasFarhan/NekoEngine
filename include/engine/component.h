@@ -70,8 +70,9 @@ template<typename T, ComponentType componentType>
 class ComponentManager
 {
 public:
-    ComponentManager()
+    ComponentManager(EntityManager& entityManager)
     {
+		entityManager.RegisterComponentManager(*this);
         ResizeIfNecessary(components_, INIT_ENTITY_NMB - 1, T{});
     }
 
@@ -87,8 +88,7 @@ public:
 
     virtual void DestroyComponent(EntityManager& entityManager, Entity entity);
 
-    virtual void SetComponent(Entity entity, const T& component)
-    { components_[entity] = component; }
+	virtual void SetComponent(Entity entity, const T& component);
 
     const T& GetComponent(Entity entity) const
     { return components_[entity]; }
@@ -125,4 +125,9 @@ void ComponentManager<T, componentType>::DestroyComponent(EntityManager& entityM
     entityManager.RemoveComponentType(entity, componentType);
 }
 
+template <typename T, ComponentType componentType>
+void ComponentManager<T, componentType>::SetComponent(Entity entity, const T& component)
+{
+	components_[entity] = component;
+}
 }

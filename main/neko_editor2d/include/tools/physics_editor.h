@@ -48,12 +48,15 @@ struct PolygonCollider : Collider<b2PolygonShape>
 class BoxColliderDefManager : public neko::ComponentManager
         <BoxCollider, neko::ComponentType(neko::NekoComponentType::BOX_COLLIDER2D)>
 {
-
+public:
+	using ComponentManager::ComponentManager;
 };
 class CircleColliderDefManager : public neko::ComponentManager
         <CircleCollider, neko::ComponentType(neko::NekoComponentType::CIRCLE_COLLIDER2D)>
 {
 public:
+
+	using ComponentManager::ComponentManager;
     neko::Index AddComponent(neko::EntityManager& entityManager, neko::Entity entity) override;
 
 };
@@ -62,6 +65,8 @@ class PolygonColldierDefManager : public neko::ComponentManager
         <PolygonCollider, neko::ComponentType(neko::NekoComponentType::POLYGON_COLLIDER2D)>
 {
 public:
+
+	using ComponentManager::ComponentManager;
 	Index AddComponent(EntityManager& entityManager, Entity entity) override;
 };
 

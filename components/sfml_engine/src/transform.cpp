@@ -81,14 +81,16 @@ void Transform2dManager::CopyAllFromBody2d(EntityManager& entityManager, box2d::
 			entityManager.HasComponent(i, EntityMask(NekoComponentType::ROTATION2D))
 			)
 		{
-			rotationManager_.SetComponent(i, glm::degrees(bodies[i]->GetAngle()));
+			auto degree = glm::degrees(bodies[i]->GetAngle());
+			rotationManager_.SetComponent(i, degree);
 		}
 		if (
 			entityManager.HasComponent(i, EntityMask(NekoComponentType::BODY2D)) &&
 			entityManager.HasComponent(i, EntityMask(NekoComponentType::POSITION2D))
 			)
 		{
-			positionManager_.SetComponent(i, Vec2f(bodies[i]->GetPosition()));
+			Vec2f pos = Vec2f(bodies[i]->GetPosition());
+			positionManager_.SetComponent(i, pos);
 		}
 	}
 }
@@ -117,7 +119,8 @@ void Transform2dManager::CopyAllFromSpineFollower(EntityManager& entityManager,
 		}
 		if (entityManager.HasComponent(i, EntityMask(NekoComponentType::ROTATION2D)))
 		{
-			rotationManager_.SetComponent(i, bone->arotation);
+			float angle = bone->arotation;
+			rotationManager_.SetComponent(i,angle);
 		}
 	}
 }

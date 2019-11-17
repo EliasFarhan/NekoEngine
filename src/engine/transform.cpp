@@ -31,7 +31,7 @@ namespace neko
 
 
 
-Position2dManager::Position2dManager() : ComponentManager()
+Position2dManager::Position2dManager(EntityManager& entityManager) : ComponentManager(entityManager)
 {
 }
 

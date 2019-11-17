@@ -112,7 +112,7 @@ neko::Index EditorPrefabManager::CreatePrefabFromEntity(neko::Entity entity)
 }
 
 EditorPrefabManager::EditorPrefabManager(NekoEditorExport& editorExport) :
-	PrefabManager(editorExport.sceneManager),
+	PrefabManager(entityManager_, editorExport.sceneManager),
 	entityManager_(editorExport.entityManager),
 	transformManager_(editorExport.transform2dManager),
 	position2dManager_(editorExport.position2dManager),
