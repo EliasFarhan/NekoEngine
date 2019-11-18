@@ -147,6 +147,7 @@ public:
 	T y; ///< Y coordinate of the vector
 
 	const static Vec2 Zero;
+	const static Vec2 One;
 };
 template<typename T>
 Vec2<T> operator *(T lhs, const Vec2<T>& rhs)
@@ -155,8 +156,7 @@ Vec2<T> operator *(T lhs, const Vec2<T>& rhs)
 }
 
 using Vec2f = Vec2<float>;
-template <>
-Vec2f const Vec2f::Zero = Vec2f(0.0f,0.0f);
+
 
 template <>
 inline float Vec2f::GetMagnitude() const
@@ -183,6 +183,7 @@ class Vec3
 public:
     T x, y, z;
     const static Vec3 Zero;
+    const static Vec3 One;
     Vec3() : x(0), y(0), z(0)
     {
     }
@@ -277,8 +278,7 @@ public:
 };
 
 using Vec3f = Vec3<float>;
-template <>
-Vec3f const Vec3f::Zero = Vec3f(0.0f,0.0f, 0.0f);
+
 
 template <>
 inline float Vec3f::GetMagnitude() const
