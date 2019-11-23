@@ -10,12 +10,26 @@
 const int fromRange = 8;
 const int toRange = 5000;
 
-void add_n(int id, int& value, int n)
+void add_n_lockaround(int id, int& value, int n)
 {
+    static std::mutex m;
+    m.lock();
 	for (int i = 0; i < n; i++)
 	{
 		++value;
 	}
+	m.unlock();
+}
+
+void add_n_lockin(int id, int& value, int n)
+{
+    static std::mutex m;
+    for (int i = 0; i < n; i++)
+    {
+        m.lock();
+        ++value;
+        m.unlock();
+    }
 }
 
 void add_atomic_n(int id, std::atomic<int>& value, int n)
@@ -28,20 +42,36 @@ void add_atomic_n(int id, std::atomic<int>& value, int n)
 
 
 
-static void BM_IntSum(benchmark::State& state)
+static void BM_IntSumMutexAround(benchmark::State& state)
 {
 
 	int a = 0;
 	for (auto _ : state)
 	{
 		a = 0;
-		add_n(0, a, state.range(0));
+        add_n_lockaround(0, a, state.range(0));
 		benchmark::DoNotOptimize(a);
         assert(a == state.range(0));
 	}
 }
 
-BENCHMARK(BM_IntSum)->Range(fromRange, toRange);
+BENCHMARK(BM_IntSumMutexAround)->Range(fromRange, toRange);
+
+static void BM_IntSumMutexIn(benchmark::State& state)
+{
+
+    int a = 0;
+    for (auto _ : state)
+    {
+        a = 0;
+        add_n_lockin(0, a, state.range(0));
+        benchmark::DoNotOptimize(a);
+        assert(a == state.range(0));
+    }
+}
+
+BENCHMARK(BM_IntSumMutexIn)->Range(fromRange, toRange);
+
 static void BM_AtomicIntSum(benchmark::State& state)
 {
 
