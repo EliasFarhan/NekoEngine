@@ -7,23 +7,23 @@
 namespace neko::net
 {
 
-ServerSimSystem::ServerSimSystem(PredSimEngine& engine) : engineExport_(engine)
+ServerSimSystem::ServerSimSystem(PredSimEngineExport& engineExport) : engineExport_(engineExport)
 {
 }
 
 void ServerSimSystem::Init()
 {
-    auto& clientSystem_ = engineExport_.client_;
-    auto& entityManager = engineExport_.entityManager_;
-    auto& transformManager = engineExport_.transformManager_;
-    auto& velocityManager = engineExport_.velocitiesManager_;
+    auto& clientSystem_ = engineExport_.client;
+    auto& entityManager = engineExport_.entityManager;
+    auto& transformManager = engineExport_.transform2dManager;
+    auto& velocityManager = engineExport_.velocityManager;
     serverEntities_.reserve(actorNmb);
     serverActorsDataBuffer_.resize(actorNmb);
 
-    auto& positionManager = transformManager.positionManager_;
-    auto& rotationManager = transformManager.rotationManager_;
+    auto& positionManager = engineExport_.position2dManager;
+    auto& rotationManager = engineExport_.rotation2dManager;
 
-    auto& shapeManager = engineExport_.shapeManager_;
+    auto& shapeManager = engineExport_.shapeManager;
     int i = 0;
     for (auto& clientEntity : clientSystem_.entities_)
     {
@@ -50,13 +50,13 @@ void ServerSimSystem::Init()
 
         neko::sfml::ShapeDef serverShape;
         serverShape.fillColor = sf::Color::Blue;
-        serverShape.fillColor.a = engineExport_.globals_.actorAlpha;
+        serverShape.fillColor.a = engineExport_.engine.globals_.actorAlpha;
         shapeManager.AddComponent(entityManager, entity);
         shapeManager.AddPolygon(entity, position, points, 3, serverShape);
         i++;
     }
-    engineExport_.drawUiDelegate_.RegisterCallback([this](){
-        auto& globals = engineExport_.globals_;
+    engineExport_.engine.drawUiDelegate_.RegisterCallback([this](float dt){
+        auto& globals = engineExport_.engine.globals_;
         ImGui::Begin("Server Control");
         ImGui::LabelText("Bandwidth", "%f bytes/s", currentSecondBandwidth_);
         const char* serverPredictionName[] = {"None", "Interpolation", "Extrapolation", "Catmull Interpolation"};
@@ -67,10 +67,10 @@ void ServerSimSystem::Init()
         }
 
         const char* clientDemoName[] = {"Linear", "Planet", "Boids"};
-        static int clientComboIndex = int(engineExport_.client_.clientMovementType_);
+        static int clientComboIndex = int(engineExport_.client.clientMovementType_);
         if (ImGui::Combo("Movement", &clientComboIndex, clientDemoName, 3))
         {
-            engineExport_.client_.clientMovementType_ = ClientMovementType(clientComboIndex);
+			engineExport_.client.clientMovementType_ = ClientMovementType(clientComboIndex);
         }
         int tmpTickPeriod = globals.clientTickPeriod;
         if (ImGui::DragInt("Client Tick Rate", &tmpTickPeriod, 1, 1, 60, "Every %d frames"))
@@ -97,16 +97,16 @@ void ServerSimSystem::Init()
 void ServerSimSystem::Update([[maybe_unused]] float dt)
 {
     tick_++;
-    if ((tick_ % engineExport_.config.framerateLimit) == 0)
+    if ((tick_ % engineExport_.engine.config.framerateLimit) == 0)
     {
-        currentSecondBandwidth_ = float(dataSent_) / float(engineExport_.config.framerateLimit);
+        currentSecondBandwidth_ = float(dataSent_) / float(engineExport_.engine.config.framerateLimit);
         dataSent_ = 0;
     }
 
-    auto& transformManager = engineExport_.transformManager_;
-    auto& positionManager = transformManager.positionManager_;
-    auto& rotationManager = transformManager.rotationManager_;
-    auto& velocityManager = engineExport_.velocitiesManager_;
+    auto& transformManager = engineExport_.transform2dManager;
+    auto& positionManager = engineExport_.position2dManager;
+    auto& rotationManager = engineExport_.rotation2dManager;
+    auto& velocityManager = engineExport_.velocityManager;
     switch (serverPredictionType_)
     {
         case ServerPredictionType::None:
@@ -120,7 +120,7 @@ void ServerSimSystem::Update([[maybe_unused]] float dt)
                 positionManager.SetComponent(entity, position);
                 const auto velocity = actorData.velocity;
                 velocityManager.SetComponent(entity, velocity);
-                const float newAngle = neko::Vec2f::AngleBetween(velocity, neko::Vec2f(0.0f, -1.0f));
+                const float newAngle = AngleBetween(velocity, Vec2f(0.0f, -1.0f));
                 rotationManager.SetComponent(entity, newAngle);
             }
             break;
@@ -148,7 +148,7 @@ void ServerSimSystem::Update([[maybe_unused]] float dt)
                                                             currentTime);
                     velocityManager.SetComponent(entity, velocity);
 
-                    const float newAngle = neko::Vec2f::AngleBetween(velocity, neko::Vec2f(0.0f, -1.0f));
+                    const float newAngle = AngleBetween(velocity, neko::Vec2f(0.0f, -1.0f));
                     rotationManager.SetComponent(entity, newAngle);
                 }
                 else
@@ -157,7 +157,7 @@ void ServerSimSystem::Update([[maybe_unused]] float dt)
                     positionManager.SetComponent(entity, position);
                     const auto velocity = lastActorData.velocity;
                     velocityManager.SetComponent(entity, velocity);
-                    const float newAngle = neko::Vec2f::AngleBetween(velocity, neko::Vec2f(0.0f, -1.0f));
+                    const float newAngle = AngleBetween(velocity, neko::Vec2f(0.0f, -1.0f));
                     rotationManager.SetComponent(entity, newAngle);
                 }
 
@@ -166,7 +166,7 @@ void ServerSimSystem::Update([[maybe_unused]] float dt)
         }
         case ServerPredictionType::Interpolation:
         {
-            neko::Index lastGlobalTick = tick_ > engineExport_.globals_.serverDelayPeriod ? tick_ - engineExport_.globals_.serverDelayPeriod : 0;
+            neko::Index lastGlobalTick = tick_ > engineExport_.engine.globals_.serverDelayPeriod ? tick_ - engineExport_.engine.globals_.serverDelayPeriod : 0;
 
             for (auto& entity : serverEntities_)
             {
@@ -189,7 +189,7 @@ void ServerSimSystem::Update([[maybe_unused]] float dt)
                                                             currentTime);
                     velocityManager.SetComponent(entity, velocity);
 
-                    const float newAngle = neko::Vec2f::AngleBetween(velocity, neko::Vec2f(0.0f, -1.0f));
+                    const float newAngle = AngleBetween(velocity, neko::Vec2f(0.0f, -1.0f));
                     rotationManager.SetComponent(entity, newAngle);
                 }
                 else
@@ -198,7 +198,7 @@ void ServerSimSystem::Update([[maybe_unused]] float dt)
                     positionManager.SetComponent(entity, position);
                     const auto velocity = lastActorData.velocity;
                     velocityManager.SetComponent(entity, velocity);
-                    const float newAngle = neko::Vec2f::AngleBetween(velocity, neko::Vec2f(0.0f, -1.0f));
+                    const float newAngle = AngleBetween(velocity, neko::Vec2f(0.0f, -1.0f));
                     rotationManager.SetComponent(entity, newAngle);
                 }
 
@@ -207,13 +207,13 @@ void ServerSimSystem::Update([[maybe_unused]] float dt)
         }
         case ServerPredictionType::Catmull_Interpolation:
         {
-            neko::Index lastGlobalTick = tick_ > engineExport_.globals_.serverDelayPeriod ? tick_ - engineExport_.globals_.serverDelayPeriod : 0;
+            neko::Index lastGlobalTick = tick_ > engineExport_.engine.globals_.serverDelayPeriod ? tick_ - engineExport_.engine.globals_.serverDelayPeriod : 0;
 
             for (auto& entity : serverEntities_)
             {
                 const auto index = neko::Index(
                         std::find(serverEntities_.cbegin(), serverEntities_.cend(), entity) - serverEntities_.cbegin());
-                if(index >= engineExport_.globals_.shownActorNmb)
+                if(index >= engineExport_.engine.globals_.shownActorNmb)
                     continue;
                 const auto& actorDataArray = serverActorsDataBuffer_[index];
                 const auto t0 = actorDataArray[0].tickIndex;
@@ -243,7 +243,7 @@ void ServerSimSystem::Update([[maybe_unused]] float dt)
                     const auto velocity = neko::Vec2f::Lerp(actorDataArray[2].velocity, actorDataArray[1].velocity, currentTime);
                     velocityManager.SetComponent(entity, velocity);
 
-                    const float newAngle = neko::Vec2f::AngleBetween(velocity, neko::Vec2f(0.0f, -1.0f));
+                    const float newAngle = AngleBetween(velocity, neko::Vec2f(0.0f, -1.0f));
                     rotationManager.SetComponent(entity, newAngle);
                 }
                 else
@@ -252,7 +252,7 @@ void ServerSimSystem::Update([[maybe_unused]] float dt)
                     positionManager.SetComponent(entity, position);
                     const auto velocity = actorDataArray[2].velocity;
                     velocityManager.SetComponent(entity, velocity);
-                    const float newAngle = neko::Vec2f::AngleBetween(velocity, neko::Vec2f(0.0f, -1.0f));
+                    const float newAngle = AngleBetween(velocity, neko::Vec2f(0.0f, -1.0f));
                     rotationManager.SetComponent(entity, newAngle);
                 }
             }
@@ -269,7 +269,7 @@ void ServerSimSystem::Destroy()
 void ServerSimSystem::PushClientData(const ActorData& data)
 {
     //Dropping random packet
-    if (engineExport_.globals_.distrNormal(eng_) < engineExport_.globals_.dataLossProb)
+    if (engineExport_.engine.globals_.distrNormal(eng_) < engineExport_.engine.globals_.dataLossProb)
     {
         return;
     }

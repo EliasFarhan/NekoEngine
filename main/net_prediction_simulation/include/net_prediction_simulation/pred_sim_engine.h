@@ -40,7 +40,6 @@ public:
 
     void Init() override;
 
-    void Update(float dt) override;
 
     void Destroy() override;
     const Globals& GetGlobals(){ return globals_; }

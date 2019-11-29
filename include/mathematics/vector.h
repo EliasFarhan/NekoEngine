@@ -56,7 +56,7 @@ public:
 		return v1.x*v2.x + v1.y*v2.y;
 	}
 	
-	Vec2<T> operator +(const Vec2<T>& rhs)
+	Vec2<T> operator +(const Vec2<T>& rhs) const
 	{
 		return Vec2<T>(x + rhs.x, y + rhs.y);
 	}

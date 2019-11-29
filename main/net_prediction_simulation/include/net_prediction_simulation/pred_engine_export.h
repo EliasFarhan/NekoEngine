@@ -15,6 +15,7 @@ namespace neko::net
 {
 class PredSimEngine;
 class VelocityManager;
+class ClientSimSystem;
 
 struct PredSimEngineExport
 {
@@ -26,5 +27,6 @@ struct PredSimEngineExport
 	PredSimEngine& engine;
 	VelocityManager& velocityManager;
 	sfml::ConvexShapeManager& shapeManager;
+	ClientSimSystem& client;
 };
 }
