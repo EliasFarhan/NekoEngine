@@ -81,7 +81,7 @@ public:
     //static T* GetInstance(){ return dynamic_cast<T*>(instance_);};
 protected:
     static BasicEngine* instance_;
-	float isRunning_;
+	bool isRunning_;
     Delegate<> initDelegate_;
     Delegate<float> updateDelegate_;
     Delegate<float> drawUiDelegate_;

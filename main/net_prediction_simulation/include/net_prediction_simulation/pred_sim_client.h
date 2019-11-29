@@ -23,7 +23,7 @@ private:
     std::vector<std::pair<ActorData, neko::Index>> dataDelayQueue_;
     std::vector<neko::Entity> entities_;
     neko::Index tick_ = 0;
-    ClientMovementType clientMovementType_ = ClientMovementType::Boids;
+    ClientMovementType clientMovementType_ = ClientMovementType::Linear;
 	PredSimEngineExport& engineExport_;
     std::random_device rd{};
     std::mt19937 eng_{rd()};

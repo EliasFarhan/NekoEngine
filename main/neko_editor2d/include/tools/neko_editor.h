@@ -151,7 +151,7 @@ protected:
 	NekoEditorExport editorExport_;
 	EntityManager entityManager_;
 	Position2dManager position2dManager_;
-	Scale2dManager scale2dManager_{Vec2f(1.0f,1.0f)};
+	Scale2dManager scale2dManager_;
 	Rotation2dManager rotation2dManager_;
 	sfml::Transform2dManager transform2dManager_;
 	EditorSceneManager sceneManager_;

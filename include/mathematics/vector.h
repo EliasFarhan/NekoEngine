@@ -36,7 +36,7 @@ public:
 	Vec2() : x(0), y(0)
 	{
 	}
-    Vec2(T same) : x(same), y(same)
+    explicit Vec2(T same) : x(same), y(same)
     {
 
     }
@@ -82,6 +82,7 @@ public:
 	{
 		return Vec2<T>(x * rhs, y * rhs);
 	}
+
 	Vec2<T> operator *(const Vec2<T>& rhs) const
 	{
 		return Vec2<T>(x * rhs.x, y * rhs.y);
@@ -188,7 +189,7 @@ public:
     {
     }
 
-    Vec3(T same) : x (same), y(same)
+    explicit Vec3(T same) : x (same), y(same)
     {
 
     }

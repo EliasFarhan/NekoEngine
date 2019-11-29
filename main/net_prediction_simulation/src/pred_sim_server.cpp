@@ -15,7 +15,6 @@ void ServerSimSystem::Init()
 {
     auto& clientSystem_ = engineExport_.client;
     auto& entityManager = engineExport_.entityManager;
-    auto& transformManager = engineExport_.transform2dManager;
     auto& velocityManager = engineExport_.velocityManager;
     serverEntities_.reserve(actorNmb);
     serverActorsDataBuffer_.resize(actorNmb);
@@ -103,7 +102,6 @@ void ServerSimSystem::Update([[maybe_unused]] float dt)
         dataSent_ = 0;
     }
 
-    auto& transformManager = engineExport_.transform2dManager;
     auto& positionManager = engineExport_.position2dManager;
     auto& rotationManager = engineExport_.rotation2dManager;
     auto& velocityManager = engineExport_.velocityManager;

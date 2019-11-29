@@ -47,17 +47,20 @@ private:
     friend class ServerSimSystem;
 
     friend class ClientSimSystem;
+
+    EntityManager entityManager_;
 	PredSimEngineExport engineExport_;
     ServerSimSystem server_;
     ClientSimSystem client_;
     Globals globals_;
-	
-    EntityManager entityManager_;
+
     sfml::Transform2dManager transformManager_;
 	Position2dManager positionManager_;
 	Scale2dManager scaleManager_;
 	Rotation2dManager rotationManager_;
 	sfml::ConvexShapeManager shapeManager_;
+	sfml::TextureManager textureManager_;
+	sfml::SpriteManager spriteManager_;
     VelocityManager velocitiesManager_;
 };
 

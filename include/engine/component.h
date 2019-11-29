@@ -76,11 +76,6 @@ public:
         ResizeIfNecessary(components_, INIT_ENTITY_NMB - 1, T{});
     }
 
-    explicit ComponentManager(T default_value)
-    {
-        ResizeIfNecessary(components_, INIT_ENTITY_NMB - 1, default_value);
-    }
-
     virtual ~ComponentManager()
     {};
 

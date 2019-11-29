@@ -27,7 +27,8 @@ transformManager_(
 	scaleManager_(entityManager_),
 	rotationManager_(entityManager_),
 	shapeManager_(entityManager_),
-	velocitiesManager_(entityManager_)
+	velocitiesManager_(entityManager_),
+	spriteManager_(entityManager_, textureManager_)
 {
 }
 
@@ -36,10 +37,17 @@ void PredSimEngine::Init()
 	config.framerateLimit = 60u;
 	config.vSync = false;
 	SfmlBasicEngine::Init();
+
+
 	client_.Init();
 	server_.Init();
-	
-	updateDelegate_.RegisterCallback([this](float dt)
+    auto texId = textureManager_.LoadTexture("data/sprites/hero/jump/hero1.png");
+    for(Entity i = 0; i < actorNmb*2; i++)
+    {
+        spriteManager_.AddComponent(entityManager_, i);
+        spriteManager_.CopyTexture(texId, i, 1);
+    }
+    updateDelegate_.RegisterCallback([this](float dt)
 		{
 			client_.Update(dt);
 			server_.Update(dt);
@@ -51,6 +59,8 @@ void PredSimEngine::Init()
 				shapeManager_.PushCommands(graphicsManager_, 0, globals_.shownActorNmb);
 			}
 			shapeManager_.PushCommands(graphicsManager_, actorNmb, globals_.shownActorNmb);
+			spriteManager_.CopyAllTransformPositions(entityManager_, positionManager_);
+			spriteManager_.PushAllCommands(entityManager_, graphicsManager_);
 		});
 }
 

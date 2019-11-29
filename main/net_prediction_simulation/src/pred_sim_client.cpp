@@ -24,7 +24,6 @@ void ClientSimSystem::Init()
 {
 
     auto& entityManager = engineExport_.entityManager;
-    auto& transformManager = engineExport_.transform2dManager;
     auto& positionManager = engineExport_.position2dManager;
     auto& rotationManager = engineExport_.rotation2dManager;
     auto& velocityManager = engineExport_.velocityManager;
@@ -84,7 +83,6 @@ void ClientSimSystem::Update(float dt)
         }
     }
 
-    auto& transformManager = engineExport_.transform2dManager;
     auto& positionManager = engineExport_.position2dManager;
     auto& rotationManager = engineExport_.rotation2dManager;
     auto& velocityManager = engineExport_.velocityManager;
@@ -98,7 +96,7 @@ void ClientSimSystem::Update(float dt)
 
 
 // seed the generator
-    for (auto& entity : entities_)
+    for (auto entity : entities_)
     {
         neko::Vec2f pos;
         neko::Vec2f vel;

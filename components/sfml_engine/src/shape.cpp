@@ -47,7 +47,8 @@ void ConvexShapeManager::AddBox(Entity entity, const Vec2f& pos, const Vec2f& ha
 void ConvexShapeManager::AddPolygon(Entity entity, const Vec2f& pos, const Vec2f* points, size_t pointNmb,
                                     const ShapeDef& shapeDef)
 {
-    sf::ConvexShape newPolygon;
+
+    sf::ConvexShape& newPolygon = components_[entity].shape_;
     newPolygon.setPointCount(pointNmb);
     newPolygon.setPosition(unit2pixel(pos));
     for (auto i = 0u; i < pointNmb; i++)
@@ -57,8 +58,7 @@ void ConvexShapeManager::AddPolygon(Entity entity, const Vec2f& pos, const Vec2f
     newPolygon.setFillColor(shapeDef.fillColor);
     newPolygon.setOutlineColor(shapeDef.outlineColor);
     newPolygon.setOutlineThickness(shapeDef.outlineThickness);
-    ResizeIfNecessary(components_, entity, {});
-    components_[entity].shape_ = newPolygon;
+    //components_[entity].shape_ = newPolygon;
 }
 
 void ConvexShapeManager::CopyTransformPosition(Position2dManager& positionManager, size_t start, size_t length)
@@ -83,8 +83,8 @@ void ConvexShapeManager::PushCommands(GraphicsManager& graphicsManager, size_t s
 {
     for(auto i = start; i < start+length;i++)
     {
-
         components_[i].SetDrawable(&components_[i].shape_);
+        components_[i].SetStates(sf::RenderStates::Default);
         graphicsManager.Render(&components_[i]);
     }
 }
