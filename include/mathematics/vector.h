@@ -67,7 +67,7 @@ public:
 		return *this;
 	}
 
-	Vec2<T> operator -(const Vec2<T>& rhs)
+	Vec2<T> operator -(const Vec2<T>& rhs) const
 	{
 		return Vec2<T>(x - rhs.x, y - rhs.y);
 	}
