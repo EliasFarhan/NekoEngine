@@ -8,7 +8,7 @@
 
 namespace neko::net
 {
-class PredSimEngineExport;
+struct PredSimEngineExport;
 class ServerSimSystem : public neko::System
 {
 public:

@@ -54,7 +54,7 @@ void ServerSimSystem::Init()
         shapeManager.AddPolygon(entity, position, points, 3, serverShape);
         i++;
     }
-    engineExport_.engine.drawUiDelegate_.RegisterCallback([this](float dt){
+    engineExport_.engine.drawUiDelegate_.RegisterCallback([this]([[maybe_unused]]float dt){
         auto& globals = engineExport_.engine.globals_;
         ImGui::Begin("Server Control");
         ImGui::LabelText("Bandwidth", "%f bytes/s", currentSecondBandwidth_);

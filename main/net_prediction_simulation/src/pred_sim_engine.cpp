@@ -27,8 +27,8 @@ transformManager_(
 	scaleManager_(entityManager_),
 	rotationManager_(entityManager_),
 	shapeManager_(entityManager_),
-	velocitiesManager_(entityManager_),
-	spriteManager_(entityManager_, textureManager_)
+    spriteManager_(entityManager_, textureManager_),
+	velocitiesManager_(entityManager_)
 {
 }
 
