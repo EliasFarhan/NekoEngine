@@ -58,7 +58,7 @@ void ServerSimSystem::Init()
         auto& globals = engineExport_.engine.globals_;
         ImGui::Begin("Server Control");
         ImGui::LabelText("Bandwidth", "%f bytes/s", currentSecondBandwidth_);
-        const char* serverPredictionName[] = {"None", "Interpolation", "Extrapolation", "Catmull Interpolation"};
+        const char* serverPredictionName[] = {"None", "Interpolation", "Extrapolation", "Speed Interpolation", "Catmull Interpolation"};
         static int serverComboIndex = int(serverPredictionType_);
         if (ImGui::Combo("Prediction", &serverComboIndex, serverPredictionName, 4))
         {
@@ -162,6 +162,47 @@ void ServerSimSystem::Update([[maybe_unused]] float dt)
             }
             break;
         }
+		case ServerPredictionType::SpeedInterpolation:
+		{
+			for (auto& entity : serverEntities_)
+			{
+				const auto index = Index(
+					std::find(serverEntities_.cbegin(), serverEntities_.cend(), entity) - serverEntities_.cbegin());
+				const auto lastActorData = serverActorsDataBuffer_[index].back();
+				const auto previousActorData = serverActorsDataBuffer_[index][serverActorDataBufferSize - 2];
+				const auto previousTick = previousActorData.tickIndex;
+				const auto lastTick = lastActorData.tickIndex;
+				if (lastTick > previousTick)
+				{
+					const float currentTime =
+						(float(tick_) - float(previousTick)) / (float(lastTick) - float(previousTick));
+
+					const auto velocity = neko::Vec2f::Lerp(previousActorData.velocity, lastActorData.velocity,
+						currentTime);
+					velocityManager.SetComponent(entity, velocity);
+					
+					const auto position = neko::Vec2f::Lerp(previousActorData.position, lastActorData.position,
+						currentTime);
+					positionManager.SetComponent(entity, position);
+
+
+
+					const float newAngle = AngleBetween(velocity, neko::Vec2f(0.0f, -1.0f));
+					rotationManager.SetComponent(entity, newAngle);
+				}
+				else
+				{
+					const auto position = lastActorData.position;
+					positionManager.SetComponent(entity, position);
+					const auto velocity = lastActorData.velocity;
+					velocityManager.SetComponent(entity, velocity);
+					const float newAngle = AngleBetween(velocity, neko::Vec2f(0.0f, -1.0f));
+					rotationManager.SetComponent(entity, newAngle);
+				}
+
+			}
+			break;
+		}
         case ServerPredictionType::Interpolation:
         {
             neko::Index lastGlobalTick = tick_ > engineExport_.engine.globals_.serverDelayPeriod ? tick_ - engineExport_.engine.globals_.serverDelayPeriod : 0;

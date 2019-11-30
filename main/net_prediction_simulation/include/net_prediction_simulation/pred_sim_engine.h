@@ -59,8 +59,6 @@ private:
 	Scale2dManager scaleManager_;
 	Rotation2dManager rotationManager_;
 	sfml::ConvexShapeManager shapeManager_;
-	sfml::TextureManager textureManager_;
-	sfml::SpriteManager spriteManager_;
     VelocityManager velocitiesManager_;
 };
 

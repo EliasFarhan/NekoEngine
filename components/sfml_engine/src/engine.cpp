@@ -39,12 +39,12 @@ void SfmlBasicEngine::Update(float dt)
 	window_->clear(sf::Color::Black);
 	updateDelegate_.Execute(dt);
 
+	RenderTarget renderTarget{ static_cast<sf::RenderTarget*>(window_.get()) };
+	graphicsManager_.RenderAll(&renderTarget);
 	ImGui::SFML::Update(*window_, sf::seconds(dt));
 	//update Ui
 	drawUiDelegate_.Execute(dt);
 	ImGui::SFML::Render(*window_);
-    RenderTarget renderTarget{ window_.get() };
-    graphicsManager_.RenderAll(&renderTarget);
 	window_->display();
 }
 
