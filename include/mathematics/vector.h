@@ -28,168 +28,174 @@
 
 namespace neko
 {
-template <typename T>
+template<typename T>
 class Vec2
 {
 public:
 
-	Vec2() : x(0), y(0)
-	{
-	}
+    Vec2() : x(0), y(0)
+    {
+    }
+
     explicit Vec2(T same) : x(same), y(same)
     {
 
     }
-	Vec2(T X, T Y) : x(X), y(Y)
-	{
-	}
 
-	template <typename U>
-	explicit Vec2(const Vec2<U>& vector) : x(static_cast<T>(vector.x)), y(static_cast<T>(vector.y))
-	{
-	}
+    Vec2(T X, T Y) : x(X), y(Y)
+    {
+    }
 
-	T GetSquareMagnitude() { return x * x + y * y; }
+    template<typename U>
+    explicit Vec2(const Vec2<U>& vector) : x(static_cast<T>(vector.x)), y(static_cast<T>(vector.y))
+    {
+    }
 
-	static T Dot(const Vec2<T>& v1, const Vec2<T>& v2)
-	{
-		return v1.x*v2.x + v1.y*v2.y;
-	}
-	
-	Vec2<T> operator +(const Vec2<T>& rhs) const
-	{
-		return Vec2<T>(x + rhs.x, y + rhs.y);
-	}
-	Vec2<T>& operator +=(const Vec2<T>& rhs)
-	{
-		this->x += rhs.x;
-		this->y += rhs.y;
-		return *this;
-	}
+    T GetSquareMagnitude()
+    { return x * x + y * y; }
 
-	Vec2<T> operator -(const Vec2<T>& rhs) const
-	{
-		return Vec2<T>(x - rhs.x, y - rhs.y);
-	}
-	Vec2<T>& operator -=(const Vec2<T>& rhs)
-	{
-		this->x -= rhs.x;
-		this->y -= rhs.y;
-		return *this;
-	}
+    static T Dot(const Vec2<T>& v1, const Vec2<T>& v2)
+    {
+        return v1.x * v2.x + v1.y * v2.y;
+    }
 
-	Vec2<T> operator *(T rhs) const
-	{
-		return Vec2<T>(x * rhs, y * rhs);
-	}
+    Vec2<T> operator+(const Vec2<T>& rhs) const
+    {
+        return Vec2<T>(x + rhs.x, y + rhs.y);
+    }
 
-	Vec2<T> operator *(const Vec2<T>& rhs) const
-	{
-		return Vec2<T>(x * rhs.x, y * rhs.y);
-	}
+    Vec2<T>& operator+=(const Vec2<T>& rhs)
+    {
+        this->x += rhs.x;
+        this->y += rhs.y;
+        return *this;
+    }
 
-	
+    Vec2<T> operator-(const Vec2<T>& rhs) const
+    {
+        return Vec2<T>(x - rhs.x, y - rhs.y);
+    }
 
-	Vec2<T>& operator *=(T rhs)
-	{
-		this->x *= rhs;
-		this->y *= rhs;
-		return *this;
-	}
+    Vec2<T>& operator-=(const Vec2<T>& rhs)
+    {
+        this->x -= rhs.x;
+        this->y -= rhs.y;
+        return *this;
+    }
 
-	Vec2<T> operator /( T rhs) const
-	{
-		return (*this) * (1.0f / rhs);
-	}
+    Vec2<T> operator*(T rhs) const
+    {
+        return Vec2<T>(x * rhs, y * rhs);
+    }
 
-	Vec2<T>& operator /=(T rhs)
-	{
-		this->x /= rhs;
-		this->y /= rhs;
-		return *this;
-	}
+    Vec2<T> operator*(const Vec2<T>& rhs) const
+    {
+        return Vec2<T>(x * rhs.x, y * rhs.y);
+    }
 
-	bool operator ==( const Vec2<T>& right)
-	{
-		return x == right.x && y == right.y;
-	}
 
-	bool operator !=( const Vec2<T>& right)
-	{
-		return !(*this == right);
-	}
+    Vec2<T>& operator*=(T rhs)
+    {
+        this->x *= rhs;
+        this->y *= rhs;
+        return *this;
+    }
 
-	T GetMagnitude() const;
+    Vec2<T> operator/(T rhs) const
+    {
+        return (*this) * (1.0f / rhs);
+    }
 
-	Vec2<T> Normalized() const
-	{
-		return (*this) / (*this).GetMagnitude();
-	}
+    Vec2<T>& operator/=(T rhs)
+    {
+        this->x /= rhs;
+        this->y /= rhs;
+        return *this;
+    }
 
-	Vec2<T> Rotate(T angle) const;
+    bool operator==(const Vec2<T>& right)
+    {
+        return x == right.x && y == right.y;
+    }
 
-	static Vec2<T> Lerp(const Vec2<T>& v1, const Vec2<T>& v2, T t)
-	{
-		return v1 + (v2 - v1) * t;
-	}
+    bool operator!=(const Vec2<T>& right)
+    {
+        return !(*this == right);
+    }
 
-	friend std::ostream& operator<<(std::ostream& os, const Vec2<T>& dt)
-	{
-		os << "Vec2(" << dt.x << "," << dt.y << ")";
-		return os;
-	}
+    T GetMagnitude() const;
 
-	template <typename U>
-	explicit Vec2(const U& v);
-	template <typename U>
-	explicit operator U() const;
+    Vec2<T> Normalized() const
+    {
+        return (*this) / (*this).GetMagnitude();
+    }
 
-	T x; ///< X coordinate of the vector
-	T y; ///< Y coordinate of the vector
+    Vec2<T> Rotate(T angle) const;
 
-	const static Vec2 Zero;
-	const static Vec2 One;
+    static Vec2<T> Lerp(const Vec2<T>& v1, const Vec2<T>& v2, T t)
+    {
+        return v1 + (v2 - v1) * t;
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const Vec2<T>& dt)
+    {
+        os << "Vec2(" << dt.x << "," << dt.y << ")";
+        return os;
+    }
+
+    template<typename U>
+    explicit Vec2(const U& v);
+
+    template<typename U>
+    explicit operator U() const;
+
+    T x; ///< X coordinate of the vector
+    T y; ///< Y coordinate of the vector
+
+    const static Vec2 Zero;
+    const static Vec2 One;
 };
+
 template<typename T>
-Vec2<T> operator *(T lhs, const Vec2<T>& rhs)
+Vec2<T> operator*(T lhs, const Vec2<T>& rhs)
 {
-	return Vec2<T>(rhs.x*lhs, rhs.y*lhs);
+    return Vec2<T>(rhs.x * lhs, rhs.y * lhs);
 }
 
 using Vec2f = Vec2<float>;
 
 
-template <>
+template<>
 inline float Vec2f::GetMagnitude() const
 {
-	return sqrtf(x * x + y * y);
+    return sqrtf(x * x + y * y);
 }
 
-template <>
+template<>
 inline Vec2<float> Vec2f::Rotate(float angle) const
 {
-	const float radianAngle = glm::radians(angle);
-	return Vec2f(cosf(radianAngle) * x - sinf(radianAngle) * y,
-		sinf(radianAngle) * x + cosf(radianAngle) * y);
+    const float radianAngle = glm::radians(angle);
+    return Vec2f(cosf(radianAngle) * x - sinf(radianAngle) * y,
+                 sinf(radianAngle) * x + cosf(radianAngle) * y);
 }
-
 
 
 float AngleBetween(const Vec2f& v1, const Vec2f& v2);
 
 
-template <typename T>
+template<typename T>
 class Vec3
 {
 public:
     T x, y, z;
     const static Vec3 Zero;
     const static Vec3 One;
+
     Vec3() : x(0), y(0), z(0)
     {
     }
 
-    explicit Vec3(T same) : x (same), y(same)
+    explicit Vec3(T same) : x(same), y(same)
     {
 
     }
@@ -199,23 +205,30 @@ public:
 
     }
 
-    template <typename U>
+    template<typename U>
     explicit Vec3(const Vec3<U>& vector) : x(static_cast<T>(vector.x)), y(static_cast<T>(vector.y))
     {
     }
 
-    T GetSquareMagnitude() const { return x * x + y * y; }
-    T GetMagnitude() const;
-    static T Dot(const Vec2<T>& v1, const Vec2<T>& v2)
-    {
-        return v1.x*v2.x + v1.y*v2.y;
+    T GetSquareMagnitude() const
+    { return Dot(*this, *this); }
+
+    template <typename ReturnT = float>
+    ReturnT GetMagnitude() const {
+        return std::sqrt(GetSquareMagnitude());
     }
 
-    Vec3<T> operator +(const Vec3<T>& rhs)
+    static T Dot(const Vec3<T> v1, const Vec3<T> v2)
+    {
+        return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+    }
+
+    Vec3<T> operator+(const Vec3<T>& rhs) const
     {
         return Vec3<T>(x + rhs.x, y + rhs.y, z + rhs.z);
     }
-    Vec3<T>& operator +=(const Vec3<T>& rhs)
+
+    Vec3<T>& operator+=(const Vec3<T>& rhs)
     {
         this->x += rhs.x;
         this->y += rhs.y;
@@ -223,11 +236,12 @@ public:
         return *this;
     }
 
-    Vec3<T> operator -(const Vec3<T>& rhs)
+    Vec3<T> operator-(const Vec3<T>& rhs) const
     {
         return Vec3<T>(x - rhs.x, y - rhs.y, z - rhs.z);
     }
-    Vec3<T>& operator -=(const Vec3<T>& rhs)
+
+    Vec3<T>& operator-=(const Vec3<T>& rhs)
     {
         this->x -= rhs.x;
         this->y -= rhs.y;
@@ -235,18 +249,18 @@ public:
         return *this;
     }
 
-    Vec3<T> operator *(T rhs) const
+    Vec3<T> operator*(T rhs) const
     {
         return Vec3<T>(x * rhs, y * rhs, z * rhs);
     }
-    Vec3<T> operator *(const Vec3<T>& rhs) const
+
+    Vec3<T> operator*(const Vec3<T>& rhs) const
     {
         return Vec3<T>(x * rhs.x, y * rhs.y, z * rhs.z);
     }
 
 
-
-    Vec3<T>& operator *=(T rhs)
+    Vec3<T>& operator*=(T rhs)
     {
         this->x *= rhs;
         this->y *= rhs;
@@ -254,23 +268,23 @@ public:
         return *this;
     }
 
-    Vec3<T> operator /( T rhs) const
+    Vec3<T> operator/(T rhs) const
     {
         return (*this) * (1.0f / rhs);
     }
 
-    Vec3<T>& operator /=(T rhs)
+    Vec3<T>& operator/=(T rhs)
     {
         *this = *this / rhs;
         return *this;
     }
 
-    bool operator ==( const Vec3<T>& right)
+    bool operator==(const Vec3<T>& right) const
     {
         return x == right.x && y == right.y && z == right.z;
     }
 
-    bool operator !=( const Vec3<T>& right)
+    bool operator!=(const Vec3<T>& right) const
     {
         return !(*this == right);
     }
@@ -281,9 +295,125 @@ public:
 using Vec3f = Vec3<float>;
 
 
-template <>
-inline float Vec3f::GetMagnitude() const
+template<typename T>
+class Vec4
 {
-    return sqrtf(GetSquareMagnitude());
-}
+public:
+    T x, y, z, w;
+    const static Vec4 Zero;
+    const static Vec4 One;
+
+    Vec4() : x(0), y(0), z(0), w(0)
+    {
+    }
+
+    explicit Vec4(T same) : x(same), y(same), z(same), w(same)
+    {
+
+    }
+
+    Vec4(T X, T Y, T Z, T w) : x(X), y(Y), z(Z), w(w)
+    {
+
+    }
+
+    template<typename U>
+    explicit
+    Vec4(const Vec4<U>& vector) : x(static_cast<T>(vector.x)),
+                                  y(static_cast<T>(vector.y)),
+                                  z(static_cast<T>(vector.z)),
+                                  w(static_cast<T>(vector.w))
+    {
+    }
+
+    T GetSquareMagnitude() const
+    { return Dot(*this, *this); }
+
+    template <typename ReturnT = float>
+    ReturnT GetMagnitude() const {
+        return std::sqrt<ReturnT>(GetSquareMagnitude());
+    }
+
+    static T Dot(const Vec4<T> v1, const Vec4<T> v2)
+    {
+        return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z + v1.w * v2.w;
+    }
+
+    static T Dot3(const Vec4<T> v1, const Vec4<T> v2)
+    {
+        return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+    }
+
+    Vec4<T> operator+(const Vec4<T>& rhs) const
+    {
+        return Vec4<T>(x + rhs.x, y + rhs.y, z + rhs.z, w + rhs.w);
+    }
+
+    Vec4<T>& operator+=(const Vec4<T>& rhs)
+    {
+        this->x += rhs.x;
+        this->y += rhs.y;
+        this->z += rhs.z;
+        return *this;
+    }
+
+    Vec4<T> operator-(const Vec4<T>& rhs)
+    {
+        return Vec4<T>(x - rhs.x, y - rhs.y, z - rhs.z, w - rhs.z);
+    }
+
+    Vec4<T>& operator-=(const Vec4<T>& rhs)
+    {
+        this->x -= rhs.x;
+        this->y -= rhs.y;
+        this->z -= rhs.z;
+        return *this;
+    }
+
+    Vec4<T> operator*(T rhs) const
+    {
+        return Vec4<T>(x * rhs, y * rhs, z * rhs, w * rhs);
+    }
+
+    Vec4<T> operator*(const Vec4<T>& rhs) const
+    {
+        return Vec4<T>(x * rhs.x, y * rhs.y, z * rhs.z, w * rhs.w);
+    }
+
+
+    Vec4<T>& operator*=(T rhs)
+    {
+        this->x *= rhs;
+        this->y *= rhs;
+        this->z *= rhs;
+        return *this;
+    }
+
+    Vec4<T> operator/(T rhs) const
+    {
+        return (*this) * (1.0f / rhs);
+    }
+
+    Vec4<T>& operator/=(T rhs)
+    {
+        *this = *this / rhs;
+        return *this;
+    }
+
+    bool operator==(const Vec4<T>& right)
+    {
+        return x == right.x && y == right.y && z == right.z;
+    }
+
+    bool operator!=(const Vec4<T>& right)
+    {
+        return !(*this == right);
+    }
+
+
+};
+
+using Vec4f = Vec4<float>;
+
+
 }
