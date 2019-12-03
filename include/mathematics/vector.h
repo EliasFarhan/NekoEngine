@@ -185,7 +185,7 @@ float AngleBetween(const Vec2f& v1, const Vec2f& v2);
 
 
 template<typename T>
-class Vec3
+class  alignas(16) Vec3
 {
 public:
     T x, y, z;
