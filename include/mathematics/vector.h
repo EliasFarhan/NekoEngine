@@ -25,6 +25,7 @@
 
 #include <ostream>
 #include <glm/glm.hpp>
+#include <array>
 
 namespace neko
 {
@@ -213,8 +214,9 @@ public:
     T GetSquareMagnitude() const
     { return Dot(*this, *this); }
 
-    template <typename ReturnT = float>
-    ReturnT GetMagnitude() const {
+    template<typename ReturnT = float>
+    ReturnT GetMagnitude() const
+    {
         return std::sqrt(GetSquareMagnitude());
     }
 
@@ -296,7 +298,7 @@ using Vec3f = Vec3<float>;
 
 
 template<typename T>
-class Vec4
+class alignas(16) Vec4
 {
 public:
     T x, y, z, w;
@@ -329,8 +331,9 @@ public:
     T GetSquareMagnitude() const
     { return Dot(*this, *this); }
 
-    template <typename ReturnT = float>
-    ReturnT GetMagnitude() const {
+    template<typename ReturnT = float>
+    ReturnT GetMagnitude() const
+    {
         return std::sqrt<ReturnT>(GetSquareMagnitude());
     }
 
@@ -414,6 +417,60 @@ public:
 };
 
 using Vec4f = Vec4<float>;
+
+template<typename T>
+struct alignas(4*sizeof(T)) FourVec4
+{
+    std::array<T, 4> xs;
+    std::array<T, 4> ys;
+    std::array<T, 4> zs;
+    std::array<T, 4> ws;
+    FourVec4():xs{}, ys{}, zs{}, ws{} {};
+    explicit FourVec4(const std::array<Vec4<T>, 4> soaV)
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            xs[i] = soaV[i].x;
+            ys[i] = soaV[i].y;
+            zs[i] = soaV[i].z;
+            ws[i] = soaV[i].w;
+        }
+    }
+    explicit FourVec4(const Vec3<T>* soaV)
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            xs[i] = soaV[i].x;
+            ys[i] = soaV[i].y;
+            zs[i] = soaV[i].z;
+            ws[i] = 0.0f;
+        }
+    }
+    explicit FourVec4(const Vec4<T>* soaV)
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            xs[i] = soaV[i].x;
+            ys[i] = soaV[i].y;
+            zs[i] = soaV[i].z;
+            ws[i] = soaV[i].w;
+        }
+    }
+
+    std::array<T, 4> Magnitude()
+    {
+        std::array<T, 4> result;
+        for (int i = 0; i < 4; i++)
+        {
+            result[i] = xs[i] * xs[i] + ys[i] * ys[i] + zs[i] * zs[i] + ws[i] * ws[i];
+            result[i] = std::sqrt(result[i]);
+        }
+        return result;
+    }
+
+};
+
+using FourVec4f = FourVec4<float>;
 
 
 }
