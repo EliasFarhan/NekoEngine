@@ -26,6 +26,8 @@
 #include <ostream>
 #include <glm/glm.hpp>
 #include <array>
+#include <cmath>
+#include <mathematics/intrinsincs.h>
 
 namespace neko
 {
@@ -185,8 +187,7 @@ float AngleBetween(const Vec2f& v1, const Vec2f& v2);
 
 
 template<typename T>
-class Vec3
-class  alignas(16) Vec3
+class alignas(4* sizeof(T)) Vec3
 {
 public:
     T x, y, z;
@@ -306,7 +307,7 @@ using Vec3f = Vec3<float>;
 
 
 template<typename T>
-class alignas(16) Vec4
+class alignas(4* sizeof(T)) Vec4
 {
 public:
     T x, y, z, w;
@@ -342,7 +343,7 @@ public:
     template<typename ReturnT = float>
     ReturnT GetMagnitude() const
     {
-        return std::sqrt<ReturnT>(GetSquareMagnitude());
+        return std::sqrt(GetSquareMagnitude());
     }
 
     static T Dot(const Vec4<T> v1, const Vec4<T> v2)
@@ -429,17 +430,17 @@ public:
 
 using Vec4f = Vec4<float>;
 
-template<typename T>
-struct alignas(4*sizeof(T)) FourVec4
+template<typename T, int N>
+struct alignas(N*sizeof(T)) NVec4
 {
-    std::array<T, 4> xs;
-    std::array<T, 4> ys;
-    std::array<T, 4> zs;
-    std::array<T, 4> ws;
-    FourVec4():xs{}, ys{}, zs{}, ws{} {};
-    explicit FourVec4(const std::array<Vec4<T>, 4> soaV)
+    std::array<T, N> xs;
+    std::array<T, N> ys;
+    std::array<T, N> zs;
+    std::array<T, N> ws;
+    NVec4():xs{}, ys{}, zs{}, ws{} {};
+    explicit NVec4(const std::array<Vec4<T>, N> soaV)
     {
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < N; i++)
         {
             xs[i] = soaV[i].x;
             ys[i] = soaV[i].y;
@@ -447,9 +448,9 @@ struct alignas(4*sizeof(T)) FourVec4
             ws[i] = soaV[i].w;
         }
     }
-    explicit FourVec4(const Vec3<T>* soaV)
+    explicit NVec4(const Vec3<T>* soaV)
     {
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < N; i++)
         {
             xs[i] = soaV[i].x;
             ys[i] = soaV[i].y;
@@ -457,9 +458,9 @@ struct alignas(4*sizeof(T)) FourVec4
             ws[i] = 0.0f;
         }
     }
-    explicit FourVec4(const Vec4<T>* soaV)
+    explicit NVec4(const Vec4<T>* soaV)
     {
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < N; i++)
         {
             xs[i] = soaV[i].x;
             ys[i] = soaV[i].y;
@@ -468,18 +469,81 @@ struct alignas(4*sizeof(T)) FourVec4
         }
     }
 
-    std::array<T, 4> Magnitude()
+    std::array<T, N> GetMagnitude() const
     {
-        std::array<T, 4> result;
-        for (int i = 0; i < 4; i++)
+        std::array<T, N> result;
+        for (int i = 0; i < N; i++)
         {
             result[i] = xs[i] * xs[i] + ys[i] * ys[i] + zs[i] * zs[i] + ws[i] * ws[i];
             result[i] = std::sqrt(result[i]);
         }
         return result;
     }
+    std::array<T, N> GetMagnitudeIntrinsincs() const;
 
 };
 
-using FourVec4f = FourVec4<float>;
+
+
+
+using FourVec4f = NVec4<float, 4>;
+using EightVec4f = NVec4<float, 8>;
+#ifdef __SSE__
+template<>
+std::array<float, 4> FourVec4f::GetMagnitudeIntrinsincs() const
+{
+    __m128 x = _mm_load_ps(&xs[0]);
+    __m128 y = _mm_load_ps(&ys[0]);
+    __m128 z = _mm_load_ps(&zs[0]);
+    __m128 w = _mm_load_ps(&ws[0]);
+
+    x = _mm_mul_ps(x, x);
+    y = _mm_mul_ps(y, y);
+    z = _mm_mul_ps(z, z);
+    w = _mm_mul_ps(w, w);
+
+    x = _mm_add_ps(x, y);
+    z = _mm_add_ps(z, w);
+
+    x = _mm_add_ps(x, z);
+    std::array<float, 4> result;
+    _mm_store_ps(&result[0], x);
+    return result;
+}
+#endif
+#ifdef __AVX2__
+template <>
+std::array<float, 8> EightVec4f::GetMagnitudeIntrinsincs() const
+{
+    __m256 x = _mm256_load_ps(&xs[0]);
+    __m256 y = _mm256_load_ps(&ys[0]);
+    __m256 z = _mm256_load_ps(&zs[0]);
+    __m256 w = _mm256_load_ps(&ws[0]);
+
+    x = _mm256_mul_ps(x, x);
+    y = _mm256_mul_ps(y, y);
+    z = _mm256_mul_ps(z, z);
+    w = _mm256_mul_ps(w, w);
+
+    x = _mm256_add_ps(x, y);
+    z = _mm256_add_ps(z, w);
+
+    x = _mm256_add_ps(x, z);
+    std::array<float, 8> result;
+    _mm256_storeu_ps(&result[0], x);
+    return result;
+}
+#endif
+template <>
+Vec3f const Vec3f::Zero = Vec3f(0.0f,0.0f, 0.0f);
+template <>
+Vec3f const Vec3f::One = Vec3f(1.0f,1.0f,1.0f);
+template <>
+Vec2f const Vec2f::Zero = Vec2f(0.0f,0.0f);
+template <>
+Vec2f const Vec2f::One = Vec2f(1.0f,1.0f);
+template <>
+Vec4f const Vec4f::Zero = Vec4f(0.0f,0.0f, 0.0f, 0.0f);
+template <>
+Vec4f const Vec4f::One = Vec4f(1.0f,1.0f,1.0f, 1.0f);
 }

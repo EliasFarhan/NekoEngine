@@ -42,16 +42,5 @@ float AngleBetween(const Vec2f& v1, const Vec2f& v2)
 	const float angle = atan2(det, dot) / float(M_PI) * 180.0f;
 	return angle;
 }
-template <>
-Vec3f const Vec3f::Zero = Vec3f(0.0f,0.0f, 0.0f);
-template <>
-Vec3f const Vec3f::One = Vec3f(1.0f,1.0f,1.0f);
-template <>
-Vec2f const Vec2f::Zero = Vec2f(0.0f,0.0f);
-template <>
-Vec2f const Vec2f::One = Vec2f(1.0f,1.0f);
-template <>
-Vec4f const Vec4f::Zero = Vec4f(0.0f,0.0f, 0.0f, 0.0f);
-template <>
-Vec4f const Vec4f::One = Vec4f(1.0f,1.0f,1.0f, 1.0f);
+
 }
