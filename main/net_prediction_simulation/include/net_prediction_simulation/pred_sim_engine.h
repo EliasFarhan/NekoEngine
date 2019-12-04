@@ -16,7 +16,7 @@ namespace neko::net
 
 class VelocityManager : public neko::ComponentManager<neko::Vec2f, velocityMask>
 {
-
+	using ComponentManager::ComponentManager;
 };
 
 struct Globals
@@ -40,7 +40,6 @@ public:
 
     void Init() override;
 
-    void Update(float dt) override;
 
     void Destroy() override;
     const Globals& GetGlobals(){ return globals_; }
@@ -49,12 +48,17 @@ private:
 
     friend class ClientSimSystem;
 
+    EntityManager entityManager_;
+	PredSimEngineExport engineExport_;
     ServerSimSystem server_;
     ClientSimSystem client_;
     Globals globals_;
-    neko::EntityManager entityManager_;
-    neko::sfml::Transform2dManager transformManager_;
-    neko::sfml::ConvexShapeManager shapeManager_;
+
+    sfml::Transform2dManager transformManager_;
+	Position2dManager positionManager_;
+	Scale2dManager scaleManager_;
+	Rotation2dManager rotationManager_;
+	sfml::ConvexShapeManager shapeManager_;
     VelocityManager velocitiesManager_;
 };
 

@@ -5,8 +5,9 @@
 #include "net_prediction_simulation/pred_sim_client.h"
 #include "sfml_engine/physics.h"
 #include "sfml_engine/shape.h"
-#include "net_prediction_simulation/pred_sim_engine.h"
 #include <cmath>
+#include "net_prediction_simulation/pred_engine_export.h"
+#include "net_prediction_simulation/pred_sim_engine.h"
 
 #ifdef WIN32
 #include <corecrt_math_defines.h>
@@ -14,7 +15,7 @@
 namespace neko::net
 {
 
-ClientSimSystem::ClientSimSystem(PredSimEngine& engine) : engine_(engine)
+ClientSimSystem::ClientSimSystem(PredSimEngineExport& engineExport) : engineExport_(engineExport)
 {
 
 }
@@ -22,14 +23,13 @@ ClientSimSystem::ClientSimSystem(PredSimEngine& engine) : engine_(engine)
 void ClientSimSystem::Init()
 {
 
-    auto& entityManager = engine_.entityManager_;
-    auto& transformManager = engine_.transformManager_;
-    auto& positionManager = transformManager.positionManager_;
-    auto& rotationManager = transformManager.rotationManager_;
-    auto& velocityManager = engine_.velocitiesManager_;
-    auto& shapeManager = engine_.shapeManager_;
+    auto& entityManager = engineExport_.entityManager;
+    auto& positionManager = engineExport_.position2dManager;
+    auto& rotationManager = engineExport_.rotation2dManager;
+    auto& velocityManager = engineExport_.velocityManager;
+    auto& shapeManager = engineExport_.shapeManager;
 
-    const auto screenSize = engine_.config.gameWindowSize;
+    const auto screenSize = engineExport_.engine.config.gameWindowSize;
 
     std::uniform_real_distribution<float> distrX(0.0f, float(screenSize.first)); // define the range
     std::uniform_real_distribution<float> distrY(0.0f, float(screenSize.second)); // define the range
@@ -57,7 +57,7 @@ void ClientSimSystem::Init()
 
         neko::sfml::ShapeDef clientShape;
         clientShape.fillColor = sf::Color::Red;
-        clientShape.fillColor.a = engine_.globals_.actorAlpha;
+        clientShape.fillColor.a = engineExport_.engine.globals_.actorAlpha;
 
         shapeManager.AddComponent(entityManager, entity);
         shapeManager.AddPolygon(entity, position, points, 3, clientShape);
@@ -74,7 +74,7 @@ void ClientSimSystem::Update(float dt)
         delayDataIt->second--;
         if (delayDataIt->second == 0)
         {
-            engine_.server_.PushClientData(delayDataIt->first);
+            engineExport_.engine.server_.PushClientData(delayDataIt->first);
             delayDataIt = dataDelayQueue_.erase(delayDataIt);
         }
         else
@@ -83,12 +83,11 @@ void ClientSimSystem::Update(float dt)
         }
     }
 
-    auto& transformManager = engine_.transformManager_;
-    auto& positionManager = transformManager.positionManager_;
-    auto& rotationManager = transformManager.rotationManager_;
-    auto& velocityManager = engine_.velocitiesManager_;
-    const auto& globals = engine_.GetGlobals();
-    const auto screenSize = engine_.config.gameWindowSize;
+    auto& positionManager = engineExport_.position2dManager;
+    auto& rotationManager = engineExport_.rotation2dManager;
+    auto& velocityManager = engineExport_.velocityManager;
+    const auto& globals = engineExport_.engine.GetGlobals();
+    const auto screenSize = engineExport_.engine.config.gameWindowSize;
     const neko::Vec2f centerPos = neko::pixel2unit(
             sf::Vector2f(float(screenSize.first), float(screenSize.second))) / 2.0f;
     std::uniform_int_distribution<neko::Index> distrDelay(globals.packetDelayMin, globals.packetDelayMax); // define the range
@@ -97,7 +96,7 @@ void ClientSimSystem::Update(float dt)
 
 
 // seed the generator
-    for (auto& entity : entities_)
+    for (auto entity : entities_)
     {
         neko::Vec2f pos;
         neko::Vec2f vel;
@@ -129,7 +128,7 @@ void ClientSimSystem::Update(float dt)
                     vel.y *= -1.0f;
                 }
 
-                const float newAngle = neko::Vec2f::AngleBetween(vel, neko::Vec2f(0.0f, -1.0f));
+                const float newAngle = neko::AngleBetween(vel, neko::Vec2f(0.0f, -1.0f));
                 rotationManager.SetComponent(entity, newAngle);
                 velocityManager.SetComponent(entity, vel);
                 break;
@@ -150,7 +149,7 @@ void ClientSimSystem::Update(float dt)
                 pos = newPos;
                 positionManager.SetComponent(entity, newPos);
 
-                const float newAngle = neko::Vec2f::AngleBetween(vel.Normalized(), neko::Vec2f(0.0f, -1.0f));
+                const float newAngle = neko::AngleBetween(vel.Normalized(), neko::Vec2f(0.0f, -1.0f));
                 rotationManager.SetComponent(entity, newAngle);
                 velocityManager.SetComponent(entity, vel);
                 break;
@@ -229,7 +228,7 @@ void ClientSimSystem::Update(float dt)
                 const auto newPos = pos + vel * dt * linearSpeed;
                 pos = newPos;
                 positionManager.SetComponent(entity, newPos);
-                const float newAngle = neko::Vec2f::AngleBetween(vel, neko::Vec2f(0.0f, -1.0f));
+                const float newAngle = neko::AngleBetween(vel, neko::Vec2f(0.0f, -1.0f));
                 rotationManager.SetComponent(entity, newAngle);
                 break;
             }

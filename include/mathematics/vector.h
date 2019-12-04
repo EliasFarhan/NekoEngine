@@ -25,6 +25,7 @@
 
 #include <ostream>
 #include <glm/glm.hpp>
+#include <array>
 
 namespace neko
 {
@@ -37,7 +38,7 @@ public:
     {
     }
 
-    Vec2(T same) : x(same), y(same)
+    explicit Vec2(T same) : x(same), y(same)
     {
 
     }
@@ -59,7 +60,7 @@ public:
         return v1.x * v2.x + v1.y * v2.y;
     }
 
-    Vec2<T> operator+(const Vec2<T>& rhs)
+    Vec2<T> operator+(const Vec2<T>& rhs) const
     {
         return Vec2<T>(x + rhs.x, y + rhs.y);
     }
@@ -71,7 +72,7 @@ public:
         return *this;
     }
 
-    Vec2<T> operator-(const Vec2<T>& rhs)
+    Vec2<T> operator-(const Vec2<T>& rhs) const
     {
         return Vec2<T>(x - rhs.x, y - rhs.y);
     }
@@ -185,6 +186,7 @@ float AngleBetween(const Vec2f& v1, const Vec2f& v2);
 
 template<typename T>
 class Vec3
+class  alignas(16) Vec3
 {
 public:
     T x, y, z;
@@ -195,7 +197,7 @@ public:
     {
     }
 
-    Vec3(T same) : x(same), y(same), z(same)
+    explicit Vec3(T same) : x(same), y(same), z(same)
     {
 
     }
@@ -216,9 +218,14 @@ public:
     T GetSquareMagnitude() const
     { return Dot(*this, *this); }
 
-    T GetMagnitude() const;
 
-    static T Dot(const Vec3<T>& v1, const Vec3<T>& v2)
+    template<typename ReturnT = float>
+    ReturnT GetMagnitude() const
+    {
+        return std::sqrt(GetSquareMagnitude());
+    }
+
+    static T Dot(const Vec3<T> v1, const Vec3<T> v2)
     {
         return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
     }
@@ -236,7 +243,8 @@ public:
         return *this;
     }
 
-    Vec3<T> operator-(const Vec3<T>& rhs)
+
+    Vec3<T> operator-(const Vec3<T>& rhs) const
     {
         return Vec3<T>(x - rhs.x, y - rhs.y, z - rhs.z);
     }
@@ -279,12 +287,12 @@ public:
         return *this;
     }
 
-    bool operator==(const Vec3<T>& right)
+    bool operator==(const Vec3<T>& right) const
     {
         return x == right.x && y == right.y && z == right.z;
     }
 
-    bool operator!=(const Vec3<T>& right)
+    bool operator!=(const Vec3<T>& right) const
     {
         return !(*this == right);
     }
@@ -295,15 +303,10 @@ public:
 using Vec3f = Vec3<float>;
 
 
-template<>
-inline float Vec3f::GetMagnitude() const
-{
-    return sqrtf(GetSquareMagnitude());
-}
 
 
 template<typename T>
-class Vec4
+class alignas(16) Vec4
 {
 public:
     T x, y, z, w;
@@ -335,11 +338,21 @@ public:
     T GetSquareMagnitude() const
     { return Dot(*this, *this); }
 
-    T GetMagnitude() const;
 
-    static T Dot(const Vec4<T>& v1, const Vec4<T>& v2)
+    template<typename ReturnT = float>
+    ReturnT GetMagnitude() const
+    {
+        return std::sqrt<ReturnT>(GetSquareMagnitude());
+    }
+
+    static T Dot(const Vec4<T> v1, const Vec4<T> v2)
     {
         return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z + v1.w * v2.w;
+    }
+
+    static T Dot3(const Vec4<T> v1, const Vec4<T> v2)
+    {
+        return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
     }
 
     Vec4<T> operator+(const Vec4<T>& rhs) const
@@ -356,7 +369,7 @@ public:
         return *this;
     }
 
-    Vec4<T> operator-(const Vec4<T>& rhs)
+    Vec4<T> operator-(const Vec4<T>& rhs) const
     {
         return Vec4<T>(x - rhs.x, y - rhs.y, z - rhs.z, w - rhs.w);
     }
@@ -401,12 +414,12 @@ public:
         return *this;
     }
 
-    bool operator==(const Vec4<T>& right)
+    bool operator==(const Vec4<T>& right) const
     {
         return x == right.x && y == right.y && z == right.z && w == right.w;
     }
 
-    bool operator!=(const Vec4<T>& right)
+    bool operator!=(const Vec4<T>& right) const
     {
         return !(*this == right);
     }
@@ -416,10 +429,57 @@ public:
 
 using Vec4f = Vec4<float>;
 
-
-template<>
-inline float Vec4f::GetMagnitude() const
+template<typename T>
+struct alignas(4*sizeof(T)) FourVec4
 {
-    return sqrtf(GetSquareMagnitude());
-}
+    std::array<T, 4> xs;
+    std::array<T, 4> ys;
+    std::array<T, 4> zs;
+    std::array<T, 4> ws;
+    FourVec4():xs{}, ys{}, zs{}, ws{} {};
+    explicit FourVec4(const std::array<Vec4<T>, 4> soaV)
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            xs[i] = soaV[i].x;
+            ys[i] = soaV[i].y;
+            zs[i] = soaV[i].z;
+            ws[i] = soaV[i].w;
+        }
+    }
+    explicit FourVec4(const Vec3<T>* soaV)
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            xs[i] = soaV[i].x;
+            ys[i] = soaV[i].y;
+            zs[i] = soaV[i].z;
+            ws[i] = 0.0f;
+        }
+    }
+    explicit FourVec4(const Vec4<T>* soaV)
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            xs[i] = soaV[i].x;
+            ys[i] = soaV[i].y;
+            zs[i] = soaV[i].z;
+            ws[i] = soaV[i].w;
+        }
+    }
+
+    std::array<T, 4> Magnitude()
+    {
+        std::array<T, 4> result;
+        for (int i = 0; i < 4; i++)
+        {
+            result[i] = xs[i] * xs[i] + ys[i] * ys[i] + zs[i] * zs[i] + ws[i] * ws[i];
+            result[i] = std::sqrt(result[i]);
+        }
+        return result;
+    }
+
+};
+
+using FourVec4f = FourVec4<float>;
 }

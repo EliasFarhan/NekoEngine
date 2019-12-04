@@ -22,6 +22,7 @@ enum class ServerPredictionType
     None,
     Interpolation,
     Extrapolation,
+	SpeedInterpolation,
     Catmull_Interpolation
 };
 

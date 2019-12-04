@@ -312,7 +312,7 @@ NekoEditorSystem::NekoEditorSystem(NekoEditor& nekoEditor, sfml::TextureManager&
 			{
 				entityManager_,
 				prefabManager_,
-				sceneManager_
+				sceneManager_{Vec2f(1.0f,1.0f)}
 			},
 			position2dManager_,
 			scale2dManager_,
@@ -333,7 +333,7 @@ NekoEditorSystem::NekoEditorSystem(NekoEditor& nekoEditor, sfml::TextureManager&
 		nekoEditor.config,
 		nekoEditor,
 		entityNameManager_
-}, position2dManager_(entityManager_), rotation2dManager_(entityManager_),
+}, position2dManager_(entityManager_), rotation2dManager_(entityManager_), scale2dManager_(entityManager_),
 transform2dManager_(position2dManager_, scale2dManager_, rotation2dManager_),
 sceneManager_(editorExport_), bodyDef2DManager_(entityManager_),
 spriteManager_(entityManager_, textureManager),

@@ -5,19 +5,20 @@
 #include <unordered_map>
 #include "actor_data.h"
 
+
 namespace neko::net
 {
-class PredSimEngine;
+struc  PredSimEngineExport;
 class ServerSimSystem : public neko::System
 {
 public:
-    explicit ServerSimSystem(PredSimEngine& engine);
+    explicit ServerSimSystem(PredSimEngineExport& engineExport);
     void Init() override;
     void Update(float dt) override;
     void Destroy() override;
     void PushClientData(const ActorData& data);
 private:
-    PredSimEngine& engine_;
+    PredSimEngineExport& engineExport_;
     std::vector<std::array<ActorData, serverActorDataBufferSize>> serverActorsDataBuffer_;
     std::vector<neko::Entity> serverEntities_;
     std::unordered_map<neko::Entity, neko::Entity> entitiesTranslateTable_;

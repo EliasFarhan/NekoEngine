@@ -55,7 +55,7 @@ static void BM_IntSumMutexAround(benchmark::State& state)
 	}
 }
 
-BENCHMARK(BM_IntSumMutexAround)->Range(fromRange, toRange);
+BENCHMARK(BM_IntSumMutexAround)->Range(fromRange, toRange)->UseRealTime();
 
 static void BM_IntSumMutexIn(benchmark::State& state)
 {
@@ -70,7 +70,7 @@ static void BM_IntSumMutexIn(benchmark::State& state)
     }
 }
 
-BENCHMARK(BM_IntSumMutexIn)->Range(fromRange, toRange);
+BENCHMARK(BM_IntSumMutexIn)->Range(fromRange, toRange)->UseRealTime();
 
 static void BM_AtomicIntSum(benchmark::State& state)
 {
@@ -84,7 +84,7 @@ static void BM_AtomicIntSum(benchmark::State& state)
 	}
 }
 
-BENCHMARK(BM_AtomicIntSum)->Range(fromRange, toRange);
+BENCHMARK(BM_AtomicIntSum)->Range(fromRange, toRange)->UseRealTime();
 
 static void BM_ThreadAtomic2IntSum(benchmark::State& state)
 {
@@ -104,7 +104,7 @@ static void BM_ThreadAtomic2IntSum(benchmark::State& state)
 	}
 }
 
-BENCHMARK(BM_ThreadAtomic2IntSum)->Range(fromRange, toRange);
+BENCHMARK(BM_ThreadAtomic2IntSum)->Range(fromRange, toRange)->UseRealTime()->Threads(2);
 
 static void BM_ThreadAtomic4IntSum(benchmark::State& state)
 {
@@ -124,7 +124,7 @@ static void BM_ThreadAtomic4IntSum(benchmark::State& state)
 	}
 }
 
-BENCHMARK(BM_ThreadAtomic4IntSum)->Range(fromRange, toRange);
+BENCHMARK(BM_ThreadAtomic4IntSum)->Range(fromRange, toRange)->UseRealTime()->Threads(4);
 
 static void BM_ThreadAtomic2SeparateIntSum(benchmark::State& state)
 {
@@ -148,7 +148,7 @@ static void BM_ThreadAtomic2SeparateIntSum(benchmark::State& state)
     }
 }
 
-BENCHMARK(BM_ThreadAtomic2SeparateIntSum)->Range(fromRange, toRange);
+BENCHMARK(BM_ThreadAtomic2SeparateIntSum)->Range(fromRange, toRange)->UseRealTime()->Threads(2);
 
 static void BM_ThreadAtomic4SeparateIntSum(benchmark::State& state)
 {
@@ -172,7 +172,7 @@ static void BM_ThreadAtomic4SeparateIntSum(benchmark::State& state)
     }
 }
 
-BENCHMARK(BM_ThreadAtomic4SeparateIntSum)->Range(fromRange, toRange);
+BENCHMARK(BM_ThreadAtomic4SeparateIntSum)->Range(fromRange, toRange)->UseRealTime()->Threads(4);
 
 static void BM_ThreadAtomic2SeparateCachelineIntSum(benchmark::State& state)
 {
@@ -196,7 +196,7 @@ static void BM_ThreadAtomic2SeparateCachelineIntSum(benchmark::State& state)
     }
 }
 
-BENCHMARK(BM_ThreadAtomic2SeparateCachelineIntSum)->Range(fromRange, toRange);
+BENCHMARK(BM_ThreadAtomic2SeparateCachelineIntSum)->Range(fromRange, toRange)->UseRealTime()->Threads(2);
 
 static void BM_ThreadAtomic4SeparateCachelineIntSum(benchmark::State& state)
 {
@@ -220,4 +220,4 @@ static void BM_ThreadAtomic4SeparateCachelineIntSum(benchmark::State& state)
     }
 }
 
-BENCHMARK(BM_ThreadAtomic4SeparateCachelineIntSum)->Range(fromRange, toRange);
+BENCHMARK(BM_ThreadAtomic4SeparateCachelineIntSum)->Range(fromRange, toRange)->UseRealTime()->Threads(4);
