@@ -36,7 +36,7 @@ namespace neko
 
 class SceneManager;
 using PrefabId = sole::uuid;
-const PrefabId INVALID_PREFAB_ID = sole::uuid();
+const PrefabId INVALID_PREFAB_ID = sole::uuid{};
 struct Prefab
 {
     Prefab();

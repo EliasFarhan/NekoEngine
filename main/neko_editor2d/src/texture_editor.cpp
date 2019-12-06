@@ -155,6 +155,7 @@ void TextureEditorSystem::SetCurrentTextureId(sfml::TextureId textureId)
 
 	resourcePath_ = textureManager_.GetTexturePath(textureId);
 	editorSystemName_ = GetFilename(resourcePath_);
+
 }
 
 void TextureEditorSystem::ReloadTextureSet()

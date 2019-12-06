@@ -33,14 +33,39 @@
 
 namespace neko
 {
+template <>
+Vec3f const Vec3f::Zero = Vec3f(0.0f,0.0f, 0.0f);
+template <>
+Vec3f const Vec3f::One = Vec3f(1.0f,1.0f,1.0f);
 
-float AngleBetween(const Vec2f& v1, const Vec2f& v2)
+template<typename T>
+template<typename U>
+U Vec3<T>::AngleBetween(const Vec3& v1, const Vec3& v2)
 {
-	const float dot = Vec2f::Dot(v1, v2) / v1.GetMagnitude() / v2.GetMagnitude();
-
-	const float det = v1.x * v2.y - v1.y * v2.x;
-	const float angle = atan2(det, dot) / float(M_PI) * 180.0f;
-	return angle;
+    const U dot = Vec3<T>::Dot(v1, v2) / v1.GetMagnitude() / v2.GetMagnitude();
+    const U det = v1.x * v2.y - v1.y * v2.x;
+    const U angle = atan2(det, dot) / float(M_PI) * 180.0f;
+    return angle;
 }
+
+template <>
+Vec2f const Vec2f::Zero = Vec2f(0.0f,0.0f);
+template <>
+Vec2f const Vec2f::One = Vec2f(1.0f,1.0f);
+
+template<typename T>
+template<typename U>
+U Vec2<T>::AngleBetween(const Vec2& v1, const Vec2& v2)
+{
+    const U dot = Vec2<T>::Dot(v1, v2) / v1.GetMagnitude() / v2.GetMagnitude();
+    const U det = v1.x * v2.y - v1.y * v2.x;
+    const U angle = atan2(det, dot) / float(M_PI) * 180.0f;
+    return angle;
+}
+
+template <>
+Vec4f const Vec4f::Zero = Vec4f(0.0f,0.0f, 0.0f, 0.0f);
+template <>
+Vec4f const Vec4f::One = Vec4f(1.0f,1.0f,1.0f, 1.0f);
 
 }

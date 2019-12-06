@@ -152,6 +152,8 @@ public:
     template<typename U>
     explicit operator U() const;
 
+    template<typename U = float>
+    static U AngleBetween(const Vec2& v1, const Vec2& v2);
     T x; ///< X coordinate of the vector
     T y; ///< Y coordinate of the vector
 
@@ -183,7 +185,6 @@ inline Vec2<float> Vec2f::Rotate(float angle) const
 }
 
 
-float AngleBetween(const Vec2f& v1, const Vec2f& v2);
 
 
 template<typename T>
@@ -297,7 +298,8 @@ public:
     {
         return !(*this == right);
     }
-
+    template<typename U = float>
+    static U AngleBetween(const Vec3& v1, const Vec3& v2);
 
 };
 
@@ -314,7 +316,7 @@ public:
     const static Vec4 Zero;
     const static Vec4 One;
 
-    Vec4() : x(0), y(0), z(0), w(0)
+    Vec4()noexcept : x(0), y(0), z(0), w(0)
     {
     }
 
@@ -490,7 +492,7 @@ using FourVec4f = NVec4<float, 4>;
 using EightVec4f = NVec4<float, 8>;
 #ifdef __SSE__
 template<>
-std::array<float, 4> FourVec4f::GetMagnitudeIntrinsincs() const
+inline std::array<float, 4> FourVec4f::GetMagnitudeIntrinsincs() const
 {
     __m128 x = _mm_load_ps(&xs[0]);
     __m128 y = _mm_load_ps(&ys[0]);
@@ -511,9 +513,9 @@ std::array<float, 4> FourVec4f::GetMagnitudeIntrinsincs() const
     return result;
 }
 #endif
-#ifdef __AVX2__
+#ifdef __AVX__
 template <>
-std::array<float, 8> EightVec4f::GetMagnitudeIntrinsincs() const
+inline std::array<float, 8> EightVec4f::GetMagnitudeIntrinsincs() const
 {
     __m256 x = _mm256_load_ps(&xs[0]);
     __m256 y = _mm256_load_ps(&ys[0]);
@@ -534,16 +536,5 @@ std::array<float, 8> EightVec4f::GetMagnitudeIntrinsincs() const
     return result;
 }
 #endif
-template <>
-Vec3f const Vec3f::Zero = Vec3f(0.0f,0.0f, 0.0f);
-template <>
-Vec3f const Vec3f::One = Vec3f(1.0f,1.0f,1.0f);
-template <>
-Vec2f const Vec2f::Zero = Vec2f(0.0f,0.0f);
-template <>
-Vec2f const Vec2f::One = Vec2f(1.0f,1.0f);
-template <>
-Vec4f const Vec4f::Zero = Vec4f(0.0f,0.0f, 0.0f, 0.0f);
-template <>
-Vec4f const Vec4f::One = Vec4f(1.0f,1.0f,1.0f, 1.0f);
+
 }

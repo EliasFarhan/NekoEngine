@@ -34,7 +34,7 @@ namespace neko
 {
 
 using SceneId = sole::uuid;
-const SceneId INVALID_SCENE_ID = sole::uuid();
+const SceneId INVALID_SCENE_ID = sole::uuid{};
 struct EngineExport;
 struct Scene
 {

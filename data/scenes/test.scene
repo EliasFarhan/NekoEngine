@@ -57,7 +57,7 @@
                 {
                     "atlas": "data/spine//cat_arm.atlas.txt",
                     "component": 256,
-                    "layer": 1,
+                    "layer": 3,
                     "skeletonData": "data/spine//cat_arm.json",
                     "spine": "data/spine/cat_arm.spine"
                 }

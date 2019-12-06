@@ -53,14 +53,8 @@ TextureManager::TextureManager()
 
 bool TextureManager::HasValidExtension(const std::string_view filename)
 {
-	const auto filenameExtensionIndex = filename.find_last_of('.');
-	if (filenameExtensionIndex >= filename.size())
-	{
-		return false;
-	}
-
 	//Check extension first
-	const std::string_view extension(&filename.at(filenameExtensionIndex));
+	const std::string extension = GetFilenameExtension(filename);
 	return imgExtensionSet.find(extension) != imgExtensionSet.end();
 }
 
@@ -73,6 +67,7 @@ TextureId TextureManager::LoadTexture(const std::string& filename)
 		logDebug(oss.str());
 		return INVALID_INDEX;
 	}
+
 	xxh::hash_state_t<64> hash_stream(0);
 	hash_stream.update(filename);
 	TextureId textureId = hash_stream.digest();

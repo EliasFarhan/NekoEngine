@@ -1,9 +1,11 @@
 #define SPINE_SHORT_NAMES
+
 #include <sfml_engine/spine.h>
 
 #include "engine/log.h"
 #include <graphics/graphics.h>
 #include <sfml_engine/transform.h>
+#include <utilities/file_utility.h>
 #include "engine/engine.h"
 #include "sfml_engine/vector.h"
 
@@ -11,6 +13,7 @@
 namespace neko::sfml
 {
 
+static const std::string_view spineMetaDataExtension = ".spine";
 
 BasicSpineDrawable::BasicSpineDrawable() : skeletonDrawable(nullptr)
 {
@@ -19,26 +22,26 @@ BasicSpineDrawable::BasicSpineDrawable() : skeletonDrawable(nullptr)
 
 BasicSpineDrawable::~BasicSpineDrawable()
 {
-	Destroy();
+    Destroy();
 }
 
 void BasicSpineDrawable::Destroy()
 {
-	if (skeletonData)
-	{
-		SkeletonData_dispose(skeletonData);
-		skeletonData = nullptr;
-	}
-	if (atlas)
-	{
-		Atlas_dispose(atlas);
-		atlas = nullptr;
-	}
+    if (skeletonData)
+    {
+        SkeletonData_dispose(skeletonData);
+        skeletonData = nullptr;
+    }
+    if (atlas)
+    {
+        Atlas_dispose(atlas);
+        atlas = nullptr;
+    }
 }
 
 void BasicSpineDrawable::SetPosition(const sf::Vector2f& position)
 {
-    if(skeletonDrawable)
+    if (skeletonDrawable)
     {
         skeletonDrawable->skeleton->x = position.x;
         skeletonDrawable->skeleton->y = position.y;
@@ -48,14 +51,14 @@ void BasicSpineDrawable::SetPosition(const sf::Vector2f& position)
 
 sf::Vector2f BasicSpineDrawable::GetPosition()
 {
-    if(!skeletonDrawable)
+    if (!skeletonDrawable)
         return sf::Vector2f();
-    return sf::Vector2f(skeletonDrawable->skeleton->x,skeletonDrawable->skeleton->y);
+    return sf::Vector2f(skeletonDrawable->skeleton->x, skeletonDrawable->skeleton->y);
 }
 
 void BasicSpineDrawable::SetSkinByName(std::string_view skinName)
 {
-    if(skeletonDrawable == nullptr)
+    if (skeletonDrawable == nullptr)
         return;
     Skeleton_setSkinByName(skeletonDrawable->skeleton, skinName.data());
     Skeleton_setSlotsToSetupPose(skeletonDrawable->skeleton);
@@ -63,7 +66,7 @@ void BasicSpineDrawable::SetSkinByName(std::string_view skinName)
 
 void BasicSpineDrawable::SetAnimationByName(std::string_view animName)
 {
-    if(skeletonDrawable == nullptr)
+    if (skeletonDrawable == nullptr)
         return;
     AnimationState_setAnimationByName(skeletonDrawable->state, 0, animName.data(), 1);
 }
@@ -100,28 +103,28 @@ SkeletonData* readSkeletonBinaryData(const char* filename, Atlas* atlas, float s
 
 sf::Transform SpineBoneFollowerManager::CalculateTransformFromBone(Bone* bone)
 {
-	sf::Transform transform = sf::Transform::Identity;
-	transform.translate(bone->x, bone->y);
-	transform.scale(bone->scaleX, bone->scaleY);
-	transform.rotate(bone->rotation);
-	return transform;
+    sf::Transform transform = sf::Transform::Identity;
+    transform.translate(bone->x, bone->y);
+    transform.scale(bone->scaleX, bone->scaleY);
+    transform.rotate(bone->rotation);
+    return transform;
 }
 
 void SpineBoneFollowerManager::ParseComponentJson(const json& componentJson, Entity entity)
 {
-	auto& boneFollower = components_[entity];
-	boneFollower.followingEntity = componentJson["followingEntity"];
-	boneFollower.boneName = componentJson["boneName"];
-	
+    auto& boneFollower = components_[entity];
+    boneFollower.followingEntity = componentJson["followingEntity"];
+    boneFollower.boneName = componentJson["boneName"];
+
 }
 
 json SpineBoneFollowerManager::SerializeComponentJson(Entity entity)
 {
-	auto& boneFollower = components_[entity];
-	json componentJson;
-	componentJson["followingEntity"] = boneFollower.followingEntity;
-	componentJson["boneName"] = boneFollower.boneName;
-	return componentJson;
+    auto& boneFollower = components_[entity];
+    json componentJson;
+    componentJson["followingEntity"] = boneFollower.followingEntity;
+    componentJson["boneName"] = boneFollower.boneName;
+    return componentJson;
 }
 
 void SpineManager::Update(EntityManager& entityManager, float dt)
@@ -175,23 +178,31 @@ bool SpineManager::AddSpineDrawable(Entity entity,
 
 void SpineManager::ParseComponentJson(const json& componentJson, Entity entity)
 {
+
+    SpineId spineId = INVALID_SPINE_ID;
+    if (CheckJsonParameter(componentJson, "spineId", json::value_t::string))
+    {
+        spineId = sole::rebuild(componentJson["spineId"]);
+    }
+
     const std::string atlasFilename = componentJson["atlas"];
     const std::string skeletonDataFilename = componentJson["skeletonData"];
-	const std::string spineFilename = componentJson["spine"];
+    const std::string spineFilename = componentJson["spine"];
     AddSpineDrawable(entity, atlasFilename, skeletonDataFilename);
-	ResizeIfNecessary(infos_, entity, {});
-	auto& spineInfo = infos_[entity];
-	spineInfo.atlasPath = atlasFilename;
-	spineInfo.skeletonDataPath = skeletonDataFilename;
-	spineInfo.spinePath = spineFilename;
+    ResizeIfNecessary(infos_, entity, {});
+    auto& spineInfo = infos_[entity];
+    spineInfo.atlasPath = atlasFilename;
+    spineInfo.skeletonDataPath = skeletonDataFilename;
+    spineInfo.spinePath = spineFilename;
+    spineInfo.spineId_ = spineId;
+    CopyLayer(componentJson["layer"], entity, 1);
 
-	CopyLayer(componentJson["layer"], entity, 1);
-	
 }
 
 void SpineManager::CopyAllTransformPositions(EntityManager& entityManager, Position2dManager& position2Manager)
 {
-	const EntityMask entityMask = EntityMask(NekoComponentType::POSITION2D) | EntityMask(NekoComponentType::SPINE_ANIMATION);
+    const EntityMask entityMask =
+            EntityMask(NekoComponentType::POSITION2D) | EntityMask(NekoComponentType::SPINE_ANIMATION);
 
     for (Entity entity = 0; entity < entityManager.GetEntitiesSize(); entity++)
     {
@@ -205,8 +216,8 @@ void SpineManager::CopyAllTransformPositions(EntityManager& entityManager, Posit
 
 void SpineManager::CopyAllTransformScales(EntityManager& entityManager, Scale2dManager& scale2DManager)
 {
-	const EntityMask entityMask = EntityMask(NekoComponentType::SCALE2D) |
-            EntityMask(NekoComponentType::SPINE_ANIMATION);
+    const EntityMask entityMask = EntityMask(NekoComponentType::SCALE2D) |
+                                  EntityMask(NekoComponentType::SPINE_ANIMATION);
 
     for (Entity entity = 0; entity < entityManager.GetEntitiesSize(); entity++)
     {
@@ -222,15 +233,16 @@ void SpineManager::CopyAllTransformScales(EntityManager& entityManager, Scale2dM
 
 void SpineManager::CopyAllTransformAngles(EntityManager& entityManager, Rotation2dManager& angle2DManager)
 {
-	const EntityMask entityMask = EntityMask(NekoComponentType::ROTATION2D) |
-                            EntityMask(NekoComponentType::SPINE_ANIMATION);
+    const EntityMask entityMask = EntityMask(NekoComponentType::ROTATION2D) |
+                                  EntityMask(NekoComponentType::SPINE_ANIMATION);
 
     for (Entity entity = 0; entity < entityManager.GetEntitiesSize(); entity++)
     {
         if (entityManager.HasComponent(entity, entityMask))
         {
             const auto& angle = angle2DManager.GetComponent(entity);
-            components_[entity].transform = components_[entity].transform.rotate(angle, sf::Vector2f(components_[entity].GetPosition()));
+            components_[entity].transform = components_[entity].transform.rotate(angle, sf::Vector2f(
+                    components_[entity].GetPosition()));
         }
     }
 }
@@ -238,7 +250,7 @@ void SpineManager::CopyAllTransformAngles(EntityManager& entityManager, Rotation
 
 void SpineManager::PushAllCommands(EntityManager& entityManager, GraphicsManager& graphicsManager)
 {
-	const auto entityMask = EntityMask(NekoComponentType::SPINE_ANIMATION);
+    const auto entityMask = EntityMask(NekoComponentType::SPINE_ANIMATION);
 
     for (Entity entity = 0; entity < Entity(entityManager.GetEntitiesSize()); entity++)
     {
@@ -264,14 +276,15 @@ json SpineManager::SerializeComponentJson(Entity entity)
 {
     json componentJson;
     const auto& componentInfo = infos_[entity];
+    componentJson["spineId"] = componentInfo.spineId_.str();
     componentJson["atlas"] = componentInfo.atlasPath;
     componentJson["skeletonData"] = componentInfo.skeletonDataPath;
-	componentJson["spine"] = componentInfo.spinePath;
-	componentJson["layer"] = components_[entity].layer;
+    componentJson["spine"] = componentInfo.spinePath;
+    componentJson["layer"] = components_[entity].layer;
     return componentJson;
 }
 
-SpineDrawableInfo& SpineManager::GetInfo(Entity entity)
+SpineDef& SpineManager::GetInfo(Entity entity)
 {
     return infos_[entity];
 }
@@ -279,9 +292,9 @@ SpineDrawableInfo& SpineManager::GetInfo(Entity entity)
 void SpineManager::CopyAllTransforms(EntityManager& entityManager, Transform2dManager& transformManager)
 {
     const auto entityMask = EntityMask(NekoComponentType::TRANSFORM2D) | EntityMask(NekoComponentType::SPINE_ANIMATION);
-    for(Entity entity = 0; entity < Entity(entityManager.GetEntitiesSize()); entity++)
+    for (Entity entity = 0; entity < Entity(entityManager.GetEntitiesSize()); entity++)
     {
-        if(entityManager.HasComponent(entity, entityMask))
+        if (entityManager.HasComponent(entity, entityMask))
         {
             const auto transform = transformManager.CalculateTransform(entity);
             components_[entity].transform = transform;
@@ -293,8 +306,8 @@ void SpineManager::DestroyComponent(EntityManager& entityManager, Entity entity)
 {
     ComponentManager::DestroyComponent(entityManager, entity);
     components_[entity].skeletonDrawable = nullptr;
-	components_[entity].Destroy();
-	
+    components_[entity].Destroy();
+
 }
 
 void SpineManager::CopyLayer(int layer, size_t start, size_t length)
@@ -313,5 +326,16 @@ void SpineManager::SetAnimationByName(Entity entity, const std::string_view anim
 void SpineManager::SetSkinByName(Entity entity, const std::string_view skinName)
 {
     components_[entity].SetSkinByName(skinName);
+}
+
+const std::string_view SpineManager::GetExtension()
+{
+    return spineMetaDataExtension;
+}
+
+bool SpineManager::HasValidExtension(std::string_view filename)
+{
+    const std::string extension = GetFilenameExtension(filename);
+    return extension.find(extension) != std::string::npos;
 }
 }

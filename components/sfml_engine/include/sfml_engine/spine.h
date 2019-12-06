@@ -25,6 +25,7 @@
  */
 #include <vector>
 #include <memory>
+#include <sole.hpp>
 #include <spine/spine-sfml.h>
 #include "engine/entity.h"
 #include "engine/component.h"
@@ -40,6 +41,9 @@ class Scale2dManager;
 namespace sfml
 {
 class Transform2dManager;
+
+using SpineId = sole::uuid;
+const SpineId INVALID_SPINE_ID = sole::uuid{};
 
 struct BasicSpineDrawable : public SfmlRenderCommand
 {
@@ -69,8 +73,9 @@ struct SpineBoneFollower
 	Bone* followingBone = nullptr;
 };
 
-struct SpineDrawableInfo
+struct SpineDef
 {
+    SpineId spineId_ = INVALID_SPINE_ID;
 	std::string spinePath = "";
 	std::string atlasPath = "";
 	std::string skeletonDataPath = "";
@@ -85,7 +90,7 @@ public:
 	void ParseComponentJson(const json& componentJson, Entity entity) override;
 	json SerializeComponentJson(Entity entity) override;
 };
-
+class SpineDefManager;
 class SpineManager : public ComponentManager<BasicSpineDrawable, EntityMask(NekoComponentType::SPINE_ANIMATION)>
 {
 public:
@@ -115,15 +120,28 @@ public:
 
 	json SerializeComponentJson(Entity entity) override;
 
-	SpineDrawableInfo& GetInfo(Entity entity);
+	SpineDef& GetInfo(Entity entity);
 
 	void DestroyComponent(EntityManager& entityManager, Entity entity) override;
 
 	void SetAnimationByName(Entity entity, std::string_view animName);
 	void SetSkinByName(Entity entity, std::string_view skinName);
 
+	const static std::string_view GetExtension();
+
+    static bool HasValidExtension(std::string_view view);
+
 private:
-	std::vector<SpineDrawableInfo> infos_;
+	std::vector<SpineDef> infos_;
+};
+
+class SpineDefManager
+{
+public:
+    void ParseDef(const std::string_view metafilePath);
+    void SerializeDef();
+private:
+    std::map<SpineId, SpineDef> spineDefMap_;
 };
 
 
