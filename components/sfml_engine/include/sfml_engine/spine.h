@@ -27,6 +27,7 @@
 #include <memory>
 #include <sole.hpp>
 #include <spine/spine-sfml.h>
+#include <engine/resource.h>
 #include "engine/entity.h"
 #include "engine/component.h"
 #include "sfml_engine/graphics.h"
@@ -73,7 +74,7 @@ struct SpineBoneFollower
 	Bone* followingBone = nullptr;
 };
 
-struct SpineDef
+struct SpineDef : Resource
 {
     SpineId spineId_ = INVALID_SPINE_ID;
 	std::string spinePath = "";
@@ -131,17 +132,12 @@ public:
 
     static bool HasValidExtension(std::string_view view);
 
-private:
-	std::vector<SpineDef> infos_;
 };
 
-class SpineDefManager
+class SpineDefManager : public ResourceManager<SpineDef>
 {
 public:
-    void ParseDef(const std::string_view metafilePath);
-    void SerializeDef();
 private:
-    std::map<SpineId, SpineDef> spineDefMap_;
 };
 
 

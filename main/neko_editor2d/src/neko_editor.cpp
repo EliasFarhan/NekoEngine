@@ -33,6 +33,7 @@
 #include "tools/scene_system.h"
 #include "tools/texture_editor.h"
 #include "tools/spine_editor.h"
+#include "sfml_engine/texture.h"
 
 namespace neko::editor
 {
@@ -49,7 +50,7 @@ void NekoEditor::Init()
     {
         if (!neko::IsRegularFile(path))
             return;
-        if (textureManager_.HasValidExtension(path))
+        if (HasValidExtension<sfml::Texture>(path))
         {
             textureManager_.LoadTexture(path.data());
         }
@@ -382,7 +383,7 @@ EditorSystemMode NekoEditor::GetEditorSystemModeFrom(const std::string_view exte
         return EditorSystemMode::PrefabMode;
     }
     if (extension == sfml::TextureManager::GetMetaExtension() or
-        sfml::TextureManager::HasValidExtension(extension))
+        HasValidExtension<sfml::Texture>(extension))
     {
         return EditorSystemMode::TextureMode;
     }

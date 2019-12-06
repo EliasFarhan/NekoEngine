@@ -70,7 +70,7 @@ template<typename T, ComponentType componentType>
 class ComponentManager
 {
 public:
-    ComponentManager(EntityManager& entityManager)
+    explicit ComponentManager(EntityManager& entityManager)
     {
 		entityManager.RegisterComponentManager(*this);
         ResizeIfNecessary(components_, INIT_ENTITY_NMB - 1, T{});

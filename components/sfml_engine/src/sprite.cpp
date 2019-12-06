@@ -65,7 +65,7 @@ void SpriteManager::CopyLayer(int layer, size_t start, size_t length)
 }
 
 SpriteManager::SpriteManager(EntityManager& entityManager, TextureManager& textureManager) :
-        ComponentManager::ComponentManager(entityManager),
+        neko::SpriteManager<Texture, Sprite>(entityManager, textureManager),
         textureManager_(textureManager)
 {
 

@@ -29,38 +29,42 @@
 #include "engine/globals.h"
 #include "utilities/file_utility.h"
 #include "utilities/json_utility.h"
+namespace neko
+{
+template<>
+bool HasValidExtension<sfml::Texture>(const std::string_view assetPath)
+{
+    constexpr std::array<std::string_view, 9> imgExtensionSet =
+            {
+                    ".png",
+                    ".jpg",
+                    ".jpeg",
+                    ".bmp",
+                    ".tga",
+                    ".gif",
+                    ".psd",
+                    ".hdr",
+                    ".pic"
+            };
+    const std::string extension = GetFilenameExtension(assetPath);
+    return std::find(imgExtensionSet.begin(), imgExtensionSet.end(), extension) != imgExtensionSet.end();
+}
+}
 
 namespace neko::sfml
 {
 static const std::string_view textureMetadataExtension = ".ntx_meta";
-static std::set<std::string_view> imgExtensionSet
-{
-		".png",
-		".jpg",
-		".jpeg",
-		".bmp",
-		".tga",
-		".gif",
-		".psd",
-		".hdr",
-		".pic"
-};
+
 
 
 TextureManager::TextureManager()
 {
 }
 
-bool TextureManager::HasValidExtension(const std::string_view filename)
-{
-	//Check extension first
-	const std::string extension = GetFilenameExtension(filename);
-	return imgExtensionSet.find(extension) != imgExtensionSet.end();
-}
 
 TextureId TextureManager::LoadTexture(const std::string& filename)
 {
-	if (!HasValidExtension(filename))
+	if (!HasValidExtension<Texture>(filename))
 	{
 		std::ostringstream oss;
 		oss << "[ERROR] Texture path: " << filename << " has invalid extension";
@@ -96,7 +100,7 @@ TextureId TextureManager::LoadTexture(const std::string& filename)
 	//Texture was never loaded
 	if (FileExists(filename))
 	{
-		textures_[textureId] = Texture{};
+		//textures_[textureId] = Texture{};
 		auto& texture = textures_[textureId];
 		auto& sfTexture = texture.texture;
 		if (!sfTexture.loadFromFile(filename))
@@ -191,5 +195,10 @@ void TextureManager::CreateEmptyMetaFile(const std::string& metaPath)
 std::string_view TextureManager::GetMetaExtension()
 {
     return textureMetadataExtension;
+}
+
+ResourceId TextureManager::LoadResource(const json& resoureceMetaJson)
+{
+    return neko::ResourceId();
 }
 } // namespace neko

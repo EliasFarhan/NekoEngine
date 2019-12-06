@@ -166,7 +166,7 @@ void TextureEditorSystem::ReloadTextureSet()
 		{
 			if (!neko::IsRegularFile(path))
 				return;
-			if (sfml::TextureManager::HasValidExtension(path))
+			if (HasValidExtension<sfml::Texture>(path))
 			{
 				const auto textureId = textureManager_.LoadTexture(path.data());
 				textureSet_.emplace(textureId);

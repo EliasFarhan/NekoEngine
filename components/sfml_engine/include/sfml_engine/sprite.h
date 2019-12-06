@@ -32,13 +32,13 @@
 #include "graphics.h"
 #include <sfml_engine/transform.h>
 #include <graphics/graphics.h>
+#include <graphics/sprite.h>
 #include "texture.h"
 
 
 namespace neko::sfml
 {
 class TextureManager;
-class SfmlGraphicsManager;
 
 struct Sprite : public SfmlRenderCommand
 {
@@ -49,8 +49,7 @@ struct Sprite : public SfmlRenderCommand
     sf::Transform transform = sf::Transform::Identity;
 };
 
-class SpriteManager :
-        public ComponentManager<Sprite, ComponentType(NekoComponentType::SPRITE2D)>
+class SpriteManager : public neko::SpriteManager<Texture, Sprite>
 {
 public:
     explicit SpriteManager(EntityManager& entityManager, TextureManager& textureManager);

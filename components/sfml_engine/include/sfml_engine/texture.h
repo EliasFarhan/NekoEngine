@@ -23,16 +23,19 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
+#include <set>
 #include <SFML/Graphics/Texture.hpp>
 #include "mathematics/vector.h"
+
 #include <xxhash.hpp>
 #include <unordered_map>
+#include <graphics/texture.h>
 #include "utilities/json_utility.h"
 
 namespace neko::sfml
 {
 
-struct Texture
+struct Texture : Resource
 {
 	Vec2f origin{};
 	sf::Texture texture;
@@ -41,13 +44,11 @@ struct Texture
 using TextureId = xxh::hash_t<64>;
 const TextureId INVALID_TEXTURE_ID = TextureId(0);
 
-class TextureManager
+class TextureManager : public neko::TextureManager<Texture>
 {
 public:
 
     TextureManager();
-
-    static bool HasValidExtension(std::string_view filename);
     static std::string_view GetMetaExtension();
 	//Return an index to avoid pointer invalidation
 	TextureId LoadTexture(const std::string& filename);
@@ -56,11 +57,20 @@ public:
 	const std::unordered_map<TextureId, std::string>& GetTextureNameMap();
 	void SetTextureOrigin(TextureId textureId, Vec2f origin);
     void SetTextureSmooth(TextureId textureId, bool isSmooth);
-private:
+protected:
     static void LoadMetadata(const std::string& metadataPath, Texture& texture);
     static void CreateEmptyMetaFile(const std::string& filename);
-	std::unordered_map<TextureId, Texture> textures_;
+    ResourceId LoadResource(const json& resoureceMetaJson) override;
+
+    std::unordered_map<TextureId, Texture> textures_;
 	std::unordered_map<TextureId, std::string> textureNames_;
 };
 
+
+
+}
+namespace neko
+{
+template<>
+bool HasValidExtension<sfml::Texture>(const std::string_view assetPath);
 }
