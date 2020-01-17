@@ -60,7 +60,6 @@ void SpineEditorSystem::ReloadSpineSet()
                                    return;
                                if (sfml::SpineManager::HasValidExtension(path))
                                {
-                                   spineSet_.emplace(path);
                                }
                            }, true);
 }
