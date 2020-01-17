@@ -24,7 +24,6 @@
  */
 
 #include <ostream>
-#include <glm/glm.hpp>
 #include <array>
 #include <cmath>
 #include <mathematics/intrinsincs.h>
@@ -175,15 +174,6 @@ inline float Vec2f::GetMagnitude() const
 {
     return sqrtf(x * x + y * y);
 }
-
-template<>
-inline Vec2<float> Vec2f::Rotate(float angle) const
-{
-    const float radianAngle = glm::radians(angle);
-    return Vec2f(cosf(radianAngle) * x - sinf(radianAngle) * y,
-                 sinf(radianAngle) * x + cosf(radianAngle) * y);
-}
-
 
 
 

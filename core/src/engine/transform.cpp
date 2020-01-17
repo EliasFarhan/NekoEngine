@@ -23,14 +23,10 @@
  */
 #include <engine/transform.h>
 #include "engine/globals.h"
-#include <sfml_engine/physics.h>
 
 
 namespace neko
 {
-
-
-
 Position2dManager::Position2dManager(EntityManager& entityManager) : ComponentManager(entityManager)
 {
 }

@@ -28,16 +28,18 @@
 #include "engine/log.h"
 
 #include "imgui.h"
-#include "imgui_impl_opengl3.h"
 #include "imgui_impl_sdl.h"
 
 namespace neko::sdl
 {
-SdlGlEngine::SdlGlEngine(Configuration* config) : BasicEngine(config), glContext_()
+SdlEngine::SdlEngine(Configuration* config) : BasicEngine(config)
+#ifdef NEKO_GLES3
+, glContext_()
+#endif
 {
 }
 
-void SdlGlEngine::Init()
+void SdlEngine::Init()
 {
     BasicEngine::Init();
     SDL_Init(SDL_INIT_VIDEO);
@@ -86,7 +88,7 @@ void SdlGlEngine::Init()
         logDebug("[Error] Unable to create window\n");
         return;
     }
-
+#ifdef NEKO_GLES3
     glContext_ = SDL_GL_CreateContext(window_);
 
     const GLenum err = glewInit();
@@ -114,11 +116,11 @@ void SdlGlEngine::Init()
 
 
     SDL_GL_SetSwapInterval(config.vSync);
-
+#endif
 	initDelegate_.Execute();
 }
 
-void SdlGlEngine::Update([[maybe_unused]]float dt)
+void SdlEngine::Update([[maybe_unused]]float dt)
 {
     SDL_Event event;
     while (SDL_PollEvent(&event))
@@ -198,7 +200,7 @@ void SdlGlEngine::Update([[maybe_unused]]float dt)
 
 }
 
-void SdlGlEngine::Destroy()
+void SdlEngine::Destroy()
 {
 	destroyDelegate_.Execute();
     ImGui_ImplOpenGL3_Shutdown();
