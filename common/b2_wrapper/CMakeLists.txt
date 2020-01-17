@@ -1,0 +1,10 @@
+#BOX2D
+set(BOX2D_DIR ${EXTERNAL_DIR}/Box2D-2.3.1)
+set(BOX2D_BUILD_EXAMPLES OFF CACHE INTERNAL "")
+SET(BOX2D_INSTALL ON CACHE INTERNAL "")
+SET(BOX2D_BUILD_STATIC ON  CACHE INTERNAL "")
+add_subdirectory(${BOX2D_DIR})
+include_directories(${BOX2D_DIR}/)
+LIST(APPEND engine2d_lib Box2D)
+
+set_target_properties (Box2D PROPERTIES FOLDER Externals)

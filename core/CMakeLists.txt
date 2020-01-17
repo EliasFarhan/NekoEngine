@@ -1,0 +1,51 @@
+
+
+
+
+
+
+#source files
+file(GLOB_RECURSE Neko_ENGINE_SRC src/engine/*.cpp include/engine/*.h)
+file(GLOB_RECURSE Neko_GRAPHICS_SRC src/graphics/*.cpp include/graphics/*.h)
+file(GLOB_RECURSE Neko_UTILITY_SRC src/utilities/*.cpp include/utilities/*.h)
+file(GLOB_RECURSE Neko_PHYSICS_SRC src/physics/*.cpp include/physics/*.h)
+file(GLOB_RECURSE Neko_SOUND_SRC src/sound/*.cpp include/sound/*.h)
+file(GLOB_RECURSE Neko_MATH_SRC src/mathematics/*.cpp include/mathematics/*.h)
+
+source_group("Graphics"				FILES ${Neko_GRAPHICS_SRC})
+source_group("Engine"				FILES ${Neko_ENGINE_SRC})
+source_group("Utility"				FILES ${Neko_UTILITY_SRC})
+source_group("Physics"				FILES ${Neko_PHYSICS_SRC})
+source_group("Sound"				FILES ${Neko_SOUND_SRC})
+source_group("Maths"			FILES ${Neko_MATH_SRC})
+
+List(APPEND Neko_SRC
+        ${Neko_ENGINE_SRC}
+        ${Neko_GRAPHICS_SRC}
+        ${Neko_UTILITY_SRC}
+        ${Neko_PHYSICS_SRC}
+        ${Neko_SOUND_SRC}
+        ${Neko_MATH_SRC})
+
+include_directories(include/)
+
+#Utility
+set(UTILITIES_DIR ${EXTERNAL_DIR}/utilities/)
+include_directories(${UTILITIES_DIR})
+#taskflow
+set(TASKFLOW_DIR ${EXTERNAL_DIR}/taskflow-2.2)
+include_directories(${TASKFLOW_DIR})
+
+add_library(Neko_Core STATIC ${Neko_SRC})
+target_compile_options(Neko_Core PRIVATE $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
+        -Wall -Wextra>
+        $<$<CXX_COMPILER_ID:MSVC>:
+        /W4>)
+
+add_dependencies(Neko_Core DataTarget)
+target_compile_definitions(Neko_Core PUBLIC $<$<CONFIG:Debug>:__neko_dbg__>)
+target_compile_definitions(Neko_Core PUBLIC $<$<CONFIG:RelWithDebInfo>:__neko_dbg__>)
+target_compile_definitions(Neko_Core PUBLIC SOURCE_PATH="${CMAKE_SOURCE_DIR}")
+
+set_target_properties (Neko_Core PROPERTIES FOLDER Neko)
+
