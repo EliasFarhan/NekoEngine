@@ -5,7 +5,7 @@
 
 namespace neko
 {
-class HelloTriangleEngine : public neko::sdl::SdlGlEngine
+class HelloTriangleEngine : public neko::sdl::SdlEngine
 {
 public:
 	explicit HelloTriangleEngine(Configuration* config = nullptr);

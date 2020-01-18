@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include <GL/glew.h>
+#include "glad/glad.h"
 #include "mathematics/vector.h"
 #include "mathematics/matrix.h"
 namespace neko::gl

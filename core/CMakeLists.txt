@@ -34,7 +34,7 @@ set(UTILITIES_DIR ${EXTERNAL_DIR}/utilities/)
 set(TASKFLOW_DIR ${EXTERNAL_DIR}/taskflow-2.2)
 include_directories(${TASKFLOW_DIR})
 
-add_library(Neko_Core STATIC ${Neko_SRC} include/mathematics/matrix.h)
+add_library(Neko_Core STATIC ${Neko_SRC})
 if (APPLE)
     target_link_libraries(Neko_Core PUBLIC ${Boost_LIBRARIES})
 endif(APPLE)

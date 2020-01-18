@@ -198,7 +198,7 @@ inline float Vec2f::GetMagnitude() const
 }
 
 template<typename T>
-class alignas(4 * sizeof(T)) Vec3
+class Vec3
 {
 public:
     union
@@ -497,10 +497,10 @@ struct alignas(N * sizeof(T)) NVec4
     {
         for (int i = 0; i < N; i++)
         {
-            xs[i] = soaV[i].x;
-            ys[i] = soaV[i].y;
-            zs[i] = soaV[i].z;
-            ws[i] = soaV[i].w;
+            xs[i] = soaV[i][0];
+            ys[i] = soaV[i][1];
+            zs[i] = soaV[i][2];
+            ws[i] = soaV[i][3];
         }
     }
     explicit NVec4(const Vec3<T> *soaV)
@@ -517,10 +517,10 @@ struct alignas(N * sizeof(T)) NVec4
     {
         for (int i = 0; i < N; i++)
         {
-            xs[i] = soaV[i].x;
-            ys[i] = soaV[i].y;
-            zs[i] = soaV[i].z;
-            ws[i] = soaV[i].w;
+            xs[i] = soaV[i][0];
+            ys[i] = soaV[i][1];
+            zs[i] = soaV[i][2];
+            ws[i] = soaV[i][3];
         }
     }
 
@@ -559,12 +559,13 @@ inline std::array<float, 4> FourVec4f::GetMagnitudeIntrinsincs() const
     z = _mm_add_ps(z, w);
 
     x = _mm_add_ps(x, z);
+    x = _mm_sqrt_ps(x);
     std::array<float, 4> result;
     _mm_store_ps(&result[0], x);
     return result;
 }
 #endif
-#ifdef __AVX__
+#ifdef __AVX2__
 template <>
 inline std::array<float, 8> EightVec4f::GetMagnitudeIntrinsincs() const
 {
@@ -582,6 +583,7 @@ inline std::array<float, 8> EightVec4f::GetMagnitudeIntrinsincs() const
     z = _mm256_add_ps(z, w);
 
     x = _mm256_add_ps(x, z);
+    x = _mm256_sqrt_ps(x);
     std::array<float, 8> result;
     _mm256_storeu_ps(&result[0], x);
     return result;

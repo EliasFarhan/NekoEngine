@@ -13,9 +13,10 @@ foreach(bench_file ${BENCH_FILES} )
     target_link_libraries(${bench_name} PUBLIC benchmark benchmark_main Neko_Core )
 
     IF(MSVC)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Oi /Ox /fp:fast /FAs /arch:AVX2")#not forcing avx2 uhuh
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Oi /Ox /fp:fast /FAs /arch:AVX2")
     elseif(UNIX)
-        set_target_properties(${bench_name} PROPERTIES COMPILE_FLAGS "-save-temps -march=native -ffast-math -fno-omit-frame-pointer")
+        set_target_properties(${bench_name} PROPERTIES COMPILE_FLAGS
+                "-save-temps -march=native -ffast-math -fno-omit-frame-pointer")
     ENDIF(MSVC)
     set_target_properties (${bench_name} PROPERTIES
             FOLDER Benchmark)

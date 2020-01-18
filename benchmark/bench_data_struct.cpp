@@ -9,8 +9,7 @@ const unsigned long toRange = 1 << 20;
 static void BM_Vector(benchmark::State& state)
 {
 	const auto length = state.range(0);
-	std::vector<int> values;
-	values.resize(length);
+	std::vector<int> values(length);
 	for (auto& v : values)
 	{
 		v = rand() % 32768;

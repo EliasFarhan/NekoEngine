@@ -39,7 +39,7 @@ SOFTWARE.
 #endif
 
 const int fromRange = 8;
-const int toRange = 1 << 10;
+const int toRange = 1 << 20;
 
 #ifdef __AVX2__
 #define SIMD_REGISTER_SIZE 8
@@ -377,9 +377,9 @@ public:
 	void Translate(const neko::Vec4f moveValue)
 	{
 		const float4 moveX = _mm_load1_ps(&moveValue.x);
-		const float4 moveY = _mm_load1_ps(&moveValue.x);
-		const float4 moveZ = _mm_load1_ps(&moveValue.x);
-		const float4 moveW = _mm_load1_ps(&moveValue.x);
+		const float4 moveY = _mm_load1_ps(&moveValue.y);
+		const float4 moveZ = _mm_load1_ps(&moveValue.z);
+		const float4 moveW = _mm_load1_ps(&moveValue.w);
 		for (auto& transform : transforms_)
 		{
 			transform.positionsX = _mm_add_ps(transform.positionsX, moveX);

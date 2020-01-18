@@ -12,8 +12,8 @@ set(Neko_Remotery OFF CACHE BOOL "Activate Remotery")
 set(Neko_GLES3 ON CACHE BOOL "Activate OpenGL ES 3.0")
 set(Neko_SDL2 ON CACHE BOOL "Activate SDL2")
 set(Neko_Box2D OFF CACHE BOOL "Activate Box2D")
-set(Neko_Test OFF CACHE BOOL "Activate Test")
-set(Neko_Benchmark OFF CACHE BOOL "Activate Benchmark")
+set(Neko_Test ON CACHE BOOL "Activate Test")
+set(Neko_Benchmark ON CACHE BOOL "Activate Benchmark")
 
 
 set(main_project_dir "main/")

@@ -42,7 +42,6 @@ protected:
 #ifdef NEKO_GLES3
 	SDL_GLContext glContext_;
 #endif
-    bool wireframeMode_ = false;
 };
 }
 

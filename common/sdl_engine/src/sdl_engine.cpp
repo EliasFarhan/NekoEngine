@@ -30,6 +30,7 @@
 #include "imgui_impl_sdl.h"
 #ifdef NEKO_GLES3
 #include "imgui_impl_opengl3.h"
+#include "glad/glad.h"
 #endif
 
 namespace neko::sdl
@@ -93,12 +94,10 @@ void SdlEngine::Init()
 #ifdef NEKO_GLES3
     glContext_ = SDL_GL_CreateContext(window_);
 
-    const GLenum err = glewInit();
-    if (GLEW_OK != err)
-    {
-        std::ostringstream oss;
-        oss << "[Error] while loading GLEW: " << glewGetErrorString(err);
-        logDebug(oss.str());
+    if (!gladLoadGLES2Loader((GLADloadproc) SDL_GL_GetProcAddress)) {
+        std::stringstream ss;
+        ss << "[Error] Failed to initialize OpenGL context" << std::endl;
+        logDebug(ss.str());
         return;
     }
     // Setup Dear ImGui context
@@ -174,16 +173,9 @@ void SdlEngine::Update([[maybe_unused]]float dt)
 #ifdef NEKO_GLES3
     SDL_GL_MakeCurrent(window_, glContext_);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    if (wireframeMode_)
-    {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    }
+
 	drawDelegate_.Execute();
 
-    if (wireframeMode_)
-    {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    }
 	// Start the Dear ImGui frame
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplSDL2_NewFrame(window_);
@@ -193,10 +185,6 @@ void SdlEngine::Update([[maybe_unused]]float dt)
 
 	ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    if (wireframeMode_)
-    {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    }
     SDL_GL_SwapWindow(window_);
 #endif
 }

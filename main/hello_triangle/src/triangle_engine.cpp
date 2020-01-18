@@ -2,7 +2,7 @@
 
 namespace neko
 {
-HelloTriangleEngine::HelloTriangleEngine(Configuration* config) : SdlGlEngine(config)
+HelloTriangleEngine::HelloTriangleEngine(Configuration* config) : SdlEngine(config)
 {
     initDelegate_.RegisterCallback(
             [&helloTriangleCommand = helloTriangleCommand_](void)
@@ -22,7 +22,7 @@ HelloTriangleEngine::HelloTriangleEngine(Configuration* config) : SdlGlEngine(co
     drawDelegate_.RegisterCallback(
             [this]()
             {
-                graphicsManager_.Render(&helloTriangleCommand_);
+                //graphicsManager_.Render(&helloTriangleCommand_);
             });
 }
 }
