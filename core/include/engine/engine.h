@@ -52,8 +52,8 @@ struct Configuration
     bool vSync = true;
     unsigned int framerateLimit = 0u;
     std::string dataRootPath = "data/";
-	int glMajorVersion = 4;
-	int glMinorVersion = 5;
+	int glMajorVersion = 3;
+	int glMinorVersion = 0;
 	Color bgColor;
 };
 

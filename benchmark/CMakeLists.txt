@@ -1,10 +1,5 @@
 
-#Google benchmark
-set(GOOGLE_BENCH_DIR ${EXTERNAL_DIR}/benchmark-1.5.0)
-add_subdirectory(${GOOGLE_BENCH_DIR})
-include_directories(${GOOGLE_BENCH_DIR}/include)
-set_target_properties (benchmark benchmark_main PROPERTIES
-        FOLDER Externals\\GTest)
+
 
 SET(BENCH_DIR ${CMAKE_SOURCE_DIR}/benchmark)
 file(GLOB BENCH_FILES ${BENCH_DIR}/*.cpp)

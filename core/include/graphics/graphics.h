@@ -77,6 +77,8 @@ public:
 
 	GraphicsManager();
 	virtual ~GraphicsManager() = default;
+
+	void Clear(){};
 	void Render(RenderCommand* command);
 	virtual void RenderAll(RenderTarget* renderTarget = nullptr);
 protected:

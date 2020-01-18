@@ -21,7 +21,6 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-#include <GL/glew.h>
 #include <sstream>
 #include <mathematics/vector.h>
 #include "sdl_engine/sdl_engine.h"
@@ -29,6 +28,9 @@
 
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
+#ifdef NEKO_GLES3
+#include "imgui_impl_opengl3.h"
+#endif
 
 namespace neko::sdl
 {
@@ -169,7 +171,7 @@ void SdlEngine::Update([[maybe_unused]]float dt)
     }
 
 	updateDelegate_.Execute(dt);
-
+#ifdef NEKO_GLES3
     SDL_GL_MakeCurrent(window_, glContext_);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     if (wireframeMode_)
@@ -177,7 +179,6 @@ void SdlEngine::Update([[maybe_unused]]float dt)
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     }
 	drawDelegate_.Execute();
-    graphicsManager_.RenderAll();
 
     if (wireframeMode_)
     {
@@ -197,18 +198,21 @@ void SdlEngine::Update([[maybe_unused]]float dt)
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     }
     SDL_GL_SwapWindow(window_);
-
+#endif
 }
 
 void SdlEngine::Destroy()
 {
 	destroyDelegate_.Execute();
+#ifdef NEKO_GLES3
     ImGui_ImplOpenGL3_Shutdown();
+#endif
     ImGui_ImplSDL2_Shutdown();
     ImGui::DestroyContext();
+#ifdef NEKO_GLES3
     // Delete our OpengL context
     SDL_GL_DeleteContext(glContext_);
-
+#endif
     // Destroy our window
     SDL_DestroyWindow(window_);
 
