@@ -31,11 +31,13 @@ foreach(main_project_path ${main_projects} )
     endif()
 endforeach()
 
+
+set(EXTERNAL_DIR ${CMAKE_SOURCE_DIR}/externals CACHE INTERNAL "Externals folder")
+set(UTILITIES_DIR "${EXTERNAL_DIR}/utilities" CACHE INTERNAL "")
+
 add_subdirectory("data/")
 set(NEKO_CORE_DIR "${CMAKE_SOURCE_DIR}/core/" CACHE INTERNAL "")
 add_subdirectory(${NEKO_CORE_DIR})
-
-set(EXTERNAL_DIR ${CMAKE_SOURCE_DIR}/externals CACHE INTERNAL "Externals folder")
 
 #imgui
 set(IMGUI_VERSION "1.74" CACHE INTERNAL "")
