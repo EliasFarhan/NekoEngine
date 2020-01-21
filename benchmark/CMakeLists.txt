@@ -3,7 +3,7 @@
 
 SET(BENCH_DIR ${CMAKE_SOURCE_DIR}/benchmark)
 file(GLOB BENCH_FILES ${BENCH_DIR}/*.cpp)
-
+include_directories("include/")
 foreach(bench_file ${BENCH_FILES} )
     # I used a simple string replace, to cut off .cpp.
     file(RELATIVE_PATH bench_relative_path ${BENCH_DIR} ${bench_file})

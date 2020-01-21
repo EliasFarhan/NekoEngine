@@ -70,7 +70,10 @@ protected:
 class PositionLight : public Light
 {
 public:
-    using Light::Light;
+    explicit PositionLight(float range) : Light(range)
+    {
+        lightType_ = LightType::LIGHT_POSITION;
+    };
 
     void virtualLightBounds() override
     {
@@ -92,6 +95,7 @@ public:
     explicit SpotLight(float range, float tanHalfSize) : Light(range)
     {
         tanHalfAngle_ = tanHalfSize;
+        lightType_ = LightType::SPOT_LIGHT;
     }
 
     void virtualLightBounds() override
@@ -119,7 +123,10 @@ public:
 class AreaLight : public Light
 {
 public:
-    using Light::Light;
+    explicit AreaLight(float range) : Light(range)
+    {
+        lightType_ = LightType::AREA_LIGHT;
+    };
 
     void virtualLightBounds() override
     {
@@ -238,6 +245,7 @@ static void BM_ParentFunc(benchmark::State& state)
         for (auto& light : lights)
         {
             light->parentLightBounds();
+            benchmark::DoNotOptimize(light);
         }
     }
 }
@@ -267,6 +275,8 @@ static void BM_ParentFuncSorted(benchmark::State& state)
         for (auto& light : lights)
         {
             light->parentLightBounds();
+
+            benchmark::DoNotOptimize(light);
         }
     }
 }
@@ -295,6 +305,8 @@ static void BM_VirtualCall(benchmark::State& state)
         for (auto& light : lights)
         {
             light->virtualLightBounds();
+
+            benchmark::DoNotOptimize(light);
         }
     }
 }
@@ -324,6 +336,8 @@ static void BM_VirtualCallSorted(benchmark::State& state)
         for (auto& light : lights)
         {
             light->virtualLightBounds();
+            benchmark::DoNotOptimize(light);
+
         }
     }
 }
