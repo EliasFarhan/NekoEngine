@@ -8,7 +8,7 @@
 
 
 const int fromRange = 8;
-const int toRange = 5000;
+const int toRange = 1<<15;
 
 enum class LightType
 {

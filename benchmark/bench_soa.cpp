@@ -426,6 +426,17 @@ static void BM_AOSOA(benchmark::State& state) {
 	}
 }
 BENCHMARK(BM_AOSOA)->Range(fromRange, toRange);
+#ifdef __SSE__
+static void BM_AOSOA_SSE(benchmark::State& state) {
+    auto transformSystem = std::make_unique<SSE::TransformSystem>(state.range(0));
+    const auto move = neko::Vec4f(floatRand(), floatRand(), floatRand(), floatRand());
+    for (auto _ : state)
+    {
+        transformSystem->Translate(move);
+    }
+}
+BENCHMARK(BM_AOSOA_SSE)->Range(fromRange, toRange);
+#endif
 #ifdef __AVX2__
 static void BM_AOSOA_AVX2(benchmark::State& state) {
     auto transformSystem = std::make_unique<AVX2::TransformSystem>(state.range(0));
@@ -437,16 +448,6 @@ static void BM_AOSOA_AVX2(benchmark::State& state) {
 }
 BENCHMARK(BM_AOSOA_AVX2)->Range(fromRange, toRange);
 #endif
-#ifdef __SSE__
-static void BM_AOSOA_SSE(benchmark::State& state) {
-	auto transformSystem = std::make_unique<SSE::TransformSystem>(state.range(0));
-	const auto move = neko::Vec4f(floatRand(), floatRand(), floatRand(), floatRand());
-	for (auto _ : state)
-	{
-		transformSystem->Translate(move);
-	}
-}
-BENCHMARK(BM_AOSOA_SSE)->Range(fromRange, toRange);
-#endif
+
 
 BENCHMARK_MAIN();
