@@ -164,6 +164,7 @@ namespace neko {
     }
 
     using Vec2f = Vec2<float>;
+    using Vec2i = Vec2<int>;
 
 
     template<>

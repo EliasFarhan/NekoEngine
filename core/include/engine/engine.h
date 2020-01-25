@@ -26,8 +26,10 @@
 
 #include <string>
 #include <engine/system.h>
-#include <utilities/delegate_utility.h>
+#include <utilities/action_utility.h>
 #include <graphics/color.h>
+#include <utilities/time_utility.h>
+#include <mathematics/vector.h>
 
 
 namespace neko
@@ -40,21 +42,12 @@ struct Collider;
 struct Configuration
 {
 	std::string windowName = "NekoEngine 0.1";
-    std::pair<unsigned, unsigned> realWindowSize = std::pair<unsigned, unsigned>(1280, 720);
+    Vec2i windowSize = Vec2i(1280, 720);
     std::pair<unsigned, unsigned> gameWindowSize = std::pair<unsigned, unsigned>(1280, 720);
     bool fullscreen = false;
-	float gravityX = 0.0f;
-	float gravityY = 9.81f;
-    float physicsTimeStep = 1.0f / 50.0f;
-    int velocityIterations = 8;
-    int positionIterations = 3;
-    float pixelPerMeter = 100.0f;
     bool vSync = true;
     unsigned int framerateLimit = 0u;
     std::string dataRootPath = "data/";
-	int glMajorVersion = 3;
-	int glMinorVersion = 0;
-	Color bgColor;
 };
 
 
@@ -76,16 +69,17 @@ public:
 
     Configuration config;
 
+    static BasicEngine* GetInstance(){return instance_;};
     //template <typename T = BasicEngine>
     //static T* GetInstance(){ return dynamic_cast<T*>(instance_);};
 protected:
     static BasicEngine* instance_;
 	bool isRunning_;
-    Delegate<> initDelegate_;
-    Delegate<float> updateDelegate_;
-    Delegate<float> drawUiDelegate_;
-    Delegate<> drawDelegate_;
-    Delegate<> destroyDelegate_;
+    Action<> initAction_;
+    Action<seconds> updateAction_;
+    Action<seconds> drawUiAction_;
+    Action<> drawDelegate_;
+    Action<> destroyDelegate_;
 
 };
 

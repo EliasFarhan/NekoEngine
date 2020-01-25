@@ -27,7 +27,7 @@
 #include <vector>
 #include <engine/globals.h>
 #include <xxhash.hpp>
-#include "utilities/delegate_utility.h"
+#include "utilities/action_utility.h"
 
 namespace neko
 {
@@ -92,7 +92,7 @@ public:
 	
 	static EntityHash HashEntityName(const std::string& entityName);
 private:
-	Delegate<Entity> onDestroyEntity;
+	Action<Entity> onDestroyEntity;
 	std::vector<EntityMask> entityMaskArray_;
 	std::vector<EntityHash> entityHashArray_;
 };

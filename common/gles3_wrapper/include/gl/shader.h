@@ -1,14 +1,17 @@
 #pragma once
 #include <string>
+#include <graphics/shader.h>
 #include "glad/glad.h"
 #include "mathematics/vector.h"
 #include "mathematics/matrix.h"
 namespace neko::gl
 {
-class Shader
+class Shader : neko::Shader
 {
 public:
-    void CompileSource(const std::string_view vertexShaderPath, const std::string_view fragmentShaderPath);
+    void LoadFromFile(
+            const std::string_view vertexShaderPath,
+            const std::string_view fragmentShaderPath) override;
 
 
     void Bind();

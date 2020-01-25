@@ -25,9 +25,13 @@
  */
 
 #include <cstdint>
+#include <chrono>
 
 namespace neko
 {
+    using seconds = std::chrono::duration<float, std::ratio<1,1>>;
+    using milliseconds = std::chrono::duration<std::uint32_t, std::ratio<1,1000>>;
+
 /**
  * \brief simple timer class in second, that needs to be updated with the current delta time of the frame
  * period is how long will the timer will run
@@ -36,9 +40,9 @@ namespace neko
 class Timer
 {
 public:
-    Timer(float time, float period);
+    Timer(seconds time, seconds period);
 
-    void Update(float dt);
+    void Update(seconds dt);
 
     bool IsOver() const;
 
@@ -46,14 +50,14 @@ public:
 
     float GetCurrentRatio() const;
 
-    float GetTimeFromStart() const;
+    seconds GetTimeFromStart() const;
 
 
-    float time = 0.0f;
-    float period = 0.0f;
+    seconds time{0.0f};
+    seconds period {0.0f};
 private:
 };
 
-void SleepMs(const uint32_t ms);
+void SleepMs(const milliseconds ms);
 
 }

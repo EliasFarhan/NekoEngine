@@ -23,6 +23,7 @@
  SOFTWARE.
  */
 #include "engine/engine.h"
+#include "sdl_engine/sdl_window.h"
 #include <SDL.h>
 #include <SDL_main.h>
 
@@ -35,13 +36,17 @@ public:
 	explicit SdlEngine(Configuration* config = nullptr);
 	SdlEngine() = delete;
 	void Init() override;
-	void Update(float dt) override;
+	void Update(seconds dt) override;
 	void Destroy() override;
+	virtual void OnEvent(const SDL_Event& event) = 0;
+/**
+ * Simple windows setter, needs to be called before Init
+ * @param window
+ */
+    void SetWindow(SdlWindow* window);
 protected:
-	SDL_Window* window_ = nullptr;
-#ifdef NEKO_GLES3
-	SDL_GLContext glContext_;
-#endif
+    SdlWindow* window = nullptr;
 };
+
 }
 

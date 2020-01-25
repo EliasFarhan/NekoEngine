@@ -63,7 +63,7 @@ void BasicEngine::EngineLoop()
     while (isRunning_)
     {
 	    const auto start = std::chrono::system_clock::now();
-	    const auto dt = std::chrono::duration_cast<std::chrono::duration<float>>(start - clock).count();
+	    const auto dt = std::chrono::duration_cast<seconds>(start - clock);
 		clock = start;
 		Update(dt);
     }

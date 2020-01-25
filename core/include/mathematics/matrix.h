@@ -190,10 +190,6 @@ namespace neko
             }
         }
 
-        std::array<T,N> Multiply(const std::array<T,N>& v)
-        {
-
-        }
         static std::array<T, N> Dot(const NVec4<T, N>& v1, const Vec4<T>& v)
         {
             std::array<T, N> result;

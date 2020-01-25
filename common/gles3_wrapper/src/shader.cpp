@@ -29,7 +29,7 @@
 namespace neko::gl
 {
 
-void Shader::CompileSource(const std::string_view vertexShaderPath, const std::string_view fragmentShaderPath)
+void Shader::LoadFromFile(const std::string_view vertexShaderPath, const std::string_view fragmentShaderPath)
 {
     const unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
     const auto vertexShaderProgram = LoadFile(vertexShaderPath.data());

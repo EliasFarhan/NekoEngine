@@ -5,10 +5,10 @@
 
 namespace neko
 {
-class HelloTriangleEngine : public neko::sdl::SdlEngine
+class CompGraphEngine : public neko::sdl::SdlEngine
 {
 public:
-	explicit HelloTriangleEngine(Configuration* config = nullptr);
+	explicit CompGraphEngine(Configuration* config = nullptr);
 private:
 	neko::HelloTriangleCommand helloTriangleCommand_;
 };

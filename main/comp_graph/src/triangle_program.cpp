@@ -9,8 +9,8 @@ void HelloTriangleCommand::Init()
 	glGenBuffers(2, &VBO[0]);
 	glGenBuffers(1, &EBO);
 
-	shader_.CompileSource("data/shaders/hello_triangle/hello_triangle.vert", 
-		"data/shaders/hello_triangle/hello_triangle.frag");
+	shader_.CompileSource("data/shaders/comp_graph/comp_graph.vert",
+		"data/shaders/comp_graph/comp_graph.frag");
 
 	glGenVertexArrays(1, &VAO);
 	// 1. bind Vertex Array Object

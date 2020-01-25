@@ -30,11 +30,11 @@ namespace neko
 {
 
 template<class ... Ts>
-class Delegate
+class Action
 {
 public:
-	Delegate() = default;
-	virtual ~Delegate() = default;
+	Action() = default;
+	virtual ~Action() = default;
 
 	void RegisterCallback(const std::function<void(Ts ...)>& callback)
 	{

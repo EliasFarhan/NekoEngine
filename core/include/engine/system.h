@@ -24,6 +24,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
+#include <utilities/time_utility.h>
 namespace neko
 {
 
@@ -45,7 +46,7 @@ public:
 
     virtual void Init() = 0;
 
-    virtual void Update(float dt) = 0;
+    virtual void Update(seconds dt) = 0;
 
     virtual void Destroy() = 0;
 
