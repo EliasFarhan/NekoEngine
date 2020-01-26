@@ -17,8 +17,12 @@ void sdl::SdlWindow::Init()
 {
 
     auto& config = BasicEngine::GetInstance()->config;
-    SDL_Init(SDL_INIT_VIDEO);
-    auto flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
+
+    auto flags = SDL_WINDOW_RESIZABLE|
+#ifdef NEKO_GLES3
+            SDL_WINDOW_OPENGL
+#endif
+                    ;
     auto windowSize = config.windowSize;
     if (config.fullscreen)
     {
@@ -71,4 +75,26 @@ void sdl::SdlWindow::OnEvent(const SDL_Event& event)
         }
     }
 }
+
+void sdl::SdlWindow::ImguiNewFrame()
+{
+    ImGui_ImplSDL2_NewFrame(window_);
+}
+
+void sdl::SdlWindow::ImguiRender()
+{
+    ImGui::Render();
+}
+
+void sdl::SdlWindow::Destroy()
+{
+
+    ImGui_ImplSDL2_Shutdown();
+    ImGui::DestroyContext();
+    // Destroy our window
+    SDL_DestroyWindow(window_);
+
+
+}
+
 }

@@ -46,7 +46,7 @@ void GraphicsManager::Render(RenderCommand* command)
 	renderLength_++;
 }
 
-void GraphicsManager::RenderAll(RenderTarget* renderTarget)
+void GraphicsManager::RenderAll()
 {
     std::sort(commandBuffer_.begin(), commandBuffer_.begin() + renderLength_, [](RenderCommand* c1, RenderCommand* c2)
     {
@@ -56,7 +56,7 @@ void GraphicsManager::RenderAll(RenderTarget* renderTarget)
     {
         if(commandBuffer_[i])
         {
-            commandBuffer_[i]->Render(renderTarget);
+            commandBuffer_[i]->Render();
         }
     }
     renderLength_ = 0;

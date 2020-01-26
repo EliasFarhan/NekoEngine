@@ -45,9 +45,10 @@ void SdlEngine::Init()
 {
     BasicEngine::Init();
 
-    assert(window != nullptr);
-    window->Init();
-    window->InitImGui();
+    assert(window_ != nullptr);
+    SDL_Init(SDL_INIT_VIDEO);
+    window_->Init();
+    window_->InitImGui();
     initAction_.Execute();
 }
 
@@ -56,7 +57,7 @@ void SdlEngine::Update([[maybe_unused]]seconds dt)
     SDL_Event event;
     while (SDL_PollEvent(&event))
     {
-        window->OnEvent(event);
+        window_->OnEvent(event);
         OnEvent(event);
         ImGui_ImplSDL2_ProcessEvent(&event);
         if (event.type == SDL_QUIT)
@@ -75,47 +76,31 @@ void SdlEngine::Update([[maybe_unused]]seconds dt)
     }
 
     updateAction_.Execute(dt);
-#ifdef NEKO_GLES3
-    SDL_GL_MakeCurrent(window_, glContext_);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    drawDelegate_.Execute();
+    window_->ClearScreen();
+    drawAction_.Execute();
 
     // Start the Dear ImGui frame
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplSDL2_NewFrame(window_);
+    window_->ImguiNewFrame();
     ImGui::NewFrame();
 
     drawUiAction_.Execute(dt);
+    window_->ImguiRender();
 
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    SDL_GL_SwapWindow(window_);
-#endif
+    window_->FinishFrame();
 }
 
 void SdlEngine::Destroy()
 {
-    destroyDelegate_.Execute();
-#ifdef NEKO_GLES3
-    ImGui_ImplOpenGL3_Shutdown();
-#endif
-    ImGui_ImplSDL2_Shutdown();
-    ImGui::DestroyContext();
-#ifdef NEKO_GLES3
-    // Delete our OpengL context
-    SDL_GL_DeleteContext(glContext_);
-#endif
-    // Destroy our window
-    SDL_DestroyWindow(window_);
+    destroyAction_.Execute();
+    window_->Destroy();
 
+    BasicEngine::Destroy();
     // Shutdown SDL 2
     SDL_Quit();
-
 }
 
 void SdlEngine::SetWindow(SdlWindow* window)
 {
-    SdlEngine::window = window;
+    SdlEngine::window_ = window;
 }
 }

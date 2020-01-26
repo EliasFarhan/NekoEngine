@@ -7,6 +7,7 @@ LIST(APPEND engine3d_lib
         ${OPENGL_LIBRARIES})
 message("OpenGL Libraries: ${OPENGL_LIBRARIES}")
 
+add_compile_definitions(IMGUI_IMPL_OPENGL_ES3=1)
 add_compile_definitions(IMGUI_IMPL_OPENGL_LOADER_GLAD=1)
 
 

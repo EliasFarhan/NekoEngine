@@ -9,6 +9,7 @@ int main(int argc, char** argv)
 {
     neko::sdl::Gles3Window window;
     neko::CompGraphEngine engine;
+    engine.SetWindow(&window);
     engine.Init();
     engine.EngineLoop();
     return 0;

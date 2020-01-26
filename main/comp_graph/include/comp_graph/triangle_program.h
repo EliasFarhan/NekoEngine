@@ -31,9 +31,9 @@ class HelloTriangleCommand : public RenderProgram
 {
 public:
 	void Init() override;
-	void Update(float dt) override;
+	void Update(seconds dt) override;
 	void Destroy() override;
-	void Render(RenderTarget* renderTarget) override;
+	void Render() override;
 private:
 	float vertices[12] = {
 		 0.5f,  0.5f, 0.0f,  // top right
@@ -56,7 +56,7 @@ private:
 	unsigned int EBO = 0; // Element Buffer Object
 	unsigned int VBO[2] = {}; //Vertex Buffer Object
 	unsigned int VAO = 0; //Vertex Array Object
-	float timeSinceInit_ = 0.0f;
+	seconds timeSinceInit_ = seconds (0.0f);
 	gl::Shader shader_;
 };
 }

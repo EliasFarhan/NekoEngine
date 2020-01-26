@@ -37,10 +37,6 @@ namespace neko
 const size_t MAX_COMMAND_NMB = 8'192;
 
 
-struct RenderTarget
-{
-	void* renderTargetPtr = nullptr;
-};
 
 /**
  * \brief abstraction of a graphic command send to the render thread
@@ -55,7 +51,7 @@ public:
     void SetLayer(int layer);
 
 
-	virtual void Render(RenderTarget* renderTarget) = 0;
+	virtual void Render() = 0;
 private:
     int layer_ = 0;
 
@@ -65,7 +61,7 @@ class RenderProgram : public RenderCommand
 {
 public:
     virtual void Init() = 0;
-    virtual void Update(float dt) = 0;
+    virtual void Update(seconds dt) = 0;
     virtual void Destroy() = 0;
 };
 
@@ -80,7 +76,7 @@ public:
 
 	void Clear(){};
 	void Render(RenderCommand* command);
-	virtual void RenderAll(RenderTarget* renderTarget = nullptr);
+	virtual void RenderAll();
 protected:
     std::vector<RenderCommand*> commandBuffer_ = {};
 	size_t renderLength_ = 0;

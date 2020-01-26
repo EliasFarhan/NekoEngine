@@ -36,14 +36,12 @@ BasicEngine::BasicEngine(Configuration* config)
     {
         this->config = *config;
     }
-    initLog();
 
 }
 
 BasicEngine::~BasicEngine()
 {
     logDebug("Destroy Basic Engine");
-    destroyLog();
 }
 
 void BasicEngine::Init()

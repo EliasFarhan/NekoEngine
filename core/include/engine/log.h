@@ -25,24 +25,10 @@
  */
 
 #include <string>
-#include <vector>
-#include <condition_variable>
 
-/**
- * \brief must be called at start
- * it is called by MainEngine::Init
- */
-void initLog();
 
 /**
  * \brief log a msg to cout and a log file to the log thread
  * @param msg
  */
 void logDebug(const std::string& msg);
-/**
- * \brief must be called at destroy
- * it is called by MainEngine destructor
- */
-void destroyLog();
-
-std::vector<std::string>& getLog();

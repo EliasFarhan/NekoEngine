@@ -16,20 +16,7 @@ set(Neko_Test ON CACHE BOOL "Activate Test")
 set(Neko_Benchmark ON CACHE BOOL "Activate Benchmark")
 
 
-set(main_project_dir "main/")
-file(GLOB main_projects "${main_project_dir}/*")
 
-foreach(main_project_path ${main_projects} )
-    # I used a simple string replace, to cut off .cpp.
-    get_filename_component(main_project_name ${main_project_path} NAME )
-
-    message("Main project path: ${main_project_path} and name: ${main_project_name}")
-    set(${main_project_name} OFF CACHE BOOL "")
-
-    if(${main_project_name})
-        add_subdirectory(${main_project_path})
-    endif()
-endforeach()
 
 
 set(EXTERNAL_DIR ${CMAKE_SOURCE_DIR}/externals CACHE INTERNAL "Externals folder")
@@ -96,5 +83,17 @@ if(Neko_Benchmark)
     add_subdirectory("benchmark/")
 endif()
 
+set(main_project_dir "main/")
+file(GLOB main_projects "${main_project_dir}/*")
 
+foreach(main_project_path ${main_projects} )
+    # I used a simple string replace, to cut off .cpp.
+    get_filename_component(main_project_name ${main_project_path} NAME )
 
+    message("Main project path: ${main_project_path} and name: ${main_project_name}")
+    set(${main_project_name} OFF CACHE BOOL "")
+
+    if(${main_project_name})
+        add_subdirectory(${main_project_path})
+    endif()
+endforeach()

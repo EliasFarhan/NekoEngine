@@ -78,8 +78,8 @@ protected:
     Action<> initAction_;
     Action<seconds> updateAction_;
     Action<seconds> drawUiAction_;
-    Action<> drawDelegate_;
-    Action<> destroyDelegate_;
+    Action<> drawAction_;
+    Action<> destroyAction_;
 
 };
 

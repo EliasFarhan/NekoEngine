@@ -36,7 +36,7 @@ public:
 	explicit SdlEngine(Configuration* config = nullptr);
 	SdlEngine() = delete;
 	void Init() override;
-	void Update(seconds dt) override;
+	void Update(seconds dt) override final;
 	void Destroy() override;
 	virtual void OnEvent(const SDL_Event& event) = 0;
 /**
@@ -45,7 +45,8 @@ public:
  */
     void SetWindow(SdlWindow* window);
 protected:
-    SdlWindow* window = nullptr;
+
+    SdlWindow* window_ = nullptr;
 };
 
 }

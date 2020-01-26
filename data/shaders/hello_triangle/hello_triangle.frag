@@ -1,4 +1,4 @@
-#version 450
+#version 300 es
 layout(location = 0) out vec4 FragColor;
 in vec3 ourColor;
 
