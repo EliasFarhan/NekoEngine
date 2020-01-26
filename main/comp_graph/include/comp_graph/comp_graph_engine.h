@@ -1,7 +1,7 @@
 #pragma once
 
 #include "sdl_engine/sdl_engine.h"
-#include "01_hello_triangle/triangle_program.h"
+#include "comp_graph/sample_browser.h"
 
 namespace neko
 {
@@ -13,6 +13,6 @@ public:
     void OnEvent(const SDL_Event& event) override;
 
 private:
-	neko::HelloTriangleCommand helloTriangleCommand_;
+	SampleBrowser sampleBrowser_;
 };
 }
