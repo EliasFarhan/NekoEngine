@@ -43,6 +43,8 @@ void IterateDirectory(const std::string_view dirname, std::function<void(const s
 
 std::ifstream::pos_type CalculateFileSize(const std::string& filename);
 
+std::string GetCurrentPath();
+
 bool CreateDirectory(const std::string_view dirname);
 
 bool RemoveDirectory(const std::string_view dirname, bool removeAll = true);

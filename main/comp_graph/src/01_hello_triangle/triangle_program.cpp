@@ -1,5 +1,5 @@
 #include <cmath>
-#include "comp_graph/triangle_program.h"
+#include "01_hello_triangle/triangle_program.h"
 #include "engine/log.h"
 
 namespace neko
@@ -10,8 +10,8 @@ void HelloTriangleCommand::Init()
 	glGenBuffers(2, &VBO[0]);
 	glGenBuffers(1, &EBO);
 
-	shader_.LoadFromFile("data/shaders/comp_graph/comp_graph.vert",
-		"data/shaders/comp_graph/comp_graph.frag");
+	shader_.LoadFromFile("../../data/shaders/01_hello_triangle/hello_triangle.vert",
+		"../../data/shaders/01_hello_triangle/hello_triangle.frag");
 
 	glGenVertexArrays(1, &VAO);
 	// 1. bind Vertex Array Object
@@ -38,8 +38,9 @@ void HelloTriangleCommand::Update(seconds dt)
 
 void HelloTriangleCommand::Render()
 {
+
 	shader_.Bind();
-	const float colorValue = (std::sin(timeSinceInit_.count()) + 1.0f) / 2.0f;
+	const float colorValue = (std::cos(timeSinceInit_.count()) + 1.0f) / 2.0f;
 	shader_.SetFloat("colorCoeff", colorValue);
 	glUseProgram(shader_.GetProgram());
 

@@ -2,7 +2,6 @@
 
 find_package (Python3 COMPONENTS Interpreter)
 MESSAGE("Python Interpreter: ${Python3_EXECUTABLE}")
-LIST(APPEND DATA_FILES ${IMG_FILES} ${SND_FILES} ${TEXT_FILES} ${SHADER_FILES})
 
 file(GLOB_RECURSE SCRIPT_FILES scripts/*.py)
 
@@ -32,13 +31,16 @@ file(GLOB_RECURSE SND_FILES
         "${PROJECT_SOURCE_DIR}/data/*.ogg"
         )
 
+
 source_group("Scripts"				FILES ${SCRIPT_FILES})
+source_group("Shader" FILES ${SHADER_FILES})
 source_group("Data\\Text"           FILES ${TEXT_FILES})
 source_group("Data\\Img"            FILES ${IMG_FILES})
 source_group("Data\\Snd"			FILES ${SND_FILES})
 source_group("Data\\Shaders"		FILES ${SHADER_FILES})
 
-#TODO clean the data pattern matching system (using a python script instead for example?)
+LIST(APPEND DATA_FILES ${IMG_FILES} ${SND_FILES} ${TEXT_FILES} ${SHADER_FILES})
+
 foreach(DATA ${DATA_FILES})
     get_filename_component(FILE_NAME ${DATA} NAME)
     get_filename_component(PATH_NAME ${DATA} DIRECTORY)
@@ -46,34 +48,14 @@ foreach(DATA ${DATA_FILES})
     file(RELATIVE_PATH PATH_NAME "${PROJECT_SOURCE_DIR}" ${PATH_NAME})
     MESSAGE("DATA: ${FILE_NAME} ${PATH_NAME} ${EXTENSION}")
     set(DATA_OUTPUT "${PROJECT_BINARY_DIR}/${PATH_NAME}/${FILE_NAME}")
-    if(${EXTENSION} STREQUAL ".scene")
-        add_custom_command(
-                OUTPUT ${DATA_OUTPUT}
-                DEPENDS ${DATA}
-                COMMAND ${CMAKE_COMMAND} -E make_directory "${PROJECT_BINARY_DIR}/${PATH_NAME}"
-                COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/scripts/scene_validator.py"  "${DATA}"
-                COMMAND ${CMAKE_COMMAND} -E copy ${DATA} "${PROJECT_BINARY_DIR}/${PATH_NAME}/${FILE_NAME}")
-    elseif(${EXTENSION} STREQUAL ".atlas.txt")
-        add_custom_command(
-                OUTPUT ${DATA_OUTPUT}
-                DEPENDS ${DATA} "${CMAKE_SOURCE_DIR}/scripts/spine_validator.py"
-                COMMAND ${CMAKE_COMMAND} -E make_directory "${PROJECT_BINARY_DIR}/${PATH_NAME}"
-                COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/scripts/spine_validator.py"  "${DATA}" "${PROJECT_SOURCE_DIR}/${PATH_NAME}/" "${PROJECT_BINARY_DIR}/${PATH_NAME}/"
-                COMMAND ${CMAKE_COMMAND} -E copy ${DATA} "${PROJECT_BINARY_DIR}/${PATH_NAME}/${FILE_NAME}")
-    elseif(${EXTENSION} STREQUAL ".vert" OR ${EXTENSION} STREQUAL ".frag")
-        add_custom_command(
-                OUTPUT ${DATA_OUTPUT}
-                DEPENDS ${DATA}
-                COMMAND ${CMAKE_COMMAND} -E make_directory "${PROJECT_BINARY_DIR}/${PATH_NAME}"
-                COMMAND "${GLSL_VALIDATOR}" "${DATA}"
-                COMMAND ${CMAKE_COMMAND} -E copy ${DATA} "${PROJECT_BINARY_DIR}/${PATH_NAME}/${FILE_NAME}")
-    else()
-        add_custom_command(
-                OUTPUT ${DATA_OUTPUT}
-                DEPENDS ${DATA}
-                COMMAND ${CMAKE_COMMAND} -E make_directory "${PROJECT_BINARY_DIR}/${PATH_NAME}"
-                COMMAND ${CMAKE_COMMAND} -E copy ${DATA} "${PROJECT_BINARY_DIR}/${PATH_NAME}/${FILE_NAME}")
-    endif()
+
+    add_custom_command(
+            OUTPUT ${DATA_OUTPUT}
+            DEPENDS ${DATA}
+            COMMAND ${CMAKE_COMMAND} -E make_directory "${PROJECT_BINARY_DIR}/${PATH_NAME}"
+            COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/scripts/validator/asset_validator.py"  "${DATA}"
+            COMMAND ${CMAKE_COMMAND} -E copy ${DATA} "${PROJECT_BINARY_DIR}/${PATH_NAME}/${FILE_NAME}"
+    )
     list(APPEND DATA_BINARY_FILES ${DATA_OUTPUT})
 endforeach(DATA)
 

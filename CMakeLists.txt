@@ -16,9 +16,6 @@ set(Neko_Test ON CACHE BOOL "Activate Test")
 set(Neko_Benchmark ON CACHE BOOL "Activate Benchmark")
 
 
-
-
-
 set(EXTERNAL_DIR ${CMAKE_SOURCE_DIR}/externals CACHE INTERNAL "Externals folder")
 set(UTILITIES_DIR "${EXTERNAL_DIR}/utilities" CACHE INTERNAL "")
 

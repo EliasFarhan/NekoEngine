@@ -64,7 +64,7 @@ public:
 
     void Destroy() override;
 
-    virtual void EngineLoop();
+    void EngineLoop();
 
 
     Configuration config;

@@ -26,6 +26,7 @@
 
 #include <engine/engine.h>
 #include <engine/log.h>
+#include <utilities/file_utility.h>
 
 namespace neko
 {
@@ -47,6 +48,7 @@ BasicEngine::~BasicEngine()
 void BasicEngine::Init()
 {
     instance_ = this;
+    logDebug("Current path: "+GetCurrentPath());
 }
 
 void BasicEngine::Destroy()

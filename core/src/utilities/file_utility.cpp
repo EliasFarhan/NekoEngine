@@ -205,4 +205,9 @@ std::string GetRelativePath(const std::string_view path, const std::string_view 
 	//logDebug(std::string("Relative path from: ") + path.data() + " to: " + relative.data());
     return MakeGeneric(fs::relative(p, relative).string());
 }
+
+std::string GetCurrentPath()
+{
+    return fs::current_path().string();
+}
 }
