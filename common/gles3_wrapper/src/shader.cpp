@@ -31,12 +31,13 @@ namespace neko::gl
 
 void Shader::LoadFromFile(const std::string_view vertexShaderPath, const std::string_view fragmentShaderPath)
 {
-    const unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-
     if(!FileExists(vertexShaderPath))
     {
         logDebug(std::string("[Error] Vertex shader: ")+vertexShaderPath.data()+" does not exist");
     }
+    const unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+
+
     const auto vertexShaderProgram = LoadFile(vertexShaderPath.data());
     const char* vertexShaderChar = vertexShaderProgram.c_str();
 

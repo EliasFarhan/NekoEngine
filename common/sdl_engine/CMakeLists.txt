@@ -1,4 +1,5 @@
 
+if(NOT Emscripten)
 LIST(APPEND sdl_engine_libs SDL2 Neko_Core)
 set_target_properties (SDL2 PROPERTIES FOLDER Externals)
 if(MSVC)
@@ -6,6 +7,7 @@ if(MSVC)
             SDL2main)
     set_target_properties (SDL2main PROPERTIES FOLDER Externals)
 endif(MSVC)
+endif()
 
 if(Neko_GLES3)
     LIST(APPEND sdl_engine_libs gles3_wrapper)
@@ -18,3 +20,7 @@ add_library(sdl_engine STATIC ${sdl_engine_src})
 target_link_libraries(sdl_engine PUBLIC ${sdl_engine_libs} imgui)
 
 target_include_directories(sdl_engine PUBLIC include/)
+neko_lib_config(sdl_engine)
+if(Emscripten)
+    set_target_properties(sdl_engine PROPERTIES LINK_FLAGS " -s USE_SDL=2 -s USE_WEBGL2=1 ")
+endif()

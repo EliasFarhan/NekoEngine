@@ -1,5 +1,6 @@
 #pragma once
 
+#ifndef EMSCRIPTEN
 #ifdef WIN32
 #include <intrin.h>
 #ifdef __AVX2__
@@ -9,4 +10,5 @@
 #endif
 #else
 #include <x86intrin.h>
+#endif
 #endif

@@ -159,7 +159,7 @@ namespace std {
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wdollar-in-identifier-extension"
 #   define $osx $yes
-#elif defined(__linux__)
+#elif defined(__linux__) || defined(EMSCRIPTEN)
 #   include <arpa/inet.h>
 #   include <net/if.h>
 #   include <netinet/in.h>
@@ -433,6 +433,7 @@ namespace sole {
         }
     )
     $lelse( $belse( // if not linux, if not bsd... valid for apple/win32
+#ifndef clock_gettime
         inline int clock_gettime( int /*clk_id*/, struct timespec* t ) {
             struct timeval now;
             int rv = gettimeofday(&now, NULL);
@@ -441,6 +442,7 @@ namespace sole {
             t->tv_nsec = now.tv_usec * 1000;
             return 0;
         }
+#endif
     ))
 
     //////////////////////////////////////////////////////////////////////////////////////

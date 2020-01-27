@@ -1,5 +1,7 @@
 #include <cmath>
 #include <imgui.h>
+#include <utilities/file_utility.h>
+#include <engine/engine.h>
 #include "01_hello_triangle/triangle_program.h"
 #include "engine/log.h"
 
@@ -7,11 +9,10 @@ namespace neko
 {
 void HelloTriangleProgram::Init()
 {
-    logDebug("Init Triangle Command");
+    const auto& config = BasicEngine::GetInstance()->config;
 
-    shader_.LoadFromFile("../../data/shaders/01_hello_triangle/hello_triangle.vert",
-                         "../../data/shaders/01_hello_triangle/hello_triangle.frag");
-
+    shader_.LoadFromFile(config.dataRootPath+"data/shaders/01_hello_triangle/hello_triangle.vert",
+                         config.dataRootPath+"data/shaders/01_hello_triangle/hello_triangle.frag");
 
     //Initialize the VAO program
     glGenBuffers(2, &vaoProgam_.VBO[0]);
@@ -50,8 +51,8 @@ void HelloTriangleProgram::Init()
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(eboProgram_.indices), eboProgram_.indices, GL_STATIC_DRAW);
 
     quadShader_.LoadFromFile(
-            "../../data/shaders/01_hello_triangle/hello_neko_quad.vert",
-            "../../data/shaders/01_hello_triangle/hello_triangle.frag"
+            config.dataRootPath+"data/shaders/01_hello_triangle/hello_neko_quad.vert",
+            config.dataRootPath+"/data/shaders/01_hello_triangle/hello_triangle.frag"
             );
     quad_.Init();
 }
@@ -63,10 +64,6 @@ void HelloTriangleProgram::Update(seconds dt)
 
 void HelloTriangleProgram::Render()
 {
-
-
-
-    glUseProgram(shader_.GetProgram());
     switch (renderType_)
     {
 
@@ -78,7 +75,7 @@ void HelloTriangleProgram::Render()
 
             glBindVertexArray(vaoProgam_.VAO);
             glDrawArrays(GL_TRIANGLES, 0, 6);
-            glBindVertexArray(0);
+
             break;
         }
         case RenderType::EboProgram:
@@ -89,7 +86,7 @@ void HelloTriangleProgram::Render()
 
             glBindVertexArray(eboProgram_.VAO);
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-            glBindVertexArray(0);
+
             break;
         }
         case RenderType::NekoQuad:
@@ -99,6 +96,7 @@ void HelloTriangleProgram::Render()
             quadShader_.SetFloat("colorCoeff", colorValue);
             quadShader_.SetVec4("aColor", Vec4f(1.0f,0.5f,0.0f,1.0f));
             quad_.Draw();
+
             break;
         }
         default:
@@ -111,7 +109,6 @@ void HelloTriangleProgram::Render()
 void HelloTriangleProgram::Destroy()
 {
 
-    logDebug("Destroy Triangle Command");
     glDeleteVertexArrays(1, &eboProgram_.VAO);
     glDeleteBuffers(2, &eboProgram_.VBO[0]);
     glDeleteBuffers(2, &eboProgram_.EBO);

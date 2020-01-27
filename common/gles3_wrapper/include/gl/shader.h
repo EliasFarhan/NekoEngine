@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include <graphics/shader.h>
-#include "glad/glad.h"
+#include "gl/gles3_include.h"
 #include "mathematics/vector.h"
 #include "mathematics/matrix.h"
 namespace neko::gl

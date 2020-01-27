@@ -8,6 +8,8 @@ set_property(GLOBAL PROPERTY USE_FOLDERS On)
 
 include(cmake/neko_executable.cmake)
 
+
+
 set(Neko_Remotery OFF CACHE BOOL "Activate Remotery")
 set(Neko_GLES3 ON CACHE BOOL "Activate OpenGL ES 3.0")
 set(Neko_SDL2 ON CACHE BOOL "Activate SDL2")
@@ -15,11 +17,16 @@ set(Neko_Box2D OFF CACHE BOOL "Activate Box2D")
 set(Neko_Test ON CACHE BOOL "Activate Test")
 set(Neko_Benchmark ON CACHE BOOL "Activate Benchmark")
 
+if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
+    include(cmake/platforms/emscripten.cmake)
+    set(CMAKE_EXECUTABLE_SUFFIX ".html")
+    set(CMAKE_STATIC_LIBRARY_SUFFIX ".a")
+endif()
 
 set(EXTERNAL_DIR ${CMAKE_SOURCE_DIR}/externals CACHE INTERNAL "Externals folder")
 set(UTILITIES_DIR "${EXTERNAL_DIR}/utilities" CACHE INTERNAL "")
 
-add_subdirectory("data/")
+include("cmake/data.cmake")
 set(NEKO_CORE_DIR "${CMAKE_SOURCE_DIR}/core/" CACHE INTERNAL "")
 add_subdirectory(${NEKO_CORE_DIR})
 
@@ -39,7 +46,9 @@ endif()
 
 if(Neko_GLES3)
     add_compile_definitions("NEKO_GLES3=1")
+    if(NOT Emscripten)
     add_subdirectory("${EXTERNAL_DIR}/glad")
+    endif()
     set(GLES3_WRAPPER_DIR "common/gles3_wrapper" CACHE INTERNAL "")
     add_subdirectory(${GLES3_WRAPPER_DIR})
 endif()
@@ -51,7 +60,9 @@ if(Neko_SDL2)
     set(SDL_STATIC OFF CACHE INTERNAL "")
     set(SDL_SHARED ON CACHE INTERNAL "")
     set(SDL_ENGINE_DIR ON CACHE INTERNAL "")
+    if(NOT Emscripten)
     add_subdirectory(${SDL_DIR})
+    ENDIF()
     include_directories(${SDL_DIR}/include ${SDL_DIR}/src)
     add_subdirectory("common/sdl_engine")
 
@@ -72,12 +83,11 @@ endif()
 
 if(Neko_Benchmark)
     #Google benchmark
-    set(GOOGLE_BENCH_DIR ${EXTERNAL_DIR}/benchmark-1.5.0)
-    add_subdirectory(${GOOGLE_BENCH_DIR})
-    include_directories(${GOOGLE_BENCH_DIR}/include)
-    set_target_properties (benchmark benchmark_main PROPERTIES
-            FOLDER Externals\\GTest)
-    add_subdirectory("benchmark/")
+    set(GOOGLE_BENCH_DIR "${EXTERNAL_DIR}/benchmark-1.5.0" CACHE STRING "")
+    if(NOT Emscripten)
+        add_subdirectory(${GOOGLE_BENCH_DIR})
+        add_subdirectory("benchmark/")
+    endif()
 endif()
 
 set(main_project_dir "main/")

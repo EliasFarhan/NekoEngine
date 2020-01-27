@@ -1,7 +1,7 @@
 #pragma once
 #ifdef NEKO_GLES3
 
-#ifdef __EMSCRIPTEN__
+#ifdef EMSCRIPTEN
 #include <GLES3/gl3.h>
 #else
 #include <glad/glad.h>

@@ -3550,7 +3550,11 @@ void ImGui::NewFrame()
         if (g.SettingsDirtyTimer <= 0.0f)
         {
             if (g.IO.IniFilename != NULL)
+            {
+#ifndef EMSCRIPTEN
                 SaveIniSettingsToDisk(g.IO.IniFilename);
+#endif
+            }
             else
                 g.IO.WantSaveIniSettings = true;  // Let user know they can call SaveIniSettingsToMemory(). user will need to clear io.WantSaveIniSettings themselves.
             g.SettingsDirtyTimer = 0.0f;

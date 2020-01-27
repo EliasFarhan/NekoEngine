@@ -242,6 +242,7 @@ namespace neko
 
     using FourVec4f = NVec4<float, 4>;
     using EightVec4f = NVec4<float, 8>;
+
 #ifdef __SSE__
 
     template<>

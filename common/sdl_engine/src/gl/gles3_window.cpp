@@ -9,7 +9,6 @@
 #include <sstream>
 #include <engine/engine.h>
 #include "engine/log.h"
-#include "glad/glad.h"
 
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
@@ -75,7 +74,7 @@ void Gles3Window::OnEvent(const SDL_Event& event)
 
 void Gles3Window::ClearScreen()
 {
-    glClearColor(0.0f,0.0f,0.0f,0.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
@@ -93,7 +92,6 @@ void Gles3Window::ImguiRender()
 
 void Gles3Window::FinishFrame()
 {
-
     SDL_GL_SwapWindow(window_);
 }
 

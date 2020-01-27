@@ -2,8 +2,8 @@
 
 #ifdef NEKO_GLES3
 
-#include "sdl_engine/sdl_window.h"
 #include "gl/gles3_include.h"
+#include "sdl_engine/sdl_window.h"
 namespace neko::sdl
 {
 class Gles3Window : public SdlWindow

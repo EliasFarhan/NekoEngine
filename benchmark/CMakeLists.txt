@@ -1,5 +1,11 @@
 
+if(Emscripten)
+    return()
+endif()
 
+include_directories(${GOOGLE_BENCH_DIR}/include)
+set_target_properties (benchmark benchmark_main PROPERTIES
+        FOLDER Externals\\GTest)
 
 SET(BENCH_DIR ${CMAKE_SOURCE_DIR}/benchmark)
 file(GLOB BENCH_FILES ${BENCH_DIR}/*.cpp)

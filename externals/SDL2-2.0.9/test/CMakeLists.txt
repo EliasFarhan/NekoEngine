@@ -6,7 +6,7 @@ project(SDL2 C)
 remove_definitions(-DUSING_GENERATED_CONFIG_H)
 link_libraries(SDL2_test SDL2-static)
 
-# FIXME: Parent directory CMakeLists.txt only sets these for mingw/cygwin,
+# FIXME: Parent directory data.cmake only sets these for mingw/cygwin,
 # but we need them for VS as well.
 if(WINDOWS)
     link_libraries(SDL2main)

@@ -47,7 +47,11 @@ struct Configuration
     bool fullscreen = false;
     bool vSync = true;
     unsigned int framerateLimit = 0u;
-    std::string dataRootPath = "data/";
+#ifdef EMSCRIPTEN
+    std::string dataRootPath = "./";
+#else
+    std::string dataRootPath = "../../";
+#endif
 };
 
 

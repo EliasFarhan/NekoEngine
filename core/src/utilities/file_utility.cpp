@@ -37,7 +37,7 @@ namespace fs = boost::filesystem;
 namespace fs = std::filesystem;
 #endif
 
-#ifdef __linux__
+#if defined(__linux__) || defined (EMSCRIPTEN)
 #include <filesystem>
 namespace fs = std::filesystem;
 #endif
@@ -152,7 +152,7 @@ std::string GetFileParentPath(const std::string_view path)
 #ifdef __APPLE__
     fs::path p = std::string(path);
 #else
-    fs::path p = fs::path(path, fs::path::generic_format);
+    fs::path p = fs::path(path);
 #endif
     return p.parent_path().string();
 }

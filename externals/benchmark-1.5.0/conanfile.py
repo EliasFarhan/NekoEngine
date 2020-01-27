@@ -28,8 +28,8 @@ class GoogleBenchmarkConan(ConanFile):
 
     def source(self):
         # Wrap the original CMake file to call conan_basic_setup
-        shutil.move("CMakeLists.txt", "CMakeListsOriginal.txt")
-        shutil.move(os.path.join("conan", "CMakeLists.txt"), "CMakeLists.txt")
+        shutil.move("data.cmake", "CMakeListsOriginal.txt")
+        shutil.move(os.path.join("conan", "data.cmake"), "data.cmake")
 
     def config_options(self):
         if self.settings.os == "Windows":
