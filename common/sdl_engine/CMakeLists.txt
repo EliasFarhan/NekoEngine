@@ -1,7 +1,7 @@
 
 if(NOT Emscripten)
-LIST(APPEND sdl_engine_libs SDL2 Neko_Core)
-set_target_properties (SDL2 PROPERTIES FOLDER Externals)
+LIST(APPEND sdl_engine_libs SDL2-static Neko_Core)
+set_target_properties (SDL2-static PROPERTIES FOLDER Externals)
 if(MSVC)
     LIST(APPEND sdl_engine_libs
             SDL2main)
