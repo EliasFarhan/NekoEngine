@@ -16,6 +16,8 @@ public:
 
     void Bind();
 
+    void Destroy();
+
     GLuint GetProgram();
 
     void SetBool(const std::string& attributeName, bool value) const;

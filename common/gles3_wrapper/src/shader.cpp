@@ -160,6 +160,11 @@ void Shader::SetVec4(const std::string& name, float x, float y, float z, float w
     glUniform4f(glGetUniformLocation(shaderProgram_, name.c_str()), x, y, z, w);
 }
 
+void Shader::Destroy()
+{
+    glDeleteProgram(shaderProgram_);
+}
+
 /*
 // ------------------------------------------------------------------------
 void Shader::SetMat2(const std::string& name, const glm::mat2& mat) const

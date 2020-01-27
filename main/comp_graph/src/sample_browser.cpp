@@ -2,6 +2,8 @@
 // Created by efarhan on 26.01.20.
 //
 
+#include <02_hello_texture/texture_program.h>
+#include <imgui.h>
 #include "comp_graph/sample_browser.h"
 
 #include "01_hello_triangle/triangle_program.h"
@@ -13,7 +15,7 @@ namespace neko
 void SampleBrowser::Init()
 {
 RegisterRenderProgram("01 Hello Triangle", std::make_unique<HelloTriangleProgram>());
-
+RegisterRenderProgram("02 Hello Texture", std::make_unique<HelloTextureProgram>());
 programs_[currentProgramIndex_]->Init();
 }
 
@@ -48,6 +50,24 @@ void SampleBrowser::Render()
 
 void SampleBrowser::DrawGui(seconds dt)
 {
+    ImGui::Begin("Sample Browser");
+    if (ImGui::BeginCombo("Current Sample", programsNames_[currentProgramIndex_].c_str())) // The second parameter is the label previewed before opening the combo.
+    {
+        for (int n = 0; n < programsNames_.size(); n++)
+        {
+            bool is_selected = (currentProgramIndex_ == n);
+            if (ImGui::Selectable(programsNames_[n].c_str(), is_selected))
+            {
+                SwitchToProgram(n);
+            }
+            if (is_selected)
+            {
+                ImGui::SetItemDefaultFocus();   // Set the initial focus when opening the combo (scrolling + for keyboard navigation support in the upcoming navigation branch)
+            }
+        }
+        ImGui::EndCombo();
+    }
+    ImGui::End();
     programs_[currentProgramIndex_]->DrawUi(dt);
 }
 

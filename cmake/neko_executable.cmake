@@ -65,11 +65,11 @@ function(neko_bin_config binary)
     if(Emscripten)
 
         set_target_properties(${binary} PROPERTIES COMPILE_FLAGS_DEBUG
-                " -s ASSERTIONS=1 -s DISABLE_EXCEPTION_CATCHING=1 -g4 -O0 -fno-rtti")
+                " -s ASSERTIONS=1 -s DISABLE_EXCEPTION_CATCHING=1 -g4 -O0 -fno-rtti -s SIMD=1")
         set_target_properties(${binary} PROPERTIES COMPILE_FLAGS_RELEASE
-                " -s DISABLE_EXCEPTION_CATCHING=0 -O3 -fno-rtti -fno-exceptions")
+                " -s DISABLE_EXCEPTION_CATCHING=0 -O3 -fno-rtti -fno-exceptions -s SIMD=1")
         set_target_properties(${binary} PROPERTIES LINK_FLAGS
-                " -s EXPORT_ALL=1 --use-preload-plugins --preload-file ${CMAKE_BINARY_DIR}/data@data/")
+                " -s EXPORT_ALL=1 --use-preload-plugins -s SIMD=1 --preload-file ${CMAKE_BINARY_DIR}/data@data/")
         set_target_properties(${binary} PROPERTIES SUFFIX ".html")
     endif()
 endfunction()
@@ -82,9 +82,9 @@ function(neko_lib_config library)
             /W4>)
     if(Emscripten)
         set_target_properties(${library} PROPERTIES COMPILE_FLAGS_DEBUG
-                " -s ASSERTIONS=1 -s DISABLE_EXCEPTION_CATCHING=01 -g4 -O0 -fno-rtti")
+                " -s ASSERTIONS=1 -s DISABLE_EXCEPTION_CATCHING=01 -g4 -O0 -fno-rtti -s SIMD=1")
         set_target_properties(${binary} PROPERTIES COMPILE_FLAGS_RELEASE
-                " -O3 -fno-rtti -fno-exceptions")
-        set_target_properties(${library} PROPERTIES LINK_FLAGS "  -s EXPORT_ALL=1")
+                " -O3 -fno-rtti -fno-exceptions -s SIMD=1")
+        set_target_properties(${library} PROPERTIES LINK_FLAGS " -s SIMD=1 -s EXPORT_ALL=1")
     endif()
 endfunction()

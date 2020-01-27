@@ -1,6 +1,5 @@
 #include <cmath>
 #include <imgui.h>
-#include <utilities/file_utility.h>
 #include <engine/engine.h>
 #include "01_hello_triangle/triangle_program.h"
 #include "engine/log.h"
@@ -115,6 +114,9 @@ void HelloTriangleProgram::Destroy()
 
     glDeleteVertexArrays(1, &vaoProgam_.VAO);
     glDeleteBuffers(2, &vaoProgam_.VBO[0]);
+
+    shader_.Destroy();
+    quadShader_.Destroy();
 }
 
 void HelloTriangleProgram::DrawUi(seconds dt)
