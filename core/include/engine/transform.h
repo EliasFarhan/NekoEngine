@@ -81,6 +81,7 @@ protected:
 class Transform3dManager : public ComponentManager<Mat4f, ComponentType::TRANSFORM3D>
 {
 public:
+	using ComponentManager::ComponentManager;
 protected:
     Position3dManager position3DManager_;
     Scale3dManager scale3DManager_;

@@ -9,9 +9,10 @@ if(NOT Emscripten)
     add_compile_definitions(IMGUI_IMPL_OPENGL_LOADER_GLAD=1)
     LIST(APPEND GLES3_WRAPPER_LIBS "${OPENGL_LIBRARIES}" glad)
 endif()
-add_compile_definitions(IMGUI_IMPL_OPENGL_ES3=1)
+if(NOT MSVC)
+    add_compile_definitions(IMGUI_IMPL_OPENGL_ES3=1)
+endif()
 if(Emscripten)
-
     add_compile_definitions(IMGUI_IMPL_OPENGL_LOADER_CUSTOM=1)
 endif()
 

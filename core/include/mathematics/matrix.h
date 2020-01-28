@@ -16,6 +16,14 @@ private:
     class alignas(4 * sizeof(T)) Mat4
     {
     public:
+    	Mat4()
+    	{
+            values_ = Identity.values_;
+    	}
+    	explicit Mat4(const Mat4& m)
+    	{
+            values_ = m.values_;
+    	}
         explicit Mat4(const std::array<Vec4<T>, 4>& v)
         {
             values_ = v;

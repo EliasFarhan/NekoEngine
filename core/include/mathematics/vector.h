@@ -180,8 +180,8 @@ struct Vec2
     template<typename U = float>
     static U AngleBetween(const Vec2& v1, const Vec2& v2);
 
-    const static inline Vec2 Zero;
-    const static inline Vec2 One;
+    const static Vec2 Zero;
+    const static Vec2 One;
 };
 
 template<typename T>
