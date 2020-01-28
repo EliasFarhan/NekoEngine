@@ -42,7 +42,7 @@ struct Collider;
 struct Configuration
 {
 	std::string windowName = "NekoEngine 0.1";
-    Vec2i windowSize = Vec2i(1280, 720);
+    Vec2i windowSize = Vec2i(1024, 1024);
     std::pair<unsigned, unsigned> gameWindowSize = std::pair<unsigned, unsigned>(1280, 720);
     bool fullscreen = false;
     bool vSync = true;

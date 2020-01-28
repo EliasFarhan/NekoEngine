@@ -23,52 +23,47 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
+#include <string>
+#include <vector>
 
-#include <engine/prefab.h>
-#include "SFML/Graphics/Rect.hpp"
+#include <engine/entity.h>
+#include <engine/transform.h>
+#include "editor_scene.h"
 
-namespace neko {
-class Position2dManager;
-}
-
-namespace neko::sfml
-{
-class SpineManager;
-class Transform2dManager;
-class SpriteManager;
-}
 namespace neko::editor
 {
-class CircleColliderDefManager;
-class BoxColliderDefManager;
-struct NekoEditorExport;
-
-class EditorPrefabManager : public PrefabManager
+class EntityNameManager;
+class EditorPrefabManager;
+class NekoEditor;
+enum class EditorSystemMode : std::uint8_t;
+class EntityViewer
 {
 public:
-    explicit EditorPrefabManager(NekoEditorExport& editorExport);
-	void SetCurrentPrefab(const Prefab& prefab);
-    const Prefab& GetCurrentPrefab() const;
-    void SaveCurrentPrefab() const;
-    neko::Index CreatePrefabFromEntity(neko::Entity entity);
-    sf::FloatRect CalculatePrefabBound();
-    bool IsCurrentPrefabValid() const;;
-protected:
+	EntityViewer();
+	void Update(EditorSystemMode editorMode);
 
-	PrefabId currentPrefabId_ = INVALID_PREFAB_ID;
+	void Reset()
+	{
+		selectedEntity_ = neko::INVALID_ENTITY;
+	}
+
+	Entity GetSelectedEntity() const
+	{
+		return selectedEntity_;
+	}
 	
-    EntityManager& entityManager_;
-	sfml::Transform2dManager& transformManager_;
-	Position2dManager& position2dManager_;
-	sfml::SpriteManager& spriteManager_;
+	void SetSelectedEntity(Entity entity)
+	{
+		selectedEntity_ = entity;
+	}
 
-	BoxColliderDefManager& boxColliderDefManager_;
-	CircleColliderDefManager& circleColliderDefManager_;
-	sfml::SpineManager& spineManager_;
-
-	EditorSceneManager& editorSceneManager_;
+private:
+	void DrawEntityHierarchy(Entity entity,
+		std::set<Entity>& entitySet,
+		bool draw,
+		bool destroy);
+	Entity selectedEntity_ = INVALID_ENTITY;
+	Transform2dManager& transformManager_;
+	EntityManager& entityManager_;
 };
-
-
-
 }

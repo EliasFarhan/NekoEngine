@@ -1,5 +1,5 @@
 #version 300 es
-precision highp float;
+precision mediump float;
 
 layout(location = 0) out vec4 FragColor;
 in vec3 ourColor;

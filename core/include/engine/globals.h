@@ -33,8 +33,6 @@ namespace neko
 
 	const size_t INIT_ENTITY_NMB = 128;
 	using Index = uint32_t;
-	using ComponentType = uint32_t;
-	const ComponentType INVALID_COMPONENT_TYPE = 0u;
 	const Index INVALID_INDEX = std::numeric_limits<uint32_t>::max();
 
 

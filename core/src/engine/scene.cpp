@@ -3,7 +3,6 @@
 //
 
 #include <engine/scene.h>
-#include <engine/engine_export.h>
 #include <utilities/file_utility.h>
 #include <engine/log.h>
 
@@ -12,8 +11,8 @@ namespace neko
 
 static const std::string_view sceneExtension = ".scene";
 
-neko::SceneManager::SceneManager(neko::EngineExport& engineExport) :
-entityManager_(engineExport.entityManager)
+neko::SceneManager::SceneManager(EntityManager& entityManager) :
+entityManager_(entityManager)
 {
 
 }

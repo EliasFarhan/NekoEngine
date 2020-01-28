@@ -11,7 +11,7 @@ class SdlWindow : neko::Window
 public:
     virtual void Init() override;
     virtual void InitImGui();
-    void Update(seconds dt) override{};
+    void Update([[maybe_unused]]seconds dt) override{};
 
     virtual void OnEvent(const SDL_Event& event);
     void Destroy() override;

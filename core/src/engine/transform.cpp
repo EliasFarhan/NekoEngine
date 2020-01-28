@@ -27,14 +27,11 @@
 
 namespace neko
 {
-Position2dManager::Position2dManager(EntityManager& entityManager) : ComponentManager(entityManager)
-{
-}
 
-Index Scale2dManager::AddComponent(EntityManager& entityManager, Entity entity)
+Index Scale2dManager::AddComponent(Entity entity)
 {
 	ResizeIfNecessary(components_, entity, Vec2f(1.0f, 1.0f));
-	return ComponentManager::AddComponent(entityManager, entity);
+	return ComponentManager::AddComponent(entity);
 }
 
 }

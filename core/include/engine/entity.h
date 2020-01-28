@@ -46,6 +46,7 @@ using EntityMask = std::uint32_t;
 const Entity INVALID_ENTITY = std::numeric_limits<Index>::max();
 const EntityMask INVALID_ENTITY_MASK = 0u;
 const EntityHash INVALID_ENTITY_HASH = EntityHash(0);
+enum class ComponentType : std::uint32_t;
 
 template<typename T, ComponentType componentType>
 class ComponentManager;
@@ -56,45 +57,66 @@ class ComponentManager;
 class EntityManager
 {
 public:
-	explicit EntityManager();
+    explicit EntityManager();
 
-	EntityMask GetMask(Entity entity);
+    EntityMask GetMask(Entity entity);
 
-	Entity CreateEntity(Entity entity = INVALID_ENTITY);
+    Entity CreateEntity(Entity entity = INVALID_ENTITY);
 
-	Entity GetLastEntity();
+    Entity GetLastEntity();
 
-	void DestroyEntity(Entity entity);
+    void DestroyEntity(Entity entity);
 
-	bool HasComponent(Entity entity, EntityMask componentType) const;
+    bool HasComponent(Entity entity, EntityMask componentType) const;
+
     bool IsPrefab(Entity entity) const;
-	bool EntityExists(Entity entity);
 
-	size_t GetEntitiesNmb(EntityMask filterComponents = INVALID_ENTITY_MASK);
-	size_t GetEntitiesSize() const;
+    bool EntityExists(Entity entity);
 
-	std::vector<Entity> FilterEntities(EntityMask filterComponents = INVALID_ENTITY_MASK) const;
+    size_t GetEntitiesNmb(EntityMask filterComponents = INVALID_ENTITY_MASK);
 
-	void AddComponentType(Entity entity, EntityMask componentType);
+    size_t GetEntitiesSize() const;
 
-	void RemoveComponentType(Entity entity, EntityMask componentType);
-	void SetEntityName(Entity entity, const std::string& entityName);
-	void SetEntityNameHash(Entity entity, EntityHash entityHash);
-	EntityHash GetEntityNameHash(Entity entity);
-	Entity FindEntityByHash(EntityHash entityHash);
-	Entity FindEntityByName(const std::string& entityName);
-	
-	template<typename T, ComponentType componentType>
-	void RegisterComponentManager(ComponentManager<T, componentType>& componentManager)
-	{
-		onDestroyEntity.RegisterCallback([this, &componentManager](Entity entity) {componentManager.DestroyComponent(*this, entity); });
-	}
-	
-	static EntityHash HashEntityName(const std::string& entityName);
+    std::vector<Entity> FilterEntities(EntityMask filterComponents = INVALID_ENTITY_MASK) const;
+
+    void AddComponentType(Entity entity, EntityMask componentType);
+
+    void RemoveComponentType(Entity entity, EntityMask componentType);
+
+    void SetEntityName(Entity entity, const std::string& entityName);
+
+    void SetEntityNameHash(Entity entity, EntityHash entityHash);
+
+    EntityHash GetEntityNameHash(Entity entity);
+
+    Entity FindEntityByHash(EntityHash entityHash);
+
+    Entity FindEntityByName(const std::string& entityName);
+
+    template<typename T, ComponentType componentType>
+    void RegisterComponentManager(ComponentManager<T, componentType>& componentManager)
+    {
+        updateDirtyEntity.RegisterCallback(
+                [&componentManager](Entity entity) { componentManager.UpdateComponent(entity); });
+        onDestroyEntity.RegisterCallback(
+                [&componentManager](Entity entity) { componentManager.DestroyComponent(entity); });
+    }
+
+    void AddDirtyEntity(Entity entity);
+
+    void UpdateDirtyEntities();
+
+
+
+    static EntityHash HashEntityName(const std::string& entityName);
+
 private:
-	Action<Entity> onDestroyEntity;
-	std::vector<EntityMask> entityMaskArray_;
-	std::vector<EntityHash> entityHashArray_;
+    Action<Entity> onDestroyEntity;
+    Action<Entity> updateDirtyEntity;
+    std::vector<Entity> dirtyEntities_;
+    std::vector<Entity> parentEntities_;
+    std::vector<EntityMask> entityMaskArray_;
+    std::vector<EntityHash> entityHashArray_;
 };
 
 }

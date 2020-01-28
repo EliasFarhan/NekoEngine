@@ -35,7 +35,7 @@
 namespace neko
 {
 
-enum class NekoComponentType : ComponentType
+enum class ComponentType : EntityMask
 {
     EMPTY = 1u << 0u,
     POSITION2D = 1u << 1u,
@@ -44,44 +44,41 @@ enum class NekoComponentType : ComponentType
     TRANSFORM2D = ROTATION2D|SCALE2D|POSITION2D,
     POSITION3D = 1u << 4u,
     SCALE3D = 1u << 5u,
-    ANGLE3D = 1u << 6u,
+    ROTATION3D = 1u << 6u,
+    TRANSFORM3D = POSITION3D|SCALE3D|ROTATION3D,
     SPRITE2D = 1u << 7u,
-    SPINE_ANIMATION = 1u << 8u,
-    BODY2D = 1u << 9u,
-    BOX_COLLIDER2D = 1u << 10u,
-    CIRCLE_COLLIDER2D = 1u << 11u,
-    POLYGON_COLLIDER2D = 1u << 12u,
-    CONVEX_SHAPE2D = 1u << 13u,
-    SPINE_FOLLOW_BONE = 1u << 14u,
-    PREFAB = 1u << 15u,
-
-
+    BODY2D = 1u << 8u,
+    BOX_COLLIDER2D = 1u << 9u,
+    CIRCLE_COLLIDER2D = 1u << 10u,
+    POLYGON_COLLIDER2D = 1u << 11u,
+    CONVEX_SHAPE2D = 1u << 12u,
+    PREFAB = 1u << 13u,
+    OTHER_TYPE = 1u << 14u
 };
-
-const std::set<NekoComponentType>& GetComponentTypeSet();
 
 struct Component
 {
     Entity entity = INVALID_ENTITY;
-    ComponentType componentType = INVALID_COMPONENT_TYPE;
+    ComponentType componentType = ComponentType::EMPTY;
 };
 
 template<typename T, ComponentType componentType>
 class ComponentManager
 {
 public:
-    explicit ComponentManager(EntityManager& entityManager)
+    explicit ComponentManager(EntityManager& entityManager) :
+        entityManager_(entityManager)
     {
-		entityManager.RegisterComponentManager(*this);
+		entityManager_.RegisterComponentManager(*this);
         ResizeIfNecessary(components_, INIT_ENTITY_NMB - 1, T{});
     }
 
     virtual ~ComponentManager()
     {};
 
-    virtual Index AddComponent(EntityManager& entityManager, Entity entity);
+    virtual Index AddComponent(Entity entity);
 
-    virtual void DestroyComponent(EntityManager& entityManager, Entity entity);
+    virtual void DestroyComponent(Entity entity);
 
 	virtual void SetComponent(Entity entity, const T& component);
 
@@ -96,33 +93,30 @@ public:
     const std::vector<T>& GetComponentsVector() const
     { return components_; }
 
-
-    virtual void ParseComponentJson([[maybe_unused]]const json& componentJson, [[maybe_unused]]Entity entity)
-    {};
-
-    virtual json SerializeComponentJson([[maybe_unused]]Entity entity)
-    { return json(); };
+    virtual void UpdateComponent([[maybe_unused]]Entity entity){};
 protected:
     std::vector<T> components_;
+    EntityManager& entityManager_;
 };
 
 template<typename T, ComponentType componentType>
-Index ComponentManager<T, componentType>::AddComponent(EntityManager& entityManager, Entity entity)
+Index ComponentManager<T, componentType>::AddComponent(Entity entity)
 {
     ResizeIfNecessary(components_, entity, T{});
-    entityManager.AddComponentType(entity, componentType);
+    entityManager_.AddComponentType(entity, static_cast<EntityMask>(componentType));
     return entity;
 }
 
 template<typename T, ComponentType componentType>
-void ComponentManager<T, componentType>::DestroyComponent(EntityManager& entityManager, Entity entity)
+void ComponentManager<T, componentType>::DestroyComponent(Entity entity)
 {
-    entityManager.RemoveComponentType(entity, componentType);
+    entityManager_.RemoveComponentType(entity, static_cast<EntityMask>(componentType));
 }
 
 template <typename T, ComponentType componentType>
 void ComponentManager<T, componentType>::SetComponent(Entity entity, const T& component)
 {
 	components_[entity] = component;
+	entityManager_.AddDirtyEntity(entity);
 }
 }

@@ -28,6 +28,7 @@
 
 #include "globals.h"
 #include <engine/entity.h>
+#include <mathematics/matrix.h>
 #include "engine/component.h"
 #include "mathematics/vector.h"
 
@@ -35,29 +36,56 @@ namespace neko
 {
 
 
-class Position2dManager : public ComponentManager<Vec2f, ComponentType(NekoComponentType::POSITION2D)>
+class Position2dManager : public ComponentManager<Vec2f, ComponentType::POSITION2D>
 {
-public:
-    explicit Position2dManager(EntityManager& entityManager);
-
-
 };
 
-class Scale2dManager : public ComponentManager<Vec2f, ComponentType(NekoComponentType::SCALE2D)>
+class Scale2dManager : public ComponentManager<Vec2f, ComponentType::SCALE2D>
 {
 public:
     using ComponentManager::ComponentManager;
-    Index AddComponent(EntityManager& entityManager, Entity entity) override;
+    Index AddComponent(Entity entity) override;
 
 };
 
-class Rotation2dManager : public ComponentManager<float, ComponentType(NekoComponentType::ROTATION2D)>
+class Rotation2dManager : public ComponentManager<float, ComponentType::ROTATION2D>
+{
+
+};
+
+class Position3dManager : public ComponentManager<Vec4f, ComponentType::POSITION3D>
+{
+
+};
+
+class Rotation3dManager : public ComponentManager<Vec4f, ComponentType::ROTATION3D>
+{
+
+};
+
+class Scale3dManager : public ComponentManager<Vec3f, ComponentType::SCALE3D>
 {
 public:
     using ComponentManager::ComponentManager;
+    Index AddComponent(Entity entity) override;
 
 };
 
+class Transform2dManager : public ComponentManager<Mat3f, ComponentType::TRANSFORM2D>
+{
+public:
+protected:
+
+};
+
+class Transform3dManager : public ComponentManager<Mat4f, ComponentType::TRANSFORM3D>
+{
+public:
+protected:
+    Position3dManager position3DManager_;
+    Scale3dManager scale3DManager_;
+    Rotation3dManager rotation3DManager_;
+};
 
 
 }

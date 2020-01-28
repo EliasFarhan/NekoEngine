@@ -45,7 +45,7 @@ struct Prefab
     json prefabJson{};
 };
 
-class PrefabManager : public ComponentManager<PrefabId, EntityMask(NekoComponentType::PREFAB)>
+class PrefabManager : public ComponentManager<PrefabId, ComponentType::PREFAB>
 {
 public:
     explicit PrefabManager(EntityManager& entityManager, SceneManager& sceneManager);

@@ -48,10 +48,7 @@ U Vec3<T>::AngleBetween(const Vec3& v1, const Vec3& v2)
     return angle;
 }
 
-template <>
-Vec2f const Vec2f::Zero = Vec2f(0.0f,0.0f);
-template <>
-Vec2f const Vec2f::One = Vec2f(1.0f,1.0f);
+
 
 template<typename T>
 template<typename U>

@@ -23,64 +23,53 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-#include <engine/scene.h>
-#include <engine/component.h>
-#include <sfml_engine/scene.h>
 
-namespace neko
-{
-namespace box2d {
-class BodyDef2dManager;
-}
+#include <engine/prefab.h>
 
-class Scale2dManager;
-class PrefabManager;
+#if false
 
-namespace sfml
-{
-class Transform2dManager;
-class SpriteManager;
-class SpineManager;
-}
-
-class Rotation2dManager;
+namespace neko {
 class Position2dManager;
 }
 
+namespace neko::sfml
+{
+class SpineManager;
+class Transform2dManager;
+class SpriteManager;
+}
 namespace neko::editor
 {
+class CircleColliderDefManager;
+class BoxColliderDefManager;
 struct NekoEditorExport;
-class EntityNameManager;
-class EditorSceneManager : public sfml::SfmlBasicSceneManager
+
+class EditorPrefabManager : public PrefabManager
 {
 public:
-	explicit EditorSceneManager(NekoEditorExport& editorExport);
-
-
-    virtual json SerializeComponent(neko::Entity entity, neko::NekoComponentType componentType);
-    virtual json SerializeEntity(neko::Entity entity);
-    virtual json SerializeScene();
-
-
-    void ClearScene() const;
-    bool IsCurrentSceneTmp();
-    void SaveCurrentScene();
-    void LoadScene(std::string_view path);
-
-    std::string_view GetSceneTmpPath();
-
-    void ParseEntityJson(const json& entityJson) override;
+    explicit EditorPrefabManager(NekoEditorExport& editorExport);
+	void SetCurrentPrefab(const Prefab& prefab);
+    const Prefab& GetCurrentPrefab() const;
+    void SaveCurrentPrefab() const;
+    neko::Index CreatePrefabFromEntity(neko::Entity entity);
+    sf::FloatRect CalculatePrefabBound();
+    bool IsCurrentPrefabValid() const;;
 protected:
 
-    void SaveScene(std::string_view path);
+	PrefabId currentPrefabId_ = INVALID_PREFAB_ID;
+	
+    EntityManager& entityManager_;
+	sfml::Transform2dManager& transformManager_;
+	Position2dManager& position2dManager_;
+	sfml::SpriteManager& spriteManager_;
 
-    std::map<NekoComponentType, std::function<json(Entity)>> componentSerializeFuncMap_;
+	BoxColliderDefManager& boxColliderDefManager_;
+	CircleColliderDefManager& circleColliderDefManager_;
+	sfml::SpineManager& spineManager_;
 
-
-    EntityNameManager& entityNameManager_;
-    PrefabManager& prefabManager_;
-	box2d::BodyDef2dManager& bodyDefManager_;
+	EditorSceneManager& editorSceneManager_;
 };
 
-
 }
+
+#endif

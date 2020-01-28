@@ -56,24 +56,26 @@ Entity EntityManager::CreateEntity(Entity entity)
         {
             const auto newEntity = entityMaskArray_.size();
             ResizeIfNecessary(entityMaskArray_, newEntity, INVALID_ENTITY_MASK);
+            ResizeIfNecessary(parentEntities_, entity, INVALID_ENTITY);
 			ResizeIfNecessary(entityHashArray_, newEntity, INVALID_ENTITY_HASH);
-        	AddComponentType(Entity(newEntity), EntityMask(NekoComponentType::EMPTY));
+        	AddComponentType(Entity(newEntity), static_cast<EntityMask>(ComponentType::EMPTY));
             return Entity(newEntity);
         }
         else
         {
             const auto newEntity = entityMaskIt - entityMaskArray_.begin();
-            AddComponentType(Entity(newEntity), EntityMask(NekoComponentType::EMPTY));
+            AddComponentType(Entity(newEntity), static_cast<EntityMask>(ComponentType::EMPTY));
             return Entity(newEntity);
         }
     }
     else
     {
         ResizeIfNecessary(entityMaskArray_, entity, INVALID_ENTITY_MASK);
+        ResizeIfNecessary(parentEntities_, entity, INVALID_ENTITY);
 		ResizeIfNecessary(entityHashArray_, entity, INVALID_ENTITY_HASH);
     	if(!EntityExists(entity))
         {
-            AddComponentType(entity, EntityMask(NekoComponentType::EMPTY));
+            AddComponentType(entity, static_cast<EntityMask>(ComponentType::EMPTY));
             return entity;
         }
         else
@@ -178,7 +180,7 @@ Entity EntityManager::GetLastEntity()
 
 bool EntityManager::IsPrefab(Entity entity) const
 {
-    return HasComponent(entity, EntityMask(NekoComponentType::PREFAB));
+    return HasComponent(entity, static_cast<EntityMask>(ComponentType::PREFAB));
 }
 
 EntityHash EntityManager::GetEntityNameHash(Entity entity)
@@ -199,6 +201,33 @@ Entity EntityManager::FindEntityByHash(EntityHash entityHash)
 void EntityManager::SetEntityNameHash(Entity entity, EntityHash entityHash)
 {
     entityHashArray_[entity] = entityHash;
+}
+
+void EntityManager::UpdateDirtyEntities()
+{
+    std::sort(dirtyEntities_.begin(), dirtyEntities_.end());
+    for (auto entity : dirtyEntities_)
+    {
+        updateDirtyEntity.Execute(entity);
+    }
+}
+
+void EntityManager::AddDirtyEntity(Entity entity)
+{
+    if (std::find(dirtyEntities_.cbegin(), dirtyEntities_.cend(), entity) == dirtyEntities_.cend())
+    {
+        dirtyEntities_.push_back(entity);
+    }
+
+    auto dirtyChildrenIt = std::find_if(parentEntities_.cbegin(), parentEntities_.cend(),
+            [&entity](Entity parent){return parent == entity;});
+    //All children entities need to be dirtied
+    while (dirtyChildrenIt != parentEntities_.cend())
+    {
+        const auto childEntity = std::distance(parentEntities_.cbegin(), dirtyChildrenIt);
+        AddDirtyEntity(childEntity);
+    }
+
 }
 
 }

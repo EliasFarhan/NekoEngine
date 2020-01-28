@@ -6,6 +6,12 @@
 
 namespace neko
 {
+template<typename T>
+class Mat3
+{
+private:
+    std::array<Vec4<T>, 4> values_; //row vector
+};
     template<typename T>
     class alignas(4 * sizeof(T)) Mat4
     {
@@ -372,8 +378,9 @@ namespace neko
     }
 
 #endif
-
+    using Mat3f = Mat3<float>;
     using Mat4f = Mat4<float>;
+
 
     template<>
     Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept ;

@@ -21,16 +21,12 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-#include <tools/engine_export.h>
-#include <sfml_engine/physics.h>
-#include <tools/physics_editor.h>
 #include <tools/editor_prefab.h>
 #include <tools/editor_scene.h>
 #include <utilities/file_utility.h>
 #include <engine/log.h>
-#include "sfml_engine/transform.h"
-#include "sfml_engine/sprite.h"
-#include "sfml_engine/spine.h"
+
+#if false
 
 namespace neko::editor
 {
@@ -38,6 +34,7 @@ namespace neko::editor
 
 void EditorPrefabManager::SaveCurrentPrefab() const
 {
+    /*
     if (currentPrefabId_ == INVALID_PREFAB_ID)
     {
         logDebug("[Warning] Trying to save current prefab while none is defined");
@@ -58,6 +55,7 @@ void EditorPrefabManager::SaveCurrentPrefab() const
     prefabJson["prefabId"] = currentPrefab.id.str();
     const auto prefabTxt = prefabJson.dump(4);
     WriteStringToFile(currentPrefab.prefabPath, prefabTxt);
+     */
 }
 
 neko::Index EditorPrefabManager::CreatePrefabFromEntity(neko::Entity entity)
@@ -247,3 +245,4 @@ bool EditorPrefabManager::IsCurrentPrefabValid() const
     return currentPrefabId_ != INVALID_PREFAB_ID;
 }
 }
+#endif

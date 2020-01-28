@@ -45,20 +45,6 @@ void PrefabManager::InstantiatePrefab(PrefabId prefabIndex, EntityManager& entit
         {
             entityJson["parent"] = Entity(parent) + entityBase;
         }
-    	//Correct spine bone follower entity number
-    	for(auto& componentJson : entityJson["components"])
-    	{
-	        const NekoComponentType componentType = componentJson["component"];
-			if (componentType == NekoComponentType::SPINE_FOLLOW_BONE)
-			{
-				Entity followingEntity = componentJson["followingEntity"];
-				if (followingEntity != INVALID_ENTITY)
-				{
-					followingEntity += entityBase;
-					componentJson["followingEntity"] = followingEntity;
-				}
-			}
-    	}
         sceneManager_.ParseEntityJson(entityJson);
     }
 	

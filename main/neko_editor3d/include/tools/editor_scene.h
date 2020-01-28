@@ -23,50 +23,66 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-#include <string>
-#include <vector>
+#include <engine/scene.h>
+#include <engine/component.h>
 
-#include <engine/entity.h>
-#include <engine/transform.h>
-#include "editor_scene.h"
+#if false
+
+namespace neko
+{
+namespace box2d {
+class BodyDef2dManager;
+}
+
+class Scale2dManager;
+class PrefabManager;
+
+namespace sfml
+{
+class Transform2dManager;
+class SpriteManager;
+class SpineManager;
+}
+
+class Rotation2dManager;
+class Position2dManager;
+}
 
 namespace neko::editor
 {
+struct NekoEditorExport;
 class EntityNameManager;
-class EditorPrefabManager;
-class NekoEditor;
-enum class EditorSystemMode : std::uint8_t;
-class EntityViewer
+class EditorSceneManager : public sfml::SfmlBasicSceneManager
 {
 public:
-	EntityViewer(NekoEditorExport& editorExport);
-	void Update(EditorSystemMode editorMode);
+	explicit EditorSceneManager(NekoEditorExport& editorExport);
 
-	void Reset()
-	{
-		selectedEntity_ = neko::INVALID_ENTITY;
-	}
 
-	Entity GetSelectedEntity() const
-	{
-		return selectedEntity_;
-	}
-	
-	void SetSelectedEntity(Entity entity)
-	{
-		selectedEntity_ = entity;
-	}
+    virtual json SerializeComponent(neko::Entity entity, neko::NekoComponentType componentType);
+    virtual json SerializeEntity(neko::Entity entity);
+    virtual json SerializeScene();
 
-private:
-	void DrawEntityHierarchy(Entity entity,
-		std::set<Entity>& entitySet,
-		bool draw,
-		bool destroy);
-	Entity selectedEntity_ = INVALID_ENTITY;
-	sfml::Transform2dManager& transformManager_;
-	EntityManager& entityManager_;
-	EditorSceneManager& sceneManager_;
-	EditorPrefabManager& prefabManager_;
-	EntityNameManager& entityNameManager_;
+
+    void ClearScene() const;
+    bool IsCurrentSceneTmp();
+    void SaveCurrentScene();
+    void LoadScene(std::string_view path);
+
+    std::string_view GetSceneTmpPath();
+
+    void ParseEntityJson(const json& entityJson) override;
+protected:
+
+    void SaveScene(std::string_view path);
+
+    std::map<NekoComponentType, std::function<json(Entity)>> componentSerializeFuncMap_;
+
+
+    EntityNameManager& entityNameManager_;
+    PrefabManager& prefabManager_;
+	box2d::BodyDef2dManager& bodyDefManager_;
 };
+
 }
+
+#endif

@@ -180,8 +180,8 @@ struct Vec2
     template<typename U = float>
     static U AngleBetween(const Vec2& v1, const Vec2& v2);
 
-    const static Vec2 Zero;
-    const static Vec2 One;
+    const static inline Vec2 Zero;
+    const static inline Vec2 One;
 };
 
 template<typename T>
@@ -193,6 +193,10 @@ Vec2<T> operator*(T lhs, const Vec2<T>& rhs)
 using Vec2f = Vec2<float>;
 using Vec2i = Vec2<int>;
 
+template <>
+inline Vec2f const Vec2f::Zero = Vec2f(0.0f,0.0f);
+template <>
+inline Vec2f const Vec2f::One = Vec2f(1.0f,1.0f);
 
 template<>
 inline float Vec2f::GetMagnitude() const
