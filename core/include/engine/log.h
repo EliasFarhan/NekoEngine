@@ -25,10 +25,11 @@
  */
 
 #include <string>
-
+#include <vector>
 
 /**
  * \brief log a msg to cout and a log file to the log thread
  * @param msg
  */
 void logDebug(const std::string& msg);
+const std::vector<std::string>& getLog();

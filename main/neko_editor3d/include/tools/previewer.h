@@ -25,13 +25,6 @@
  */
 #include <SFML/Graphics/RenderTexture.hpp>
 
-#include <sfml_engine/spine.h>
-
-
-namespace neko::sfml
-{
-struct BasicSpineDrawable;
-}
 namespace neko::editor
 {
 enum class PreviewStatus
@@ -45,12 +38,10 @@ class Previewer
 public:
     void Update(float dt);
 
-    void SetSpineAnimation(const sfml::BasicSpineDrawable* spineDrawablePtr);
 
     virtual ~Previewer();
 
 private:
-    neko::sfml::BasicSpineDrawable spineDrawable_;
     PreviewStatus status_ = PreviewStatus::None;
     sf::RenderTexture previewTexture_;
 };

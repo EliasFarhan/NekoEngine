@@ -23,7 +23,15 @@
  */
 #include <engine/log.h>
 #include <iostream>
+
+static std::vector<std::string> logs;
 void logDebug(const std::string& msg)
 {
 	std::cout << msg << '\n';
+	logs.push_back(msg);
+}
+
+const std::vector<std::string>& getLog()
+{
+    return logs;
 }

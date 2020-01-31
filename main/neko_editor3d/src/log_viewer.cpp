@@ -31,8 +31,8 @@ namespace neko::editor
 
 void LogViewer::Update()
 {
-    auto& logHistory = getLog();
-    for(auto& log : logHistory)
+    const auto& logHistory = getLog();
+    for(const auto& log : logHistory)
     {
         if(log.find("[Error]") != std::string_view::npos)
         {

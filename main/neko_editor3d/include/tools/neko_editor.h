@@ -25,20 +25,16 @@
  */
 #include <engine/engine.h>
 #include <engine/transform.h>
+#include <sdl_engine/sdl_engine.h>
 #include "entity_viewer.h"
 #include "scene_viewer.h"
 #include "inspector.h"
 #include "editor_scene.h"
 #include "log_viewer.h"
 #include "previewer.h"
-#include "physics_editor.h"
 #include "editor_prefab.h"
 #include "imgui.h"
 #include "imfilebrowser.h"
-#include "sfml_engine/sprite.h"
-#include "sfml_engine/texture.h"
-#include "sfml_engine/engine.h"
-#include "tools/engine_export.h"
 #include "tools/editor_entity_name.h"
 
 namespace sf {
@@ -68,7 +64,7 @@ enum class EditorSystemMode  : std::uint8_t
 using EditorSystemId = xxh::hash64_t;
 const EditorSystemId INVALID_EDITOR_SYSTEM_ID = EditorSystemId(0);
 
-class NekoEditor : public neko::sfml::SfmlBasicEngine
+class NekoEditor : public neko::sdl::SdlEngine
 {
 public:
     NekoEditor();
@@ -82,7 +78,7 @@ public:
     //void SaveSceneEvent();
     //void SavePrefabEvent();
 
-    void OnEvent(sf::Event& event) override;
+    void OnEvent(const SDL_Event& event) override;
     void OpenAsset(std::string_view assetPath);
 
 	void RemoveEditorSystem(EditorSystemId editorSystemId, bool destroy);
@@ -100,7 +96,7 @@ protected:
     ImGui::FileBrowser fileDialog_;
     EditorSystemMode currentEditorMode_ = EditorSystemMode::SceneMode;
 	std::vector<std::unique_ptr<BasicEditorSystem>> editorSystems_;
-	sfml::TextureManager textureManager_;
+	neko::sdl::TextureManager textureManager_;
     FileOperation currentFileOperation_ = FileOperation::NONE;
 
     EditorSystemId currentEditorSystemId_ = INVALID_EDITOR_SYSTEM_ID;

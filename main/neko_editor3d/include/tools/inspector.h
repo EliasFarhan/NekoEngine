@@ -25,6 +25,7 @@
  */
 #include <engine/entity.h>
 #include <engine/engine.h>
+#include <engine/transform.h>
 
 
 namespace neko {
@@ -35,14 +36,6 @@ class BodyDef2dManager;
 class Rotation2dManager;
 class Scale2dManager;
 class Position2dManager;
-}
-
-namespace neko::sfml {
-class SpineManager;
-class SpineBoneFollowerManager;
-class TextureManager;
-class SpriteManager;
-class Transform2dManager;
 }
 
 
@@ -61,16 +54,12 @@ public:
 	explicit Inspector(NekoEditorExport& nekoEditorExport);
     void ShowEntityInfo(neko::Entity entity) const;
 private:
-    sfml::Transform2dManager& transformManager_;
+    Transform3dManager& transformManager_;
 	EditorSceneManager& sceneManager_;
 	EntityManager& entityManager_;
 	Position2dManager& positionManager_;
 	Scale2dManager& scaleManager_;
 	Rotation2dManager& rotationManager_;
-	sfml::SpriteManager& spriteManager_;
-	sfml::TextureManager& textureManager_;
-	sfml::SpineManager& spineManager_;
-	sfml::SpineBoneFollowerManager& spineBoneFollowerManager_;
 	Configuration& config_;
 	box2d::BodyDef2dManager& bodyDefManager_;
 	BoxColliderDefManager& boxColliderDefManager_;
