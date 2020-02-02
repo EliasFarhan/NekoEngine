@@ -23,7 +23,6 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-#include <SFML/Graphics/RenderTexture.hpp>
 
 namespace neko::editor
 {
@@ -43,7 +42,6 @@ public:
 
 private:
     PreviewStatus status_ = PreviewStatus::None;
-    sf::RenderTexture previewTexture_;
 };
 
 }

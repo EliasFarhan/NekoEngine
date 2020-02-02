@@ -19,7 +19,7 @@ void HelloTextureProgram::Init()
     quad_.Init();
 
     auto texturePath = config.dataRootPath + "data/sprites/wall.jpg";
-    textureId_ = neko::gl::stbCreateTexture(texturePath.c_str(), false, false, false);
+    textureId_ = neko::gl::stbCreateTexture(texturePath.c_str());
 }
 
 void HelloTextureProgram::Update(seconds dt)

@@ -27,7 +27,6 @@
 #include <engine/transform.h>
 #include <sdl_engine/sdl_engine.h>
 #include "entity_viewer.h"
-#include "scene_viewer.h"
 #include "inspector.h"
 #include "editor_scene.h"
 #include "log_viewer.h"

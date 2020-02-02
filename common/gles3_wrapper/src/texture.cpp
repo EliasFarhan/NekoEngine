@@ -9,7 +9,7 @@
 namespace neko::gl
 {
 
-unsigned stbCreateTexture(const char* filename, bool smooth, bool mipMaps, bool clampWrap)
+unsigned stbCreateTexture(const char* filename, TextureFlags flags)
 {
     std::string extension = GetFilenameExtension(filename);
     if(!FileExists(filename))
@@ -47,16 +47,16 @@ unsigned stbCreateTexture(const char* filename, bool smooth, bool mipMaps, bool 
     glGenTextures(1, &texture);
 
     glBindTexture(GL_TEXTURE_2D, texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, clampWrap ? GL_CLAMP_TO_EDGE : GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, clampWrap ? GL_CLAMP_TO_EDGE : GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, smooth ? GL_LINEAR : GL_NEAREST);
-    if(mipMaps)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, flags & CLAMP_WRAP_TEXTURE ? GL_CLAMP_TO_EDGE : GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, flags & CLAMP_WRAP_TEXTURE ? GL_CLAMP_TO_EDGE : GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, flags & SMOOTH_TEXTURE ? GL_LINEAR : GL_NEAREST);
+    if(flags & MIPMAPS_TEXTURE)
     {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, smooth ? GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, flags & SMOOTH_TEXTURE  ? GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_LINEAR);
     }
     else
     {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, smooth ? GL_LINEAR : GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, flags & SMOOTH_TEXTURE ? GL_LINEAR : GL_NEAREST);
     }
     if (extension == ".jpg" || extension == ".tga")
     {
@@ -70,7 +70,7 @@ unsigned stbCreateTexture(const char* filename, bool smooth, bool mipMaps, bool 
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, data);
     }
-    if (mipMaps)
+    if (flags & MIPMAPS_TEXTURE)
     {
         glGenerateMipmap(GL_TEXTURE_2D);
     }
