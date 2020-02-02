@@ -45,13 +45,12 @@ class CircleColliderDefManager;
 class PolygonColldierDefManager;
 class BoxColliderDefManager;
 class EditorSceneManager;
-struct NekoEditorExport;
 class NekoEditor;
 class EntityNameManager;
 class Inspector
 {
 public:
-	explicit Inspector(NekoEditorExport& nekoEditorExport);
+	Inspector();
     void ShowEntityInfo(neko::Entity entity) const;
 private:
     Transform3dManager& transformManager_;

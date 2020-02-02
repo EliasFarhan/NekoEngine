@@ -29,8 +29,10 @@
 #include "globals.h"
 #include <engine/entity.h>
 #include <mathematics/matrix.h>
+#include <mathematics/quaternion.h>
 #include "engine/component.h"
 #include "mathematics/vector.h"
+#include "mathematics/quaternion.h"
 
 namespace neko
 {
@@ -53,12 +55,18 @@ class Rotation2dManager : public ComponentManager<float, ComponentType::ROTATION
 
 };
 
+class Transform3d : public Mat4f
+{
+
+};
+
 class Position3dManager : public ComponentManager<Vec4f, ComponentType::POSITION3D>
 {
 
 };
 
-class Rotation3dManager : public ComponentManager<Vec4f, ComponentType::ROTATION3D>
+
+class Rotation3dManager : public ComponentManager<Quaternion, ComponentType::ROTATION3D>
 {
 
 };
@@ -78,10 +86,12 @@ protected:
 
 };
 
-class Transform3dManager : public ComponentManager<Mat4f, ComponentType::TRANSFORM3D>
+class Transform3dManager : public ComponentManager<Transform3d, ComponentType::TRANSFORM3D>
 {
 public:
 	using ComponentManager::ComponentManager;
+
+	void UpdateTransform(Entity entity);
 protected:
     Position3dManager position3DManager_;
     Scale3dManager scale3DManager_;

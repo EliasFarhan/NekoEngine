@@ -230,4 +230,9 @@ void EntityManager::AddDirtyEntity(Entity entity)
 
 }
 
+Entity EntityManager::GetEntityParent(Entity entity)
+{
+    return parentEntities_[entity];
+}
+
 }

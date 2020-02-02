@@ -9,7 +9,7 @@ add_executable(Neko_TEST ${TEST_FILES})
 
 include_directories(${NEKO_CORE_DIR}/include)
 
-target_link_libraries(Neko_TEST gtest gtest_main Neko_Core)
+target_link_libraries(Neko_TEST gtest gtest_main Neko_Core sdl_engine gles3_wrapper)
 
 
 set_target_properties (Neko_TEST PROPERTIES FOLDER Neko)

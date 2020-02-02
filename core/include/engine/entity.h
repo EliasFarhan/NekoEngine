@@ -106,7 +106,7 @@ public:
 
     void UpdateDirtyEntities();
 
-
+    Entity GetEntityParent(Entity entity);
 
     static EntityHash HashEntityName(const std::string& entityName);
 

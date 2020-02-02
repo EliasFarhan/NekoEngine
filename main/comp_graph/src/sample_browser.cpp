@@ -2,11 +2,12 @@
 // Created by efarhan on 26.01.20.
 //
 
-#include <02_hello_texture/texture_program.h>
 #include <imgui.h>
 #include "comp_graph/sample_browser.h"
 
 #include "01_hello_triangle/triangle_program.h"
+#include "02_hello_texture/texture_program.h"
+#include "03_hello_transform/transform_program.h"
 
 namespace neko
 {
@@ -14,27 +15,28 @@ namespace neko
 
 void SampleBrowser::Init()
 {
-RegisterRenderProgram("01 Hello Triangle", std::make_unique<HelloTriangleProgram>());
-RegisterRenderProgram("02 Hello Texture", std::make_unique<HelloTextureProgram>());
-programs_[currentProgramIndex_]->Init();
+    RegisterRenderProgram("01 Hello Triangle", std::make_unique<HelloTriangleProgram>());
+    RegisterRenderProgram("02 Hello Texture", std::make_unique<HelloTextureProgram>());
+    RegisterRenderProgram("03 Hello Coords", std::make_unique<HelloTransformProgram>());
+    programs_[currentProgramIndex_]->Init();
 }
 
 void SampleBrowser::Update(seconds dt)
 {
-programs_[currentProgramIndex_]->Update(dt);
+    programs_[currentProgramIndex_]->Update(dt);
 }
 
 void SampleBrowser::Destroy()
 {
-programs_[currentProgramIndex_]->Destroy();
+    programs_[currentProgramIndex_]->Destroy();
 }
 
 void SampleBrowser::SwitchToProgram(size_t index)
 {
-const auto previousindex = currentProgramIndex_;
-currentProgramIndex_ = index;
-programs_[previousindex]->Destroy();
-programs_[currentProgramIndex_]->Init();
+    const auto previousindex = currentProgramIndex_;
+    currentProgramIndex_ = index;
+    programs_[previousindex]->Destroy();
+    programs_[currentProgramIndex_]->Init();
 }
 
 
@@ -51,7 +53,8 @@ void SampleBrowser::Render()
 void SampleBrowser::DrawGui(seconds dt)
 {
     ImGui::Begin("Sample Browser");
-    if (ImGui::BeginCombo("Current Sample", programsNames_[currentProgramIndex_].c_str())) // The second parameter is the label previewed before opening the combo.
+    if (ImGui::BeginCombo("Current Sample",
+                          programsNames_[currentProgramIndex_].c_str())) // The second parameter is the label previewed before opening the combo.
     {
         for (int n = 0; n < programsNames_.size(); n++)
         {

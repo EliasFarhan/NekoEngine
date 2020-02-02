@@ -3,6 +3,7 @@
 #include <comp_graph/sample_program.h>
 #include "gl/shape.h"
 #include "gl/shader.h"
+#include "gl/texture.h"
 
 namespace neko
 {
@@ -26,6 +27,6 @@ private:
     neko::gl::Quad quad_{Vec2f::Zero, Vec2f::One};
     gl::Shader shader_;
 
-    unsigned int textureId_;
+    gl::TextureId textureId_ = 0u;
 };
 }

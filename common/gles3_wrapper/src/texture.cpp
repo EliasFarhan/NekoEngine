@@ -78,4 +78,9 @@ unsigned stbCreateTexture(const char* filename, TextureFlags flags)
     stbi_image_free(data);
     return texture;
 }
+
+void DestroyTexture(TextureId textureId)
+{
+    glDeleteTextures(1, &textureId);
+}
 }

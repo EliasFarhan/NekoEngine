@@ -138,6 +138,7 @@ public:
     static Mat4<T> Translate(const Mat4<T>& transform, Vec4<T> pos);
     static Mat4<T> Scale(const Mat4<T>& transform, Vec3<T> scale);
     static Mat4<T> Rotate(const Mat4<T>& transform, T angle, Vec3<T> axis);
+    static Mat4<T> Rotate(const Mat4<T>& transform, Vec4<T> quaternion);
 
     const static Mat4<T> Identity;
 private:
@@ -431,5 +432,26 @@ inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
         v[x] = Vec4f(FourVec4f::DotIntrinsics(rhsM, rows_[x]));
     }
     return Mat4f(v);
+}
+
+//TODO Implement transfrom translation
+template<typename T>
+Mat4<T> Mat4<T>::Translate(const Mat4<T>& transform, Vec4<T> pos)
+{
+    return Mat4<T>();
+}
+
+//TODO Implement transform scale
+template<typename T>
+Mat4<T> Mat4<T>::Scale(const Mat4<T>& transform, Vec3<T> scale)
+{
+    return Mat4<T>();
+}
+
+//TODO Implement transform rotation with axis
+template<typename T>
+Mat4<T> Mat4<T>::Rotate(const Mat4<T>& transform, T angle, Vec3<T> axis)
+{
+    return Mat4<T>();
 }
 }

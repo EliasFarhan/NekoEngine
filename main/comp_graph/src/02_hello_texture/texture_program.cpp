@@ -11,7 +11,6 @@ namespace neko
 
 void HelloTextureProgram::Init()
 {
-
     const auto& config = BasicEngine::GetInstance()->config;
     shader_.LoadFromFile(
             config.dataRootPath + "data/shaders/02_hello_texture/texture.vert",
@@ -31,6 +30,7 @@ void HelloTextureProgram::Destroy()
 {
     quad_.Destroy();
     shader_.Destroy();
+    gl::DestroyTexture(textureId_);
 }
 
 void HelloTextureProgram::Render()

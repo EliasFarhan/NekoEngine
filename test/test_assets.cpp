@@ -61,9 +61,9 @@ TEST(Engine, TestAssetImport)
 		}
 		else
 		{
-			std::cerr << "Could not open filename: " << filename << "\n";
+			std::cerr << "Could not open filename: " << filename << std::endl;
 		}
 		const xxh::hash_t<64> final_hash = hash_stream.digest();
-		std::cout << "Filename: " << filename << " Hash: " << final_hash << "\n";
+		std::cout << "Filename: " << filename << " Hash: " << final_hash << std::endl;
 	}
 }

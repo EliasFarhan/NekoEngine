@@ -26,6 +26,8 @@
 #include <engine/engine.h>
 #include <engine/transform.h>
 #include <sdl_engine/sdl_engine.h>
+#include <graphics/texture.h>
+#include <gl/texture.h>
 #include "entity_viewer.h"
 #include "inspector.h"
 #include "editor_scene.h"
@@ -95,7 +97,6 @@ protected:
     ImGui::FileBrowser fileDialog_;
     EditorSystemMode currentEditorMode_ = EditorSystemMode::SceneMode;
 	std::vector<std::unique_ptr<BasicEditorSystem>> editorSystems_;
-	neko::sdl::TextureManager textureManager_;
     FileOperation currentFileOperation_ = FileOperation::NONE;
 
     EditorSystemId currentEditorSystemId_ = INVALID_EDITOR_SYSTEM_ID;
@@ -140,29 +141,16 @@ protected:
 class NekoEditorSystem : public BasicEditorSystem
 {
 public:
-	explicit NekoEditorSystem(NekoEditor& nekoEditor, sfml::TextureManager& textureManager);
+	explicit NekoEditorSystem();
 protected:
-	sf::RenderTexture screenRenderTexture_;
-	NekoEditorExport editorExport_;
 	EntityManager entityManager_;
 	Position2dManager position2dManager_;
 	Scale2dManager scale2dManager_;
 	Rotation2dManager rotation2dManager_;
-	sfml::Transform2dManager transform2dManager_;
-	EditorSceneManager sceneManager_;
-	box2d::BodyDef2dManager bodyDef2DManager_;
-	sfml::SpriteManager spriteManager_;
-	sfml::SpineManager spineManager_;
-	sfml::SpineBoneFollowerManager spineBoneFollowerManager_;
-	BoxColliderDefManager boxColliderDefManager_;
-	CircleColliderDefManager circleColliderDefManager_;
-	PolygonColldierDefManager polygonColldierDefManager_;
-	ColliderDefManager colliderManagerDefManager_;
-	EditorPrefabManager prefabManager_;
-	GraphicsManager graphicsManager_;
+	Transform2dManager transform2dManager_;
+
 	EntityViewer entityViewer_;
 	Inspector inspector_;
-	SceneViewer sceneViewer_;
 	EntityNameManager entityNameManager_;
 
 };

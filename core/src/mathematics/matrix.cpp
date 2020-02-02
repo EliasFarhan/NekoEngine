@@ -1,5 +1,4 @@
 #include "mathematics/matrix.h"
-#include "mathematics/multiple_vector.h"
 
 namespace neko {
     template<>
