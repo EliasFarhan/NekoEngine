@@ -1,6 +1,7 @@
 #include <gl/texture.h>
 #include <engine/transform.h>
 #include <engine/engine.h>
+#include <imgui.h>
 #include "03_hello_transform/transform_program.h"
 
 
@@ -12,46 +13,51 @@ void HelloTransformProgram::Init()
 {
 
     const auto& config = BasicEngine::GetInstance()->config;
-    shaderProgram.LoadFromFile(
-            config.dataRootPath+"data/shaders/03_hello_coords/transform.vert",
-            config.dataRootPath+"data/shaders/03_hello_coords/transform.frag"
+    shaderProgram_.LoadFromFile(
+            config.dataRootPath + "data/shaders/03_hello_coords/transform.vert",
+            config.dataRootPath + "data/shaders/03_hello_coords/transform.frag"
     );
-    const auto texturePath = config.dataRootPath+"data/sprites/wall.jpg";
-    textureWall = gl::stbCreateTexture(texturePath.c_str());
-    quad.Init();
+    const auto texturePath = config.dataRootPath + "data/sprites/wall.jpg";
+    textureWall_ = gl::stbCreateTexture(texturePath.c_str());
+    quad_.Init();
 }
 
 void HelloTransformProgram::Render()
 {
 
 
-    shaderProgram.Bind();
+    shaderProgram_.Bind();
 
-    unsigned int transformLoc = glGetUniformLocation(shaderProgram.GetProgram(), "transform");
-    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, &transform[0][0]);
+    unsigned int transformLoc = glGetUniformLocation(shaderProgram_.GetProgram(), "transform");
+    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, &transform_[0][0]);
 
-    glBindTexture(GL_TEXTURE_2D, textureWall);
-    quad.Draw();
+    glBindTexture(GL_TEXTURE_2D, textureWall_);
+    quad_.Draw();
 
 }
 
 void HelloTransformProgram::Destroy()
 {
-    quad.Destroy();
-    gl::DestroyTexture(textureWall);
+    quad_.Destroy();
+    gl::DestroyTexture(textureWall_);
 }
 
 void HelloTransformProgram::Update(seconds dt)
 {
-    transform = Mat4f::Identity;
-    transform = Mat4f::Translate(transform, Vec4f(0.5f, -0.5f, 0.0f, 0.0f));
-    transform = Mat4f::Rotate(transform, dt.count(), Vec3f(0.0f, 0.0f, 1.0f));
+    transform_ = Mat4f::Identity;
+    transform_ = Mat4f::Translate(transform_, position_);
+    transform_ = Mat4f::Scale(transform_, scale_);
+    transform_ = Mat4f::Rotate(transform_, angle_, Vec3f(0.0f, 0.0f, 1.0f));
 
 }
 
 void HelloTransformProgram::DrawUi(seconds dt)
 {
-
+    ImGui::Begin("Transform Window");
+    ImGui::InputFloat3("Position", &position_[0]);
+    ImGui::InputFloat3("Scale", &scale_[0]);
+    ImGui::InputFloat("Rotation", &angle_);
+    ImGui::End();
 }
 
 void HelloTransformProgram::OnEvent(const SDL_Event& event)

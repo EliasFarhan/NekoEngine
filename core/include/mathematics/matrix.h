@@ -10,7 +10,8 @@ template<typename T>
 class Mat3
 {
 private:
-    std::array<Vec4<T>, 4> rows_; //row vector
+    std::array<Vec4 < T>, 4>
+    columns_; //row vector
 };
 
 template<typename T>
@@ -19,47 +20,55 @@ class alignas(4 * sizeof(T)) Mat4
 public:
     Mat4()
     {
-        rows_ = Identity.rows_;
+        columns_ = Identity.columns_;
     }
 
-    explicit Mat4(const Mat4& m)
+    Mat4& operator=(Mat4 m)
     {
-        rows_ = m.rows_;
+        columns_ = m.columns_;
+        return *this;
     }
 
-    explicit Mat4(const std::array<Vec4<T>, 4>& v)
+    Mat4(const Mat4& m)
     {
-        rows_ = v;
+        columns_ = m.columns_;
     }
 
-    const T& operator()(size_t x, size_t y) const
+    explicit Mat4(const std::array<Vec4 < T>,
+
+    4>& v)
     {
-        return rows_[x][y];
+        columns_ = v;
     }
 
-    T& operator()(size_t x, size_t y)
+    const T& operator()(size_t row, size_t column) const
     {
-        return rows_[x][y];
+        return columns_[column][row];
     }
 
-    const Vec4<T>& operator[](size_t x) const
+    T& operator()(size_t row, size_t column)
     {
-        return rows_[x];
+        return columns_[column][row];
     }
 
-    Vec4<T>& operator[](size_t x)
+    const Vec4 <T>& operator[](size_t column) const
     {
-        return rows_[x];
+        return columns_[column];
+    }
+
+    Vec4 <T>& operator[](size_t column)
+    {
+        return columns_[column];
     }
 
     Mat4<T> Transpose() const
     {
         std::array<Vec4<T>, 4> v;
-        for (int i = 0; i < 4; i++)
+        for (int column = 0; column < 4; column++)
         {
-            for (int j = 0; j < 4; j++)
+            for (int row = 0; row < 4; row++)
             {
-                v[j][i] = rows_[i][j];
+                v[row][column] = columns_[column][row];
             }
         }
         return Mat4<T>(v);
@@ -70,7 +79,7 @@ public:
         std::array<Vec4<T>, 4> v;
         for (int i = 0; i < 4; i++)
         {
-            v[i] = rows_[i] + rhs.rows_[i];
+            v[i] = columns_[i] + rhs.columns_[i];
         }
         return Mat4<T>(v);
     }
@@ -80,36 +89,41 @@ public:
         std::array<Vec4<T>, 4> v;
         for (int i = 0; i < 4; i++)
         {
-            v[i] = rows_[i] - rhs.rows_[i];
+            v[i] = columns_[i] - rhs.columns_[i];
         }
         return Mat4<T>(v);
     }
 
-    Vec4<T> operator*(const Vec4<T>& rhs) const
+    Vec4 <T> operator*(const Vec4 <T>& rhs) const
     {
         Vec4<T> v;
-        for (int x = 0; x < 4; x++)
+        for (int column = 0; column < 4; column++)
         {
-            v[x] = 0;
-            for (int i = 0; i < 4; i++)
+            v[column] = 0;
+            for (int row = 0; row < 4; row++)
             {
-                v[x] += rows_[x][i] * rhs[i];
+                v[column] += columns_[column][row] * rhs[row];
             }
         }
         return Mat4<T>(v);
     }
 
+    Mat4<T> operator*(const Mat4<T>& rhs) const
+    {
+        return MultiplyIntrinsincs(rhs);
+    }
+
     inline Mat4<T> MultiplyNaive(const Mat4<T>& rhs) const noexcept
     {
         std::array<Vec4<T>, 4> v;
-        for (int x = 0; x < 4; x++)
+        for (int column = 0; column < 4; column++)
         {
-            for (int y = 0; y < 4; y++)
+            for (int row = 0; row < 4; row++)
             {
-                v[x][y] = 0;
+                v[column][row] = 0;
                 for (int i = 0; i < 4; i++)
                 {
-                    v[x][y] += rows_[x][i] * rhs[i][y];
+                    v[column][row] += columns_[i][column] * rhs[row][i];
                 }
             }
         }
@@ -118,13 +132,13 @@ public:
 
     inline Mat4<T> MultiplyTranpose(const Mat4<T>& rhs) const noexcept
     {
-        const auto rhsT = rhs.Transpose();
+        const auto lhsT = this->Transpose();
         std::array<Vec4<T>, 4> v;
-        for (int x = 0; x < 4; x++)
+        for (int column = 0; column < 4; column++)
         {
-            for (int y = 0; y < 4; y++)
+            for (int row = 0; row < 4; row++)
             {
-                v[x][y] = Vec4<T>::Dot(Vec4<T>(rows_[x]), rhsT[y]);
+                v[column][row] = Vec4<T>::Dot(lhsT[row], Vec4<T>(rhs.columns_[column]));
             }
         }
         return Mat4<T>(v);
@@ -134,15 +148,31 @@ public:
 
     Mat4<T> MultiplyIntrinsincs(const Mat4<T>& rhs) const noexcept;
 
+    static T MatrixDifference(const Mat4<T>& rhs, const Mat4<T>& lhs)
+    {
+        T result = 0;
+        for (int column = 0; column < 4; column++)
+        {
+            for (int row = 0; row < 4; row++)
+            {
+                result += rhs[column][row] - lhs[column][row];
+            }
+        }
+        return result;
+    };
 
-    static Mat4<T> Translate(const Mat4<T>& transform, Vec4<T> pos);
-    static Mat4<T> Scale(const Mat4<T>& transform, Vec3<T> scale);
-    static Mat4<T> Rotate(const Mat4<T>& transform, T angle, Vec3<T> axis);
-    static Mat4<T> Rotate(const Mat4<T>& transform, Vec4<T> quaternion);
+    static Mat4<T> Translate(const Mat4<T>& transform, Vec3 <T> pos);
+
+    static Mat4<T> Scale(const Mat4<T>& transform, Vec3 <T> scale);
+
+    static Mat4<T> Rotate(const Mat4<T>& transform, T angle, Vec3 <T> axis);
+
+    static Mat4<T> Rotate(const Mat4<T>& transform, Vec4 <T> quaternion);
 
     const static Mat4<T> Identity;
 private:
-    std::array<Vec4<T>, 4> rows_; //row vector
+    std::array<Vec4 < T>, 4>
+    columns_; //row vector
 };
 
 template<typename T, int N>
@@ -160,16 +190,19 @@ struct alignas(N * sizeof(T)) NVec4
 
     explicit NVec4(const Mat4<T>& m)
     {
-        for (int i = 0; i < N; i++)
+        for (int row = 0; row < N; row++)
         {
-            xs[i] = m[0][i];
-            ys[i] = m[1][i];
-            zs[i] = m[2][i];
-            ws[i] = m[3][i];
+            xs[row] = m[0][row];
+            ys[row] = m[1][row];
+            zs[row] = m[2][row];
+            ws[row] = m[3][row];
         }
     }
 
-    explicit NVec4(const std::array<Vec4<T>, N>& soaV)
+    //Transpose the matrix
+    explicit NVec4(const std::array<Vec4 < T>, N
+
+    >& soaV)
     {
         for (int i = 0; i < N; i++)
         {
@@ -180,7 +213,7 @@ struct alignas(N * sizeof(T)) NVec4
         }
     }
 
-    explicit NVec4(const Vec3<T>* soaV)
+    explicit NVec4(const Vec3 <T>* soaV)
     {
         for (int i = 0; i < N; i++)
         {
@@ -191,7 +224,7 @@ struct alignas(N * sizeof(T)) NVec4
         }
     }
 
-    explicit NVec4(const Vec4<T>* soaV)
+    explicit NVec4(const Vec4 <T>* soaV)
     {
         for (int i = 0; i < N; i++)
         {
@@ -202,7 +235,7 @@ struct alignas(N * sizeof(T)) NVec4
         }
     }
 
-    explicit NVec4(const Vec4<T>& v)
+    explicit NVec4(const Vec4 <T>& v)
     {
         for (int i = 0; i < N; i++)
         {
@@ -213,12 +246,15 @@ struct alignas(N * sizeof(T)) NVec4
         }
     }
 
-    static std::array<T, N> Dot(const NVec4<T, N>& v1, const Vec4<T>& v)
+    static std::array<T, N> Dot(const NVec4<T, N>& v1, const Vec4 <T>& v)
     {
-        std::array<T, N> result;
+        std::array<T, N> result{};
         for (int i = 0; i < N; i++)
         {
-            result[i] = v1.xs[i] * v.x + v1.ys[i] * v.y + v1.zs[i] * v.z + v1.ws[i] * v.z;
+            result[0] += v1.xs[i] * v[i];
+            result[1] += v1.ys[i] * v[i];
+            result[2] += v1.zs[i] * v[i];
+            result[3] += v1.ws[i] * v[i];
         }
         return result;
     }
@@ -235,7 +271,7 @@ struct alignas(N * sizeof(T)) NVec4
 
     static std::array<T, N> DotIntrinsics(const NVec4<T, N>& v1, const NVec4<T, N>& v2);
 
-    static std::array<T, N> DotIntrinsics(const NVec4<T, N>& v1, const Vec4<T>& v);
+    static std::array<T, N> DotIntrinsics(const NVec4<T, N>& v1, const Vec4 <T>& v);
 
 
     std::array<T, N> GetSquareMagnitude() const
@@ -350,7 +386,8 @@ inline std::array<float, 4> FourVec4f::GetMagnitudeIntrinsincs() const
 #ifdef __AVX2__
 
 template<>
-inline std::array<float, 8> EightVec4f::DotIntrinsics(const EightVec4f& v1, const EightVec4f& v2) {
+inline std::array<float, 8> EightVec4f::DotIntrinsics(const EightVec4f& v1, const EightVec4f& v2)
+{
     auto x1 = _mm256_load_ps(&v1.xs[0]);
     auto y1 = _mm256_load_ps(&v1.ys[0]);
     auto z1 = _mm256_load_ps(&v1.zs[0]);
@@ -376,7 +413,8 @@ inline std::array<float, 8> EightVec4f::DotIntrinsics(const EightVec4f& v1, cons
 }
 
 template<>
-inline std::array<float, 8> EightVec4f::GetMagnitudeIntrinsincs() const {
+inline std::array<float, 8> EightVec4f::GetMagnitudeIntrinsincs() const
+{
     __m256 x = _mm256_load_ps(&xs[0]);
     __m256 y = _mm256_load_ps(&ys[0]);
     __m256 z = _mm256_load_ps(&zs[0]);
@@ -409,13 +447,11 @@ Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept;
 template<typename T>
 inline Mat4<T> Mat4<T>::MultiplyAoSoA(const Mat4<T>& rhs) const noexcept
 {
-    const FourVec4f rhsM(rhs.rows_);
+    const NVec4<T, 4> lhsM(Transpose());
     std::array<Vec4f, 4> v;
-    for (int x = 0; x < 4; x++)
+    for (int column = 0; column < 4; column++)
     {
-        //NVec4<T, 4> lhsM(values_[x]);
-
-        v[x] = Vec4<T>(NVec4<T, 4>::Dot(rhsM, rows_[x]));
+        v[column] = Vec4<T>(NVec4<T, 4>::Dot(lhsM, rhs.columns_[column]));
     }
     return Mat4<T>(v);
 }
@@ -423,35 +459,41 @@ inline Mat4<T> Mat4<T>::MultiplyAoSoA(const Mat4<T>& rhs) const noexcept
 template<>
 inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
 {
-    const FourVec4f rhsM(rhs.rows_);
+    const FourVec4f lhsM(Transpose());
     std::array<Vec4f, 4> v;
-    for (int x = 0; x < 4; x++)
+    for (int column = 0; column < 4; column++)
     {
-        //FourVec4f lhsM(values_[x]);
-
-        v[x] = Vec4f(FourVec4f::DotIntrinsics(rhsM, rows_[x]));
+        v[column] = Vec4f(FourVec4f::DotIntrinsics(lhsM, rhs.columns_[column]));
     }
     return Mat4f(v);
 }
 
-//TODO Implement transfrom translation
+//TODO Implement Matrix Translation
 template<typename T>
-Mat4<T> Mat4<T>::Translate(const Mat4<T>& transform, Vec4<T> pos)
+Mat4<T> Mat4<T>::Translate(const Mat4<T>& transform, Vec3<T> pos)
 {
-    return Mat4<T>();
+    return transform;
 }
 
-//TODO Implement transform scale
+//TODO Implement Matrix Scale
 template<typename T>
 Mat4<T> Mat4<T>::Scale(const Mat4<T>& transform, Vec3<T> scale)
 {
-    return Mat4<T>();
+    return transform;
 }
 
-//TODO Implement transform rotation with axis
+//TODO Implement Matrix Rotation with angle and axis
 template<typename T>
 Mat4<T> Mat4<T>::Rotate(const Mat4<T>& transform, T angle, Vec3<T> axis)
 {
-    return Mat4<T>();
+    return transform;
 }
+
+//TODO Implement Matrix Rotation with Quaternion
+template<typename T>
+Mat4<T> Mat4<T>::Rotate(const Mat4<T>& transform, Vec4<T> quaternion)
+{
+    return transform;
+}
+
 }

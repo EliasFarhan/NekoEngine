@@ -3,12 +3,13 @@
 //
 #include <benchmark/benchmark.h>
 #include <mathematics/vector.h>
+#include "mathematics/matrix.h"
 #include <vector>
 #include <random>
 #include <iostream>
 
 const long fromRange = 8;
-const long toRange = 1<<10;
+const long toRange = 1<<15;
 const float maxNmb = 100.0f;
 
 
@@ -68,12 +69,12 @@ static void BM_Vec3MagnitudeAoSoA4(benchmark::State& state)
     RandomFill(local_numbers, 0.0f, maxNmb);
     assert(reinterpret_cast<uintptr_t>(&local_numbers[0]) % alignof(__STDCPP_DEFAULT_NEW_ALIGNMENT__) == 0);
     assert(reinterpret_cast<uintptr_t>(&local_numbers[1]) % alignof(__STDCPP_DEFAULT_NEW_ALIGNMENT__) == 0);
-    neko::FourVec4f tmp;
+
     for (auto _ : state)
     {
         for(size_t i = 0; i<local_numbers.size();i+=4)
         {
-            tmp = neko::FourVec4f(&local_numbers[i]);
+            const neko::FourVec4f tmp = neko::FourVec4f(&local_numbers[i]);
             benchmark::DoNotOptimize(tmp.GetMagnitude());
         }
     }
@@ -86,12 +87,12 @@ static void BM_Vec4MagnitudeAoSoA4(benchmark::State& state)
     RandomFill(local_numbers, 0.0f, maxNmb);
     assert(reinterpret_cast<uintptr_t>(&local_numbers[0]) % alignof(__STDCPP_DEFAULT_NEW_ALIGNMENT__) == 0);
     assert(reinterpret_cast<uintptr_t>(&local_numbers[1]) % alignof(__STDCPP_DEFAULT_NEW_ALIGNMENT__) == 0);
-    neko::FourVec4f tmp;
+
     for (auto _ : state)
     {
         for(size_t i = 0; i<local_numbers.size();i+=4)
         {
-            tmp = neko::FourVec4f(&local_numbers[i]);
+            const neko::FourVec4f tmp = neko::FourVec4f(&local_numbers[i]);
             benchmark::DoNotOptimize(tmp.GetMagnitude());
         }
     }
@@ -104,12 +105,11 @@ static void BM_Vec4MagnitudeAoSoA4Intrinsincs(benchmark::State& state)
     RandomFill(local_numbers, 0.0f, maxNmb);
     assert(reinterpret_cast<uintptr_t>(&local_numbers[0]) % alignof(__STDCPP_DEFAULT_NEW_ALIGNMENT__) == 0);
     assert(reinterpret_cast<uintptr_t>(&local_numbers[1]) % alignof(__STDCPP_DEFAULT_NEW_ALIGNMENT__) == 0);
-    neko::FourVec4f tmp;
     for (auto _ : state)
     {
         for(size_t i = 0; i<local_numbers.size();i+=4)
         {
-            tmp = neko::FourVec4f(&local_numbers[i]);
+            const neko::FourVec4f tmp = neko::FourVec4f(&local_numbers[i]);
             benchmark::DoNotOptimize(tmp.GetMagnitudeIntrinsincs());
         }
     }
@@ -123,12 +123,12 @@ static void BM_Vec3MagnitudeAoSoA8(benchmark::State& state)
     RandomFill(local_numbers, 0.0f, maxNmb);
     assert(reinterpret_cast<uintptr_t>(&local_numbers[0]) % alignof(__STDCPP_DEFAULT_NEW_ALIGNMENT__) == 0);
     assert(reinterpret_cast<uintptr_t>(&local_numbers[1]) % alignof(__STDCPP_DEFAULT_NEW_ALIGNMENT__) == 0);
-    neko::EightVec4f tmp;
+
     for (auto _ : state)
     {
         for(size_t i = 0; i<local_numbers.size();i+=8)
         {
-            tmp = neko::EightVec4f(&local_numbers[i]);
+            const neko::EightVec4f tmp = neko::EightVec4f(&local_numbers[i]);
             benchmark::DoNotOptimize(tmp.GetMagnitude());
         }
     }
@@ -141,12 +141,12 @@ static void BM_Vec4MagnitudeAoSoA8(benchmark::State& state)
     RandomFill(local_numbers, 0.0f, maxNmb);
     assert(reinterpret_cast<uintptr_t>(&local_numbers[0]) % alignof(__STDCPP_DEFAULT_NEW_ALIGNMENT__) == 0);
     assert(reinterpret_cast<uintptr_t>(&local_numbers[1]) % alignof(__STDCPP_DEFAULT_NEW_ALIGNMENT__) == 0);
-    neko::EightVec4f tmp;
+
     for (auto _ : state)
     {
         for(size_t i = 0; i<local_numbers.size();i+=8)
         {
-            tmp = neko::EightVec4f(&local_numbers[i]);
+            const neko::EightVec4f tmp = neko::EightVec4f(&local_numbers[i]);
             benchmark::DoNotOptimize(tmp.GetMagnitude());
         }
     }
@@ -159,12 +159,12 @@ static void BM_Vec4MagnitudeAoSoA8Intrinsincs(benchmark::State& state)
     RandomFill(local_numbers, 0.0f, maxNmb);
     assert(reinterpret_cast<uintptr_t>(&local_numbers[0]) % alignof(__STDCPP_DEFAULT_NEW_ALIGNMENT__) == 0);
     assert(reinterpret_cast<uintptr_t>(&local_numbers[1]) % alignof(__STDCPP_DEFAULT_NEW_ALIGNMENT__) == 0);
-    neko::EightVec4f tmp;
+
     for (auto _ : state)
     {
         for(size_t i = 0; i<local_numbers.size();i+=8)
         {
-            tmp = neko::EightVec4f(&local_numbers[i]);
+            const neko::EightVec4f tmp = neko::EightVec4f(&local_numbers[i]);
             benchmark::DoNotOptimize(tmp.GetMagnitudeIntrinsincs());
         }
     }
