@@ -78,6 +78,18 @@ static void BM_Vec3MagnitudeAoSoA4(benchmark::State& state)
             benchmark::DoNotOptimize(tmp.GetMagnitude());
         }
     }
+    float result = 0.0f;
+    for (size_t i = 0; i < local_numbers.size(); i += 4)
+    {
+        const neko::FourVec4f tmp = neko::FourVec4f(&local_numbers[i]);
+        const auto magnitudes = tmp.GetMagnitude();
+    	for(int j = 0; j < 4; j++)
+    	{
+            result += magnitudes[j] - local_numbers[i + j].GetMagnitude();
+    	}
+    }
+	std::cout << "Magnitude difference: " << result / static_cast<float>(state.range(0)) << " Range: "
+        << state.range(0) << "\n";
 
 }
 BENCHMARK(BM_Vec3MagnitudeAoSoA4)->Range(fromRange, toRange);
@@ -96,6 +108,18 @@ static void BM_Vec4MagnitudeAoSoA4(benchmark::State& state)
             benchmark::DoNotOptimize(tmp.GetMagnitude());
         }
     }
+    float result = 0.0f;
+    for (size_t i = 0; i < local_numbers.size(); i += 4)
+    {
+        const neko::FourVec4f tmp = neko::FourVec4f(&local_numbers[i]);
+        const auto magnitudes = tmp.GetMagnitude();
+        for (int j = 0; j < 4; j++)
+        {
+            result += magnitudes[j] - local_numbers[i + j].GetMagnitude();
+        }
+    }
+    std::cout << "Magnitude difference: " << result / static_cast<float>(state.range(0)) << " Range: "
+        << state.range(0) << "\n";
 
 }
 BENCHMARK(BM_Vec4MagnitudeAoSoA4)->Range(fromRange, toRange);
@@ -113,6 +137,18 @@ static void BM_Vec4MagnitudeAoSoA4Intrinsincs(benchmark::State& state)
             benchmark::DoNotOptimize(tmp.GetMagnitudeIntrinsincs());
         }
     }
+    float result = 0.0f;
+    for (size_t i = 0; i < local_numbers.size(); i += 4)
+    {
+        const neko::FourVec4f tmp = neko::FourVec4f(&local_numbers[i]);
+        const auto magnitudes = tmp.GetMagnitude();
+        for (int j = 0; j < 4; j++)
+        {
+            result += magnitudes[j] - local_numbers[i + j].GetMagnitude();
+        }
+    }
+    std::cout << "Magnitude difference: " << result / static_cast<float>(state.range(0)) << " Range: "
+        << state.range(0) << "\n";
 
 }
 BENCHMARK(BM_Vec4MagnitudeAoSoA4Intrinsincs)->Range(fromRange, toRange);
@@ -132,6 +168,18 @@ static void BM_Vec3MagnitudeAoSoA8(benchmark::State& state)
             benchmark::DoNotOptimize(tmp.GetMagnitude());
         }
     }
+    float result = 0.0f;
+    for (size_t i = 0; i < local_numbers.size(); i += 4)
+    {
+        const neko::FourVec4f tmp = neko::FourVec4f(&local_numbers[i]);
+        const auto magnitudes = tmp.GetMagnitude();
+        for (int j = 0; j < 4; j++)
+        {
+            result += magnitudes[j] - local_numbers[i + j].GetMagnitude();
+        }
+    }
+    std::cout << "Magnitude difference: " << result / static_cast<float>(state.range(0)) << " Range: "
+        << state.range(0) << "\n";
 
 }
 BENCHMARK(BM_Vec3MagnitudeAoSoA8)->Range(fromRange, toRange);
@@ -150,6 +198,18 @@ static void BM_Vec4MagnitudeAoSoA8(benchmark::State& state)
             benchmark::DoNotOptimize(tmp.GetMagnitude());
         }
     }
+    float result = 0.0f;
+    for (size_t i = 0; i < local_numbers.size(); i += 4)
+    {
+        const neko::FourVec4f tmp = neko::FourVec4f(&local_numbers[i]);
+        const auto magnitudes = tmp.GetMagnitude();
+        for (int j = 0; j < 4; j++)
+        {
+            result += magnitudes[j] - local_numbers[i + j].GetMagnitude();
+        }
+    }
+    std::cout << "Magnitude difference: " << result / static_cast<float>(state.range(0)) << " Range: "
+        << state.range(0) << "\n";
 
 }
 BENCHMARK(BM_Vec4MagnitudeAoSoA8)->Range(fromRange, toRange);
@@ -168,6 +228,19 @@ static void BM_Vec4MagnitudeAoSoA8Intrinsincs(benchmark::State& state)
             benchmark::DoNotOptimize(tmp.GetMagnitudeIntrinsincs());
         }
     }
+
+    float result = 0.0f;
+    for (size_t i = 0; i < local_numbers.size(); i += 4)
+    {
+        const neko::FourVec4f tmp = neko::FourVec4f(&local_numbers[i]);
+        const auto magnitudes = tmp.GetMagnitude();
+        for (int j = 0; j < 4; j++)
+        {
+            result += magnitudes[j] - local_numbers[i + j].GetMagnitude();
+        }
+    }
+    std::cout << "Magnitude difference: " << result / static_cast<float>(state.range(0)) << " Range: "
+        << state.range(0) << "\n";
 
 }
 BENCHMARK(BM_Vec4MagnitudeAoSoA8Intrinsincs)->Range(fromRange, toRange);
