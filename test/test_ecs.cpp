@@ -29,7 +29,7 @@
 TEST(Entity, EntityManager)
 {
     neko::EntityManager entityManager;
-    const neko::Index entityNmb = 1024u;
+    const neko::Index entityNmb = 16u;
 	const neko::EntityMask componentType1 = 1 << 0;
 	const neko::EntityMask componentType2 = 1 << 1;
 

@@ -29,7 +29,7 @@ public:
         return *this;
     }
 
-    Mat4(const Mat4& m)
+    Mat4(const Mat4& m) noexcept
     {
         columns_ = m.columns_;
     }
@@ -168,6 +168,8 @@ public:
     static Mat4<T> Rotate(const Mat4<T>& transform, T angle, Vec3 <T> axis);
 
     static Mat4<T> Rotate(const Mat4<T>& transform, Vec4 <T> quaternion);
+
+    static Mat4<T> FromQuaternion(Vec4<T> quaternion);
 
     const static Mat4<T> Identity;
 private:
@@ -438,6 +440,7 @@ inline std::array<float, 8> EightVec4f::GetMagnitudeIntrinsincs() const
 #endif
 using Mat3f = Mat3<float>;
 using Mat4f = Mat4<float>;
+using Transform3d = Mat4f;
 
 
 template<>
@@ -469,31 +472,51 @@ inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
 }
 
 //TODO Implement Matrix Translation
-template<typename T>
-Mat4<T> Mat4<T>::Translate(const Mat4<T>& transform, Vec3<T> pos)
+template<>
+Transform3d Transform3d::Translate(const Transform3d& transform, Vec3f pos)
 {
+    (void) pos;
     return transform;
 }
 
 //TODO Implement Matrix Scale
-template<typename T>
-Mat4<T> Mat4<T>::Scale(const Mat4<T>& transform, Vec3<T> scale)
+template<>
+Transform3d Transform3d::Scale(const Transform3d& transform, Vec3f scale)
 {
+    (void) scale;
     return transform;
 }
 
 //TODO Implement Matrix Rotation with angle and axis
-template<typename T>
-Mat4<T> Mat4<T>::Rotate(const Mat4<T>& transform, T angle, Vec3<T> axis)
+template<>
+Transform3d Transform3d::Rotate(const Transform3d& transform, float angle, Vec3f axis)
 {
+    (void) angle;
+    (void) axis;
     return transform;
 }
 
 //TODO Implement Matrix Rotation with Quaternion
-template<typename T>
-Mat4<T> Mat4<T>::Rotate(const Mat4<T>& transform, Vec4<T> quaternion)
+template<>
+Transform3d Transform3d::Rotate(const Transform3d& transform, Quaternion quaternion)
 {
+    (void) quaternion;
     return transform;
+}
+
+template<>
+const inline Mat4f Mat4f::Identity = Mat4f(
+        std::array<Vec4f, 4>{
+                Vec4f(1, 0, 0, 0),
+                Vec4f(0, 1, 0, 0),
+                Vec4f(0, 0, 1, 0),
+                Vec4f(0, 0, 0, 1)});
+
+template<>
+Transform3d Transform3d::FromQuaternion(Quaternion quaternion)
+{
+    (void) quaternion;
+    return Transform3d::Identity;
 }
 
 }

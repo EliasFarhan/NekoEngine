@@ -52,7 +52,7 @@ function(add_neko_library binary source_folder)
     add_library(${binary} STATIC ${LIB_FILES})
 
     target_compile_options(${binary} PRIVATE $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
-            -Wall -Wextra>
+            >
             $<$<CXX_COMPILER_ID:MSVC>:
             /W4>)
     target_link_libraries(${binary} PUBLIC ${ARGN})
@@ -71,6 +71,9 @@ function(neko_bin_config binary)
         set_target_properties(${binary} PROPERTIES LINK_FLAGS
                 " -s EXPORT_ALL=1 --use-preload-plugins -s SIMD=1 -msimd128 --preload-file ${CMAKE_BINARY_DIR}/data@data/")
         set_target_properties(${binary} PROPERTIES SUFFIX ".html")
+    elseif(UNIX)
+        set_target_properties(${binary} PROPERTIES COMPILE_FLAGS_DEBUG "-fno-rtti -fno-exceptions -Wall -Wextra")
+        set_target_properties(${binary} PROPERTIES COMPILE_FLAGS_RELEASE "-fno-rtti -fno-exceptions -Wall -Wextra")
     endif()
 endfunction()
 
@@ -86,5 +89,8 @@ function(neko_lib_config library)
         set_target_properties(${binary} PROPERTIES COMPILE_FLAGS_RELEASE
                 " -O3 -fno-rtti -fno-exceptions -s SIMD=1  -msimd128 ")
         set_target_properties(${library} PROPERTIES LINK_FLAGS " -s SIMD=1 -msimd128 -s EXPORT_ALL=1")
+    elseif(UNIX)
+        set_target_properties(${binary} PROPERTIES COMPILE_FLAGS_DEBUG "-fno-rtti -fno-exceptions -Wall -Wextra")
+        set_target_properties(${binary} PROPERTIES COMPILE_FLAGS_RELEASE "-fno-rtti -fno-exceptions -Wall -Wextra")
     endif()
 endfunction()

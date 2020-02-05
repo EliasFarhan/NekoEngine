@@ -2,7 +2,7 @@
 /*
  MIT License
 
- Copyright (c) 2019 SAE Institute Switzerland AG
+ Copyright (c) 2020 SAE Institute Switzerland AG
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@
 #include <ostream>
 #include <array>
 #include <cmath>
+#include "mathematics/const.h"
 #include <mathematics/intrinsincs.h>
 
 namespace neko
@@ -55,7 +56,7 @@ struct Vec2
 
     }
 
-    Vec2(T X, T Y)
+    Vec2(T X, T Y) noexcept
             : x(X), y(Y)
     {
     }
@@ -171,9 +172,11 @@ struct Vec2
         return os;
     }
 
+    //Used to specialize in case of other kind of vector
     template<typename U>
     explicit Vec2(const U& v);
 
+    //Used to specialize in case of other kind of vector
     template<typename U>
     explicit operator U() const;
 
@@ -185,6 +188,16 @@ struct Vec2
 };
 
 template<typename T>
+template<typename U>
+U Vec2<T>::AngleBetween(const Vec2& v1, const Vec2& v2)
+{
+    const U dot = Vec2<T>::Dot(v1, v2) / v1.GetMagnitude() / v2.GetMagnitude();
+    const U det = v1.x * v2.y - v1.y * v2.x;
+    const U angle = atan2(det, dot) / float(M_PI) * 180.0f;
+    return angle;
+}
+
+template<typename T>
 Vec2<T> operator*(T lhs, const Vec2<T>& rhs)
 {
     return Vec2<T>(rhs.x * lhs, rhs.y * lhs);
@@ -192,6 +205,7 @@ Vec2<T> operator*(T lhs, const Vec2<T>& rhs)
 
 using Vec2f = Vec2<float>;
 using Vec2i = Vec2<int>;
+using Vec2u = Vec2<unsigned>;
 
 template <>
 inline Vec2f const Vec2f::Zero = Vec2f(0.0f,0.0f);
@@ -345,9 +359,27 @@ public:
 
 };
 
+template<typename T>
+template<typename U>
+U Vec3<T>::AngleBetween(const Vec3& v1, const Vec3& v2)
+{
+    const U dot = Vec3<T>::Dot(v1, v2) / v1.GetMagnitude() / v2.GetMagnitude();
+    const U det = v1.x * v2.y - v1.y * v2.x;
+    const U angle = atan2(det, dot) / float(M_PI) * 180.0f;
+    return angle;
+}
+
+
+
+
 using Vec3f = Vec3<float>;
 using Vec3i = Vec3<int>;
 using Vec3u = Vec3<unsigned int>;
+
+template <>
+Vec3f inline const Vec3f::Zero = Vec3f(0.0f,0.0f, 0.0f);
+template <>
+Vec3f inline const Vec3f::One = Vec3f(1.0f,1.0f,1.0f);
 
 template<typename T>
 class alignas(4 * sizeof(T)) Vec4
@@ -504,9 +536,39 @@ public:
         return !(*this == right);
     }
 
+    static Vec4<T> AngleAxis(T angle, Vec3<T> axis);
+    static Vec4<T> FromEulerAngles(Vec3<T> axisX);
+
 };
 
 using Vec4f = Vec4<float>;
+using Quaternion = Vec4f;
+
+
+
+
+template <>
+Vec4f inline const Vec4f::Zero = Vec4f(0.0f,0.0f, 0.0f, 0.0f);
+template <>
+Vec4f inline const Vec4f::One = Vec4f(1.0f,1.0f,1.0f, 1.0f);
+
+//TODO Implement quaternion specific method
+template<>
+Quaternion Quaternion::AngleAxis(float angle, Vec3f axis)
+{
+    (void)angle;
+    (void)axis;
+    return Zero;
+}
+
+template<>
+Quaternion Quaternion::FromEulerAngles(Vec3f eulerAngles)
+{
+    (void) eulerAngles;
+    return Zero;
+}
+
+
 
 
 }
