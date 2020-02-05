@@ -554,7 +554,7 @@ Vec4f inline const Vec4f::One = Vec4f(1.0f,1.0f,1.0f, 1.0f);
 
 //TODO Implement quaternion specific method
 template<>
-Quaternion Quaternion::AngleAxis(float angle, Vec3f axis)
+inline Quaternion Quaternion::AngleAxis(float angle, Vec3f axis)
 {
     (void)angle;
     (void)axis;
@@ -562,7 +562,7 @@ Quaternion Quaternion::AngleAxis(float angle, Vec3f axis)
 }
 
 template<>
-Quaternion Quaternion::FromEulerAngles(Vec3f eulerAngles)
+inline Quaternion Quaternion::FromEulerAngles(Vec3f eulerAngles)
 {
     (void) eulerAngles;
     return Zero;

@@ -473,7 +473,7 @@ inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
 
 //TODO Implement Matrix Translation
 template<>
-Transform3d Transform3d::Translate(const Transform3d& transform, Vec3f pos)
+inline Transform3d Transform3d::Translate(const Transform3d& transform, Vec3f pos)
 {
     (void) pos;
     return transform;
@@ -481,7 +481,7 @@ Transform3d Transform3d::Translate(const Transform3d& transform, Vec3f pos)
 
 //TODO Implement Matrix Scale
 template<>
-Transform3d Transform3d::Scale(const Transform3d& transform, Vec3f scale)
+inline Transform3d Transform3d::Scale(const Transform3d& transform, Vec3f scale)
 {
     (void) scale;
     return transform;
@@ -489,7 +489,7 @@ Transform3d Transform3d::Scale(const Transform3d& transform, Vec3f scale)
 
 //TODO Implement Matrix Rotation with angle and axis
 template<>
-Transform3d Transform3d::Rotate(const Transform3d& transform, float angle, Vec3f axis)
+inline Transform3d Transform3d::Rotate(const Transform3d& transform, float angle, Vec3f axis)
 {
     (void) angle;
     (void) axis;
@@ -498,7 +498,7 @@ Transform3d Transform3d::Rotate(const Transform3d& transform, float angle, Vec3f
 
 //TODO Implement Matrix Rotation with Quaternion
 template<>
-Transform3d Transform3d::Rotate(const Transform3d& transform, Quaternion quaternion)
+inline Transform3d Transform3d::Rotate(const Transform3d& transform, Quaternion quaternion)
 {
     (void) quaternion;
     return transform;
@@ -513,7 +513,7 @@ const inline Mat4f Mat4f::Identity = Mat4f(
                 Vec4f(0, 0, 0, 1)});
 
 template<>
-Transform3d Transform3d::FromQuaternion(Quaternion quaternion)
+inline Transform3d Transform3d::FromQuaternion(Quaternion quaternion)
 {
     (void) quaternion;
     return Transform3d::Identity;
