@@ -1,6 +1,7 @@
 #include <benchmark/benchmark.h>
 #include <random>
 #include <algorithm>
+#include <numeric>
 #include <vector>
 #include <mathematics/vector.h>
 

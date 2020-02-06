@@ -450,11 +450,16 @@ Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept;
 template<typename T>
 inline Mat4<T> Mat4<T>::MultiplyAoSoA(const Mat4<T>& rhs) const noexcept
 {
-    const NVec4<T, 4> lhsM(Transpose());
+    const auto lhsT(Transpose());
     std::array<Vec4f, 4> v;
     for (int column = 0; column < 4; column++)
     {
-        v[column] = Vec4<T>(NVec4<T, 4>::Dot(lhsM, rhs.columns_[column]));
+    	for(int row = 0; row < 4; row++)
+    	{
+            const auto result = Vec4f::Dot(lhsT[row], rhs.columns_[column]);
+            v[column][row] = result;
+    	}
+        
     }
     return Mat4<T>(v);
 }
@@ -462,11 +467,29 @@ inline Mat4<T> Mat4<T>::MultiplyAoSoA(const Mat4<T>& rhs) const noexcept
 template<>
 inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
 {
-    const FourVec4f lhsM(Transpose());
+    const auto lhsT(Transpose());
     std::array<Vec4f, 4> v;
     for (int column = 0; column < 4; column++)
     {
-        v[column] = Vec4f(FourVec4f::DotIntrinsics(lhsM, rhs.columns_[column]));
+
+        __m128 c = _mm_load_ps(&rhs[column][0]);
+    	
+        __m128 x = _mm_load_ps(&lhsT[0][0]);
+        __m128 y = _mm_load_ps(&lhsT[1][0]);
+        __m128 z = _mm_load_ps(&lhsT[2][0]);
+        __m128 w = _mm_load_ps(&lhsT[3][0]);
+
+
+        x = _mm_mul_ps(x, c);
+        y = _mm_mul_ps(y, c);
+        z = _mm_mul_ps(z, c);
+        w = _mm_mul_ps(w, c);
+
+        x = _mm_add_ps(x, y);
+        z = _mm_add_ps(z, w);
+
+        x = _mm_add_ps(x, z);
+        _mm_store_ps(&v[column][0], x);
     }
     return Mat4f(v);
 }

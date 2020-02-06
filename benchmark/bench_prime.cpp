@@ -6,6 +6,13 @@ const long fromRange = 8;
 const long toRange = 1<<20;
 const unsigned maxNmb = 1<<20;
 
+#ifdef WIN32
+inline bool __builtin_expect (bool a, bool b)
+{
+    return a;
+}
+#endif
+
 bool is_prime_naive(unsigned int n)
 {
     if (n == 1)
