@@ -23,6 +23,10 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
     set(CMAKE_STATIC_LIBRARY_SUFFIX ".a")
 endif()
 
+if(MSVC)
+    include(cmake/platforms/msvc.cmake)
+endif()
+
 set(EXTERNAL_DIR ${CMAKE_SOURCE_DIR}/externals CACHE INTERNAL "Externals folder")
 set(UTILITIES_DIR "${EXTERNAL_DIR}/utilities" CACHE INTERNAL "")
 
