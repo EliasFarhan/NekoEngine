@@ -37,8 +37,13 @@ class Cuboid : public  VertexArrayObject
 {
 public:
     explicit Cuboid(Vec3f origin, Vec3f size);
+    void Init() override;
+
+    void Draw() override;
+
+    void Destroy() override;
 protected:
-    Vec3f origin;
-    Vec3f size;
+    Vec3f origin_;
+    Vec3f size_;
 };
 }

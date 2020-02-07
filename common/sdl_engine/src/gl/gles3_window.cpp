@@ -48,6 +48,8 @@ void Gles3Window::Init()
         assert(false);
     }
 #endif
+
+    glEnable(GL_DEPTH_TEST);
 }
 
 void Gles3Window::InitImGui()

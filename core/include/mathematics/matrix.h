@@ -169,6 +169,8 @@ public:
 
     static Mat4<T> Rotate(const Mat4<T>& transform, Vec4 <T> quaternion);
 
+    static Mat4<T> Rotate(const Mat4<T>& transform, Vec3 <T> eulerAngles);
+	
     static Mat4<T> FromQuaternion(Vec4<T> quaternion);
 
     const static Mat4<T> Identity;
@@ -526,6 +528,15 @@ inline Transform3d Transform3d::Rotate(const Transform3d& transform, Quaternion 
     (void) quaternion;
     return transform;
 }
+
+//TODO Implement Matrix Rotation with Simple Euler Angles
+template<>
+inline Transform3d Transform3d::Rotate(const Transform3d& transform, Vec3f eulerAngles)
+{
+    (void)eulerAngles;
+    return transform;
+}
+
 
 template<>
 const inline Mat4f Mat4f::Identity = Mat4f(
