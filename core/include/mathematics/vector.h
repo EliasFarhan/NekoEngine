@@ -152,6 +152,17 @@ struct Vec2
         return !(*this == right);
     }
 
+    bool operator>=(const Vec2<T>& right) const
+    {
+        return x >= right.x && y >= right.y;
+    }
+
+    bool operator<=(const Vec2<T>& right) const
+    {
+        return x <= right.x && y <= right.y;
+    }
+
+
     T GetMagnitude() const;
 
     Vec2<T> Normalized() const
@@ -352,6 +363,22 @@ public:
     bool operator!=(const Vec3<T>& right) const
     {
         return !(*this == right);
+    }
+
+    bool operator>=(const Vec3<T>& right) const
+    {
+        return x >= right.x && y >= right.y && z >= right.z;
+    }
+
+    bool operator<=(const Vec3<T>& right) const
+    {
+        return x <= right.x && y <= right.y && z <= right.z;
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const Vec3<T>& dt)
+    {
+        os << "Vec3(" << dt.x << "," << dt.y << "," << dt.z << ")";
+        return os;
     }
 
     template<typename U = float>
