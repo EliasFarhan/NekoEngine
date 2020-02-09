@@ -88,10 +88,10 @@ endif()
 if(Neko_Benchmark)
     #Google benchmark
     set(GOOGLE_BENCH_DIR "${EXTERNAL_DIR}/benchmark-1.5.0" CACHE STRING "")
-    if(NOT Emscripten)
-        add_subdirectory(${GOOGLE_BENCH_DIR})
-        add_subdirectory("benchmark/")
-    endif()
+
+    add_subdirectory(${GOOGLE_BENCH_DIR})
+    add_subdirectory("benchmark/")
+
 endif()
 
 set(main_project_dir "main/")

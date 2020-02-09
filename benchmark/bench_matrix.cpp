@@ -113,3 +113,5 @@ static void BM_MatrixMultIntrinsics(benchmark::State& state)
 }
 
 BENCHMARK(BM_MatrixMultIntrinsics)->Range(fromRange, toRange);
+
+BENCHMARK_MAIN();
