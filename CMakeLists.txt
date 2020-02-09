@@ -90,6 +90,8 @@ if(Neko_Benchmark)
     set(GOOGLE_BENCH_DIR "${EXTERNAL_DIR}/benchmark-1.5.0" CACHE STRING "")
 
     add_subdirectory(${GOOGLE_BENCH_DIR})
+    set_target_properties (benchmark PROPERTIES FOLDER Externals)
+    set_target_properties (benchmark_main PROPERTIES FOLDER Externals)
     add_subdirectory("benchmark/")
 
 endif()
