@@ -500,25 +500,50 @@ inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
 template<>
 inline Transform3d Transform3d::Translate(const Transform3d& transform, Vec3f pos)
 {
-    (void) pos;
-    return transform;
+    Transform3d output = transform;
+
+    output[3][0] += pos[0];
+    output[3][1] += pos[1];
+    output[3][2] += pos[2];
+
+    return output;
 }
 
 //TODO Implement Matrix Scale
 template<>
 inline Transform3d Transform3d::Scale(const Transform3d& transform, Vec3f scale)
 {
-    (void) scale;
-    return transform;
+    Transform3d output = transform;
+
+    output[0][0] *= scale[0];
+    output[1][1] *= scale[1];
+    output[2][2] *= scale[2];
+
+    return output;
 }
 
 //TODO Implement Matrix Rotation with angle and axis
 template<>
 inline Transform3d Transform3d::Rotate(const Transform3d& transform, float angle, Vec3f axis)
 {
-    (void) angle;
-    (void) axis;
-    return transform;
+    Transform3d output = transform;
+    axis /= axis.GetMagnitude();
+
+    auto rotationMat = std::array<Vec4f, 4>{
+            Vec4f(cosf(angle) + powf(axis[0], 2) * (1 - cosf(angle)), axis[0] * axis[1] * (1 - cosf(angle)) - axis[2] * sinf(angle), axis[0] * axis[2] * (1 - cosf(angle)) + axis[1] * sinf(angle), 0),
+            Vec4f(axis[1] * axis[0] * (1 - cosf(angle)) + axis[2] * sinf(angle), cosf(angle) + powf(axis[1], 2) * (1 - cosf(angle)), axis[1] * axis[2] * (1 - cosf(angle)) - axis[0] * sinf(angle), 0),
+            Vec4f(axis[2] * axis[0] * (1 - cosf(angle)) - axis[1] * sinf(angle), axis[2] * axis[1] * (1 - cosf(angle)) + axis[0] * sinf(angle), cosf(angle) + powf(axis[2], 2) * (1 - cosf(angle)), 0),
+            Vec4f(0, 0, 0, 1)};
+
+    for (int i = 0; i < 4; ++i)
+    {
+        for (int j = 0; j < 4; ++j)
+        {
+            output[i][j] *= rotationMat[i][j];
+        }
+    }
+
+    return output;
 }
 
 //TODO Implement Matrix Rotation with Quaternion
@@ -533,8 +558,37 @@ inline Transform3d Transform3d::Rotate(const Transform3d& transform, Quaternion 
 template<>
 inline Transform3d Transform3d::Rotate(const Transform3d& transform, Vec3f eulerAngles)
 {
-    (void)eulerAngles;
-    return transform;
+    Transform3d output = transform;
+
+    auto rotationMat_x = Mat4f(std::array<Vec4f, 4>{
+            Vec4f(0, 0, 0, 0),
+            Vec4f(0, cosf(eulerAngles[0]), -sinf(eulerAngles[0]), 0),
+            Vec4f(0, sinf(eulerAngles[0]), cosf(eulerAngles[0]), 0),
+            Vec4f(0, 0, 0, 1)});
+
+    auto rotationMat_y = Mat4f(std::array<Vec4f, 4>{
+            Vec4f(cosf(eulerAngles[1]), 0, sinf(eulerAngles[1]), 0),
+            Vec4f(0, 0, 0, 0),
+            Vec4f(-sinf(eulerAngles[1]), 0, cosf(eulerAngles[1]), 0),
+            Vec4f(0, 0, 0, 1)});
+
+    auto rotationMat_z = Mat4f(std::array<Vec4f, 4>{
+            Vec4f(cosf(eulerAngles[2]), -sinf(eulerAngles[2]), 0, 0),
+            Vec4f(sinf(eulerAngles[2]), cosf(eulerAngles[2]), 0, 0),
+            Vec4f(0, 0, 0, 0),
+            Vec4f(0, 0, 0, 1)});
+
+    auto rotationMat = rotationMat_x * rotationMat_y * rotationMat_z;
+
+    for (int i = 0; i < 4; ++i)
+    {
+        for (int j = 0; j < 4; ++j)
+        {
+            output[i][j] *= rotationMat[i][j];
+        }
+    }
+
+    return output;
 }
 
 
