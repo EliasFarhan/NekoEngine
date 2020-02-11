@@ -1,12 +1,12 @@
 //
 // Created by efarhan on 11/16/19.
 //
-
+#define _USE_MATH_DEFINES
 #include <cmath>
 #include <random>
 #include <gtest/gtest.h>
 #include <mathematics/func_table.h>
-
+#include <mathematics/circle.h>
 const float maxNmb = 100.0f;
 
 void RandomFill(std::vector<float>& numbers, float start = -maxNmb, float end = maxNmb)
@@ -32,4 +32,12 @@ TEST(Engine, TestMathematics)
     }
     error /= float(sampleSize);
     std::cout << "Error margin for sinFuncTable with resolution 512: "<<error<<"\n";
+}
+
+TEST(Engine, TestCircleCollision)
+{
+    neko::Circle_f circleA(neko::Vec2f(2,2), 2);
+    neko::Circle_f circleB(neko::Vec2f(3, 3), 3);
+
+    std::cout << circleA.IsCircleCollision(circleB) << std::endl;
 }
