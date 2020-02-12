@@ -95,20 +95,19 @@ struct Vec2
     {
     }
 
-    /*Doesn't Compile
     template<typename U>
-    explicit Vec2(const Vec3<U>& vec3)
+    Vec2(const Vec3<U>& vec3)
             : x(static_cast<T>(vec3.x)),
               y(static_cast<T>(vec3.y))
     {
     }
 
     template<typename U>
-    explicit Vec2(const Vec4<U>& vec4)
+    Vec2(const Vec4<U>& vec4)
             : x(static_cast<T>(vec4.x)),
               y(static_cast<T>(vec4.y))
     {
-    }*/
+    }
 
     //-----------------------------------------------------------------------------
     // Operators
@@ -348,7 +347,7 @@ public:
     }
 
     template<typename U>
-    explicit Vec3(const Vec2<U>& vec2)
+    Vec3(const Vec2<U>& vec2)
             : x(static_cast<T>(vec2.x)),
               y(static_cast<T>(vec2.y)),
               z(static_cast<T>(0))
@@ -363,14 +362,13 @@ public:
     {
     }
 
-    /*Doesn't Compile
     template<typename U>
-    explicit Vec3(const Vec4<U>& vec4)
+    Vec3(const Vec4<U>& vec4)
             : x(static_cast<T>(vec4.x)),
               y(static_cast<T>(vec4.y)),
               z(static_cast<T>(vec4.z))
     {
-    }*/
+    }
 
     //-----------------------------------------------------------------------------
     // Operators
@@ -601,7 +599,7 @@ public:
     }
 
     template<typename U>
-    explicit Vec4(const Vec2<U>& vec2)
+    Vec4(const Vec2<U>& vec2)
             : x(static_cast<T>(vec2.x)),
               y(static_cast<T>(vec2.y)),
               z(static_cast<T>(0)),
@@ -610,7 +608,7 @@ public:
     }
 
     template<typename U>
-    explicit Vec4(const Vec3<U>& vec3)
+    Vec4(const Vec3<U>& vec3)
             : x(static_cast<T>(vec3.x)),
               y(static_cast<T>(vec3.y)),
               z(static_cast<T>(vec3.z)),
