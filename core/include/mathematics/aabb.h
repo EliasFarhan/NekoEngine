@@ -24,6 +24,7 @@
  */
 
 #include "mathematics/vector.h"
+#include "matrix.h"
 
 namespace neko
 {
@@ -36,15 +37,42 @@ namespace neko
 		}
 
 		/// Get the extents of the AABB (half-widths).
-		Vec2f GetExtents() const
+		Vec2f GetExtend() const
 		{
 			return 0.5f * (upperBound - lowerBound);
 		}
 
 		/// Get the center of the AABB.
-		void SetCenterExtend(Vec2f center, Vec2f extends) {
-			lowerBound = center - extends;
-			upperBound = center + extends;
+		void SetCenterExtend(Vec2f center, Vec2f extend, float rotation = 0) {
+			lowerBound = center - extend;
+			upperBound = center + extend;
+			float newAngle = rotation / 180 * M_PI;
+			std::vector<Vec2f> corners = std::vector<Vec2f>(4);
+			corners[0] = center - extend;
+			corners[1] = center + extend;
+			corners[2] = Vec2f(center.x - extend.x, center.y + extend.y);
+			corners[3] = Vec2f(center.x + extend.x, center.y - extend.y);
+			for (Vec2f& corner : corners)
+			{
+				float x = corner.x * cos(newAngle) - corner.y * sin(newAngle);
+				float y = corner.x * sin(newAngle) + corner.y * cos(newAngle);
+				if (x > upperBound.x)
+				{
+					upperBound.x = x;
+				}
+				if (x < lowerBound.x)
+				{
+					lowerBound.x = x;
+				}
+				if (y > upperBound.y)
+				{
+					upperBound.y = y;
+				}
+				if (y < lowerBound.y)
+				{
+					lowerBound.y = y;
+				}
+			}
 		}
 
 		bool ContainsPoint(Vec2f point)
@@ -62,8 +90,8 @@ namespace neko
 			return (ContainsPoint(aabb.upperBound) || ContainsPoint(aabb.lowerBound));
 		}
 
-		Vec2f lowerBound;	///< the lower vertex
-		Vec2f upperBound;	///< the upper vertex
+		Vec2f lowerBound;	// the lower vertex
+		Vec2f upperBound;	// the upper vertex
 	};
 
 	struct Aabb3
@@ -81,9 +109,58 @@ namespace neko
 		}
 
 		/// Get the center of the AABB.
-		void SetCenterExtend(Vec3f center, Vec3f extends) {
+		void SetCenterExtend(Vec3f center, Vec3f extends, Vec3f rotation = Vec3f(0)) {
 			lowerBound = center - extends;
 			upperBound = center + extends;
+			Vec3f newAngle = Vec3f(rotation.x / 180 * M_PI, rotation.y / 180 * M_PI, rotation.z / 180 * M_PI);
+			std::vector<Vec3f> corners = std::vector<Vec3f>(6);
+			corners[0] = center - extends;
+			corners[1] = center + extends;
+			corners[2] = Vec3f(center.x - extends.x, center.y - extends.y, center.z + extends.z);
+			corners[3] = Vec3f(center.x - extends.x, center.y + extends.y, center.z - extends.z);
+			corners[4] = Vec3f(center.x + extends.x, center.y + extends.y, center.z - extends.z);
+			corners[5] = Vec3f(center.x + extends.x, center.y - extends.y, center.z + extends.z);
+			for (Vec3f& corner : corners)
+			{
+				//Rotate around X
+				float x = corner.x * cos(newAngle.x) - corner.y * sin(newAngle.x);
+				float y = corner.x * sin(newAngle.x) + corner.y * cos(newAngle.x);
+				float z = corner.z;
+				corner = Vec3f(x, y, z);
+				//Rotate around Y
+				x = corner.x * cos(newAngle.y) + corner.z * sin(newAngle.y);
+				y = corner.y;
+				z = -corner.x * sin(newAngle.y) + corner.z * cos(newAngle.y);
+				corner = Vec3f(x, y, z);
+				//Rotate around Z
+				x = corner.x;
+				y = corner.y * cos(newAngle.z) - corner.z * sin(newAngle.z);
+				z = corner.y * sin(newAngle.z) + corner.z * cos(newAngle.z);
+				if (x > upperBound.x)
+				{
+					upperBound.x = x;
+				}
+				if (x < lowerBound.x)
+				{
+					lowerBound.x = x;
+				}
+				if (y > upperBound.y)
+				{
+					upperBound.y = y;
+				}
+				if (y < lowerBound.y)
+				{
+					lowerBound.y = y;
+				}
+				if (z > upperBound.z)
+				{
+					upperBound.z = z;
+				}
+				if (z < lowerBound.z)
+				{
+					lowerBound.z = z;
+				}
+			}
 		}
 
 		bool ContainsPoint(Vec3f point)
@@ -101,8 +178,8 @@ namespace neko
 			return (ContainsPoint(aabb.upperBound) || ContainsPoint(aabb.lowerBound));
 		}
 
-		Vec3f lowerBound;	///< the lower vertex
-		Vec3f upperBound;	///< the upper vertex
+		Vec3f lowerBound;	// the lower vertex
+		Vec3f upperBound;	// the upper vertex
 	};
 
 	struct Obb2
@@ -186,3 +263,4 @@ namespace neko
 		Vec2f direction;	///< the normal of the upper side
 	};
 }
+
