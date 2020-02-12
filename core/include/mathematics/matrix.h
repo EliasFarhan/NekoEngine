@@ -500,19 +500,50 @@ inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
 template<>
 inline Transform3d Transform3d::Translate(const Transform3d& transform, Vec3f pos)
 {
+    // TODO: Why isn't Identity mat working? Inline?
+
     Transform3d output = transform;
 
-    output[3][0] += pos[0];
-    output[3][1] += pos[1];
-    output[3][2] += pos[2];
+    Transform3d translationMat = Transform3d();
+    for (int i = 0; i < 4; ++i)
+    {
+        for (int j = 0; j < 4; ++j)
+        {
+            translationMat[i][j] = 0.0f;
+        }
+    }
 
-    return output;
+    translationMat[3][0] = pos[0];
+    translationMat[3][1] = pos[1];
+    translationMat[3][2] = pos[2];
+    translationMat[3][3] = 0.0f;
+
+    return output + translationMat;
 }
 
 //TODO Implement Matrix Scale
 template<>
 inline Transform3d Transform3d::Scale(const Transform3d& transform, Vec3f scale)
 {
+    // TODO: Why isn't this approach working?
+    /*Transform3d output = transform;
+
+    Transform3d scalingMat = Transform3d();
+    for (int i = 0; i < 4; ++i)
+    {
+        for (int j = 0; j < 4; ++j)
+        {
+            scalingMat[i][j] = 0.0f;
+        }
+    }
+
+    scalingMat[0][0] = scale[0];
+    scalingMat[1][1] = scale[1];
+    scalingMat[2][2] = scale[2];
+    scalingMat[3][3] = 1.0f;
+
+    return output * scalingMat;*/
+
     Transform3d output = transform;
 
     output[0][0] *= scale[0];
@@ -520,12 +551,50 @@ inline Transform3d Transform3d::Scale(const Transform3d& transform, Vec3f scale)
     output[2][2] *= scale[2];
 
     return output;
+
 }
 
 //TODO Implement Matrix Rotation with angle and axis
 template<>
 inline Transform3d Transform3d::Rotate(const Transform3d& transform, float angle, Vec3f axis)
 {
+    angle = angle * (M_PI / 180.0f);
+
+    // TODO: why isn't this approach working with mat*mat?
+    /*Transform3d output = transform;
+    Transform3d rotationMat = Transform3d();
+    axis = axis / axis.GetMagnitude();
+    const float x = axis[0];
+    const float y = axis[1];
+    const float z = axis[2];
+    const float c = cosf(angle);
+    const float s = sinf(angle);
+    const float t = 1.0f - c;
+
+    rotationMat[0][0] = t*x*x + c;
+    rotationMat[0][1] = t*x*y + s*z;
+    rotationMat[0][2] = t*x*z - s*y;
+    rotationMat[0][3] = 0.0f;
+
+    rotationMat[1][0] = t*x*y - s*z;
+    rotationMat[1][1] = t*y*y + c;
+    rotationMat[1][2] = t*y*z + s*x;
+    rotationMat[1][3] = 0.0f;
+
+    rotationMat[2][0] = t*x*z + s*y;
+    rotationMat[2][1] = t*y*z - s*x;
+    rotationMat[2][2] = t*z*z + c;
+    rotationMat[2][3] = 0.0f;
+
+    rotationMat[3][0] = 0.0f;
+    rotationMat[3][1] = 0.0f;
+    rotationMat[3][2] = 0.0f;
+    rotationMat[3][3] = 1.0f;
+
+    return output * rotationMat;*/
+
+    // TODO: Why isn't this approach working with *=
+
     /*Transform3d output = transform;
     axis = axis / axis.GetMagnitude();
     const float x = axis[0];
@@ -586,6 +655,14 @@ inline Transform3d Transform3d::Rotate(const Transform3d& transform, float angle
 template<>
 inline Transform3d Transform3d::Rotate(const Transform3d& transform, Quaternion quaternion)
 {
+    // Code taken from https://stackoverflow.com/questions/1556260/convert-quaternion-rotation-to-rotation-matrix
+
+    // TODO: test once quaterions are implemented.
+
+    /*Transform3d output = transform;
+
+    return output * FromQuaternion(quaternion);*/
+
     (void) quaternion;
     return transform;
 }
@@ -594,6 +671,95 @@ inline Transform3d Transform3d::Rotate(const Transform3d& transform, Quaternion 
 template<>
 inline Transform3d Transform3d::Rotate(const Transform3d& transform, Vec3f eulerAngles)
 {
+    // Question: can I modify the function's signature? Rotate(const Vec3f) instead
+
+    // TODO: why isn't this working because of the *=
+
+    /*
+    const Vec3f radians = eulerAngles * (M_PI / 180.0f);
+    const float rotX = eulerAngles[0];
+    const float rotY = eulerAngles[1];
+    const float rotZ = eulerAngles[2];
+    Transform3d output = transform;
+    const float cosX = cosf(rotX);
+    const float sinX = sinf(rotX);
+    const float cosY = cosf(rotY);
+    const float sinY = sinf(rotY);
+    const float cosZ = cosf(rotZ);
+    const float sinZ = sinf(rotZ);
+
+    // Rotation around X:
+    output[1][1] *= cosX;
+    output[2][1] *= -sinX;
+    output[1][2] *= sinX;
+    output[2][2] *= cosX;
+
+    // Rotation around Y:
+    output[0][0] *= cosY;
+    output[2][0] *= sinY;
+    output[0][2] *= -sinY;
+    output[2][2] *= cosY;
+
+    // Rotation around Z:
+    output[0][0] *= cosZ;
+    output[1][0] *= -sinZ;
+    output[0][1] *= sinZ;
+    output[1][1] *= cosZ;
+
+    return output;*/
+
+    // TODO: Why isn't this working? scaling bug instead of rotation
+
+    /*const float rotX = eulerAngles[0];
+    const float rotY = eulerAngles[1];
+    const float rotZ = eulerAngles[2];
+    Transform3d output = transform;
+    const float cosX = cosf(rotX);
+    const float sinX = sinf(rotX);
+    const float cosY = cosf(rotY);
+    const float sinY = sinf(rotY);
+    const float cosZ = cosf(rotZ);
+    const float sinZ = sinf(rotZ);
+
+    Transform3d rotationMatX = Transform3d();
+    Transform3d rotationMatY = Transform3d();
+    Transform3d rotationMatZ = Transform3d();
+    rotationMatX[0][0] = 1.0f;
+    rotationMatX[1][1] = 1.0f;
+    rotationMatX[2][2] = 1.0f;
+    rotationMatX[3][3] = 1.0f;
+    rotationMatY[0][0] = 1.0f;
+    rotationMatY[1][1] = 1.0f;
+    rotationMatY[2][2] = 1.0f;
+    rotationMatY[3][3] = 1.0f;
+    rotationMatZ[0][0] = 1.0f;
+    rotationMatZ[1][1] = 1.0f;
+    rotationMatZ[2][2] = 1.0f;
+    rotationMatZ[3][3] = 1.0f;
+
+    // Rotation around X:
+    rotationMatX[1][1] *= cosX;
+    rotationMatX[2][1] *= -sinX;
+    rotationMatX[1][2] *= sinX;
+    rotationMatX[2][2] *= cosX;
+    output = output * rotationMatX;
+
+    // Rotation around Y:
+    rotationMatY[0][0] *= cosY;
+    rotationMatY[2][0] *= sinY;
+    rotationMatY[0][2] *= -sinY;
+    rotationMatY[2][2] *= cosY;
+    output = output * rotationMatY;
+
+    // Rotation around Z:
+    rotationMatZ[0][0] *= cosZ;
+    rotationMatZ[1][0] *= -sinZ;
+    rotationMatZ[0][1] *= sinZ;
+    rotationMatZ[1][1] *= cosZ;
+    output = output * rotationMatZ;
+
+    return output;*/
+
     (void) eulerAngles;
     return transform;
 }
@@ -610,8 +776,45 @@ const inline Mat4f Mat4f::Identity = Mat4f(
 template<>
 inline Transform3d Transform3d::FromQuaternion(Quaternion quaternion)
 {
+    // TODO: is this working?
+
+    /*float w = quaternion[0];
+    float x = quaternion[1];
+    float y = quaternion[2];
+    float z = quaternion[3];
+
+    const float n = 1.0f / (sqrtf(x*x+y*y+z*z+w*w));
+    x *= n;
+    y *= n;
+    z *= n;
+    w *= n;
+
+    Transform3d rotationMat = Transform3d();
+
+    rotationMat[0][0] = 1.0f - (2.0f * y * y) - (2.0f * z * z);
+    rotationMat[1][0] = (2.0f*x*y) - (2.0f*z*w);
+    rotationMat[2][0] = (2.0f*x*z) + (2.0f*y*w);
+    rotationMat[3][0] = 0.0f;
+
+    rotationMat[0][1] = (2.0f*x*y + 2.0f*z*w);
+    rotationMat[1][1] = 1.0f - (2.0f*x*x) - (2.0f*z*z);
+    rotationMat[2][1] = (2.0f*y*z) - (2.0f*x*w);
+    rotationMat[3][1] = 0.0f;
+
+    rotationMat[0][2] = (2.0f*x*z) - (2.0f*y*w);
+    rotationMat[1][2] = (2.0f*y*z) + (2.0f*x*w);
+    rotationMat[2][2] = 1.0f - (2.0f*x*x) - (2.0f*y*y);
+    rotationMat[3][2] = 0.0f;
+
+    rotationMat[0][3] = 0.0f;
+    rotationMat[1][3] = 0.0f;
+    rotationMat[2][3] = 0.0f;
+    rotationMat[3][3] = 1.0f;
+
+    return rotationMat;*/
+
     (void) quaternion;
-    return Transform3d::Identity;
+    return Mat4f::Identity;
 }
 
 }

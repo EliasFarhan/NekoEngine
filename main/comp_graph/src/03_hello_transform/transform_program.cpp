@@ -45,9 +45,10 @@ void HelloTransformProgram::Destroy()
 void HelloTransformProgram::Update(seconds dt)
 {
     transform_ = Mat4f::Identity;
-    // transform_ = Mat4f::Translate(transform_, position_);
-    // transform_ = Mat4f::Scale(transform_, scale_);
+    transform_ = Mat4f::Translate(transform_, position_);
+    transform_ = Mat4f::Scale(transform_, scale_);
     transform_ = Mat4f::Rotate(transform_, angle_, Vec3f(0.0f, 0.0f, 1.0f));
+    // transform_ = Mat4f::Rotate(transform_, Vec3f(angle_, angle_, angle_));
 }
 
 void HelloTransformProgram::DrawUi(seconds dt)
