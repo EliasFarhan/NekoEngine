@@ -104,4 +104,85 @@ namespace neko
 		Vec3f lowerBound;	///< the lower vertex
 		Vec3f upperBound;	///< the upper vertex
 	};
+
+	struct Obb2
+	{
+		/// Get the center of the OBB.
+		Vec2f GetCenter() const
+		{
+			return 0.5f * (lowerLeftBound + upperRightBound);
+		}
+
+		/// Get the direction of the OBB rotated 90 degrees clockwise.
+		Vec2f GetRight()
+		{
+			return Vec2f(-(direction.y - GetCenter().y) + GetCenter().x, direction.x - GetCenter().x + GetCenter().y);
+		}
+
+		/// Set the center, the extend and the direction of the OBB.
+		void SetCenterExtendDir(Vec2f center, Vec2f extends, Vec2f dir) {
+			lowerLeftBound = center - extends;
+			upperRightBound = center + extends;
+			direction = dir.Normalized;
+		}
+
+
+		bool IntersectObb(Obb2 obb)
+		{
+			Vec2f axis1 = direction;
+			Vec2f axis2 = GetRight();
+			Vec2f axis3 = obb.direction;
+			Vec2f axis4 = obb.GetRight();
+
+			/// TODO ExtendsComparaison
+
+			return true;
+		}
+
+		float GetExtendOnAxis(Vec2f axis)
+		{
+			float extend;
+
+			if (axis == direction)
+			{
+				extend = upperRightBound.y - lowerLeftBound.y;
+			}
+
+			if (axis == GetRight())
+			{
+				extend = upperRightBound.x - lowerLeftBound.x;
+			}
+
+			/// TODO General case
+
+			return extend;
+		}
+
+		Vec2f GetOppositeBound(Vec2f bound, bool isUpper)
+		{
+			Vec2f centerToProjectionOnDir;
+			Vec2f oppositeBound;
+			Vec2f boundToOppositeBound;
+			Vec2f centerToBound = bound - GetCenter();
+
+			if (isUpper)
+			{
+				centerToProjectionOnDir = direction * (centerToBound).GetMagnitude() * cos(Vec2<float>::AngleBetween(centerToBound, direction));
+				boundToOppositeBound = GetCenter() = centerToProjectionOnDir - bound;
+				oppositeBound = upperRightBound + boundToOppositeBound + boundToOppositeBound;
+			}
+			else
+			{
+				centerToProjectionOnDir = direction * (centerToBound).GetMagnitude() * cos(Vec2<float>::AngleBetween(centerToBound, direction)) * -1;
+				boundToOppositeBound = GetCenter() = centerToProjectionOnDir - bound;
+				oppositeBound = upperRightBound + boundToOppositeBound + boundToOppositeBound;
+			}
+
+			return oppositeBound;
+		}
+
+		Vec2f lowerLeftBound;	///< the lower vertex
+		Vec2f upperRightBound;	///< the upper vertex
+		Vec2f direction;	///< the normal of the upper side
+	};
 }
