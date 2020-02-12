@@ -102,7 +102,7 @@ struct Quaternion
 	x degrees around the x axis, and y degrees around the y axis; 
 	applied in that order
 	*/
-	Quaternion Euler(Vec3f angle) const //TODO Change to EulerAngle
+	static Quaternion FromEuler(Vec3f angle) //TODO Change to EulerAngle
 	{
 		float cy = cos(angle.x * 0.5f);
 		float sy = sin(angle.x * 0.5f);
@@ -134,6 +134,13 @@ struct Quaternion
 			w / rhs);
 	}
 
+	void Quaternion::operator/=(const float rhs) {
+		x /= rhs;
+		y /= rhs;
+		z /= rhs;
+		w /= rhs;
+	}
+
 	Quaternion operator-(const Quaternion& rhs) const
 	{
 		return Quaternion(
@@ -141,6 +148,13 @@ struct Quaternion
 			y - rhs.y, 
 			z - rhs.z, 
 			w - rhs.w);
+	}
+
+	void Quaternion::operator-=(const float rhs) {
+		x -= rhs;
+		y -= rhs;
+		z -= rhs;
+		w -= rhs;
 	}
 
 	Quaternion operator+(const Quaternion& rhs) const
@@ -152,6 +166,13 @@ struct Quaternion
 			w + rhs.w);
 	}
 
+	void Quaternion::operator+=(const float rhs) {
+		x += rhs;
+		y += rhs;
+		z += rhs;
+		w += rhs;
+	}
+
 	Quaternion operator*(const Quaternion& rhs) const
 	{
 		return Quaternion(
@@ -159,6 +180,31 @@ struct Quaternion
 			w * rhs.y + y * rhs.w + z * rhs.x - x * rhs.z,
 			w * rhs.z + z * rhs.w + x * rhs.y - y * rhs.x,
 			w * rhs.w - x * rhs.x - y * rhs.y - z * rhs.z);
+	}
+
+	Quaternion operator*(const float rhs) const {
+		return Quaternion(
+			x * rhs,
+			y * rhs,
+			z * rhs,
+			w * rhs);
+	}
+	
+	void Quaternion::operator*=(const float rhs) {
+		x *= rhs;
+		y *= rhs;
+		z *= rhs;
+		w *= rhs;
+	}
+	
+	bool operator==(const Quaternion& right) const
+	{
+		return x == right.x && y == right.y && z == right.z && w == right.w;
+	}
+	
+	bool operator!=(const Quaternion& right) const
+	{
+		return !(*this == right);
 	}
 };
 }
