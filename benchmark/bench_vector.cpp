@@ -13,13 +13,13 @@ const float end = 100.0f;
 float accumulate_magnitude_v3(const std::vector<neko::Vec3f>& v)
 {
     return std::accumulate(v.cbegin(), v.cend(), 0.0f, [](float total, const neko::Vec3f& b)
-    { return total + b.GetMagnitude(); });
+    { return total + b.Magnitude(); });
 }
 
 float accumulate_magnitude_v4(const std::vector<neko::Vec4f>& v)
 {
     return std::accumulate(v.cbegin(), v.cend(), 0.0f, [](float total, const neko::Vec4f& b)
-    { return total + b.GetMagnitude(); });
+    { return total + b.Magnitude(); });
 }
 
 float accumulate_then_magnitude_v3(const std::vector<neko::Vec3f>& v)

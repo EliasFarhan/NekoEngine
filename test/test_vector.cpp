@@ -7,9 +7,9 @@
 
 TEST(Engine, TestVector) {
     neko::Vec4f vec;
-    neko::Vec3f vec1 = neko::Vec2f::right;
+    neko::Vec3f vec1 = neko::Vec3f::right;
 
-    neko::Vec2f vec2 = vec + vec1;
+    neko::Vec2f vec2 = (neko::Vec2f) vec + (neko::Vec2f) vec1;
 
-    std::cout << vec2;
+    std::cout << vec2.SquareMagnitude();
 }
