@@ -28,7 +28,6 @@ struct Quaternion
 	explicit Quaternion(T same)
 		: x(same), y(same), z(same), w(same)
 	{
-
 	}
 
 	Quaternion(T X, T Y, T Z, T W) noexcept
@@ -44,6 +43,17 @@ struct Quaternion
 			z(static_cast<T>(quaternion.z)),
 			w(static_cast<T>(quaternion.w))
 	{
+	}
+
+	const T& operator[](size_t p_axis) const
+	{
+		return coord[p_axis];
+	}
+
+	T& operator[](size_t p_axis)
+	{
+
+		return coord[p_axis];
 	}
 
 	/*

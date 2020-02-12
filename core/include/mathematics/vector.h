@@ -264,7 +264,6 @@ public:
 
     const T& operator[](size_t p_axis) const
     {
-
         return coord[p_axis];
     }
 
