@@ -1,12 +1,11 @@
 #include <engine/entity.h>
 #include <mathematics/matrix.h>
-#include "engine/component.h"
-#include "mathematics/vector.h"
+#include <engine/component.h>
+#include <mathematics/vector.h>
 #include <cmath>
 
 namespace neko
 {
-template<typename T>
 struct Quaternion
 {
 	union
@@ -17,7 +16,7 @@ struct Quaternion
 			float z;
 			float w;
 		};
-		T coord[4];
+		float coord[4];
 	};
 
 	Quaternion()
@@ -25,40 +24,29 @@ struct Quaternion
 		x = y = z = w = 0;
 	}
 
-	explicit Quaternion(T same)
+	explicit Quaternion(float same)
 		: x(same), y(same), z(same), w(same)
 	{
 	}
 
-	Quaternion(T X, T Y, T Z, T W) noexcept
+	Quaternion(float X, float Y, float Z, float W) noexcept
 		: x(X), y(Y), z(Z), w(W)
 	{
 	}
 
-	template<typename U>
-	explicit
-		Quaternion(const Quaternion<U>& quaternion): 
-			x(static_cast<T>(quaternion.x)),
-			y(static_cast<T>(quaternion.y)),
-			z(static_cast<T>(quaternion.z)),
-			w(static_cast<T>(quaternion.w))
-	{
-	}
 
-	const T& operator[](size_t p_axis) const
+	const float& operator[](size_t p_axis) const
 	{
 		return coord[p_axis];
 	}
 
-	T& operator[](size_t p_axis)
+	float& operator[](size_t p_axis)
 	{
 
 		return coord[p_axis];
 	}
 
-	/*
-	The dot product between two rotations.
-	*/
+	//The dot product between two rotations.
 	float Dot(Quaternion a, Quaternion b) const
 	{
 		return	a.x * b.x +
@@ -67,17 +55,7 @@ struct Quaternion
 				a.w * b.w;
 	}
 
-	/*
-	Returns the Inverse of rotation.
-	*/
-	Quaternion Inverse(Quaternion quaternion) const
-	{
-
-	}
-
-	/*
-	Converts this quaternion to one with the same orientation but with a magnitude of 1.
-	*/
+	//Converts this quaternion to one with the same orientation but with a magnitude of 1.
 	Quaternion Normalize(Quaternion quaternion) const
 	{
 		return quaternion / Magnitude(quaternion);
@@ -91,50 +69,49 @@ struct Quaternion
 					quaternion.w * quaternion.w);
 	}
 
-	/*
-	Creates a rotation which rotates angle degrees around axis.
-	*/
+	//Creates a rotation which rotates angle degrees around axis.
 	Vec3f AngleAxis(Quaternion quaternion, float angle, Vec3f axis) const
 	{
 
 	}
 
-	/*
-	Returns the angle in degrees between two rotations a and b.
-	*/
+
+	//Returns the angle in degrees between two rotations a and b.
 	float Angle(Quaternion a, Quaternion b) const
 	{
 
 	}
 
-	Quaternion GetConjugate() const
+	Quaternion Conjugate() const
 	{
-		return Quaternion<T>(-quaternion.x, -quaternion.y, -quaternion.z, quaternion.w);)
+		return Quaternion(-x, -y, -z, w);
 	}
 
-
-	Quaternion GetInverse() const
+	//Returns the Inverse of rotation.
+	Quaternion Quaternion::Inverse() const
 	{
-		const Quaternion<T> conj = GetConjugate();
-		const float mag = Magnitude();
+		const Quaternion conj = Conjugate();
+		const float mag = Magnitude(*this);
 
 		return conj / (mag * mag);
 	}
+
+
 	/*
 	Returns a rotation that rotates z degrees around the z axis,
 	x degrees around the x axis, and y degrees around the y axis; 
 	applied in that order
 	*/
-	Quaternion Euler(Vec3f vector3) const
+	Quaternion Euler(Vec3f angle) const //TODO Change to EulerAngle
 	{
-		double cy = cos(vector3.x * 0.5);
-		double sy = sin(vector3.x * 0.5);
-		double cp = cos(vector3.y * 0.5);
-		double sp = sin(vector3.y * 0.5);
-		double cr = cos(vector3.z * 0.5);
-		double sr = sin(vector3.z * 0.5);
+		float cy = cos(angle.x * 0.5f);
+		float sy = sin(angle.x * 0.5f);
+		float cp = cos(angle.y * 0.5f);
+		float sp = sin(angle.y * 0.5f);
+		float cr = cos(angle.z * 0.5f);
+		float sr = sin(angle.z * 0.5f);
 
-		Quaternion<T> q;
+		Quaternion q;
 		q.w = cy * cp * cr + sy * sp * sr;
 		q.x = cy * cp * sr - sy * sp * cr;
 		q.y = sy * cp * sr + cy * sp * cr;
@@ -143,33 +120,41 @@ struct Quaternion
 		return q;
 	}
 
-	Quaternion<T> operator/(Quaternion rhs) const
+	//Operators
+	Quaternion operator/(Quaternion rhs) const
 	{
-		return *this * rhs.GetInverse();
-
+		return *this * rhs.Inverse();
 	}
 
-	Quaternion<T> operator-(const Quaternion<T>& rhs) const
+	Quaternion operator/(const float rhs) const {
+		return Quaternion(
+			x / rhs,
+			y / rhs,
+			z / rhs,
+			w / rhs);
+	}
+
+	Quaternion operator-(const Quaternion& rhs) const
 	{
-		return Quaternion<T>(
+		return Quaternion(
 			x - rhs.x,
 			y - rhs.y, 
 			z - rhs.z, 
 			w - rhs.w);
 	}
 
-	Quaternion<T> operator+(const Quaternion<T>& rhs) const
+	Quaternion operator+(const Quaternion& rhs) const
 	{
-		return Quaternion<T>(
+		return Quaternion(
 			x + rhs.x,
 			y + rhs.y,
 			z + rhs.z,
 			w + rhs.w);
 	}
 
-	Quaternion<T> operator*(const Quaternion<T>& rhs) const
+	Quaternion operator*(const Quaternion& rhs) const
 	{
-		return Quaternion<T>(
+		return Quaternion(
 			w * rhs.x + x * rhs.w + y * rhs.z - z * rhs.y,
 			w * rhs.y + y * rhs.w + z * rhs.x - x * rhs.z,
 			w * rhs.z + z * rhs.w + x * rhs.y - y * rhs.x,
