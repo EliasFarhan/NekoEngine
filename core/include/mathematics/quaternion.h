@@ -59,7 +59,7 @@ struct Quaternion
 	/*
 	The dot product between two rotations.
 	*/
-	float Dot(Quaternion a, Quaternion b)
+	float Dot(Quaternion a, Quaternion b) const
 	{
 		return	a.x * b.x +
 				a.y * b.y +
@@ -70,7 +70,7 @@ struct Quaternion
 	/*
 	Returns the Inverse of rotation.
 	*/
-	Quaternion Inverse(Quaternion quaternion)
+	Quaternion Inverse(Quaternion quaternion) const
 	{
 
 	}
@@ -78,12 +78,13 @@ struct Quaternion
 	/*
 	Converts this quaternion to one with the same orientation but with a magnitude of 1.
 	*/
-	Quaternion Normalize(Quaternion quaternion)
+	Quaternion Normalize(Quaternion quaternion) const
 	{
 		return quaternion / Magnitude(quaternion);
 	}
 
-	float Magnitude(Quaternion quaternion) {
+	float Magnitude(Quaternion quaternion) const
+	{
 		return sqrtf(quaternion.x * quaternion.x +
 					quaternion.y * quaternion.y +
 					quaternion.z * quaternion.z +
@@ -93,24 +94,26 @@ struct Quaternion
 	/*
 	Creates a rotation which rotates angle degrees around axis.
 	*/
-	Vec3f AngleAxis(Quaternion quaternion, float angle, Vec3f axis) {
+	Vec3f AngleAxis(Quaternion quaternion, float angle, Vec3f axis) const
+	{
 
 	}
 
 	/*
 	Returns the angle in degrees between two rotations a and b.
 	*/
-	float Angle(Quaternion a, Quaternion b) {
+	float Angle(Quaternion a, Quaternion b) const
+	{
 
 	}
 
-	Quaternion GetConjugate()
+	Quaternion GetConjugate() const
 	{
 		return Quaternion<T>(-quaternion.x, -quaternion.y, -quaternion.z, quaternion.w);)
 	}
 
 
-	Quaternion GetInverse()
+	Quaternion GetInverse() const
 	{
 		const Quaternion<T> conj = GetConjugate();
 		const float mag = Magnitude();
@@ -122,7 +125,7 @@ struct Quaternion
 	x degrees around the x axis, and y degrees around the y axis; 
 	applied in that order
 	*/
-	Quaternion Euler(Vec3f vector3)
+	Quaternion Euler(Vec3f vector3) const
 	{
 		double cy = cos(vector3.x * 0.5);
 		double sy = sin(vector3.x * 0.5);
