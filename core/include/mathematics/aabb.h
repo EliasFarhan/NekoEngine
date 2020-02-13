@@ -42,7 +42,7 @@ namespace neko
 			return 0.5f * (upperBound - lowerBound);
 		}
 
-		/// Get the center of the AABB.
+		/// Set the center of the AABB.
 		void SetCenterExtend(Vec2f center, Vec2f extend, float rotation = 0) {
 			lowerBound = center - extend;
 			upperBound = center + extend;
