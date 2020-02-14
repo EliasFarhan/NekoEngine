@@ -19,9 +19,8 @@ foreach(bench_file ${BENCH_FILES} )
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Oi /Ox /fp:fast /FAs /arch:AVX2")
     elseif(UNIX)
         set_target_properties(${bench_name} PROPERTIES COMPILE_FLAGS
-                "-save-temps -march=haswell -ffast-math -fno-omit-frame-pointer -fno-exceptions -fno-rtti")
+                "-save-temps -march=native -ffast-math -fno-omit-frame-pointer -fno-exceptions -fno-rtti")
     ENDIF(MSVC)
-    neko_bin_config(${bench_name})
     set_target_properties (${bench_name} PROPERTIES
             FOLDER Benchmark)
     IF(APPLE)
