@@ -35,9 +35,7 @@ public:
         columns_ = m.columns_;
     }
 
-    explicit Mat4(const std::array<Vec4 < T>,
-
-    4>& v)
+    explicit Mat4(const std::array<Vec4 < T>,4>& v)
     {
         columns_ = v;
     }
@@ -62,14 +60,14 @@ public:
         return columns_[column];
     }
 
-    Mat4<T> Transpose() const
+    inline Mat4<T> Transpose() const
     {
         std::array<Vec4<T>, 4> v;
         for (int column = 0; column < 4; column++)
         {
             for (int row = 0; row < 4; row++)
             {
-                v[row][column] = columns_[column][row];
+                v[column][row] = columns_[row][column];
             }
         }
         return Mat4<T>(v);
@@ -448,6 +446,31 @@ using Mat4f = Mat4<float>;
 using Transform3d = Mat4f;
 
 
+#ifdef __SSE__
+template<>
+inline Mat4f Mat4f::Transpose() const
+{
+    std::array<Vec4f, 4> v;
+    auto xmm3 = _mm_load_ps(&columns_[1][0]);
+    auto xmm4 = _mm_load_ps(&columns_[3][0]);
+    auto xmm0 = _mm_load_ps(&columns_[0][0]);
+    auto xmm1 = _mm_load_ps(&columns_[2][0]);
+
+    auto xmm2 = _mm_shuffle_ps(xmm0, xmm3, 136);
+    xmm0 = _mm_shuffle_ps(xmm0, xmm3, 221);
+    xmm3 = _mm_shuffle_ps(xmm1, xmm4, 136);
+    xmm1 = _mm_shuffle_ps(xmm1, xmm4, 221);
+    xmm4 = _mm_shuffle_ps(xmm2, xmm3, 136);
+    xmm2 = _mm_shuffle_ps(xmm2, xmm3, 221);
+    _mm_store_ps(&v[0][0], xmm4);
+    xmm4 = _mm_shuffle_ps(xmm0, xmm1, 136);
+    _mm_store_ps(&v[2][0], xmm2);
+    xmm0 = _mm_shuffle_ps(xmm0, xmm1, 221);
+    _mm_store_ps(&v[1][0], xmm4);
+    _mm_store_ps(&v[3][0], xmm0);
+    return Mat4f(v);
+}
+#endif
 template<>
 Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept;
 
