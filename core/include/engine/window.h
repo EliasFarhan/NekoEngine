@@ -26,7 +26,7 @@
 
 namespace neko
 {
-class Window : public System
+class Window : public SystemInterface
 {
 
 };

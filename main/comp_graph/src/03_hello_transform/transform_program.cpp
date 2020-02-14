@@ -26,6 +26,7 @@ void HelloTransformProgram::Init()
 void HelloTransformProgram::Render()
 {
 
+    std::lock_guard<std::mutex> lock(updateMutex_);
 
     shaderProgram_.Bind();
 
@@ -57,6 +58,7 @@ void HelloTransformProgram::Destroy()
 
 void HelloTransformProgram::Update(seconds dt)
 {
+    std::lock_guard<std::mutex> lock(updateMutex_);
     transform_ = Mat4f::Identity;
     transform_ = Mat4f::Translate(transform_, position_);
     transform_ = Mat4f::Scale(transform_, scale_);

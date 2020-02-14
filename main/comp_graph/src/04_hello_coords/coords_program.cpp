@@ -25,11 +25,13 @@ void HelloCoordsProgram::Init()
 
 void HelloCoordsProgram::Update(seconds dt)
 {
+    std::lock_guard<std::mutex> lock(updateMutex_);
     timeSinceInit_ += dt;
 }
 
 void HelloCoordsProgram::Render()
 {
+    std::lock_guard<std::mutex> lock(updateMutex_);
     shader_.Bind();
     glBindTexture(GL_TEXTURE_2D, textureWall_);
     shader_.SetMat4("view", view);

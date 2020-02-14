@@ -7,7 +7,7 @@
 
 namespace neko
 {
-class SampleBrowser : public System
+class SampleBrowser : public SystemInterface
 {
 public:
     void Init() override;

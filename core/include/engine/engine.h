@@ -43,7 +43,7 @@ struct Configuration
 {
 	std::string windowName = "NekoEngine 0.1";
     Vec2i windowSize = Vec2i(1024, 1024);
-    std::pair<unsigned, unsigned> gameWindowSize = std::pair<unsigned, unsigned>(1280, 720);
+    Vec2i gameWindowSize{1280, 720};
     bool fullscreen = false;
     bool vSync = true;
     unsigned int framerateLimit = 0u;
@@ -58,12 +58,12 @@ struct Configuration
 /**
  * \brief basic engine class with no graphics manager implementation
  */
-class BasicEngine : public System
+class BasicEngine : public SystemInterface
 {
 public:
     explicit BasicEngine(Configuration* config = nullptr);
 	BasicEngine() = delete;
-    ~BasicEngine() override;
+    ~BasicEngine();
     void Init() override;
 
     void Destroy() override;

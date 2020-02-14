@@ -58,11 +58,13 @@ void HelloTriangleProgram::Init()
 
 void HelloTriangleProgram::Update(seconds dt)
 {
+    std::lock_guard<std::mutex> lock(updateMutex_);
     timeSinceInit_ += dt;
 }
 
 void HelloTriangleProgram::Render()
 {
+    std::lock_guard<std::mutex> lock(updateMutex_);
     switch (renderType_)
     {
 

@@ -22,8 +22,10 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
+
 #include "engine/engine.h"
 #include "sdl_engine/sdl_window.h"
+#include "graphics/graphics.h"
 #include <SDL.h>
 #include <SDL_main.h>
 
@@ -44,8 +46,9 @@ public:
  * @param window
  */
     void SetWindow(SdlWindow* window);
+    void SetRenderer(Renderer* renderer);
 protected:
-
+    Renderer* renderer_ = nullptr;
     SdlWindow* window_ = nullptr;
 };
 

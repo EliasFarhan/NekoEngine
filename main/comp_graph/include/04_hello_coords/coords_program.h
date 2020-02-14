@@ -15,7 +15,7 @@ public:
 
     void Update(seconds) override;
 
-    void Render() override;
+    void Render()override;
 
     void Destroy() override;
 

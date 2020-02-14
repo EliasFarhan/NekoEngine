@@ -96,7 +96,7 @@ void Shader::LoadFromFile(const std::string_view vertexShaderPath, const std::st
 
 
 
-void Shader::Bind()
+void Shader::Bind() const
 {
     glUseProgram(shaderProgram_);
 }

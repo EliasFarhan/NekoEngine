@@ -29,51 +29,35 @@
 
 namespace neko
 {
-GraphicsManager::GraphicsManager()
+Renderer::Renderer()
 {
-	commandBuffer_.resize(MAX_COMMAND_NMB);
+    currentCommandBuffer_.reserve(MAX_COMMAND_NMB);
+    nextCommandBuffer_.reserve(MAX_COMMAND_NMB);
 }
 
 
-void GraphicsManager::Render(RenderCommand* command)
+void Renderer::Render(RenderCommandInterface* command)
 {
-	if (renderLength_ >= MAX_COMMAND_NMB)
-	{
-		logDebug("[Error] Max Number of Graphics Command");
-		return;
-	}
-	commandBuffer_[renderLength_] = command;
-	renderLength_++;
+    nextCommandBuffer_.push_back(command);
 }
 
-void GraphicsManager::RenderAll()
+void Renderer::RenderAll()
 {
-    std::sort(commandBuffer_.begin(), commandBuffer_.begin() + renderLength_, [](RenderCommand* c1, RenderCommand* c2)
+    for (auto* renderCommand : currentCommandBuffer_)
     {
-        return c1->GetLayer() < c2->GetLayer();
-    });
-    for(Index i = 0; i < renderLength_;i++)
-    {
-        if(commandBuffer_[i])
-        {
-            commandBuffer_[i]->Render();
-        }
+        renderCommand->Render();
     }
-    renderLength_ = 0;
 }
 
-
-
-int RenderCommand::GetLayer() const
+void Renderer::Sync()
 {
-    return layer_;
+    std::swap(currentCommandBuffer_, nextCommandBuffer_);
+    nextCommandBuffer_.clear();
 }
 
-void RenderCommand::SetLayer(int layer)
+void Renderer::RenderLoop()
 {
-    layer_ = layer;
+
 }
-
-
 }
 
