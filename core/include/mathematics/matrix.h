@@ -67,7 +67,7 @@ public:
         {
             for (int row = 0; row < 4; row++)
             {
-                v[column][row] = columns_[row][column];
+                v[row][column] = columns_[column][row];
             }
         }
         return Mat4<T>(v);
@@ -143,9 +143,9 @@ public:
         return Mat4<T>(v);
     }
 
-    Mat4<T> MultiplyAoSoA(const Mat4<T>& rhs) const noexcept;
+    inline Mat4<T> MultiplyAoSoA(const Mat4<T>& rhs) const noexcept;
 
-    Mat4<T> MultiplyIntrinsincs(const Mat4<T>& rhs) const noexcept;
+    inline Mat4<T> MultiplyIntrinsincs(const Mat4<T>& rhs) const noexcept;
 
     static T MatrixDifference(const Mat4<T>& rhs, const Mat4<T>& lhs)
     {
@@ -471,8 +471,11 @@ inline Mat4f Mat4f::Transpose() const
     return Mat4f(v);
 }
 #endif
+
+
+
 template<>
-Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept;
+inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept;
 
 
 template<typename T>
@@ -523,8 +526,38 @@ inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
     return Mat4f(v);
 }
 #endif
+#if defined(__arm__)
+template<>
+inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
+{
+    const auto lhsT(Transpose());
+    std::array<Vec4f, 4> v;
+    for (int column = 0; column < 4; column++)
+    {
 
-#if defined(EMSCRIPTEN) || defined(__arm__)
+        auto c = vld1q_f32(&rhs[column][0]);
+    	
+        auto x = vld1q_f32(&lhsT[0][0]);
+        auto y = vld1q_f32(&lhsT[1][0]);
+        auto z = vld1q_f32(&lhsT[2][0]);
+        auto w = vld1q_f32(&lhsT[3][0]);
+
+
+        x = vmulq_f32(x, c);
+        y = vmulq_f32(y, c);
+        z = vmulq_f32(z, c);
+        w = vmulq_f32(w, c);
+
+        x = vaddq_f32(x, y);
+        z = vaddq_f32(z, w);
+
+        x = vaddq_f32(x, z);
+        vst1q_f32(&v[column][0], x);
+    }
+    return Mat4f(v);
+}
+#endif
+#if defined(EMSCRIPTEN) 
 template<>
 inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
 {

@@ -23,6 +23,13 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
     set(CMAKE_STATIC_LIBRARY_SUFFIX ".a")
 endif()
 
+if(UNIX)
+    EXECUTE_PROCESS(COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE)
+    if("${ARCHITECTURE}" MATCHES "arm")
+        include(cmake/platforms/arm.cmake)
+    endif()
+endif()
+
 if(MSVC)
     include(cmake/platforms/msvc.cmake)
 endif()
