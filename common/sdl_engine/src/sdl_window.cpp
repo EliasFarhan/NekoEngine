@@ -47,7 +47,6 @@ void sdl::SdlWindow::Init()
         logDebug("[Error] Unable to create window\n");
         return;
     }
-
 }
 
 void sdl::SdlWindow::InitImGui()
@@ -64,27 +63,13 @@ void sdl::SdlWindow::InitImGui()
     ImGui::StyleColorsClassic();
 }
 
-void sdl::SdlWindow::OnEvent(const SDL_Event& event)
-{
-    auto& config = BasicEngine::GetInstance()->config;
-    if (event.type == SDL_WINDOWEVENT)
-    {
-        if (event.window.event == SDL_WINDOWEVENT_RESIZED)
-        {
-            config.windowSize = Vec2i(event.window.data1,event.window.data2);
-        }
-    }
-}
 
 void sdl::SdlWindow::ImguiNewFrame()
 {
     ImGui_ImplSDL2_NewFrame(window_);
+    ImGui::NewFrame();
 }
 
-void sdl::SdlWindow::ImguiRender()
-{
-    ImGui::Render();
-}
 
 void sdl::SdlWindow::Destroy()
 {
@@ -95,6 +80,16 @@ void sdl::SdlWindow::Destroy()
     SDL_DestroyWindow(window_);
 
 
+}
+
+void sdl::SdlWindow::SwapBuffer()
+{
+
+}
+
+void sdl::SdlWindow::RenderUi()
+{
+    ImGui::Render();
 }
 
 }

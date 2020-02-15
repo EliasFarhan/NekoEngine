@@ -24,15 +24,18 @@
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
+
 #include <chrono>
 
 #include <engine/engine.h>
 #include <engine/log.h>
 #include <utilities/file_utility.h>
+#include "graphics/graphics.h"
 
 namespace neko
 {
 BasicEngine* BasicEngine::instance_ = nullptr;
+
 BasicEngine::BasicEngine(Configuration* config)
 {
     if (config != nullptr)
@@ -50,13 +53,25 @@ BasicEngine::~BasicEngine()
 void BasicEngine::Init()
 {
     instance_ = this;
-    logDebug("Current path: "+GetCurrentPath());
+    logDebug("Current path: " + GetCurrentPath());
+}
+
+void BasicEngine::Update(seconds dt)
+{
+    ManageEvent();
+    updateAction_.Execute(dt);
+#ifdef EMSCRIPTEN
+    renderer_->Update();
+#endif
+    renderer_->Sync();
 }
 
 void BasicEngine::Destroy()
 {
+    renderer_->Close();
     instance_ = nullptr;
 }
+
 static std::chrono::time_point<std::chrono::system_clock> clock;
 #ifdef EMSCRIPTEN
 void EmLoop(void* arg)
@@ -68,24 +83,40 @@ void EmLoop(void* arg)
     (engine)->Update(dt);
 }
 #endif
+
 void BasicEngine::EngineLoop()
 {
     isRunning_ = true;
-	clock = std::chrono::system_clock::now();
+
+    renderer_->RenderLoop();
+    clock = std::chrono::system_clock::now();
 #ifdef EMSCRIPTEN
     // void emscripten_set_main_loop(em_callback_func func, int fps, int simulate_infinite_loop);
 
-	emscripten_set_main_loop_arg(&EmLoop, this, 0, 1);
+    emscripten_set_main_loop_arg(&EmLoop, this, 0, 1);
 #else
     while (isRunning_)
     {
-	    const auto start = std::chrono::system_clock::now();
-	    const auto dt = std::chrono::duration_cast<seconds>(start - clock);
-		clock = start;
-		Update(dt);
+        const auto start = std::chrono::system_clock::now();
+        const auto dt = std::chrono::duration_cast<seconds>(start - clock);
+        clock = start;
+        Update(dt);
     }
 #endif
     Destroy();
+}
+
+void BasicEngine::SetWindowAndRenderer(Window* window, Renderer* renderer)
+{
+    window_ = window;
+    renderer_ = renderer;
+    renderer_->SetWindow(window);
+    RendererLocator::provide(renderer);
+}
+
+void BasicEngine::GenerateUiFrame()
+{
+    drawUiAction_.Execute();
 }
 
 

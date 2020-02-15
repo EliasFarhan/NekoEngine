@@ -23,7 +23,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-
+#include <mutex>
 #include <string>
 #include <engine/system.h>
 #include <utilities/action_utility.h>
@@ -32,9 +32,11 @@
 #include <mathematics/vector.h>
 
 
+
 namespace neko
 {
-struct Collider;
+class Renderer;
+class Window;
 
 /**
  * \brief store various Engine constant or global values
@@ -65,24 +67,31 @@ public:
 	BasicEngine() = delete;
     ~BasicEngine();
     void Init() override;
-
+    void Update(seconds dt) final;
     void Destroy() override;
+
+    //Update functions
+    virtual void ManageEvent() = 0;
+    virtual void GenerateUiFrame();
 
     void EngineLoop();
 
+    void SetWindowAndRenderer(Window* window, Renderer* renderer);
 
     Configuration config;
 
-    static BasicEngine* GetInstance(){return instance_;};
+    static BasicEngine* GetInstance(){return instance_;}
+
     //template <typename T = BasicEngine>
     //static T* GetInstance(){ return dynamic_cast<T*>(instance_);};
 protected:
     static BasicEngine* instance_;
+    Renderer* renderer_ = nullptr;
+    Window* window_ = nullptr;
 	bool isRunning_;
     Action<> initAction_;
     Action<seconds> updateAction_;
-    Action<seconds> drawUiAction_;
-    Action<> drawAction_;
+    Action<> drawUiAction_;
     Action<> destroyAction_;
 
 };

@@ -39,8 +39,7 @@ void Gles3Window::Init()
     SDL_GL_SetSwapInterval(config.vSync);
     SdlWindow::Init();
     glContext_ = SDL_GL_CreateContext(window_);
-
-    SDL_GL_MakeCurrent(window_, glContext_);
+    MakeCurrentContext();
 #ifndef __EMSCRIPTEN__
     if (!gladLoadGLES2Loader((GLADloadproc) SDL_GL_GetProcAddress))
     {
@@ -49,6 +48,7 @@ void Gles3Window::Init()
     }
 #endif
 
+    InitImGui();
     glEnable(GL_DEPTH_TEST);
 }
 
@@ -61,49 +61,50 @@ void Gles3Window::InitImGui()
 
 }
 
-void Gles3Window::OnEvent(const SDL_Event& event)
-{
-    SdlWindow::OnEvent(event);
-    if (event.type == SDL_WINDOWEVENT)
-    {
-        if (event.window.event == SDL_WINDOWEVENT_RESIZED)
-        {
-            Vec2f newWindowSize = Vec2f(event.window.data1, event.window.data2);
-            glViewport(0, 0, newWindowSize.x, newWindowSize.y);
-        }
-    }
-}
 
-void Gles3Window::ClearScreen()
-{
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-}
-
-void Gles3Window::ImguiNewFrame()
+void Gles3Window::GenerateUiFrame()
 {
     ImGui_ImplOpenGL3_NewFrame();
-    SdlWindow::ImguiNewFrame();
+    ImGui_ImplSDL2_NewFrame(window_);
+    ImGui::NewFrame();
 }
 
-void Gles3Window::ImguiRender()
-{
-    SdlWindow::ImguiRender();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-}
 
-void Gles3Window::FinishFrame()
+void Gles3Window::SwapBuffer()
 {
     SDL_GL_SwapWindow(window_);
 }
 
 void Gles3Window::Destroy()
 {
+    MakeCurrentContext();
     ImGui_ImplOpenGL3_Shutdown();
     // Delete our OpengL context
     SDL_GL_DeleteContext(glContext_);
 
     SdlWindow::Destroy();
+}
+
+void Gles3Window::RenderUi()
+{
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+}
+
+void Gles3Window::OnResize(Vec2u newWindowSize)
+{
+    glViewport(0, 0, newWindowSize.x, newWindowSize.y);
+}
+
+void Gles3Window::MakeCurrentContext()
+{
+    SDL_GL_MakeCurrent(window_, glContext_);
+}
+
+void Gles3Window::LeaveCurrentContext()
+{
+    SDL_GL_MakeCurrent(nullptr, nullptr);
 }
 }
 

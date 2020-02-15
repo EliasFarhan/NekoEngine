@@ -38,18 +38,14 @@ public:
 	explicit SdlEngine(Configuration* config = nullptr);
 	SdlEngine() = delete;
 	void Init() override;
-	void Update(seconds dt) override final;
 	void Destroy() override;
 	virtual void OnEvent(const SDL_Event& event) = 0;
-/**
- * Simple windows setter, needs to be called before Init
- * @param window
- */
-    void SetWindow(SdlWindow* window);
-    void SetRenderer(Renderer* renderer);
-protected:
-    Renderer* renderer_ = nullptr;
-    SdlWindow* window_ = nullptr;
+
+    void ManageEvent() override;
+
+    void GenerateUiFrame() override;
+
+
 };
 
 }

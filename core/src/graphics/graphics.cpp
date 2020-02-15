@@ -24,6 +24,8 @@
 #include <graphics/graphics.h>
 #include <algorithm>
 #include <engine/globals.h>
+#include <engine/window.h>
+#include <engine/engine.h>
 #include "engine/log.h"
 
 
@@ -51,13 +53,68 @@ void Renderer::RenderAll()
 
 void Renderer::Sync()
 {
+    std::unique_lock lock(renderMutex_);
+    flags_ |= IS_APP_WAITING;
+#ifndef EMSCRIPTEN
+    cv_.wait(lock);
+#endif
     std::swap(currentCommandBuffer_, nextCommandBuffer_);
     nextCommandBuffer_.clear();
+    flags_ &= ~IS_APP_WAITING;
+    //TODO copy all the new transform3d?
 }
 
 void Renderer::RenderLoop()
 {
-
+#ifndef EMSCRIPTEN
+    flags_ |= IS_RUNNING;
+    window_->LeaveCurrentContext();
+    renderThread_ = std::thread([this] {
+        window_->MakeCurrentContext();
+        while (flags_ & IS_RUNNING)
+        {
+           Update();
+        }
+        window_->LeaveCurrentContext();
+    });
+#endif
 }
+
+void Renderer::Close()
+{
+    flags_ &= ~IS_RUNNING;
+    renderThread_.join();
+}
+
+void Renderer::SetFlag(Renderer::RendererFlag flag)
+{
+    flags_ |= flag;
+}
+
+void Renderer::SetWindow(Window* window)
+{
+    window_ = window;
+}
+
+void Renderer::Update()
+{
+    auto* engine = BasicEngine::GetInstance();
+    {
+        std::lock_guard<std::mutex> lock(renderMutex_);
+        window_->MakeCurrentContext();
+        ClearScreen();
+        engine->GenerateUiFrame();
+        RenderAll();
+        window_->RenderUi();
+    }
+    window_->SwapBuffer();
+
+    //Sync the beginning frame with EngineLoop
+    if (flags_ & IS_APP_WAITING)
+    {
+        cv_.notify_one();
+    }
+}
+
 }
 

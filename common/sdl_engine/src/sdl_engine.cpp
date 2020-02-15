@@ -48,16 +48,26 @@ void SdlEngine::Init()
     assert(window_ != nullptr);
     SDL_Init(SDL_INIT_VIDEO);
     window_->Init();
-    window_->InitImGui();
     initAction_.Execute();
 }
 
-void SdlEngine::Update([[maybe_unused]]seconds dt)
+void SdlEngine::Destroy()
 {
+    BasicEngine::Destroy();
+    destroyAction_.Execute();
+    window_->Destroy();
+
+    // Shutdown SDL 2
+    SDL_Quit();
+}
+
+void SdlEngine::ManageEvent()
+{
+    std::lock_guard<std::mutex> lock(renderer_->GetRenderMutex());
+    window_->MakeCurrentContext();
     SDL_Event event;
     while (SDL_PollEvent(&event))
     {
-        window_->OnEvent(event);
         OnEvent(event);
         ImGui_ImplSDL2_ProcessEvent(&event);
         if (event.type == SDL_QUIT)
@@ -73,39 +83,24 @@ void SdlEngine::Update([[maybe_unused]]seconds dt)
                     break;
             }
         }
+
+        auto& config = BasicEngine::GetInstance()->config;
+        if (event.type == SDL_WINDOWEVENT)
+        {
+            if (event.window.event == SDL_WINDOWEVENT_RESIZED)
+            {
+                config.windowSize = Vec2i(event.window.data1, event.window.data2);
+                window_->OnResize(Vec2u(event.window.data1, event.window.data2));
+            }
+        }
     }
-
-    updateAction_.Execute(dt);
-    window_->ClearScreen();
-    drawAction_.Execute();
-
-    // Start the Dear ImGui frame
-    window_->ImguiNewFrame();
-    ImGui::NewFrame();
-
-    drawUiAction_.Execute(dt);
-    window_->ImguiRender();
-
-    window_->FinishFrame();
+    window_->LeaveCurrentContext();
 }
 
-void SdlEngine::Destroy()
+void SdlEngine::GenerateUiFrame()
 {
-    destroyAction_.Execute();
-    window_->Destroy();
-
-    BasicEngine::Destroy();
-    // Shutdown SDL 2
-    SDL_Quit();
+    window_->GenerateUiFrame();
+    BasicEngine::GenerateUiFrame();
 }
 
-void SdlEngine::SetWindow(SdlWindow* window)
-{
-    window_ = window;
-}
-
-void SdlEngine::SetRenderer(Renderer* renderer)
-{
-    renderer_ = renderer;
-}
 }

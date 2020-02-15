@@ -25,7 +25,8 @@ void HelloTransformProgram::Init()
 
 void HelloTransformProgram::Render()
 {
-
+    if(shaderProgram_.GetProgram() == 0)
+        return;
     std::lock_guard<std::mutex> lock(updateMutex_);
 
     shaderProgram_.Bind();
@@ -77,7 +78,7 @@ void HelloTransformProgram::Update(seconds dt)
 
 }
 
-void HelloTransformProgram::DrawUi(seconds dt)
+void HelloTransformProgram::DrawUi()
 {
     ImGui::Begin("Transform Window");
     const char* items[static_cast<size_t>(ShapeType::LENGTH)]= {

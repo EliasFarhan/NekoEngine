@@ -16,13 +16,9 @@ CompGraphEngine::CompGraphEngine(Configuration* config) : SdlEngine(config)
             [this](void) {
                 sampleBrowser_.Destroy();
             });
-    drawAction_.RegisterCallback(
-            [this]() {
-                sampleBrowser_.Render();
-            });
     drawUiAction_.RegisterCallback(
-            [this](seconds dt) {
-                sampleBrowser_.DrawGui(dt);
+            [this]() {
+                sampleBrowser_.DrawGui();
             });
 }
 

@@ -12,8 +12,7 @@ int main(int argc, char** argv)
     neko::gl::Gles3Renderer renderer;
     neko::CompGraphEngine engine;
 
-    engine.SetWindow(&window);
-    engine.SetRenderer(&renderer);
+    engine.SetWindowAndRenderer(&window, &renderer);
 
     engine.Init();
     engine.EngineLoop();

@@ -31,6 +31,8 @@ void HelloCoordsProgram::Update(seconds dt)
 
 void HelloCoordsProgram::Render()
 {
+    if(shader_.GetProgram() == 0)
+        return;
     std::lock_guard<std::mutex> lock(updateMutex_);
     shader_.Bind();
     glBindTexture(GL_TEXTURE_2D, textureWall_);
@@ -57,7 +59,7 @@ void HelloCoordsProgram::Destroy()
 
 }
 
-void HelloCoordsProgram::DrawUi(seconds dt)
+void HelloCoordsProgram::DrawUi()
 {
 
 }

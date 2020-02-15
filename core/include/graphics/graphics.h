@@ -28,15 +28,16 @@
 #include <array>
 #include <vector>
 #include <thread>
+#include <atomic>
+#include <utilities/service_locator.h>
 
 #include "engine/system.h"
 #include "engine/log.h"
 
 namespace neko
 {
-
+class Window;
 const size_t MAX_COMMAND_NMB = 8'192;
-
 
 
 /**
@@ -46,8 +47,10 @@ class RenderCommandInterface
 {
 public:
     RenderCommandInterface() = default;
+
     virtual ~RenderCommandInterface() = default;
-	virtual void Render() = 0;
+
+    virtual void Render() = 0;
 };
 
 /**
@@ -58,24 +61,70 @@ class RenderProgram : public RenderCommandInterface, public SystemInterface
 {
 };
 
-
-
-class Renderer
+class RendererInterface
 {
 public:
-	Renderer();
-	virtual ~Renderer() = default;
-	void Render(RenderCommandInterface* command);
-	void Sync();
-	virtual void RenderAll();
-	//TODO implement render loop
-	void RenderLoop();
-protected:
-    std::thread renderThread_;
-    std::vector<RenderCommandInterface*> currentCommandBuffer_ = {};
-    std::vector<RenderCommandInterface*> nextCommandBuffer_ = {};
-	size_t renderLength_ = 0;
+    virtual void Render(RenderCommandInterface* command) = 0;
 };
 
+class NullRenderer final : public RendererInterface
+{
+public:
+    void Render([[maybe_unused]]RenderCommandInterface* command) override
+    {};
+};
+
+class Renderer : public RendererInterface
+{
+public:
+    enum RendererFlag : std::uint8_t
+    {
+        IS_RUNNING = 1u << 0u,
+        IS_APP_WAITING = 1u << 1u,
+        IS_RENDERING_UI = 1u << 2u,
+    };
+
+    Renderer();
+
+    virtual ~Renderer() = default;
+
+    /**
+     * \brief Send the RenderCommand to the queue for next frame
+     * @param command
+     */
+    void Render(RenderCommandInterface* command) override;
+
+    /**
+     * \brief Called from Engine Loop to sync with the Render Loop
+     */
+    void Sync();
+
+    void Update();
+    void RenderLoop();
+
+    void Close();
+
+    void SetFlag(RendererFlag flag);
+    void SetWindow(Window* window);
+    std::mutex& GetRenderMutex(){ return renderMutex_;}
+protected:
+    virtual void ClearScreen() = 0;
+
+    virtual void RenderAll();
+
+    Window* window_ = nullptr;
+    std::thread renderThread_;
+
+    //Used to synchronize the EngineLoop with the RenderLoop
+    std::mutex renderMutex_;
+    std::atomic<std::uint8_t> flags_{IS_RENDERING_UI};
+    std::condition_variable cv_;
+
+    std::vector<RenderCommandInterface*> currentCommandBuffer_ = {};
+    std::vector<RenderCommandInterface*> nextCommandBuffer_ = {};
+    size_t renderLength_ = 0;
+};
+
+using RendererLocator = Locator<RendererInterface, NullRenderer>;
 
 }

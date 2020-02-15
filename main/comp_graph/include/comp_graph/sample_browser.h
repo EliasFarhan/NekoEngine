@@ -13,8 +13,7 @@ public:
     void Init() override;
 
     void Update(seconds dt) override;
-    void Render();
-    void DrawGui(seconds dt);
+    void DrawGui();
 
     void Destroy() override;
 
