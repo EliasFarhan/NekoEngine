@@ -60,8 +60,13 @@ void HelloTransformProgram::Update(seconds dt)
 {
     std::lock_guard<std::mutex> lock(updateMutex_);
     transform_ = Mat4f::Identity;
-    transform_ = Mat4f::Translate(transform_, position_);
-    transform_ = Mat4f::Scale(transform_, scale_);
+    transform_ =
+            Mat4f::Translate(transform_, position_) *
+            Mat4f::Rotate(transform_, degree_t(angle_), Vec3f(0.0f, 0.0f, 1.0f)) *
+            Mat4f::Scale(transform_, scale_);
+
+
+    /*transform_ = Mat4f::Translate(transform_, position_);
     switch(shape_)
     {
 
@@ -74,17 +79,18 @@ void HelloTransformProgram::Update(seconds dt)
         default:
             break;
     }
+    transform_ = Mat4f::Scale(transform_, scale_);*/
 }
 
 void HelloTransformProgram::DrawUi(seconds dt)
 {
     ImGui::Begin("Transform Window");
-    const char* items[static_cast<size_t>(ShapeType::LENGTH)]= {
+    const char* items[static_cast<size_t>(ShapeType::LENGTH)] = {
             "Plane",
             "Cube",
     };
     int currentIndex = static_cast<int>(shape_);
-    if(ImGui::Combo("Render Types", &currentIndex, items, (size_t)ShapeType::LENGTH))
+    if (ImGui::Combo("Render Types", &currentIndex, items, (size_t) ShapeType::LENGTH))
     {
         shape_ = static_cast<ShapeType>(currentIndex);
     }
@@ -96,7 +102,7 @@ void HelloTransformProgram::DrawUi(seconds dt)
             ImGui::InputFloat("Rotation", &angle_);
             break;
         case ShapeType::CUBE:
-            ImGui::InputFloat3("Euler Angles", (float*)&eulerAngle_[0]);
+            ImGui::InputFloat3("Euler Angles", (float*) &eulerAngle_[0]);
             break;
         default:
             break;

@@ -377,6 +377,7 @@ using Vec3f = Vec3<float>;
 using Vec3i = Vec3<int>;
 using Vec3u = Vec3<unsigned int>;
 using EulerAngles = Vec3<degree_t>;
+using RadianAngles = Vec3<radian_t>;
 
 template <>
 Vec3f inline const Vec3f::Zero = Vec3f(0.0f,0.0f, 0.0f);
