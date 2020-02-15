@@ -23,11 +23,20 @@ public:
 
 private:
 
+    enum class ShapeType
+    {
+        PLANE = 0,
+        CUBE,
+        LENGTH
+    };
+    ShapeType shape_ = ShapeType::PLANE;
+    gl::Cuboid cube_{ Vec3f::Zero, Vec3f::One };
     gl::Quad quad_{Vec2f::Zero, Vec2f::One};
     Mat4f transform_{Mat4f::Identity};
     Vec3f position_ = Vec3f::Zero;
     Vec3f scale_ = Vec3f::One;
     float angle_ = 0.0f;
+    EulerAngles eulerAngle_{Vec3f::Zero};
     gl::Shader shaderProgram_;
     gl::TextureId textureWall_;
 };

@@ -1,14 +1,11 @@
-
-if(Emscripten)
-    return()
-endif()
-
 include_directories(${GOOGLE_BENCH_DIR}/include)
 set_target_properties (benchmark benchmark_main PROPERTIES
         FOLDER Externals\\GTest)
 
 SET(BENCH_DIR ${CMAKE_SOURCE_DIR}/benchmark)
 file(GLOB BENCH_FILES ${BENCH_DIR}/*.cpp)
+neko_lib_config(benchmark)
+neko_lib_config(benchmark_main)
 include_directories("include/")
 foreach(bench_file ${BENCH_FILES} )
     # I used a simple string replace, to cut off .cpp.
@@ -24,6 +21,7 @@ foreach(bench_file ${BENCH_FILES} )
         set_target_properties(${bench_name} PROPERTIES COMPILE_FLAGS
                 "-save-temps -march=haswell -ffast-math -fno-omit-frame-pointer -fno-exceptions -fno-rtti")
     ENDIF(MSVC)
+    neko_bin_config(${bench_name})
     set_target_properties (${bench_name} PROPERTIES
             FOLDER Benchmark)
     IF(APPLE)

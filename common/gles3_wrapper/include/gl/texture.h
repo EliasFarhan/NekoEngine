@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string_view>
 #include "gl/gles3_include.h"
 
 namespace neko::gl
@@ -15,7 +16,7 @@ enum TextureFlags : unsigned
     CLAMP_WRAP_TEXTURE = 1u << 2u
 };
 
-TextureId stbCreateTexture(const char* filename, TextureFlags flags = NO_FLAGS);
+TextureId stbCreateTexture(const std::string_view filename, TextureFlags flags = NO_FLAGS);
 void DestroyTexture(TextureId);
 
 }

@@ -1,6 +1,6 @@
 
 
-find_package (Python3 COMPONENTS Interpreter)
+find_package (Python3 REQUIRED COMPONENTS Interpreter)
 MESSAGE("Python Interpreter: ${Python3_EXECUTABLE}")
 
 file(GLOB_RECURSE SCRIPT_FILES scripts/*.py)
@@ -65,7 +65,6 @@ add_custom_target(
 
 set_target_properties (DataTarget PROPERTIES FOLDER Neko)
 
-#TODO probably manage the shaders things with a python script instead than cmake?
 if(MSVC)
     if (${CMAKE_HOST_SYSTEM_PROCESSOR} STREQUAL "AMD64")
         set(GLSL_VALIDATOR "$ENV{VULKAN_SDK}/Bin/glslangValidator.exe")

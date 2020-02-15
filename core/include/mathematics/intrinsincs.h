@@ -11,4 +11,7 @@
 #else
 #include <x86intrin.h>
 #endif
+#else
+#include <wasm_simd128.h>
+typedef float v4f __attribute__ ((vector_size (16)));
 #endif

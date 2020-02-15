@@ -8,12 +8,12 @@ class VertexArrayObject
 {
 public:
     virtual void Init() = 0;
-    virtual void Draw() = 0;
+    virtual void Draw() const = 0;
     virtual void Destroy() = 0;
 protected:
-    unsigned int VAO;
-    unsigned int EBO;
-    unsigned int VBO[2];
+    unsigned int VAO = 0;
+    unsigned int EBO = 0;
+    unsigned int VBO[2]{};
 };
 
 
@@ -24,7 +24,7 @@ public:
 
     void Init() override;
 
-    void Draw() override;
+    void Draw() const override;
 
     void Destroy() override;
 
@@ -39,7 +39,7 @@ public:
     explicit Cuboid(Vec3f origin, Vec3f size);
     void Init() override;
 
-    void Draw() override;
+    void Draw() const override;
 
     void Destroy() override;
 protected:

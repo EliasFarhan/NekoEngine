@@ -27,6 +27,7 @@
 #include <condition_variable>
 #include <array>
 #include <vector>
+#include <thread>
 
 #include "engine/system.h"
 #include "engine/log.h"
@@ -41,44 +42,38 @@ const size_t MAX_COMMAND_NMB = 8'192;
 /**
  * \brief abstraction of a graphic command send to the render thread
  */
-class RenderCommand
+class RenderCommandInterface
 {
 public:
-    RenderCommand() = default;
-    virtual ~RenderCommand() = default;
-
-    int GetLayer() const;
-    void SetLayer(int layer);
-
-
+    RenderCommandInterface() = default;
+    virtual ~RenderCommandInterface() = default;
 	virtual void Render() = 0;
-private:
-    int layer_ = 0;
-
 };
 
-class RenderProgram : public RenderCommand
+/**
+ * \brief Abstraction of a a graphic command that can be initialized, destroyed and update
+ * Warning! Update can be run concurrently to Render!
+ */
+class RenderProgram : public RenderCommandInterface, public SystemInterface
 {
-public:
-    virtual void Init() = 0;
-    virtual void Update(seconds dt) = 0;
-    virtual void Destroy() = 0;
 };
 
 
 
-class GraphicsManager
+class Renderer
 {
 public:
-
-	GraphicsManager();
-	virtual ~GraphicsManager() = default;
-
-	void Clear(){};
-	void Render(RenderCommand* command);
+	Renderer();
+	virtual ~Renderer() = default;
+	void Render(RenderCommandInterface* command);
+	void Sync();
 	virtual void RenderAll();
+	//TODO implement render loop
+	void RenderLoop();
 protected:
-    std::vector<RenderCommand*> commandBuffer_ = {};
+    std::thread renderThread_;
+    std::vector<RenderCommandInterface*> currentCommandBuffer_ = {};
+    std::vector<RenderCommandInterface*> nextCommandBuffer_ = {};
 	size_t renderLength_ = 0;
 };
 

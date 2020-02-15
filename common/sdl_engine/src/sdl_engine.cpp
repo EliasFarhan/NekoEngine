@@ -101,6 +101,11 @@ void SdlEngine::Destroy()
 
 void SdlEngine::SetWindow(SdlWindow* window)
 {
-    SdlEngine::window_ = window;
+    window_ = window;
+}
+
+void SdlEngine::SetRenderer(Renderer* renderer)
+{
+    renderer_ = renderer;
 }
 }
