@@ -501,17 +501,11 @@ template<>
 inline Transform3d Transform3d::Translate(const Transform3d& transform, Vec3f pos)
 {
     // TODO: Why isn't Identity mat working? Inline?
+    // Question: comment disable CPU scaling?
 
     Transform3d output = transform;
 
     Transform3d translationMat = Transform3d();
-    for (int i = 0; i < 4; ++i)
-    {
-        for (int j = 0; j < 4; ++j)
-        {
-            translationMat[i][j] = 0.0f;
-        }
-    }
 
     translationMat[3][0] = pos[0];
     translationMat[3][1] = pos[1];
@@ -526,31 +520,24 @@ template<>
 inline Transform3d Transform3d::Scale(const Transform3d& transform, Vec3f scale)
 {
     // TODO: Why isn't this approach working?
-    /*Transform3d output = transform;
+    // Transform3d output = transform;
 
     Transform3d scalingMat = Transform3d();
-    for (int i = 0; i < 4; ++i)
-    {
-        for (int j = 0; j < 4; ++j)
-        {
-            scalingMat[i][j] = 0.0f;
-        }
-    }
-
+// rotate then scale then translate
     scalingMat[0][0] = scale[0];
     scalingMat[1][1] = scale[1];
     scalingMat[2][2] = scale[2];
     scalingMat[3][3] = 1.0f;
 
-    return output * scalingMat;*/
+    return transform * scalingMat; // scaling * transform
 
-    Transform3d output = transform;
+    /*Transform3d output = transform;
 
     output[0][0] *= scale[0];
     output[1][1] *= scale[1];
     output[2][2] *= scale[2];
 
-    return output;
+    return output;*/
 
 }
 
@@ -558,10 +545,12 @@ inline Transform3d Transform3d::Scale(const Transform3d& transform, Vec3f scale)
 template<>
 inline Transform3d Transform3d::Rotate(const Transform3d& transform, float angle, Vec3f axis)
 {
-    angle = angle * (M_PI / 180.0f);
+    // todo separate header
+
+    angle = angle * (PI / 180.0f); // use mathemtatics .h
 
     // TODO: why isn't this approach working with mat*mat?
-    /*Transform3d output = transform;
+    // Transform3d output = transform;
     Transform3d rotationMat = Transform3d();
     axis = axis / axis.GetMagnitude();
     const float x = axis[0];
@@ -591,9 +580,11 @@ inline Transform3d Transform3d::Rotate(const Transform3d& transform, float angle
     rotationMat[3][2] = 0.0f;
     rotationMat[3][3] = 1.0f;
 
-    return output * rotationMat;*/
+    return transform * rotationMat;
 
     // TODO: Why isn't this approach working with *=
+
+    // TODO: add individual functions for matrices generation (rotation, translation, scaling, etc.)
 
     /*Transform3d output = transform;
     axis = axis / axis.GetMagnitude();
