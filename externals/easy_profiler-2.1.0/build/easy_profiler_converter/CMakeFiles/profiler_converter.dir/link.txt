@@ -1,1 +1,0 @@
-/usr/bin/c++  -O3 -DNDEBUG  -rdynamic CMakeFiles/profiler_converter.dir/converter.cpp.o CMakeFiles/profiler_converter.dir/reader.cpp.o CMakeFiles/profiler_converter.dir/main.cpp.o  -o ../bin/profiler_converter -Wl,-rpath,/home/efarhan/Development/NekoEngine/externals/easy_profiler-2.1.0/build/bin: ../bin/libeasy_profiler.so -lpthread 
