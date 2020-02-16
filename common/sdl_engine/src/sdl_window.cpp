@@ -10,12 +10,18 @@
 
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
+#ifdef EASY_PROFILE_USE
+#include "easy/profiler.h"
+#endif
 namespace neko
 {
 
 void sdl::SdlWindow::Init()
 {
 
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("InitSdlWindow");
+#endif
     auto& config = BasicEngine::GetInstance()->config;
 
     auto flags = SDL_WINDOW_RESIZABLE|
@@ -51,6 +57,9 @@ void sdl::SdlWindow::Init()
 
 void sdl::SdlWindow::InitImGui()
 {
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("InitSdlImGui");
+#endif
 // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -73,7 +82,9 @@ void sdl::SdlWindow::ImguiNewFrame()
 
 void sdl::SdlWindow::Destroy()
 {
-
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("DestroySdlWindow");
+#endif
     ImGui_ImplSDL2_Shutdown();
     ImGui::DestroyContext();
     // Destroy our window

@@ -1,0 +1,42 @@
+file(REMOVE_RECURSE
+  "profiler_gui_autogen"
+  "CMakeFiles/profiler_gui_autogen.dir/AutogenOldSettings.txt"
+  "profiler_gui_autogen/EWIEGA46WW/qrc_resources.cpp"
+  "CMakeFiles/profiler_gui.dir/main.cpp.o"
+  "CMakeFiles/profiler_gui.dir/arbitrary_value_inspector.cpp.o"
+  "CMakeFiles/profiler_gui.dir/arbitrary_value_tooltip.cpp.o"
+  "CMakeFiles/profiler_gui.dir/blocks_graphics_view.cpp.o"
+  "CMakeFiles/profiler_gui.dir/blocks_tree_widget.cpp.o"
+  "CMakeFiles/profiler_gui.dir/bookmarks_editor.cpp.o"
+  "CMakeFiles/profiler_gui.dir/common_functions.cpp.o"
+  "CMakeFiles/profiler_gui.dir/descriptors_tree_widget.cpp.o"
+  "CMakeFiles/profiler_gui.dir/dialog.cpp.o"
+  "CMakeFiles/profiler_gui.dir/file_reader.cpp.o"
+  "CMakeFiles/profiler_gui.dir/fps_widget.cpp.o"
+  "CMakeFiles/profiler_gui.dir/globals.cpp.o"
+  "CMakeFiles/profiler_gui.dir/globals_qobjects.cpp.o"
+  "CMakeFiles/profiler_gui.dir/graphics_block_item.cpp.o"
+  "CMakeFiles/profiler_gui.dir/graphics_image_item.cpp.o"
+  "CMakeFiles/profiler_gui.dir/graphics_ruler_item.cpp.o"
+  "CMakeFiles/profiler_gui.dir/graphics_scrollbar.cpp.o"
+  "CMakeFiles/profiler_gui.dir/graphics_slider_area.cpp.o"
+  "CMakeFiles/profiler_gui.dir/main_window.cpp.o"
+  "CMakeFiles/profiler_gui.dir/round_progress_widget.cpp.o"
+  "CMakeFiles/profiler_gui.dir/socket_listener.cpp.o"
+  "CMakeFiles/profiler_gui.dir/text_highlighter.cpp.o"
+  "CMakeFiles/profiler_gui.dir/timer.cpp.o"
+  "CMakeFiles/profiler_gui.dir/thread_pool.cpp.o"
+  "CMakeFiles/profiler_gui.dir/thread_pool_task.cpp.o"
+  "CMakeFiles/profiler_gui.dir/tree_widget_item.cpp.o"
+  "CMakeFiles/profiler_gui.dir/tree_widget_loader.cpp.o"
+  "CMakeFiles/profiler_gui.dir/window_header.cpp.o"
+  "CMakeFiles/profiler_gui.dir/profiler_gui_autogen/mocs_compilation.cpp.o"
+  "CMakeFiles/profiler_gui.dir/profiler_gui_autogen/EWIEGA46WW/qrc_resources.cpp.o"
+  "../bin/profiler_gui.pdb"
+  "../bin/profiler_gui"
+)
+
+# Per-language clean rules from dependency scanning.
+foreach(lang CXX)
+  include(CMakeFiles/profiler_gui.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()

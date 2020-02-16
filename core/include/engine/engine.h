@@ -32,7 +32,6 @@
 #include <mathematics/vector.h>
 
 
-
 namespace neko
 {
 class Renderer;

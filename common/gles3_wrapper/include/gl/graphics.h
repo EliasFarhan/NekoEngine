@@ -9,8 +9,11 @@ class Gles3Renderer : public Renderer
 {
 protected:
     void ClearScreen() override;
+    void Update() override;
 
-public:
+    void BeforeRenderLoop() override;
+
+    void AfterRenderLoop() override;
 
 };
 

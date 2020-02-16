@@ -14,11 +14,18 @@
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
 
+#ifdef EASY_PROFILE_USE
+#include <easy/profiler.h>
+#endif
+
 namespace neko::sdl
 {
 
 void Gles3Window::Init()
 {
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("GLES3WindowInit");
+#endif
     const auto& config = BasicEngine::GetInstance()->config;
     // Set our OpenGL version.
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
@@ -54,7 +61,9 @@ void Gles3Window::Init()
 
 void Gles3Window::InitImGui()
 {
-
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("ImGuiInit");
+#endif
     SdlWindow::InitImGui();
     ImGui_ImplSDL2_InitForOpenGL(window_, glContext_);
     ImGui_ImplOpenGL3_Init("#version 300 es");
@@ -64,6 +73,10 @@ void Gles3Window::InitImGui()
 
 void Gles3Window::GenerateUiFrame()
 {
+
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("ImGuiGenerate");
+#endif
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame(window_);
     ImGui::NewFrame();
@@ -72,11 +85,19 @@ void Gles3Window::GenerateUiFrame()
 
 void Gles3Window::SwapBuffer()
 {
+
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("SwapBuffer");
+#endif
     SDL_GL_SwapWindow(window_);
 }
 
 void Gles3Window::Destroy()
 {
+
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("DestroyWindow");
+#endif
     MakeCurrentContext();
     ImGui_ImplOpenGL3_Shutdown();
     // Delete our OpengL context
@@ -87,6 +108,10 @@ void Gles3Window::Destroy()
 
 void Gles3Window::RenderUi()
 {
+
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("ImGuiRender");
+#endif
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 

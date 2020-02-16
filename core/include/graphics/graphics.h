@@ -99,7 +99,7 @@ public:
      */
     void Sync();
 
-    void Update();
+    virtual void Update();
     void RenderLoop();
 
     void Close();
@@ -111,6 +111,9 @@ protected:
     virtual void ClearScreen() = 0;
 
     virtual void RenderAll();
+
+    virtual void BeforeRenderLoop();
+    virtual void AfterRenderLoop();
 
     Window* window_ = nullptr;
     std::thread renderThread_;

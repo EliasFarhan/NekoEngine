@@ -30,9 +30,11 @@
 #include "imgui_impl_sdl.h"
 
 #ifdef NEKO_GLES3
-
 #include "gl/gles3_window.h"
+#endif
 
+#ifdef EASY_PROFILE_USE
+#include "easy/profiler.h"
 #endif
 
 namespace neko::sdl
@@ -44,7 +46,9 @@ SdlEngine::SdlEngine(Configuration* config) : BasicEngine(config)
 void SdlEngine::Init()
 {
     BasicEngine::Init();
-
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("InitSdl");
+#endif
     assert(window_ != nullptr);
     SDL_Init(SDL_INIT_VIDEO);
     window_->Init();
@@ -64,6 +68,9 @@ void SdlEngine::Destroy()
 void SdlEngine::ManageEvent()
 {
     std::lock_guard<std::mutex> lock(renderer_->GetRenderMutex());
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("Manage Event");
+#endif
     window_->MakeCurrentContext();
     SDL_Event event;
     while (SDL_PollEvent(&event))

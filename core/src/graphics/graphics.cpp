@@ -28,6 +28,8 @@
 #include <engine/engine.h>
 #include "engine/log.h"
 
+#include "easy/profiler.h"
+
 
 namespace neko
 {
@@ -45,6 +47,9 @@ void Renderer::Render(RenderCommandInterface* command)
 
 void Renderer::RenderAll()
 {
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("RenderAllCPU");
+#endif
     for (auto* renderCommand : currentCommandBuffer_)
     {
         renderCommand->Render();
@@ -53,6 +58,9 @@ void Renderer::RenderAll()
 
 void Renderer::Sync()
 {
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("EngineRenderSync");
+#endif
     std::unique_lock lock(renderMutex_);
     flags_ |= IS_APP_WAITING;
 #ifndef EMSCRIPTEN
@@ -70,18 +78,21 @@ void Renderer::RenderLoop()
     flags_ |= IS_RUNNING;
     window_->LeaveCurrentContext();
     renderThread_ = std::thread([this] {
-        window_->MakeCurrentContext();
+        BeforeRenderLoop();
         while (flags_ & IS_RUNNING)
         {
            Update();
         }
-        window_->LeaveCurrentContext();
+        AfterRenderLoop();
     });
 #endif
 }
 
 void Renderer::Close()
 {
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("ClosingFromEngine");
+#endif
     flags_ &= ~IS_RUNNING;
     renderThread_.join();
 }
@@ -98,9 +109,15 @@ void Renderer::SetWindow(Window* window)
 
 void Renderer::Update()
 {
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("RenderFullUpdateCPU");
+#endif
     auto* engine = BasicEngine::GetInstance();
     {
         std::lock_guard<std::mutex> lock(renderMutex_);
+#ifdef EASY_PROFILE_USE
+        EASY_BLOCK("RenderUpdateCPU");
+#endif
         window_->MakeCurrentContext();
         ClearScreen();
         engine->GenerateUiFrame();
@@ -115,6 +132,16 @@ void Renderer::Update()
         cv_.notify_one();
     }
 }
+void Renderer::BeforeRenderLoop()
+{
+    window_->MakeCurrentContext();
+}
+void Renderer::AfterRenderLoop()
+{
+    window_->LeaveCurrentContext();
+}
+
+
 
 }
 
