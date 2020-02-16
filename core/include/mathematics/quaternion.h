@@ -1,4 +1,3 @@
-#include <engine/entity.h>
 #include <mathematics/matrix.h>
 #include <engine/component.h>
 #include <mathematics/vector.h>
@@ -96,20 +95,19 @@ struct Quaternion
 		return conj / (mag * mag);
 	}
 
-
 	/*
 	Returns a rotation that rotates z degrees around the z axis,
 	x degrees around the x axis, and y degrees around the y axis; 
 	applied in that order
 	*/
-	static Quaternion FromEuler(Vec3f angle) //TODO Change to EulerAngle
+	static Quaternion FromEuler(EulerAngles angle)
 	{
-		float cy = cos(angle.x * 0.5f);
-		float sy = sin(angle.x * 0.5f);
-		float cp = cos(angle.y * 0.5f);
-		float sp = sin(angle.y * 0.5f);
-		float cr = cos(angle.z * 0.5f);
-		float sr = sin(angle.z * 0.5f);
+		float cy = cos(static_cast<float>(angle.x * 0.5f));
+		float sy = sin(static_cast<float>(angle.x * 0.5f));
+		float cp = cos(static_cast<float>(angle.y * 0.5f));
+		float sp = sin(static_cast<float>(angle.y * 0.5f));
+		float cr = cos(static_cast<float>(angle.z * 0.5f));
+		float sr = sin(static_cast<float>(angle.z * 0.5f));
 
 		Quaternion q;
 		q.w = cy * cp * cr + sy * sp * sr;
