@@ -65,7 +65,6 @@ void HelloTransformProgram::Update(seconds dt)
     transform_ = Mat4f::Scale(transform_, scale_);
     switch(shape_)
     {
-
         case ShapeType::PLANE:
             transform_ = Mat4f::Rotate(transform_, degree_t(angle_), Vec3f(0.0f, 0.0f, 1.0f));
             break;

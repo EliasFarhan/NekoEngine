@@ -106,6 +106,7 @@ public:
 
     void SetFlag(RendererFlag flag);
     void SetWindow(Window* window);
+    float GetDeltaTime() const { return dt_; }
     std::mutex& GetRenderMutex(){ return renderMutex_;}
 protected:
     virtual void ClearScreen() = 0;
@@ -122,6 +123,7 @@ protected:
     std::mutex renderMutex_;
     std::atomic<std::uint8_t> flags_{IS_RENDERING_UI};
     std::condition_variable cv_;
+    std::atomic<float> dt_;
 
     std::vector<RenderCommandInterface*> currentCommandBuffer_ = {};
     std::vector<RenderCommandInterface*> nextCommandBuffer_ = {};

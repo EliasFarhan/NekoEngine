@@ -1,5 +1,6 @@
 #include <engine/engine.h>
 #include "04_hello_coords/coords_program.h"
+#include "imgui.h"
 
 namespace neko
 {
@@ -61,7 +62,6 @@ void HelloCoordsProgram::Destroy()
 
 void HelloCoordsProgram::DrawUi()
 {
-
 }
 
 void HelloCoordsProgram::OnEvent(const SDL_Event& event)

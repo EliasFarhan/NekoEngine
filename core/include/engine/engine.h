@@ -30,6 +30,7 @@
 #include <graphics/color.h>
 #include <utilities/time_utility.h>
 #include <mathematics/vector.h>
+#include <atomic>
 
 
 namespace neko
@@ -79,6 +80,9 @@ public:
 
     Configuration config;
 
+
+    float GetDeltaTime() const { return dt_; };
+	
     static BasicEngine* GetInstance(){return instance_;}
 
     //template <typename T = BasicEngine>
@@ -88,6 +92,7 @@ protected:
     Renderer* renderer_ = nullptr;
     Window* window_ = nullptr;
 	bool isRunning_;
+    std::atomic<float> dt_;
     Action<> initAction_;
     Action<seconds> updateAction_;
     Action<> drawUiAction_;

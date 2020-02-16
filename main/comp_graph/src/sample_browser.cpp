@@ -57,7 +57,7 @@ void SampleBrowser::DrawGui()
     {
         for (int n = 0; n < programsNames_.size(); n++)
         {
-            bool is_selected = (currentProgramIndex_ == n);
+	        const bool is_selected = (currentProgramIndex_ == n);
             if (ImGui::Selectable(programsNames_[n].c_str(), is_selected))
             {
                 SwitchToProgram(n);

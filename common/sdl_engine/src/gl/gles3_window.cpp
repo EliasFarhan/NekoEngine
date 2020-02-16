@@ -43,10 +43,11 @@ void Gles3Window::Init()
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
-    SDL_GL_SetSwapInterval(config.vSync);
     SdlWindow::Init();
     glContext_ = SDL_GL_CreateContext(window_);
     MakeCurrentContext();
+
+    SDL_GL_SetSwapInterval(config.vSync);
 #ifndef __EMSCRIPTEN__
     if (!gladLoadGLES2Loader((GLADloadproc) SDL_GL_GetProcAddress))
     {

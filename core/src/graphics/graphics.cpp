@@ -23,13 +23,15 @@
  */
 #include <graphics/graphics.h>
 #include <algorithm>
+#include <chrono>
 #include <engine/globals.h>
 #include <engine/window.h>
 #include <engine/engine.h>
 #include "engine/log.h"
 
+#ifdef EASY_PROFILE_USE
 #include "easy/profiler.h"
-
+#endif
 
 namespace neko
 {
@@ -79,8 +81,15 @@ void Renderer::RenderLoop()
     window_->LeaveCurrentContext();
     renderThread_ = std::thread([this] {
         BeforeRenderLoop();
+
+        std::chrono::time_point<std::chrono::system_clock> clock = std::chrono::system_clock::now();
         while (flags_ & IS_RUNNING)
         {
+            const auto start = std::chrono::system_clock::now();
+            const auto dt = std::chrono::duration_cast<seconds>(start - clock);
+            dt_ = dt.count();
+        	clock = start;
+        	
            Update();
         }
         AfterRenderLoop();
@@ -124,13 +133,15 @@ void Renderer::Update()
         RenderAll();
         window_->RenderUi();
     }
-    window_->SwapBuffer();
 
+    window_->SwapBuffer();
     //Sync the beginning frame with EngineLoop
     if (flags_ & IS_APP_WAITING)
     {
         cv_.notify_one();
     }
+
+
 }
 void Renderer::BeforeRenderLoop()
 {

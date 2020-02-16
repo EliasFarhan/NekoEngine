@@ -184,7 +184,7 @@ set(SOURCES
     ${INCLUDE_FILES}
 )
 
-add_library(easy_profiler ${SOURCES} resources.rc)
+add_library(easy_profiler STATIC ${SOURCES} resources.rc)
 # End adding source files.
 #################################################
 

@@ -5,7 +5,7 @@
 
 namespace neko
 {
-class CompGraphEngine : public neko::sdl::SdlEngine
+class CompGraphEngine : public sdl::SdlEngine
 {
 public:
 	explicit CompGraphEngine(Configuration* config = nullptr);
