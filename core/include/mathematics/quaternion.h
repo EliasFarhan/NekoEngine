@@ -3,6 +3,8 @@
 #include <mathematics/vector.h>
 #include <cmath>
 
+//DATE : 17.02.2020
+
 namespace neko
 {
 struct Quaternion
