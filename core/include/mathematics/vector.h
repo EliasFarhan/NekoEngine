@@ -28,6 +28,7 @@
 #include <cmath>
 #include "mathematics/const.h"
 #include <mathematics/intrinsincs.h>
+#include "mathematics/angle.h"
 
 namespace neko
 {
@@ -381,6 +382,7 @@ U Vec3<T>::AngleBetween(const Vec3& v1, const Vec3& v2)
 using Vec3f = Vec3<float>;
 using Vec3i = Vec3<int>;
 using Vec3u = Vec3<unsigned int>;
+using EulerAngles = Vec3<degree_t>;
 
 template <>
 Vec3f inline const Vec3f::Zero = Vec3f(0.0f,0.0f, 0.0f);
@@ -549,6 +551,7 @@ public:
 
 using Vec4f = Vec4<float>;
 using Quaternion = Vec4f;
+
 
 
 

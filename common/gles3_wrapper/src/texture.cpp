@@ -9,7 +9,7 @@
 namespace neko::gl
 {
 
-unsigned stbCreateTexture(const char* filename, TextureFlags flags)
+unsigned stbCreateTexture(const std::string_view filename, TextureFlags flags)
 {
     std::string extension = GetFilenameExtension(filename);
     if(!FileExists(filename))
@@ -30,11 +30,11 @@ unsigned stbCreateTexture(const char* filename, TextureFlags flags)
     void *data = nullptr;
     if(extension == ".hdr")
     {
-        data = stbi_loadf(filename, &width, &height, &reqComponents, 0);
+        data = stbi_loadf(filename.data(), &width, &height, &reqComponents, 0);
     }
     else
     {
-        data = stbi_load(filename, &width, &height, &nrChannels, reqComponents);
+        data = stbi_load(filename.data(), &width, &height, &nrChannels, reqComponents);
     }
     if (data == nullptr)
     {
