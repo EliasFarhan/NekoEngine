@@ -10,13 +10,13 @@ const unsigned long toRange = 1 << 20;
 static void BM_Aabb2CheckIntersect(benchmark::State& state)
 {
     const size_t n = state.range(0);
-    std::vector<neko::Aabb2> v1(n);
-    std::vector<neko::Aabb2> v2(n);
+    std::vector<neko::Aabb2d> v1(n);
+    std::vector<neko::Aabb2d> v2(n);
     for (auto v : v1) {
-        v.SetCenterExtend(neko::Vec2f(RandomFloat(), RandomFloat()), neko::Vec2f(RandomFloat(), RandomFloat()));
+        v.FromCenterExtends(neko::Vec2f(RandomFloat(), RandomFloat()), neko::Vec2f(RandomFloat(), RandomFloat()));
     }
     for (auto v : v2) {
-        v.SetCenterExtend(neko::Vec2f(RandomFloat(), RandomFloat()), neko::Vec2f(RandomFloat(), RandomFloat()));
+        v.FromCenterExtends(neko::Vec2f(RandomFloat(), RandomFloat()), neko::Vec2f(RandomFloat(), RandomFloat()));
     }
     for (auto _ : state)
     {
@@ -32,13 +32,13 @@ BENCHMARK(BM_Aabb2CheckIntersect)->Range(fromRange, toRange);
 static void BM_Aabb2CheckContains(benchmark::State& state)
 {
     const size_t n = state.range(0);
-    std::vector<neko::Aabb2> v1(n);
-    std::vector<neko::Aabb2> v2(n);
+    std::vector<neko::Aabb2d> v1(n);
+    std::vector<neko::Aabb2d> v2(n);
     for (auto v : v1) {
-        v.SetCenterExtend(neko::Vec2f(RandomFloat(), RandomFloat()), neko::Vec2f(RandomFloat(), RandomFloat()));
+        v.FromCenterExtends(neko::Vec2f(RandomFloat(), RandomFloat()), neko::Vec2f(RandomFloat(), RandomFloat()));
     }
     for (auto v : v2) {
-        v.SetCenterExtend(neko::Vec2f(RandomFloat(), RandomFloat()), neko::Vec2f(RandomFloat(), RandomFloat()));
+        v.FromCenterExtends(neko::Vec2f(RandomFloat(), RandomFloat()), neko::Vec2f(RandomFloat(), RandomFloat()));
     }
     for (auto _ : state)
     {
