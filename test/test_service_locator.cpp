@@ -33,7 +33,7 @@ using ProutLocator = neko::Locator<ProutInterface, NullProut>;
 
 TEST(Engine, TestServiceLocator)
 {
-    ProutLocator::initialize();
+    //ProutLocator::initialize();
     {
         const auto& prout = ProutLocator::get();
         prout.Execute();
