@@ -34,10 +34,14 @@ TEST(Engine, TestMathematics)
     std::cout << "Error margin for sinFuncTable with resolution 512: "<<error<<"\n";
 }
 
-TEST(Engine, TestCircleCollision)
+TEST(Engine, TestCircleContact)
 {
-    neko::Circle_f circleA(neko::Vec2f(2,2), 2);
-    neko::Circle_f circleB(neko::Vec2f(3, 3), 3);
+    neko::Circle2D circleA(neko::Vec2f(2,2), 2);
+    neko::Circle2D circleB(neko::Vec2f(3, 3), 3);
 
-    std::cout << circleA.IsCircleCollision(circleB) << std::endl;
+    neko::Sphere3D sphere1(neko::Vec3f(2, 2, 2), 2);
+    neko::Sphere3D sphere2(neko::Vec3f(5, 5, 5), 2);
+
+    std::cout << circleA.Intersect(circleB) << "\n";
+    std::cout << sphere1.Intersect(sphere2) << "\n";
 }
