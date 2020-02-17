@@ -123,11 +123,10 @@ protected:
     std::mutex renderMutex_;
     std::atomic<std::uint8_t> flags_{IS_RENDERING_UI};
     std::condition_variable cv_;
-    std::atomic<float> dt_;
+    std::atomic<float> dt_{0.0f};
 
     std::vector<RenderCommandInterface*> currentCommandBuffer_ = {};
     std::vector<RenderCommandInterface*> nextCommandBuffer_ = {};
-    size_t renderLength_ = 0;
 };
 
 using RendererLocator = Locator<RendererInterface, NullRenderer>;

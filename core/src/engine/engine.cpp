@@ -74,6 +74,7 @@ void BasicEngine::Init()
 
 void BasicEngine::Update(seconds dt)
 {
+    dt_ = dt.count();
 #ifdef EASY_PROFILE_USE
 	EASY_BLOCK("Basic Engine Update");
 #endif
@@ -125,7 +126,6 @@ void BasicEngine::EngineLoop()
 		const auto start = std::chrono::system_clock::now();
 		const auto dt = std::chrono::duration_cast<seconds>(start - clock);
 		clock = start;
-		dt_ = dt.count();
 		Update(dt);
 	}
 #endif
@@ -146,7 +146,10 @@ void BasicEngine::GenerateUiFrame()
 
 	std::ostringstream oss;
 	oss << "App FPS: " << 1.0f / GetDeltaTime() << '\n'
-		<< "Render FPS: " << 1.0f / renderer_->GetDeltaTime() << '\n';
+#ifndef EMSCRIPTEN
+		<< "Render FPS: " << 1.0f / renderer_->GetDeltaTime()
+#endif
+		<< '\n';
 	ImGui::Text(oss.str().c_str());
 	ImGui::End();
 	drawUiAction_.Execute();

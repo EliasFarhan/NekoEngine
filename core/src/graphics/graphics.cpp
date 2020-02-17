@@ -133,13 +133,13 @@ void Renderer::Update()
         RenderAll();
         window_->RenderUi();
     }
-
-    window_->SwapBuffer();
     //Sync the beginning frame with EngineLoop
     if (flags_ & IS_APP_WAITING)
     {
         cv_.notify_one();
     }
+    window_->SwapBuffer();
+
 
 
 }
