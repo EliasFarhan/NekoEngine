@@ -48,7 +48,7 @@ struct Quaternion
 	}
 
 	//The dot product between two rotations.
-	float Dot(Quaternion a, Quaternion b) const
+	static float Dot(Quaternion a, Quaternion b)
 	{
 		return	a.x * b.x +
 				a.y * b.y +
