@@ -6,10 +6,10 @@
 #include "const.h"
 #include "angle.h"
 
-using Transform3d = neko::Mat4f;
-
 namespace neko
 {
+
+using Transform3d = neko::Mat4f;
 
 template<>
 inline Mat4f const Transform3d::TranslationMatrixFrom(const Vec3f translation)
@@ -38,7 +38,7 @@ inline Mat4f const Transform3d::ScalingMatrixFrom(const Vec3f scale)
 template<>
 inline Mat4f const Transform3d::RotationMatrixFrom(const degree_t angle, const Vec3f axis)
 {
-    const float angleAsFloat = static_cast<degree_t>(angle).to<float>();
+    const float angleAsFloat = static_cast<radian_t>(angle).to<float>();
     const Vec3f normalizedAxis = axis / axis.GetMagnitude();
 
     const float x = axis[0];
@@ -233,5 +233,41 @@ template<>
 inline Transform3d Transform3d::Rotate(const Transform3d& transform, const EulerAngles eulerAngles)
 {
     return transform * RotationMatrixFrom(eulerAngles);
+}
+
+template<>
+inline float const Transform3d::Pitch(const Mat4<float>& transform)
+{
+    return std::asin(transform[1][0]);
+}
+
+template<>
+inline float const Transform3d::RotationOnX(const Mat4<float>& transform)
+{
+    return Pitch(transform);
+}
+
+template<>
+inline float const Transform3d::Yaw(const Mat4<float>& transform)
+{
+    return std::atan2(-transform[2][1], transform[0][0]);
+}
+
+template<>
+inline float const Transform3d::RotationOnY(const Mat4<float>& transform)
+{
+    return Yaw(transform);
+}
+
+template<>
+inline float const Transform3d::Roll(const Mat4<float>& transform)
+{
+    return std::atan2(-transform[1][2], transform[1][1]);
+}
+
+template<>
+inline float const Transform3d::RotationOnZ(const Mat4<float>& transform)
+{
+    return Roll(transform);
 }
 }
