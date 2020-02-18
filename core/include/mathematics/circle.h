@@ -41,44 +41,35 @@ namespace neko
             return radius;
         }
 
-    	const bool CirclesIntersect(Circle<T> circle) const
+    	bool CirclesIntersect(Circle<T> circle) const
         {
             const T distanceVector = circle.center - center;
         	
-            if (Distance(distanceVector.GetMagnitude()) <= circle.radius + radius)
-            {
-                return true;            	
-            }
+            return distanceVector.GetMagnitude() <= circle.radius + radius;
+        }
+
+        bool SquareCircleIntersect(neko::Rect2f rect) const
+        {
+			const T distanceVector = rect.center - center;
+
+			if (distanceVector.GetMagnitude() <= rect.halfSize.x + radius)
+			{
+                return true;
+			}
+
+			if (distanceVector.GetMagnitude() <= rect.halfSize.y + radius)
+			{
+                return true;
+			}
         	
             return false;
         }
 
-        const bool SquareCircleIntersect(neko::Rect2f rect) const
-        {
-			const T distanceVector = rect.center - center;
-
-			if (Distance(distanceVector.GetMagnitude()) <= rect.halfSize.x + radius)
-			{
-                return true;
-			}
-
-			if (Distance(distanceVector.GetMagnitude()) <= rect.halfSize.y + radius)
-			{
-                return true;
-			}
-            return false;
-        }
-
-    	static bool IsPlanCircleContact(Circle<Vec3f> sphere, Vec3f normal, Vec3f pos)
+    	static bool IsPlanCircleContact(const Circle<Vec3f> sphere, const Vec3f normal, const Vec3f pos)
         {
             const float p = Vec3f::Dot(sphere.center - pos, normal) / normal.GetMagnitude();
         	
             return p < sphere.radius && p > -sphere.radius;
-        }
-    	
-        static float Distance(const float magnitude)
-        {
-            return magnitude;
         }
     	
     	T center;
