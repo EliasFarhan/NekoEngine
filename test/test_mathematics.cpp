@@ -50,5 +50,5 @@ TEST(Engine, TestCircleContact)
     std::cout << sphere1.CirclesIntersect(sphere2) << "\n";
     std::cout << circleC.SquareCircleIntersect(rect) << "\n";
 
-	
+    std::cout << neko::Sphere3D::IsPlanCircleContact(sphere1, neko::Vec3f(0, 1, 0), neko::Vec3f(1, 100, 1)) << "\n";
 }

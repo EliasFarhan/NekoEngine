@@ -288,7 +288,7 @@ public:
     {
         return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
     }
-
+    
     Vec3<T> operator+(const Vec3<T>& rhs) const
     {
         return Vec3<T>(x + rhs.x, y + rhs.y, z + rhs.z);

@@ -45,9 +45,7 @@ namespace neko
         {
             const T distanceVector = circle.center - center;
         	
-            const float distance = distanceVector.GetMagnitude();
-        	
-            if (distance <= circle.radius + radius)
+            if (Distance(distanceVector.GetMagnitude()) <= circle.radius + radius)
             {
                 return true;            	
             }
@@ -59,26 +57,31 @@ namespace neko
         {
 			const T distanceVector = rect.center - center;
 
-            const float distance = distanceVector.GetMagnitude();
-
-			if (distance <= rect.halfSize.x + radius)
+			if (Distance(distanceVector.GetMagnitude()) <= rect.halfSize.x + radius)
 			{
                 return true;
 			}
 
-			if (distance <= rect.halfSize.y + radius)
+			if (Distance(distanceVector.GetMagnitude()) <= rect.halfSize.y + radius)
 			{
                 return true;
 			}
             return false;
         }
 
-    	T IsPlanCircleContact(Circle circle)
+    	static bool IsPlanCircleContact(Circle<Vec3f> sphere, Vec3f normal, Vec3f pos)
         {
-            T plan = circle.center
-            T centerToPlan(circle.center, plan);
+            const float p = Vec3f::Dot(sphere.center - pos, normal) / normal.GetMagnitude();
+        	
+            return p < sphere.radius && p > -sphere.radius;
         }
-        T center;
+    	
+        static float Distance(const float magnitude)
+        {
+            return magnitude;
+        }
+    	
+    	T center;
         const float radius = 0;
     };
 
