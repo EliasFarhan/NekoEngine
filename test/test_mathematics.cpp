@@ -44,7 +44,8 @@ TEST(Engine, TestCircleContact)
     neko::Sphere3D sphere2(neko::Vec3f(5, 5, 5), 2);
 
     neko::Rect2f rect(neko::Vec2f(3, 3), neko::Vec2f(2, 2));
-    neko::Circle2D circleC(neko::Vec2f(0, 3), 3);
+    neko::Circle2D circleC(neko::Vec2f(4, 3), 2);
+	
     std::cout << circleA.CirclesIntersect(circleB) << "\n";
     std::cout << sphere1.CirclesIntersect(sphere2) << "\n";
     std::cout << circleC.SquareCircleIntersect(rect) << "\n";

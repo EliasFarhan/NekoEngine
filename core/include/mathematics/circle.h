@@ -61,18 +61,23 @@ namespace neko
 
             const float distance = distanceVector.GetMagnitude();
 
-			if (distance <= rect.halfSize.x - radius)
+			if (distance <= rect.halfSize.x + radius)
 			{
                 return true;
 			}
 
-			if (distance <= rect.halfSize.y - radius)
+			if (distance <= rect.halfSize.y + radius)
 			{
                 return true;
 			}
             return false;
         }
-    	
+
+    	T IsPlanCircleContact(Circle circle)
+        {
+            T plan = circle.center
+            T centerToPlan(circle.center, plan);
+        }
         T center;
         const float radius = 0;
     };
