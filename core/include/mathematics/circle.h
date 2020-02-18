@@ -24,6 +24,7 @@
  */
 
 #include "mathematics/vector.h"
+#include "rect.h"
 
 namespace neko
 {
@@ -35,14 +36,12 @@ namespace neko
 
         }
 
-        
-        float GetRadius()
+    	float GetRadius() const
         {
             return radius;
         }
 
-    	
-    	const bool Intersect(Circle<T> circle) const
+    	const bool CirclesIntersect(Circle<T> circle) const
         {
             const T distanceVector = circle.center - center;
         	
@@ -50,16 +49,33 @@ namespace neko
         	
             if (distance <= circle.radius + radius)
             {
-                return true;
+                return true;            	
             }
         	
             return false;
         }
 
-        T center;
-        float radius = 0;
-    };
+        const bool SquareCircleIntersect(neko::Rect2f rect) const
+        {
+			const T distanceVector = rect.center - center;
 
+            const float distance = distanceVector.GetMagnitude();
+
+			if (distance <= rect.halfSize.x - radius)
+			{
+                return true;
+			}
+
+			if (distance <= rect.halfSize.y - radius)
+			{
+                return true;
+			}
+            return false;
+        }
+    	
+        T center;
+        const float radius = 0;
+    };
 
     using Circle2D = Circle<Vec2f>;
     using Sphere3D = Circle<Vec3f>;

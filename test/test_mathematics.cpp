@@ -36,12 +36,18 @@ TEST(Engine, TestMathematics)
 
 TEST(Engine, TestCircleContact)
 {
+	
     neko::Circle2D circleA(neko::Vec2f(2,2), 2);
     neko::Circle2D circleB(neko::Vec2f(3, 3), 3);
 
     neko::Sphere3D sphere1(neko::Vec3f(2, 2, 2), 2);
     neko::Sphere3D sphere2(neko::Vec3f(5, 5, 5), 2);
 
-    std::cout << circleA.Intersect(circleB) << "\n";
-    std::cout << sphere1.Intersect(sphere2) << "\n";
+    neko::Rect2f rect(neko::Vec2f(3, 3), neko::Vec2f(2, 2));
+    neko::Circle2D circleC(neko::Vec2f(0, 3), 3);
+    std::cout << circleA.CirclesIntersect(circleB) << "\n";
+    std::cout << sphere1.CirclesIntersect(sphere2) << "\n";
+    std::cout << circleC.SquareCircleIntersect(rect) << "\n";
+
+	
 }
