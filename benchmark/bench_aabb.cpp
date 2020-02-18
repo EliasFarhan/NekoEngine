@@ -4,7 +4,7 @@
 #include <mathematics/aabb.h>
 #include <random_fill.h>
 
-const unsigned long fromRange = 8;
+const unsigned long fromRange = 2;
 const unsigned long toRange = 1 << 20;
 
 static void BM_Aabb2CheckIntersect(benchmark::State& state)
