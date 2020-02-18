@@ -11,7 +11,7 @@ foreach(bench_file ${BENCH_FILES} )
     # I used a simple string replace, to cut off .cpp.
     file(RELATIVE_PATH bench_relative_path ${BENCH_DIR} ${bench_file})
     string( REPLACE ".cpp" "" bench_name ${bench_relative_path} )
-    add_executable(${bench_name} ${bench_file} bench_transformations.cpp)
+    add_executable(${bench_name} ${bench_file})
     # Make sure YourLib is linked to each app
     target_link_libraries(${bench_name} PUBLIC benchmark benchmark_main Neko_Core )
 

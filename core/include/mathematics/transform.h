@@ -236,37 +236,76 @@ inline Transform3d Transform3d::Rotate(const Transform3d& transform, const Euler
 }
 
 template<>
-inline float const Transform3d::Pitch(const Mat4<float>& transform)
+inline EulerAngles const Transform3d::Rotation(const Mat4<float>& transform)
+{
+    // TODO: Don't think this works properly...
+
+    float theta = 0.0f;
+    float psi = 0.0f;
+    float phi = 0.0f;
+
+    if (std::abs(transform[0][2]) != 1.0f)
+    {
+        theta = -std::sin(transform[0][2]);
+        psi = std::atan2((transform[1][2] / std::cos(theta)), (transform[2][2] / std::cos(theta)));
+        phi = std::atan2((transform[0][1] / std::cos(theta)), (transform[0][0] / std::cos(theta)));
+    }
+    else if (transform[0][2] == -1.0f)
+    {
+        theta = PI * 0.5f;
+        psi = phi + std::atan2(transform[1][0], transform[2][0]);
+    }
+    else
+    {
+        theta = -PI * 0.5f;
+        psi = -phi + std::atan2(-transform[1][0], -transform[2][0]);
+    }
+
+    return EulerAngles(
+            degree_t(static_cast<degree_t>(radian_t(theta))),
+            degree_t(static_cast<degree_t>(radian_t(psi))),
+            degree_t(static_cast<degree_t>(radian_t(phi)))
+    );
+}
+
+template<>
+inline Quaternion const Transform3d::RotationQuaternion(const Mat4<float>& transform)
+{
+
+}
+
+template<>
+inline float Transform3d::Pitch(const Mat4<float>& transform)
 {
     return std::asin(transform[1][0]);
 }
 
 template<>
-inline float const Transform3d::RotationOnX(const Mat4<float>& transform)
+inline float Transform3d::RotationOnX(const Mat4<float>& transform)
 {
     return Pitch(transform);
 }
 
 template<>
-inline float const Transform3d::Yaw(const Mat4<float>& transform)
+inline float Transform3d::Yaw(const Mat4<float>& transform)
 {
     return std::atan2(-transform[2][1], transform[0][0]);
 }
 
 template<>
-inline float const Transform3d::RotationOnY(const Mat4<float>& transform)
+inline float Transform3d::RotationOnY(const Mat4<float>& transform)
 {
     return Yaw(transform);
 }
 
 template<>
-inline float const Transform3d::Roll(const Mat4<float>& transform)
+inline float Transform3d::Roll(const Mat4<float>& transform)
 {
     return std::atan2(-transform[1][2], transform[1][1]);
 }
 
 template<>
-inline float const Transform3d::RotationOnZ(const Mat4<float>& transform)
+inline float Transform3d::RotationOnZ(const Mat4<float>& transform)
 {
     return Roll(transform);
 }

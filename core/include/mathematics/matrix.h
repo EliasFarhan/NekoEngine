@@ -186,17 +186,21 @@ public:
 
     static Mat4<float> const RotationMatrixFrom(const Quaternion quaternion);
 
-    static float const Pitch(const Mat4<float>& transform);
+    static Quaternion const RotationQuaternion(const Mat4<float>& transform);
 
-    static float const RotationOnX(const Mat4<float>& transform);
+    static EulerAngles const Rotation(const Mat4<float>& transform);
 
-    static float const Yaw(const Mat4<float>& transform);
+    static float Pitch(const Mat4<float>& transform);
 
-    static float const RotationOnY(const Mat4<float>& transform);
+    static float RotationOnX(const Mat4<float>& transform);
 
-    static float const Roll(const Mat4<float>& transform);
+    static float Yaw(const Mat4<float>& transform);
 
-    static float const RotationOnZ(const Mat4<float>& transform);
+    static float RotationOnY(const Mat4<float>& transform);
+
+    static float Roll(const Mat4<float>& transform);
+
+    static float RotationOnZ(const Mat4<float>& transform);
 
     static Mat4<T> Perspective(radian_t fovy, float aspect, float near, float far);
     const static Mat4<T> Identity;
