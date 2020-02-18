@@ -109,7 +109,7 @@ public:
 
     Mat4<T> operator*(const Mat4<T>& rhs) const
     {
-        return MultiplyIntrinsincs(rhs);
+        return MultiplyNaive(rhs); // MultiplyIntrinsincs(rhs); // TODO @Elias: Intrinsics version is glitched.
     }
 
     inline Mat4<T> MultiplyNaive(const Mat4<T>& rhs) const noexcept

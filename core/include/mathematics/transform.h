@@ -17,10 +17,10 @@ inline Mat4f const Transform3d::TranslationMatrixFrom(const Vec3f translation)
     return Mat4f(
             std::array<Vec4f, 4>
                     {
-                            Vec4f(1.0f, 0, 0, 0),
-                            Vec4f(0, 1.0f, 0, 0),
-                            Vec4f(0, 0, 1.0f, 0),
-                            Vec4f(translation[0], translation[1], translation[2], 1)});
+                            Vec4f(1.0f, 0, 0, translation[0]),
+                            Vec4f(0, 1.0f, 0, translation[1]),
+                            Vec4f(0, 0, 1.0f, translation[2]),
+                            Vec4f(0, 0, 0, 1)});
 }
 
 template<>

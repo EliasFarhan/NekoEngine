@@ -60,13 +60,8 @@ void HelloTransformProgram::Update(seconds dt)
 {
     std::lock_guard<std::mutex> lock(updateMutex_);
     transform_ = Mat4f::Identity;
-    transform_ =
-            Mat4f::Translate(transform_, position_) *
-            Mat4f::Rotate(transform_, degree_t(angle_), Vec3f(0.0f, 0.0f, 1.0f)) *
-            Mat4f::Scale(transform_, scale_);
-
-
-    /*transform_ = Mat4f::Translate(transform_, position_);
+    transform_ = Mat4f::Translate(transform_, position_);
+    transform_ = Mat4f::Scale(transform_, scale_);
     switch(shape_)
     {
 
@@ -79,7 +74,6 @@ void HelloTransformProgram::Update(seconds dt)
         default:
             break;
     }
-    transform_ = Mat4f::Scale(transform_, scale_);*/
 }
 
 void HelloTransformProgram::DrawUi(seconds dt)
