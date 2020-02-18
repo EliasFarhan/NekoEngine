@@ -3,13 +3,22 @@
 //
 
 #include <gtest/gtest.h>
-#include <mathematics/vector.h>
+#include <iostream>
 
-TEST(Engine, TestVector) {
-    neko::Vec4f vec;
-    neko::Vec3f vec1 = neko::Vec3f::right;
+#include <mathematics/vector_nvec.h>
 
-    neko::Vec2f vec2 = (neko::Vec2f) vec + (neko::Vec2f) vec1;
+namespace neko
+{
+TEST(Engine, TestVector)
+{
+    std::array<Vec4f, 4> array;
+    array.fill(Vec4f(5, 1, 3, 9));
+    FourVec4f test = (FourVec4f) array;
 
-    std::cout << vec2.SquareMagnitude();
+    auto result = test.MagnitudeIntrinsics();
+
+    for (auto& tet : result) {
+        std::cout << tet << "\n";
+    }
+}
 }

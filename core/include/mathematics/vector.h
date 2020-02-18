@@ -223,23 +223,23 @@ struct Vec2
     }
 
     /// \brief Interpolate between two vectors.
-    /// \t The interpolation amount.
+    /// \param t The interpolation amount.
     static Vec2<T> Lerp(const Vec2<T>& v1, const Vec2<T>& v2, T t)
     {
         return v1 + (v2 - v1) * t;
     }
 
     /// \brief Reflect the inVec using the normal given (doesn't need to be normalized).
-    /// \inVec The vector to reflect.
-    /// \normal The normal vector of the line to reflect off.
+    /// \param inVec The vector to reflect.
+    /// \param normal The normal vector of the line to reflect off.
     static Vec2<T> Reflect(const Vec2<T>& inVec, const Vec2<T>& normal)
     {
         return inVec - normal * 2 * Dot(inVec, normal);
     }
 
     /// \brief Project v1 on v2 (doesn't need to be normalized).
-    /// \v1 The vector to project.
-    /// \v2 The vector to project on.
+    /// \param v1 The vector to project.
+    /// \param v2 The vector to project on.
     static Vec2<T> Project(const Vec2<T>& v1, const Vec2<T>& v2)
     {
         const auto dot = Dot(v1, v2);
@@ -498,15 +498,15 @@ public:
     }
 
     /// \brief Interpolate between two vectors.
-    /// \t The interpolation amount.
+    /// \param t the interpolation amount.
     static Vec3<T> Lerp(const Vec3<T>& v1, const Vec3<T>& v2, T t)
     {
         return v1 + (v2 - v1) * t;
     }
 
     /// \brief Reflect the inVec using the normal given (doesn't need to be normalized).
-    /// \inVec The vector to reflect.
-    /// \normal The normal vector of the line to reflect off.
+    /// \param inVec the vector to reflect.
+    /// \param normal the normal vector of the line to reflect off.
     static Vec3<T> Reflect(const Vec3<T>& inVec, const Vec3<T>& normal)
     {
         Vec3<T> normalized = normal.Normalized();
@@ -514,8 +514,8 @@ public:
     }
 
     /// \brief Project v1 on v2 (doesn't need to be normalized).
-    /// \v1 The vector to project.
-    /// \v2 The vector to project on.
+    /// \param v1 the vector to project.
+    /// \param v2 the vector to project on.
     static Vec3<T> Project(const Vec3<T>& v1, const Vec3<T>& v2)
     {
         const auto dot = Dot(v1, v2);
@@ -768,15 +768,15 @@ public:
     }
 
     /// \brief Interpolate between two vectors.
-    /// \t The interpolation amount.
+    /// \param t the interpolation amount.
     static Vec4<T> Lerp(const Vec4<T>& v1, const Vec4<T>& v2, T t)
     {
         return v1 + (v2 - v1) * t;
     }
 
     /// \brief Project v1 on v2 (doesn't need to be normalized).
-    /// \v1 The vector to project.
-    /// \v2 The vector to project on.
+    /// \param v1 the vector to project.
+    /// \param v2 the vector to project on.
     static Vec4<T> Project(const Vec4<T>& v1, const Vec4<T>& v2)
     {
         const auto dot = Dot(v1, v2);
