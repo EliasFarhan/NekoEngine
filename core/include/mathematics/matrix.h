@@ -559,12 +559,12 @@ inline Transform3d Transform3d::Rotate(const Transform3d& transform, radian_t an
 }
 
 //TODO Implement Matrix Rotation with Quaternion
-template<>
+/*template<>
 inline Transform3d Transform3d::Rotate(const Transform3d& transform, Quaternion quaternion)
 {
     (void) quaternion;
     return transform;
-}
+}*/
 
 //TODO Implement Matrix Rotation with Simple Euler Angles
 template<>
@@ -608,11 +608,11 @@ inline Mat4f Mat4f::Perspective(radian_t fovy, float aspect, float near, float f
     return perspective;
 }
 
-template<>
+/*template<>
 inline Transform3d Transform3d::FromQuaternion(Quaternion quaternion)
 {
     (void) quaternion;
     return Transform3d::Identity;
-}
+}*/
 
 }

@@ -73,14 +73,15 @@ struct Quaternion
 	//Creates a rotation which rotates angle degrees around axis.
 	Vec3f AngleAxis(Quaternion quaternion, float angle, Vec3f axis) const
 	{
-
+		//return axis* Angle(quaternion, FromEuler(angle));
 	}
 
 
 	//Returns the angle in degrees between two rotations a and b.
 	float Angle(Quaternion a, Quaternion b) const
 	{
-
+		
+		return 2 * acosf(abs(Dot(a, b)));
 	}
 
 	Quaternion Conjugate() const
