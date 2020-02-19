@@ -3,6 +3,7 @@
 #include <mathematics/vector.h>
 #include <cmath>
 
+
 //DATE : 17.02.2020
 
 namespace neko
@@ -71,9 +72,22 @@ struct Quaternion
 	}
 
 	//Creates a rotation which rotates angle degrees around axis.
-	Vec3f AngleAxis(Quaternion quaternion, float angle, Vec3f axis) const
+	Quaternion AngleAxis(float  degress, neko::Vec3f axis) const
 	{
-		//return axis* Angle(quaternion, FromEuler(angle));
+		if (axis.GetSquareMagnitude() == 0.0f)
+			return Quaternion(0, 0, 0, 0);
+
+		Quaternion result = Quaternion(0,0,0,0);
+		float radians = degress * PI/180;
+		radians *= 0.5f;
+		//TODO: axis.Normalize();
+		axis = axis * sin(radians);
+		result.x = axis.x;
+		result.y = axis.y;
+		result.z = axis.z;
+		result.w = cos(radians);
+
+		return Normalize(result);
 	}
 
 
