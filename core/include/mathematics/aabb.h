@@ -164,6 +164,11 @@ struct Obb3d {
 		rotationX = rotx;
 	}
 
+	Vec3f CalculateDirection(){
+		return Vec3f(cosf(rotationZ), sinf(rotationX) + sinf(rotationZ), cos(rotationX));		// TODO normalize vec3f
+	}
+
+
 
 	Vec3f lowerLeftBound;	///< the lower vertex
 	Vec3f upperRightBound;	///< the upper vertex
