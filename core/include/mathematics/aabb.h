@@ -39,10 +39,10 @@ struct Obb2d {
 		return Vec2f(CalculateDirection().y,-CalculateDirection().x);
     }
 
-    /// Set the center, the extend and the direction of the OBB.
-    void SetCenterExtendRot(Vec2f center, Vec2f extends, float rot) {
-        lowerLeftBound = center - extends;
-        upperRightBound = center + extends;
+    /// Set the center, the extent and the rotation of the OBB.
+    void SetCenterExtentRot(Vec2f center, Vec2f extent, float rot) {
+        lowerLeftBound = center - extent;
+        upperRightBound = center + extent;
 		rotation = rot;
     }
 
@@ -153,6 +153,24 @@ struct Obb2d {
     Vec2f upperRightBound;	///< the upper vertex
 	float rotation;       ///< the angle of rotation in rd
 };
+
+struct Obb3d {
+
+	/// Set the center, the extent and the rotations of the OBB.
+	void SetCenterExtentRotZRotX(Vec3f center, Vec3f extent, float rotz, float rotx) {
+		lowerLeftBound = center - extent;
+		upperRightBound = center + extent;
+		rotationZ = rotz;
+		rotationX = rotx;
+	}
+
+
+	Vec3f lowerLeftBound;	///< the lower vertex
+	Vec3f upperRightBound;	///< the upper vertex
+	float rotationZ;       ///< the angle of rotation on the Z axis in rd
+	float rotationX;       ///< the angle of rotation on the X axis in rd
+};
+
 
 
 struct Aabb2d {
