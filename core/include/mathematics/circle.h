@@ -48,7 +48,7 @@ namespace neko
             return distanceVector.GetMagnitude() <= circle.radius + radius;
         }
 
-        bool SquareCircleIntersect(neko::Rect2f rect) const
+        bool RectCircleIntersect(Rect2f rect) const
         {
 			const T distanceVector = rect.center - center;
 
