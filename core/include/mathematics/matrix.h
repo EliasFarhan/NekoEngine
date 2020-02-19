@@ -137,7 +137,7 @@ public:
         {
             for (int row = 0; row < 4; row++)
             {
-                v[column][row] = Vec4<T>::Dot(lhsT[row], Vec4<T>(rhs.columns_[column]));
+                v[column][row] = Vec4<T>::Dot(lhsT[column], Vec4<T>(rhs.columns_[row]));
             }
         }
         return Mat4<T>(v);
@@ -154,7 +154,7 @@ public:
         {
             for (int row = 0; row < 4; row++)
             {
-                result += rhs[column][row] - lhs[column][row];
+                result += std::abs(rhs[column][row] - lhs[column][row]);
             }
         }
         return result;
@@ -487,8 +487,8 @@ inline Mat4<T> Mat4<T>::MultiplyAoSoA(const Mat4<T>& rhs) const noexcept
     {
     	for(int row = 0; row < 4; row++)
     	{
-            const auto result = Vec4f::Dot(lhsT[row], rhs.columns_[column]);
-            v[column][row] = result;
+            const auto result = Vec4f::Dot(lhsT[column], rhs.columns_[row]);
+            v[column] = result;
     	}
         
     }
@@ -505,7 +505,7 @@ inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
     {
 
         __m128 c = _mm_load_ps(&rhs[column][0]);
-    	
+
         __m128 x = _mm_load_ps(&lhsT[0][0]);
         __m128 y = _mm_load_ps(&lhsT[1][0]);
         __m128 z = _mm_load_ps(&lhsT[2][0]);
