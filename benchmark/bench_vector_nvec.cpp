@@ -187,13 +187,13 @@ BENCHMARK(BM_DotIntrinsics);
 
 static void BM_ReflectSimple(benchmark::State& state)
 {
-    std::array<neko::Vec3f, 4> array1;
+    std::array<neko::Vec3f, 8> array1;
     for (auto& arr : array1)
     {
         arr = neko::Vec3f(1, 1, 0);
     }
 
-    std::array<neko::Vec3f, 4> array2;
+    std::array<neko::Vec3f, 8> array2;
     for (auto& arr : array2)
     {
         arr = neko::Vec3f(0, -1, 0);
@@ -212,23 +212,23 @@ BENCHMARK(BM_ReflectSimple);
 
 static void BM_Reflect(benchmark::State& state)
 {
-    std::array<neko::Vec3f, 4> array1;
+    std::array<neko::Vec3f, 8> array1;
     for (auto& arr : array1)
     {
         arr = neko::Vec3f(1, 1, 0);
     }
-    neko::FourVec3f test1 = (neko::FourVec3f) array1;
+    neko::EightVec3f test1 = (neko::EightVec3f) array1;
 
-    std::array<neko::Vec3f, 4> array2;
+    std::array<neko::Vec3f, 8> array2;
     for (auto& arr : array2)
     {
         arr = neko::Vec3f(0, -1, 0);
     }
-    neko::FourVec3f test2 = (neko::FourVec3f) array2;
+    neko::EightVec3f test2 = (neko::EightVec3f) array2;
 
     for (auto _ : state)
     {
-        neko::FourVec3f::Reflect(test1, test2);
+        neko::EightVec3f::Reflect(test1, test2);
     }
 }
 
@@ -236,24 +236,23 @@ BENCHMARK(BM_Reflect);
 
 static void BM_ReflectIntrinsics(benchmark::State& state)
 {
-    std::array<neko::Vec3f, 4> array1;
+    std::array<neko::Vec3f, 8> array1;
     for (auto& arr : array1)
     {
         arr = neko::Vec3f(1, 1, 0);
     }
-    neko::FourVec3f test1 = (neko::FourVec3f) array1;
+    neko::EightVec3f test1 = (neko::EightVec3f) array1;
 
-    std::array<neko::Vec3f, 4> array2;
+    std::array<neko::Vec3f, 8> array2;
     for (auto& arr : array2)
     {
-        arr = neko::Vec3f(0, -1, 0);
+        arr = neko::Vec3f(0, -5, 0);
     }
-    neko::FourVec3f test2 = (neko::FourVec3f) array2;
+    neko::EightVec3f test2 = (neko::EightVec3f) array2;
 
     for (auto _ : state)
     {
-        auto test = neko::FourVec3f::ReflectIntrinsics(test1, test2);
-        int t = 0;
+        neko::EightVec3f::ReflectIntrinsics(test1, test2);
     }
 }
 
