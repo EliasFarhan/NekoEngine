@@ -186,8 +186,6 @@ public:
 
     static Mat4<float> const RotationMatrixFrom(const Quaternion quaternion);
 
-    static Quaternion const RotationQuaternion(const Mat4<float>& transform);
-
     static EulerAngles const Rotation(const Mat4<float>& transform);
 
     static float Pitch(const Mat4<float>& transform);

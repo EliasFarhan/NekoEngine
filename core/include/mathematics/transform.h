@@ -100,15 +100,15 @@ inline Mat4f const Transform3d::RotationMatrixFrom(const radian_t angle, const V
 template<>
 inline Mat4<float> const Transform3d::RotationMatrixFrom(const EulerAngles cardinalRotation)
 {
-    const float rotX = static_cast<radian_t>(cardinalRotation[0]).to<float>();
-    const float rotY = static_cast<radian_t>(cardinalRotation[1]).to<float>();
-    const float rotZ = static_cast<radian_t>(cardinalRotation[2]).to<float>();
-    const float cosX = std::cos(rotX);
-    const float sinX = std::sin(rotX);
-    const float cosY = std::cos(rotY);
-    const float sinY = std::sin(rotY);
-    const float cosZ = std::cos(rotZ);
-    const float sinZ = std::sin(rotZ);
+    const radian_t rotX = cardinalRotation[0];
+    const radian_t rotY = cardinalRotation[1];
+    const radian_t rotZ = cardinalRotation[2];
+    const float cosX = std::cos(rotX.value());
+    const float sinX = std::sin(rotX.value());
+    const float cosY = std::cos(rotY.value());
+    const float sinY = std::sin(rotY.value());
+    const float cosZ = std::cos(rotZ.value());
+    const float sinZ = std::sin(rotZ.value());
 
     const Mat4f matX = Mat4f(
             std::array<Vec4f, 4>
@@ -138,39 +138,7 @@ inline Mat4<float> const Transform3d::RotationMatrixFrom(const EulerAngles cardi
 template<>
 inline Mat4<float> const Transform3d::RotationMatrixFrom(const RadianAngles cardinalRotation)
 {
-    const float rotX = cardinalRotation[0].to<float>();
-    const float rotY = cardinalRotation[1].to<float>();
-    const float rotZ = cardinalRotation[2].to<float>();
-    const float cosX = std::cos(rotX);
-    const float sinX = std::sin(rotX);
-    const float cosY = std::cos(rotY);
-    const float sinY = std::sin(rotY);
-    const float cosZ = std::cos(rotZ);
-    const float sinZ = std::sin(rotZ);
-
-    const Mat4f matX = Mat4f(
-            std::array<Vec4f, 4>
-                    {
-                            Vec4f(1, 0, 0, 0),
-                            Vec4f(0, cosX, -sinX, 0),
-                            Vec4f(0, sinX, cosX, 0),
-                            Vec4f(0, 0, 0, 1)});
-    const Mat4f matY = Mat4f(
-            std::array<Vec4f, 4>
-                    {
-                            Vec4f(cosY, 0, sinY, 0),
-                            Vec4f(0, 1, 0, 0),
-                            Vec4f(0, 0, 1, 0),
-                            Vec4f(-sinY, 0, cosY, 1)});
-    const Mat4f matZ = Mat4f(
-            std::array<Vec4f, 4>
-                    {
-                            Vec4f(cosZ, -sinZ, 0, 0),
-                            Vec4f(sinZ, cosZ, 0, 0),
-                            Vec4f(0, 0, 1, 0),
-                            Vec4f(0, 0, 0, 1)});
-
-    return matZ * matY * matX;
+    return RotationMatrixFrom(cardinalRotation);
 }
 
 template<>
@@ -238,46 +206,13 @@ inline Transform3d Transform3d::Rotate(const Transform3d& transform, const Euler
 template<>
 inline EulerAngles const Transform3d::Rotation(const Mat4<float>& transform)
 {
-    // TODO: Don't think this works properly...
-
-    float theta = 0.0f;
-    float psi = 0.0f;
-    float phi = 0.0f;
-
-    if (std::abs(transform[0][2]) != 1.0f)
-    {
-        theta = -std::sin(transform[0][2]);
-        psi = std::atan2((transform[1][2] / std::cos(theta)), (transform[2][2] / std::cos(theta)));
-        phi = std::atan2((transform[0][1] / std::cos(theta)), (transform[0][0] / std::cos(theta)));
-    }
-    else if (transform[0][2] == -1.0f)
-    {
-        theta = PI * 0.5f;
-        psi = phi + std::atan2(transform[1][0], transform[2][0]);
-    }
-    else
-    {
-        theta = -PI * 0.5f;
-        psi = -phi + std::atan2(-transform[1][0], -transform[2][0]);
-    }
-
-    return EulerAngles(
-            degree_t(static_cast<degree_t>(radian_t(theta))),
-            degree_t(static_cast<degree_t>(radian_t(psi))),
-            degree_t(static_cast<degree_t>(radian_t(phi)))
-    );
-}
-
-template<>
-inline Quaternion const Transform3d::RotationQuaternion(const Mat4<float>& transform)
-{
-
+    return EulerAngles();
 }
 
 template<>
 inline float Transform3d::Pitch(const Mat4<float>& transform)
 {
-    return std::asin(transform[1][0]);
+    return 0.0f;
 }
 
 template<>
@@ -289,7 +224,7 @@ inline float Transform3d::RotationOnX(const Mat4<float>& transform)
 template<>
 inline float Transform3d::Yaw(const Mat4<float>& transform)
 {
-    return std::atan2(-transform[2][1], transform[0][0]);
+    return 0.0f;
 }
 
 template<>
@@ -301,7 +236,7 @@ inline float Transform3d::RotationOnY(const Mat4<float>& transform)
 template<>
 inline float Transform3d::Roll(const Mat4<float>& transform)
 {
-    return std::atan2(-transform[1][2], transform[1][1]);
+    return 0.0f;
 }
 
 template<>
