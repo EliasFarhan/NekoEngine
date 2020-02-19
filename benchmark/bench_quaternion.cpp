@@ -26,7 +26,6 @@ static void BM_Dot(benchmark::State& state)
         vq.push_back(neko::Quaternion(v.x, v.y, v.z, v.w));
     }
 	
-    float a;
 	for (auto s : state)
 	{
 		for (neko::Quaternion element : vq)
@@ -39,18 +38,51 @@ BENCHMARK(BM_Dot)->Range(fromRange, toRange);
 
 static void BM_Magnitude(benchmark::State& state)
 {
-	
+    std::vector<neko::Quaternion> vq;
+    for (int i = 0; i < state.range(0); i++)
+    {
+        neko::Vec4f v;
+        RandomFill(v);
+        vq.push_back(neko::Quaternion(v.x, v.y, v.z, v.w));
+    }
+
+    for (auto s : state)
+    {
+        for (neko::Quaternion element : vq)
+        {
+            neko::Quaternion::Magnitude(element);
+        }
+    }
 }
 BENCHMARK(BM_Magnitude)->Range(fromRange, toRange);
 
 static void BM_Angle(benchmark::State& state)
 {
+    neko::Quaternion q;
+    neko::Vec4f i;
+    RandomFill(i);
+    q = neko::Quaternion(i.x, i.y, i.z, i.w);
 
+    std::vector<neko::Quaternion> vq;
+    for (int i = 0; i < state.range(0); i++)
+    {
+        neko::Vec4f v;
+        RandomFill(v);
+        vq.push_back(neko::Quaternion(v.x, v.y, v.z, v.w));
+    }
+
+    for (auto s : state)
+    {
+        for (neko::Quaternion element : vq)
+        {
+            neko::Quaternion::Angle(q, element);
+        }
+    }
 }
 BENCHMARK(BM_Angle)->Range(fromRange, toRange);
 
-static void BM_FromEuler(benchmark::State& state)
+/*static void BM_FromEuler(benchmark::State& state)
 {
 
 }
-BENCHMARK(BM_FromEuler)->Range(fromRange, toRange);
+BENCHMARK(BM_FromEuler)->Range(fromRange, toRange);*/

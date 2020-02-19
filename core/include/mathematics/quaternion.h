@@ -63,7 +63,7 @@ struct Quaternion
 		return quaternion / Magnitude(quaternion);
 	}
 
-	float Magnitude(Quaternion quaternion) const
+	static float Magnitude(Quaternion quaternion)
 	{
 		return sqrtf(quaternion.x * quaternion.x +
 					quaternion.y * quaternion.y +
@@ -92,7 +92,7 @@ struct Quaternion
 
 
 	//Returns the angle in degrees between two rotations a and b.
-	float Angle(Quaternion a, Quaternion b) const
+	static float Angle(Quaternion a, Quaternion b)
 	{
 		
 		return 2 * acosf(abs(Dot(a, b)));
