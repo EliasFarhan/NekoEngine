@@ -77,7 +77,7 @@ struct Quaternion
 		if (axis.GetSquareMagnitude() == 0.0f)
 			return Quaternion(0, 0, 0, 0);
 
-		Quaternion result = Quaternion(0,0,0,0);
+		Quaternion result = Quaternion(0,0,0,1);
 		float radians = degress * PI/180;
 		radians *= 0.5f;
 		//TODO: axis.Normalize();

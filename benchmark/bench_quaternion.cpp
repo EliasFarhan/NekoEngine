@@ -36,3 +36,21 @@ static void BM_Dot(benchmark::State& state)
 	}
 }
 BENCHMARK(BM_Dot)->Range(fromRange, toRange);
+
+static void BM_Magnitude(benchmark::State& state)
+{
+	
+}
+BENCHMARK(BM_Magnitude)->Range(fromRange, toRange);
+
+static void BM_Angle(benchmark::State& state)
+{
+
+}
+BENCHMARK(BM_Angle)->Range(fromRange, toRange);
+
+static void BM_FromEuler(benchmark::State& state)
+{
+
+}
+BENCHMARK(BM_FromEuler)->Range(fromRange, toRange);
