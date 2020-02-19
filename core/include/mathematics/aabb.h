@@ -40,10 +40,10 @@ struct Obb2d {
     }
 
     /// Set the center, the extend and the direction of the OBB.
-    void SetCenterExtendDir(Vec2f center, Vec2f extends, Vec2f dir) {
+    void SetCenterExtendRot(Vec2f center, Vec2f extends, float rot) {
         lowerLeftBound = center - extends;
         upperRightBound = center + extends;
-        CalculateDirection() = dir.Normalized();
+		rotation = rot;
     }
 
 
