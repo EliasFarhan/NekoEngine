@@ -197,6 +197,8 @@ public:
         return result;
     }
 
+    static std::array<T, N> DotIntrinsics(NVec2<T, N> v1, NVec2<T, N> v2);
+    static std::array<T, N> DotIntrinsics(NVec2<T, N> v1, Vec2<T> v2);
     std::array<T, N> SquareMagnitudeIntrinsics() const;
     std::array<T, N> MagnitudeIntrinsics() const;
 };
@@ -211,6 +213,42 @@ using EightVec2f = NVec2<float, 8>;
 // NVec2 Implementations
 //-----------------------------------------------------------------------------
 #ifdef __SSE__
+template <>
+std::array<float, 4> FourVec2f::DotIntrinsics(FourVec2f v1, FourVec2f v2)
+{
+    alignas(4 * sizeof(float))
+    std::array<float, 4> result;
+    auto x1 = _mm_load_ps(v1.xs.data());
+    auto y1 = _mm_load_ps(v1.ys.data());
+
+    auto x2 = _mm_load_ps(v2.xs.data());
+    auto y2 = _mm_load_ps(v2.ys.data());
+
+    x1 = _mm_mul_ps(x1, x2);
+    y1 = _mm_mul_ps(y1, y2);
+
+    x1 = _mm_add_ps(x1, y1);
+    _mm_store_ps(result.data(), x1);
+    return result;
+}
+template <>
+std::array<float, 4> FourVec2f::DotIntrinsics(FourVec2f v1, Vec2f v2)
+{
+    alignas(4 * sizeof(float))
+    std::array<float, 4> result;
+    auto x1 = _mm_load_ps(v1.xs.data());
+    auto y1 = _mm_load_ps(v1.ys.data());
+
+    auto x2 = _mm_load_ps(&v2.x);
+    auto y2 = _mm_load_ps(&v2.y);
+
+    x1 = _mm_mul_ps(x1, x2);
+    y1 = _mm_mul_ps(y1, y2);
+
+    x1 = _mm_add_ps(x1, y1);
+    _mm_store_ps(result.data(), x1);
+    return result;
+}
 template<>
 std::array<float, 4> FourVec2f::SquareMagnitudeIntrinsics() const
 {
@@ -245,6 +283,42 @@ std::array<float, 4> FourVec2f::MagnitudeIntrinsics() const
 #endif
 
 #ifdef __AVX2__
+template <>
+std::array<float, 8> EightVec2f::DotIntrinsics(EightVec2f v1, EightVec2f v2)
+{
+    alignas(8 * sizeof(float))
+    std::array<float, 8> result;
+    auto x1 = _mm_load_ps(v1.xs.data());
+    auto y1 = _mm_load_ps(v1.ys.data());
+
+    auto x2 = _mm_load_ps(v2.xs.data());
+    auto y2 = _mm_load_ps(v2.ys.data());
+
+    x1 = _mm_mul_ps(x1, x2);
+    y1 = _mm_mul_ps(y1, y2);
+
+    x1 = _mm_add_ps(x1, y1);
+    _mm_store_ps(result.data(), x1);
+    return result;
+}
+template <>
+std::array<float, 8> EightVec2f::DotIntrinsics(EightVec2f v1, Vec2f v2)
+{
+    alignas(8 * sizeof(float))
+    std::array<float, 8> result;
+    auto x1 = _mm_load_ps(v1.xs.data());
+    auto y1 = _mm_load_ps(v1.ys.data());
+
+    auto x2 = _mm_load_ps(&v2.x);
+    auto y2 = _mm_load_ps(&v2.y);
+
+    x1 = _mm_mul_ps(x1, x2);
+    y1 = _mm_mul_ps(y1, y2);
+
+    x1 = _mm_add_ps(x1, y1);
+    _mm_store_ps(result.data(), x1);
+    return result;
+}
 template<>
 std::array<float, 8> EightVec2f::SquareMagnitudeIntrinsics() const
 {
@@ -449,8 +523,11 @@ public:
         return result;
     }
 
+    static std::array<T, N> DotIntrinsics(NVec3<T, N> v1, NVec3<T, N> v2);
+    static std::array<T, N> DotIntrinsics(NVec3<T, N> v1, Vec3<T> v2);
     std::array<T, N> SquareMagnitudeIntrinsics() const;
     std::array<T, N> MagnitudeIntrinsics() const;
+    static NVec3<T, N> ReflectIntrinsics(NVec3<T, N> inVec, NVec3<T, N> normal);
 };
 
 //-----------------------------------------------------------------------------
@@ -463,6 +540,50 @@ using EightVec3f = NVec3<float, 8>;
 // NVec3 Implementations
 //-----------------------------------------------------------------------------
 #ifdef __SSE__
+template <>
+std::array<float, 4> FourVec3f::DotIntrinsics(FourVec3f v1, FourVec3f v2)
+{
+    alignas(4 * sizeof(float))
+    std::array<float, 4> result;
+    auto x1 = _mm_load_ps(v1.xs.data());
+    auto y1 = _mm_load_ps(v1.ys.data());
+    auto z1 = _mm_load_ps(v1.zs.data());
+
+    auto x2 = _mm_load_ps(v2.xs.data());
+    auto y2 = _mm_load_ps(v2.ys.data());
+    auto z2 = _mm_load_ps(v2.zs.data());
+
+    x1 = _mm_mul_ps(x1, x2);
+    y1 = _mm_mul_ps(y1, y2);
+    z1 = _mm_mul_ps(z1, z2);
+
+    x1 = _mm_add_ps(x1, y1);
+    x1 = _mm_add_ps(x1, z1);
+    _mm_store_ps(result.data(), x1);
+    return result;
+}
+template <>
+std::array<float, 4> FourVec3f::DotIntrinsics(FourVec3f v1, Vec3f v2)
+{
+    alignas(4 * sizeof(float))
+    std::array<float, 4> result;
+    auto x1 = _mm_load_ps(v1.xs.data());
+    auto y1 = _mm_load_ps(v1.ys.data());
+    auto z1 = _mm_load_ps(v1.zs.data());
+
+    auto x2 = _mm_load_ps(&v2.x);
+    auto y2 = _mm_load_ps(&v2.y);
+    auto z2 = _mm_load_ps(&v2.z);
+
+    x1 = _mm_mul_ps(x1, x2);
+    y1 = _mm_mul_ps(y1, y2);
+    z1 = _mm_mul_ps(z1, z2);
+
+    x1 = _mm_add_ps(x1, y1);
+    x1 = _mm_add_ps(x1, z1);
+    _mm_store_ps(result.data(), x1);
+    return result;
+}
 template<>
 std::array<float, 4> FourVec3f::SquareMagnitudeIntrinsics() const
 {
@@ -500,9 +621,80 @@ std::array<float, 4> FourVec3f::MagnitudeIntrinsics() const
     _mm_store_ps(result.data(), x);
     return result;
 }
+template<>
+FourVec3f FourVec3f::ReflectIntrinsics(FourVec3f inVec, FourVec3f normal)
+{
+    FourVec3f result;
+    FourVec3f normalized = normal.Normalized();
+
+    auto xi = _mm_load_ps(inVec.xs.data());
+    auto yi = _mm_load_ps(inVec.ys.data());
+    auto zi = _mm_load_ps(inVec.zs.data());
+
+    auto dot = _mm_load_ps(DotIntrinsics(inVec, normal).data());
+
+    auto xn = _mm_load_ps(normal.xs.data()) * 2;
+    auto yn = _mm_load_ps(normal.ys.data()) * 2;
+    auto zn = _mm_load_ps(normal.zs.data()) * 2;
+
+    xn = _mm_mul_ps(xn, dot);
+    yn = _mm_mul_ps(yn, dot);
+    zn = _mm_mul_ps(zn, dot);
+
+    xi = _mm_sub_ps(xi, xn);
+    yi = _mm_sub_ps(yi, yn);
+    zi = _mm_sub_ps(zi, zn);
+
+    return result;
+}
+
 #endif
 
 #ifdef __AVX2__
+template <>
+std::array<float, 8> EightVec3f::DotIntrinsics(EightVec3f v1, EightVec3f v2)
+{
+    alignas(8 * sizeof(float))
+    std::array<float, 8> result;
+    auto x1 = _mm_load_ps(v1.xs.data());
+    auto y1 = _mm_load_ps(v1.ys.data());
+    auto z1 = _mm_load_ps(v1.zs.data());
+
+    auto x2 = _mm_load_ps(v2.xs.data());
+    auto y2 = _mm_load_ps(v2.ys.data());
+    auto z2 = _mm_load_ps(v2.zs.data());
+
+    x1 = _mm_mul_ps(x1, x2);
+    y1 = _mm_mul_ps(y1, y2);
+    z1 = _mm_mul_ps(z1, z2);
+
+    x1 = _mm_add_ps(x1, y1);
+    x1 = _mm_add_ps(x1, z1);
+    _mm_store_ps(result.data(), x1);
+    return result;
+}
+template <>
+std::array<float, 8> EightVec3f::DotIntrinsics(EightVec3f v1, Vec3f v2)
+{
+    alignas(8 * sizeof(float))
+    std::array<float, 8> result;
+    auto x1 = _mm_load_ps(v1.xs.data());
+    auto y1 = _mm_load_ps(v1.ys.data());
+    auto z1 = _mm_load_ps(v1.zs.data());
+
+    auto x2 = _mm_load_ps(&v2.x);
+    auto y2 = _mm_load_ps(&v2.y);
+    auto z2 = _mm_load_ps(&v2.z);
+
+    x1 = _mm_mul_ps(x1, x2);
+    y1 = _mm_mul_ps(y1, y2);
+    z1 = _mm_mul_ps(z1, z2);
+
+    x1 = _mm_add_ps(x1, y1);
+    x1 = _mm_add_ps(x1, z1);
+    _mm_store_ps(result.data(), x1);
+    return result;
+}
 template<>
 std::array<float, 8> EightVec3f::SquareMagnitudeIntrinsics() const
 {
@@ -723,6 +915,8 @@ public:
         return result;
     }
 
+    static std::array<T, N> DotIntrinsics(NVec4<T, N> v1, NVec4<T, N> v2);
+    static std::array<T, N> DotIntrinsics(NVec4<T, N> v1, Vec4<T> v2);
     std::array<T, N> SquareMagnitudeIntrinsics() const;
     std::array<T, N> MagnitudeIntrinsics() const;
 };
@@ -737,6 +931,58 @@ using EightVec4f = NVec4<float, 8>;
 // NVec4 Implementations
 //-----------------------------------------------------------------------------
 #ifdef __SSE__
+template <>
+std::array<float, 4> FourVec4f::DotIntrinsics(FourVec4f v1, FourVec4f v2)
+{
+    alignas(4 * sizeof(float))
+    std::array<float, 4> result;
+    auto x1 = _mm_load_ps(v1.xs.data());
+    auto y1 = _mm_load_ps(v1.ys.data());
+    auto z1 = _mm_load_ps(v1.zs.data());
+    auto w1 = _mm_load_ps(v1.ws.data());
+
+    auto x2 = _mm_load_ps(v2.xs.data());
+    auto y2 = _mm_load_ps(v2.ys.data());
+    auto z2 = _mm_load_ps(v2.zs.data());
+    auto w2 = _mm_load_ps(v2.ws.data());
+
+    x1 = _mm_mul_ps(x1, x2);
+    y1 = _mm_mul_ps(y1, y2);
+    z1 = _mm_mul_ps(z1, z2);
+    w1 = _mm_mul_ps(w1, w2);
+
+    x1 = _mm_add_ps(x1, y1);
+    z1 = _mm_add_ps(z1, w1);
+    x1 = _mm_add_ps(x1, z1);
+    _mm_store_ps(result.data(), x1);
+    return result;
+}
+template <>
+std::array<float, 4> FourVec4f::DotIntrinsics(FourVec4f v1, Vec4f v2)
+{
+    alignas(4 * sizeof(float))
+    std::array<float, 4> result;
+    auto x1 = _mm_load_ps(v1.xs.data());
+    auto y1 = _mm_load_ps(v1.ys.data());
+    auto z1 = _mm_load_ps(v1.zs.data());
+    auto w1 = _mm_load_ps(v1.ws.data());
+
+    auto x2 = _mm_load_ps(&v2.x);
+    auto y2 = _mm_load_ps(&v2.y);
+    auto z2 = _mm_load_ps(&v2.z);
+    auto w2 = _mm_load_ps(&v2.w);
+
+    x1 = _mm_mul_ps(x1, x2);
+    y1 = _mm_mul_ps(y1, y2);
+    z1 = _mm_mul_ps(z1, z2);
+    w1 = _mm_mul_ps(w1, w2);
+
+    x1 = _mm_add_ps(x1, y1);
+    z1 = _mm_add_ps(z1, w1);
+    x1 = _mm_add_ps(x1, z1);
+    _mm_store_ps(result.data(), x1);
+    return result;
+}
 template<>
 std::array<float, 4> FourVec4f::SquareMagnitudeIntrinsics() const
 {
@@ -783,6 +1029,58 @@ std::array<float, 4> FourVec4f::MagnitudeIntrinsics() const
 #endif
 
 #ifdef __AVX2__
+template <>
+std::array<float, 8> EightVec4f::DotIntrinsics(EightVec4f v1, EightVec4f v2)
+{
+    alignas(8 * sizeof(float))
+    std::array<float, 8> result;
+    auto x1 = _mm256_load_ps(v1.xs.data());
+    auto y1 = _mm256_load_ps(v1.ys.data());
+    auto z1 = _mm256_load_ps(v1.zs.data());
+    auto w1 = _mm256_load_ps(v1.ws.data());
+
+    auto x2 = _mm256_load_ps(v2.xs.data());
+    auto y2 = _mm256_load_ps(v2.ys.data());
+    auto z2 = _mm256_load_ps(v2.zs.data());
+    auto w2 = _mm256_load_ps(v2.ws.data());
+
+    x1 = _mm256_mul_ps(x1, x2);
+    y1 = _mm256_mul_ps(y1, y2);
+    z1 = _mm256_mul_ps(z1, z2);
+    w1 = _mm256_mul_ps(w1, w2);
+
+    x1 = _mm256_add_ps(x1, y1);
+    z1 = _mm256_add_ps(z1, w1);
+    x1 = _mm256_add_ps(x1, z1);
+    _mm256_store_ps(result.data(), x1);
+    return result;
+}
+template <>
+std::array<float, 8> EightVec4f::DotIntrinsics(EightVec4f v1, Vec4f v2)
+{
+    alignas(8 * sizeof(float))
+    std::array<float, 8> result;
+    auto x1 = _mm_load_ps(v1.xs.data());
+    auto y1 = _mm_load_ps(v1.ys.data());
+    auto z1 = _mm_load_ps(v1.zs.data());
+    auto w1 = _mm_load_ps(v1.ws.data());
+
+    auto x2 = _mm_load_ps(&v2.x);
+    auto y2 = _mm_load_ps(&v2.y);
+    auto z2 = _mm_load_ps(&v2.z);
+    auto w2 = _mm_load_ps(&v2.w);
+
+    x1 = _mm_mul_ps(x1, x2);
+    y1 = _mm_mul_ps(y1, y2);
+    z1 = _mm_mul_ps(z1, z2);
+    w1 = _mm_mul_ps(w1, w2);
+
+    x1 = _mm_add_ps(x1, y1);
+    z1 = _mm_add_ps(z1, w1);
+    x1 = _mm_add_ps(x1, z1);
+    _mm_store_ps(result.data(), x1);
+    return result;
+}
 template<>
 std::array<float, 8> EightVec4f::SquareMagnitudeIntrinsics() const
 {

@@ -249,14 +249,13 @@ struct Vec2
     }
 
     /// \brief Calculates the angle between two vectors.
-    template<typename U = float>
-    static U AngleBetween(const Vec2& v1, const Vec2& v2);
+    static neko::radian_t AngleBetween(const Vec2& v1, const Vec2& v2);
 
     /// \brief Rotates the Vec2 from the given angle (in degrees).
-    Vec2<T> Rotate(T angle) const
+    Vec2<T> Rotate(neko::radian_t angle) const
     {
-        angle *= PI / 180.0f;
-        return {x * cos(angle) - y * sin(angle), x * sin(angle) + y * cos(angle)};
+        return {x * cosf(angle.value()) - y * sinf(angle.value()),
+                x * sinf(angle.value()) + y * cosf(angle.value())};
     }
 
     //-----------------------------------------------------------------------------
@@ -290,12 +289,11 @@ inline Vec2<T> const Vec2<T>::right = Vec2<T>(1, 0);
 // Vec2 Implementations
 //-----------------------------------------------------------------------------
 template<typename T>
-template<typename U>
-U Vec2<T>::AngleBetween(const Vec2& v1, const Vec2& v2)
+neko::radian_t Vec2<T>::AngleBetween(const Vec2& v1, const Vec2& v2)
 {
-    const U dot = Vec2<T>::Dot(v1, v2) / v1.Magnitude() / v2.Magnitude();
-    const U det = v1.x * v2.y - v1.y * v2.x;
-    const U angle = atan2(det, dot) / PI * 180.0f;
+    const float dot = Vec2<T>::Dot(v1, v2) / v1.Magnitude() / v2.Magnitude();
+    const float det = v1.x * v2.y - v1.y * v2.x;
+    const neko::radian_t angle = (neko::radian_t) atan2(det, dot);
     return angle;
 }
 
@@ -525,8 +523,7 @@ public:
                 (dot / mag) * v2.z};
     }
 
-    template<typename U = float>
-    static U AngleBetween(const Vec3& v1, const Vec3& v2);
+    static neko::radian_t AngleBetween(const Vec3& v1, const Vec3& v2);
 };
 //-----------------------------------------------------------------------------
 // Vec3 Aliases
@@ -557,12 +554,11 @@ inline Vec3<T> const Vec3<T>::back = Vec3<T>(0, 0, -1);
 // Vec3 Implementations
 //-----------------------------------------------------------------------------
 template<typename T>
-template<typename U>
-U Vec3<T>::AngleBetween(const Vec3& v1, const Vec3& v2)
+neko::radian_t Vec3<T>::AngleBetween(const Vec3& v1, const Vec3& v2)
 {
-    const U dot = Vec3<T>::Dot(v1, v2) / v1.Magnitude() / v2.Magnitude();
-    const U det = v1.x * v2.y - v1.y * v2.x;
-    const U angle = atan2(det, dot) / PI * 180.0f;
+    const float dot = Vec3<T>::Dot(v1, v2) / v1.Magnitude() / v2.Magnitude();
+    const float det = v1.x * v2.y - v1.y * v2.x;
+    const neko::radian_t angle = (neko::radian_t) atan2(det, dot);
     return angle;
 }
 
