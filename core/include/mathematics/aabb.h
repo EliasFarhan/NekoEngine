@@ -105,9 +105,7 @@ struct Obb2d {
 		}
 		else
 		{
-			Vec2f centerToTopRight = upperRightBound - GetCenter();
-			Vec2f upperSideMiddle = GetCenter() + CalculateDirection() * centerToTopRight.GetMagnitude() * cosf(Vec2<float>::AngleBetween(CalculateDirection(), centerToTopRight));
-			Vec2f upperLeftBound = upperRightBound + (upperSideMiddle - upperRightBound) * 2;
+			Vec2f upperLeftBound = GetOppositeBound(upperRightBound, true);
 			Vec2 lowerRightToUpperLeft = (upperLeftBound - GetCenter()) * 2;
 
 			extent = lowerRightToUpperLeft.GetMagnitude() * Vec2<float>::AngleBetween(lowerRightToUpperLeft, axis);
