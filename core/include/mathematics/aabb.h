@@ -36,8 +36,7 @@ struct Obb2d {
 
     /// Get the direction of the OBB rotated 90 degrees clockwise.
     Vec2f GetRight() {
-        return Vec2f(-(CalculateDirection().y - GetCenter().y) + GetCenter().x,
-                     CalculateDirection().x - GetCenter().x + GetCenter().y);
+		return Vec2f(CalculateDirection().y,-CalculateDirection().x);
     }
 
     /// Set the center, the extend and the direction of the OBB.
@@ -54,25 +53,67 @@ struct Obb2d {
         Vec2f axis3 = obb.CalculateDirection();
         Vec2f axis4 = obb.GetRight();
 
-        /// TODO ExtendsComparaison
+		float centersDistance = (GetCenter() - obb.GetCenter()).GetMagnitude();
+
+		if(2*centersDistance <= GetExtentOnAxis(axis1) + obb.GetExtentOnAxis(axis1))
+		{
+			return false;
+		}
+		if (2 * centersDistance <= GetExtentOnAxis(axis1) + obb.GetExtentOnAxis(axis2))
+		{
+			return false;
+		}
+		if (2 * centersDistance <= GetExtentOnAxis(axis1) + obb.GetExtentOnAxis(axis3))
+		{
+			return false;
+		}
+		if (2 * centersDistance <= GetExtentOnAxis(axis1) + obb.GetExtentOnAxis(axis4))
+		{
+			return false;
+		}
 
         return true;
     }
 
-    float GetExtendOnAxis(Vec2f axis) {
-        float extend;
+    float GetExtentOnAxis(Vec2f axis) {
+        float extent;
+		float rotationToAxis;
 
         if (axis == CalculateDirection()) {
-            extend = upperRightBound.y - lowerLeftBound.y;
+            extent = upperRightBound.y - lowerLeftBound.y;
         }
 
         if (axis == GetRight()) {
-            extend = upperRightBound.x - lowerLeftBound.x;
+            extent = upperRightBound.x - lowerLeftBound.x;
         }
 
-        /// TODO General case
+		rotationToAxis = Vec2<float>::AngleBetween(axis, CalculateDirection());
+		if (rotationToAxis >= 0)
+		{
+			rotationToAxis = rotationToAxis - int(rotationToAxis / PI) * PI;
+		}
+		else
+		{
+			rotationToAxis = rotationToAxis + int(rotationToAxis / PI) * PI;
+		}
 
-        return extend;
+		if((rotationToAxis >= 0 && rotationToAxis <= PI / 2) || (rotationToAxis >= -PI && rotationToAxis <= -PI / 2))
+		{
+			Vec2f lowerLeftToTopRight = lowerLeftBound - upperRightBound;
+
+			extent = lowerLeftToTopRight.GetMagnitude() * Vec2<float>::AngleBetween(lowerLeftToTopRight, axis);
+		}
+		else
+		{
+			Vec2f centerToTopRight = upperRightBound - GetCenter();
+			Vec2f upperSideMiddle = GetCenter() + CalculateDirection() * centerToTopRight.GetMagnitude() * cosf(Vec2<float>::AngleBetween(CalculateDirection(), centerToTopRight));
+			Vec2f upperLeftBound = upperRightBound + (upperSideMiddle - upperRightBound) * 2;
+			Vec2 lowerRightToUpperLeft = (upperLeftBound - GetCenter()) * 2;
+
+			extent = lowerRightToUpperLeft.GetMagnitude() * Vec2<float>::AngleBetween(lowerRightToUpperLeft, axis);
+		}
+
+        return extent;
     }
 
     Vec2f GetOppositeBound(Vec2f bound, bool isUpper) {
