@@ -28,7 +28,7 @@
 #include "const.h"
 
 namespace neko {
-struct Obb2 {
+struct Obb2d {
     /// Get the center of the OBB.
     Vec2f GetCenter() const {
         return 0.5f * (lowerLeftBound + upperRightBound);
@@ -36,22 +36,22 @@ struct Obb2 {
 
     /// Get the direction of the OBB rotated 90 degrees clockwise.
     Vec2f GetRight() {
-        return Vec2f(-(direction.y - GetCenter().y) + GetCenter().x,
-                     direction.x - GetCenter().x + GetCenter().y);
+        return Vec2f(-(CalculateDirection().y - GetCenter().y) + GetCenter().x,
+                     CalculateDirection().x - GetCenter().x + GetCenter().y);
     }
 
     /// Set the center, the extend and the direction of the OBB.
     void SetCenterExtendDir(Vec2f center, Vec2f extends, Vec2f dir) {
         lowerLeftBound = center - extends;
         upperRightBound = center + extends;
-        direction = dir.Normalized();
+        CalculateDirection() = dir.Normalized();
     }
 
 
-    bool IntersectObb(Obb2 obb) {
-        Vec2f axis1 = direction;
+    bool IntersectObb(Obb2d obb) {
+        Vec2f axis1 = CalculateDirection();
         Vec2f axis2 = GetRight();
-        Vec2f axis3 = obb.direction;
+        Vec2f axis3 = obb.CalculateDirection();
         Vec2f axis4 = obb.GetRight();
 
         /// TODO ExtendsComparaison
@@ -62,7 +62,7 @@ struct Obb2 {
     float GetExtendOnAxis(Vec2f axis) {
         float extend;
 
-        if (axis == direction) {
+        if (axis == CalculateDirection()) {
             extend = upperRightBound.y - lowerLeftBound.y;
         }
 
@@ -83,16 +83,16 @@ struct Obb2 {
 
         if (isUpper) {
             centerToProjectionOnDir =
-                direction * (centerToBound).GetMagnitude() *
-                cos(Vec2<float>::AngleBetween(centerToBound, direction));
+                CalculateDirection() * (centerToBound).GetMagnitude() *
+                cos(Vec2<float>::AngleBetween(centerToBound, CalculateDirection()));
             boundToOppositeBound =
                 GetCenter() = centerToProjectionOnDir - bound;
             oppositeBound = upperRightBound + boundToOppositeBound +
                             boundToOppositeBound;
         } else {
             centerToProjectionOnDir =
-                direction * (centerToBound).GetMagnitude() *
-                cos(Vec2<float>::AngleBetween(centerToBound, direction)) * -1;
+                CalculateDirection() * (centerToBound).GetMagnitude() *
+                cos(Vec2<float>::AngleBetween(centerToBound, CalculateDirection())) * -1;
             boundToOppositeBound =
                 GetCenter() = centerToProjectionOnDir - bound;
             oppositeBound = upperRightBound + boundToOppositeBound +
@@ -102,9 +102,17 @@ struct Obb2 {
         return oppositeBound;
     }
 
-    Vec2f lowerLeftBound;  ///< the lower vertex
-    Vec2f upperRightBound; ///< the upper vertex
-    Vec2f direction;       ///< the normal of the upper side
+	Vec2f CalculateDirection()	///< return the normal of the upper side
+	{
+		Vec2f direction;
+		direction.x = cosf(rotation);
+		direction.y = sinf(rotation);
+		return direction;
+	}
+
+    Vec2f lowerLeftBound;	///< the lower vertex
+    Vec2f upperRightBound;	///< the upper vertex
+	float rotation;       ///< the angle of rotation in rd
 };
 
 
@@ -145,12 +153,12 @@ struct Aabb2d {
     }
 
     ///\brief Set the AABB from OBB.
-    void FromObb(Obb2 obb) {
+    void FromObb(Obb2d obb) {
         FromCenterExtendsRotation(0.5f * (
                                       obb.upperRightBound - obb.lowerLeftBound),
                                   obb.GetCenter(),
                                   Vec2f::AngleBetween<>(Vec2f(0, 1),
-                                                        obb.direction));
+                                                        obb.CalculateDirection()));
     }
 
     bool ContainsPoint(const Vec2f point) const {
