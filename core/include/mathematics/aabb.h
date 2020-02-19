@@ -180,109 +180,108 @@ struct Obb3d {
 
 struct Aabb2d {
     ///\brief Get the center of the AABB.
-    Vec2f CalculateCenter() const { return 0.5f * (lowerBound + upperBound); }
+    Vec2f CalculateCenter() const { return 0.5f * (lowerLeftBound + upperRightBound); }
 
     ///\brief Get the extends of the AABB (half-widths).
-    Vec2f CalculateExtends() const { return 0.5f * (upperBound - lowerBound); }
+    Vec2f CalculateExtends() const { return 0.5f * (upperRightBound - lowerLeftBound); }
 
     ///\brief Set the AABB from the center, extends.
     void FromCenterExtends(const Vec2f center, const Vec2f extend) {
-        lowerBound = center - extend;
-        upperBound = center + extend;
+        lowerLeftBound = center - extend;
+        upperRightBound = center + extend;
     }
 
     ///\brief Enlarge AABB after a rotation
     void FromCenterExtendsRotation(
         const Vec2f center,
         const Vec2f extend,
-        const float rotation) {
-        const float newAngle = rotation / 180 * PI;
+        const degree_t rotation) {
+        radian_t newAngle = rotation;
         std::array<Vec2f, 4> corners;
-        corners[0] = lowerBound;
-        corners[1] = Vec2f(lowerBound.x, upperBound.y);
-        corners[2] = Vec2f(upperBound.x, lowerBound.y);
-        corners[3] = upperBound;
-        const float cosAngle = cosf(newAngle);
-        const float sinAngle = sinf(newAngle);
+        corners[0] = lowerLeftBound;
+        corners[1] = Vec2f(lowerLeftBound.x, upperRightBound.y);
+        corners[2] = Vec2f(upperRightBound.x, lowerLeftBound.y);
+        corners[3] = upperRightBound;
+        const float cosAngle = std::cos(newAngle.value());
+        const float sinAngle = std::sin(newAngle.value());
         for (const Vec2f corner : corners) {
             const float x = corner.x * cosAngle - corner.y * sinAngle;
             const float y = corner.x * sinAngle + corner.y * cosAngle;
-            if (x > upperBound.x) { upperBound.x = x; }
-            if (x < lowerBound.x) { lowerBound.x = x; }
-            if (y > upperBound.y) { upperBound.y = y; }
-            if (y < lowerBound.y) { lowerBound.y = y; }
+            if (x > upperRightBound.x) { upperRightBound.x = x; }
+            if (x < lowerLeftBound.x) { lowerLeftBound.x = x; }
+            if (y > upperRightBound.y) { upperRightBound.y = y; }
+            if (y < lowerLeftBound.y) { lowerLeftBound.y = y; }
         }
     }
 
     ///\brief Set the AABB from OBB.
     void FromObb(Obb2d obb) {
-        FromCenterExtendsRotation(0.5f * (
-                                      obb.upperRightBound - obb.lowerLeftBound),
-                                  obb.GetCenter(),
-                                  Vec2f::AngleBetween<>(Vec2f(0, 1),
-                                                        obb.CalculateDirection()));
+        FromCenterExtendsRotation(
+            obb.GetCenter(),
+            Vec2f(obb.GetExtentOnAxis(obb.GetRight()), obb.GetExtentOnAxis(obb.CalculateDirection())),
+            static_cast<degree_t>(obb.rotation));
     }
 
     bool ContainsPoint(const Vec2f point) const {
-        bool contains = point.x <= upperBound.x && point.x >= lowerBound.x;
-        contains = point.y <= upperBound.y && point.y >= lowerBound.y &&
+        bool contains = point.x <= upperRightBound.x && point.x >= lowerLeftBound.x;
+        contains = point.y <= upperRightBound.y && point.y >= lowerLeftBound.y &&
                    contains;
         return contains;
     }
 
     bool ContainsAabb(const Aabb2d& aabb) const {
-        return (ContainsPoint(aabb.upperBound) && ContainsPoint(aabb.lowerBound)
+        return (ContainsPoint(aabb.upperRightBound) && ContainsPoint(aabb.lowerLeftBound)
         );
     }
 
     bool IntersectAabb(const Aabb2d& aabb) const {
-        return (ContainsPoint(aabb.upperBound) || ContainsPoint(aabb.lowerBound)
+        return (ContainsPoint(aabb.upperRightBound) || ContainsPoint(aabb.lowerLeftBound)
         );
     }
 
-    Vec2f lowerBound = Vec2f::Zero; // the lower vertex
-    Vec2f upperBound = Vec2f::Zero; // the upper vertex
+    Vec2f lowerLeftBound = Vec2f::Zero; // the lower vertex
+    Vec2f upperRightBound = Vec2f::Zero; // the upper vertex
 };
 
 struct Aabb3d {
     ///\brief Get the center of the AABB.
-    Vec3f CalculateCenter() const { return (lowerBound + upperBound) * 0.5f; }
+    Vec3f CalculateCenter() const { return (lowerLeftBound + upperRightBound) * 0.5f; }
 
     ///\brief Get the extends of the AABB (half-widths).
-    Vec3f CalculateExtends() const { return (upperBound - lowerBound) * 0.5f; }
+    Vec3f CalculateExtends() const { return (upperRightBound - lowerLeftBound) * 0.5f; }
 
     ///\brief Set the AABB from the center, extends.
     void FromCenterExtends(
         const Vec3f center,
         const Vec3f extends,
         const Vec3f rotation = Vec3f::Zero) {
-        lowerBound = center - extends;
-        upperBound = center + extends;
+        lowerLeftBound = center - extends;
+        upperRightBound = center + extends;
     }
 
     ///\brief Enlarge AABB after a rotation
     void FromCenterExtendsRotation(
         const Vec3f center,
         const Vec3f extends,
-        const Vec3f rotation) {
-        lowerBound = center - extends;
-        upperBound = center + extends;
-        Vec3f newAngle = Vec3f(rotation.x / 180 * M_PI,
-                               rotation.y / 180 * M_PI,
-                               rotation.z / 180 * M_PI);
+        const EulerAngles rotation) {
+        lowerLeftBound = center - extends;
+        upperRightBound = center + extends;
+        Vec3<radian_t> newAngle = Vec3<radian_t>{
+        rotation.x, rotation.y, rotation.z
+        };
         std::array<Vec3f, 6> corners;
-        corners[0] = lowerBound;
-        corners[1] = upperBound;
-        corners[2] = Vec3f(lowerBound.x, upperBound.y, upperBound.z);
-        corners[3] = Vec3f(lowerBound.x, lowerBound.y, upperBound.z);
-        corners[4] = Vec3f(upperBound.x, lowerBound.y, lowerBound.z);
-        corners[5] = Vec3f(upperBound.x, upperBound.y, lowerBound.z);
-        const float cosAngleX = cosf(newAngle.x);
-        const float sinAngleX = sinf(newAngle.x);
-        const float cosAngleY = cosf(newAngle.y);
-        const float sinAngleY = sinf(newAngle.y);
-        const float cosAngleZ = cosf(newAngle.z);
-        const float sinAngleZ = sinf(newAngle.z);
+        corners[0] = lowerLeftBound;
+        corners[1] = upperRightBound;
+        corners[2] = Vec3f(lowerLeftBound.x, upperRightBound.y, upperRightBound.z);
+        corners[3] = Vec3f(lowerLeftBound.x, lowerLeftBound.y, upperRightBound.z);
+        corners[4] = Vec3f(upperRightBound.x, lowerLeftBound.y, lowerLeftBound.z);
+        corners[5] = Vec3f(upperRightBound.x, upperRightBound.y, lowerLeftBound.z);
+        const float cosAngleX = std::cos(newAngle.x.value());
+        const float sinAngleX = std::sin(newAngle.x.value());
+        const float cosAngleY = std::cos(newAngle.y.value());
+        const float sinAngleY = std::sin(newAngle.y.value());
+        const float cosAngleZ = std::cos(newAngle.z.value());
+        const float sinAngleZ = std::sin(newAngle.z.value());
         for (Vec3f corner : corners) {
             //Rotate around X
             float x = corner.x * cosAngleX - corner.y * sinAngleX;
@@ -298,41 +297,41 @@ struct Aabb3d {
             x = corner.x;
             y = corner.y * cosAngleZ - corner.z * sinAngleZ;
             z = corner.y * sinAngleZ + corner.z * cosAngleZ;
-            if (x > upperBound.x) { upperBound.x = x; }
-            if (x < lowerBound.x) { lowerBound.x = x; }
-            if (y > upperBound.y) { upperBound.y = y; }
-            if (y < lowerBound.y) { lowerBound.y = y; }
-            if (z > upperBound.z) { upperBound.z = z; }
-            if (z < lowerBound.z) { lowerBound.z = z; }
+            if (x > upperRightBound.x) { upperRightBound.x = x; }
+            if (x < lowerLeftBound.x) { lowerLeftBound.x = x; }
+            if (y > upperRightBound.y) { upperRightBound.y = y; }
+            if (y < lowerLeftBound.y) { lowerLeftBound.y = y; }
+            if (z > upperRightBound.z) { upperRightBound.z = z; }
+            if (z < lowerLeftBound.z) { lowerLeftBound.z = z; }
         }
     }
 
-    /////\brief Set the AABB from OBB.
-    //void FromObb(Obb3 obb) {
+    ////\brief Set the AABB3d from OBB3d.
+    //void FromObb(Obb3d obb) {
     //	FromCenterExtendsRotation(0.5f * (obb.upperRightBound - obb.lowerLeftBound), obb.GetCenter(), Vec3f::AngleBetween<>(Vec3f(0, 1), obb.direction));
     //}
 
     bool ContainsPoint(const Vec3f point) const {
-        bool contains = point.x <= upperBound.x && point.x >= lowerBound.x;
-        contains = point.y <= upperBound.y && point.y >= lowerBound.y &&
+        bool contains = point.x <= upperRightBound.x && point.x >= lowerLeftBound.x;
+        contains = point.y <= upperRightBound.y && point.y >= lowerLeftBound.y &&
                    contains;
-        contains = point.z <= upperBound.z && point.z >= lowerBound.z &&
+        contains = point.z <= upperRightBound.z && point.z >= lowerLeftBound.z &&
                    contains;
         return contains;
     }
 
     bool ContainsAabb(const Aabb3d& aabb) const {
-        return (ContainsPoint(aabb.upperBound) &&
-                ContainsPoint(aabb.lowerBound));
+        return (ContainsPoint(aabb.upperRightBound) &&
+                ContainsPoint(aabb.lowerLeftBound));
     }
 
     bool IntersectAabb(const Aabb3d& aabb) const {
-        return (ContainsPoint(aabb.upperBound) ||
-                ContainsPoint(aabb.lowerBound));
+        return (ContainsPoint(aabb.upperRightBound) ||
+                ContainsPoint(aabb.lowerLeftBound));
     }
 
-    Vec3f lowerBound = Vec3f::Zero; // the lower vertex
-    Vec3f upperBound = Vec3f::Zero; // the upper vertex
+    Vec3f lowerLeftBound = Vec3f::Zero; // the lower vertex
+    Vec3f upperRightBound = Vec3f::Zero; // the upper vertex
 };
 
 }
