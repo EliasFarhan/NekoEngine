@@ -4,7 +4,7 @@
 #include <cmath>
 
 
-//DATE : 17.02.2020
+//DATE : 19.02.2020
 
 namespace neko
 {
@@ -65,27 +65,25 @@ struct Quaternion
 
 	static float Magnitude(Quaternion quaternion)
 	{
-		return sqrtf(quaternion.x * quaternion.x +
+		return std::sqrt(quaternion.x * quaternion.x +
 					quaternion.y * quaternion.y +
 					quaternion.z * quaternion.z +
 					quaternion.w * quaternion.w);
 	}
 
-	//Creates a rotation which rotates angle degrees around axis.
-	Quaternion AngleAxis(float  degress, neko::Vec3f axis) const
+	//Rotates the Quaternion of angle degrees around axis.
+	Quaternion AngleAxis(radian_t rad, neko::Vec3f axis) const
 	{
 		if (axis.GetSquareMagnitude() == 0.0f)
-			return Quaternion(0, 0, 0, 0);
+			return Quaternion(0, 0, 0, 1);
 
 		Quaternion result = Quaternion(0,0,0,1);
-		float radians = degress * PI/180;
-		radians *= 0.5f;
 		//TODO: axis.Normalize();
-		axis = axis * sin(radians);
+		axis = axis * std::sin(rad.value());
 		result.x = axis.x;
 		result.y = axis.y;
 		result.z = axis.z;
-		result.w = cos(radians);
+		result.w = std::cos(rad.value());
 
 		return Normalize(result);
 	}
@@ -95,7 +93,7 @@ struct Quaternion
 	static float Angle(Quaternion a, Quaternion b)
 	{
 		
-		return 2 * acosf(abs(Dot(a, b)));
+		return 2.0f * std::acos(std::abs(Dot(a, b)));
 	}
 
 	Quaternion Conjugate() const
@@ -119,20 +117,19 @@ struct Quaternion
 	*/
 	static Quaternion FromEuler(EulerAngles angle)
 	{
-		float cy = cos(static_cast<float>(angle.x * 0.5f));
-		float sy = sin(static_cast<float>(angle.x * 0.5f));
-		float cp = cos(static_cast<float>(angle.y * 0.5f));
-		float sp = sin(static_cast<float>(angle.y * 0.5f));
-		float cr = cos(static_cast<float>(angle.z * 0.5f));
-		float sr = sin(static_cast<float>(angle.z * 0.5f));
+		float cy = std::cos((angle.x.value() * 0.5f));
+		float sy = std::sin((angle.x.value() * 0.5f));
+		float cp = std::cos((angle.y.value() * 0.5f));
+		float sp = std::sin((angle.y.value() * 0.5f));
+		float cr = std::cos((angle.z.value() * 0.5f));
+		float sr = std::sin((angle.z.value() * 0.5f));
 
-		Quaternion q;
-		q.w = cy * cp * cr + sy * sp * sr;
-		q.x = cy * cp * sr - sy * sp * cr;
-		q.y = sy * cp * sr + cy * sp * cr;
-		q.z = sy * cp * cr - cy * sp * sr;
-
-		return q;
+		return Quaternion(
+			cy * cp * cr + sy * sp * sr,
+			cy * cp * sr - sy * sp * cr,
+			sy * cp * sr + cy * sp * cr,
+			sy * cp * cr - cy * sp * sr
+		);
 	}
 
 	//Operators

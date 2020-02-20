@@ -80,9 +80,3 @@ static void BM_Angle(benchmark::State& state)
     }
 }
 BENCHMARK(BM_Angle)->Range(fromRange, toRange);
-
-/*static void BM_FromEuler(benchmark::State& state)
-{
-
-}
-BENCHMARK(BM_FromEuler)->Range(fromRange, toRange);*/
