@@ -20,6 +20,11 @@ void RandomFill(std::vector<float>& numbers, float start = -maxNmb, float end = 
     std::generate(numbers.begin(), numbers.end(), [&g, &dist](){return dist(g);});
 }
 
+void DisplayQuaternion(std::string quaternionName, neko::Quaternion q)
+{
+    std::cout << quaternionName << "(" << q.x << "," << q.y << "," << q.z << "," << q.w << ") ";
+}
+
 TEST(Engine, TestMathematics)
 {
     neko::FuncTable<float> sinFuncTable(0.0f, M_PI, [](float x){ return sinf(x);});
@@ -39,25 +44,47 @@ TEST(Engine, TestMathematics)
 
 TEST(Engine, TestQuaternion)
 {
-    neko::Quaternion quaternion = neko::Quaternion(0,0,0,1);
-    std::cout << "test Dot" << std::endl;
-    std::cout << "test Normalize" << std::endl;
-    std::cout << "test Magnitude" << std::endl;
-    std::cout << "test AngleAxis" << std::endl;
-    std::cout << "test Angle" << std::endl;
-    std::cout << "test Conjugate" << std::endl;
-    std::cout << "test Inverse" << std::endl;
-    std::cout << "test FromEuler" << std::endl;
-    std::cout << "test operator/Quaternion" << std::endl;
-    std::cout << "test operator/float" << std::endl;
-    std::cout << "test operator/=" << std::endl;
-    std::cout << "test operator-Quaternion" << std::endl;
-    std::cout << "test operator-=" << std::endl;
-    std::cout << "test operator+" << std::endl;
-    std::cout << "test operator+=" << std::endl;
-    std::cout << "test operator*Quaternion" << std::endl;
-    std::cout << "test operator*float" << std::endl;
-    std::cout << "test operator*=" << std::endl;
-    std::cout << "test operator==" << std::endl;
-    std::cout << "test operator !=" << std::endl;
+	//Variables
+    neko::Quaternion quaternionA = neko::Quaternion(0.71,0,0,0.71);
+    neko::Quaternion quaternionB = neko::Quaternion(0, 0, 0, 1);
+    neko::Quaternion quaternionACopy;
+
+	//Display start variables
+    DisplayQuaternion("QuaternionA", quaternionA);
+    std::cout << std::endl;
+    DisplayQuaternion("QuaternionB", quaternionB);
+    std::cout << std::endl << std::endl;
+
+	//Dot Product Test
+    std::cout << "Dot product: " << neko::Quaternion::Dot(quaternionA, quaternionB) << std::endl << std::endl;
+
+	//Normalize Test
+    std::cout << "Normalize: ";
+	DisplayQuaternion("NormalizedQuaternionA", neko::Quaternion::Normalize(quaternionA));
+    std::cout << std::endl << std::endl;
+
+	//Magnitude Test
+    std::cout << "Magnitude: " << neko::Quaternion::Magnitude(quaternionA) << std::endl << std::endl;
+
+	//AngleAxis Test
+    std::cout << "AngleAxis: " << "Cannot be tested right now" << std::endl << std::endl;
+
+	//Angle Test
+    std::cout << "Angle: " << neko::Quaternion::Angle(quaternionA, quaternionB) << std::endl << std::endl;
+
+	//Conjugate Test
+    quaternionACopy = quaternionA;
+    std::cout << "Conjugate: ";
+    DisplayQuaternion("QuaternionAConjugate", quaternionACopy.Conjugate());
+    std::cout << std::endl << std::endl;
+
+	//Inverse Test
+    quaternionACopy = quaternionA;
+    std::cout << "Inverse: ";
+    DisplayQuaternion("QuaternionAInverse", quaternionACopy.Inverse());
+    std::cout << std::endl << std::endl;
+
+	//FromEuler
+    std::cout << "Euler: " << "Cannot be tested right now" << std::endl << std::endl;
+    
 }

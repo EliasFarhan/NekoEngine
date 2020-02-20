@@ -58,7 +58,7 @@ struct Quaternion
 	}
 
 	//Converts this quaternion to one with the same orientation but with a magnitude of 1.
-	Quaternion Normalize(Quaternion quaternion) const
+	static Quaternion Normalize(Quaternion quaternion)
 	{
 		return quaternion / Magnitude(quaternion);
 	}
