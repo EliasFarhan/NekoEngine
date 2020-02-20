@@ -241,6 +241,36 @@ struct Aabb2d {
         );
     }
 
+
+    bool IntersectRay(const Vec2f& dirRay, const Vec2f& origin) const {
+        if (ContainsPoint(origin))
+        {
+            return true;
+        }
+        std::array<float, 4> touch;
+        touch[0] = (lowerLeftBound.x - origin.x) / dirRay.x;
+        touch[1] = (upperRightBound.x - origin.x) / dirRay.x;
+        touch[2] = (lowerLeftBound.y - origin.y) / dirRay.y;
+        touch[3] = (upperRightBound.y - origin.y) / dirRay.y;
+        float touchMin = std::max(std::min(touch[0], touch[1]), std::min(touch[2], touch[3]));
+        float touchMax = std::min(std::max(touch[0], touch[1]), std::max(touch[2], touch[3]));
+
+        // if tmax < 0, ray (line) is intersecting AABB, but the whole AABB is behind us
+        if (touchMax < 0)
+        {
+            return false;
+        }
+
+        // if tmin > tmax, ray doesn't intersect AABB
+        if (touchMin > touchMax)
+        {
+            return false;
+        }
+        return true;
+
+    }
+
+
     Vec2f lowerLeftBound = Vec2f::Zero; // the lower vertex
     Vec2f upperRightBound = Vec2f::Zero; // the upper vertex
 };
@@ -330,6 +360,50 @@ struct Aabb3d {
     bool IntersectAabb(const Aabb3d& aabb) const {
         return (ContainsPoint(aabb.upperRightBound) ||
                 ContainsPoint(aabb.lowerLeftBound));
+    }
+
+    bool IntersectRay(const Vec3f& dirRay, const Vec3f& origin) const {
+        if (ContainsPoint(origin))
+        {
+            return true;
+        }
+        std::array<float, 6> touch;
+        touch[0] = (lowerLeftBound.x - origin.x) / dirRay.x;
+        touch[1] = (upperRightBound.x - origin.x) / dirRay.x;
+        touch[2] = (lowerLeftBound.y - origin.y) / dirRay.y;
+        touch[3] = (upperRightBound.y - origin.y) / dirRay.y;
+        touch[4] = (lowerLeftBound.z - origin.z) / dirRay.z;
+        touch[5] = (upperRightBound.z - origin.z) / dirRay.z;
+        float touchMin = std::max(std::max(std::min(touch[0], touch[1]), std::min(touch[2], touch[3])), std::min(touch[4], touch[5]));
+        float touchMax = std::min(std::min(std::max(touch[0], touch[1]), std::max(touch[2], touch[3])), std::max(touch[4], touch[5]));
+
+        // if tmax < 0, ray (line) is intersecting AABB, but the whole AABB is behind us
+        if (touchMax < 0)
+        {
+            return false;
+        }
+
+        // if tmin > tmax, ray doesn't intersect AABB
+        if (touchMin > touchMax)
+        {
+            return false;
+        }
+        return true;
+
+    }
+
+
+    bool IntersectPlane(const Vec3f& normal, const Vec3f& point) const {
+        if (ContainsPoint(point))
+        {
+            return true;
+        }
+        Vec3f extends = CalculateExtends();
+        Vec3f center = CalculateCenter();
+        float r = extends.x * std::abs(normal.x) + extends.y * std::abs(normal.y) + extends.z * std::abs(normal.z);
+        float d = Vec3f::Dot(normal, point);
+        float s = Vec3f::Dot(normal, center)-d;
+        return std::abs(s) <= r;
     }
 
     Vec3f lowerLeftBound = Vec3f::Zero; // the lower vertex
