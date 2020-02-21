@@ -264,7 +264,6 @@ public:
 
     const T& operator[](size_t p_axis) const
     {
-
         return coord[p_axis];
     }
 
@@ -545,7 +544,6 @@ public:
 };
 
 using Vec4f = Vec4<float>;
-using Quaternion = Vec4f;
 
 
 
@@ -556,21 +554,6 @@ Vec4f inline const Vec4f::Zero = Vec4f(0.0f,0.0f, 0.0f, 0.0f);
 template <>
 Vec4f inline const Vec4f::One = Vec4f(1.0f,1.0f,1.0f, 1.0f);
 
-//TODO Implement quaternion specific method
-template<>
-inline Quaternion Quaternion::AngleAxis(float angle, Vec3f axis)
-{
-    (void)angle;
-    (void)axis;
-    return Zero;
-}
-
-template<>
-inline Quaternion Quaternion::FromEulerAngles(Vec3f eulerAngles)
-{
-    (void) eulerAngles;
-    return Zero;
-}
 
 
 

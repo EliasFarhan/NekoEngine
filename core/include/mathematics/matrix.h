@@ -615,5 +615,4 @@ inline Mat4f Mat4f::Perspective(radian_t fovy, float aspect, float near, float f
     perspective[3][2] = - (2.0f * far * near) / (far - near);
     return perspective;
 }
-
 }
