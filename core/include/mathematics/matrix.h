@@ -7,6 +7,8 @@
 
 namespace neko
 {
+struct Quaternion;
+
 template<typename T>
 class Mat3
 {
@@ -168,7 +170,7 @@ public:
 
     static Mat4<float> Rotate(const Mat4<float>& transform, const radian_t angle, const Vec3f axis);
 
-    static Mat4<float> Rotate(const Mat4<float>& transform, const Quaternion quaternion);
+    static Mat4<float> Rotate(const Mat4<float>& transform, const Quaternion& quaternion);
 
     static Mat4<float> Rotate(const Mat4<float>& transform, const EulerAngles eulerAngles);
 
@@ -184,7 +186,7 @@ public:
 
     static Mat4<float> const RotationMatrixFrom(const RadianAngles cardinalRotation);
 
-    static Mat4<float> const RotationMatrixFrom(const Quaternion quaternion);
+    static Mat4<float> const RotationMatrixFrom(const Quaternion& quaternion);
 
     static EulerAngles const Rotation(const Mat4<float>& transform);
 

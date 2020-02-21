@@ -1,6 +1,3 @@
-//
-// Created by efarhan on 21/01/2020.
-//
 #include <iostream>
 #include <random>
 #include "random_fill.h"
@@ -80,3 +77,5 @@ static void BM_Angle(benchmark::State& state)
     }
 }
 BENCHMARK(BM_Angle)->Range(fromRange, toRange);
+
+BENCHMARK_MAIN();

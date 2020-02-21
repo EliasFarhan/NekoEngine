@@ -5,6 +5,7 @@
 #include "mathematics/matrix.h"
 #include "const.h"
 #include "angle.h"
+#include "mathematics/quaternion.h"
 
 namespace neko
 {
@@ -142,12 +143,12 @@ inline Mat4<float> const Transform3d::RotationMatrixFrom(const RadianAngles card
 }
 
 template<>
-inline Mat4f const Transform3d::RotationMatrixFrom(const Quaternion quaternion)
+inline Mat4f const Transform3d::RotationMatrixFrom(const Quaternion& quaternion)
 {
-    const float x = quaternion[0];
-    const float y = quaternion[1];
-    const float z = quaternion[2];
-    const float w = quaternion[3];
+    const float x = quaternion.x;
+    const float y = quaternion.y;
+    const float z = quaternion.z;
+    const float w = quaternion.w;
     const float xx = 2.0f * x * x;
     const float yy = 2.0f * y * y;
     const float zz = 2.0f * z * z;
@@ -192,7 +193,7 @@ inline Transform3d Transform3d::Rotate(const Transform3d& transform, const radia
 }
 
 template<>
-inline Transform3d Transform3d::Rotate(const Transform3d& transform, const Quaternion quaternion)
+inline Transform3d Transform3d::Rotate(const Transform3d& transform, const Quaternion& quaternion)
 {
     return transform * RotationMatrixFrom(quaternion);
 }
