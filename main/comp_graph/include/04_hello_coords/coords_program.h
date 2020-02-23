@@ -24,7 +24,7 @@ public:
     void OnEvent(const SDL_Event& event) override;
 
 private:
-    gl::Cuboid cube_{Vec3f::zero, Vec3f::one};
+    gl::RenderCuboid cube_{Vec3f::zero, Vec3f::one};
     const static size_t cubeNumbers_ = 10;
     Vec3f cubePositions[cubeNumbers_] =
     {

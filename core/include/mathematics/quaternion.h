@@ -74,7 +74,7 @@ struct Quaternion
 	//Rotates the Quaternion of angle degrees around axis.
 	Quaternion AngleAxis(radian_t rad, neko::Vec3f axis) const
 	{
-		if (axis.GetSquareMagnitude() == 0.0f)
+		if (axis.SquareMagnitude() == 0.0f)
 			return Quaternion(0, 0, 0, 1);
 
 		Quaternion result = Quaternion(0,0,0,1);

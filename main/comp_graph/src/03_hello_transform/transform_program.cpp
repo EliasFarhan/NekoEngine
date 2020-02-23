@@ -94,7 +94,7 @@ void HelloTransformProgram::DrawUi()
     switch (shape_)
     {
         case ShapeType::PLANE:
-            ImGui::InputFloat("Rotation", &angle_);
+            ImGui::InputFloat("Rotation", (float*) &angle_);
             break;
         case ShapeType::CUBE:
             ImGui::InputFloat3("Euler Angles", (float*) &eulerAngle_[0]);

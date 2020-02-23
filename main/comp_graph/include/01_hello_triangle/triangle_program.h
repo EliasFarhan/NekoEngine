@@ -37,6 +37,7 @@ public:
         VaoProgram,
         EboProgram,
         NekoQuad,
+        NekoCircle,
         Length
     };
 
@@ -103,10 +104,10 @@ private:
     };
     EboProgram eboProgram_;
 
-    neko::gl::Quad quad_{Vec2f::zero, Vec2f::one};
-
+    gl::RenderQuad quad_{Vec3f::zero, Vec2f::one};
+    gl::RenderCircle circle_{Vec3f::zero, 0.5f};
     seconds timeSinceInit_ = seconds(0.0f);
     gl::Shader shader_;
-    gl::Shader quadShader_;
+    gl::Shader nekoShader_;
 };
 }

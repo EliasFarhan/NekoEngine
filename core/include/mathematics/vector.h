@@ -244,8 +244,8 @@ struct Vec2
     {
         const auto dot = Dot(v1, v2);
         const auto mag = v2.SquareMagnitude();
-        return {(dot / mag ) * v2.x,
-                (dot / mag ) * v2.y};
+        return {(dot / mag) * v2.x,
+                (dot / mag) * v2.y};
     }
 
     /// \brief Calculates the angle between two vectors.
@@ -333,8 +333,7 @@ public:
     //-----------------------------------------------------------------------------
     // Constructors
     //-----------------------------------------------------------------------------
-    Vec3()
-            : x(0), y(0), z(0)
+    Vec3() : x(0), y(0), z(0)
     {
     }
 
@@ -358,6 +357,7 @@ public:
     {
 
     }
+
     template<typename U>
     explicit
     Vec3(const Vec3<U>& vector)
@@ -376,10 +376,6 @@ public:
     {
 
         return coord[p_axis];
-    }
-
-    T GetSquareMagnitude() const
-    {
     }
 
 

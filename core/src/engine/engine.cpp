@@ -150,7 +150,7 @@ void BasicEngine::GenerateUiFrame()
 		<< "Render FPS: " << 1.0f / renderer_->GetDeltaTime()
 #endif
 		<< '\n';
-	ImGui::Text(oss.str().c_str());
+	ImGui::Text("%s", oss.str().c_str());
 	ImGui::End();
 	drawUiAction_.Execute();
 }
