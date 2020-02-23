@@ -58,7 +58,7 @@ struct Quaternion
 	}
 
 	//Converts this quaternion to one with the same orientation but with a magnitude of 1.
-	Quaternion Normalize(Quaternion quaternion) const
+	static Quaternion Normalized(Quaternion quaternion)
 	{
 		return quaternion / Magnitude(quaternion);
 	}
@@ -85,7 +85,7 @@ struct Quaternion
 		result.z = axis.z;
 		result.w = std::cos(rad.value());
 
-		return Normalize(result);
+		return Normalized(result);
 	}
 
 
@@ -218,5 +218,11 @@ struct Quaternion
 	{
 		return !(*this == right);
 	}
+
+    friend std::ostream& operator<<(std::ostream& os, const Quaternion& quat)
+    {
+        os << "Quaternion(" << quat.x << "," << quat.y << "," << quat.z << "," << quat.w << ")";
+        return os;
+    }
 };
 }

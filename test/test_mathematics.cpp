@@ -43,27 +43,48 @@ TEST(Engine, TestMathematics)
 
 TEST(Engine, TestQuaternion)
 {
-    neko::Quaternion quaternion = neko::Quaternion(0, 0, 0, 1);
-    std::cout << "test Dot" << std::endl;
-    std::cout << "test Normalize" << std::endl;
-    std::cout << "test Magnitude" << std::endl;
-    std::cout << "test AngleAxis" << std::endl;
-    std::cout << "test Angle" << std::endl;
-    std::cout << "test Conjugate" << std::endl;
-    std::cout << "test Inverse" << std::endl;
-    std::cout << "test FromEuler" << std::endl;
-    std::cout << "test operator/Quaternion" << std::endl;
-    std::cout << "test operator/float" << std::endl;
-    std::cout << "test operator/=" << std::endl;
-    std::cout << "test operator-Quaternion" << std::endl;
-    std::cout << "test operator-=" << std::endl;
-    std::cout << "test operator+" << std::endl;
-    std::cout << "test operator+=" << std::endl;
-    std::cout << "test operator*Quaternion" << std::endl;
-    std::cout << "test operator*float" << std::endl;
-    std::cout << "test operator*=" << std::endl;
-    std::cout << "test operator==" << std::endl;
-    std::cout << "test operator !=" << std::endl;
+    //Variables
+    neko::Quaternion quaternionA = neko::Quaternion(0.71, 0, 0, 0.71);
+    neko::Quaternion quaternionB = neko::Quaternion(0, 0, 0, 1);
+    neko::Quaternion quaternionACopy;
+
+    //Display start variables
+    std::cout << "QuaternionA"<<quaternionA<<'\n';
+    std::cout << std::endl;
+    std::cout <<"QuaternionB"<< quaternionB<<'\n';
+    std::cout << std::endl << std::endl;
+
+    //Dot Product Test
+    std::cout << "Dot product: " << neko::Quaternion::Dot(quaternionA, quaternionB) << std::endl << std::endl;
+
+    //Normalize Test
+    std::cout << "Normalize: ";
+    std::cout << "NormalizedQuaternionA" << neko::Quaternion::Normalized(quaternionA) << '\n';
+    std::cout << std::endl << std::endl;
+
+    //Magnitude Test
+    std::cout << "Magnitude: " << neko::Quaternion::Magnitude(quaternionA) <<'\n'<<'\n';
+
+    //AngleAxis Test
+    std::cout << "AngleAxis: " << "Cannot be tested right now"<<'\n'<<'\n';
+
+    //Angle Test
+    std::cout << "Angle: " << neko::Quaternion::Angle(quaternionA, quaternionB) <<'\n'<<'\n';
+
+    //Conjugate Test
+    quaternionACopy = quaternionA;
+    std::cout << "Conjugate: ";
+    std::cout <<"QuaternionAConjugate"<< quaternionACopy.Conjugate()<<'\n';
+    std::cout <<'\n'<<'\n';
+
+    //Inverse Test
+    quaternionACopy = quaternionA;
+    std::cout << "Inverse: ";
+    std::cout <<"QuaternionAInverse"<< quaternionACopy.Inverse()<<'\n';
+    std::cout << std::endl << std::endl;
+
+    //FromEuler
+    std::cout << "Euler: " << "Cannot be tested right now" <<'\n'<<'\n';
 }
 TEST(Engine, TestMatrix4)
 {
