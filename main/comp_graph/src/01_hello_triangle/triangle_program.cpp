@@ -58,11 +58,15 @@ void HelloTriangleProgram::Init()
 
 void HelloTriangleProgram::Update(seconds dt)
 {
+    std::lock_guard<std::mutex> lock(updateMutex_);
     timeSinceInit_ += dt;
 }
 
 void HelloTriangleProgram::Render()
 {
+    if(shader_.GetProgram() == 0)
+        return;
+    std::lock_guard<std::mutex> lock(updateMutex_);
     switch (renderType_)
     {
 
@@ -119,10 +123,9 @@ void HelloTriangleProgram::Destroy()
     quadShader_.Destroy();
 }
 
-void HelloTriangleProgram::DrawUi(seconds dt)
+void HelloTriangleProgram::DrawUi()
 {
     ImGui::Begin("Hello Triangle Program");
-    ImGui::Text("FPS: %f", 1.0f / dt.count());
     const char* items[(size_t)RenderType::Length]= {
             "Simple Vao Program",
             "Simple Vbo Program",

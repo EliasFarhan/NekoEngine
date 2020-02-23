@@ -48,7 +48,7 @@ public:
 
     void Render() override;
 
-    void DrawUi(seconds dt) override;
+    void DrawUi() override;
 
     void OnEvent(const SDL_Event& event) override;
 
@@ -103,7 +103,7 @@ private:
     };
     EboProgram eboProgram_;
 
-    neko::gl::Quad quad_{Vec2f::Zero, Vec2f::One};
+    neko::gl::Quad quad_{Vec2f::zero, Vec2f::one};
 
     seconds timeSinceInit_ = seconds(0.0f);
     gl::Shader shader_;

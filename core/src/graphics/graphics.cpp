@@ -23,56 +23,135 @@
  */
 #include <graphics/graphics.h>
 #include <algorithm>
+#include <chrono>
 #include <engine/globals.h>
+#include <engine/window.h>
+#include <engine/engine.h>
 #include "engine/log.h"
 
+#ifdef EASY_PROFILE_USE
+#include "easy/profiler.h"
+#endif
 
 namespace neko
 {
-GraphicsManager::GraphicsManager()
+Renderer::Renderer()
 {
-	commandBuffer_.resize(MAX_COMMAND_NMB);
+    currentCommandBuffer_.reserve(MAX_COMMAND_NMB);
+    nextCommandBuffer_.reserve(MAX_COMMAND_NMB);
 }
 
 
-void GraphicsManager::Render(RenderCommand* command)
+void Renderer::Render(RenderCommandInterface* command)
 {
-	if (renderLength_ >= MAX_COMMAND_NMB)
-	{
-		logDebug("[Error] Max Number of Graphics Command");
-		return;
-	}
-	commandBuffer_[renderLength_] = command;
-	renderLength_++;
+    nextCommandBuffer_.push_back(command);
 }
 
-void GraphicsManager::RenderAll()
+void Renderer::RenderAll()
 {
-    std::sort(commandBuffer_.begin(), commandBuffer_.begin() + renderLength_, [](RenderCommand* c1, RenderCommand* c2)
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("RenderAllCPU");
+#endif
+    for (auto* renderCommand : currentCommandBuffer_)
     {
-        return c1->GetLayer() < c2->GetLayer();
-    });
-    for(Index i = 0; i < renderLength_;i++)
-    {
-        if(commandBuffer_[i])
-        {
-            commandBuffer_[i]->Render();
-        }
+        renderCommand->Render();
     }
-    renderLength_ = 0;
 }
 
-
-
-int RenderCommand::GetLayer() const
+void Renderer::Sync()
 {
-    return layer_;
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("EngineRenderSync");
+#endif
+    std::unique_lock lock(renderMutex_);
+    flags_ |= IS_APP_WAITING;
+#ifndef EMSCRIPTEN
+    cv_.wait(lock);
+#endif
+    std::swap(currentCommandBuffer_, nextCommandBuffer_);
+    nextCommandBuffer_.clear();
+    flags_ &= ~IS_APP_WAITING;
+    //TODO copy all the new transform3d?
 }
 
-void RenderCommand::SetLayer(int layer)
+void Renderer::RenderLoop()
 {
-    layer_ = layer;
+#ifndef EMSCRIPTEN
+    flags_ |= IS_RUNNING;
+    window_->LeaveCurrentContext();
+    renderThread_ = std::thread([this] {
+        BeforeRenderLoop();
+
+        std::chrono::time_point<std::chrono::system_clock> clock = std::chrono::system_clock::now();
+        while (flags_ & IS_RUNNING)
+        {
+            const auto start = std::chrono::system_clock::now();
+            const auto dt = std::chrono::duration_cast<seconds>(start - clock);
+            dt_ = dt.count();
+        	clock = start;
+        	
+           Update();
+        }
+        AfterRenderLoop();
+    });
+#endif
 }
+
+void Renderer::Close()
+{
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("ClosingFromEngine");
+#endif
+    flags_ &= ~IS_RUNNING;
+    renderThread_.join();
+}
+
+void Renderer::SetFlag(Renderer::RendererFlag flag)
+{
+    flags_ |= flag;
+}
+
+void Renderer::SetWindow(Window* window)
+{
+    window_ = window;
+}
+
+void Renderer::Update()
+{
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("RenderFullUpdateCPU");
+#endif
+    auto* engine = BasicEngine::GetInstance();
+    {
+        std::lock_guard<std::mutex> lock(renderMutex_);
+#ifdef EASY_PROFILE_USE
+        EASY_BLOCK("RenderUpdateCPU");
+#endif
+        window_->MakeCurrentContext();
+        ClearScreen();
+        engine->GenerateUiFrame();
+        RenderAll();
+        window_->RenderUi();
+    }
+    //Sync the beginning frame with EngineLoop
+    if (flags_ & IS_APP_WAITING)
+    {
+        cv_.notify_one();
+    }
+    window_->SwapBuffer();
+
+
+
+}
+void Renderer::BeforeRenderLoop()
+{
+    window_->MakeCurrentContext();
+}
+void Renderer::AfterRenderLoop()
+{
+    window_->LeaveCurrentContext();
+}
+
 
 
 }

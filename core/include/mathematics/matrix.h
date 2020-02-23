@@ -2,11 +2,13 @@
 
 #include "mathematics/vector.h"
 #include "mathematics/angle.h"
+#include "mathematics/quaternion.h"
 
 #include <cassert>
 
 namespace neko
 {
+
 template<typename T>
 class Mat3
 {
@@ -35,9 +37,7 @@ public:
         columns_ = m.columns_;
     }
 
-    explicit Mat4(const std::array<Vec4 < T>,
-
-    4>& v)
+    explicit Mat4(const std::array<Vec4 < T>,4>& v)
     {
         columns_ = v;
     }
@@ -62,7 +62,7 @@ public:
         return columns_[column];
     }
 
-    Mat4<T> Transpose() const
+    inline Mat4<T> Transpose() const
     {
         std::array<Vec4<T>, 4> v;
         for (int column = 0; column < 4; column++)
@@ -124,7 +124,7 @@ public:
                 v[column][row] = 0;
                 for (int i = 0; i < 4; i++)
                 {
-                    v[column][row] += columns_[i][column] * rhs[row][i];
+                    v[column][row] += columns_[i][row] * rhs[column][i];
                 }
             }
         }
@@ -145,9 +145,9 @@ public:
         return Mat4<T>(v);
     }
 
-    Mat4<T> MultiplyAoSoA(const Mat4<T>& rhs) const noexcept;
+    inline Mat4<T> MultiplyAoSoA(const Mat4<T>& rhs) const noexcept;
 
-    Mat4<T> MultiplyIntrinsincs(const Mat4<T>& rhs) const noexcept;
+    inline Mat4<T> MultiplyIntrinsincs(const Mat4<T>& rhs) const noexcept;
 
     static T MatrixDifference(const Mat4<T>& rhs, const Mat4<T>& lhs)
     {
@@ -156,25 +156,69 @@ public:
         {
             for (int row = 0; row < 4; row++)
             {
-                result += rhs[column][row] - lhs[column][row];
+                result += std::abs(rhs[column][row] - lhs[column][row]);
             }
         }
         return result;
     };
 
-    static Mat4<T> Translate(const Mat4<T>& transform, Vec3 <T> pos);
+    static Mat4<float> Translate(const Mat4<float>& transform, const Vec3f pos);
 
-    static Mat4<T> Scale(const Mat4<T>& transform, Vec3 <T> scale);
+    static Mat4<float> Scale(const Mat4<float>& transform, const Vec3f scale);
 
-    static Mat4<T> Rotate(const Mat4<T>& transform, radian_t angle, Vec3 <T> axis);
+    static Mat4<float> Rotate(const Mat4<float>& transform, const degree_t angle, const Vec3f axis);
 
-    static Mat4<T> Rotate(const Mat4<T>& transform, Vec4 <T> quaternion);
+    static Mat4<float> Rotate(const Mat4<float>& transform, const radian_t angle, const Vec3f axis);
 
-    static Mat4<T> Rotate(const Mat4<T>& transform, Vec3 <degree_t> eulerAngles);
-	
-    static Mat4<T> FromQuaternion(Vec4<T> quaternion);
+    static Mat4<float> Rotate(const Mat4<float>& transform, const Quaternion& quaternion);
+
+    static Mat4<float> Rotate(const Mat4<float>& transform, const EulerAngles eulerAngles);
+
+    static Mat4<float> const TranslationMatrixFrom(const Vec3f translation);
+
+    static Mat4<float> const ScalingMatrixFrom(const Vec3f scale);
+
+    static Mat4<float> const RotationMatrixFrom(const degree_t angle, const Vec3f axis);
+
+    static Mat4<float> const RotationMatrixFrom(const radian_t angle, const Vec3f axis);
+
+    static Mat4<float> const RotationMatrixFrom(const EulerAngles cardinalRotation);
+
+    static Mat4<float> const RotationMatrixFrom(const RadianAngles cardinalRotation);
+
+    static Mat4<float> const RotationMatrixFrom(const Quaternion& quaternion);
+
+    static EulerAngles const Rotation(const Mat4<float>& transform);
+
+    static float Pitch(const Mat4<float>& transform);
+
+    static float RotationOnX(const Mat4<float>& transform);
+
+    static float Yaw(const Mat4<float>& transform);
+
+    static float RotationOnY(const Mat4<float>& transform);
+
+    static float Roll(const Mat4<float>& transform);
+
+    static float RotationOnZ(const Mat4<float>& transform);
 
     static Mat4<T> Perspective(radian_t fovy, float aspect, float near, float far);
+
+    friend std::ostream& operator<<(std::ostream& os, const Mat4<T>& m)
+    {
+        for(int row=0; row < 4;row++)
+        {
+            os << "(";
+            for(int col=0; col < 4;col++)
+            {
+                 os << m[col][row]<<' ';
+            }
+            os << ")";
+        }
+        return os;
+    }
+
+
     const static Mat4<T> Identity;
     const static Mat4<T> Zero;
 private:
@@ -207,9 +251,7 @@ struct alignas(N * sizeof(T)) NVec4
     }
 
     //Transpose the matrix
-    explicit NVec4(const std::array<Vec4 < T>, N
-
-    >& soaV)
+    explicit NVec4(const std::array<Vec4 < T>, N>& soaV)
     {
         for (int i = 0; i < N; i++)
         {
@@ -308,7 +350,7 @@ struct alignas(N * sizeof(T)) NVec4
 };
 
 
-using FourVec4f = NVec4<float, 4>;
+using FourVec4f = NVec4<float, 4>; // TODO @Simon et @Oleg: move this to some separate header?
 using EightVec4f = NVec4<float, 8>;
 
 #ifdef __SSE__
@@ -445,11 +487,37 @@ inline std::array<float, 8> EightVec4f::GetMagnitudeIntrinsincs() const
 #endif
 using Mat3f = Mat3<float>;
 using Mat4f = Mat4<float>;
-using Transform3d = Mat4f;
+
+#ifdef __SSE__
+template<>
+inline Mat4f Mat4f::Transpose() const
+{
+    std::array<Vec4f, 4> v;
+    auto xmm3 = _mm_load_ps(&columns_[1][0]);
+    auto xmm4 = _mm_load_ps(&columns_[3][0]);
+    auto xmm0 = _mm_load_ps(&columns_[0][0]);
+    auto xmm1 = _mm_load_ps(&columns_[2][0]);
+
+    auto xmm2 = _mm_shuffle_ps(xmm0, xmm3, 136);
+    xmm0 = _mm_shuffle_ps(xmm0, xmm3, 221);
+    xmm3 = _mm_shuffle_ps(xmm1, xmm4, 136);
+    xmm1 = _mm_shuffle_ps(xmm1, xmm4, 221);
+    xmm4 = _mm_shuffle_ps(xmm2, xmm3, 136);
+    xmm2 = _mm_shuffle_ps(xmm2, xmm3, 221);
+    _mm_store_ps(&v[0][0], xmm4);
+    xmm4 = _mm_shuffle_ps(xmm0, xmm1, 136);
+    _mm_store_ps(&v[2][0], xmm2);
+    xmm0 = _mm_shuffle_ps(xmm0, xmm1, 221);
+    _mm_store_ps(&v[1][0], xmm4);
+    _mm_store_ps(&v[3][0], xmm0);
+    return Mat4f(v);
+}
+#endif
+
 
 
 template<>
-Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept;
+inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept;
 
 
 template<typename T>
@@ -459,17 +527,46 @@ inline Mat4<T> Mat4<T>::MultiplyAoSoA(const Mat4<T>& rhs) const noexcept
     std::array<Vec4f, 4> v;
     for (int column = 0; column < 4; column++)
     {
-    	for(int row = 0; row < 4; row++)
-    	{
+        for(int row = 0; row < 4; row++)
+        {
             const auto result = Vec4f::Dot(lhsT[row], rhs.columns_[column]);
             v[column][row] = result;
-    	}
-        
+        }
+
     }
-    return Mat4<T>(v);
+    return Mat4f(v);
 }
 
 #ifdef __SSE__
+template<>
+inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
+{
+    std::array<Vec4f, 4> v;
+    __m128 c1 = _mm_load_ps(&this->columns_[0][0]);
+    __m128 c2 = _mm_load_ps(&this->columns_[1][0]);
+    __m128 c3 = _mm_load_ps(&this->columns_[2][0]);
+    __m128 c4 = _mm_load_ps(&this->columns_[3][0]);
+    for (int column = 0; column < 4; column++)
+    {
+
+        __m128 rhsX = _mm_load1_ps(&rhs.columns_[column][0]);
+        __m128 rhsY = _mm_load1_ps(&rhs.columns_[column][1]);
+        __m128 rhsZ = _mm_load1_ps(&rhs.columns_[column][2]);
+        __m128 rhsW = _mm_load1_ps(&rhs.columns_[column][3]);
+        __m128 x = _mm_mul_ps(c1, rhsX);
+        __m128 y = _mm_mul_ps(c2, rhsY);
+        __m128 z = _mm_mul_ps(c3, rhsZ);
+        __m128 w = _mm_mul_ps(c4, rhsW);
+
+        x = _mm_add_ps(x,y);
+        z = _mm_add_ps(z,w);
+        x = _mm_add_ps(x,z);
+        _mm_store_ps(&v[column][0], x);
+    }
+    return Mat4f(v);
+}
+#endif
+#if defined(__arm__)
 template<>
 inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
 {
@@ -478,30 +575,29 @@ inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
     for (int column = 0; column < 4; column++)
     {
 
-        __m128 c = _mm_load_ps(&rhs[column][0]);
+        auto c = vld1q_f32(&rhs[column][0]);
     	
-        __m128 x = _mm_load_ps(&lhsT[0][0]);
-        __m128 y = _mm_load_ps(&lhsT[1][0]);
-        __m128 z = _mm_load_ps(&lhsT[2][0]);
-        __m128 w = _mm_load_ps(&lhsT[3][0]);
+        auto x = vld1q_f32(&lhsT[0][0]);
+        auto y = vld1q_f32(&lhsT[1][0]);
+        auto z = vld1q_f32(&lhsT[2][0]);
+        auto w = vld1q_f32(&lhsT[3][0]);
 
 
-        x = _mm_mul_ps(x, c);
-        y = _mm_mul_ps(y, c);
-        z = _mm_mul_ps(z, c);
-        w = _mm_mul_ps(w, c);
+        x = vmulq_f32(x, c);
+        y = vmulq_f32(y, c);
+        z = vmulq_f32(z, c);
+        w = vmulq_f32(w, c);
 
-        x = _mm_add_ps(x, y);
-        z = _mm_add_ps(z, w);
+        x = vaddq_f32(x, y);
+        z = vaddq_f32(z, w);
 
-        x = _mm_add_ps(x, z);
-        _mm_store_ps(&v[column][0], x);
+        x = vaddq_f32(x, z);
+        vst1q_f32(&v[column][0], x);
     }
     return Mat4f(v);
 }
 #endif
-
-#ifdef EMSCRIPTEN
+#if defined(EMSCRIPTEN) 
 template<>
 inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
 {
@@ -533,47 +629,6 @@ inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
 }
 #endif
 
-//TODO Implement Matrix Translation
-template<>
-inline Transform3d Transform3d::Translate(const Transform3d& transform, Vec3f pos)
-{
-    (void) pos;
-    return transform;
-}
-
-//TODO Implement Matrix Scale
-template<>
-inline Transform3d Transform3d::Scale(const Transform3d& transform, Vec3f scale)
-{
-    (void) scale;
-    return transform;
-}
-
-//TODO Implement Matrix Rotation with angle and axis
-template<>
-inline Transform3d Transform3d::Rotate(const Transform3d& transform, radian_t angle, Vec3f axis)
-{
-    (void) angle;
-    (void) axis;
-    return transform;
-}
-
-//TODO Implement Matrix Rotation with Quaternion
-/*template<>
-inline Transform3d Transform3d::Rotate(const Transform3d& transform, Quaternion quaternion)
-{
-    (void) quaternion;
-    return transform;
-}*/
-
-//TODO Implement Matrix Rotation with Simple Euler Angles
-template<>
-inline Transform3d Transform3d::Rotate(const Transform3d& transform, EulerAngles eulerAngles)
-{
-    (void)eulerAngles;
-    return transform;
-}
-
 template<>
 const inline Mat4f Mat4f::Identity = Mat4f(
         std::array<Vec4f, 4>
@@ -586,10 +641,10 @@ template <>
 const inline Mat4f Mat4f::Zero = Mat4f(
         std::array<Vec4f, 4>
         {
-            Vec4f::Zero,
-            Vec4f::Zero,
-            Vec4f::Zero,
-            Vec4f::Zero
+            Vec4f::zero,
+            Vec4f::zero,
+            Vec4f::zero,
+            Vec4f::zero
         });
 
 template <>
@@ -607,12 +662,4 @@ inline Mat4f Mat4f::Perspective(radian_t fovy, float aspect, float near, float f
     perspective[3][2] = - (2.0f * far * near) / (far - near);
     return perspective;
 }
-
-/*template<>
-inline Transform3d Transform3d::FromQuaternion(Quaternion quaternion)
-{
-    (void) quaternion;
-    return Transform3d::Identity;
-}*/
-
 }

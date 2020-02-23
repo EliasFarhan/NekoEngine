@@ -1,4 +1,4 @@
-#include <mathematics/matrix.h>
+#pragma once
 #include <engine/component.h>
 #include <mathematics/vector.h>
 #include <cmath>
@@ -102,7 +102,7 @@ struct Quaternion
 	}
 
 	//Returns the Inverse of rotation.
-	Quaternion Quaternion::Inverse() const
+	Quaternion Inverse() const
 	{
 		const Quaternion conj = Conjugate();
 		const float mag = Magnitude(*this);
@@ -146,7 +146,7 @@ struct Quaternion
 			w / rhs);
 	}
 
-	void Quaternion::operator/=(const float rhs) {
+	void operator/=(const float rhs) {
 		x /= rhs;
 		y /= rhs;
 		z /= rhs;
@@ -162,7 +162,7 @@ struct Quaternion
 			w - rhs.w);
 	}
 
-	void Quaternion::operator-=(const float rhs) {
+	void operator-=(const float rhs) {
 		x -= rhs;
 		y -= rhs;
 		z -= rhs;
@@ -178,7 +178,7 @@ struct Quaternion
 			w + rhs.w);
 	}
 
-	void Quaternion::operator+=(const float rhs) {
+	void operator+=(const float rhs) {
 		x += rhs;
 		y += rhs;
 		z += rhs;
@@ -202,7 +202,7 @@ struct Quaternion
 			w * rhs);
 	}
 	
-	void Quaternion::operator*=(const float rhs) {
+	void operator*=(const float rhs) {
 		x *= rhs;
 		y *= rhs;
 		z *= rhs;

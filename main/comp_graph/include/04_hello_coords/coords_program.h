@@ -15,16 +15,16 @@ public:
 
     void Update(seconds) override;
 
-    void Render() override;
+    void Render()override;
 
     void Destroy() override;
 
-    void DrawUi(seconds dt) override;
+    void DrawUi() override;
 
     void OnEvent(const SDL_Event& event) override;
 
 private:
-    gl::Cuboid cube_{Vec3f::Zero, Vec3f::One};
+    gl::Cuboid cube_{Vec3f::zero, Vec3f::one};
     const static size_t cubeNumbers_ = 10;
     Vec3f cubePositions[cubeNumbers_] =
     {

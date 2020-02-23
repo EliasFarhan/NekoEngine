@@ -10,7 +10,7 @@ include(cmake/neko_executable.cmake)
 
 
 
-set(Neko_Remotery OFF CACHE BOOL "Activate Remotery")
+set(Neko_Profile OFF CACHE BOOL "Activate Profiling with Easy Profile")
 set(Neko_GLES3 ON CACHE BOOL "Activate OpenGL ES 3.0")
 set(Neko_SDL2 ON CACHE BOOL "Activate SDL2")
 set(Neko_Box2D OFF CACHE BOOL "Activate Box2D")
@@ -23,12 +23,25 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
     set(CMAKE_STATIC_LIBRARY_SUFFIX ".a")
 endif()
 
+if(UNIX)
+    EXECUTE_PROCESS(COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE)
+    if("${ARCHITECTURE}" MATCHES "arm")
+        include(cmake/platforms/arm.cmake)
+    endif()
+endif()
+
 if(MSVC)
     include(cmake/platforms/msvc.cmake)
 endif()
 
 set(EXTERNAL_DIR ${CMAKE_SOURCE_DIR}/externals CACHE INTERNAL "Externals folder")
 set(UTILITIES_DIR "${EXTERNAL_DIR}/utilities" CACHE INTERNAL "")
+
+if(Neko_Profile)
+    set(EASY_PROFILE_DIR "${EXTERNAL_DIR}/easy_profiler-2.1.0")
+    add_compile_definitions("EASY_PROFILE_USE=1")
+    add_subdirectory(${EASY_PROFILE_DIR})
+endif()
 
 include("cmake/data.cmake")
 set(NEKO_CORE_DIR "${CMAKE_SOURCE_DIR}/core/" CACHE INTERNAL "")
@@ -39,14 +52,7 @@ set(IMGUI_VERSION "1.74" CACHE INTERNAL "")
 set(IMGUI_ROOT "${EXTERNAL_DIR}/imgui-${IMGUI_VERSION}" CACHE INTERNAL "")
 add_subdirectory("${IMGUI_ROOT}")
 
-if(Neko_Remotery)
-    #Remotery
-    set(REMOTERY_DIR ${EXTERNAL_DIR}/Remotery)
-    add_subdirectory(${REMOTERY_DIR})
-    include_directories(${REMOTERY_DIR})
-    LIST(APPEND Neko_LIBRARIES Remotery)
-    set_target_properties (Remotery PROPERTIES FOLDER Externals)
-endif()
+
 
 if(Neko_GLES3)
     add_compile_definitions("NEKO_GLES3=1")

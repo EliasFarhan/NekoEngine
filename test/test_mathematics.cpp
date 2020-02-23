@@ -8,7 +8,11 @@
 #include <random>
 #include <gtest/gtest.h>
 #include <mathematics/func_table.h>
+
 #include <mathematics/quaternion.h>
+#include <mathematics/matrix.h>
+#include "mathematics/vector.h"
+
 
 const float maxNmb = 100.0f;
 
@@ -44,47 +48,59 @@ TEST(Engine, TestMathematics)
 
 TEST(Engine, TestQuaternion)
 {
-	//Variables
-    neko::Quaternion quaternionA = neko::Quaternion(0.71,0,0,0.71);
+    //Variables
+    neko::Quaternion quaternionA = neko::Quaternion(0.71, 0, 0, 0.71);
     neko::Quaternion quaternionB = neko::Quaternion(0, 0, 0, 1);
     neko::Quaternion quaternionACopy;
 
-	//Display start variables
+    //Display start variables
     DisplayQuaternion("QuaternionA", quaternionA);
     std::cout << std::endl;
     DisplayQuaternion("QuaternionB", quaternionB);
     std::cout << std::endl << std::endl;
 
-	//Dot Product Test
+    //Dot Product Test
     std::cout << "Dot product: " << neko::Quaternion::Dot(quaternionA, quaternionB) << std::endl << std::endl;
 
-	//Normalize Test
+    //Normalize Test
     std::cout << "Normalize: ";
-	DisplayQuaternion("NormalizedQuaternionA", neko::Quaternion::Normalize(quaternionA));
+    DisplayQuaternion("NormalizedQuaternionA", neko::Quaternion::Normalize(quaternionA));
     std::cout << std::endl << std::endl;
 
-	//Magnitude Test
+    //Magnitude Test
     std::cout << "Magnitude: " << neko::Quaternion::Magnitude(quaternionA) << std::endl << std::endl;
 
-	//AngleAxis Test
+    //AngleAxis Test
     std::cout << "AngleAxis: " << "Cannot be tested right now" << std::endl << std::endl;
 
-	//Angle Test
+    //Angle Test
     std::cout << "Angle: " << neko::Quaternion::Angle(quaternionA, quaternionB) << std::endl << std::endl;
 
-	//Conjugate Test
+    //Conjugate Test
     quaternionACopy = quaternionA;
     std::cout << "Conjugate: ";
     DisplayQuaternion("QuaternionAConjugate", quaternionACopy.Conjugate());
     std::cout << std::endl << std::endl;
 
-	//Inverse Test
+    //Inverse Test
     quaternionACopy = quaternionA;
     std::cout << "Inverse: ";
     DisplayQuaternion("QuaternionAInverse", quaternionACopy.Inverse());
     std::cout << std::endl << std::endl;
 
-	//FromEuler
+    //FromEuler
     std::cout << "Euler: " << "Cannot be tested right now" << std::endl << std::endl;
-    
+}
+TEST(Engine, TestMatrix4)
+{
+    neko::Mat4f m1 (std::array<neko::Vec4f,4>
+            {
+                    neko::Vec4f{1,2,3,4},
+                    neko::Vec4f{-1,-2,-3,-4},
+                    neko::Vec4f{4,2,2,1},
+                    neko::Vec4f{-4,-3,-2,-1}
+            });
+
+    std::cout << (m1.MultiplyNaive(m1))<<'\n';
+    std::cout << (m1.MultiplyIntrinsincs(m1))<<'\n';
 }

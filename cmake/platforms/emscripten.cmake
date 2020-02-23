@@ -1,3 +1,4 @@
+message("Hello Emscripten")
 set(Emscripten ON CACHE BOOL "")
 
 add_compile_definitions(EMSCRIPTEN=1)

@@ -1,0 +1,2 @@
+MESSAGE("Hello ARM")
+set(ARM ON CACHE BOOL "")

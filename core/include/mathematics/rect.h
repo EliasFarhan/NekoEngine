@@ -38,7 +38,7 @@ struct Rect
     template<typename U = float>
     U GetRadius()
     {
-        return halfSize.GetMagnitude();
+        return halfSize.Magnitude();
     }
 
     T center;
