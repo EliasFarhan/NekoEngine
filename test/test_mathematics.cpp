@@ -24,11 +24,6 @@ void RandomFill(std::vector<float>& numbers, float start = -maxNmb, float end = 
     std::generate(numbers.begin(), numbers.end(), [&g, &dist](){return dist(g);});
 }
 
-void DisplayQuaternion(std::string quaternionName, neko::Quaternion q)
-{
-    std::cout << quaternionName << "(" << q.x << "," << q.y << "," << q.z << "," << q.w << ") ";
-}
-
 TEST(Engine, TestMathematics)
 {
     neko::FuncTable<float> sinFuncTable(0.0f, M_PI, [](float x){ return sinf(x);});
@@ -54,9 +49,9 @@ TEST(Engine, TestQuaternion)
     neko::Quaternion quaternionACopy;
 
     //Display start variables
-    DisplayQuaternion("QuaternionA", quaternionA);
+    std::cout << "QuaternionA"<<quaternionA<<'\n';
     std::cout << std::endl;
-    DisplayQuaternion("QuaternionB", quaternionB);
+    std::cout <<"QuaternionB"<< quaternionB<<'\n';
     std::cout << std::endl << std::endl;
 
     //Dot Product Test
@@ -64,32 +59,32 @@ TEST(Engine, TestQuaternion)
 
     //Normalize Test
     std::cout << "Normalize: ";
-    DisplayQuaternion("NormalizedQuaternionA", neko::Quaternion::Normalize(quaternionA));
+    std::cout << "NormalizedQuaternionA" << neko::Quaternion::Normalized(quaternionA) << '\n';
     std::cout << std::endl << std::endl;
 
     //Magnitude Test
-    std::cout << "Magnitude: " << neko::Quaternion::Magnitude(quaternionA) << std::endl << std::endl;
+    std::cout << "Magnitude: " << neko::Quaternion::Magnitude(quaternionA) <<'\n'<<'\n';
 
     //AngleAxis Test
-    std::cout << "AngleAxis: " << "Cannot be tested right now" << std::endl << std::endl;
+    std::cout << "AngleAxis: " << "Cannot be tested right now"<<'\n'<<'\n';
 
     //Angle Test
-    std::cout << "Angle: " << neko::Quaternion::Angle(quaternionA, quaternionB) << std::endl << std::endl;
+    std::cout << "Angle: " << neko::Quaternion::Angle(quaternionA, quaternionB) <<'\n'<<'\n';
 
     //Conjugate Test
     quaternionACopy = quaternionA;
     std::cout << "Conjugate: ";
-    DisplayQuaternion("QuaternionAConjugate", quaternionACopy.Conjugate());
-    std::cout << std::endl << std::endl;
+    std::cout <<"QuaternionAConjugate"<< quaternionACopy.Conjugate()<<'\n';
+    std::cout <<'\n'<<'\n';
 
     //Inverse Test
     quaternionACopy = quaternionA;
     std::cout << "Inverse: ";
-    DisplayQuaternion("QuaternionAInverse", quaternionACopy.Inverse());
+    std::cout <<"QuaternionAInverse"<< quaternionACopy.Inverse()<<'\n';
     std::cout << std::endl << std::endl;
 
     //FromEuler
-    std::cout << "Euler: " << "Cannot be tested right now" << std::endl << std::endl;
+    std::cout << "Euler: " << "Cannot be tested right now" <<'\n'<<'\n';
 }
 TEST(Engine, TestMatrix4)
 {
