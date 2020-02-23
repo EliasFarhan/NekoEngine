@@ -7,6 +7,8 @@
 
 namespace neko
 {
+struct Quaternion;
+
 template<typename T>
 class Mat3
 {
@@ -160,17 +162,45 @@ public:
         return result;
     };
 
-    static Mat4<T> Translate(const Mat4<T>& transform, Vec3 <T> pos);
+    static Mat4<float> Translate(const Mat4<float>& transform, const Vec3f pos);
 
-    static Mat4<T> Scale(const Mat4<T>& transform, Vec3 <T> scale);
+    static Mat4<float> Scale(const Mat4<float>& transform, const Vec3f scale);
 
-    static Mat4<T> Rotate(const Mat4<T>& transform, radian_t angle, Vec3 <T> axis);
+    static Mat4<float> Rotate(const Mat4<float>& transform, const degree_t angle, const Vec3f axis);
 
-    static Mat4<T> Rotate(const Mat4<T>& transform, Vec4 <T> quaternion);
+    static Mat4<float> Rotate(const Mat4<float>& transform, const radian_t angle, const Vec3f axis);
 
-    static Mat4<T> Rotate(const Mat4<T>& transform, Vec3 <degree_t> eulerAngles);
-	
-    static Mat4<T> FromQuaternion(Vec4<T> quaternion);
+    static Mat4<float> Rotate(const Mat4<float>& transform, const Quaternion& quaternion);
+
+    static Mat4<float> Rotate(const Mat4<float>& transform, const EulerAngles eulerAngles);
+
+    static Mat4<float> const TranslationMatrixFrom(const Vec3f translation);
+
+    static Mat4<float> const ScalingMatrixFrom(const Vec3f scale);
+
+    static Mat4<float> const RotationMatrixFrom(const degree_t angle, const Vec3f axis);
+
+    static Mat4<float> const RotationMatrixFrom(const radian_t angle, const Vec3f axis);
+
+    static Mat4<float> const RotationMatrixFrom(const EulerAngles cardinalRotation);
+
+    static Mat4<float> const RotationMatrixFrom(const RadianAngles cardinalRotation);
+
+    static Mat4<float> const RotationMatrixFrom(const Quaternion& quaternion);
+
+    static EulerAngles const Rotation(const Mat4<float>& transform);
+
+    static float Pitch(const Mat4<float>& transform);
+
+    static float RotationOnX(const Mat4<float>& transform);
+
+    static float Yaw(const Mat4<float>& transform);
+
+    static float RotationOnY(const Mat4<float>& transform);
+
+    static float Roll(const Mat4<float>& transform);
+
+    static float RotationOnZ(const Mat4<float>& transform);
 
     static Mat4<T> Perspective(radian_t fovy, float aspect, float near, float far);
 
@@ -320,7 +350,7 @@ struct alignas(N * sizeof(T)) NVec4
 };
 
 
-using FourVec4f = NVec4<float, 4>;
+using FourVec4f = NVec4<float, 4>; // TODO @Simon et @Oleg: move this to some separate header?
 using EightVec4f = NVec4<float, 8>;
 
 #ifdef __SSE__
@@ -457,8 +487,6 @@ inline std::array<float, 8> EightVec4f::GetMagnitudeIntrinsincs() const
 #endif
 using Mat3f = Mat3<float>;
 using Mat4f = Mat4<float>;
-using Transform3d = Mat4f;
-
 
 #ifdef __SSE__
 template<>
@@ -602,47 +630,6 @@ inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
 }
 #endif
 
-//TODO Implement Matrix Translation
-template<>
-inline Transform3d Transform3d::Translate(const Transform3d& transform, Vec3f pos)
-{
-    (void) pos;
-    return transform;
-}
-
-//TODO Implement Matrix Scale
-template<>
-inline Transform3d Transform3d::Scale(const Transform3d& transform, Vec3f scale)
-{
-    (void) scale;
-    return transform;
-}
-
-//TODO Implement Matrix Rotation with angle and axis
-template<>
-inline Transform3d Transform3d::Rotate(const Transform3d& transform, radian_t angle, Vec3f axis)
-{
-    (void) angle;
-    (void) axis;
-    return transform;
-}
-
-//TODO Implement Matrix Rotation with Quaternion
-template<>
-inline Transform3d Transform3d::Rotate(const Transform3d& transform, Quaternion quaternion)
-{
-    (void) quaternion;
-    return transform;
-}
-
-//TODO Implement Matrix Rotation with Simple Euler Angles
-template<>
-inline Transform3d Transform3d::Rotate(const Transform3d& transform, EulerAngles eulerAngles)
-{
-    (void)eulerAngles;
-    return transform;
-}
-
 template<>
 const inline Mat4f Mat4f::Identity = Mat4f(
         std::array<Vec4f, 4>
@@ -676,12 +663,4 @@ inline Mat4f Mat4f::Perspective(radian_t fovy, float aspect, float near, float f
     perspective[3][2] = - (2.0f * far * near) / (far - near);
     return perspective;
 }
-
-template<>
-inline Transform3d Transform3d::FromQuaternion(Quaternion quaternion)
-{
-    (void) quaternion;
-    return Transform3d::Identity;
-}
-
 }

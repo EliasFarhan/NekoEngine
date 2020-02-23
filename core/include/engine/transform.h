@@ -31,6 +31,7 @@
 #include <mathematics/matrix.h>
 #include "engine/component.h"
 #include "mathematics/vector.h"
+#include "mathematics/quaternion.h"
 
 namespace neko
 {
@@ -60,7 +61,7 @@ class Position3dManager : public ComponentManager<Vec3f, ComponentType::POSITION
 };
 
 
-class Rotation3dManager : public ComponentManager<Vec4f, ComponentType::ROTATION3D>
+class Rotation3dManager : public ComponentManager<Quaternion, ComponentType::ROTATION3D>
 {
 
 };

@@ -8,8 +8,11 @@
 #include <random>
 #include <gtest/gtest.h>
 #include <mathematics/func_table.h>
+
+#include <mathematics/quaternion.h>
 #include <mathematics/matrix.h>
 #include "mathematics/vector.h"
+
 
 const float maxNmb = 100.0f;
 
@@ -38,6 +41,30 @@ TEST(Engine, TestMathematics)
     std::cout << "Error margin for sinFuncTable with resolution 512: "<<error<<"\n";
 }
 
+TEST(Engine, TestQuaternion)
+{
+    neko::Quaternion quaternion = neko::Quaternion(0, 0, 0, 1);
+    std::cout << "test Dot" << std::endl;
+    std::cout << "test Normalize" << std::endl;
+    std::cout << "test Magnitude" << std::endl;
+    std::cout << "test AngleAxis" << std::endl;
+    std::cout << "test Angle" << std::endl;
+    std::cout << "test Conjugate" << std::endl;
+    std::cout << "test Inverse" << std::endl;
+    std::cout << "test FromEuler" << std::endl;
+    std::cout << "test operator/Quaternion" << std::endl;
+    std::cout << "test operator/float" << std::endl;
+    std::cout << "test operator/=" << std::endl;
+    std::cout << "test operator-Quaternion" << std::endl;
+    std::cout << "test operator-=" << std::endl;
+    std::cout << "test operator+" << std::endl;
+    std::cout << "test operator+=" << std::endl;
+    std::cout << "test operator*Quaternion" << std::endl;
+    std::cout << "test operator*float" << std::endl;
+    std::cout << "test operator*=" << std::endl;
+    std::cout << "test operator==" << std::endl;
+    std::cout << "test operator !=" << std::endl;
+}
 TEST(Engine, TestMatrix4)
 {
     neko::Mat4f m1 (std::array<neko::Vec4f,4>
