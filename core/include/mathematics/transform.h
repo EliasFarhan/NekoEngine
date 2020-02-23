@@ -40,7 +40,7 @@ template<>
 inline Mat4f const Transform3d::RotationMatrixFrom(const degree_t angle, const Vec3f axis)
 {
     const float angleAsFloat = static_cast<radian_t>(angle).to<float>();
-    const Vec3f normalizedAxis = axis / axis.GetMagnitude();
+    const Vec3f normalizedAxis = axis.Normalized();
 
     const float x = axis[0];
     const float y = axis[1];
@@ -71,7 +71,7 @@ template<>
 inline Mat4f const Transform3d::RotationMatrixFrom(const radian_t angle, const Vec3f axis)
 {
     const float angleAsFloat = angle.to<float>();
-    const Vec3f normalizedAxis = axis / axis.GetMagnitude();
+    const Vec3f normalizedAxis = axis.Normalized();
 
     const float x = axis[0];
     const float y = axis[1];

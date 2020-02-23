@@ -39,7 +39,7 @@ static void BM_Vec3Magnitude(benchmark::State& state)
     {
         for(auto v : local_numbers)
         {
-            float f = v.GetMagnitude();
+            float f = v.Magnitude();
             benchmark::DoNotOptimize(f);
         }
     }
@@ -85,7 +85,7 @@ static void BM_Vec3MagnitudeAoSoA4(benchmark::State& state)
         const auto magnitudes = tmp.GetMagnitude();
     	for(int j = 0; j < 4; j++)
     	{
-            result += magnitudes[j] - local_numbers[i + j].GetMagnitude();
+            result += magnitudes[j] - local_numbers[i + j].Magnitude();
     	}
     }
 	std::cout << "Magnitude difference: " << result / static_cast<float>(state.range(0)) << " Range: "
@@ -115,7 +115,7 @@ static void BM_Vec4MagnitudeAoSoA4(benchmark::State& state)
         const auto magnitudes = tmp.GetMagnitude();
         for (int j = 0; j < 4; j++)
         {
-            result += magnitudes[j] - local_numbers[i + j].GetMagnitude();
+            result += magnitudes[j] - local_numbers[i + j].Magnitude();
         }
     }
     std::cout << "Magnitude difference: " << result / static_cast<float>(state.range(0)) << " Range: "
@@ -144,7 +144,7 @@ static void BM_Vec4MagnitudeAoSoA4Intrinsincs(benchmark::State& state)
         const auto magnitudes = tmp.GetMagnitude();
         for (int j = 0; j < 4; j++)
         {
-            result += magnitudes[j] - local_numbers[i + j].GetMagnitude();
+            result += magnitudes[j] - local_numbers[i + j].Magnitude();
         }
     }
     std::cout << "Magnitude difference: " << result / static_cast<float>(state.range(0)) << " Range: "
@@ -175,7 +175,7 @@ static void BM_Vec3MagnitudeAoSoA8(benchmark::State& state)
         const auto magnitudes = tmp.GetMagnitude();
         for (int j = 0; j < 4; j++)
         {
-            result += magnitudes[j] - local_numbers[i + j].GetMagnitude();
+            result += magnitudes[j] - local_numbers[i + j].Magnitude();
         }
     }
     std::cout << "Magnitude difference: " << result / static_cast<float>(state.range(0)) << " Range: "
@@ -205,7 +205,7 @@ static void BM_Vec4MagnitudeAoSoA8(benchmark::State& state)
         const auto magnitudes = tmp.GetMagnitude();
         for (int j = 0; j < 4; j++)
         {
-            result += magnitudes[j] - local_numbers[i + j].GetMagnitude();
+            result += magnitudes[j] - local_numbers[i + j].Magnitude();
         }
     }
     std::cout << "Magnitude difference: " << result / static_cast<float>(state.range(0)) << " Range: "
@@ -236,7 +236,7 @@ static void BM_Vec4MagnitudeAoSoA8Intrinsincs(benchmark::State& state)
         const auto magnitudes = tmp.GetMagnitude();
         for (int j = 0; j < 4; j++)
         {
-            result += magnitudes[j] - local_numbers[i + j].GetMagnitude();
+            result += magnitudes[j] - local_numbers[i + j].Magnitude();
         }
     }
     std::cout << "Magnitude difference: " << result / static_cast<float>(state.range(0)) << " Range: "

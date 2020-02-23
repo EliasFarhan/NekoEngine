@@ -1,5 +1,4 @@
 #pragma once
-#include <mathematics/matrix.h>
 #include <engine/component.h>
 #include <mathematics/vector.h>
 #include <cmath>

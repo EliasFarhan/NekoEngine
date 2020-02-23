@@ -31,13 +31,13 @@ private:
         LENGTH
     };
     ShapeType shape_ = ShapeType::PLANE;
-    gl::Cuboid cube_{ Vec3f::Zero, Vec3f::One };
-    gl::Quad quad_{Vec2f::Zero, Vec2f::One};
+    gl::Cuboid cube_{ Vec3f::zero, Vec3f::one };
+    gl::Quad quad_{Vec2f::zero, Vec2f::one};
     Mat4f transform_{Mat4f::Identity};
-    Vec3f position_ = Vec3f::Zero;
-    Vec3f scale_ = Vec3f::One;
+    Vec3f position_ = Vec3f::zero;
+    Vec3f scale_ = Vec3f::one;
     float angle_ = 0.0f;
-    EulerAngles eulerAngle_{Vec3f::Zero};
+    EulerAngles eulerAngle_{Vec3f::zero};
     gl::Shader shaderProgram_;
     gl::TextureId textureWall_;
 };

@@ -2,12 +2,12 @@
 
 #include "mathematics/vector.h"
 #include "mathematics/angle.h"
+#include "mathematics/quaternion.h"
 
 #include <cassert>
 
 namespace neko
 {
-struct Quaternion;
 
 template<typename T>
 class Mat3
@@ -541,7 +541,6 @@ inline Mat4<T> Mat4<T>::MultiplyAoSoA(const Mat4<T>& rhs) const noexcept
 template<>
 inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
 {
-    const auto lhsT(Transpose());
     std::array<Vec4f, 4> v;
     __m128 c1 = _mm_load_ps(&this->columns_[0][0]);
     __m128 c2 = _mm_load_ps(&this->columns_[1][0]);
@@ -642,10 +641,10 @@ template <>
 const inline Mat4f Mat4f::Zero = Mat4f(
         std::array<Vec4f, 4>
         {
-            Vec4f::Zero,
-            Vec4f::Zero,
-            Vec4f::Zero,
-            Vec4f::Zero
+            Vec4f::zero,
+            Vec4f::zero,
+            Vec4f::zero,
+            Vec4f::zero
         });
 
 template <>

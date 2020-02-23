@@ -103,7 +103,7 @@ private:
     };
     EboProgram eboProgram_;
 
-    neko::gl::Quad quad_{Vec2f::Zero, Vec2f::One};
+    neko::gl::Quad quad_{Vec2f::zero, Vec2f::one};
 
     seconds timeSinceInit_ = seconds(0.0f);
     gl::Shader shader_;
