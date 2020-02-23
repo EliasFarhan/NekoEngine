@@ -11,6 +11,8 @@ typedef float v4f __attribute__ ((vector_size (16)));
 #define __SSE__
 #define __SSE4_2__
 #define __FMA__
+#else
+static_assert(false, "AVX2 is not enabled");
 #endif
 #endif
 

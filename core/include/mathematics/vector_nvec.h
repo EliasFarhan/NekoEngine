@@ -688,9 +688,15 @@ inline FourVec3f FourVec3f::ReflectIntrinsics(FourVec3f inVec, FourVec3f normal)
 
     auto dot = _mm_load_ps(DotIntrinsics(inVec, normal).data());
 
-    auto xn = _mm_load_ps(normal.xs.data()) * 2;
-    auto yn = _mm_load_ps(normal.ys.data()) * 2;
-    auto zn = _mm_load_ps(normal.zs.data()) * 2;
+    auto xn = _mm_load_ps(normal.xs.data());
+    auto yn = _mm_load_ps(normal.ys.data());
+    auto zn = _mm_load_ps(normal.zs.data());
+    const float multiplier = 2.0f;
+    const auto twos = _mm_load1_ps(&multiplier);
+
+    xn = _mm_mul_ps(xn, twos);
+    yn = _mm_mul_ps(yn, twos);
+    zn = _mm_mul_ps(zn, twos);
 
     xn = _mm_mul_ps(xn, dot);
     yn = _mm_mul_ps(yn, dot);
@@ -822,10 +828,14 @@ inline EightVec3f EightVec3f::ReflectIntrinsics(EightVec3f inVec, EightVec3f nor
 
     auto dot = _mm_load_ps(DotIntrinsics(inVec, normal).data());
 
-    auto xn = _mm_load_ps(normal.xs.data()) * 2;
-    auto yn = _mm_load_ps(normal.ys.data()) * 2;
-    auto zn = _mm_load_ps(normal.zs.data()) * 2;
-
+    auto xn = _mm_load_ps(normal.xs.data());
+    auto yn = _mm_load_ps(normal.ys.data());
+    auto zn = _mm_load_ps(normal.zs.data());
+    const float multiplier = 2.0f;
+    const auto twos = _mm_load1_ps(&multiplier);
+    xn = _mm_mul_ps(xn, twos);
+    yn = _mm_mul_ps(yn, twos);
+    zn = _mm_mul_ps(zn, twos);
     xn = _mm_mul_ps(xn, dot);
     yn = _mm_mul_ps(yn, dot);
     zn = _mm_mul_ps(zn, dot);

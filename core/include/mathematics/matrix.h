@@ -3,6 +3,7 @@
 #include "mathematics/vector.h"
 #include "mathematics/angle.h"
 #include "mathematics/quaternion.h"
+#include "mathematics/intrinsincs.h"
 #include "trigo.h"
 
 #include <cassert>
@@ -110,7 +111,7 @@ public:
         return Mat4<T>(v);
     }
 
-    Mat4<T> operator*(const Mat4<T>& rhs) const
+    Mat4<T> operator*(const Mat4<T>& rhs) const noexcept
     {
         return MultiplyIntrinsincs(rhs);
     }
@@ -256,12 +257,6 @@ inline Mat4f Mat4f::Transpose() const
 }
 #endif
 
-
-
-template<>
-inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept;
-
-
 template<typename T>
 inline Mat4<T> Mat4<T>::MultiplyAoSoA(const Mat4<T>& rhs) const noexcept
 {
@@ -278,6 +273,9 @@ inline Mat4<T> Mat4<T>::MultiplyAoSoA(const Mat4<T>& rhs) const noexcept
     }
     return Mat4f(v);
 }
+
+template<>
+inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept;
 
 #ifdef __SSE__
 template<>

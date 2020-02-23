@@ -4,7 +4,6 @@
 #include "gl/shape.h"
 #include "gl/shader.h"
 #include <gl/texture.h>
-// #include "mathematics/vector.h" // Included in transform.h
 #include "mathematics/transform.h"
 
 namespace neko

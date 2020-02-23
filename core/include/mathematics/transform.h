@@ -166,6 +166,8 @@ inline Mat4f const Transform3d::RotationMatrixFrom(const Quaternion& quaternion)
                     });
 }
 
+
+
 template<>
 inline Transform3d Transform3d::Translate(const Transform3d& transform, const Vec3f translation)
 {

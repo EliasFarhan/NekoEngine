@@ -30,7 +30,7 @@ public:
     explicit RenderCircle(Vec3f offset, float radius) : RenderShape(offset), radius_(radius){}
 protected:
     float radius_ = 0.0f;
-    const size_t resolution = 50;
+    static const size_t resolution = 50;
 };
 
 class RenderQuad : public RenderShape

@@ -24,8 +24,6 @@
  SOFTWARE.
  */
 
-#include <vector>
-
 #include "globals.h"
 #include <engine/entity.h>
 #include <mathematics/matrix.h>
