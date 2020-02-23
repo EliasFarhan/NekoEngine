@@ -13,4 +13,5 @@ TEST(Engine, TestUnits)
     neko::degree_t angle2 = angle;
 
     std::cout << "This should be 180: "<< angle2.value()<<'\n';
+    EXPECT_TRUE(std::abs(angle2.value()-180.0f) < 0.001f);
 }

@@ -22,8 +22,10 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
+
 #include "engine/engine.h"
 #include "sdl_engine/sdl_window.h"
+#include "graphics/graphics.h"
 #include <SDL.h>
 #include <SDL_main.h>
 
@@ -36,17 +38,14 @@ public:
 	explicit SdlEngine(Configuration* config = nullptr);
 	SdlEngine() = delete;
 	void Init() override;
-	void Update(seconds dt) override final;
 	void Destroy() override;
 	virtual void OnEvent(const SDL_Event& event) = 0;
-/**
- * Simple windows setter, needs to be called before Init
- * @param window
- */
-    void SetWindow(SdlWindow* window);
-protected:
 
-    SdlWindow* window_ = nullptr;
+    void ManageEvent() override;
+
+    void GenerateUiFrame() override;
+
+
 };
 
 }

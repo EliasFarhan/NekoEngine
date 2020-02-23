@@ -1,5 +1,7 @@
 #include <engine/engine.h>
 #include "04_hello_coords/coords_program.h"
+#include "imgui.h"
+#include "mathematics/transform.h"
 
 namespace neko
 {
@@ -25,11 +27,15 @@ void HelloCoordsProgram::Init()
 
 void HelloCoordsProgram::Update(seconds dt)
 {
+    std::lock_guard<std::mutex> lock(updateMutex_);
     timeSinceInit_ += dt;
 }
 
 void HelloCoordsProgram::Render()
 {
+    if(shader_.GetProgram() == 0)
+        return;
+    std::lock_guard<std::mutex> lock(updateMutex_);
     shader_.Bind();
     glBindTexture(GL_TEXTURE_2D, textureWall_);
     shader_.SetMat4("view", view);
@@ -38,10 +44,10 @@ void HelloCoordsProgram::Render()
     for (auto cubePosition : cubePositions)
     {
         Mat4f model = Mat4f::Identity; //model transform matrix
-        model = Mat4f::Translate(model, cubePosition);
         model = Mat4f::Rotate(model, degree_t(timeSinceInit_.count()*45.0f), Vec3f(1.0f, 0.0f, 0.0f));
         model = Mat4f::Rotate(model, degree_t(timeSinceInit_.count()*45.0f), Vec3f(0.0f, 1.0f, 0.0f));
 
+        model = Mat4f::Translate(model, cubePosition);
         shader_.SetMat4("model", model);
         cube_.Draw();
     }
@@ -55,9 +61,8 @@ void HelloCoordsProgram::Destroy()
 
 }
 
-void HelloCoordsProgram::DrawUi(seconds dt)
+void HelloCoordsProgram::DrawUi()
 {
-
 }
 
 void HelloCoordsProgram::OnEvent(const SDL_Event& event)

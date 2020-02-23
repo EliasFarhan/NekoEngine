@@ -19,6 +19,7 @@ TEST(Engine, TestVector)
 
     for (auto& tet : result) {
         std::cout << tet << "\n";
+        EXPECT_TRUE(tet-array[0].Magnitude() < 0.01f);
     }
 }
 }

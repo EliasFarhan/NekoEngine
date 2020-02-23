@@ -287,17 +287,14 @@ FourVec2f FourVec2f::NormalizedIntrinsics()
     FourVec2f result;
     auto x = _mm_load_ps(xs.data());
     auto y = _mm_load_ps(ys.data());
-    auto z = _mm_load_ps(zs.data());
 
     auto mag = _mm_load_ps(MagnitudeIntrinsics().data());
 
     x = _mm_div_ps(x, mag);
     y = _mm_div_ps(y, mag);
-    z = _mm_div_ps(z, mag);
 
     _mm_store_ps(result.xs.data(), x);
     _mm_store_ps(result.ys.data(), y);
-    _mm_store_ps(result.zs.data(), z);
 
     return result;
 }
@@ -377,17 +374,13 @@ EightVec2f EightVec2f::NormalizedIntrinsics()
     EightVec2f result;
     auto x = _mm_load_ps(xs.data());
     auto y = _mm_load_ps(ys.data());
-    auto z = _mm_load_ps(zs.data());
-
     auto mag = _mm_load_ps(MagnitudeIntrinsics().data());
 
     x = _mm_div_ps(x, mag);
     y = _mm_div_ps(y, mag);
-    z = _mm_div_ps(z, mag);
 
     _mm_store_ps(result.xs.data(), x);
     _mm_store_ps(result.ys.data(), y);
-    _mm_store_ps(result.zs.data(), z);
 
     return result;
 }

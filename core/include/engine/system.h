@@ -25,32 +25,23 @@
  SOFTWARE.
  */
 #include <utilities/time_utility.h>
+
 namespace neko
 {
 
 /**
- * \brief abstraction of System in the Entity-Component-System engine, movable non-copyable.
+ * \brief Interface of System in the Entity-Component-System engine
  * Needs to implement Init, Update and Destroy
  */
-class System
+class SystemInterface
 {
 public:
-    System() = default;
-
-    virtual ~System() = default;
-
-    System& operator=(const System&) = delete;
-
-    System(System&&) = default; //move constructor
-    System(const System&) = delete; //delete copy constructor
-
-    virtual void Init() = 0;
+	virtual ~SystemInterface() = default;
+	virtual void Init() = 0;
 
     virtual void Update(seconds dt) = 0;
 
     virtual void Destroy() = 0;
-
-
 };
 
 }

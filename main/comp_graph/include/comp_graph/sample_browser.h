@@ -7,14 +7,13 @@
 
 namespace neko
 {
-class SampleBrowser : public System
+class SampleBrowser : public SystemInterface
 {
 public:
     void Init() override;
 
     void Update(seconds dt) override;
-    void Render();
-    void DrawGui(seconds dt);
+    void DrawGui();
 
     void Destroy() override;
 

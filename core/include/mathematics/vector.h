@@ -356,15 +356,32 @@ public:
               y(static_cast<T>(vec2.y)),
               z(static_cast<T>(0))
     {
-    }
 
+    }
     template<typename U>
-    explicit Vec3(const Vec3<U>& vector)
+    explicit
+    Vec3(const Vec3<U>& vector)
             : x(static_cast<T>(vector.x)),
               y(static_cast<T>(vector.y)),
               z(static_cast<T>(vector.z))
     {
     }
+
+    const T& operator[](size_t p_axis) const
+    {
+        return coord[p_axis];
+    }
+
+    T& operator[](size_t p_axis)
+    {
+
+        return coord[p_axis];
+    }
+
+    T GetSquareMagnitude() const
+    {
+    }
+
 
     template<typename U>
     explicit Vec3(const Vec4<U>& vec4)
@@ -447,17 +464,7 @@ public:
         os << "Vec3(" << dt.x << "," << dt.y << "," << dt.z << ")";
         return os;
     }
-    const T& operator[](size_t p_axis) const
-    {
 
-        return coord[p_axis];
-    }
-
-    T& operator[](size_t p_axis)
-    {
-
-        return coord[p_axis];
-    }
 
     //-----------------------------------------------------------------------------
     // Formulas
@@ -532,6 +539,7 @@ using Vec3f = Vec3<float>;
 using Vec3i = Vec3<int>;
 using Vec3u = Vec3<unsigned int>;
 using EulerAngles = Vec3<degree_t>;
+using RadianAngles = Vec3<radian_t>;
 
 template<typename T>
 inline Vec3<T> const Vec3<T>::zero = Vec3<T>(0, 0, 0);
@@ -719,7 +727,6 @@ public:
 
     T& operator[](size_t p_axis)
     {
-
         return coord[p_axis];
     }
 
@@ -787,7 +794,6 @@ public:
 // Vec4 Aliases
 //-----------------------------------------------------------------------------
 using Vec4f = Vec4<float>;
-using Quaternion = Vec4f;
 
 template<typename T>
 inline Vec4<T> const Vec4<T>::zero = Vec4<T>(0);

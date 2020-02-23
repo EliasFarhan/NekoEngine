@@ -105,7 +105,7 @@ protected:
 };
 
 
-class BasicEditorSystem : public System
+class BasicEditorSystem : public SystemInterface
 {
 public:
 	explicit BasicEditorSystem(Configuration& config);

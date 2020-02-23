@@ -5,28 +5,20 @@ namespace neko
 CompGraphEngine::CompGraphEngine(Configuration* config) : SdlEngine(config)
 {
     initAction_.RegisterCallback(
-            [this](void)
-            {
+            [this](void) {
                 sampleBrowser_.Init();
             });
     updateAction_.RegisterCallback(
-            [this](seconds dt)
-            {
+            [this](seconds dt) {
                 sampleBrowser_.Update(dt);
             });
     destroyAction_.RegisterCallback(
-            [this](void)
-            {
+            [this](void) {
                 sampleBrowser_.Destroy();
             });
-    drawAction_.RegisterCallback(
-            [this]()
-            {
-                sampleBrowser_.Render();
-            });
     drawUiAction_.RegisterCallback(
-            [this](seconds dt){
-                sampleBrowser_.DrawGui(dt);
+            [this]() {
+                sampleBrowser_.DrawGui();
             });
 }
 
