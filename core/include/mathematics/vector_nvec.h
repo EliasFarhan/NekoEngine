@@ -24,7 +24,7 @@
  */
 
 #include <mathematics/vector.h>
-
+#include "mathematics/intrinsincs.h"
 namespace neko
 {
 //-----------------------------------------------------------------------------
@@ -215,7 +215,7 @@ using EightVec2f = NVec2<float, 8>;
 //-----------------------------------------------------------------------------
 #ifdef __SSE__
 template <>
-std::array<float, 4> FourVec2f::DotIntrinsics(FourVec2f v1, FourVec2f v2)
+inline std::array<float, 4> FourVec2f::DotIntrinsics(FourVec2f v1, FourVec2f v2)
 {
     alignas(4 * sizeof(float))
     std::array<float, 4> result;
@@ -233,7 +233,7 @@ std::array<float, 4> FourVec2f::DotIntrinsics(FourVec2f v1, FourVec2f v2)
     return result;
 }
 template <>
-std::array<float, 4> FourVec2f::DotIntrinsics(FourVec2f v1, Vec2f v2)
+inline std::array<float, 4> FourVec2f::DotIntrinsics(FourVec2f v1, Vec2f v2)
 {
     alignas(4 * sizeof(float))
     std::array<float, 4> result;
@@ -251,7 +251,7 @@ std::array<float, 4> FourVec2f::DotIntrinsics(FourVec2f v1, Vec2f v2)
     return result;
 }
 template<>
-std::array<float, 4> FourVec2f::SquareMagnitudeIntrinsics() const
+inline std::array<float, 4> FourVec2f::SquareMagnitudeIntrinsics() const
 {
     alignas(4 * sizeof(float))
     std::array<float, 4> result;
@@ -266,7 +266,7 @@ std::array<float, 4> FourVec2f::SquareMagnitudeIntrinsics() const
     return result;
 }
 template<>
-std::array<float, 4> FourVec2f::MagnitudeIntrinsics() const
+inline std::array<float, 4> FourVec2f::MagnitudeIntrinsics() const
 {
     alignas(4 * sizeof(float))
     std::array<float, 4> result;
@@ -282,7 +282,7 @@ std::array<float, 4> FourVec2f::MagnitudeIntrinsics() const
     return result;
 }
 template<>
-FourVec2f FourVec2f::NormalizedIntrinsics()
+inline FourVec2f FourVec2f::NormalizedIntrinsics()
 {
     FourVec2f result;
     auto x = _mm_load_ps(xs.data());
@@ -302,7 +302,7 @@ FourVec2f FourVec2f::NormalizedIntrinsics()
 
 #ifdef __AVX2__
 template <>
-std::array<float, 8> EightVec2f::DotIntrinsics(EightVec2f v1, EightVec2f v2)
+inline std::array<float, 8> EightVec2f::DotIntrinsics(EightVec2f v1, EightVec2f v2)
 {
     alignas(8 * sizeof(float))
     std::array<float, 8> result;
@@ -320,7 +320,7 @@ std::array<float, 8> EightVec2f::DotIntrinsics(EightVec2f v1, EightVec2f v2)
     return result;
 }
 template <>
-std::array<float, 8> EightVec2f::DotIntrinsics(EightVec2f v1, Vec2f v2)
+inline std::array<float, 8> EightVec2f::DotIntrinsics(EightVec2f v1, Vec2f v2)
 {
     alignas(8 * sizeof(float))
     std::array<float, 8> result;
@@ -338,7 +338,7 @@ std::array<float, 8> EightVec2f::DotIntrinsics(EightVec2f v1, Vec2f v2)
     return result;
 }
 template<>
-std::array<float, 8> EightVec2f::SquareMagnitudeIntrinsics() const
+inline std::array<float, 8> EightVec2f::SquareMagnitudeIntrinsics() const
 {
     alignas(8 * sizeof(float))
     std::array<float, 8> result;
@@ -353,7 +353,7 @@ std::array<float, 8> EightVec2f::SquareMagnitudeIntrinsics() const
     return result;
 }
 template<>
-std::array<float, 8> EightVec2f::MagnitudeIntrinsics() const
+inline std::array<float, 8> EightVec2f::MagnitudeIntrinsics() const
 {
     alignas(8 * sizeof(float))
     std::array<float, 8> result;
@@ -369,7 +369,7 @@ std::array<float, 8> EightVec2f::MagnitudeIntrinsics() const
     return result;
 }
 template<>
-EightVec2f EightVec2f::NormalizedIntrinsics()
+inline EightVec2f EightVec2f::NormalizedIntrinsics()
 {
     EightVec2f result;
     auto x = _mm_load_ps(xs.data());
@@ -576,7 +576,7 @@ using EightVec3f = NVec3<float, 8>;
 //-----------------------------------------------------------------------------
 #ifdef __SSE__
 template <>
-std::array<float, 4> FourVec3f::DotIntrinsics(FourVec3f v1, FourVec3f v2)
+inline std::array<float, 4> FourVec3f::DotIntrinsics(FourVec3f v1, FourVec3f v2)
 {
     alignas(4 * sizeof(float))
     std::array<float, 4> result;
@@ -598,7 +598,7 @@ std::array<float, 4> FourVec3f::DotIntrinsics(FourVec3f v1, FourVec3f v2)
     return result;
 }
 template <>
-std::array<float, 4> FourVec3f::DotIntrinsics(FourVec3f v1, Vec3f v2)
+inline std::array<float, 4> FourVec3f::DotIntrinsics(FourVec3f v1, Vec3f v2)
 {
     alignas(4 * sizeof(float))
     std::array<float, 4> result;
@@ -620,7 +620,7 @@ std::array<float, 4> FourVec3f::DotIntrinsics(FourVec3f v1, Vec3f v2)
     return result;
 }
 template<>
-std::array<float, 4> FourVec3f::SquareMagnitudeIntrinsics() const
+inline std::array<float, 4> FourVec3f::SquareMagnitudeIntrinsics() const
 {
     alignas(4 * sizeof(float))
     std::array<float, 4> result;
@@ -638,7 +638,7 @@ std::array<float, 4> FourVec3f::SquareMagnitudeIntrinsics() const
     return result;
 }
 template<>
-std::array<float, 4> FourVec3f::MagnitudeIntrinsics() const
+inline std::array<float, 4> FourVec3f::MagnitudeIntrinsics() const
 {
     alignas(4 * sizeof(float))
     std::array<float, 4> result;
@@ -657,7 +657,7 @@ std::array<float, 4> FourVec3f::MagnitudeIntrinsics() const
     return result;
 }
 template<>
-FourVec3f FourVec3f::NormalizedIntrinsics()
+inline FourVec3f FourVec3f::NormalizedIntrinsics()
 {
     FourVec3f result;
     auto x = _mm_load_ps(xs.data());
@@ -677,7 +677,7 @@ FourVec3f FourVec3f::NormalizedIntrinsics()
     return result;
 }
 template<>
-FourVec3f FourVec3f::ReflectIntrinsics(FourVec3f inVec, FourVec3f normal)
+inline FourVec3f FourVec3f::ReflectIntrinsics(FourVec3f inVec, FourVec3f normal)
 {
     FourVec3f result;
     normal = normal.NormalizedIntrinsics();
@@ -710,7 +710,7 @@ FourVec3f FourVec3f::ReflectIntrinsics(FourVec3f inVec, FourVec3f normal)
 
 #ifdef __AVX2__
 template <>
-std::array<float, 8> EightVec3f::DotIntrinsics(EightVec3f v1, EightVec3f v2)
+inline std::array<float, 8> EightVec3f::DotIntrinsics(EightVec3f v1, EightVec3f v2)
 {
     alignas(8 * sizeof(float))
     std::array<float, 8> result;
@@ -732,7 +732,7 @@ std::array<float, 8> EightVec3f::DotIntrinsics(EightVec3f v1, EightVec3f v2)
     return result;
 }
 template <>
-std::array<float, 8> EightVec3f::DotIntrinsics(EightVec3f v1, Vec3f v2)
+inline std::array<float, 8> EightVec3f::DotIntrinsics(EightVec3f v1, Vec3f v2)
 {
     alignas(8 * sizeof(float))
     std::array<float, 8> result;
@@ -754,7 +754,7 @@ std::array<float, 8> EightVec3f::DotIntrinsics(EightVec3f v1, Vec3f v2)
     return result;
 }
 template<>
-std::array<float, 8> EightVec3f::SquareMagnitudeIntrinsics() const
+inline std::array<float, 8> EightVec3f::SquareMagnitudeIntrinsics() const
 {
     alignas(8 * sizeof(float))
     std::array<float, 8> result;
@@ -772,7 +772,7 @@ std::array<float, 8> EightVec3f::SquareMagnitudeIntrinsics() const
     return result;
 }
 template<>
-std::array<float, 8> EightVec3f::MagnitudeIntrinsics() const
+inline std::array<float, 8> EightVec3f::MagnitudeIntrinsics() const
 {
     alignas(8 * sizeof(float))
     std::array<float, 8> result;
@@ -791,7 +791,7 @@ std::array<float, 8> EightVec3f::MagnitudeIntrinsics() const
     return result;
 }
 template<>
-EightVec3f EightVec3f::NormalizedIntrinsics()
+inline EightVec3f EightVec3f::NormalizedIntrinsics()
 {
     EightVec3f result;
     auto x = _mm_load_ps(xs.data());
@@ -811,7 +811,7 @@ EightVec3f EightVec3f::NormalizedIntrinsics()
     return result;
 }
 template<>
-EightVec3f EightVec3f::ReflectIntrinsics(EightVec3f inVec, EightVec3f normal)
+inline EightVec3f EightVec3f::ReflectIntrinsics(EightVec3f inVec, EightVec3f normal)
 {
     EightVec3f result;
     normal = normal.NormalizedIntrinsics();
@@ -1041,7 +1041,7 @@ using EightVec4f = NVec4<float, 8>;
 //-----------------------------------------------------------------------------
 #ifdef __SSE__
 template <>
-std::array<float, 4> FourVec4f::DotIntrinsics(FourVec4f v1, FourVec4f v2)
+inline std::array<float, 4> FourVec4f::DotIntrinsics(FourVec4f v1, FourVec4f v2)
 {
     alignas(4 * sizeof(float))
     std::array<float, 4> result;
@@ -1067,7 +1067,7 @@ std::array<float, 4> FourVec4f::DotIntrinsics(FourVec4f v1, FourVec4f v2)
     return result;
 }
 template <>
-std::array<float, 4> FourVec4f::DotIntrinsics(FourVec4f v1, Vec4f v2)
+inline std::array<float, 4> FourVec4f::DotIntrinsics(FourVec4f v1, Vec4f v2)
 {
     alignas(4 * sizeof(float))
     std::array<float, 4> result;
@@ -1093,7 +1093,7 @@ std::array<float, 4> FourVec4f::DotIntrinsics(FourVec4f v1, Vec4f v2)
     return result;
 }
 template<>
-std::array<float, 4> FourVec4f::SquareMagnitudeIntrinsics() const
+inline std::array<float, 4> FourVec4f::SquareMagnitudeIntrinsics() const
 {
     alignas(4 * sizeof(float))
     std::array<float, 4> result;
@@ -1114,7 +1114,7 @@ std::array<float, 4> FourVec4f::SquareMagnitudeIntrinsics() const
     return result;
 }
 template<>
-std::array<float, 4> FourVec4f::MagnitudeIntrinsics() const
+inline std::array<float, 4> FourVec4f::MagnitudeIntrinsics() const
 {
     alignas(4 * sizeof(float))
     std::array<float, 4> result;
@@ -1136,7 +1136,7 @@ std::array<float, 4> FourVec4f::MagnitudeIntrinsics() const
     return result;
 }
 template<>
-FourVec4f FourVec4f::NormalizedIntrinsics()
+inline FourVec4f FourVec4f::NormalizedIntrinsics()
 {
     FourVec4f result;
     auto x = _mm_load_ps(xs.data());
@@ -1159,7 +1159,7 @@ FourVec4f FourVec4f::NormalizedIntrinsics()
 
 #ifdef __AVX2__
 template <>
-std::array<float, 8> EightVec4f::DotIntrinsics(EightVec4f v1, EightVec4f v2)
+inline std::array<float, 8> EightVec4f::DotIntrinsics(EightVec4f v1, EightVec4f v2)
 {
     alignas(8 * sizeof(float))
     std::array<float, 8> result;
@@ -1185,7 +1185,7 @@ std::array<float, 8> EightVec4f::DotIntrinsics(EightVec4f v1, EightVec4f v2)
     return result;
 }
 template <>
-std::array<float, 8> EightVec4f::DotIntrinsics(EightVec4f v1, Vec4f v2)
+inline std::array<float, 8> EightVec4f::DotIntrinsics(EightVec4f v1, Vec4f v2)
 {
     alignas(8 * sizeof(float))
     std::array<float, 8> result;
@@ -1211,7 +1211,7 @@ std::array<float, 8> EightVec4f::DotIntrinsics(EightVec4f v1, Vec4f v2)
     return result;
 }
 template<>
-std::array<float, 8> EightVec4f::SquareMagnitudeIntrinsics() const
+inline std::array<float, 8> EightVec4f::SquareMagnitudeIntrinsics() const
 {
     alignas(8 * sizeof(float))
     std::array<float, 8> result;
@@ -1232,7 +1232,7 @@ std::array<float, 8> EightVec4f::SquareMagnitudeIntrinsics() const
     return result;
 }
 template<>
-std::array<float, 8> EightVec4f::MagnitudeIntrinsics() const
+inline std::array<float, 8> EightVec4f::MagnitudeIntrinsics() const
 {
     alignas(8 * sizeof(float))
     std::array<float, 8> result;
@@ -1254,7 +1254,7 @@ std::array<float, 8> EightVec4f::MagnitudeIntrinsics() const
     return result;
 }
 template<>
-EightVec4f EightVec4f::NormalizedIntrinsics()
+inline EightVec4f EightVec4f::NormalizedIntrinsics()
 {
     EightVec4f result;
     auto x = _mm_load_ps(xs.data());

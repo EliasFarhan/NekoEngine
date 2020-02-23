@@ -25,10 +25,10 @@
 
 #include <ostream>
 #include <array>
-#include <cmath>
 #include "mathematics/const.h"
 #include <mathematics/intrinsincs.h>
 #include "mathematics/angle.h"
+#include "trigo.h"
 
 namespace neko
 {
@@ -254,8 +254,8 @@ struct Vec2
     /// \brief Rotates the Vec2 from the given angle (in degrees).
     Vec2<T> Rotate(neko::radian_t angle) const
     {
-        return {x * cosf(angle.value()) - y * sinf(angle.value()),
-                x * sinf(angle.value()) + y * cosf(angle.value())};
+        return {x * Cos(angle) - y * Sin(angle),
+                x * Sin(angle) + y * Cos(angle)};
     }
 
     //-----------------------------------------------------------------------------
@@ -293,7 +293,7 @@ neko::radian_t Vec2<T>::AngleBetween(const Vec2& v1, const Vec2& v2)
 {
     const float dot = Vec2<T>::Dot(v1, v2) / v1.Magnitude() / v2.Magnitude();
     const float det = v1.x * v2.y - v1.y * v2.x;
-    const neko::radian_t angle = (neko::radian_t) atan2(det, dot);
+    const neko::radian_t angle = Atan2(det, dot);
     return angle;
 }
 
@@ -562,7 +562,7 @@ neko::radian_t Vec3<T>::AngleBetween(const Vec3& v1, const Vec3& v2)
 {
     const float dot = Vec3<T>::Dot(v1, v2) / v1.Magnitude() / v2.Magnitude();
     const float det = v1.x * v2.y - v1.y * v2.x;
-    const neko::radian_t angle = (neko::radian_t) atan2(det, dot);
+    const neko::radian_t angle = Atan2(det, dot);
     return angle;
 }
 

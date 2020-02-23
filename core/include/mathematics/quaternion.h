@@ -1,7 +1,7 @@
 #pragma once
 #include <engine/component.h>
 #include <mathematics/vector.h>
-#include <cmath>
+#include "mathematics/trigo.h"
 
 
 //DATE : 19.02.2020
@@ -79,21 +79,21 @@ struct Quaternion
 
 		Quaternion result = Quaternion(0,0,0,1);
 		//TODO: axis.Normalize();
-		axis = axis * std::sin(rad.value());
+		axis = axis * Sin(rad);
 		result.x = axis.x;
 		result.y = axis.y;
 		result.z = axis.z;
-		result.w = std::cos(rad.value());
+		result.w = Cos(rad);
 
 		return Normalized(result);
 	}
 
 
 	//Returns the angle in degrees between two rotations a and b.
-	static float Angle(Quaternion a, Quaternion b)
+	static degree_t Angle(Quaternion a, Quaternion b)
 	{
 		
-		return 2.0f * std::acos(std::abs(Dot(a, b)));
+		return 2.0f * Acos(std::abs(Dot(a, b)));
 	}
 
 	Quaternion Conjugate() const
@@ -117,12 +117,12 @@ struct Quaternion
 	*/
 	static Quaternion FromEuler(EulerAngles angle)
 	{
-		float cy = std::cos((angle.x.value() * 0.5f));
-		float sy = std::sin((angle.x.value() * 0.5f));
-		float cp = std::cos((angle.y.value() * 0.5f));
-		float sp = std::sin((angle.y.value() * 0.5f));
-		float cr = std::cos((angle.z.value() * 0.5f));
-		float sr = std::sin((angle.z.value() * 0.5f));
+		const auto cy = Cos(angle.x * 0.5f);
+		const auto sy = Sin(angle.x * 0.5f);
+		const auto cp = Cos(angle.y * 0.5f);
+		const auto sp = Sin(angle.y * 0.5f);
+		const auto cr = Cos(angle.z * 0.5f);
+		const auto sr = Sin(angle.z * 0.5f);
 
 		return Quaternion(
 			cy * cp * cr + sy * sp * sr,
