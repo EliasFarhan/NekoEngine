@@ -69,7 +69,7 @@ public:
         {
             for (int row = 0; row < 4; row++)
             {
-                v[column][row] = columns_[row][column];
+                v[row][column] = columns_[column][row];
             }
         }
         return Mat4<T>(v);
@@ -111,7 +111,7 @@ public:
 
     Mat4<T> operator*(const Mat4<T>& rhs) const
     {
-        return MultiplyNaive(rhs); // MultiplyIntrinsincs(rhs); // TODO @Elias: Intrinsics version is glitched.
+        return MultiplyIntrinsincs(rhs);
     }
 
     inline Mat4<T> MultiplyNaive(const Mat4<T>& rhs) const noexcept
@@ -124,7 +124,7 @@ public:
                 v[column][row] = 0;
                 for (int i = 0; i < 4; i++)
                 {
-                    v[column][row] += columns_[i][column] * rhs[row][i];
+                    v[column][row] += columns_[i][row] * rhs[column][i];
                 }
             }
         }
@@ -145,9 +145,9 @@ public:
         return Mat4<T>(v);
     }
 
-    Mat4<T> MultiplyAoSoA(const Mat4<T>& rhs) const noexcept;
+    inline Mat4<T> MultiplyAoSoA(const Mat4<T>& rhs) const noexcept;
 
-    Mat4<T> MultiplyIntrinsincs(const Mat4<T>& rhs) const noexcept;
+    inline Mat4<T> MultiplyIntrinsincs(const Mat4<T>& rhs) const noexcept;
 
     static T MatrixDifference(const Mat4<T>& rhs, const Mat4<T>& lhs)
     {
@@ -156,7 +156,7 @@ public:
         {
             for (int row = 0; row < 4; row++)
             {
-                result += rhs[column][row] - lhs[column][row];
+                result += std::abs(rhs[column][row] - lhs[column][row]);
             }
         }
         return result;
@@ -203,6 +203,22 @@ public:
     static float RotationOnZ(const Mat4<float>& transform);
 
     static Mat4<T> Perspective(radian_t fovy, float aspect, float near, float far);
+
+    friend std::ostream& operator<<(std::ostream& os, const Mat4<T>& m)
+    {
+        for(int row=0; row < 4;row++)
+        {
+            os << "(";
+            for(int col=0; col < 4;col++)
+            {
+                 os << m[col][row]<<' ';
+            }
+            os << ")";
+        }
+        return os;
+    }
+
+
     const static Mat4<T> Identity;
     const static Mat4<T> Zero;
 private:
@@ -235,9 +251,7 @@ struct alignas(N * sizeof(T)) NVec4
     }
 
     //Transpose the matrix
-    explicit NVec4(const std::array<Vec4 < T>, N
-
-    >& soaV)
+    explicit NVec4(const std::array<Vec4 < T>, N>& soaV)
     {
         for (int i = 0; i < N; i++)
         {
@@ -499,8 +513,11 @@ inline Mat4f Mat4f::Transpose() const
     return Mat4f(v);
 }
 #endif
+
+
+
 template<>
-Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept;
+inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept;
 
 
 template<typename T>
@@ -510,14 +527,14 @@ inline Mat4<T> Mat4<T>::MultiplyAoSoA(const Mat4<T>& rhs) const noexcept
     std::array<Vec4f, 4> v;
     for (int column = 0; column < 4; column++)
     {
-    	for(int row = 0; row < 4; row++)
-    	{
+        for(int row = 0; row < 4; row++)
+        {
             const auto result = Vec4f::Dot(lhsT[row], rhs.columns_[column]);
             v[column][row] = result;
-    	}
-        
+        }
+
     }
-    return Mat4<T>(v);
+    return Mat4f(v);
 }
 
 #ifdef __SSE__
@@ -526,33 +543,62 @@ inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
 {
     const auto lhsT(Transpose());
     std::array<Vec4f, 4> v;
+    __m128 c1 = _mm_load_ps(&this->columns_[0][0]);
+    __m128 c2 = _mm_load_ps(&this->columns_[1][0]);
+    __m128 c3 = _mm_load_ps(&this->columns_[2][0]);
+    __m128 c4 = _mm_load_ps(&this->columns_[3][0]);
     for (int column = 0; column < 4; column++)
     {
 
-        __m128 c = _mm_load_ps(&rhs[column][0]);
-    	
-        __m128 x = _mm_load_ps(&lhsT[0][0]);
-        __m128 y = _mm_load_ps(&lhsT[1][0]);
-        __m128 z = _mm_load_ps(&lhsT[2][0]);
-        __m128 w = _mm_load_ps(&lhsT[3][0]);
+        __m128 rhsX = _mm_load1_ps(&rhs.columns_[column][0]);
+        __m128 rhsY = _mm_load1_ps(&rhs.columns_[column][1]);
+        __m128 rhsZ = _mm_load1_ps(&rhs.columns_[column][2]);
+        __m128 rhsW = _mm_load1_ps(&rhs.columns_[column][3]);
+        __m128 x = _mm_mul_ps(c1, rhsX);
+        __m128 y = _mm_mul_ps(c2, rhsY);
+        __m128 z = _mm_mul_ps(c3, rhsZ);
+        __m128 w = _mm_mul_ps(c4, rhsW);
 
-
-        x = _mm_mul_ps(x, c);
-        y = _mm_mul_ps(y, c);
-        z = _mm_mul_ps(z, c);
-        w = _mm_mul_ps(w, c);
-
-        x = _mm_add_ps(x, y);
-        z = _mm_add_ps(z, w);
-
-        x = _mm_add_ps(x, z);
+        x = _mm_add_ps(x,y);
+        z = _mm_add_ps(z,w);
+        x = _mm_add_ps(x,z);
         _mm_store_ps(&v[column][0], x);
     }
     return Mat4f(v);
 }
 #endif
+#if defined(__arm__)
+template<>
+inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
+{
+    const auto lhsT(Transpose());
+    std::array<Vec4f, 4> v;
+    for (int column = 0; column < 4; column++)
+    {
 
-#ifdef EMSCRIPTEN
+        auto c = vld1q_f32(&rhs[column][0]);
+    	
+        auto x = vld1q_f32(&lhsT[0][0]);
+        auto y = vld1q_f32(&lhsT[1][0]);
+        auto z = vld1q_f32(&lhsT[2][0]);
+        auto w = vld1q_f32(&lhsT[3][0]);
+
+
+        x = vmulq_f32(x, c);
+        y = vmulq_f32(y, c);
+        z = vmulq_f32(z, c);
+        w = vmulq_f32(w, c);
+
+        x = vaddq_f32(x, y);
+        z = vaddq_f32(z, w);
+
+        x = vaddq_f32(x, z);
+        vst1q_f32(&v[column][0], x);
+    }
+    return Mat4f(v);
+}
+#endif
+#if defined(EMSCRIPTEN) 
 template<>
 inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
 {

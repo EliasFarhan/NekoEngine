@@ -48,7 +48,7 @@ public:
 
     void Render() override;
 
-    void DrawUi(seconds dt) override;
+    void DrawUi() override;
 
     void OnEvent(const SDL_Event& event) override;
 

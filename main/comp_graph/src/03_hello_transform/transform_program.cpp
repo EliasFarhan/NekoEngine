@@ -25,7 +25,8 @@ void HelloTransformProgram::Init()
 
 void HelloTransformProgram::Render()
 {
-
+    if(shaderProgram_.GetProgram() == 0)
+        return;
     std::lock_guard<std::mutex> lock(updateMutex_);
 
     shaderProgram_.Bind();
@@ -60,11 +61,9 @@ void HelloTransformProgram::Update(seconds dt)
 {
     std::lock_guard<std::mutex> lock(updateMutex_);
     transform_ = Mat4f::Identity;
-    transform_ = Mat4f::Translate(transform_, position_);
     transform_ = Mat4f::Scale(transform_, scale_);
     switch(shape_)
     {
-
         case ShapeType::PLANE:
             transform_ = Mat4f::Rotate(transform_, degree_t(angle_), Vec3f(0.0f, 0.0f, 1.0f));
             break;
@@ -74,9 +73,11 @@ void HelloTransformProgram::Update(seconds dt)
         default:
             break;
     }
+
+    transform_ = Mat4f::Translate(transform_, position_);
 }
 
-void HelloTransformProgram::DrawUi(seconds dt)
+void HelloTransformProgram::DrawUi()
 {
     ImGui::Begin("Transform Window");
     const char* items[static_cast<size_t>(ShapeType::LENGTH)] = {

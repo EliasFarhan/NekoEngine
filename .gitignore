@@ -21,7 +21,7 @@
 *.smod
 
 # Build directories
-build*/**
+*/build*/**
 
 # Compiled Static libraries
 *.lai

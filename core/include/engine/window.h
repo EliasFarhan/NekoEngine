@@ -23,11 +23,27 @@
  SOFTWARE.
  */
 #include "engine/system.h"
+#include "mathematics/vector.h"
 
 namespace neko
 {
 class Window : public SystemInterface
 {
-
+public:
+    virtual void GenerateUiFrame() = 0;
+    /**
+     * \brief Called at the end of a graphics frame to switch the double
+     */
+    virtual void SwapBuffer() = 0;
+    /**
+     * \brief Called by the render thread to render the Ui
+     */
+    virtual void RenderUi() = 0;
+    virtual void OnResize(Vec2u newWindowSize) = 0;
+    /**
+     * \brief Called by a render thread to take ownership of the context, typically used in OpenGL
+     */
+    virtual void MakeCurrentContext() {};
+    virtual void LeaveCurrentContext() {};
 };
 }

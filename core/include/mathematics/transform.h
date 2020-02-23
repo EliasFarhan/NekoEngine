@@ -18,10 +18,10 @@ inline Mat4f const Transform3d::TranslationMatrixFrom(const Vec3f translation)
     return Mat4f(
             std::array<Vec4f, 4>
                     {
-                            Vec4f(1.0f, 0, 0, translation[0]),
-                            Vec4f(0, 1.0f, 0, translation[1]),
-                            Vec4f(0, 0, 1.0f, translation[2]),
-                            Vec4f(0, 0, 0, 1)});
+                            Vec4f(1.0f, 0, 0, 0),
+                            Vec4f(0, 1.0f, 0, 0),
+                            Vec4f(0, 0, 1.0f, 0),
+                            Vec4f(translation[0], translation[1], translation[2], 1)});
 }
 
 template<>
@@ -115,21 +115,21 @@ inline Mat4<float> const Transform3d::RotationMatrixFrom(const EulerAngles cardi
             std::array<Vec4f, 4>
                     {
                             Vec4f(1, 0, 0, 0),
-                            Vec4f(0, cosX, -sinX, 0),
-                            Vec4f(0, sinX, cosX, 0),
+                            Vec4f(0, cosX, sinX, 0),
+                            Vec4f(0, -sinX, cosX, 0),
                             Vec4f(0, 0, 0, 1)});
     const Mat4f matY = Mat4f(
             std::array<Vec4f, 4>
                     {
-                            Vec4f(cosY, 0, sinY, 0),
+                            Vec4f(cosY, 0, 0, -sinY),
                             Vec4f(0, 1, 0, 0),
-                            Vec4f(0, 0, 1, 0),
-                            Vec4f(-sinY, 0, cosY, 1)});
+                            Vec4f(sinY, 0, 1, cosY),
+                            Vec4f(0, 0, 0, 1)});
     const Mat4f matZ = Mat4f(
             std::array<Vec4f, 4>
                     {
-                            Vec4f(cosZ, -sinZ, 0, 0),
-                            Vec4f(sinZ, cosZ, 0, 0),
+                            Vec4f(cosZ, sinZ, 0, 0),
+                            Vec4f(-sinZ, cosZ, 0, 0),
                             Vec4f(0, 0, 1, 0),
                             Vec4f(0, 0, 0, 1)});
 
@@ -162,46 +162,47 @@ inline Mat4f const Transform3d::RotationMatrixFrom(const Quaternion& quaternion)
     return Mat4f(
             std::array<Vec4f, 4>
                     {
-                            Vec4f(1.0f - yy - zz, xy - zw, xz + yw, 0),
-                            Vec4f(xy + zw, 1.0f - xx - zz, yz - xw, 0),
-                            Vec4f(xz - yw, yz + xw, 1.0f - xx - yy, 0),
-                            Vec4f(0, 0, 0, 1)});
+                            Vec4f(1.0f - yy - zz, xy + zw, xz - yw, 0),
+                            Vec4f(xy - zw, 1.0f - xx - zz, yz + xw, 0),
+                            Vec4f(xz + yw, yz - xw, 1.0f - xx - yy, 0),
+                            Vec4f(0, 0, 0, 1)
+                    });
 }
 
 template<>
 inline Transform3d Transform3d::Translate(const Transform3d& transform, const Vec3f translation)
 {
-    return transform * TranslationMatrixFrom(translation);
+    return TranslationMatrixFrom(translation) * transform;
 }
 
 template<>
 inline Transform3d Transform3d::Scale(const Transform3d& transform, const Vec3f scale)
 {
-    return transform * ScalingMatrixFrom(scale);
+    return ScalingMatrixFrom(scale) * transform;
 }
 
 template<>
 inline Transform3d Transform3d::Rotate(const Transform3d& transform, const degree_t angle, const Vec3f axis)
 {
-    return transform * RotationMatrixFrom(angle, axis);
+    return RotationMatrixFrom(angle, axis) * transform;
 }
 
 template<>
 inline Transform3d Transform3d::Rotate(const Transform3d& transform, const radian_t angle, const Vec3f axis)
 {
-    return transform * RotationMatrixFrom(angle, axis);
+    return RotationMatrixFrom(angle, axis) * transform;
 }
 
 template<>
 inline Transform3d Transform3d::Rotate(const Transform3d& transform, const Quaternion& quaternion)
 {
-    return transform * RotationMatrixFrom(quaternion);
+    return RotationMatrixFrom(quaternion) * transform;
 }
 
 template<>
 inline Transform3d Transform3d::Rotate(const Transform3d& transform, const EulerAngles eulerAngles)
 {
-    return transform * RotationMatrixFrom(eulerAngles);
+    return RotationMatrixFrom(eulerAngles) * transform;
 }
 
 template<>

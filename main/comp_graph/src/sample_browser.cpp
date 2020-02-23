@@ -26,6 +26,7 @@ void SampleBrowser::Init()
 void SampleBrowser::Update(seconds dt)
 {
     programs_[currentProgramIndex_]->Update(dt);
+    RendererLocator::get().Render(programs_[currentProgramIndex_].get());
 }
 
 void SampleBrowser::Destroy()
@@ -47,12 +48,8 @@ void SampleBrowser::OnEvent(const SDL_Event& event)
     programs_[currentProgramIndex_]->OnEvent(event);
 }
 
-void SampleBrowser::Render()
-{
-    programs_[currentProgramIndex_]->Render();
-}
 
-void SampleBrowser::DrawGui(seconds dt)
+void SampleBrowser::DrawGui()
 {
     ImGui::Begin("Sample Browser");
     if (ImGui::BeginCombo("Current Sample",
@@ -60,7 +57,7 @@ void SampleBrowser::DrawGui(seconds dt)
     {
         for (int n = 0; n < programsNames_.size(); n++)
         {
-            bool is_selected = (currentProgramIndex_ == n);
+	        const bool is_selected = (currentProgramIndex_ == n);
             if (ImGui::Selectable(programsNames_[n].c_str(), is_selected))
             {
                 SwitchToProgram(n);
@@ -73,7 +70,7 @@ void SampleBrowser::DrawGui(seconds dt)
         ImGui::EndCombo();
     }
     ImGui::End();
-    programs_[currentProgramIndex_]->DrawUi(dt);
+    programs_[currentProgramIndex_]->DrawUi();
 }
 
 size_t SampleBrowser::RegisterRenderProgram(const std::string_view name, std::unique_ptr<SampleProgram> program)

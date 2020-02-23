@@ -163,6 +163,7 @@ void Shader::SetVec4(const std::string& name, float x, float y, float z, float w
 void Shader::Destroy()
 {
     glDeleteProgram(shaderProgram_);
+    shaderProgram_ = 0;
 }
 
 /*

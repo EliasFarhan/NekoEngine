@@ -36,7 +36,8 @@ namespace neko
 class SystemInterface
 {
 public:
-    virtual void Init() = 0;
+	virtual ~SystemInterface() = default;
+	virtual void Init() = 0;
 
     virtual void Update(seconds dt) = 0;
 

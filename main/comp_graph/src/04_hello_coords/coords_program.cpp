@@ -1,5 +1,7 @@
 #include <engine/engine.h>
 #include "04_hello_coords/coords_program.h"
+#include "imgui.h"
+#include "mathematics/transform.h"
 
 namespace neko
 {
@@ -31,6 +33,8 @@ void HelloCoordsProgram::Update(seconds dt)
 
 void HelloCoordsProgram::Render()
 {
+    if(shader_.GetProgram() == 0)
+        return;
     std::lock_guard<std::mutex> lock(updateMutex_);
     shader_.Bind();
     glBindTexture(GL_TEXTURE_2D, textureWall_);
@@ -57,9 +61,8 @@ void HelloCoordsProgram::Destroy()
 
 }
 
-void HelloCoordsProgram::DrawUi(seconds dt)
+void HelloCoordsProgram::DrawUi()
 {
-
 }
 
 void HelloCoordsProgram::OnEvent(const SDL_Event& event)

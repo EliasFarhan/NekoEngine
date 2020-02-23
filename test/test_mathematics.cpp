@@ -8,7 +8,11 @@
 #include <random>
 #include <gtest/gtest.h>
 #include <mathematics/func_table.h>
+
 #include <mathematics/quaternion.h>
+#include <mathematics/matrix.h>
+#include "mathematics/vector.h"
+
 
 const float maxNmb = 100.0f;
 
@@ -39,7 +43,7 @@ TEST(Engine, TestMathematics)
 
 TEST(Engine, TestQuaternion)
 {
-    neko::Quaternion quaternion = neko::Quaternion(0,0,0,1);
+    neko::Quaternion quaternion = neko::Quaternion(0, 0, 0, 1);
     std::cout << "test Dot" << std::endl;
     std::cout << "test Normalize" << std::endl;
     std::cout << "test Magnitude" << std::endl;
@@ -60,4 +64,17 @@ TEST(Engine, TestQuaternion)
     std::cout << "test operator*=" << std::endl;
     std::cout << "test operator==" << std::endl;
     std::cout << "test operator !=" << std::endl;
+}
+TEST(Engine, TestMatrix4)
+{
+    neko::Mat4f m1 (std::array<neko::Vec4f,4>
+            {
+                    neko::Vec4f{1,2,3,4},
+                    neko::Vec4f{-1,-2,-3,-4},
+                    neko::Vec4f{4,2,2,1},
+                    neko::Vec4f{-4,-3,-2,-1}
+            });
+
+    std::cout << (m1.MultiplyNaive(m1))<<'\n';
+    std::cout << (m1.MultiplyIntrinsincs(m1))<<'\n';
 }

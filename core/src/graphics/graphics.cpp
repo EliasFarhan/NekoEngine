@@ -23,9 +23,15 @@
  */
 #include <graphics/graphics.h>
 #include <algorithm>
+#include <chrono>
 #include <engine/globals.h>
+#include <engine/window.h>
+#include <engine/engine.h>
 #include "engine/log.h"
 
+#ifdef EASY_PROFILE_USE
+#include "easy/profiler.h"
+#endif
 
 namespace neko
 {
@@ -43,6 +49,9 @@ void Renderer::Render(RenderCommandInterface* command)
 
 void Renderer::RenderAll()
 {
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("RenderAllCPU");
+#endif
     for (auto* renderCommand : currentCommandBuffer_)
     {
         renderCommand->Render();
@@ -51,13 +60,99 @@ void Renderer::RenderAll()
 
 void Renderer::Sync()
 {
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("EngineRenderSync");
+#endif
+    std::unique_lock lock(renderMutex_);
+    flags_ |= IS_APP_WAITING;
+#ifndef EMSCRIPTEN
+    cv_.wait(lock);
+#endif
     std::swap(currentCommandBuffer_, nextCommandBuffer_);
     nextCommandBuffer_.clear();
+    flags_ &= ~IS_APP_WAITING;
+    //TODO copy all the new transform3d?
 }
 
 void Renderer::RenderLoop()
 {
+#ifndef EMSCRIPTEN
+    flags_ |= IS_RUNNING;
+    window_->LeaveCurrentContext();
+    renderThread_ = std::thread([this] {
+        BeforeRenderLoop();
+
+        std::chrono::time_point<std::chrono::system_clock> clock = std::chrono::system_clock::now();
+        while (flags_ & IS_RUNNING)
+        {
+            const auto start = std::chrono::system_clock::now();
+            const auto dt = std::chrono::duration_cast<seconds>(start - clock);
+            dt_ = dt.count();
+        	clock = start;
+        	
+           Update();
+        }
+        AfterRenderLoop();
+    });
+#endif
+}
+
+void Renderer::Close()
+{
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("ClosingFromEngine");
+#endif
+    flags_ &= ~IS_RUNNING;
+    renderThread_.join();
+}
+
+void Renderer::SetFlag(Renderer::RendererFlag flag)
+{
+    flags_ |= flag;
+}
+
+void Renderer::SetWindow(Window* window)
+{
+    window_ = window;
+}
+
+void Renderer::Update()
+{
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("RenderFullUpdateCPU");
+#endif
+    auto* engine = BasicEngine::GetInstance();
+    {
+        std::lock_guard<std::mutex> lock(renderMutex_);
+#ifdef EASY_PROFILE_USE
+        EASY_BLOCK("RenderUpdateCPU");
+#endif
+        window_->MakeCurrentContext();
+        ClearScreen();
+        engine->GenerateUiFrame();
+        RenderAll();
+        window_->RenderUi();
+    }
+    //Sync the beginning frame with EngineLoop
+    if (flags_ & IS_APP_WAITING)
+    {
+        cv_.notify_one();
+    }
+    window_->SwapBuffer();
+
+
 
 }
+void Renderer::BeforeRenderLoop()
+{
+    window_->MakeCurrentContext();
+}
+void Renderer::AfterRenderLoop()
+{
+    window_->LeaveCurrentContext();
+}
+
+
+
 }
 
