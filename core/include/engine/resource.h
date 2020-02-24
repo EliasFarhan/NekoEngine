@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <future>
 #include "sole.hpp"
 #include "utilities/json_utility.h"
 #include "utilities/file_utility.h"
@@ -31,9 +32,16 @@ class ResourceManager
     const T* GetResource(ResourceId resourceId)
     {
         const auto resourcePair = resourceMap_.find(resourceId);
+        const auto resourceThread = resourceThread_.find(resourceId);
         if (resourcePair != resourceMap_.end())
         {
             return resourcePair->second;
+        } else if (resourceThread != resourceThread_.end())
+        {
+            T value = resourceFuture_[resourceId].get(0);
+            resourceMap_[resourceId] = value;
+            resourceThread_[resourceId].join();
+            return value;
         }
         return nullptr;
     }
@@ -42,16 +50,23 @@ class ResourceManager
     {
         const std::string resourceMetaPath = assetPath + resourceMetafile_;
         const json resourceMetaJson = LoadJson(assetPath);
-        const auto resourceId = LoadResource(resourceMetaJson);
+        std::promise<T> p;
+        std::future<T> f3 = p.get_future();
+        std::thread workThread(LoadResource, resourceMetaJson, std::move(p));
+        ResourceId id;
+        resourceFuture_[id] = f3;
+        resourceThread_[id] = workThread;
+        workThread.join();
         return resourceId;
     }
 
 protected:
     const std::string_view resourceMetafile_ = ".n_meta";
 
-    virtual ResourceId LoadResource(const json& resoureceMetaJson) = 0;
-
+    virtual ResourceId LoadResource(const json& resoureceMetaJson, std::promise<T> promise) = 0;
     std::map<ResourceId, T> resourceMap_;
+    std::map<ResourceId, std::thread> resourceThread_;
+    std::map<ResourceId, std::future<T>> resourceFuture_;
     std::map<ResourceId, std::string> resourcePathMap_;
 };
 
