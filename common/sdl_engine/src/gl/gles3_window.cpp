@@ -51,7 +51,7 @@ void Gles3Window::Init()
 #ifndef __EMSCRIPTEN__
     if (!gladLoadGLES2Loader((GLADloadproc) SDL_GL_GetProcAddress))
     {
-        logDebug("Failed to initialize OpenGL context\n");
+        LogDebug("Failed to initialize OpenGL context\n");
         assert(false);
     }
 #endif

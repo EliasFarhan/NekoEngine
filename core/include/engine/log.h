@@ -26,10 +26,135 @@
 
 #include <string>
 #include <vector>
+#include <iostream>
+#include <cassert>
+#include <mutex>
+#include <thread>
+#include <queue>
+#include <functional>
+#include <utilities/service_locator.h>
+#include <condition_variable>
+
+namespace neko
+{
+//-----------------------------------------------------------------------------
+// LogTypes
+//-----------------------------------------------------------------------------
+/// \brief To differentiate log messages
+enum class LogTypes : char
+{
+    DEBUG, //For regular debug messages
+    WARNING, //For non-critical errors
+    ERROR //For critical errors
+};
+
+//-----------------------------------------------------------------------------
+// LogMessage
+//-----------------------------------------------------------------------------
+/// \brief Struct representing a log message with its type
+struct LogMessage
+{
+    LogTypes type = LogTypes::DEBUG;
+    std::string msg;
+
+    explicit LogMessage(const std::string& log)
+            : msg(log)
+    {}
+
+    explicit LogMessage(const LogTypes& logType, const std::string& log)
+            : type(logType), msg(log)
+    {}
+};
+
+//-----------------------------------------------------------------------------
+// LogManagerInterface
+//-----------------------------------------------------------------------------
+/// \brief Used for the service locator
+class LogManagerInterface
+{
+public:
+    /**
+     * \brief Generate a log message.
+     * @param logType the type of the log message
+     * @param log the log message
+     */
+    virtual void Log(LogTypes logType, const std::string& log) = 0;
+
+    /**
+     * \brief Retrieves the log history
+     */
+    virtual const std::vector<std::string>& GetLogs() = 0;
+};
+
+//-----------------------------------------------------------------------------
+// NullLogManager
+//-----------------------------------------------------------------------------
+/// \brief Used for the service locator
+class NullLogManager final : public LogManagerInterface
+{
+public:
+    void Log([[maybe_unused]]LogTypes logType, [[maybe_unused]]const std::string& log) override
+    {};
+
+    const std::vector<std::string>& GetLogs() override
+    {
+        std::cerr << "Impossible to get log history from a null LogManager\n";
+        assert(false);
+    };
+};
+
+//-----------------------------------------------------------------------------
+// LogManager
+//-----------------------------------------------------------------------------
+/// \brief Creates and stores log messages
+class LogManager : public LogManagerInterface
+{
+public:
+    ~LogManager() = default;
+
+    void Log(LogTypes logType, const std::string& log) override;
+
+    const std::vector<std::string>& GetLogs() override
+    { return logHistory_; }
+
+    void WriteToFile();
+
+    void Close();
+
+private:
+    std::vector<std::string> logHistory_;
+
+    std::mutex logMutex_;
+    std::queue<std::function<void()>> tasks_;
+    std::unique_ptr<std::thread> logThread_;
+    std::condition_variable itemInQueue_;
+};
+
+//-----------------------------------------------------------------------------
+// Service Locator definition
+//-----------------------------------------------------------------------------
+using Log = Locator<LogManagerInterface, NullLogManager>;
+
+//-----------------------------------------------------------------------------
+// Shorthands
+//-----------------------------------------------------------------------------
+/**
+ * \brief Generate a debug type log message
+ */
+void LogDebug(const std::string& msg);
 
 /**
- * \brief log a msg to cout and a log file to the log thread
- * @param msg
+ * \brief Generate a warning type log message
  */
-void logDebug(const std::string& msg);
-const std::vector<std::string>& getLog();
+void LogWarning(const std::string& msg);
+
+/**
+ * \brief Generate an error type log message
+ */
+void LogError(const std::string& msg);
+
+/**
+ * \brief Retrieves the log history
+ */
+const std::vector<std::string>& GetLogs();
+}

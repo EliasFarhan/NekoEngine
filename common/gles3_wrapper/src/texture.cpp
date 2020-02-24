@@ -16,7 +16,7 @@ unsigned stbCreateTexture(const std::string_view filename, TextureFlags flags)
     {
         std::ostringstream oss;
         oss << "[Error] Texture: " << filename << " does not exist\n";
-        logDebug(oss.str());
+        LogDebug(oss.str());
         return 0;
     }
     int width, height, nrChannels;
@@ -40,7 +40,7 @@ unsigned stbCreateTexture(const std::string_view filename, TextureFlags flags)
     {
         std::ostringstream oss;
         oss << "[Error] Texture: cannot load " << filename << "\n";
-        logDebug(oss.str());
+        LogDebug(oss.str());
         return 0;
     }
     unsigned int texture;

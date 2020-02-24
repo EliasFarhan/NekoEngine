@@ -99,7 +99,7 @@ bool EntityManager::HasComponent(Entity entity, EntityMask componentType) const
     {
 	    std::ostringstream oss;
 	    oss << "[Error] Accessing entity: "<<entity<<" while entity mask array is of size: "<<entityMaskArray_.size();
-	    logDebug(oss.str());
+        LogDebug(oss.str());
 	    return false;
     }
     return (entityMaskArray_[entity] & EntityMask(componentType)) == EntityMask(componentType);

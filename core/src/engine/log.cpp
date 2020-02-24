@@ -22,16 +22,102 @@
  SOFTWARE.
  */
 #include <engine/log.h>
-#include <iostream>
+#include <utilities/file_utility.h>
 
-static std::vector<std::string> logs;
-void logDebug(const std::string& msg)
+namespace neko
 {
-	std::cout << msg << '\n';
-	logs.push_back(msg);
+//-----------------------------------------------------------------------------
+// LogManager definitions
+//-----------------------------------------------------------------------------
+void LogManager::Log(LogTypes logType, const std::string& log)
+{
+    std::string message = "";
+
+    auto curTime = time(nullptr);
+    auto localTime = localtime(&curTime);
+    message += '[' + std::to_string(localTime->tm_hour) + ':'
+               + std::to_string(localTime->tm_min) + ':'
+               + std::to_string(localTime->tm_sec) + "] ";
+
+    switch (logType)
+    {
+        case LogTypes::DEBUG:
+            message += "[DEBUG] ";
+            break;
+        case LogTypes::WARNING:
+            message += "[WARNING] ";
+            break;
+        case LogTypes::ERROR:
+            message += "[ERROR] ";
+            break;
+    }
+
+    message += log + '\n';
+
+    std::cout << message;
+    logHistory_.push_back(message);
 }
 
-const std::vector<std::string>& getLog()
+void LogManager::WriteToFile()
 {
-    return logs;
+    std::unique_lock<std::mutex> lock(logMutex_);
+
+    auto curTime = time(nullptr);
+    auto localTime = localtime(&curTime);
+
+    std::string filePath = "../data/logs/";
+    std::string fileName = std::to_string(localTime->tm_mday) + "-" +
+                           std::to_string(localTime->tm_mon + 1) + "-" +
+                           std::to_string(localTime->tm_year + 1900) + "_" +
+                           std::to_string(localTime->tm_hour) + "-" +
+                           std::to_string(localTime->tm_min) + "-" +
+                           std::to_string(localTime->tm_sec);
+
+    std::string fileContent = "/--------------------------------------------------------------------------------\\\n";
+    fileContent += "|                                 NekoEngine logs                                |\n";
+    fileContent += "|                               " + fileName + "                               |\n";
+    fileContent += "|              Copyright (c) 2017-2020 SAE Institute Switzerland AG              |\n";
+    fileContent += "\\--------------------------------------------------------------------------------/\n\n";
+
+    fileContent += "Program start (=^ ◡ ^=)\n";
+    fileContent += "--------------------------------------------------------------------------------\n";
+    for (auto& line : logHistory_)
+    {
+        fileContent += line;
+    }
+
+    CreateDirectory(filePath);
+    WriteStringToFile(filePath + fileName + ".log", fileContent);
+}
+
+void LogManager::Close()
+{
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("ClosingFromEngine");
+#endif
+    logThread_->join();
+}
+
+//-----------------------------------------------------------------------------
+// Shorthands definitions
+//-----------------------------------------------------------------------------
+void LogDebug(const std::string& msg)
+{
+    Log::get().Log(LogTypes::DEBUG, msg);
+}
+
+void LogWarning(const std::string& msg)
+{
+    Log::get().Log(LogTypes::WARNING, msg);
+}
+
+void LogError(const std::string& msg)
+{
+    Log::get().Log(LogTypes::ERROR, msg);
+}
+
+const std::vector<std::string>& GetLogs()
+{
+    return Log::get().GetLogs();
+}
 }
