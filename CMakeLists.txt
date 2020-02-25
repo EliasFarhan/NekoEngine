@@ -10,7 +10,7 @@ include(cmake/neko_executable.cmake)
 
 
 
-set(Neko_Remotery OFF CACHE BOOL "Activate Remotery")
+set(Neko_Profile OFF CACHE BOOL "Activate Profiling with Easy Profile")
 set(Neko_GLES3 ON CACHE BOOL "Activate OpenGL ES 3.0")
 set(Neko_SDL2 ON CACHE BOOL "Activate SDL2")
 set(Neko_Box2D OFF CACHE BOOL "Activate Box2D")
@@ -23,8 +23,25 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
     set(CMAKE_STATIC_LIBRARY_SUFFIX ".a")
 endif()
 
+if(UNIX)
+    EXECUTE_PROCESS(COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE)
+    if("${ARCHITECTURE}" MATCHES "arm")
+        include(cmake/platforms/arm.cmake)
+    endif()
+endif()
+
+if(MSVC)
+    include(cmake/platforms/msvc.cmake)
+endif()
+
 set(EXTERNAL_DIR ${CMAKE_SOURCE_DIR}/externals CACHE INTERNAL "Externals folder")
 set(UTILITIES_DIR "${EXTERNAL_DIR}/utilities" CACHE INTERNAL "")
+
+if(Neko_Profile)
+    set(EASY_PROFILE_DIR "${EXTERNAL_DIR}/easy_profiler-2.1.0")
+    add_compile_definitions("EASY_PROFILE_USE=1")
+    add_subdirectory(${EASY_PROFILE_DIR})
+endif()
 
 include("cmake/data.cmake")
 set(NEKO_CORE_DIR "${CMAKE_SOURCE_DIR}/core/" CACHE INTERNAL "")
@@ -35,14 +52,7 @@ set(IMGUI_VERSION "1.74" CACHE INTERNAL "")
 set(IMGUI_ROOT "${EXTERNAL_DIR}/imgui-${IMGUI_VERSION}" CACHE INTERNAL "")
 add_subdirectory("${IMGUI_ROOT}")
 
-if(Neko_Remotery)
-    #Remotery
-    set(REMOTERY_DIR ${EXTERNAL_DIR}/Remotery)
-    add_subdirectory(${REMOTERY_DIR})
-    include_directories(${REMOTERY_DIR})
-    LIST(APPEND Neko_LIBRARIES Remotery)
-    set_target_properties (Remotery PROPERTIES FOLDER Externals)
-endif()
+
 
 if(Neko_GLES3)
     add_compile_definitions("NEKO_GLES3=1")
@@ -61,9 +71,10 @@ if(Neko_SDL2)
     set(SDL_SHARED OFF CACHE INTERNAL "")
     set(SDL_ENGINE_DIR ON CACHE INTERNAL "")
     if(NOT Emscripten)
-    add_subdirectory(${SDL_DIR})
+        add_subdirectory(${SDL_DIR})
     ENDIF()
     include_directories(${SDL_DIR}/include ${SDL_DIR}/src)
+
     add_subdirectory("common/sdl_engine")
 
 endif()
@@ -84,10 +95,12 @@ endif()
 if(Neko_Benchmark)
     #Google benchmark
     set(GOOGLE_BENCH_DIR "${EXTERNAL_DIR}/benchmark-1.5.0" CACHE STRING "")
-    if(NOT Emscripten)
-        add_subdirectory(${GOOGLE_BENCH_DIR})
-        add_subdirectory("benchmark/")
-    endif()
+
+    add_subdirectory(${GOOGLE_BENCH_DIR})
+    set_target_properties (benchmark PROPERTIES FOLDER Externals)
+    set_target_properties (benchmark_main PROPERTIES FOLDER Externals)
+    add_subdirectory("benchmark/")
+
 endif()
 
 set(main_project_dir "main/")

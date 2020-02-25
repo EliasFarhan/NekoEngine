@@ -1,12 +1,19 @@
 //
 // Created by efarhan on 11/16/19.
 //
+#ifdef WIN32
 #define _USE_MATH_DEFINES
+#endif
 #include <cmath>
 #include <random>
 #include <gtest/gtest.h>
 #include <mathematics/func_table.h>
-#include <mathematics/circle.h>
+
+#include <mathematics/quaternion.h>
+#include <mathematics/matrix.h>
+#include "mathematics/vector.h"
+
+
 const float maxNmb = 100.0f;
 
 void RandomFill(std::vector<float>& numbers, float start = -maxNmb, float end = maxNmb)
@@ -34,21 +41,61 @@ TEST(Engine, TestMathematics)
     std::cout << "Error margin for sinFuncTable with resolution 512: "<<error<<"\n";
 }
 
-TEST(Engine, TestCircleContact)
+TEST(Engine, TestQuaternion)
 {
-	
-    neko::Circle2D circleA(neko::Vec2f(2,2), 2);
-    neko::Circle2D circleB(neko::Vec2f(3, 3), 3);
+    //Variables
+    neko::Quaternion quaternionA = neko::Quaternion(0.71, 0, 0, 0.71);
+    neko::Quaternion quaternionB = neko::Quaternion(0, 0, 0, 1);
+    neko::Quaternion quaternionACopy;
 
-    neko::Sphere3D sphere1(neko::Vec3f(2, 2, 2), 2);
-    neko::Sphere3D sphere2(neko::Vec3f(5, 5, 5), 2);
+    //Display start variables
+    std::cout << "QuaternionA"<<quaternionA<<'\n';
+    std::cout << std::endl;
+    std::cout <<"QuaternionB"<< quaternionB<<'\n';
+    std::cout << std::endl << std::endl;
 
-    neko::Rect2f rect(neko::Vec2f(3, 3), neko::Vec2f(2, 2));
-    neko::Circle2D circleC(neko::Vec2f(4, 3), 2);
-	
-    std::cout << circleA.CirclesIntersect(circleB) << "\n";
-    std::cout << sphere1.CirclesIntersect(sphere2) << "\n";
-    std::cout << circleC.SquareCircleIntersect(rect) << "\n";
+    //Dot Product Test
+    std::cout << "Dot product: " << neko::Quaternion::Dot(quaternionA, quaternionB) << std::endl << std::endl;
 
-    std::cout << neko::Sphere3D::IsPlanCircleContact(sphere1, neko::Vec3f(0, 1, 0), neko::Vec3f(1, 100, 1)) << "\n";
+    //Normalize Test
+    std::cout << "Normalize: ";
+    std::cout << "NormalizedQuaternionA" << neko::Quaternion::Normalized(quaternionA) << '\n';
+    std::cout << std::endl << std::endl;
+
+    //Magnitude Test
+    std::cout << "Magnitude: " << neko::Quaternion::Magnitude(quaternionA) <<'\n'<<'\n';
+
+    //AngleAxis Test
+    std::cout << "AngleAxis: " << "Cannot be tested right now"<<'\n'<<'\n';
+
+    //Angle Test
+    std::cout << "Angle: " << neko::Quaternion::Angle(quaternionA, quaternionB) <<'\n'<<'\n';
+
+    //Conjugate Test
+    quaternionACopy = quaternionA;
+    std::cout << "Conjugate: ";
+    std::cout <<"QuaternionAConjugate"<< quaternionACopy.Conjugate()<<'\n';
+    std::cout <<'\n'<<'\n';
+
+    //Inverse Test
+    quaternionACopy = quaternionA;
+    std::cout << "Inverse: ";
+    std::cout <<"QuaternionAInverse"<< quaternionACopy.Inverse()<<'\n';
+    std::cout << std::endl << std::endl;
+
+    //FromEuler
+    std::cout << "Euler: " << "Cannot be tested right now" <<'\n'<<'\n';
+}
+TEST(Engine, TestMatrix4)
+{
+    neko::Mat4f m1 (std::array<neko::Vec4f,4>
+            {
+                    neko::Vec4f{1,2,3,4},
+                    neko::Vec4f{-1,-2,-3,-4},
+                    neko::Vec4f{4,2,2,1},
+                    neko::Vec4f{-4,-3,-2,-1}
+            });
+
+    std::cout << (m1.MultiplyNaive(m1))<<'\n';
+    std::cout << (m1.MultiplyIntrinsincs(m1))<<'\n';
 }

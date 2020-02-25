@@ -5,11 +5,11 @@
 
 namespace neko
 {
-class CompGraphEngine : public neko::sdl::SdlEngine
+class CompGraphEngine : public sdl::SdlEngine
 {
 public:
 	explicit CompGraphEngine(Configuration* config = nullptr);
-
+	
     void OnEvent(const SDL_Event& event) override;
 
 private:

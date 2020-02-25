@@ -29,7 +29,7 @@ size_t find_even_raw(const std::vector<int>& array)
 size_t find_even_ranges(const std::vector<int>& array)
 {
     size_t count = 0;
-    for(auto& a : array)
+    for(const auto& a : array)
     {
         if(is_even(a))
             ++count;
@@ -41,7 +41,6 @@ size_t find_even_ranges(const std::vector<int>& array)
 size_t find_even_iterator(const std::vector<int>& array)
 {
     size_t count = 0;
-
     for(auto it = array.cbegin();it != array.cend();++it)
     {
         if(is_even(*it))
@@ -52,7 +51,7 @@ size_t find_even_iterator(const std::vector<int>& array)
 
 size_t find_even_algo(const std::vector<int>& array)
 {
-    return std::count_if(array.begin(), array.end(), is_even);
+    return std::count_if(array.cbegin(), array.cend(), is_even);
 }
 
 static void RandomFill(std::vector<int>& numbers)

@@ -14,11 +14,18 @@
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
 
+#ifdef EASY_PROFILE_USE
+#include <easy/profiler.h>
+#endif
+
 namespace neko::sdl
 {
 
 void Gles3Window::Init()
 {
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("GLES3WindowInit");
+#endif
     const auto& config = BasicEngine::GetInstance()->config;
     // Set our OpenGL version.
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
@@ -36,11 +43,15 @@ void Gles3Window::Init()
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
-    SDL_GL_SetSwapInterval(config.vSync);
     SdlWindow::Init();
+    
+    std::string videoDriver = SDL_GetCurrentVideoDriver();
+    logDebug(videoDriver);
+    
     glContext_ = SDL_GL_CreateContext(window_);
+    MakeCurrentContext();
 
-    SDL_GL_MakeCurrent(window_, glContext_);
+    SDL_GL_SetSwapInterval(config.vSync);
 #ifndef __EMSCRIPTEN__
     if (!gladLoadGLES2Loader((GLADloadproc) SDL_GL_GetProcAddress))
     {
@@ -48,60 +59,82 @@ void Gles3Window::Init()
         assert(false);
     }
 #endif
+
+    InitImGui();
+    glEnable(GL_DEPTH_TEST);
 }
 
 void Gles3Window::InitImGui()
 {
-
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("ImGuiInit");
+#endif
     SdlWindow::InitImGui();
     ImGui_ImplSDL2_InitForOpenGL(window_, glContext_);
     ImGui_ImplOpenGL3_Init("#version 300 es");
 
 }
 
-void Gles3Window::OnEvent(const SDL_Event& event)
-{
-    SdlWindow::OnEvent(event);
-    if (event.type == SDL_WINDOWEVENT)
-    {
-        if (event.window.event == SDL_WINDOWEVENT_RESIZED)
-        {
-            Vec2f newWindowSize = Vec2f(event.window.data1, event.window.data2);
-            glViewport(0, 0, newWindowSize.x, newWindowSize.y);
-        }
-    }
-}
 
-void Gles3Window::ClearScreen()
+void Gles3Window::GenerateUiFrame()
 {
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-}
 
-void Gles3Window::ImguiNewFrame()
-{
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("ImGuiGenerate");
+#endif
     ImGui_ImplOpenGL3_NewFrame();
-    SdlWindow::ImguiNewFrame();
+    ImGui_ImplSDL2_NewFrame(window_);
+    ImGui::NewFrame();
 }
 
-void Gles3Window::ImguiRender()
-{
-    SdlWindow::ImguiRender();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-}
 
-void Gles3Window::FinishFrame()
+void Gles3Window::SwapBuffer()
 {
+
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("SwapBuffer");
+#endif
     SDL_GL_SwapWindow(window_);
 }
 
 void Gles3Window::Destroy()
 {
+
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("DestroyWindow");
+#endif
+    MakeCurrentContext();
     ImGui_ImplOpenGL3_Shutdown();
     // Delete our OpengL context
     SDL_GL_DeleteContext(glContext_);
 
     SdlWindow::Destroy();
+}
+
+void Gles3Window::RenderUi()
+{
+
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("ImGuiRender");
+#endif
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+}
+
+void Gles3Window::OnResize(Vec2u newWindowSize)
+{
+    glViewport(0, 0, newWindowSize.x, newWindowSize.y);
+}
+
+void Gles3Window::MakeCurrentContext()
+{
+    SDL_GL_MakeCurrent(window_, glContext_);
+}
+
+void Gles3Window::LeaveCurrentContext()
+{
+    SDL_GL_MakeCurrent(nullptr, nullptr);
 }
 }
 
