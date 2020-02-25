@@ -24,78 +24,136 @@
 #include <engine/log.h>
 #include <utilities/file_utility.h>
 
+#include <memory>
+
 namespace neko
 {
 //-----------------------------------------------------------------------------
 // LogManager definitions
 //-----------------------------------------------------------------------------
-void LogManager::Log(LogTypes logType, const std::string& log)
+LogManager::LogManager()
+        : isRunning_(false)
 {
-    std::string message = "";
+    pthread_setname_np(pthread_self(), "LogManager");
+    logThread_ = std::make_unique<std::thread>([this] {
+        isRunning_ = true;
+        this->Start();
+    });
+}
 
-    auto curTime = time(nullptr);
-    auto localTime = localtime(&curTime);
-    message += '[' + std::to_string(localTime->tm_hour) + ':'
-               + std::to_string(localTime->tm_min) + ':'
-               + std::to_string(localTime->tm_sec) + "] ";
-
-    switch (logType)
+void LogManager::Start()
+{
+    std::unique_lock<std::mutex> lock(logMutex_);
+    do
     {
-        case LogTypes::DEBUG:
-            message += "[DEBUG] ";
-            break;
-        case LogTypes::WARNING:
-            message += "[WARNING] ";
-            break;
-        case LogTypes::ERROR:
-            message += "[ERROR] ";
-            break;
+        while (isRunning_ && tasks_.empty())
+        { itemInQueue_.wait(lock); }
+
+        while (!tasks_.empty())
+        {
+            const auto task = tasks_.front();
+            tasks_.pop();
+            lock.unlock();
+            task();
+            lock.lock();
+        }
+        itemInQueue_.notify_all();
+    } while (isRunning_);
+    itemInQueue_.notify_all();
+}
+
+void LogManager::Wait()
+{
+    std::unique_lock<std::mutex> lock(logMutex_);
+    while (!tasks_.empty())
+        itemInQueue_.wait(lock);
+}
+
+void LogManager::Close()
+{
+    Wait();
+
+    {
+        std::lock_guard<std::mutex> l(logMutex_);
+        isRunning_ = false;
+        itemInQueue_.notify_one();
     }
 
-    message += log + '\n';
+    logThread_->join();
+}
 
-    std::cout << message;
-    logHistory_.push_back(message);
+void LogManager::Log(LogTypes logType, const std::string& log)
+{
+    std::unique_lock<std::mutex> lock(logMutex_);
+    auto task([this, logType, log] {
+        std::string message = "";
+
+        auto curTime = time(nullptr);
+        auto localTime = localtime(&curTime);
+        message += '[' + std::to_string(localTime->tm_hour) + ':'
+                   + std::to_string(localTime->tm_min) + ':'
+                   + std::to_string(localTime->tm_sec) + "] ";
+
+        switch (logType)
+        {
+            case LogTypes::DEBUG:
+                message += "[DEBUG] ";
+                break;
+            case LogTypes::WARNING:
+                message += "[WARNING] ";
+                break;
+            case LogTypes::ERROR:
+                message += "[ERROR] ";
+                break;
+        }
+
+        message += log + '\n';
+
+        std::cout << message;
+        logHistory_.push_back(message);
+    });
+
+    tasks_.push(task);
+    itemInQueue_.notify_one();
+    lock.unlock();
 }
 
 void LogManager::WriteToFile()
 {
     std::unique_lock<std::mutex> lock(logMutex_);
 
-    auto curTime = time(nullptr);
-    auto localTime = localtime(&curTime);
+    auto task([this] {
+        auto curTime = time(nullptr);
+        auto localTime = localtime(&curTime);
 
-    std::string filePath = "../data/logs/";
-    std::string fileName = std::to_string(localTime->tm_mday) + "-" +
-                           std::to_string(localTime->tm_mon + 1) + "-" +
-                           std::to_string(localTime->tm_year + 1900) + "_" +
-                           std::to_string(localTime->tm_hour) + "-" +
-                           std::to_string(localTime->tm_min) + "-" +
-                           std::to_string(localTime->tm_sec);
+        std::string filePath = "../data/logs/";
+        std::string fileName = std::to_string(localTime->tm_mday) + "-" +
+                               std::to_string(localTime->tm_mon + 1) + "-" +
+                               std::to_string(localTime->tm_year + 1900) + "_" +
+                               std::to_string(localTime->tm_hour) + "-" +
+                               std::to_string(localTime->tm_min) + "-" +
+                               std::to_string(localTime->tm_sec);
 
-    std::string fileContent = "/--------------------------------------------------------------------------------\\\n";
-    fileContent += "|                                 NekoEngine logs                                |\n";
-    fileContent += "|                               " + fileName + "                               |\n";
-    fileContent += "|              Copyright (c) 2017-2020 SAE Institute Switzerland AG              |\n";
-    fileContent += "\\--------------------------------------------------------------------------------/\n\n";
+        std::string fileContent = "/--------------------------------------------------------------------------------\\\n";
+        fileContent += "|                                 NekoEngine logs                                |\n";
+        fileContent += "|                               " + fileName + "                               |\n";
+        fileContent += "|              Copyright (c) 2017-2020 SAE Institute Switzerland AG              |\n";
+        fileContent += "\\--------------------------------------------------------------------------------/\n\n";
 
-    fileContent += "Program start (=^ ◡ ^=)\n";
-    fileContent += "--------------------------------------------------------------------------------\n";
-    for (auto& line : logHistory_)
-    {
-        fileContent += line;
-    }
+        fileContent += "Program start (=^ ◡ ^=)\n";
+        fileContent += "--------------------------------------------------------------------------------\n";
+        for (auto& line : logHistory_)
+        {
+            fileContent += line;
+        }
 
-    CreateDirectory(filePath);
-    WriteStringToFile(filePath + fileName + ".log", fileContent);
-}
+        CreateDirectory(filePath);
+        WriteStringToFile(filePath + fileName + ".log", fileContent);
+    });
 
-void LogManager::Close()
-{
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("ClosingFromEngine");
-#endif
-    logThread_->join();
+    tasks_.push(task);
+    itemInQueue_.notify_one();
+    lock.unlock();
 }
 
 //-----------------------------------------------------------------------------

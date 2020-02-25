@@ -18,4 +18,6 @@ TEST(Engine, TestLogs)
     LogDebug("you?");
 
     logger.WriteToFile();
+
+    logger.Close();
 }

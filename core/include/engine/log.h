@@ -110,7 +110,12 @@ public:
 class LogManager : public LogManagerInterface
 {
 public:
+    LogManager();
     ~LogManager() = default;
+
+    void Start();
+    void Wait();
+    void Close();
 
     void Log(LogTypes logType, const std::string& log) override;
 
@@ -119,9 +124,9 @@ public:
 
     void WriteToFile();
 
-    void Close();
-
 private:
+    bool isRunning_;
+
     std::vector<std::string> logHistory_;
 
     std::mutex logMutex_;
