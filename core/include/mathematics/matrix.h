@@ -288,14 +288,14 @@ inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
     __m128 c4 = _mm_load_ps(&this->columns_[3][0]);
     for (int column = 0; column < 4; column++)
     {
-        __m128 rhsX = _mm_load1_ps(&rhs.columns_[column][0]);
-        __m128 rhsY = _mm_load1_ps(&rhs.columns_[column][1]);
-        __m128 rhsZ = _mm_load1_ps(&rhs.columns_[column][2]);
-        __m128 rhsW = _mm_load1_ps(&rhs.columns_[column][3]);
-        __m128 x = _mm_mul_ps(c1, rhsX);
-        __m128 y = _mm_mul_ps(c2, rhsY);
-        __m128 z = _mm_mul_ps(c3, rhsZ);
-        __m128 w = _mm_mul_ps(c4, rhsW);
+        __m128 x = _mm_load1_ps(&rhs.columns_[column][0]);
+        __m128 y = _mm_load1_ps(&rhs.columns_[column][1]);
+        __m128 z = _mm_load1_ps(&rhs.columns_[column][2]);
+        __m128 w = _mm_load1_ps(&rhs.columns_[column][3]);
+        x = _mm_mul_ps(c1, x);
+        y = _mm_mul_ps(c2, y);
+        z = _mm_mul_ps(c3, z);
+        w = _mm_mul_ps(c4, w);
 
         x = _mm_add_ps(x,y);
         z = _mm_add_ps(z,w);
@@ -306,7 +306,41 @@ inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
 }
 #endif
 
-#if defined(EMSCRIPTEN) || defined(__arm__)
+#if defined(__arm__)
+template<>
+inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
+{
+    std::array<Vec4f, 4> v;
+    float32x4_t c1 = vld1q_f32(&this->columns_[0][0]);
+    float32x4_t c2 = vld1q_f32(&this->columns_[1][0]);
+    float32x4_t c3 = vld1q_f32(&this->columns_[2][0]);
+    float32x4_t c4 = vld1q_f32(&this->columns_[3][0]);
+    for (int column = 0; column < 4; column++)
+    {
+        const float tmpX = rhs.columns_[column][0];
+        float32x4_t x = vdupq_n_f32(tmpX);
+        const float tmpY = rhs.columns_[column][1];
+        float32x4_t y = vdupq_n_f32(tmpY);
+        const float tmpZ = rhs.columns_[column][2];
+        float32x4_t z = vdupq_n_f32(tmpZ);
+        const float tmpW = rhs.columns_[column][3];
+        float32x4_t w = vdupq_n_f32(tmpW);
+        
+        x = vmulq_f32(c1,x);
+        y = vmulq_f32(c2,y);
+        z = vmulq_f32(c3,z);
+        w = vmulq_f32(c4,w);
+
+        x = vaddq_f32(x,y);
+        z = vaddq_f32(z,w);
+        x = vaddq_f32(x,z);
+        vst1q_f32(&v[column][0], x);
+    }
+    return Mat4f(v);
+}
+#endif
+
+#if defined(EMSCRIPTEN)
 template<>
 inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
 {

@@ -71,9 +71,10 @@ if(Neko_SDL2)
     set(SDL_SHARED OFF CACHE INTERNAL "")
     set(SDL_ENGINE_DIR ON CACHE INTERNAL "")
     if(NOT Emscripten)
-    add_subdirectory(${SDL_DIR})
+        add_subdirectory(${SDL_DIR})
     ENDIF()
     include_directories(${SDL_DIR}/include ${SDL_DIR}/src)
+
     add_subdirectory("common/sdl_engine")
 
 endif()
