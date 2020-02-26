@@ -36,7 +36,6 @@ namespace neko
 LogManager::LogManager()
         : isRunning_(false)
 {
-    pthread_setname_np(pthread_self(), "LogManager");
     logThread_ = std::make_unique<std::thread>([this] {
         isRunning_ = true;
         this->Start();
