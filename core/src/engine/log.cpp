@@ -25,6 +25,8 @@
 #include <utilities/file_utility.h>
 
 #include <memory>
+#include <iomanip>
+#include <sstream>
 
 namespace neko
 {
@@ -126,17 +128,20 @@ void LogManager::WriteToFile()
         auto curTime = time(nullptr);
         auto localTime = localtime(&curTime);
 
-        std::string filePath = "../data/logs/";
-        std::string fileName = std::to_string(localTime->tm_mday) + "-" +
-                               std::to_string(localTime->tm_mon + 1) + "-" +
-                               std::to_string(localTime->tm_year + 1900) + "_" +
-                               std::to_string(localTime->tm_hour) + "-" +
-                               std::to_string(localTime->tm_min) + "-" +
-                               std::to_string(localTime->tm_sec);
+        const std::string filePath = "../data/logs/";
+        std::ostringstream ss;
+        ss << std::setw(2) << std::setfill('0') << localTime->tm_mday << "-"
+           << std::setw(2) << std::setfill('0') << localTime->tm_mon + 1 << "-"
+           << std::to_string(localTime->tm_year + 1900) << "_"
+           << std::setw(2) << std::setfill('0') << localTime->tm_hour << "-"
+           << std::setw(2) << std::setfill('0') << localTime->tm_min << "-"
+           << std::setw(2) << std::setfill('0') << localTime->tm_sec;
+
+        const std::string fileName(ss.str());
 
         std::string fileContent = "/--------------------------------------------------------------------------------\\\n";
         fileContent += "|                                 NekoEngine logs                                |\n";
-        fileContent += "|                               " + fileName + "                               |\n";
+        fileContent += "|                              " + fileName + "                               |\n";
         fileContent += "|              Copyright (c) 2017-2020 SAE Institute Switzerland AG              |\n";
         fileContent += "\\--------------------------------------------------------------------------------/\n\n";
 
