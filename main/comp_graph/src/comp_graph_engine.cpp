@@ -26,4 +26,10 @@ void CompGraphEngine::OnEvent(const SDL_Event& event)
 {
     sampleBrowser_.OnEvent(event);
 }
+
+void CompGraphEngine::Destroy()
+{
+    sampleBrowser_.Destroy();
+    SdlEngine::Destroy();
+}
 }

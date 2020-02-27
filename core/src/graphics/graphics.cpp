@@ -63,6 +63,7 @@ void Renderer::Sync()
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("EngineRenderSync");
 #endif
+
     std::unique_lock lock(renderMutex_);
     flags_ |= IS_APP_WAITING;
 #ifndef EMSCRIPTEN
@@ -79,7 +80,7 @@ void Renderer::RenderLoop()
 #ifndef EMSCRIPTEN
     flags_ |= IS_RUNNING;
     window_->LeaveCurrentContext();
-    renderThread_ = std::thread([this] {
+    renderThread_ = std::thread([this]{
         BeforeRenderLoop();
 
         std::chrono::time_point<std::chrono::system_clock> clock = std::chrono::system_clock::now();
@@ -97,7 +98,7 @@ void Renderer::RenderLoop()
 #endif
 }
 
-void Renderer::Close()
+void Renderer::Destroy()
 {
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("ClosingFromEngine");

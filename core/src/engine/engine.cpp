@@ -94,7 +94,7 @@ void BasicEngine::Update(seconds dt)
 
 void BasicEngine::Destroy()
 {
-	renderer_->Close();
+    renderer_->Destroy();
 	instance_ = nullptr;
 }
 

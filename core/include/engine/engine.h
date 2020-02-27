@@ -47,7 +47,7 @@ struct Configuration
     Vec2i windowSize = Vec2i(1024, 1024);
     Vec2i gameWindowSize{1280, 720};
     bool fullscreen = false;
-    bool vSync = false;
+    bool vSync = true;
     unsigned int framerateLimit = 0u;
 #ifdef EMSCRIPTEN
     std::string dataRootPath = "./";
