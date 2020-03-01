@@ -13,7 +13,7 @@ TEST(Engine, TestVector)
 {
     std::array<Vec4f, 4> array;
     array.fill(Vec4f(5, 1, 3, 9));
-    FourVec4f test = (FourVec4f) array;
+    const FourVec4f test(array);
 
     auto result = test.MagnitudeIntrinsics();
 

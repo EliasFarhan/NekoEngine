@@ -43,7 +43,7 @@ namespace neko
 /// \brief To differentiate log messages
 enum class LogTypes : char
 {
-    DEBUG, //For regular debug messages
+    DEBUG = 0, //For regular debug messages
     WARNING, //For non-critical errors
     ERROR //For critical errors
 };
@@ -94,13 +94,14 @@ class NullLogManager final : public LogManagerInterface
 {
 public:
     void Log([[maybe_unused]]LogTypes logType, [[maybe_unused]]const std::string& log) override
-    {};
+    {}
 
     const std::vector<std::string>& GetLogs() override
     {
         std::cerr << "Impossible to get log history from a null LogManager\n";
         assert(false);
-    };
+        return {};
+    }
 };
 
 //-----------------------------------------------------------------------------
