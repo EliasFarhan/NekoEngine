@@ -24,28 +24,45 @@
 #include <functional>
 #include <future>
 #include <thread>
+#include <queue>
+#include <condition_variable>
 
 namespace neko
 {
 
-class IJobSystem{
-public:
-    virtual std::future<T> AddJob(std::function<T()> f) = 0;
-};
+std::mutex mutex;
+std::condition_variable cv;
 
-class NullJobSystem final : public IJobSystem{
+template<typename ReturnType, typename... Args> class Job;
+template<typename ReturnType, typename... Args> class Job<ReturnType(Args...)>
+{
 public:
-    std::future<void> AddJob(std::function<void()> f) override {return std::future<void>();}
-};
+    Job(std::function<ReturnType(Args...)> func, std::tuple<Args...> args): func_(func), args_(args) {};
 
-class DefaultJobSystem final : public IJobSystem{
-public:
-    template <typename T>
-    std::future<T> AddJob(std::function<T()> f) override;
+    ReturnType Execute()
+    {
+        return std::apply(func_,args_);
+    }
 private:
-    std::vector<std::function<void()>> jobQueue_;
+    std::function<ReturnType(Args...)> func_;
+    std::tuple<Args...> args_;
 };
 
-using JobSystem = Locator<IJobSystem, NullJobSystem>;
+class JobSystem{
+public:
+    template<typename ReturnType, typename... Args>
+    std::future<ReturnType> AddJob(std::function<ReturnType(Args...)> func, std::tuple<Args...> args){
+        jobQueue_.emplace_back(Job<ReturnType(Args...)>(func, args));
+        return std::promise<ReturnType>().get_future();
+    }
+
+    void RunJobs(){
+        for (auto& job : jobQueue_){
+            job.Execute();
+        }
+    }
+private:
+    std::vector<Job> jobQueue_;
+};
 
 }
