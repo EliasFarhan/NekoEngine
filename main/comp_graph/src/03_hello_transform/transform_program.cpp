@@ -76,7 +76,7 @@ void HelloTransformProgram::Update(seconds dt)
     transform_ = Mat4f::Translate(transform_, position_);
 }
 
-void HelloTransformProgram::DrawUi()
+void HelloTransformProgram::DrawImGui()
 {
     ImGui::Begin("Transform Window");
     const char* items[static_cast<size_t>(ShapeType::LENGTH)] = {

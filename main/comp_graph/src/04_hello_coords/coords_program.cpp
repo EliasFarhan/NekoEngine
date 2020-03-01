@@ -62,7 +62,7 @@ void HelloCoordsProgram::Destroy()
 
 }
 
-void HelloCoordsProgram::DrawUi()
+void HelloCoordsProgram::DrawImGui()
 {
 }
 

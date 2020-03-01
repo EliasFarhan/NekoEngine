@@ -9,8 +9,7 @@ class CompGraphEngine : public sdl::SdlEngine
 {
 public:
 	explicit CompGraphEngine(Configuration* config = nullptr);
-	
-    void OnEvent(const SDL_Event& event) override;
+
     void Destroy() override;
 
 private:

@@ -80,6 +80,8 @@ public:
 
     Configuration config;
 
+    void RegisterSystem(SystemInterface& system);
+    void RegisterOnDrawUi(DrawImGuiInterface& drawUi);
 
     float GetDeltaTime() const { return dt_; };
 	
@@ -95,7 +97,7 @@ protected:
     std::atomic<float> dt_;
     Action<> initAction_;
     Action<seconds> updateAction_;
-    Action<> drawUiAction_;
+    Action<> drawImGuiAction_;
     Action<> destroyAction_;
 
 };

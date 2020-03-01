@@ -41,10 +41,12 @@ public:
 		callbacks_.push_back(callback);
 		
 	}
-	void UnregisterCallback(const std::function<void(Ts ...)>& callback)
-	{
-		callbacks_.erase(std::remove(callbacks_.begin(), callbacks_.end(), callback));
-	}
+    /*
+    void UnregisterCallback(const std::function<void(Ts ...)>& callback)
+    {
+        callbacks_.erase(std::remove(callbacks_.begin(), callbacks_.end(), callback));
+    }
+    */
 
 	void Execute(Ts ... args)
 	{
