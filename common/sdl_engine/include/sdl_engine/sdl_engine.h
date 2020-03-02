@@ -32,6 +32,12 @@
 namespace neko::sdl
 {
 
+class SdlEventSystemInterface
+{
+public:
+    virtual void OnEvent(const SDL_Event& event) = 0;
+};
+
 class SdlEngine : public BasicEngine
 {
 public:
@@ -39,11 +45,15 @@ public:
 	SdlEngine() = delete;
 	void Init() override;
 	void Destroy() override;
-	virtual void OnEvent(const SDL_Event& event) = 0;
+
+	void RegisterOnEvent(SdlEventSystemInterface& eventInterface);
 
     void ManageEvent() override;
 
     void GenerateUiFrame() override;
+
+protected:
+    Action<const SDL_Event&> onEventAction_;
 
 
 };
