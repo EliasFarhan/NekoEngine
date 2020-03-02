@@ -9,12 +9,11 @@ namespace neko
 
 void* LinearAllocator::Allocate(size_t allocatedSize, size_t alignment)
 {
-    assert(allocatedSize != 0);
+    neko_assert(allocatedSize != 0, "Linear Allocator cannot allocated nothing");
     const auto adjustment = CalculateAlignForwardAdjustment(currentPos_, alignment);
-    if (usedMemory_ + adjustment + allocatedSize > size_)
-    {
-        assert(false && "Linear Allocator has not enough space for this allocation");
-    }
+
+    neko_assert(usedMemory_ + adjustment + allocatedSize > size_, "Linear Allocator has not enough space for this allocation");
+
     auto* alignedAddress = (void*) ((std::uint64_t) currentPos_ + adjustment);
     currentPos_ = (void*) ((std::uint64_t) alignedAddress + allocatedSize);
     usedMemory_ += allocatedSize + adjustment;
@@ -24,7 +23,7 @@ void* LinearAllocator::Allocate(size_t allocatedSize, size_t alignment)
 
 void LinearAllocator::Deallocate([[maybe_unused]]void* p)
 {
-    assert(false and "Use clear() instead");
+    neko_assert(false,"Use clear() instead");
 }
 
 void LinearAllocator::Clear()
@@ -36,11 +35,11 @@ void LinearAllocator::Clear()
 
 void* StackAllocator::Allocate(size_t allocatedSize, size_t alignment)
 {
-    assert(allocatedSize != 0);
+    neko_assert(allocatedSize != 0, "Stack Allocator cannot allocate nothing");
     const auto adjustment = CalculateAlignForwardAdjustmentWithHeader(currentPos_, alignment, sizeof(AllocationHeader));
     if (usedMemory_ + adjustment + allocatedSize > size_)
     {
-        assert(false && "StackAllocator has not enough space for this allocation");
+        neko_assert(false, "StackAllocator has not enough space for this allocation");
     }
 
     void* alignedAddress = (void*) ((std::uint64_t) currentPos_ + adjustment);
@@ -58,7 +57,7 @@ void* StackAllocator::Allocate(size_t allocatedSize, size_t alignment)
 
 void StackAllocator::Deallocate(void* p)
 {
-    assert(p == prevPos_ && "Stack allocator needs to deallocate from the top");
+    neko_assert(p == prevPos_, "Stack allocator needs to deallocate from the top");
     //Access the AllocationHeader in the bytes before p
     auto* header = (AllocationHeader*) ((std::uint64_t) p - sizeof(AllocationHeader));
     usedMemory_ -= (std::uint64_t) currentPos_ - (std::uint64_t) p + header->adjustment;
@@ -115,16 +114,16 @@ void* FreeListAllocator::Allocate(size_t allocatedSize, size_t alignment)
         header->adjustment = adjustment;
         usedMemory_ += totalSize;
         numAllocations_++;
-        assert(CalculateAlignForwardAdjustment(alignedAddress, alignment) == 0);
+        neko_assert(CalculateAlignForwardAdjustment(alignedAddress, alignment) == 0, "Free List Allocator: New generated block is not aligned");
         return alignedAddress;
     }
-    assert(false and "FreeList Allocator has not enough space for this allocation");
+    neko_assert(false, "FreeList Allocator has not enough space for this allocation");
     return nullptr;
 }
 
 void FreeListAllocator::Deallocate(void* p)
 {
-    assert(p != nullptr);
+    neko_assert(p != nullptr, "Free List cannot deallocate nullptr");
     AllocationHeader* header = (AllocationHeader*) ((std::uint64_t) p - sizeof(AllocationHeader));
     void* blockStart = (void*) ((std::uint64_t) p - header->adjustment);
     size_t blockSize = header->size;

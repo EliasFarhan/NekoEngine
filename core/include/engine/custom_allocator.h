@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include <cassert>
+#include "engine/assert.h"
 
 namespace neko
 {
@@ -19,7 +19,7 @@ public:
 
     virtual ~Allocator()
     {
-        assert(numAllocations_ == 0 && usedMemory_ == 0);
+        neko_assert(numAllocations_ == 0 && usedMemory_ == 0, "Allocator should be emptied before destruction");
         start_ = nullptr;
         size_ = 0;
     }
@@ -31,7 +31,7 @@ public:
     inline static size_t CalculateAlignForwardAdjustment(const void* address, size_t alignment)
     {
         //Check if alignement is power of 2
-        assert((alignment & (alignment - 1)) == 0 && "Alignement needs to be a power of two");
+        neko_assert((alignment & (alignment - 1)) == 0, "Alignement needs to be a power of two");
         const size_t adjustment = alignment - ((std::size_t) const_cast<void*>(address) & ((alignment - 1)));
 
         if (adjustment == alignment) return 0;
@@ -90,7 +90,7 @@ class LinearAllocator : public Allocator
 public:
     LinearAllocator(size_t size, void* start) : Allocator(size, start), currentPos_(start_)
     {
-        assert(size > 0);
+        neko_assert(size > 0, "Linear Allocator cannot be empty");
     }
 
     ~LinearAllocator() override
@@ -117,7 +117,7 @@ class StackAllocator : public Allocator
 public:
     StackAllocator(size_t size, void* start) : Allocator(size, start), currentPos_(start)
     {
-        assert(size > 0);
+        neko_assert(size > 0, "Stack Allocator cannot be empty");
     }
 
     ~StackAllocator() override
@@ -150,7 +150,7 @@ class FreeListAllocator : public Allocator
 public:
     FreeListAllocator(size_t size, void* start) : Allocator(size, start), freeBlocks_((FreeBlock*) start)
     {
-        assert(size > sizeof(FreeBlock));
+        neko_assert(size > sizeof(FreeBlock), "Free List Allocator cannot be empty");
         freeBlocks_->size = size;
         freeBlocks_->next = nullptr;
     }
@@ -223,10 +223,10 @@ PoolAllocator<T>::PoolAllocator(size_t size, void* mem) : Allocator(size, mem)
 template<typename T>
 void* PoolAllocator<T>::Allocate(size_t allocatedSize, [[maybe_unused]]size_t alignment)
 {
-    assert(allocatedSize == sizeof(T) and alignment == alignof(T));
+    neko_assert(allocatedSize == sizeof(T) and alignment == alignof(T), "Pool Allocator can only allocate one Object pooled at once");
     if(freeBlocks_ == nullptr)
     {
-        assert(false and "Pool Allocator is full");
+        neko_assert(false, "Pool Allocator is full");
     }
     void* p = freeBlocks_;
     freeBlocks_ = freeBlocks_->next;
@@ -238,7 +238,7 @@ void* PoolAllocator<T>::Allocate(size_t allocatedSize, [[maybe_unused]]size_t al
 template<typename T>
 void PoolAllocator<T>::Deallocate(void* p)
 {
-    FreeBlock* freeBlock = p;
+    FreeBlock* freeBlock = (FreeBlock*)p;
     freeBlock->next = freeBlocks_;
     freeBlocks_ = freeBlock;
     usedMemory_ -= sizeof(T);
