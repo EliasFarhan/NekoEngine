@@ -67,15 +67,24 @@ private:
     std::vector<Job> jobQueue_;
 };*/
 
-void Work(std::function<void(void)> (* GrabJob)())
+using GrabJobFunctionPtr = std::function<void(void)> (*)(std::stack<std::function<void(void)>>&);
+
+void Work(GrabJobFunctionPtr jobGrabber, std::stack<std::function<void(void)>>& queue)
 {
     while (true)
     {
         std::unique_lock<std::mutex> lock(mutex);
         cv.wait(lock);
 
-        GrabJob()(); // Grab job and execute
+        jobGrabber(queue)(); // Grab job and execute
     }
+}
+
+static std::function<void(void)> GrabJob(std::stack<std::function<void(void)>>& jobQueue)
+{
+    auto job = jobQueue.top();
+    jobQueue.pop();
+    return job;
 }
 
 class JobSystem
@@ -85,7 +94,7 @@ public:
     {
         for (int i = 0; i < DEFAULT_WORKER_SIZE; ++i)
         {
-            workers_[i] = std::thread(Work, [this] { GrabJob(); });
+            workers_[i] = std::thread(Work, GrabJob, this->jobQueue_);
         }
     }
 
@@ -101,13 +110,6 @@ public:
         {
             cv.notify_one();
         }
-    }
-
-    std::function<void(void)> GrabJob()
-    {
-        auto job = jobQueue_.top();
-        jobQueue_.pop();
-        return job;
     }
 
 private:
