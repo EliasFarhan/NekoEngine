@@ -5,15 +5,25 @@
 namespace neko
 {
 
-int sum(int a, int b){
-    return a+b;
+void sum(int a, int b){
+    std::cout << "The sum of " << a << '+' << b << " is " << a+b << ".\n";
 }
 
 TEST(Engine, TestJobSystem)
 {
-    Job<int(int,int)> job(sum, {5,3});
-    auto result = job.Execute();
-    std::cout << result << '\n';
+    JobSystem system;
+    int a = 5;
+    int b = 2;
+    int c = 10;
+    int d = 15;
+    auto lambda = [a,b]{sum(a,b);};
+    auto lambda2 = [c,d]{sum(c,d);};
+    system.AddJob(lambda);
+    system.AddJob(lambda2);
+    system.ExecuteJobs();
+
+    // auto lambda = [a,b]{sum(a,b);};
+    // lambda();
 }
 
 }
