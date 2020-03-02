@@ -26,6 +26,8 @@
 #include <thread>
 #include <queue>
 #include <condition_variable>
+#include <array>
+#include <stack>
 
 namespace neko
 {
@@ -33,7 +35,7 @@ namespace neko
 std::mutex mutex;
 std::condition_variable cv;
 
-template<typename ReturnType, typename... Args> class Job;
+/*template<typename ReturnType, typename... Args> class Job;
 template<typename ReturnType, typename... Args> class Job<ReturnType(Args...)>
 {
 public:
@@ -63,6 +65,55 @@ public:
     }
 private:
     std::vector<Job> jobQueue_;
+};*/
+
+void Work(std::function<void(void)> (* GrabJob)())
+{
+    while (true)
+    {
+        std::unique_lock<std::mutex> lock(mutex);
+        cv.wait(lock);
+
+        GrabJob()(); // Grab job and execute
+    }
+}
+
+class JobSystem
+{
+public:
+    JobSystem()
+    {
+        for (int i = 0; i < DEFAULT_WORKER_SIZE; ++i)
+        {
+            workers_[i] = std::thread(Work, [this] { GrabJob(); });
+        }
+    }
+
+    void AddJob(std::function<void(void)> job)
+    {
+        jobQueue_.push(job);
+    }
+
+    void ExecuteJobs()
+    {
+        const size_t queueSize = jobQueue_.size();
+        for (int i = 0; i < queueSize; ++i)
+        {
+            cv.notify_one();
+        }
+    }
+
+    std::function<void(void)> GrabJob()
+    {
+        auto job = jobQueue_.top();
+        jobQueue_.pop();
+        return job;
+    }
+
+private:
+    const static size_t DEFAULT_WORKER_SIZE = 2;
+    std::stack<std::function<void(void)>> jobQueue_;
+    std::array<std::thread, DEFAULT_WORKER_SIZE> workers_;
 };
 
 }
