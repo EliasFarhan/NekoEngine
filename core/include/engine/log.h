@@ -24,13 +24,13 @@
  SOFTWARE.
  */
 
+#include <atomic>
 #include <string>
 #include <vector>
 #include <iostream>
 #include <cassert>
 #include <mutex>
 #include <thread>
-#include <queue>
 #include <functional>
 #include <utilities/service_locator.h>
 #include <condition_variable>
@@ -43,9 +43,23 @@ namespace neko
 /// \brief To differentiate log messages
 enum class LogTypes : char
 {
-    DEBUG = 0, //For regular debug messages
-    WARNING, //For non-critical errors
-    ERROR //For critical errors
+	DEBUG = 0, //For regular debug messages
+	WARNING, //For non-critical errors
+	CRITICAL //For critical errors
+};
+
+//-----------------------------------------------------------------------------
+// LogCategory
+//-----------------------------------------------------------------------------
+/// \brief To sort log messages into different categories
+enum class LogCategory : char
+{
+	NONE = 0,
+	ENGINE,
+	MATH,
+	GRAPHICS,
+	IO,
+	SOUND
 };
 
 //-----------------------------------------------------------------------------
@@ -54,16 +68,34 @@ enum class LogTypes : char
 /// \brief Struct representing a log message with its type
 struct LogMessage
 {
-    LogTypes type = LogTypes::DEBUG;
-    std::string msg;
+	LogTypes type = LogTypes::DEBUG;
+	LogCategory category = LogCategory::NONE;
+	std::string log;
 
-    explicit LogMessage(const std::string& log)
-            : msg(log)
-    {}
+	explicit LogMessage(std::string log)
+		: log(std::move(log))
+	{
+		Generate();
+	}
 
-    explicit LogMessage(const LogTypes& logType, const std::string& log)
-            : type(logType), msg(log)
-    {}
+	explicit LogMessage(const LogTypes& logType, std::string log)
+		: type(logType), log(std::move(log))
+	{
+		Generate();
+	}
+
+	explicit LogMessage(const LogCategory& category, const LogTypes& logType,
+	                    std::string log)
+		: type(logType), category(category), log(std::move(log))
+	{
+		Generate();
+	}
+
+	void Generate();
+	void Display() const
+	{
+		(type != LogTypes::CRITICAL ? std::cout : std::cerr) << log;
+	}
 };
 
 //-----------------------------------------------------------------------------
@@ -72,18 +104,29 @@ struct LogMessage
 /// \brief Used for the service locator
 class LogManagerInterface
 {
+protected:
+	~LogManagerInterface() = default;
 public:
-    /**
-     * \brief Generate a log message.
-     * @param logType the type of the log message
-     * @param log the log message
-     */
-    virtual void Log(LogTypes logType, const std::string& log) = 0;
+	/**
+	 * \brief Generate a log message.
+	 * @param logType the type of the log message
+	 * @param log the log message
+	 */
+	virtual void Log(LogTypes logType, const std::string& log) = 0;
 
-    /**
-     * \brief Retrieves the log history
-     */
-    virtual const std::vector<std::string>& GetLogs() = 0;
+	/**
+	 * \brief Generate a log message.
+	 * @param logType the type of the log message
+	 * @param category the category of the log message
+	 * @param log the log message
+	 */
+	virtual void Log(LogCategory category, LogTypes logType,
+	                 const std::string& log) = 0;
+
+	/**
+	 * \brief Retrieves the log history
+	 */
+	virtual const std::vector<LogMessage>& GetLogs() = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -92,48 +135,69 @@ public:
 /// \brief Used for the service locator
 class NullLogManager final : public LogManagerInterface
 {
-public:
-    void Log([[maybe_unused]]LogTypes logType, [[maybe_unused]]const std::string& log) override
-    {}
+	void Log([[maybe_unused]] LogTypes logType,
+	         [[maybe_unused]] const std::string& log) override
+	{}
 
-    const std::vector<std::string>& GetLogs() override
-    {
-        std::cerr << "Impossible to get log history from a null LogManager\n";
-        assert(false);
-        return {};
-    }
+	void Log([[maybe_unused]] LogCategory category,
+	         [[maybe_unused]] LogTypes logType,
+	         [[maybe_unused]] const std::string& log) override
+	{}
+
+	const std::vector<LogMessage>& GetLogs() override
+	{
+		std::cerr << "Impossible to get log history from a null LogManager\n";
+		assert(false);
+		return {};
+	}
 };
 
 //-----------------------------------------------------------------------------
 // LogManager
 //-----------------------------------------------------------------------------
 /// \brief Creates and stores log messages
-class LogManager : public LogManagerInterface
+class LogManager final : public LogManagerInterface
 {
+protected:
+	//-----------------------------------------------------------------------------
+	// LogManagerStatus
+	//-----------------------------------------------------------------------------
+	/// \brief To get the status of the engine
+	enum LogManagerStatus : std::uint8_t
+	{
+		IS_RUNNING = 1u << 0u, //To check if the LogManager is running
+		IS_EMPTY = 1u << 1u, //To check if the LogManager has tasks
+		IS_APP_WAITING = 1u << 2u, //To check if the LogManager is waiting for a task
+		IS_WRITING = 1u << 3u //To check if the LogManager is writing its output to a file
+	};
 public:
-    LogManager();
-    ~LogManager() = default;
+	LogManager();
+	~LogManager();
 
-    void Start();
-    void Wait();
-    void Close();
+	void Start();
+	void Wait();
+	void Destroy();
 
-    void Log(LogTypes logType, const std::string& log) override;
+	void Log(LogTypes logType, const std::string& log) override;
 
-    const std::vector<std::string>& GetLogs() override
-    { return logHistory_; }
+	void Log(LogCategory category, LogTypes logType,
+		const std::string& log) override;
 
-    void WriteToFile();
+	const std::vector<LogMessage>& GetLogs() override
+	{
+		return logHistory_;
+	}
 
+	void WriteToFile();
 private:
-    bool isRunning_;
+	std::atomic<std::uint8_t> status_;
 
-    std::vector<std::string> logHistory_;
+	std::vector<LogMessage> logHistory_;
 
-    std::mutex logMutex_;
-    std::queue<std::function<void()>> tasks_;
-    std::unique_ptr<std::thread> logThread_;
-    std::condition_variable itemInQueue_;
+	std::unique_ptr<std::thread> logThread_;
+	std::mutex logMutex_;
+	std::vector<std::function<void()>> tasks_;
+	std::condition_variable itemInQueue_;
 };
 
 //-----------------------------------------------------------------------------
@@ -150,9 +214,19 @@ using Log = Locator<LogManagerInterface, NullLogManager>;
 void LogDebug(const std::string& msg);
 
 /**
+ * \brief Generate a debug type log message
+ */
+void LogDebug(LogCategory category, const std::string& msg);
+
+/**
  * \brief Generate a warning type log message
  */
 void LogWarning(const std::string& msg);
+
+/**
+ * \brief Generate a warning type log message
+ */
+void LogWarning(LogCategory category, const std::string& msg);
 
 /**
  * \brief Generate an error type log message
@@ -160,7 +234,12 @@ void LogWarning(const std::string& msg);
 void LogError(const std::string& msg);
 
 /**
+ * \brief Generate an error type log message
+ */
+void LogError(LogCategory category, const std::string& msg);
+
+/**
  * \brief Retrieves the log history
  */
-const std::vector<std::string>& GetLogs();
+const std::vector<LogMessage>& GetLogs();
 }

@@ -5,19 +5,39 @@
 #include <gtest/gtest.h>
 #include <engine/log.h>
 
-TEST(Engine, TestLogs)
+#include "engine/engine.h"
+
+namespace neko
 {
-    using namespace neko;
-
+TEST(Logs, TestLogsBasic)
+{
     LogManager logger;
-    Log::provide(&logger);
 
-    LogDebug("Hello");
-    LogWarning("How");
-    LogError("are");
-    LogDebug("you?");
+    LogDebug(LogCategory::ENGINE, "Engine is running");
+    LogWarning("That feature isn't fully supported yet");
+    LogError("Could not retrieve value!");
 
-    logger.WriteToFile();
+    logger.Wait();
+}
 
-    logger.Close();
+TEST(Logs, TestLogsFromNewThread)
+{
+    LogManager logger;
+
+    auto task([]
+    {
+        LogDebug("Task Begin");
+        LogDebug("This is a task");
+    });
+	
+    auto newThread = std::thread([task]
+    {
+        LogDebug(LogCategory::ENGINE, "Creating logs from another thread");
+        task();
+    });
+
+    newThread.join();
+
+    logger.Wait();
+}
 }

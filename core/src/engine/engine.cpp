@@ -60,7 +60,7 @@ BasicEngine::~BasicEngine()
 {
     LogDebug("Destroy Basic Engine");
     logManager_->WriteToFile();
-    logManager_->Close();
+    logManager_->Destroy();
 
 #ifdef EASY_PROFILE_USE
     profiler::dumpBlocksToFile("Neko_Profile.prof");
