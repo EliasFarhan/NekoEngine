@@ -3,10 +3,23 @@
 #include <random>
 #include <gtest/gtest.h>
 #include <engine/resource.h>
+#include <filesystem>
+
 #include "sole.hpp"
 
 TEST(Engine, TestResource)
 {
+    std::string path = "./../../data/test/test.txt";
+    neko::ResourceManager resourceManager;
+    neko::ResourceId resourceId = resourceManager.LoadResource(path);
+    int count = 0;
+    while (!resourceManager.IsResourceReady(resourceId)) {
+        count++;
+    }
+    std::cout << count << "   " << resourceManager.GetResource(resourceId);
+
+    resourceManager.Close();
+    /*
     sole::uuid u0 = sole::uuid0(), u1 = sole::uuid1(), u4 = sole::uuid4();
 
     std::cout << "uuid v0 string : " << u0 << std::endl;
@@ -27,4 +40,5 @@ TEST(Engine, TestResource)
     std::cout << "uuid v1 rebuilt : " << u1 << " -> " << u1.pretty() << std::endl;
     std::cout << "uuid v4 rebuilt : " << u4 << " -> " << u4.pretty() << std::endl;
     std::cout << "Hello World " << "\n";
+    */
 }
