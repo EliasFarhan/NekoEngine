@@ -23,7 +23,11 @@ void HelloTextureProgram::Init()
 
 void HelloTextureProgram::Update(seconds dt)
 {
-
+    inputManager.OnPreUserInputs();
+    if (inputManager.IsKeyDown(neko::KeyCode::W))
+    {
+        std::cout << "Touche W appuyé" << '\n';
+    }
 }
 
 void HelloTextureProgram::Destroy()

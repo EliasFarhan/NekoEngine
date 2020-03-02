@@ -26,6 +26,7 @@
 #include "engine/engine.h"
 #include "sdl_engine/sdl_window.h"
 #include "graphics/graphics.h"
+#include <sdl_engine/sdl_input.h>
 #include <SDL.h>
 #include <SDL_main.h>
 
@@ -51,10 +52,11 @@ public:
     void ManageEvent() override;
 
     void GenerateUiFrame() override;
-
+	InputManager inputManager;
+	
 protected:
     Action<const SDL_Event&> onEventAction_;
-
+    
 
 };
 

@@ -5,6 +5,7 @@
 #include <imgui.h>
 #include "comp_graph/sample_browser.h"
 
+
 #include "01_hello_triangle/triangle_program.h"
 #include "02_hello_texture/texture_program.h"
 #include "03_hello_transform/transform_program.h"
@@ -27,6 +28,7 @@ void SampleBrowser::Update(seconds dt)
 {
     programs_[currentProgramIndex_]->Update(dt);
     RendererLocator::get().Render(programs_[currentProgramIndex_].get());
+    
 }
 
 void SampleBrowser::Destroy()
