@@ -45,7 +45,7 @@ enum class LogTypes : char
 {
     DEBUG = 0, //For regular debug messages
     WARNING, //For non-critical errors
-    ERROR //For critical errors
+    PROBLEM //For critical errors
 };
 
 //-----------------------------------------------------------------------------

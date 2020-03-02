@@ -103,7 +103,7 @@ void LogManager::Log(LogTypes logType, const std::string& log)
             case LogTypes::WARNING:
                 message += "[WARNING] ";
                 break;
-            case LogTypes::ERROR:
+            case LogTypes::PROBLEM:
                 message += "[ERROR] ";
                 break;
         }
@@ -175,7 +175,7 @@ void LogWarning(const std::string& msg)
 
 void LogError(const std::string& msg)
 {
-    Log::get().Log(LogTypes::ERROR, msg);
+    Log::get().Log(LogTypes::PROBLEM, msg);
 }
 
 const std::vector<std::string>& GetLogs()
