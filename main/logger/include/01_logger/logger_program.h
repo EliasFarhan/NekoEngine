@@ -45,6 +45,12 @@ public:
 
     void WriteLog();
 
+
 private:
+    LogManager logger;
+
+    std::vector<LogMessage> currentSessionLogs;
+
+    std::string LogCategoryToString(LogCategory category);
 };
 }
