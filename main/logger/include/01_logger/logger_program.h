@@ -43,14 +43,66 @@ public:
 
     void OnEvent(const SDL_Event& event) override;
 
-    void WriteLog();
-
 
 private:
     LogManager logger;
+    const char* caterogies[7] = {
+    	"NONE",
+    	"ENGINE",
+    	"MATH",
+    	"GRAPHICS",
+    	"IO",
+    	"SOUND",
+    	"ALL"
+    };
+	
+    const char* types[4] = {
+    	"DEBUG",
+    	"WARNING",
+    	"CRITICAL",
+    	"ALL"
+    };
+	
+    const char* logCount[5] = {
+    	"50",
+    	"100",
+    	"150",
+        "200",
+        "ALL"
+    };
 
+    int maxLogCountSteps[5] = {
+    	50,
+    	100,
+    	150,
+    	200,
+    	5000
+    };
+    int logScreenSizeSteps[5] = {
+    	200,
+    	250,
+    	300,
+    	350,
+    	500
+    };
+
+    int selectedCat;
+    int selectedType;
+    int selectedLogCount;
+    int logIndex;
+    int maxLogToShow;
+    int logScreenSize;
+	
+    std::vector<LogMessage> logsToShow;
     std::vector<LogMessage> currentSessionLogs;
+	
+    void InsertCurrentLog();
+    void SetMaxLogsToShow();
+	
+    int CalculateCurrentLogIndex(int logCount, int currentY, int maxY);
 
-    std::string LogCategoryToString(LogCategory category);
+	//TEST FUNCTIONS
+    void WriteTestLog();
+    void Write50Logs();
 };
 }
