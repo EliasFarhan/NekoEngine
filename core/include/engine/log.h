@@ -43,23 +43,25 @@ namespace neko
 /// \brief To differentiate log messages
 enum class LogTypes : char
 {
-	DEBUG = 0, //For regular debug messages
+	DEBUG = 1, //For regular debug messages
 	WARNING, //For non-critical errors
-	CRITICAL //For critical errors
+	CRITICAL, //For critical errors
+	LENGTH
 };
 
 //-----------------------------------------------------------------------------
 // LogCategory
 //-----------------------------------------------------------------------------
 /// \brief To sort log messages into different categories
-enum class LogCategory : char
+enum class LogCategories : char
 {
-	NONE = 0,
+	NONE = 1,
 	ENGINE,
 	MATH,
 	GRAPHICS,
 	IO,
-	SOUND
+	SOUND,
+	LENGTH
 };
 
 //-----------------------------------------------------------------------------
@@ -69,7 +71,7 @@ enum class LogCategory : char
 struct LogMessage
 {
 	LogTypes type = LogTypes::DEBUG;
-	LogCategory category = LogCategory::NONE;
+	LogCategories category = LogCategories::NONE;
 	std::string log;
 
 	explicit LogMessage(std::string log)
@@ -84,7 +86,7 @@ struct LogMessage
 		Generate();
 	}
 
-	explicit LogMessage(const LogCategory& category, const LogTypes& logType,
+	explicit LogMessage(const LogCategories& category, const LogTypes& logType,
 	                    std::string log)
 		: type(logType), category(category), log(std::move(log))
 	{
@@ -120,7 +122,7 @@ public:
 	 * @param category the category of the log message
 	 * @param log the log message
 	 */
-	virtual void Log(LogCategory category, LogTypes logType,
+	virtual void Log(LogCategories category, LogTypes logType,
 	                 const std::string& log) = 0;
 
 	/**
@@ -139,7 +141,7 @@ class NullLogManager final : public LogManagerInterface
 	         [[maybe_unused]] const std::string& log) override
 	{}
 
-	void Log([[maybe_unused]] LogCategory category,
+	void Log([[maybe_unused]] LogCategories category,
 	         [[maybe_unused]] LogTypes logType,
 	         [[maybe_unused]] const std::string& log) override
 	{}
@@ -180,7 +182,7 @@ public:
 
 	void Log(LogTypes logType, const std::string& log) override;
 
-	void Log(LogCategory category, LogTypes logType,
+	void Log(LogCategories category, LogTypes logType,
 		const std::string& log) override;
 
 	const std::vector<LogMessage>& GetLogs() override
@@ -216,7 +218,7 @@ void LogDebug(const std::string& msg);
 /**
  * \brief Generate a debug type log message
  */
-void LogDebug(LogCategory category, const std::string& msg);
+void LogDebug(LogCategories category, const std::string& msg);
 
 /**
  * \brief Generate a warning type log message
@@ -226,7 +228,7 @@ void LogWarning(const std::string& msg);
 /**
  * \brief Generate a warning type log message
  */
-void LogWarning(LogCategory category, const std::string& msg);
+void LogWarning(LogCategories category, const std::string& msg);
 
 /**
  * \brief Generate an error type log message
@@ -236,7 +238,7 @@ void LogError(const std::string& msg);
 /**
  * \brief Generate an error type log message
  */
-void LogError(LogCategory category, const std::string& msg);
+void LogError(LogCategories category, const std::string& msg);
 
 /**
  * \brief Retrieves the log history

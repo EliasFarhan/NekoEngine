@@ -31,26 +31,49 @@ class LoggerProgram : public SampleProgram
 {
 public:
 
-    void Init() override;
+    void Init() override {}
 
-    void Update(seconds dt) override;
-
-    void Destroy() override;
-
-    void Render() override;
+    void Update(seconds dt) override {}
+    void Render() override {}
+    void Destroy() override {}
 
     void DrawUi() override;
 
-    void OnEvent(const SDL_Event& event) override;
+    void OnEvent(const SDL_Event& event) override {}
+	
+    void GenerateTestLogs();
 
-    void WriteLog();
+    static std::string LogCategoryToString(const LogCategories categories)
+    {
+        switch (categories)
+        {
+        default: return "All";
+        case LogCategories::NONE: return "Not categorized";
+        case LogCategories::ENGINE: return "Engine";
+        case LogCategories::MATH: return "Math";
+        case LogCategories::GRAPHICS: return "Graphics";
+        case LogCategories::IO: return "I/O";
+        case LogCategories::SOUND: return "Sound";
+        }
+    }
 
-
+    static std::string LogTypeToString(const LogTypes types)
+    {
+        switch (types)
+        {
+        default: return "All";
+        case LogTypes::DEBUG: return "Debug";
+        case LogTypes::WARNING: return "Warning";
+        case LogTypes::CRITICAL: return "Error";
+        }
+    }
 private:
-    LogManager logger;
+    //ImGui variables
+    bool isActive_ = true;
+	
+    uint8_t currentCategories_ = (1 << static_cast<uint8_t>(LogCategories::LENGTH)) - 1;
+    uint8_t currentTypes_ = (1 << static_cast<uint8_t>(LogTypes::LENGTH)) - 1;
 
-    std::vector<LogMessage> currentSessionLogs;
-
-    std::string LogCategoryToString(LogCategory category);
+    uint32_t logCount_ = 0;
 };
 }

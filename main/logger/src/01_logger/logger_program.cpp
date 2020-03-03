@@ -1,158 +1,108 @@
-#include <cmath>
 #include <imgui.h>
 #include <engine/engine.h>
 #include "01_logger/logger_program.h"
 #include <engine/log.h>
 namespace neko
 {
-void LoggerProgram::Init()
-{
-    const auto& config = BasicEngine::GetInstance()->config; 
-}
-
-void LoggerProgram::Update(seconds dt)
-{
-}
-
-void LoggerProgram::Render()
-{
-
-}
-
-void LoggerProgram::Destroy()
-{
-
-}
-
 void LoggerProgram::DrawUi()
 {
-    const char* caterogies[] = { "NONE","ENGINE","MATH","GRAPHICS","IO","SOUND", "ALL" };
-    const char* types[] = { "DEBUG","WARNING","CRITICAL", "ALL"};
-    const char* logCount[] = { "10","20","50", "100", "ALL" };
+    if (ImGui::Begin("Logs", &isActive_, ImGuiWindowFlags_MenuBar))
+    {
+	    if (ImGui::BeginMenuBar())
+	    {
+		    if (ImGui::BeginMenu("Severity"))
+		    {
+			    for (uint8_t i = 1; i < static_cast<uint8_t>(LogTypes::LENGTH); ++i)
+			    {
+				    const bool isSelected = currentTypes_ & 1 << i - 1;
+			    	if (ImGui::MenuItem(LogTypeToString(static_cast<LogTypes>(i)).c_str(),
+						"", isSelected))
+			    	{
+						if (isSelected) {
+							currentTypes_ &= ~(1 << i - 1);
+						}
+						else {
+							currentTypes_ |= 1 << i - 1;
+						}
+			    	}
+			    }
+				ImGui::EndMenu();
+		    }
 
+		    if (ImGui::BeginMenu("Type"))
+		    {
+				for (uint8_t i = 1; i < static_cast<uint8_t>(LogCategories::LENGTH); ++i)
+				{
+					const bool isSelected = currentCategories_ & 1 << i - 1;
+					if (ImGui::MenuItem(LogCategoryToString(static_cast<LogCategories>(i)).c_str(),
+						"", isSelected))
+					{
+						if (isSelected) {
+							currentCategories_ &= ~(1 << i - 1);
+						}
+						else {
+							currentCategories_ |= 1 << i - 1;
+						}
+					}
+				}
+				ImGui::EndMenu();
+		    }
+	    	
+			if (ImGui::Button("Generate Test Logs")) {
+				GenerateTestLogs();
+			}
+	    	
+			ImGui::EndMenuBar();
+	    }
 
-    ImGui::Begin("Logger buttons");
-    if(ImGui::Button("Write logs")) {
-        WriteLog();
+		ImGui::Text("Number of logs to display (0 for all)");
+	    ImGui::InputScalar("##LogCount", ImGuiDataType_U32, &logCount_);
+
+	    ImGui::Separator();
+    	
+	    ImGui::BeginChild("logs");
+		auto& logs = Log::get().GetLogs();
+		const uint32_t logsSize = logs.size();
+	    const uint32_t logsOffset = logCount_ > 0 ?
+			std::clamp(logCount_, 0u, logsSize) : logsSize;
+	    for (uint32_t i = logsSize - logsOffset; i < logsSize; ++i)
+	    {
+		    const uint8_t category = static_cast<uint8_t>(logs[i].category);
+		    const uint8_t type = static_cast<uint8_t>(logs[i].type);
+		    if (currentCategories_ & 1 << category - 1 &&
+				currentTypes_ & 1 << type - 1)
+		    {
+				ImGui::Text(logs[i].log.c_str());
+		    }
+	    }
+	    ImGui::EndChild();
+    	
+		ImGui::End();
     }
-    ImGui::End();
-
-    ImGui::Begin("Logs");
-    static int selectedCat = 0;
-    static int selectedType = 0;
-    static int selectedLogCount = 0;
-
-    ImGui::Combo("Category", &selectedCat, caterogies, IM_ARRAYSIZE(caterogies));
-    ImGui::Combo("Type", &selectedType, types, IM_ARRAYSIZE(types));
-    ImGui::Combo("LogCount (NOT IMPLEMENTED)", &selectedLogCount, logCount, IM_ARRAYSIZE(logCount));
-
-    ImGui::Separator();
-    ImGui::BeginChild("logs");
-    for (int i = 0; i < currentSessionLogs.size(); i++) {
-        bool correctCat = false;
-        bool correctType = false;
-
-        switch(selectedCat) {
-            case 0:
-                if (currentSessionLogs[i].category == LogCategory::NONE) {
-                    correctCat = true;
-                }
-            break;
-            case 1:
-                if (currentSessionLogs[i].category == LogCategory::ENGINE) {
-                    correctCat = true;
-                }
-                break;
-            case 2:
-                if (currentSessionLogs[i].category == LogCategory::MATH) {
-                    correctCat = true;
-                }
-                break;
-            case 3:
-                if (currentSessionLogs[i].category == LogCategory::GRAPHICS) {
-                    correctCat = true;
-                }
-                break;
-            case 4:
-                if (currentSessionLogs[i].category == LogCategory::IO) {
-                    correctCat = true;
-                }
-                break;
-            case 5:
-                if (currentSessionLogs[i].category == LogCategory::SOUND) {
-                    correctCat = true;
-                }
-                break;
-            case 6:
-                correctCat = true;
-                break;
-            default:
-                correctCat = false;
-                break;
-        }
-        switch (selectedType) {
-        case 0:
-            if (currentSessionLogs[i].type == LogTypes::DEBUG) {
-                correctType = true;
-            }
-            break;
-        case 1:
-            if (currentSessionLogs[i].type == LogTypes::WARNING) {
-                correctType = true;
-            }
-            break;
-        case 2:
-            if (currentSessionLogs[i].type == LogTypes::CRITICAL) {
-                correctType = true;
-            }
-            break;
-        case 3:
-            correctType = true;
-            break;
-        default:
-            correctType = false;
-            break;
-        }
-        
-        if (correctCat && correctType) {
-            ImGui::Text(currentSessionLogs[i].log.c_str());
-        }
-    }
-    ImGui::EndChild();
-    ImGui::End();
 }
 
-void LoggerProgram::OnEvent(const SDL_Event& event)
+void LoggerProgram::GenerateTestLogs() const
 {
+	LogDebug(LogCategories::NONE, "Debug");
+    LogDebug(LogCategories::ENGINE, "Engine Debug");
+    LogDebug(LogCategories::GRAPHICS, "Graphics Debug");
+    LogDebug(LogCategories::IO, "I/O Debug");
+    LogDebug(LogCategories::MATH, "Math Debug");
+    LogDebug(LogCategories::SOUND, "Sound Debug");
 
-}
+	LogWarning(LogCategories::NONE, "Warning");
+	LogWarning(LogCategories::ENGINE, "Engine Warning");
+	LogWarning(LogCategories::GRAPHICS, "Graphics Warning");
+	LogWarning(LogCategories::IO, "I/O Warning");
+	LogWarning(LogCategories::MATH, "Math Warning");
+	LogWarning(LogCategories::SOUND, "Sound Warning");
 
-void LoggerProgram::WriteLog() {
-    LogDebug(LogCategory::ENGINE, "Test");
-    LogDebug(LogCategory::GRAPHICS, "Test");
-    LogDebug(LogCategory::IO, "Test");
-    LogDebug(LogCategory::MATH, "Test");
-    LogDebug(LogCategory::NONE, "Test");
-    LogDebug(LogCategory::SOUND, "Test");
-
-    LogWarning(LogCategory::ENGINE, "Test");
-    LogWarning(LogCategory::GRAPHICS, "Test");
-    LogWarning(LogCategory::IO, "Test");
-    LogWarning(LogCategory::MATH, "Test");
-    LogWarning(LogCategory::NONE, "Test");
-    LogWarning(LogCategory::SOUND, "Test");
-
-    LogError(LogCategory::ENGINE, "Test");
-    LogError(LogCategory::GRAPHICS, "Test");
-    LogError(LogCategory::IO, "Test");
-    LogError(LogCategory::MATH, "Test");
-    LogError(LogCategory::NONE, "Test");
-    LogError(LogCategory::SOUND, "Test");
-
-
-    logger.Wait();
-    currentSessionLogs = logger.GetLogs();
-
+	LogError(LogCategories::NONE, "Error");
+	LogError(LogCategories::ENGINE, "Engine Error");
+	LogError(LogCategories::GRAPHICS, "Graphics Error");
+	LogError(LogCategories::IO, "I/O Error");
+	LogError(LogCategories::MATH, "Math Error");
+	LogError(LogCategories::SOUND, "Sound Error");
 }
 
 
