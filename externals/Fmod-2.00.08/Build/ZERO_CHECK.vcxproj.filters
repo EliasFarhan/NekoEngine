@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\Adam\Desktop\NekoEngine\NekoEngine\externals\Fmod-2.00.08\Build\CMakeFiles\4d4bf80460bfc3b533cf40a511e5e172\generate.stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{A2B8FD7D-6933-3C79-890E-0CA3C68FDCDC}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
