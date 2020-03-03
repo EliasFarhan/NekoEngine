@@ -45,21 +45,21 @@ void LogMessage::Generate()
 
 	switch (category)
 	{
-	case LogCategory::NONE:
+	case LogCategories::NONE:
 		break;
-	case LogCategory::ENGINE:
+	case LogCategories::ENGINE:
 		message << "[ENGINE] ";
 		break;
-	case LogCategory::MATH:
+	case LogCategories::MATH:
 		message << "[MATH] ";
 		break;
-	case LogCategory::GRAPHICS:
+	case LogCategories::GRAPHICS:
 		message << "[GRAPHICS] ";
 		break;
-	case LogCategory::IO:
+	case LogCategories::IO:
 		message << "[IO] ";
 		break;
-	case LogCategory::SOUND:
+	case LogCategories::SOUND:
 		message << "[SOUND] ";
 		break;
 	}
@@ -162,11 +162,11 @@ void LogManager::Destroy()
 
 void LogManager::Log(LogTypes logType, const std::string& log)
 {
-	Log(LogCategory::NONE, logType, log);
+	Log(LogCategories::NONE, logType, log);
 }
 
 
-void LogManager::Log(LogCategory category, LogTypes logType,
+void LogManager::Log(LogCategories category, LogTypes logType,
 	const std::string& log)
 {
 	std::unique_lock<std::mutex> lock(logMutex_);
@@ -221,7 +221,7 @@ void LogManager::WriteToFile()
 		fileContent +=
 			"--------------------------------------------------------------------------------\n";
 
-		LogMessage message(LogCategory::IO, LogTypes::DEBUG, "Successfully saved log output");
+		LogMessage message(LogCategories::IO, LogTypes::DEBUG, "Successfully saved log output");
 		logHistory_.emplace_back(message);
 		message.Display();
 		
@@ -248,7 +248,7 @@ void LogDebug(const std::string& msg)
 	Log::get().Log(LogTypes::DEBUG, msg);
 }
 
-void LogDebug(const LogCategory category, const std::string& msg)
+void LogDebug(const LogCategories category, const std::string& msg)
 {
 	Log::get().Log(category, LogTypes::DEBUG, msg);
 }
@@ -258,7 +258,7 @@ void LogWarning(const std::string& msg)
 	Log::get().Log(LogTypes::WARNING, msg);
 }
 
-void LogWarning(const LogCategory category, const std::string& msg)
+void LogWarning(const LogCategories category, const std::string& msg)
 {
 	Log::get().Log(category, LogTypes::WARNING, msg);
 }
@@ -268,7 +268,7 @@ void LogError(const std::string& msg)
 	Log::get().Log(LogTypes::CRITICAL, msg);
 }
 
-void LogError(const LogCategory category, const std::string& msg)
+void LogError(const LogCategories category, const std::string& msg)
 {
 	Log::get().Log(category, LogTypes::CRITICAL, msg);
 }

@@ -13,7 +13,7 @@ TEST(Logs, TestLogsBasic)
 {
     LogManager logger;
 
-    LogDebug(LogCategory::ENGINE, "Engine is running");
+    LogDebug(LogCategories::ENGINE, "Engine is running");
     LogWarning("That feature isn't fully supported yet");
     LogError("Could not retrieve value!");
 
@@ -32,7 +32,7 @@ TEST(Logs, TestLogsFromNewThread)
 	
     auto newThread = std::thread([task]
     {
-        LogDebug(LogCategory::ENGINE, "Creating logs from another thread");
+        LogDebug(LogCategories::ENGINE, "Creating logs from another thread");
         task();
     });
 

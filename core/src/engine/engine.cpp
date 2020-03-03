@@ -58,8 +58,9 @@ BasicEngine::BasicEngine(Configuration* config)
 
 BasicEngine::~BasicEngine()
 {
-    LogDebug("Destroy Basic Engine");
     logManager_->WriteToFile();
+    LogDebug("Destroy Basic Engine");
+    logManager_->Wait();
     logManager_->Destroy();
 
 #ifdef EASY_PROFILE_USE
@@ -69,7 +70,8 @@ BasicEngine::~BasicEngine()
 
 void BasicEngine::Init()
 {
-
+    logManager_ = new LogManager;
+	
 #ifdef EASY_PROFILE_USE
     EASY_FUNCTION(profiler::colors::Magenta);
 #endif
