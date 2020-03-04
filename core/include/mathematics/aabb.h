@@ -170,7 +170,35 @@ struct Obb3d {
 		return Vec3f(cosf(rotationZ), sinf(rotationX) + sinf(rotationZ), cos(rotationX));		// TODO normalize vec3f
 	}
 
+	bool IntersectObb(Obb3d obb)
+	{
+		Vec3f axis1 = GetDirection();
+		Vec3f axis2 = GetRight();
+		Vec3f axis3 = GetUp();
+		Vec3f axis4 = obb.GetDirection();
+		Vec3f axis5 = obb.GetRight();
+		Vec3f axis6 = obb.GetUp();
 
+		return false;
+	}
+
+	Vec3f GetDirection()
+	{
+		float x = cosf(rotationZ);
+		float y = sinf(rotationZ)+sinf(rotationX);
+		float z = cosf(rotationX);
+		// return Vec3f(x, y, z).Normalized;
+	}
+
+	Vec3f GetRight()
+	{
+
+	}
+
+	Vec3f GetUp()
+	{
+
+	}
 
 	Vec3f lowerLeftBound;	///< the lower vertex
 	Vec3f upperRightBound;	///< the upper vertex
