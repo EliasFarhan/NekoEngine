@@ -94,14 +94,14 @@ struct Obb2d {
 		{
 			Vec2f lowerLeftToTopRight = lowerLeftBound - upperRightBound;
 
-			extent = lowerLeftToTopRight.Magnitude() * Vec2f::AngleBetween(lowerLeftToTopRight, axis);
+			extent = (lowerLeftToTopRight.Magnitude() * Vec2f::AngleBetween(lowerLeftToTopRight, axis)).value;
 		}
 		else
 		{
 			Vec2f upperLeftBound = GetOppositeBound(upperRightBound, true);
 			Vec2 lowerRightToUpperLeft = (upperLeftBound - GetCenter()) * 2;
 
-			extent = lowerRightToUpperLeft.Magnitude() * Vec2f::AngleBetween(lowerRightToUpperLeft, axis);
+			extent = (lowerRightToUpperLeft.Magnitude() * Vec2f::AngleBetween(lowerRightToUpperLeft, axis)).value;
 		}
 
         return extent;
@@ -117,18 +117,18 @@ struct Obb2d {
 		{
             centerToProjectionOnDir =
                 CalculateDirection() * (centerToBound).Magnitude() *
-                std::cosf(Vec2f::AngleBetween(centerToBound, CalculateDirection()));
+                std::cosf(Vec2f::AngleBetween(centerToBound, CalculateDirection()).value);
             boundToOppositeBound =
-                GetCenter() = centerToProjectionOnDir - bound; //TODO FIX THIS LINE
+                GetCenter() + centerToProjectionOnDir - bound;
             oppositeBound = upperRightBound + boundToOppositeBound +
                             boundToOppositeBound;
         } else 
 		{
             centerToProjectionOnDir =
                 CalculateDirection() * (centerToBound).Magnitude() *
-                std::cosf(Vec2f::AngleBetween(centerToBound, CalculateDirection())) * -1;
+                std::cosf(Vec2f::AngleBetween(centerToBound, CalculateDirection()).value) * -1;
             boundToOppositeBound =
-                GetCenter() = centerToProjectionOnDir - bound;
+                GetCenter() + centerToProjectionOnDir - bound;
             oppositeBound = upperRightBound + boundToOppositeBound +
                             boundToOppositeBound;
         }
