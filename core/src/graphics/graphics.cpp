@@ -24,6 +24,7 @@
 #include <graphics/graphics.h>
 #include <algorithm>
 #include <chrono>
+#include <sstream>
 #include <engine/globals.h>
 #include <engine/window.h>
 #include <engine/engine.h>
@@ -134,7 +135,21 @@ void Renderer::Update()
         RenderAll();
         window_->RenderUi();
     }
+    size_t count = 0;
     //Sync the beginning frame with EngineLoop
+	while(!(flags_ & IS_APP_WAITING) && (flags_ & IS_RUNNING))
+	{
+        using namespace std::chrono_literals;
+        std::this_thread::sleep_for(1us);
+        //count++;
+	}
+	/*
+    {
+        std::ostringstream oss;
+        oss << "Render wait count: " << count;
+        logDebug(oss.str());
+    }
+    */
     if (flags_ & IS_APP_WAITING)
     {
         cv_.notify_one();
