@@ -4,13 +4,18 @@ namespace neko
 {
     InputManager::InputManager()
     {
+        keyboard_ = nullptr;
+        mouse_ = 0;
     }
 
-    void InputManager::OnPreUserInputs() {
+    InputManager::~InputManager() = default;
 
-        keyPressedUp.clear();
-        keyPressedDown.clear();
-    	
+    void InputManager::OnPreUserInputs() {
+        for (size_t i = 0; i < static_cast<int>(KeyCode::KEYBOARD_SIZE); i++) 
+        {
+            keyPressedUp.clear();
+            keyPressedDown.clear();
+        }
         for (size_t i = 0; i < static_cast<int>(ButtonCode::MOUSE_MAX); i++) {
             buttonUp_[i] = false;
             buttonDown_[i] = false;
@@ -29,44 +34,36 @@ namespace neko
 
             switch (event.type)
             {
-            case SDL_QUIT:
-                break;
 
-            case  SDL_WINDOWEVENT:
-            {
-                if (event.window.event == SDL_WINDOWEVENT_RESIZED)
-                {
-                }
-                break;
-            }
-
-#pragma region keyboard
-            // SDL2's new way of handling input
+                // SDL2's new way of handling input
             case SDL_TEXTINPUT:
+                text += event.text.text;
                 break;
-
-            case SDL_KEYDOWN: {
+            case SDL_TEXTEDITING:
+                composition = event.edit.text;
+                mouse_ = event.edit.start;
+                selection = event.edit.length;
+                break;
+            case SDL_KEYDOWN:
+            {
                 this->keyboard_ = SDL_GetKeyboardState(nullptr);
-
                 const int index = event.key.keysym.scancode;
+                if (IsKeyDown(KeyCode::BACKSPACE) && !text.empty())
+                {
+                    text.pop_back();
+                }
                 keyPressedDown.push_back(static_cast<KeyCode>(index));
+                           
             }
-                            break;
-
-            case SDL_KEYUP: {
+            	break;
+                 
+            case SDL_KEYUP:
+            {
                 this->keyboard_ = SDL_GetKeyboardState(nullptr);
-
                 const int index = event.key.keysym.scancode;
                 keyPressedUp.push_back(static_cast<KeyCode>(index));
-                /*if (IsKeyUp(neko::KeyCode::W))
-                {
-                    std::cout << "Touche W appuyé" << '\n';
-                }*/
-            }
-                          break;
-#pragma endregion
-
-#pragma region Mouse
+			}
+                break;
             case SDL_MOUSEMOTION:
                 mousePos_.x = -event.motion.x;
                 mousePos_.y = -event.motion.y;
@@ -104,7 +101,6 @@ namespace neko
 
                 scrollUpdate = true;
                 break;
-#pragma endregion
 
             case SDL_JOYDEVICEREMOVED:
 
@@ -169,7 +165,6 @@ namespace neko
                 break;
             case SDL_JOYBUTTONUP:
                 break;
-                /* Fall through to signal quit */
             case SDL_FINGERDOWN:
                 break;
 
@@ -202,8 +197,6 @@ namespace neko
 		    }
 	    }
     	return false;
-        
-
     }
 
 	bool InputManager::IsKeyUp(KeyCode key)
@@ -217,6 +210,11 @@ namespace neko
         }
     	return false;
 	}
+
+	Vec2f InputManager::GetMousePosition() const
+    {
+        return mousePos_;
+    }
 
 }
 

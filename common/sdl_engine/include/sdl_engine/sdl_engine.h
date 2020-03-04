@@ -52,8 +52,8 @@ public:
     void ManageEvent() override;
 
     void GenerateUiFrame() override;
-	InputManager inputManager;
-	
+
+    InputManager inputManager;
 protected:
     Action<const SDL_Event&> onEventAction_;
     

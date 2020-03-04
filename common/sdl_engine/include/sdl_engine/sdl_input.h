@@ -265,11 +265,12 @@ namespace neko
     /**
      * \brief Manage inputs
      */
-    class InputManager {
+    class InputManager
+	{
     public:
-        InputManager();
+        InputManager::InputManager();
 
-        ~InputManager() = default;
+        InputManager::~InputManager();
 
         void OnPreUserInputs();
     	
@@ -277,10 +278,9 @@ namespace neko
 
         bool IsKeyUp(KeyCode key);
 
-        /*bool IsKeyHeld(KeyCode key) const;
-
         Vec2f GetMousePosition() const;
 
+        /*bool IsKeyHeld(KeyCode key) const;
         bool IsButtonDown(ButtonCode button) const;
 
         bool IsButtonReleased(ButtonCode button) const;
@@ -305,12 +305,14 @@ namespace neko
         std::vector<bool> buttonDown_ = std::vector<bool
         >(static_cast<int>(ButtonCode::MOUSE_MAX));
 
-        std::vector<KeyCode> keyPressedDown;
-        std::vector<KeyCode> keyPressedUp;
+        std::vector<KeyCode> keyPressedDown{};
+        std::vector<KeyCode> keyPressedUp{};
         const uint8_t* keyboard_;
         uint32_t mouse_;
+        uint32_t selection;
         Vec2f mousePos_;
-
+        std::string text;
+        std::string composition;
         SDL_Joystick* joystick_{};
 	};
 }

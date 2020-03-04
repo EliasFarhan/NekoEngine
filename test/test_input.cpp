@@ -9,7 +9,7 @@
 
 TEST(Engine, TestInput)
 {
-	auto engine = neko::sdl::SdlEngine(nullptr);
+	neko::sdl::SdlEngine engine = neko::sdl::SdlEngine(nullptr);
 	
 	neko::InputManager inputManager;
 	SDL_Init(SDL_INIT_EVENTS);
@@ -21,5 +21,4 @@ TEST(Engine, TestInput)
 			std::cout << "Touche W appuyé" << '\n';
 		}
 	}
-	
 }

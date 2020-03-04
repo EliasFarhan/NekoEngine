@@ -9,7 +9,7 @@
 namespace neko
 {
 
-void HelloTextureProgram::Init()
+void InputProgram::Init()
 {
     const auto& config = BasicEngine::GetInstance()->config;
     shader_.LoadFromFile(
@@ -21,16 +21,12 @@ void HelloTextureProgram::Init()
     textureId_ = neko::gl::stbCreateTexture(texturePath.c_str());
 }
 
-void HelloTextureProgram::Update(seconds dt)
+void InputProgram::Update(seconds dt)
 {
-    inputManager.OnPreUserInputs();
-    if (inputManager.IsKeyDown(neko::KeyCode::W))
-    {
-        std::cout << "Touche W appuyé" << '\n';
-    }
+    
 }
 
-void HelloTextureProgram::Destroy()
+void InputProgram::Destroy()
 {
     quad_.Destroy();
     shader_.Destroy();
@@ -38,7 +34,7 @@ void HelloTextureProgram::Destroy()
     textureId_ = 0;
 }
 
-void HelloTextureProgram::Render()
+void InputProgram::Render()
 {
     if(shader_.GetProgram() == 0)
         return;
@@ -49,12 +45,16 @@ void HelloTextureProgram::Render()
     quad_.Draw();
 }
 
-void HelloTextureProgram::DrawImGui()
+void InputProgram::DrawImGui()
 {
-
+	inputManager.OnPreUserInputs();
+    if (inputManager.IsKeyDown(neko::KeyCode::W))
+    {
+        std::cout << "Touche W appuyé" << '\n';
+    }
 }
 
-void HelloTextureProgram::OnEvent(const SDL_Event& event)
+void InputProgram::OnEvent(const SDL_Event& event)
 {
 
 }

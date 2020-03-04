@@ -3,13 +3,11 @@
 //
 
 #include <imgui.h>
-#include "comp_graph/sample_browser.h"
+#include "input/sample_browser.h"
 
 
-#include "01_hello_triangle/triangle_program.h"
-#include "02_hello_texture/texture_program.h"
-#include "03_hello_transform/transform_program.h"
-#include "04_hello_coords/coords_program.h"
+#include "01_Input/input_program.h"
+
 
 namespace neko
 {
@@ -17,10 +15,7 @@ namespace neko
 
 void SampleBrowser::Init()
 {
-    RegisterRenderProgram("01 Hello Triangle", std::make_unique<HelloTriangleProgram>());
     RegisterRenderProgram("02 Hello Texture", std::make_unique<InputProgram>());
-    RegisterRenderProgram("03 Hello Transform", std::make_unique<HelloTransformProgram>());
-    RegisterRenderProgram("04 Hello Coords", std::make_unique<HelloCoordsProgram>());
     programs_[currentProgramIndex_]->Init();
 }
 
