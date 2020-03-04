@@ -88,7 +88,7 @@ struct Obb2d {
         }
 		
 		rotationToAxis = Vec2f::AngleBetween(axis, CalculateDirection()).value;
-		rotationToAxis = rotationToAxis % M_PI;
+		rotationToAxis = rotationToAxis % PI;
 
 		if((rotationToAxis >= 0 && rotationToAxis <= PI / 2) || (rotationToAxis >= -PI && rotationToAxis <= -PI / 2))
 		{
