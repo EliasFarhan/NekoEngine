@@ -94,7 +94,7 @@ void BasicEngine::Update(seconds dt)
 
 void BasicEngine::Destroy()
 {
-	renderer_->Close();
+    renderer_->Destroy();
 	instance_ = nullptr;
 }
 
@@ -150,9 +150,21 @@ void BasicEngine::GenerateUiFrame()
 		<< "Render FPS: " << 1.0f / renderer_->GetDeltaTime()
 #endif
 		<< '\n';
-	ImGui::Text(oss.str().c_str());
+	ImGui::Text("%s", oss.str().c_str());
 	ImGui::End();
-	drawUiAction_.Execute();
+	drawImGuiAction_.Execute();
+}
+
+void BasicEngine::RegisterSystem(SystemInterface& system)
+{
+    initAction_.RegisterCallback([&system]{system.Init();});
+    updateAction_.RegisterCallback([&system](seconds dt){system.Update(dt);});
+    destroyAction_.RegisterCallback([&system]{system.Destroy();});
+}
+
+void BasicEngine::RegisterOnDrawUi(DrawImGuiInterface& drawUi)
+{
+    drawImGuiAction_.RegisterCallback([&drawUi]{ drawUi.DrawImGui();});
 }
 
 

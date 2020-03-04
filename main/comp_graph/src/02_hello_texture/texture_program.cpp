@@ -45,7 +45,7 @@ void HelloTextureProgram::Render()
     quad_.Draw();
 }
 
-void HelloTextureProgram::DrawUi()
+void HelloTextureProgram::DrawImGui()
 {
 
 }

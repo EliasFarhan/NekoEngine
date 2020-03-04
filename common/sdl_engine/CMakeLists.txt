@@ -1,12 +1,12 @@
 
 if(NOT Emscripten)
-LIST(APPEND sdl_engine_libs SDL2-static Neko_Core)
-set_target_properties (SDL2-static PROPERTIES FOLDER Externals)
-if(MSVC)
-    LIST(APPEND sdl_engine_libs
-            SDL2main)
-    set_target_properties (SDL2main PROPERTIES FOLDER Externals)
-endif(MSVC)
+    LIST(APPEND sdl_engine_libs SDL2-static Neko_Core)
+    set_target_properties (SDL2-static PROPERTIES FOLDER Externals)
+    if(MSVC)
+        LIST(APPEND sdl_engine_libs
+                SDL2main)
+        set_target_properties (SDL2main PROPERTIES FOLDER Externals)
+    endif(MSVC)
 endif()
 
 if(Neko_GLES3)

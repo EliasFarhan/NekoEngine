@@ -10,6 +10,11 @@
 #include <mathematics/func_table.h>
 #include <mathematics/aabb.h>
 
+#include <mathematics/quaternion.h>
+#include <mathematics/matrix.h>
+#include "mathematics/vector.h"
+
+
 const float maxNmb = 100.0f;
 
 void RandomFill(std::vector<float>& numbers, float start = -maxNmb, float end = maxNmb)
@@ -37,42 +42,69 @@ TEST(Engine, TestMathematics)
     std::cout << "Error margin for sinFuncTable with resolution 512: "<<error<<"\n";
 }
 
-TEST(Engine, TestAabb)
+TEST(Engine, TestQuaternion)
 {
-    neko::Aabb2d aabb1;
-    aabb1.FromCenterExtends(neko::Vec2f(0, 0), neko::Vec2f(0.5, 0.5));
-    neko::Aabb2d aabb2;
-    aabb2.FromCenterExtends(neko::Vec2f(1, 1), neko::Vec2f(0.5, 0.5));
-    std::cout << "AABB1 (" << aabb1.lowerLeftBound << " , " << aabb1.upperRightBound << "); AABB2 (" << aabb2.lowerLeftBound << " , " << aabb2.upperRightBound << ")  Contains :" << aabb1.ContainsAabb(aabb2) << "  Intersect :" << aabb1.IntersectAabb(aabb2) << "\n";
-    neko::Vec2f origin1 = neko::Vec2f(-1, -1);
-    neko::Vec2f dir1 = neko::Vec2f(1, 1);
-    std::cout << "AABB1 (" << aabb1.lowerLeftBound << " , " << aabb1.upperRightBound << "); Ray (" << origin1 << " , " << dir1 << ")  Intersect :" << aabb1.IntersectRay(dir1, origin1) << "\n";
-    neko::Obb2d obb1;
-    obb1.SetCenterExtentRot(neko::Vec2f(0, 0), neko::Vec2f(0.5, 0.5), neko::PI/4);
-    neko::Obb2d obb2;
-    obb2.SetCenterExtentRot(neko::Vec2f(1, 1), neko::Vec2f(0.5, 0.5), neko::PI/4);
-    std::cout << "OBB1 (" << obb1.lowerLeftBound << " , " << obb1.upperRightBound << "); OBB2 (" << obb2.lowerLeftBound << " , " << obb2.upperRightBound << ")  Intersect :" << obb1.IntersectObb(obb2) << "\n";
-    aabb1.FromObb(obb1);
-    aabb2.FromObb(obb2);
-    std::cout << "AABB1 (" << aabb1.lowerLeftBound << " , " << aabb1.upperRightBound << "); AABB2 (" << aabb2.lowerLeftBound << " , " << aabb2.upperRightBound << ")  Contains :" << aabb1.ContainsAabb(aabb2) << "  Intersect :" << aabb1.IntersectAabb(aabb2) << "\n";
-    neko::Aabb3d aabb3;
-    aabb3.FromCenterExtends(neko::Vec3f(0, 0, 0), neko::Vec3f(1, 1, 1));
-    neko::Aabb3d aabb4;
-    aabb4.FromCenterExtends(neko::Vec3f(1, 1, 1), neko::Vec3f(1, 1, 1));
-    std::cout << "AABB1 (" << aabb3.lowerLeftBound << " , " << aabb3.upperRightBound << "); AABB2 (" << aabb4.lowerLeftBound << " , " << aabb4.upperRightBound << ")  Contains :" << aabb3.ContainsAabb(aabb4) << "  Intersect :" << aabb3.IntersectAabb(aabb4) << "\n";
-    neko::Vec3f origin2 = neko::Vec3f(-2, -2, -2);
-    neko::Vec3f dir2 = neko::Vec3f(1, 0, 1);
-    std::cout << "AABB1 (" << aabb3.lowerLeftBound << " , " << aabb3.upperRightBound << "); Ray (" << origin2 << " , " << dir2 << ")  Intersect :" << aabb3.IntersectRay(dir2, origin2) << "\n";
-    neko::Vec3f origin3 = neko::Vec3f(-10, 0, -2);
-    neko::Vec3f normal3 = neko::Vec3f(1, 1, 0);
-    std::cout << "AABB1 (" << aabb3.lowerLeftBound << " , " << aabb3.upperRightBound << "); Plane (" << origin3 << " , " << normal3 << ")  Intersect :" << aabb3.IntersectPlane(normal3, origin3) << "\n";
-    neko::Obb2d obb3;
-    obb3.SetCenterExtentRot(neko::Vec2f(0, 0), neko::Vec2f(0.5, 0.5), neko::PI / 4);
-    neko::Obb2d obb4;
-    obb4.SetCenterExtentRot(neko::Vec2f(1, 1), neko::Vec2f(0.5, 0.5), neko::PI / 4);
-    std::cout << "OBB1 (" << obb3.lowerLeftBound << " , " << obb3.upperRightBound << "); OBB2 (" << obb4.lowerLeftBound << " , " << obb4.upperRightBound << ")  Intersect :" << obb3.IntersectObb(obb4) << "\n";
-    //aabb3.FromObb(obb3);
-    //aabb4.FromObb(obb4);
-    //std::cout << "AABB1 (" << aabb3.lowerLeftBound << " , " << aabb3.upperRightBound << "); AABB2 (" << aabb4.lowerLeftBound << " , " << aabb4.upperRightBound << ")  Contains :" << aabb3.ContainsAabb(aabb4) << "  Intersect :" << aabb3.IntersectAabb(aabb4) << "\n";
+    //Variables
+    neko::Quaternion quaternionA = neko::Quaternion(0.71, 0, 0, 0.71);
+    neko::Quaternion quaternionB = neko::Quaternion(0, 0, 0, 1);
+    neko::Quaternion quaternionACopy;
 
+    //Display start variables
+    std::cout << "QuaternionA"<<quaternionA<<'\n';
+    std::cout << std::endl;
+    std::cout <<"QuaternionB"<< quaternionB<<'\n';
+    std::cout << std::endl << std::endl;
+
+    //Dot Product Test
+    std::cout << "Dot product: " << neko::Quaternion::Dot(quaternionA, quaternionB) << std::endl << std::endl;
+
+    //Normalize Test
+    std::cout << "Normalize: ";
+    std::cout << "NormalizedQuaternionA" << neko::Quaternion::Normalized(quaternionA) << '\n';
+    std::cout << std::endl << std::endl;
+
+    //Magnitude Test
+    std::cout << "Magnitude: " << neko::Quaternion::Magnitude(quaternionA) <<'\n'<<'\n';
+
+    //AngleAxis Test
+    std::cout << "AngleAxis: " << "Cannot be tested right now"<<'\n'<<'\n';
+
+    //Angle Test
+    std::cout << "Angle: " << neko::Quaternion::Angle(quaternionA, quaternionB) <<'\n'<<'\n';
+
+    //Conjugate Test
+    quaternionACopy = quaternionA;
+    std::cout << "Conjugate: ";
+    std::cout <<"QuaternionAConjugate"<< quaternionACopy.Conjugate()<<'\n';
+    std::cout <<'\n'<<'\n';
+
+    //Inverse Test
+    quaternionACopy = quaternionA;
+    std::cout << "Inverse: ";
+    std::cout <<"QuaternionAInverse"<< quaternionACopy.Inverse()<<'\n';
+    std::cout << std::endl << std::endl;
+
+    //FromEuler
+    std::cout << "Euler: " << "Cannot be tested right now" <<'\n'<<'\n';
+}
+TEST(Engine, TestMatrix4)
+{
+    neko::Mat4f m1 (std::array<neko::Vec4f,4>
+            {
+                    neko::Vec4f{1,2,3,4},
+                    neko::Vec4f{-1,-2,-3,-4},
+                    neko::Vec4f{4,2,2,1},
+                    neko::Vec4f{-4,-3,-2,-1}
+            });
+
+    neko::Mat4f result = neko::Mat4f(std::array<neko::Vec4f, 4>{
+            neko::Vec4f(-5,5,6,-5 ),
+            neko::Vec4f(-8,8,5,-3 ),
+            neko::Vec4f(-5,5,8,-5 ),
+            neko::Vec4f(-5,5,9,-5 )
+    });
+    result = result.Transpose();
+    EXPECT_TRUE(neko::Mat4f::MatrixDifference(m1.MultiplyNaive(m1), result)< 0.01f);
+    EXPECT_TRUE(neko::Mat4f::MatrixDifference(m1.MultiplyIntrinsincs(m1), result)<0.01f);
+    EXPECT_TRUE(neko::Mat4f::MatrixDifference(m1.MultiplyNaive(m1), m1.MultiplyIntrinsincs(m1))<0.01f);
 }

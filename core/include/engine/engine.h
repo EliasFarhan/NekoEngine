@@ -47,7 +47,7 @@ struct Configuration
     Vec2i windowSize = Vec2i(1024, 1024);
     Vec2i gameWindowSize{1280, 720};
     bool fullscreen = false;
-    bool vSync = false;
+    bool vSync = true;
     unsigned int framerateLimit = 0u;
 #ifdef EMSCRIPTEN
     std::string dataRootPath = "./";
@@ -80,6 +80,8 @@ public:
 
     Configuration config;
 
+    void RegisterSystem(SystemInterface& system);
+    void RegisterOnDrawUi(DrawImGuiInterface& drawUi);
 
     float GetDeltaTime() const { return dt_; };
 	
@@ -95,7 +97,7 @@ protected:
     std::atomic<float> dt_;
     Action<> initAction_;
     Action<seconds> updateAction_;
-    Action<> drawUiAction_;
+    Action<> drawImGuiAction_;
     Action<> destroyAction_;
 
 };

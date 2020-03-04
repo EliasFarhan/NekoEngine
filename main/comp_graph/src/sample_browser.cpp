@@ -49,7 +49,7 @@ void SampleBrowser::OnEvent(const SDL_Event& event)
 }
 
 
-void SampleBrowser::DrawGui()
+void SampleBrowser::DrawImGui()
 {
     ImGui::Begin("Sample Browser");
     if (ImGui::BeginCombo("Current Sample",
@@ -70,7 +70,7 @@ void SampleBrowser::DrawGui()
         ImGui::EndCombo();
     }
     ImGui::End();
-    programs_[currentProgramIndex_]->DrawUi();
+    programs_[currentProgramIndex_]->DrawImGui();
 }
 
 size_t SampleBrowser::RegisterRenderProgram(const std::string_view name, std::unique_ptr<SampleProgram> program)
