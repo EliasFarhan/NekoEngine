@@ -43,37 +43,39 @@ void LogMessage::Generate()
 		<< std::setw(2) << std::setfill('0') << localTime.tm_min << ":"
 		<< std::setw(2) << std::setfill('0') << localTime.tm_sec << "] ";
 
-	switch (category)
-	{
-	case LogCategories::NONE:
-		break;
-	case LogCategories::ENGINE:
-		message << "[ENGINE] ";
-		break;
-	case LogCategories::MATH:
-		message << "[MATH] ";
-		break;
-	case LogCategories::GRAPHICS:
-		message << "[GRAPHICS] ";
-		break;
-	case LogCategories::IO:
-		message << "[IO] ";
-		break;
-	case LogCategories::SOUND:
-		message << "[SOUND] ";
-		break;
-	}
-
 	switch (type)
 	{
-	case LogTypes::DEBUG:
+	case LogType::DEBUG:
 		message << "[DEBUG] ";
 		break;
-	case LogTypes::WARNING:
+	case LogType::WARNING:
 		message << "[WARNING] ";
 		break;
-	case LogTypes::CRITICAL:
+	case LogType::CRITICAL:
 		message << "[ERROR] ";
+		break;
+	default:
+		break;
+	}
+	
+	switch (category)
+	{
+	case LogCategory::ENGINE:
+		message << "[ENGINE] ";
+		break;
+	case LogCategory::MATH:
+		message << "[MATH] ";
+		break;
+	case LogCategory::GRAPHICS:
+		message << "[GRAPHICS] ";
+		break;
+	case LogCategory::IO:
+		message << "[IO] ";
+		break;
+	case LogCategory::SOUND:
+		message << "[SOUND] ";
+		break;
+	default:
 		break;
 	}
 
@@ -88,10 +90,10 @@ LogManager::LogManager()
 	: status_(0)
 {
 	Log::provide(this);
+	status_ |= IS_RUNNING | IS_EMPTY;
 	logThread_ = std::make_unique<std::thread>([this]
 	{
-		status_ |= IS_RUNNING;
-		this->Start();
+		LogLoop();
 	});
 }
 
@@ -101,43 +103,45 @@ LogManager::~LogManager()
 	Destroy();
 }
 
-void LogManager::Start()
+void LogManager::LogLoop()
 {
 	do {
-		if (tasks_.empty()) status_ |= IS_EMPTY;
 		if (status_ & IS_EMPTY)
 		{
 			std::unique_lock<std::mutex> lock(logMutex_);
 			
-			status_ |= IS_APP_WAITING;
-			itemInQueue_.wait(lock);
-			status_ &= ~IS_APP_WAITING;
+			status_ |= IS_LOG_WAITING;
+			conditionVariable_.wait(lock);
+			status_ &= ~IS_LOG_WAITING;
 		}
 		else
 		{
-			std::lock_guard<std::mutex> lock(logMutex_);
-			const auto task = tasks_.front();
-			tasks_.erase(tasks_.begin());
+			std::function<void()> task;
+			{
+				std::lock_guard<std::mutex> lock(logMutex_);
+				task = tasks_.front();
+				tasks_.erase(tasks_.begin());
+				if (tasks_.empty()) status_ |= IS_EMPTY;
+			}
 			task();
-			itemInQueue_.notify_one();
+			conditionVariable_.notify_one();
 		}
 	} while (status_ & IS_RUNNING);
 }
 
 void LogManager::Wait()
 {
-	std::unique_lock<std::mutex> lock(logMutex_);
 	while (!(status_ & IS_EMPTY))
 	{
+		std::unique_lock<std::mutex> lock(logMutex_);
 		if (tasks_.empty()) status_ |= IS_EMPTY;
 		else
 		{
-			status_ |= IS_APP_WAITING;
-			itemInQueue_.wait(lock);
-			status_ &= ~IS_APP_WAITING;
+			status_ |= IS_LOG_WAITING;
+			conditionVariable_.wait(lock);
+			status_ &= ~IS_LOG_WAITING;
 		}
 	}
-	lock.unlock();
 }
 
 void LogManager::Destroy()
@@ -145,13 +149,13 @@ void LogManager::Destroy()
 	std::unique_lock<std::mutex> lock(logMutex_);
 	if (status_ & IS_WRITING)
 	{
-		status_ |= IS_APP_WAITING;
-		itemInQueue_.wait(lock);
-		status_ &= ~IS_APP_WAITING;
+		status_ |= IS_LOG_WAITING;
+		conditionVariable_.wait(lock);
+		status_ &= ~IS_LOG_WAITING;
 	}
 	
 	{
-		itemInQueue_.notify_one();
+		conditionVariable_.notify_one();
 		
 		status_ &= ~IS_RUNNING;
 	}
@@ -160,16 +164,16 @@ void LogManager::Destroy()
 	logThread_->join();
 }
 
-void LogManager::Log(LogTypes logType, const std::string& log)
+void LogManager::Log(LogType logType, const std::string& log)
 {
-	Log(LogCategories::NONE, logType, log);
+	Log(LogCategory::NONE, logType, log);
 }
 
 
-void LogManager::Log(LogCategories category, LogTypes logType,
+void LogManager::Log(LogCategory category, LogType logType,
 	const std::string& log)
 {
-	std::unique_lock<std::mutex> lock(logMutex_);
+	std::lock_guard<std::mutex> lock(logMutex_);
 	status_ &= ~IS_EMPTY;
 
 	auto task([this, logType, category, log]
@@ -181,8 +185,7 @@ void LogManager::Log(LogCategories category, LogTypes logType,
 	});
 
 	tasks_.emplace_back(task);
-	itemInQueue_.notify_one();
-	lock.unlock();
+	conditionVariable_.notify_one();
 }
 
 void LogManager::WriteToFile()
@@ -221,7 +224,7 @@ void LogManager::WriteToFile()
 		fileContent +=
 			"--------------------------------------------------------------------------------\n";
 
-		LogMessage message(LogCategories::IO, LogTypes::DEBUG, "Successfully saved log output");
+		LogMessage message(LogCategory::IO, LogType::DEBUG, "Successfully saved log output");
 		logHistory_.emplace_back(message);
 		message.Display();
 		
@@ -237,7 +240,7 @@ void LogManager::WriteToFile()
 	});
 
 	tasks_.emplace_back(task);
-	itemInQueue_.notify_one();
+	conditionVariable_.notify_one();
 }
 
 //-----------------------------------------------------------------------------
@@ -245,32 +248,32 @@ void LogManager::WriteToFile()
 //-----------------------------------------------------------------------------
 void LogDebug(const std::string& msg)
 {
-	Log::get().Log(LogTypes::DEBUG, msg);
+	Log::get().Log(LogType::DEBUG, msg);
 }
 
-void LogDebug(const LogCategories category, const std::string& msg)
+void LogDebug(const LogCategory category, const std::string& msg)
 {
-	Log::get().Log(category, LogTypes::DEBUG, msg);
+	Log::get().Log(category, LogType::DEBUG, msg);
 }
 
 void LogWarning(const std::string& msg)
 {
-	Log::get().Log(LogTypes::WARNING, msg);
+	Log::get().Log(LogType::WARNING, msg);
 }
 
-void LogWarning(const LogCategories category, const std::string& msg)
+void LogWarning(const LogCategory category, const std::string& msg)
 {
-	Log::get().Log(category, LogTypes::WARNING, msg);
+	Log::get().Log(category, LogType::WARNING, msg);
 }
 
 void LogError(const std::string& msg)
 {
-	Log::get().Log(LogTypes::CRITICAL, msg);
+	Log::get().Log(LogType::CRITICAL, msg);
 }
 
-void LogError(const LogCategories category, const std::string& msg)
+void LogError(const LogCategory category, const std::string& msg)
 {
-	Log::get().Log(category, LogTypes::CRITICAL, msg);
+	Log::get().Log(category, LogType::CRITICAL, msg);
 }
 
 const std::vector<LogMessage>& GetLogs()

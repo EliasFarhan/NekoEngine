@@ -73,40 +73,38 @@ void LoggerProgram::OnEvent(const SDL_Event& event)
 }
 
 void LoggerProgram::WriteTestLog() {
-    LogDebug(LogCategories::ENGINE, "Test");
-    LogDebug(LogCategories::GRAPHICS, "Test");
-    LogDebug(LogCategories::IO, "Test");
-    LogDebug(LogCategories::MATH, "Test");
-    LogDebug(LogCategories::NONE, "Test");
-    LogDebug(LogCategories::SOUND, "Test");
+    LogDebug(LogCategory::ENGINE, "Test");
+    LogDebug(LogCategory::GRAPHICS, "Test");
+    LogDebug(LogCategory::IO, "Test");
+    LogDebug(LogCategory::MATH, "Test");
+    LogDebug(LogCategory::NONE, "Test");
+    LogDebug(LogCategory::SOUND, "Test");
 
-    LogWarning(LogCategories::ENGINE, "Test");
-    LogWarning(LogCategories::GRAPHICS, "Test");
-    LogWarning(LogCategories::IO, "Test");
-    LogWarning(LogCategories::MATH, "Test");
-    LogWarning(LogCategories::NONE, "Test");
-    LogWarning(LogCategories::SOUND, "Test");
+    LogWarning(LogCategory::ENGINE, "Test");
+    LogWarning(LogCategory::GRAPHICS, "Test");
+    LogWarning(LogCategory::IO, "Test");
+    LogWarning(LogCategory::MATH, "Test");
+    LogWarning(LogCategory::NONE, "Test");
+    LogWarning(LogCategory::SOUND, "Test");
 
-    LogError(LogCategories::ENGINE, "Test");
-    LogError(LogCategories::GRAPHICS, "Test");
-    LogError(LogCategories::IO, "Test");
-    LogError(LogCategories::MATH, "Test");
-    LogError(LogCategories::NONE, "Test");
-    LogError(LogCategories::SOUND, "Test");
+    LogError(LogCategory::ENGINE, "Test");
+    LogError(LogCategory::GRAPHICS, "Test");
+    LogError(LogCategory::IO, "Test");
+    LogError(LogCategory::MATH, "Test");
+    LogError(LogCategory::NONE, "Test");
+    LogError(LogCategory::SOUND, "Test");
 
-    logger.Wait();
-    currentSessionLogs = logger.GetLogs();
+    currentSessionLogs = Log::get().GetLogs();
     InsertCurrentLog();
 
 }
 
 void LoggerProgram::Write50Logs() {
-    for (int a = 0; a < 50; a++) {
-        LogDebug(LogCategories::NONE, "Log :" + std::to_string(a));
+    for (int a = 0; a < 5000; a++) {
+        LogDebug(LogCategory::NONE, "Log :" + std::to_string(a));
     }
 
-    logger.Wait();
-    currentSessionLogs = logger.GetLogs();
+    currentSessionLogs = Log::get().GetLogs();
     InsertCurrentLog();
 }
 
@@ -119,32 +117,32 @@ void LoggerProgram::InsertCurrentLog() {
         bool correctType = false;
         switch (selectedCat) {
         case 0:
-            if (currentSessionLogs[i].category == LogCategories::NONE) {
+            if (currentSessionLogs[i].category == LogCategory::NONE) {
                 correctCat = true;
             }
             break;
         case 1:
-            if (currentSessionLogs[i].category == LogCategories::ENGINE) {
+            if (currentSessionLogs[i].category == LogCategory::ENGINE) {
                 correctCat = true;
             }
             break;
         case 2:
-            if (currentSessionLogs[i].category == LogCategories::MATH) {
+            if (currentSessionLogs[i].category == LogCategory::MATH) {
                 correctCat = true;
             }
             break;
         case 3:
-            if (currentSessionLogs[i].category == LogCategories::GRAPHICS) {
+            if (currentSessionLogs[i].category == LogCategory::GRAPHICS) {
                 correctCat = true;
             }
             break;
         case 4:
-            if (currentSessionLogs[i].category == LogCategories::IO) {
+            if (currentSessionLogs[i].category == LogCategory::IO) {
                 correctCat = true;
             }
             break;
         case 5:
-            if (currentSessionLogs[i].category == LogCategories::SOUND) {
+            if (currentSessionLogs[i].category == LogCategory::SOUND) {
                 correctCat = true;
             }
             break;
@@ -157,17 +155,17 @@ void LoggerProgram::InsertCurrentLog() {
         }
         switch (selectedType) {
         case 0:
-            if (currentSessionLogs[i].type == LogTypes::DEBUG) {
+            if (currentSessionLogs[i].type == LogType::DEBUG) {
                 correctType = true;
             }
             break;
         case 1:
-            if (currentSessionLogs[i].type == LogTypes::WARNING) {
+            if (currentSessionLogs[i].type == LogType::WARNING) {
                 correctType = true;
             }
             break;
         case 2:
-            if (currentSessionLogs[i].type == LogTypes::CRITICAL) {
+            if (currentSessionLogs[i].type == LogType::CRITICAL) {
                 correctType = true;
             }
             break;

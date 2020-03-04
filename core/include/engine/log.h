@@ -38,10 +38,10 @@
 namespace neko
 {
 //-----------------------------------------------------------------------------
-// LogTypes
+// LogType
 //-----------------------------------------------------------------------------
 /// \brief To differentiate log messages
-enum class LogTypes : char
+enum class LogType : std::uint8_t
 {
 	DEBUG = 1, //For regular debug messages
 	WARNING, //For non-critical errors
@@ -53,7 +53,7 @@ enum class LogTypes : char
 // LogCategory
 //-----------------------------------------------------------------------------
 /// \brief To sort log messages into different categories
-enum class LogCategories : char
+enum class LogCategory : std::uint8_t
 {
 	NONE = 1,
 	ENGINE,
@@ -70,8 +70,8 @@ enum class LogCategories : char
 /// \brief Struct representing a log message with its type
 struct LogMessage
 {
-	LogTypes type = LogTypes::DEBUG;
-	LogCategories category = LogCategories::NONE;
+	LogType type = LogType::DEBUG;
+	LogCategory category = LogCategory::NONE;
 	std::string log;
 
 	explicit LogMessage(std::string log)
@@ -80,13 +80,13 @@ struct LogMessage
 		Generate();
 	}
 
-	explicit LogMessage(const LogTypes& logType, std::string log)
+	explicit LogMessage(const LogType& logType, std::string log)
 		: type(logType), log(std::move(log))
 	{
 		Generate();
 	}
 
-	explicit LogMessage(const LogCategories& category, const LogTypes& logType,
+	explicit LogMessage(const LogCategory& category, const LogType& logType,
 	                    std::string log)
 		: type(logType), category(category), log(std::move(log))
 	{
@@ -96,7 +96,7 @@ struct LogMessage
 	void Generate();
 	void Display() const
 	{
-		(type != LogTypes::CRITICAL ? std::cout : std::cerr) << log;
+		(type != LogType::CRITICAL ? std::cout : std::cerr) << log;
 	}
 };
 
@@ -114,7 +114,7 @@ public:
 	 * @param logType the type of the log message
 	 * @param log the log message
 	 */
-	virtual void Log(LogTypes logType, const std::string& log) = 0;
+	virtual void Log(LogType logType, const std::string& log) = 0;
 
 	/**
 	 * \brief Generate a log message.
@@ -122,7 +122,7 @@ public:
 	 * @param category the category of the log message
 	 * @param log the log message
 	 */
-	virtual void Log(LogCategories category, LogTypes logType,
+	virtual void Log(LogCategory category, LogType logType,
 	                 const std::string& log) = 0;
 
 	/**
@@ -137,12 +137,12 @@ public:
 /// \brief Used for the service locator
 class NullLogManager final : public LogManagerInterface
 {
-	void Log([[maybe_unused]] LogTypes logType,
+	void Log([[maybe_unused]] LogType logType,
 	         [[maybe_unused]] const std::string& log) override
 	{}
 
-	void Log([[maybe_unused]] LogCategories category,
-	         [[maybe_unused]] LogTypes logType,
+	void Log([[maybe_unused]] LogCategory category,
+	         [[maybe_unused]] LogType logType,
 	         [[maybe_unused]] const std::string& log) override
 	{}
 
@@ -169,20 +169,20 @@ protected:
 	{
 		IS_RUNNING = 1u << 0u, //To check if the LogManager is running
 		IS_EMPTY = 1u << 1u, //To check if the LogManager has tasks
-		IS_APP_WAITING = 1u << 2u, //To check if the LogManager is waiting for a task
+		IS_LOG_WAITING = 1u << 2u, //To check if the LogManager is waiting for a task
 		IS_WRITING = 1u << 3u //To check if the LogManager is writing its output to a file
 	};
 public:
 	LogManager();
 	~LogManager();
 
-	void Start();
+	void LogLoop();
 	void Wait();
 	void Destroy();
 
-	void Log(LogTypes logType, const std::string& log) override;
+	void Log(LogType logType, const std::string& log) override;
 
-	void Log(LogCategories category, LogTypes logType,
+	void Log(LogCategory category, LogType logType,
 		const std::string& log) override;
 
 	const std::vector<LogMessage>& GetLogs() override
@@ -199,7 +199,7 @@ private:
 	std::unique_ptr<std::thread> logThread_;
 	std::mutex logMutex_;
 	std::vector<std::function<void()>> tasks_;
-	std::condition_variable itemInQueue_;
+	std::condition_variable conditionVariable_;
 };
 
 //-----------------------------------------------------------------------------
@@ -218,7 +218,7 @@ void LogDebug(const std::string& msg);
 /**
  * \brief Generate a debug type log message
  */
-void LogDebug(LogCategories category, const std::string& msg);
+void LogDebug(LogCategory category, const std::string& msg);
 
 /**
  * \brief Generate a warning type log message
@@ -228,7 +228,7 @@ void LogWarning(const std::string& msg);
 /**
  * \brief Generate a warning type log message
  */
-void LogWarning(LogCategories category, const std::string& msg);
+void LogWarning(LogCategory category, const std::string& msg);
 
 /**
  * \brief Generate an error type log message
@@ -238,7 +238,7 @@ void LogError(const std::string& msg);
 /**
  * \brief Generate an error type log message
  */
-void LogError(LogCategories category, const std::string& msg);
+void LogError(LogCategory category, const std::string& msg);
 
 /**
  * \brief Retrieves the log history

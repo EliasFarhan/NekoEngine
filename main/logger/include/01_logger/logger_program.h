@@ -45,7 +45,6 @@ public:
 
 
 private:
-    LogManager logger;
     const char* caterogies[7] = {
     	"NONE",
     	"ENGINE",
