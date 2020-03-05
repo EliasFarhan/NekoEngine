@@ -4,6 +4,7 @@
 #include <benchmark/benchmark.h>
 
 #include "engine/resource.h"
+#include "utilities/file_utility.h"
 
 const int fromRange = 2;
 const int toRange = 1024;
@@ -32,19 +33,16 @@ static void BM_ResourceThread(benchmark::State& state)
                 }
                 if (resourceManager.IsResourceReady(resourcesId[n])) {
                     resources[resourcesId[n]] = resourceManager.GetResource(resourcesId[n]);
+                    if (test != resources[resourcesId[n]]) {
+                        std::cout << "Error Loading" << '\n';
+                    }
                 }
-            }
-        }
-        for (auto resource : resources) {
-            if (test != resource.second) {
-                std::cout << 'E';
             }
         }
     }
     resourceManager.Close();
 }
 
-BENCHMARK(BM_ResourceThread)->Range(fromRange, toRange)->UseRealTime();
 
 
 static void BM_ResourceNonThread(benchmark::State& state)
@@ -59,13 +57,12 @@ static void BM_ResourceNonThread(benchmark::State& state)
         for (int i = 0; i < size; i++)
         {
             resources.push_back(neko::LoadFile(path));
-        }
-        for (auto resource : resources) {
-            if (test != resource) {
-                std::cout << 'E';
+            if (test != resources.back()) {
+                std::cout << "Error Loading" << '\n';
             }
         }
     }
 }
+BENCHMARK(BM_ResourceThread)->Range(fromRange, toRange)->UseRealTime();
 
 BENCHMARK(BM_ResourceNonThread)->Range(fromRange, toRange)->UseRealTime();
