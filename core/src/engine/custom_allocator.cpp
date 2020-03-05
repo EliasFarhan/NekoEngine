@@ -12,7 +12,7 @@ void* LinearAllocator::Allocate(size_t allocatedSize, size_t alignment)
     neko_assert(allocatedSize != 0, "Linear Allocator cannot allocated nothing");
     const auto adjustment = CalculateAlignForwardAdjustment(currentPos_, alignment);
 
-    neko_assert(usedMemory_ + adjustment + allocatedSize > size_, "Linear Allocator has not enough space for this allocation");
+    neko_assert(usedMemory_ + adjustment + allocatedSize < size_, "Linear Allocator has not enough space for this allocation");
 
     auto* alignedAddress = (void*) ((std::uint64_t) currentPos_ + adjustment);
     currentPos_ = (void*) ((std::uint64_t) alignedAddress + allocatedSize);

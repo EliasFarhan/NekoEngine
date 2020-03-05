@@ -123,6 +123,21 @@ void Renderer::Update()
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("RenderFullUpdateCPU");
 #endif
+    size_t countWait = 0;
+    while((flags_ & IS_APP_WAITING) && (flags_ & IS_RUNNING))
+    {
+        using namespace std::chrono_literals;
+        std::this_thread::sleep_for(1ms);
+
+        cv_.notify_one();
+        countWait++;
+    }
+    {
+        std::ostringstream oss;
+        oss << "Count Wait: "<<countWait<<'\n';
+        logDebug(oss.str());
+    }
+
     auto* engine = BasicEngine::GetInstance();
     {
         std::lock_guard<std::mutex> lock(renderMutex_);
@@ -134,27 +149,12 @@ void Renderer::Update()
         engine->GenerateUiFrame();
         RenderAll();
         window_->RenderUi();
+
+        window_->SwapBuffer();
+
+        window_->LeaveCurrentContext();
     }
-    size_t count = 0;
-    //Sync the beginning frame with EngineLoop
-	while(!(flags_ & IS_APP_WAITING) && (flags_ & IS_RUNNING))
-	{
-        using namespace std::chrono_literals;
-        std::this_thread::sleep_for(1us);
-        //count++;
-	}
-	/*
-    {
-        std::ostringstream oss;
-        oss << "Render wait count: " << count;
-        logDebug(oss.str());
-    }
-    */
-    if (flags_ & IS_APP_WAITING)
-    {
-        cv_.notify_one();
-    }
-    window_->SwapBuffer();
+
 
 
 

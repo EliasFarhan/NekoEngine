@@ -20,3 +20,20 @@ TEST(Engine, TestCustomAllocator)
     EXPECT_EQ(neko::Allocator::CalculateAlignForwardAdjustmentWithHeader(ptr, alignof(int), sizeof(header)), 4);
 
 }
+
+TEST(Engine, TestLinearAllocator)
+{
+    const size_t length = 100;
+    void* data = malloc(sizeof(int)*(length+1));
+    neko::LinearAllocator allocator = neko::LinearAllocator(sizeof(int)*(length+1), data);
+
+    for(size_t i = 0; i < length; i++)
+    {
+        int* v = (int*)allocator.Allocate(sizeof(int), alignof(int));
+        *v = rand();
+    }
+    std::cout << "Used Memory: "<<allocator.GetUsedMemory()<<"B for total size: "<<allocator.GetSize()<<"B"<<std::endl;
+    allocator.Clear();
+    free(data);
+
+}

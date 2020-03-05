@@ -15,6 +15,7 @@ set(Neko_GLES3 ON CACHE BOOL "Activate OpenGL ES 3.0")
 set(Neko_SDL2 ON CACHE BOOL "Activate SDL2")
 set(Neko_Box2D OFF CACHE BOOL "Activate Box2D")
 set(Neko_Test ON CACHE BOOL "Activate Test")
+set(Neko_Assert ON CACHE BOOL "Activate Neko Assertion")
 set(Neko_Benchmark ON CACHE BOOL "Activate Benchmark")
 
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
@@ -36,6 +37,10 @@ endif()
 
 set(EXTERNAL_DIR ${CMAKE_SOURCE_DIR}/externals CACHE INTERNAL "Externals folder")
 set(UTILITIES_DIR "${EXTERNAL_DIR}/utilities" CACHE INTERNAL "")
+
+if(Neko_Assert)
+    add_compile_definitions("NEKO_ASSERT=1")
+endif()
 
 if(Neko_Profile)
     set(EASY_PROFILE_DIR "${EXTERNAL_DIR}/easy_profiler-2.1.0")
