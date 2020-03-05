@@ -19,103 +19,92 @@
  SOFTWARE.
  */
 
-#include <utilities/service_locator.h>
-#include <vector>
 #include <functional>
-#include <future>
 #include <thread>
-#include <queue>
 #include <condition_variable>
 #include <array>
-#include <stack>
+#include <queue>
+#include <atomic>
 
 namespace neko
 {
 
-std::mutex mutex;
-std::condition_variable cv;
-
-/*template<typename ReturnType, typename... Args> class Job;
-template<typename ReturnType, typename... Args> class Job<ReturnType(Args...)>
-{
-public:
-    Job(std::function<ReturnType(Args...)> func, std::tuple<Args...> args): func_(func), args_(args) {};
-
-    ReturnType Execute()
-    {
-        return std::apply(func_,args_);
-    }
-private:
-    std::function<ReturnType(Args...)> func_;
-    std::tuple<Args...> args_;
-};
-
-class JobSystem{
-public:
-    template<typename ReturnType, typename... Args>
-    std::future<ReturnType> AddJob(std::function<ReturnType(Args...)> func, std::tuple<Args...> args){
-        jobQueue_.emplace_back(Job<ReturnType(Args...)>(func, args));
-        return std::promise<ReturnType>().get_future();
-    }
-
-    void RunJobs(){
-        for (auto& job : jobQueue_){
-            job.Execute();
-        }
-    }
-private:
-    std::vector<Job> jobQueue_;
-};*/
-
-using GrabJobFunctionPtr = std::function<void(void)> (*)(std::stack<std::function<void(void)>>&);
-
-void Work(GrabJobFunctionPtr jobGrabber, std::stack<std::function<void(void)>>& queue)
-{
-    while (true)
-    {
-        std::unique_lock<std::mutex> lock(mutex);
-        cv.wait(lock);
-
-        jobGrabber(queue)(); // Grab job and execute
-    }
-}
-
-static std::function<void(void)> GrabJob(std::stack<std::function<void(void)>>& jobQueue)
-{
-    auto job = jobQueue.top();
-    jobQueue.pop();
-    return job;
-}
-
 class JobSystem
 {
+    enum Status : uint8_t
+    { // Q: Why declaring this as an enum CLASS makes status_ & Status::RUNNING an invalid operation?
+        RUNNING = 1u
+    };
+
 public:
     JobSystem()
     {
-        for (int i = 0; i < DEFAULT_WORKER_SIZE; ++i)
+        for (size_t i = 0; i < DEFAULT_WORKER_SIZE; ++i)
         {
-            workers_[i] = std::thread(Work, GrabJob, this->jobQueue_);
+            tasks_.push([] {}); // Fill tasks queue with dummy functions to init workers.
+        }
+        for (size_t i = 0; i < DEFAULT_WORKER_SIZE; ++i)
+        {
+            workers_[i] = std::thread([this] { Work(); }); // Kick the thread => sys call
         }
     }
 
-    void AddJob(std::function<void(void)> job)
+    ~JobSystem()
     {
-        jobQueue_.push(job);
+        status_ = 0u; // Atomic assign.
+        cv_.notify_all(); // Wake all workers.
+        for (size_t i = 0; i < DEFAULT_WORKER_SIZE; ++i)
+        {
+            workers_[i].join();
+        }
     }
 
-    void ExecuteJobs()
+    void KickJob(const std::function<void()>& func)
     {
-        const size_t queueSize = jobQueue_.size();
-        for (int i = 0; i < queueSize; ++i)
+        { // CRITICAL
+            std::unique_lock<std::mutex> lock(mutex_);
+            tasks_.push(func);
+        } // !CRITICAL
+        cv_.notify_one();
+    }
+
+    void Work()
+    {
+        NEXT_TASK:
+        while (status_ & Status::RUNNING)
         {
-            cv.notify_one();
+            std::function<void()> task = [] {};
+            { // CRITICAL
+                std::unique_lock<std::mutex> lock(mutex_);
+                if (!tasks_.empty())
+                {
+                    task = tasks_.front();
+                    tasks_.pop();
+                }
+                else
+                {
+                    goto SLEEP;
+                }
+            } // !CRITICAL
+            task();
+            goto NEXT_TASK;
+
+            SLEEP:
+            if (status_ & Status::RUNNING) // Atomic check.
+            {
+                std::unique_lock<std::mutex> lock(mutex_); // CRITICAL
+                cv_.wait(lock); // !CRITICAL
+            }
         }
     }
 
 private:
-    const static size_t DEFAULT_WORKER_SIZE = 2;
-    std::stack<std::function<void(void)>> jobQueue_;
+    const static size_t DEFAULT_WORKER_SIZE = 4;
+    std::queue<std::function<void()>> tasks_; // Managed via mutex.
     std::array<std::thread, DEFAULT_WORKER_SIZE> workers_;
+    std::mutex mutex_;
+    std::condition_variable cv_;
+    std::atomic<std::uint8_t> status_ = 1u;
 };
 
 }

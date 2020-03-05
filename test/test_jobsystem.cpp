@@ -1,29 +1,39 @@
 #include <gtest/gtest.h>
 #include <engine/jobsystem.h>
 #include <iostream>
+#include <easy/profiler.h>
 
 namespace neko
 {
 
-void sum(int a, int b){
-    std::cout << "The sum of " << a << '+' << b << " is " << a+b << ".\n";
+void DoNothing(){
+    EASY_BLOCK("JOBSYSTEM_DO_NOTHING");
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::cout << "Task is done!\n";
 }
 
 TEST(Engine, TestJobSystem)
 {
-    JobSystem system;
-    int a = 5;
-    int b = 2;
-    int c = 10;
-    int d = 15;
-    auto lambda = [a,b]{sum(a,b);};
-    auto lambda2 = [c,d]{sum(c,d);};
-    system.AddJob(lambda);
-    system.AddJob(lambda2);
-    system.ExecuteJobs();
+    EASY_PROFILER_ENABLE;
 
-    // auto lambda = [a,b]{sum(a,b);};
-    // lambda();
+    EASY_BLOCK("JOBSYSTEM_MAIN_THREAD");
+    {
+        const size_t TASKS_COUNT = 8;
+
+        JobSystem system;
+        for (size_t i = 0; i < TASKS_COUNT; ++i)
+        {
+            system.KickJob(DoNothing);
+        }
+
+        // Simulate some work on the main thread.
+        std::this_thread::sleep_for(std::chrono::seconds(4));
+
+        std::cout << "Main thread is done!\n";
+    }
+    EASY_END_BLOCK;
+
+    profiler::dumpBlocksToFile("JobSystem.prof");
 }
 
 }
