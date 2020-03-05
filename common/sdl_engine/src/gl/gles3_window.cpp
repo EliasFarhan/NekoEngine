@@ -44,6 +44,10 @@ void Gles3Window::Init()
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
     SdlWindow::Init();
+    
+    std::string videoDriver = SDL_GetCurrentVideoDriver();
+    LogDebug(videoDriver);
+    
     glContext_ = SDL_GL_CreateContext(window_);
     MakeCurrentContext();
 

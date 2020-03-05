@@ -24,6 +24,7 @@
 #include <graphics/graphics.h>
 #include <algorithm>
 #include <chrono>
+#include <sstream>
 #include <engine/globals.h>
 #include <engine/window.h>
 #include <engine/engine.h>
@@ -63,6 +64,7 @@ void Renderer::Sync()
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("EngineRenderSync");
 #endif
+
     std::unique_lock lock(renderMutex_);
     flags_ |= IS_APP_WAITING;
 #ifndef EMSCRIPTEN
@@ -79,7 +81,7 @@ void Renderer::RenderLoop()
 #ifndef EMSCRIPTEN
     flags_ |= IS_RUNNING;
     window_->LeaveCurrentContext();
-    renderThread_ = std::thread([this] {
+    renderThread_ = std::thread([this]{
         BeforeRenderLoop();
 
         std::chrono::time_point<std::chrono::system_clock> clock = std::chrono::system_clock::now();
@@ -97,7 +99,7 @@ void Renderer::RenderLoop()
 #endif
 }
 
-void Renderer::Close()
+void Renderer::Destroy()
 {
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("ClosingFromEngine");
@@ -133,7 +135,21 @@ void Renderer::Update()
         RenderAll();
         window_->RenderUi();
     }
+    size_t count = 0;
     //Sync the beginning frame with EngineLoop
+	while(!(flags_ & IS_APP_WAITING) && (flags_ & IS_RUNNING))
+	{
+        using namespace std::chrono_literals;
+        std::this_thread::sleep_for(1us);
+        //count++;
+	}
+	/*
+    {
+        std::ostringstream oss;
+        oss << "Render wait count: " << count;
+        logDebug(oss.str());
+    }
+    */
     if (flags_ & IS_APP_WAITING)
     {
         cv_.notify_one();

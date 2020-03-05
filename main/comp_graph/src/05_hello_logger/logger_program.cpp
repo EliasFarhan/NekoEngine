@@ -1,39 +1,42 @@
-#include <cmath>
-#include <imgui.h>
 #include <engine/engine.h>
-#include "01_logger/logger_program.h"
-#include <engine/log.h>
+#include "05_hello_logger/logger_program.h"
+#include "imgui.h"
+#include "mathematics/matrix.h"
+#include "mathematics/transform.h"
+
 namespace neko
 {
-void LoggerProgram::Init()
+
+void HelloLoggerProgram::Init()
 {
     selectedType = 0;
     selectedLogCount = 0;
     selectedCat = 0;
     maxLogToShow = 50;
-    const auto& config = BasicEngine::GetInstance()->config; 
+    const auto& config = BasicEngine::GetInstance()->config;
 }
 
-void LoggerProgram::Update(seconds dt)
+
+
+void HelloLoggerProgram::Update(seconds dt)
 {
 
 }
 
-void LoggerProgram::Render()
+void HelloLoggerProgram::Render()
 {
 
 }
 
-void LoggerProgram::Destroy()
+void HelloLoggerProgram::Destroy()
 {
 
 }
 
-void LoggerProgram::DrawUi()
+void HelloLoggerProgram::DrawImGui()
 {
-
     ImGui::Begin("Logger buttons");
-    if(ImGui::Button("Add Test logs")) {
+    if (ImGui::Button("Add Test logs")) {
         WriteTestLog();
     }
     if (ImGui::Button("Add 50 logs")) {
@@ -53,30 +56,30 @@ void LoggerProgram::DrawUi()
     ImGui::Combo("Type", &selectedType, types, IM_ARRAYSIZE(types));
     ImGui::Combo("Log Count", &selectedLogCount, logCount, IM_ARRAYSIZE(logCount));
     SetMaxLogsToShow();
-    if(selectedCat != prevCat || selectedType != prevType || selectedLogCount != prevLogCount) {
+    if (selectedCat != prevCat || selectedType != prevType || selectedLogCount != prevLogCount) {
         InsertCurrentLog();
     }
 
     ImGui::Separator();
 
-    ImGui::BeginChild("logs", ImVec2(0,logScreenSize), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+    ImGui::BeginChild("logs", ImVec2(0, logScreenSize), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
     logIndex = CalculateCurrentLogIndex(logsToShow.size(), ImGui::GetScrollY(), ImGui::GetScrollMaxY());
-        for (int j = 0; j < logsToShow.size(); j++) {
-            if (j >= logIndex - maxLogToShow && j <= logIndex + maxLogToShow) {
-                ImGui::Text(logsToShow[j].log.c_str());
-            }
+    for (int j = 0; j < logsToShow.size(); j++) {
+        if (j >= logIndex - maxLogToShow && j <= logIndex + maxLogToShow) {
+            ImGui::Text(logsToShow[j].log.c_str());
         }
+    }
     ImGui::EndChild();
 
     ImGui::End();
 }
 
-void LoggerProgram::OnEvent(const SDL_Event& event)
+void HelloLoggerProgram::OnEvent(const SDL_Event& event)
 {
 
 }
 
-void LoggerProgram::WriteTestLog() {
+void HelloLoggerProgram::WriteTestLog() {
     LogDebug(LogCategory::ENGINE, "Test");
     LogDebug(LogCategory::GRAPHICS, "Test");
     LogDebug(LogCategory::IO, "Test");
@@ -102,7 +105,7 @@ void LoggerProgram::WriteTestLog() {
     InsertCurrentLog();
 }
 
-void LoggerProgram::Write50Logs() {
+void HelloLoggerProgram::Write50Logs() {
     for (int a = 0; a < 5000; a++) {
         LogDebug(LogCategory::NONE, "Log :" + std::to_string(a));
     }
@@ -112,7 +115,7 @@ void LoggerProgram::Write50Logs() {
 }
 
 
-void LoggerProgram::InsertCurrentLog() {
+void HelloLoggerProgram::InsertCurrentLog() {
     logsToShow.clear();
     for (int i = 0; i < currentSessionLogs.size(); i++) {
 
@@ -186,21 +189,19 @@ void LoggerProgram::InsertCurrentLog() {
     }
 }
 
-int LoggerProgram::CalculateCurrentLogIndex(int logCount, int currentY, int maxY) {
+int HelloLoggerProgram::CalculateCurrentLogIndex(int logCount, int currentY, int maxY) {
     if (maxY <= 0) { maxY = 1; }
     return (logCount * currentY) / maxY;
 }
 
-void LoggerProgram::SetMaxLogsToShow() {
+void HelloLoggerProgram::SetMaxLogsToShow() {
     logScreenSize = logScreenSizeSteps[selectedLogCount];
     maxLogToShow = maxLogCountSteps[selectedLogCount] * 0.5f;
 }
 
-void LoggerProgram::RefreshLogs() {
+void HelloLoggerProgram::RefreshLogs() {
     currentSessionLogs = Log::get().GetLogs();
     InsertCurrentLog();
 }
-
-
 
 }

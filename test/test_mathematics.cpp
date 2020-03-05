@@ -96,6 +96,14 @@ TEST(Engine, TestMatrix4)
                     neko::Vec4f{-4,-3,-2,-1}
             });
 
-    std::cout << (m1.MultiplyNaive(m1))<<'\n';
-    std::cout << (m1.MultiplyIntrinsincs(m1))<<'\n';
+    neko::Mat4f result = neko::Mat4f(std::array<neko::Vec4f, 4>{
+            neko::Vec4f(-5,5,6,-5 ),
+            neko::Vec4f(-8,8,5,-3 ),
+            neko::Vec4f(-5,5,8,-5 ),
+            neko::Vec4f(-5,5,9,-5 )
+    });
+    result = result.Transpose();
+    EXPECT_TRUE(neko::Mat4f::MatrixDifference(m1.MultiplyNaive(m1), result)< 0.01f);
+    EXPECT_TRUE(neko::Mat4f::MatrixDifference(m1.MultiplyIntrinsincs(m1), result)<0.01f);
+    EXPECT_TRUE(neko::Mat4f::MatrixDifference(m1.MultiplyNaive(m1), m1.MultiplyIntrinsincs(m1))<0.01f);
 }

@@ -1086,10 +1086,10 @@ inline std::array<float, 4> FourVec4f::DotIntrinsics(FourVec4f v1, Vec4f v2)
     auto z1 = _mm_load_ps(v1.zs.data());
     auto w1 = _mm_load_ps(v1.ws.data());
 
-    auto x2 = _mm_load_ps(&v2.x);
-    auto y2 = _mm_load_ps(&v2.y);
-    auto z2 = _mm_load_ps(&v2.z);
-    auto w2 = _mm_load_ps(&v2.w);
+    auto x2 = _mm_load1_ps(&v2.x);
+    auto y2 = _mm_load1_ps(&v2.y);
+    auto z2 = _mm_load1_ps(&v2.z);
+    auto w2 = _mm_load1_ps(&v2.w);
 
     x1 = _mm_mul_ps(x1, x2);
     y1 = _mm_mul_ps(y1, y2);
@@ -1199,25 +1199,25 @@ inline std::array<float, 8> EightVec4f::DotIntrinsics(EightVec4f v1, Vec4f v2)
 {
     alignas(8 * sizeof(float))
     std::array<float, 8> result;
-    auto x1 = _mm_load_ps(v1.xs.data());
-    auto y1 = _mm_load_ps(v1.ys.data());
-    auto z1 = _mm_load_ps(v1.zs.data());
-    auto w1 = _mm_load_ps(v1.ws.data());
+    auto x1 = _mm256_load_ps(v1.xs.data());
+    auto y1 = _mm256_load_ps(v1.ys.data());
+    auto z1 = _mm256_load_ps(v1.zs.data());
+    auto w1 = _mm256_load_ps(v1.ws.data());
 
-    auto x2 = _mm_load_ps(&v2.x);
-    auto y2 = _mm_load_ps(&v2.y);
-    auto z2 = _mm_load_ps(&v2.z);
-    auto w2 = _mm_load_ps(&v2.w);
+    auto x2 = _mm256_broadcast_ss(&v2.x);
+    auto y2 = _mm256_broadcast_ss(&v2.y);
+    auto z2 = _mm256_broadcast_ss(&v2.z);
+    auto w2 = _mm256_broadcast_ss(&v2.w);
 
-    x1 = _mm_mul_ps(x1, x2);
-    y1 = _mm_mul_ps(y1, y2);
-    z1 = _mm_mul_ps(z1, z2);
-    w1 = _mm_mul_ps(w1, w2);
+    x1 = _mm256_mul_ps(x1, x2);
+    y1 = _mm256_mul_ps(y1, y2);
+    z1 = _mm256_mul_ps(z1, z2);
+    w1 = _mm256_mul_ps(w1, w2);
 
-    x1 = _mm_add_ps(x1, y1);
-    z1 = _mm_add_ps(z1, w1);
-    x1 = _mm_add_ps(x1, z1);
-    _mm_store_ps(result.data(), x1);
+    x1 = _mm256_add_ps(x1, y1);
+    z1 = _mm256_add_ps(z1, w1);
+    x1 = _mm256_add_ps(x1, z1);
+    _mm256_store_ps(result.data(), x1);
     return result;
 }
 template<>

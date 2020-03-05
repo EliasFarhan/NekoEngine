@@ -137,7 +137,7 @@ void HelloTriangleProgram::Destroy()
 
 }
 
-void HelloTriangleProgram::DrawUi()
+void HelloTriangleProgram::DrawImGui()
 {
     ImGui::Begin("Hello Triangle Program");
     const char* items[(size_t)RenderType::Length]= {

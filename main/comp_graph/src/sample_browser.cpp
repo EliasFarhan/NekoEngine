@@ -9,6 +9,8 @@
 #include "02_hello_texture/texture_program.h"
 #include "03_hello_transform/transform_program.h"
 #include "04_hello_coords/coords_program.h"
+#include "05_hello_logger/logger_program.h"
+
 
 namespace neko
 {
@@ -20,6 +22,8 @@ void SampleBrowser::Init()
     RegisterRenderProgram("02 Hello Texture", std::make_unique<HelloTextureProgram>());
     RegisterRenderProgram("03 Hello Transform", std::make_unique<HelloTransformProgram>());
     RegisterRenderProgram("04 Hello Coords", std::make_unique<HelloCoordsProgram>());
+    RegisterRenderProgram("05 Hello Logger", std::make_unique<HelloLoggerProgram>());
+
     programs_[currentProgramIndex_]->Init();
 }
 
@@ -49,7 +53,7 @@ void SampleBrowser::OnEvent(const SDL_Event& event)
 }
 
 
-void SampleBrowser::DrawGui()
+void SampleBrowser::DrawImGui()
 {
     ImGui::Begin("Sample Browser");
     if (ImGui::BeginCombo("Current Sample",
@@ -70,7 +74,7 @@ void SampleBrowser::DrawGui()
         ImGui::EndCombo();
     }
     ImGui::End();
-    programs_[currentProgramIndex_]->DrawUi();
+    programs_[currentProgramIndex_]->DrawImGui();
 }
 
 size_t SampleBrowser::RegisterRenderProgram(const std::string_view name, std::unique_ptr<SampleProgram> program)

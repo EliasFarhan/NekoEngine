@@ -101,8 +101,9 @@ void BasicEngine::Update(seconds dt)
 
 void BasicEngine::Destroy()
 {
-    renderer_->Close();
-    instance_ = nullptr;
+
+    renderer_->Destroy();
+	instance_ = nullptr;
 }
 
 static std::chrono::time_point<std::chrono::system_clock> clock;
@@ -149,17 +150,29 @@ void BasicEngine::SetWindowAndRenderer(Window* window, Renderer* renderer)
 
 void BasicEngine::GenerateUiFrame()
 {
-    ImGui::Begin("Neko Window");
+	ImGui::Begin("Neko Window");
 
-    std::ostringstream oss;
-    oss << "App FPS: " << 1.0f / GetDeltaTime() << '\n'
-        #ifndef EMSCRIPTEN
-        << "Render FPS: " << 1.0f / renderer_->GetDeltaTime()
-        #endif
-        << '\n';
-    ImGui::Text("%s", oss.str().c_str());
-    ImGui::End();
-    drawUiAction_.Execute();
+	std::ostringstream oss;
+	oss << "App FPS: " << 1.0f / GetDeltaTime() << '\n'
+#ifndef EMSCRIPTEN
+		<< "Render FPS: " << 1.0f / renderer_->GetDeltaTime()
+#endif
+		<< '\n';
+	ImGui::Text("%s", oss.str().c_str());
+	ImGui::End();
+	drawImGuiAction_.Execute();
+}
+
+void BasicEngine::RegisterSystem(SystemInterface& system)
+{
+    initAction_.RegisterCallback([&system]{system.Init();});
+    updateAction_.RegisterCallback([&system](seconds dt){system.Update(dt);});
+    destroyAction_.RegisterCallback([&system]{system.Destroy();});
+}
+
+void BasicEngine::RegisterOnDrawUi(DrawImGuiInterface& drawUi)
+{
+    drawImGuiAction_.RegisterCallback([&drawUi]{ drawUi.DrawImGui();});
 }
 
 
