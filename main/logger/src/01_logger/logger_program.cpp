@@ -16,6 +16,7 @@ void LoggerProgram::Init()
 
 void LoggerProgram::Update(seconds dt)
 {
+
 }
 
 void LoggerProgram::Render()
@@ -37,6 +38,9 @@ void LoggerProgram::DrawUi()
     }
     if (ImGui::Button("Add 50 logs")) {
         Write50Logs();
+    }
+    if (ImGui::Button("Refresh")) {
+        RefreshLogs();
     }
     ImGui::End();
 
@@ -96,7 +100,6 @@ void LoggerProgram::WriteTestLog() {
 
     currentSessionLogs = Log::get().GetLogs();
     InsertCurrentLog();
-
 }
 
 void LoggerProgram::Write50Logs() {
@@ -193,6 +196,10 @@ void LoggerProgram::SetMaxLogsToShow() {
     maxLogToShow = maxLogCountSteps[selectedLogCount] * 0.5f;
 }
 
+void LoggerProgram::RefreshLogs() {
+    currentSessionLogs = Log::get().GetLogs();
+    InsertCurrentLog();
+}
 
 
 

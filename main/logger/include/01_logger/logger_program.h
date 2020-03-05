@@ -45,6 +45,8 @@ public:
 
 
 private:
+    void RefreshLogs();
+	
     const char* caterogies[7] = {
     	"NONE",
     	"ENGINE",
@@ -99,7 +101,7 @@ private:
     void SetMaxLogsToShow();
 	
     int CalculateCurrentLogIndex(int logCount, int currentY, int maxY);
-
+	
 	//TEST FUNCTIONS
     void WriteTestLog();
     void Write50Logs();
