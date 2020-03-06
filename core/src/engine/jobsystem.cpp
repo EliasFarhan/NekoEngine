@@ -7,7 +7,7 @@ JobSystem::JobSystem()
 {
     numberOfWorkers = std::thread::hardware_concurrency() - OCCUPIED_THREADS;
     //TODO@Oleg: Add neko assert to check number of worker threads is valid!
-    workers_.reserve(numberOfWorkers);
+    workers_.resize(numberOfWorkers);
 
     const size_t len = numberOfWorkers;
     for (size_t i = 0; i < len; ++i)
