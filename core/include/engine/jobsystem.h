@@ -22,7 +22,6 @@
 #include <functional>
 #include <thread>
 #include <condition_variable>
-#include <array>
 #include <queue>
 #include <atomic>
 
@@ -37,74 +36,20 @@ class JobSystem
     };
 
 public:
-    JobSystem()
-    {
-        for (size_t i = 0; i < DEFAULT_WORKER_SIZE; ++i)
-        {
-            tasks_.push([] {}); // Fill tasks queue with dummy functions to init workers.
-        }
-        for (size_t i = 0; i < DEFAULT_WORKER_SIZE; ++i)
-        {
-            workers_[i] = std::thread([this] { Work(); }); // Kick the thread => sys call
-        }
-    }
-
-    ~JobSystem()
-    {
-        status_ = 0u; // Atomic assign.
-        cv_.notify_all(); // Wake all workers.
-        for (size_t i = 0; i < DEFAULT_WORKER_SIZE; ++i)
-        {
-            workers_[i].join();
-        }
-    }
-
-    void KickJob(const std::function<void()>& func)
-    {
-        { // CRITICAL
-            std::unique_lock<std::mutex> lock(mutex_);
-            tasks_.push(func);
-        } // !CRITICAL
-        cv_.notify_one();
-    }
-
-    void Work()
-    {
-        NEXT_TASK:
-        while (status_ & Status::RUNNING)
-        {
-            std::function<void()> task = [] {};
-            { // CRITICAL
-                std::unique_lock<std::mutex> lock(mutex_);
-                if (!tasks_.empty())
-                {
-                    task = tasks_.front();
-                    tasks_.pop();
-                }
-                else
-                {
-                    goto SLEEP;
-                }
-            } // !CRITICAL
-            task();
-            goto NEXT_TASK;
-
-            SLEEP:
-            if (status_ & Status::RUNNING) // Atomic check.
-            {
-                std::unique_lock<std::mutex> lock(mutex_); // CRITICAL
-                cv_.wait(lock); // !CRITICAL
-            }
-        }
-    }
+    JobSystem();
+    ~JobSystem();
+    void KickJob(const std::function<void()>& func);
+    void Work();
 
 private:
-    const static size_t DEFAULT_WORKER_SIZE = 4;
-    std::queue<std::function<void()>> tasks_; // Managed via mutex.
-    std::array<std::thread, DEFAULT_WORKER_SIZE> workers_;
+    const static std::uint8_t OCCUPIED_THREADS = 3; // Define number of threads used by engine.
+    std::uint8_t numberOfWorkers;
+    std::queue<std::function<void()>> tasks_; // Managed via mutex. // TODO: replace with custom queue when those are implemented.
+    std::vector<std::thread> workers_; // TODO: replace with fixed vector when those are implemented.
     std::mutex mutex_;
     std::condition_variable cv_;
     std::atomic<std::uint8_t> status_ = 1u;
+    std::atomic<std::uint8_t> initializedWorkers_ = 0;
 };
 
 }
