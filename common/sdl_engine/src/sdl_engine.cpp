@@ -67,7 +67,7 @@ void SdlEngine::Destroy()
 
 void SdlEngine::ManageEvent()
 {
-    std::lock_guard<std::mutex> lock(renderer_->GetRenderMutex());
+    
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("Manage Event");
 #endif

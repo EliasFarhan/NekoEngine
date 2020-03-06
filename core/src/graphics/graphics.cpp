@@ -72,7 +72,8 @@ void Renderer::Sync()
 #endif
     std::swap(currentCommandBuffer_, nextCommandBuffer_);
     nextCommandBuffer_.clear();
-    flags_ &= ~IS_APP_WAITING;
+    BasicEngine::GetInstance()->ManageEvent();
+	flags_ &= ~IS_APP_WAITING;
     //TODO copy all the new transform3d?
 }
 
@@ -123,20 +124,7 @@ void Renderer::Update()
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("RenderFullUpdateCPU");
 #endif
-    size_t countWait = 0;
-    while((flags_ & IS_APP_WAITING) && (flags_ & IS_RUNNING))
-    {
-        using namespace std::chrono_literals;
-        std::this_thread::sleep_for(1ms);
 
-        cv_.notify_one();
-        countWait++;
-    }
-    {
-        std::ostringstream oss;
-        oss << "Count Wait: "<<countWait<<'\n';
-        logDebug(oss.str());
-    }
 
     auto* engine = BasicEngine::GetInstance();
     {
@@ -153,6 +141,14 @@ void Renderer::Update()
         window_->SwapBuffer();
 
         window_->LeaveCurrentContext();
+    }
+    while (!(flags_ & IS_APP_WAITING) && (flags_ & IS_RUNNING))
+    {
+        //cv_.notify_one();
+    }
+    while ((flags_ & IS_APP_WAITING) && (flags_ & IS_RUNNING))
+    {
+        cv_.notify_one();
     }
 
 
