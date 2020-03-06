@@ -211,6 +211,7 @@ inline EulerAngles const Transform3d::Rotation(const Mat4<float>& transform)
     return EulerAngles();
 }
 
+// TODO
 template<>
 inline float Transform3d::Pitch(const Mat4<float>& transform)
 {
@@ -223,6 +224,7 @@ inline float Transform3d::RotationOnX(const Mat4<float>& transform)
     return Pitch(transform);
 }
 
+// TODO
 template<>
 inline float Transform3d::Yaw(const Mat4<float>& transform)
 {
@@ -235,6 +237,7 @@ inline float Transform3d::RotationOnY(const Mat4<float>& transform)
     return Yaw(transform);
 }
 
+// TODO
 template<>
 inline float Transform3d::Roll(const Mat4<float>& transform)
 {
