@@ -1,6 +1,7 @@
 #pragma once
 #include <engine/custom_allocator.h>
 #include <vector>
+#include <xxhash.hpp>
 
 namespace neko{
 
@@ -8,7 +9,7 @@ template <typename Key, typename Value>
 class Map{
 public:
     Map(const Allocator& allocator){
-
+        allocator_ = allocator;
     }
     ~Map(){
 
@@ -29,34 +30,74 @@ public:
     }
 
     size_t Count(){
-        return 0;
+        return pairs_.count;
     }
 
-    void Add(){
-
+    bool Add(Key key, Value value){
+        xxh::hash_t<64> hash = xxh::xxhash<64>(&key, sizeof(key));
+		for (int i = 0; i < pairs_.size(); i++)
+		{
+			if(pairs_[i].first == nullptr)
+			{
+                pairs_[i].first == hash;
+                pairs_[i].second == value;
+                return true;
+			}
+		}
+        return false;
     }
 
     bool Remove(const Key key){
+        xxh::hash_t<64> hash = xxh::xxhash<64>(&key, sizeof(key));
+    	for(int i = 0; i < pairs_.size(); i++)
+    	{
+    		if (pairs_[i].first == hash)
+    		{
+                pairs_[i].first = nullptr;
+                pairs_[i].second = nullptr;
+                return true;
+    		}
+    	}
         return false;
     }
 
     bool Swap(const Key a, const Key b){
+    	if (a == b)
+    	{
+            return false;
+    	}
+        xxh::hash_t<64> hashA = xxh::xxhash<64>(&key, sizeof(key));
+        xxh::hash_t<64> hashB = xxh::xxhash<64>(&key, sizeof(key));
+        int intA;
+        int intB;
+    	for(int i = 0; i <pairs_.size(); i++)
+    	{
+    		if (pairs_[i].first == hashA)
+    		{
+    			
+    		}
+    	}
         return false;
     }
 
     void Clear(){
-
+        
     }
 
-    bool ContainsKey(const Key key){
-
+    Value FindValue(const Key key){
+        xxh::hash_t<64> hash = xxh::xxhash<64>(&key, sizeof(key));
+	    for(int i = 0; i < pairs_.size(); i++)
+	    {
+            if (pairs_[i].first == hash)
+            {
+                return pairs_[i].second;
+            }
+	    }
+        return Value();
     }
 
-    bool ContainsValue(const Value value){
-
-    }
 private:
-    std::vector<std::pair<Key, Value>> pairs_;
+    std::vector<std::pair<xxh::hash_t<64>, Value>> pairs_;
     Allocator& allocator_;
 };
 
