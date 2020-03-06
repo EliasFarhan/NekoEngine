@@ -77,14 +77,36 @@ public:
         xxh::hash_t<64> hashB = xxh::xxhash<64>(&b, sizeof(b));
         int intA;
         int intB;
+        int check = 0;              //Check increases each time he find a value
     	for(int i = 0; i <pairs_.size(); i++)
     	{
     		if (pairs_[i].first == hashA)
     		{
-    			
+                intA = i;
+                check++;
+    			if(check >=2)
+    			{
+                    break;
+    			}
     		}
+            else if (pairs_[i].first == hashB)
+            {
+                intB = i;
+                check++;
+            	if(check >=2)
+            	{
+                    break;
+            	}
+            }
     	}
-        return false;
+    	if (check < 2)
+    	{
+            return false;
+    	}
+        Value value = pairs_[intA].second;
+        pairs_[intA].second = pairs_[intB].second;
+        pairs_[intB].second = value;
+        return true;
     }
 
     Value FindValue(const Key key){
