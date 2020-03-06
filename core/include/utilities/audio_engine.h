@@ -33,8 +33,8 @@ public:
     void PlayEvent(const std::string& eventName);
     void StopChannel(int channelID);
     void StopEvent(const std::string& eventName, bool stopImmediate = false);
-    void GetEventParameter(const std::string& strEventName, const std::string& strEventParameter, float* parameter);
-    void SetEventParameter(const std::string& strEventName, const std::string& strParameterName, float eventValue);
+    void GetEventParameter(const std::string& eventName, const std::string& eventParameter, float* parameter);
+    void SetEventParameter(const std::string& eventName, const std::string& parameterName, float eventValue);
     void StopAllChannels();
     void SetChannel3dPosition(int channelID, const Vector3& position);
     void SetChannelVolume(int channelID, float volumeDB);

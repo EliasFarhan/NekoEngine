@@ -1,2 +1,0 @@
-C:/Users/Adam/Desktop/NekoEngine/NekoEngine/externals/Fmod-2.00.08/Build/CMakeFiles/ALL_BUILD.dir
-C:/Users/Adam/Desktop/NekoEngine/NekoEngine/externals/Fmod-2.00.08/Build/CMakeFiles/ZERO_CHECK.dir
