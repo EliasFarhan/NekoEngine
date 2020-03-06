@@ -136,12 +136,17 @@ public:
 
     struct AllocationHeader
     {
+#if defined(NEKO_ASSERT)
+        void* prevPos = nullptr;
+#endif
         std::uint8_t adjustment = 0;
     };
 
 protected:
     void* currentPos_ = nullptr;
+#if defined(NEKO_ASSERT)
     void* prevPos_ = nullptr;
+#endif
 
 };
 
@@ -248,8 +253,8 @@ void PoolAllocator<T>::Deallocate(void* p)
 class ProxyAllocator : public Allocator
 {
 public:
-    explicit ProxyAllocator(Allocator& allocator) : Allocator(allocator.GetSize(), allocator.GetStart()),
-                                                    allocator_(allocator)
+    explicit ProxyAllocator(Allocator& allocator) :
+    Allocator(allocator.GetSize(), allocator.GetStart()), allocator_(allocator)
     {
 
     }
