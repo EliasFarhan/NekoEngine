@@ -44,4 +44,10 @@ public:
     virtual void Destroy() = 0;
 };
 
+class DrawImGuiInterface
+{
+public:
+    virtual void DrawImGui() = 0;
+};
+
 }

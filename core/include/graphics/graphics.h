@@ -47,7 +47,6 @@ class RenderCommandInterface
 {
 public:
     RenderCommandInterface() = default;
-
     virtual ~RenderCommandInterface() = default;
 
     virtual void Render() = 0;
@@ -102,7 +101,7 @@ public:
     virtual void Update();
     void RenderLoop();
 
-    void Close();
+    void Destroy();
 
     void SetFlag(RendererFlag flag);
     void SetWindow(Window* window);

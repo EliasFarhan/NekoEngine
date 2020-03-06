@@ -75,20 +75,10 @@ void SdlEngine::ManageEvent()
     SDL_Event event;
     while (SDL_PollEvent(&event))
     {
-        OnEvent(event);
         ImGui_ImplSDL2_ProcessEvent(&event);
         if (event.type == SDL_QUIT)
         {
             isRunning_ = false;
-        }
-
-        if (event.type == SDL_KEYDOWN)
-        {
-            switch (event.key.keysym.scancode)
-            {
-                default:
-                    break;
-            }
         }
 
         auto& config = BasicEngine::GetInstance()->config;
@@ -101,6 +91,7 @@ void SdlEngine::ManageEvent()
             }
         }
     }
+    onEventAction_.Execute(event);
     window_->LeaveCurrentContext();
 }
 
@@ -108,6 +99,11 @@ void SdlEngine::GenerateUiFrame()
 {
     window_->GenerateUiFrame();
     BasicEngine::GenerateUiFrame();
+}
+
+void SdlEngine::RegisterOnEvent(SdlEventSystemInterface& eventInterface)
+{
+    onEventAction_.RegisterCallback([&eventInterface](const SDL_Event& event){eventInterface.OnEvent(event);});
 }
 
 }
