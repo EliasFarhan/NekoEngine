@@ -123,7 +123,9 @@ public:
     ~StackAllocator() override
     {
         currentPos_ = nullptr;
+#if defined(NEKO_ASSERT)
         prevPos_ = nullptr;
+#endif
     }
 
     StackAllocator(const StackAllocator&) = delete;
