@@ -5,7 +5,7 @@
 namespace neko
 {
 
-void IncrementMem(unsigned int& mem)
+void IncrementMem(std::atomic<unsigned int>& mem)
 {
     const unsigned int TASK_WORK_TIME = 1;
 
@@ -18,8 +18,8 @@ void IncrementMem(unsigned int& mem)
 
 TEST(Engine, TestJobSystem)
 {
-    const unsigned int TASKS_COUNT = 8;
-    unsigned int tasksDone = 0;
+    const unsigned int TASKS_COUNT = 16;
+    std::atomic<unsigned int> tasksDone = 0;
 
     {// JobSystem
 #ifdef USING_EASY_PROFILER
@@ -42,7 +42,7 @@ TEST(Engine, TestJobSystem)
 #endif
 
     // JobSystem must make main thread wait until all tasks are done before self-destructing.
-    EXPECT_TRUE(TASKS_COUNT == tasksDone);
+    EXPECT_EQ(TASKS_COUNT, tasksDone);
 }
 
 }
