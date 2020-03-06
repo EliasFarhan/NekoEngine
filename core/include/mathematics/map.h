@@ -8,17 +8,24 @@ namespace neko{
 template <typename Key, typename Value>
 class Map{
 public:
-    Map(const Allocator& allocator){
+    Map(Allocator* allocator, const size_t sizeInBytes){
         allocator_ = allocator;
+        count_ = 0;
+        pairs_.reserve(sizeInBytes / sizeof(Value));
+        pairs_.resize(sizeInBytes / sizeof(Value));
+        for (auto& pair : pairs_)
+        {
+            pair = std::pair<xxh::hash_t<64>, Value>(0,Value());
+        }
     }
     ~Map(){
 
     }
 
     // Copy assignment
-    Map<Key,Value> operator=(const Map<Key,Value>& other){
+    /*Map<Key,Value> operator=(const Map<Key,Value>& other){
         return Map<Key,Value>();
-    }
+    }*/
 
     // Move assignment
     Map<Key,Value>& operator=(Map<Key,Value>&& other) noexcept{
@@ -26,21 +33,21 @@ public:
     }
 
     bool IsEmpty(){
-        return false;
+        return count_ != 0;
     }
 
     size_t Count(){
-        return pairs_.count;
+        return count_;
     }
 
     bool Add(Key key, Value value){
         xxh::hash_t<64> hash = xxh::xxhash<64>(&key, sizeof(key));
-		for (int i = 0; i < pairs_.size(); i++)
+		for (int i = 0; i < pairs_.capacity(); i++)
 		{
-			if(pairs_[i].first == nullptr)
+			if(pairs_[i].first == 0)
 			{
-                pairs_[i].first == hash;
-                pairs_[i].second == value;
+                pairs_[i].first = hash;
+                pairs_[i].second = value;
                 return true;
 			}
 		}
@@ -49,12 +56,12 @@ public:
 
     bool Remove(const Key key){
         xxh::hash_t<64> hash = xxh::xxhash<64>(&key, sizeof(key));
-    	for(int i = 0; i < pairs_.size(); i++)
+    	for(int i = 0; i < pairs_.capacity(); i++)
     	{
     		if (pairs_[i].first == hash)
     		{
-                pairs_[i].first = nullptr;
-                pairs_[i].second = nullptr;
+                pairs_[i].first = 0;
+                pairs_[i].second = Value();
                 return true;
     		}
     	}
@@ -66,8 +73,8 @@ public:
     	{
             return false;
     	}
-        xxh::hash_t<64> hashA = xxh::xxhash<64>(&key, sizeof(key));
-        xxh::hash_t<64> hashB = xxh::xxhash<64>(&key, sizeof(key));
+        xxh::hash_t<64> hashA = xxh::xxhash<64>(&a, sizeof(a));
+        xxh::hash_t<64> hashB = xxh::xxhash<64>(&b, sizeof(b));
         int intA;
         int intB;
     	for(int i = 0; i <pairs_.size(); i++)
@@ -78,10 +85,6 @@ public:
     		}
     	}
         return false;
-    }
-
-    void Clear(){
-        
     }
 
     Value FindValue(const Key key){
@@ -98,7 +101,8 @@ public:
 
 private:
     std::vector<std::pair<xxh::hash_t<64>, Value>> pairs_;
-    Allocator& allocator_;
+    Allocator* allocator_;
+    size_t count_;
 };
 
 }// !neko
