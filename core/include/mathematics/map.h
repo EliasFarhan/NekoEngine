@@ -44,9 +44,9 @@ public:
         return pairs_.capacity();
     }
 
-    bool Add(const Key key, const Value value) const
+    bool Add(const Key key, const Value value)
     {
-        // TODO@Seb: matchCount that key doesn't exist already in the map! Otherwise 1 key may have multiple values!
+        // TODO@Seb: check that key doesn't exist already in the map! Otherwise 1 key may have multiple values!
 
         const xxh::hash_t<64> hash = xxh::xxhash<64>(&key, sizeof(Key));
         const size_t len = pairs_.capacity();
@@ -56,13 +56,14 @@ public:
             {
                 pairs_[i].first = hash;
                 pairs_[i].second = value;
+                count_++;
                 return true;
             }
         }
         return false;
     }
 
-    bool Remove(const Key key) const
+    bool Remove(const Key key)
     {
         const xxh::hash_t<64> hash = xxh::xxhash<64>(&key, sizeof(Key));
         const size_t len = pairs_.capacity();
@@ -72,23 +73,25 @@ public:
             {
                 pairs_[i].first = 0;
                 pairs_[i].second = Value();
+                count_--;
                 return true;
             }
         }
         return false;
     }
 
-    void Clear() const
+    void Clear()
     {
         for (auto& pair : pairs_)
         {
             pair = std::pair<xxh::hash_t<64>, Value>(0, Value());
         }
+        count_ = 0;
     }
 
-    bool Swap(const Key a, const Key b) const
+    bool Swap(const Key a, const Key b)
     {
-        if (a == b) return true;
+        if (a == b || count_ < 2) return true;
 
         const xxh::hash_t<64> hash0 = xxh::xxhash<64>(&a, sizeof(Key));
         const xxh::hash_t<64> hash1 = xxh::xxhash<64>(&b, sizeof(Key));
@@ -99,7 +102,7 @@ public:
         size_t i = 0;
         bool firstMatch = false;
 
-        while (i++ < len)
+        do
         {
             auto hash = pairs_[i].first;
             if (hash == hash0 || hash == hash1)
@@ -115,7 +118,7 @@ public:
                     goto RETURN;
                 }
             }
-        }
+        } while (i++ < len);
         return false; // Traversed whole map without finding both keys.
 
         RETURN:
@@ -125,10 +128,12 @@ public:
         return true;
     }
 
-    Value& FindValue(const Key key) const
+    Value FindValue(const Key key) const
     {
+        // TODO@Seb: Have to traverse whole vector regardless of count_ if there are holes in the memory layout!
+
         const xxh::hash_t<64> hash = xxh::xxhash<64>(&key, sizeof(Key));
-        const size_t len = count_;
+        const size_t len = pairs_.size(); // TODO@Seb: this...
 
         for (size_t i = 0; i < len; i++)
         {
@@ -137,7 +142,7 @@ public:
                 return pairs_[i].second;
             }
         }
-        return Value();
+        return 0;
     }
 
 private:

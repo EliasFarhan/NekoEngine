@@ -11,7 +11,8 @@
 
 #include <mathematics/quaternion.h>
 #include <mathematics/matrix.h>
-#include "mathematics/vector.h"
+#include <mathematics/vector.h>
+#include <mathematics/map.h>
 
 
 const float maxNmb = 100.0f;
@@ -106,4 +107,79 @@ TEST(Engine, TestMatrix4)
     EXPECT_TRUE(neko::Mat4f::MatrixDifference(m1.MultiplyNaive(m1), result)< 0.01f);
     EXPECT_TRUE(neko::Mat4f::MatrixDifference(m1.MultiplyIntrinsincs(m1), result)<0.01f);
     EXPECT_TRUE(neko::Mat4f::MatrixDifference(m1.MultiplyNaive(m1), m1.MultiplyIntrinsincs(m1))<0.01f);
+}
+
+TEST(Engine, Map)
+{
+    const size_t sizeInBytes = 512;
+
+    void* mem = malloc(sizeInBytes);
+    const auto allocator = neko::PoolAllocator<std::pair<xxh::hash_t<64>, double>>(sizeInBytes, mem);
+
+    neko::Map<std::uint8_t, double> map((neko::Allocator*) &allocator, sizeInBytes);
+
+    {// Set / retrieve.
+        const uint8_t key[] = {1u, 2u, 3u, 4u, 5u};
+        const double value[] = {1.0, 2.0, 3.0, 4.0, 5.0};
+        for (uint8_t i = 0; i < 5u ; i++)
+        {
+            const bool result = map.Add(key[i], value[i]);
+            EXPECT_TRUE(result);
+        }
+        for (uint8_t i = 0; i < 5 ; i++)
+        {
+            EXPECT_EQ(value[i], map.FindValue(key[i]));
+        }
+    }
+
+    {// Swap.
+        const double value = map.FindValue(1u);
+        const double expectedSum = 1.0 + 2.0 + 3.0 + 4.0 + 5.0;
+        double sum = 0.0;
+        for (uint8_t i = 1u; i < 5u; i++)
+        {
+            const bool result = map.Swap(i, i+1u);
+            EXPECT_TRUE(result);
+        }
+        for (uint8_t i = 1u; i < 6u; i++)
+        {
+            sum += map.FindValue(i);
+        }
+        EXPECT_EQ(value, map.FindValue(5u));
+        EXPECT_EQ(expectedSum, sum);
+    }
+
+    {// Clear, remove and add.
+        map.Clear();
+        const uint8_t key[] = {1u, 2u, 3u, 4u, 5u};
+        const double value[] = {1.0, 2.0, 3.0, 4.0, 5.0};
+        for (uint8_t i = 0; i < 5u ; i++)
+        {
+            map.Add(key[i], value[i]);
+        }
+
+        map.Remove(2u);
+        map.Remove(4u);
+
+        double expectedSum = 1.0 + 3.0 + 5.0;
+        double sum = 0.0;
+        for (uint8_t i = 1u; i < 6u; i++)
+        {
+            sum += map.FindValue(i);
+        }
+        EXPECT_EQ(expectedSum, sum);
+
+        map.Add(2u, 2.0);
+        map.Add(4u, 4.0);
+
+        expectedSum = 1.0 + 2.0 + 3.0 + 4.0 + 5.0;
+        sum = 0.0;
+        for (uint8_t i = 1u; i < 6u; i++)
+        {
+            sum += map.FindValue(i);
+        }
+        EXPECT_EQ(expectedSum, sum);
+    }
+
+    free(mem);
 }
