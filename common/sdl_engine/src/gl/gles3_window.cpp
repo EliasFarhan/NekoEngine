@@ -125,6 +125,7 @@ void Gles3Window::RenderUi()
 void Gles3Window::OnResize(Vec2u newWindowSize)
 {
     glViewport(0, 0, newWindowSize.x, newWindowSize.y);
+    logDebug("Resizing GLES3 window");
 }
 
 void Gles3Window::MakeCurrentContext()

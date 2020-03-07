@@ -83,8 +83,9 @@ void BasicEngine::Update(seconds dt)
 		EASY_BLOCK("Application Update");
 #endif
 
-    	//TODO Needs to lock the render thread?
-		//ManageEvent();
+#ifdef EMSCRIPTEN
+		ManageEvent();
+#endif
 		updateAction_.Execute(dt);
 	}
 #ifdef EMSCRIPTEN
