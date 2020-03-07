@@ -24,14 +24,15 @@
 
 #include <engine/string.h>
 #include <iostream>
-#include <engine/custom_allocator.h>
 
 namespace neko {
     //-----------------------------------------------------------------------------
     // Constructors
     //-----------------------------------------------------------------------------
-    String::String()
+    String::String(Allocator* allocator, const size_t sizeInBytes)
     {
+        allocator = nullptr;
+
         length = 0;
         data = new char[0];
     }

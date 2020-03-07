@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <engine/custom_allocator.h>
 
 namespace neko
 {
@@ -11,7 +12,7 @@ public:
     // Constructors
     //-----------------------------------------------------------------------------
 
-    String();
+    String(Allocator* allocator, const size_t sizeInBytes);
     String(char c);
 
     String(const char* c);
