@@ -17,9 +17,8 @@ void HelloCoordsProgram::Init()
     cube_.Init();
 
     // note that we're translating the scene in the reverse direction of where we want to move
+    view = Mat4f::Identity;
     view = Mat4f::Translate(view, Vec3f(0.0f, 0.0f, -3.0f));
-
-    projection = Mat4f::Perspective(degree_t(45.0f), (float) config.windowSize.x / config.windowSize.y, 0.1f, 100.0f);
 
 
 }
@@ -30,6 +29,14 @@ void HelloCoordsProgram::Update(seconds dt)
 {
     std::lock_guard<std::mutex> lock(updateMutex_);
     timeSinceInit_ += dt;
+
+    const auto& config = BasicEngine::GetInstance()->config;
+    projection = Mat4f::Perspective(
+        degree_t(45.0f), 
+        static_cast<float>(config.windowSize.x) / config.windowSize.y, 
+        0.1f, 
+        100.0f);
+
 }
 
 void HelloCoordsProgram::Render()

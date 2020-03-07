@@ -73,7 +73,7 @@ void Renderer::Sync()
     std::swap(currentCommandBuffer_, nextCommandBuffer_);
     nextCommandBuffer_.clear();
     BasicEngine::GetInstance()->ManageEvent();
-	flags_ &= ~IS_APP_WAITING;
+    window_->LeaveCurrentContext();
     //TODO copy all the new transform3d?
 }
 
@@ -145,15 +145,8 @@ void Renderer::Update()
     window_->LeaveCurrentContext();
     while (!(flags_ & IS_APP_WAITING) && (flags_ & IS_RUNNING))
     {
-        //cv_.notify_one();
     }
-
     cv_.notify_one();
-    
-
-
-
-
 }
 void Renderer::BeforeRenderLoop()
 {
