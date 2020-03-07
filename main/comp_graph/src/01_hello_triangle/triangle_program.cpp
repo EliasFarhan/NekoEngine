@@ -139,6 +139,8 @@ void HelloTriangleProgram::Destroy()
 
 void HelloTriangleProgram::DrawImGui()
 {
+
+    ImGui::SetNextWindowPos(ImVec2(0, 400), ImGuiCond_FirstUseEver);
     ImGui::Begin("Hello Triangle Program");
     const char* items[(size_t)RenderType::Length]= {
             "Simple Vao Program",
