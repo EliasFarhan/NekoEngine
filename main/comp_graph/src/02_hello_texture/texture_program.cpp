@@ -5,6 +5,10 @@
 #include <engine/engine.h>
 #include <gl/texture.h>
 #include "02_hello_texture/texture_program.h"
+#include <string.h>
+#include <imgui.h>
+
+#include "engine/string.h"
 
 namespace neko
 {
@@ -45,9 +49,13 @@ void HelloTextureProgram::Render()
     quad_.Draw();
 }
 
+
+
 void HelloTextureProgram::DrawImGui()
 {
-
+   if(ImGui::Button("Print")) {
+       std::cout << neko::String("Test") << std::endl;
+   }
 }
 
 void HelloTextureProgram::OnEvent(const SDL_Event& event)
