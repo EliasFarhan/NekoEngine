@@ -91,7 +91,7 @@ public:
 
     bool Swap(const Key a, const Key b)
     {
-        if (a == b || count_ < 2) return true;
+        if (a == b || count_ < 2) return false;
 
         const xxh::hash_t<64> hash0 = xxh::xxhash<64>(&a, sizeof(Key));
         const xxh::hash_t<64> hash1 = xxh::xxhash<64>(&b, sizeof(Key));
