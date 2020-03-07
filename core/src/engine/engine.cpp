@@ -144,6 +144,7 @@ void BasicEngine::SetWindowAndRenderer(Window* window, Renderer* renderer)
 
 void BasicEngine::GenerateUiFrame()
 {
+	ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_FirstUseEver);
 	ImGui::Begin("Neko Window");
 
 	std::ostringstream oss;

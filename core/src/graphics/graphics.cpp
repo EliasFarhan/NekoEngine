@@ -138,18 +138,18 @@ void Renderer::Update()
         RenderAll();
         window_->RenderUi();
 
-        window_->SwapBuffer();
 
-        window_->LeaveCurrentContext();
     }
+    window_->SwapBuffer();
+
+    window_->LeaveCurrentContext();
     while (!(flags_ & IS_APP_WAITING) && (flags_ & IS_RUNNING))
     {
         //cv_.notify_one();
     }
-    while ((flags_ & IS_APP_WAITING) && (flags_ & IS_RUNNING))
-    {
-        cv_.notify_one();
-    }
+
+    cv_.notify_one();
+    
 
 
 
