@@ -83,8 +83,9 @@ void BasicEngine::Update(seconds dt)
 		EASY_BLOCK("Application Update");
 #endif
 
-    	//TODO Needs to lock the render thread?
-		//ManageEvent();
+#ifdef EMSCRIPTEN
+		ManageEvent();
+#endif
 		updateAction_.Execute(dt);
 	}
 #ifdef EMSCRIPTEN
@@ -144,6 +145,7 @@ void BasicEngine::SetWindowAndRenderer(Window* window, Renderer* renderer)
 
 void BasicEngine::GenerateUiFrame()
 {
+	ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_FirstUseEver);
 	ImGui::Begin("Neko Window");
 
 	std::ostringstream oss;
