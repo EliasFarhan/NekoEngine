@@ -1,9 +1,7 @@
 #pragma once
 
-#include "mathematics/vector.h"
-#include "mathematics/angle.h"
-
 #include <cassert>
+#include "mathematics/vector.h"
 
 namespace neko
 {
@@ -13,8 +11,8 @@ template<typename T>
 class Mat3
 {
 private:
-    std::array<Vec4 < T>, 4>
-    columns_; //row vector
+    std::array<Vec4<T>, 4>
+            columns_; //row vector
 };
 
 template<typename T>
@@ -37,7 +35,7 @@ public:
         columns_ = m.columns_;
     }
 
-    explicit Mat4(const std::array<Vec4 < T>,4>& v)
+    explicit Mat4(const std::array<Vec4<T>, 4>& v)
     {
         columns_ = v;
     }
@@ -52,12 +50,12 @@ public:
         return columns_[column][row];
     }
 
-    const Vec4 <T>& operator[](size_t column) const
+    const Vec4<T>& operator[](size_t column) const
     {
         return columns_[column];
     }
 
-    Vec4 <T>& operator[](size_t column)
+    Vec4<T>& operator[](size_t column)
     {
         return columns_[column];
     }
@@ -95,7 +93,7 @@ public:
         return Mat4<T>(v);
     }
 
-    Vec4 <T> operator*(const Vec4 <T>& rhs) const
+    Vec4<T> operator*(const Vec4<T>& rhs) const
     {
         Vec4<T> v;
         for (int column = 0; column < 4; column++)
@@ -188,30 +186,22 @@ public:
 
     static Mat4<float> const RotationMatrixFrom(const Quaternion& quaternion);
 
-    static EulerAngles const Rotation(const Mat4<float>& transform);
+    static Mat4<float> const RotationMatrix(const Mat4<float>& transform);
 
-    static float Pitch(const Mat4<float>& transform);
+    static Vec3f Position(const Mat4<float>& transform);
 
-    static float RotationOnX(const Mat4<float>& transform);
-
-    static float Yaw(const Mat4<float>& transform);
-
-    static float RotationOnY(const Mat4<float>& transform);
-
-    static float Roll(const Mat4<float>& transform);
-
-    static float RotationOnZ(const Mat4<float>& transform);
+    static Vec3f Scale(const Mat4<float>& transform);
 
     static Mat4<T> Perspective(radian_t fovy, float aspect, float near, float far);
 
     friend std::ostream& operator<<(std::ostream& os, const Mat4<T>& m)
     {
-        for(int row=0; row < 4;row++)
+        for (int row = 0; row < 4; row++)
         {
             os << "(";
-            for(int col=0; col < 4;col++)
+            for (int col = 0; col < 4; col++)
             {
-                 os << m[col][row]<<' ';
+                os << m[col][row] << ' ';
             }
             os << ")";
         }
@@ -222,8 +212,8 @@ public:
     const static Mat4<T> Identity;
     const static Mat4<T> Zero;
 private:
-    std::array<Vec4 < T>, 4>
-    columns_; //row vector
+    std::array<Vec4<T>, 4>
+            columns_; //row vector
 };
 
 template<typename T, int N>
@@ -251,7 +241,7 @@ struct alignas(N * sizeof(T)) NVec4
     }
 
     //Transpose the matrix
-    explicit NVec4(const std::array<Vec4 < T>, N>& soaV)
+    explicit NVec4(const std::array<Vec4<T>, N>& soaV)
     {
         for (int i = 0; i < N; i++)
         {
@@ -262,7 +252,7 @@ struct alignas(N * sizeof(T)) NVec4
         }
     }
 
-    explicit NVec4(const Vec3 <T>* soaV)
+    explicit NVec4(const Vec3<T>* soaV)
     {
         for (int i = 0; i < N; i++)
         {
@@ -273,7 +263,7 @@ struct alignas(N * sizeof(T)) NVec4
         }
     }
 
-    explicit NVec4(const Vec4 <T>* soaV)
+    explicit NVec4(const Vec4<T>* soaV)
     {
         for (int i = 0; i < N; i++)
         {
@@ -284,7 +274,7 @@ struct alignas(N * sizeof(T)) NVec4
         }
     }
 
-    explicit NVec4(const Vec4 <T>& v)
+    explicit NVec4(const Vec4<T>& v)
     {
         for (int i = 0; i < N; i++)
         {
@@ -295,7 +285,7 @@ struct alignas(N * sizeof(T)) NVec4
         }
     }
 
-    static std::array<T, N> Dot(const NVec4<T, N>& v1, const Vec4 <T>& v)
+    static std::array<T, N> Dot(const NVec4<T, N>& v1, const Vec4<T>& v)
     {
         std::array<T, N> result{};
         for (int i = 0; i < N; i++)
@@ -320,7 +310,7 @@ struct alignas(N * sizeof(T)) NVec4
 
     static std::array<T, N> DotIntrinsics(const NVec4<T, N>& v1, const NVec4<T, N>& v2);
 
-    static std::array<T, N> DotIntrinsics(const NVec4<T, N>& v1, const Vec4 <T>& v);
+    static std::array<T, N> DotIntrinsics(const NVec4<T, N>& v1, const Vec4<T>& v);
 
 
     std::array<T, N> GetSquareMagnitude() const
@@ -489,6 +479,7 @@ using Mat3f = Mat3<float>;
 using Mat4f = Mat4<float>;
 
 #ifdef __SSE__
+
 template<>
 inline Mat4f Mat4f::Transpose() const
 {
@@ -512,8 +503,8 @@ inline Mat4f Mat4f::Transpose() const
     _mm_store_ps(&v[3][0], xmm0);
     return Mat4f(v);
 }
-#endif
 
+#endif
 
 
 template<>
@@ -527,7 +518,7 @@ inline Mat4<T> Mat4<T>::MultiplyAoSoA(const Mat4<T>& rhs) const noexcept
     std::array<Vec4f, 4> v;
     for (int column = 0; column < 4; column++)
     {
-        for(int row = 0; row < 4; row++)
+        for (int row = 0; row < 4; row++)
         {
             const auto result = Vec4f::Dot(lhsT[row], rhs.columns_[column]);
             v[column][row] = result;
@@ -538,6 +529,7 @@ inline Mat4<T> Mat4<T>::MultiplyAoSoA(const Mat4<T>& rhs) const noexcept
 }
 
 #ifdef __SSE__
+
 template<>
 inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
 {
@@ -559,13 +551,14 @@ inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
         __m128 z = _mm_mul_ps(c3, rhsZ);
         __m128 w = _mm_mul_ps(c4, rhsW);
 
-        x = _mm_add_ps(x,y);
-        z = _mm_add_ps(z,w);
-        x = _mm_add_ps(x,z);
+        x = _mm_add_ps(x, y);
+        z = _mm_add_ps(z, w);
+        x = _mm_add_ps(x, z);
         _mm_store_ps(&v[column][0], x);
     }
     return Mat4f(v);
 }
+
 #endif
 #if defined(__arm__)
 template<>
@@ -577,7 +570,7 @@ inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
     {
 
         auto c = vld1q_f32(&rhs[column][0]);
-    	
+
         auto x = vld1q_f32(&lhsT[0][0]);
         auto y = vld1q_f32(&lhsT[1][0]);
         auto z = vld1q_f32(&lhsT[2][0]);
@@ -598,7 +591,7 @@ inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
     return Mat4f(v);
 }
 #endif
-#if defined(EMSCRIPTEN) 
+#if defined(EMSCRIPTEN)
 template<>
 inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
 {
@@ -633,22 +626,22 @@ inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
 template<>
 const inline Mat4f Mat4f::Identity = Mat4f(
         std::array<Vec4f, 4>
-        {
-                Vec4f(1, 0, 0, 0),
-                Vec4f(0, 1, 0, 0),
-                Vec4f(0, 0, 1, 0),
-                Vec4f(0, 0, 0, 1)});
-template <>
+                {
+                        Vec4f(1, 0, 0, 0),
+                        Vec4f(0, 1, 0, 0),
+                        Vec4f(0, 0, 1, 0),
+                        Vec4f(0, 0, 0, 1)});
+template<>
 const inline Mat4f Mat4f::Zero = Mat4f(
         std::array<Vec4f, 4>
-        {
-            Vec4f::Zero,
-            Vec4f::Zero,
-            Vec4f::Zero,
-            Vec4f::Zero
-        });
+                {
+                        Vec4f::Zero,
+                        Vec4f::Zero,
+                        Vec4f::Zero,
+                        Vec4f::Zero
+                });
 
-template <>
+template<>
 inline Mat4f Mat4f::Perspective(radian_t fovy, float aspect, float near, float far)
 {
     assert(fabsf(aspect - std::numeric_limits<float>::epsilon()) > 0.0f);
@@ -656,11 +649,11 @@ inline Mat4f Mat4f::Perspective(radian_t fovy, float aspect, float near, float f
     const float tanHalfFovy = tanf(fovy.value() / 2.0f);
     Mat4f perspective{Mat4f::Zero};
 
-    perspective[0][0] = 1.0f/ (aspect * tanHalfFovy);
+    perspective[0][0] = 1.0f / (aspect * tanHalfFovy);
     perspective[1][1] = 1.0f / (tanHalfFovy);
-    perspective[2][2] = - (far + near) / (far - near);
-    perspective[2][3] = - 1.0f;
-    perspective[3][2] = - (2.0f * far * near) / (far - near);
+    perspective[2][2] = -(far + near) / (far - near);
+    perspective[2][3] = -1.0f;
+    perspective[3][2] = -(2.0f * far * near) / (far - near);
     return perspective;
 }
 }

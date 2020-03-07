@@ -1,4 +1,27 @@
 #pragma once
+/*
+ MIT License
+
+ Copyright (c) 2020 SAE Institute Switzerland AG
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
+ */
 
 #include "cmath"
 #include "mathematics/vector.h"
@@ -206,47 +229,36 @@ inline Transform3d Transform3d::Rotate(const Transform3d& transform, const Euler
 }
 
 template<>
-inline EulerAngles const Transform3d::Rotation(const Mat4<float>& transform)
+inline Vec3f Transform3d::Position(const Mat4<float>& transform)
 {
-    return EulerAngles();
-}
-
-// TODO
-template<>
-inline float Transform3d::Pitch(const Mat4<float>& transform)
-{
-    return 0.0f;
+    const Vec4f column = transform[3];
+    return Vec3f(column[0], column[1], column[2]);
 }
 
 template<>
-inline float Transform3d::RotationOnX(const Mat4<float>& transform)
+inline Vec3f Transform3d::Scale(const Mat4<float>& transform)
 {
-    return Pitch(transform);
-}
-
-// TODO
-template<>
-inline float Transform3d::Yaw(const Mat4<float>& transform)
-{
-    return 0.0f;
+    const Transform3d transposed = transform.Transpose();
+    return Vec3f(
+            transposed[0].GetMagnitude(),
+            transposed[1].GetMagnitude(),
+            transposed[2].GetMagnitude());
 }
 
 template<>
-inline float Transform3d::RotationOnY(const Mat4<float>& transform)
+inline Mat4<float> const Transform3d::RotationMatrix(const Mat4<float>& transform)
 {
-    return Yaw(transform);
+    // TODO: This doesn't work.
+    const Vec3f scale = Scale(transform);
+    const Transform3d transposed = transform.Transpose();
+    return Transform3d(
+            std::array<Vec4f, 4>
+                    {
+                            Vec4f(transposed[0][0] / scale.x, transposed[0][1] / scale.y, transposed[0][2] / scale.z, 0),
+                            Vec4f(transposed[1][0] / scale.x, transposed[1][1] / scale.y, transposed[1][2] / scale.y, 0),
+                            Vec4f(transposed[2][0] / scale.x, transposed[2][1] / scale.y, transposed[2][2] / scale.y, 0),
+                            Vec4f(0, 0, 0, 1)}
+            );
 }
 
-// TODO
-template<>
-inline float Transform3d::Roll(const Mat4<float>& transform)
-{
-    return 0.0f;
-}
-
-template<>
-inline float Transform3d::RotationOnZ(const Mat4<float>& transform)
-{
-    return Roll(transform);
-}
 }
