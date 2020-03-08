@@ -35,9 +35,13 @@ namespace neko
 //-----------------------------------------------------------------------------
 void LogMessage::Generate()
 {
+    time_t curTime = time(nullptr);
+#ifdef _MSC_VER
 	struct tm localTime {};
-	time_t curTime = time(nullptr);
 	localtime_s(&localTime, &curTime);
+#else
+    tm localTime = *localtime(&curTime);
+#endif
 	std::ostringstream message;
 	message << '[' << std::setw(2) << std::setfill('0') << localTime.tm_hour << ":"
 		<< std::setw(2) << std::setfill('0') << localTime.tm_min << ":"
@@ -197,9 +201,13 @@ void LogManager::WriteToFile()
 
 	auto task([this]
 	{
-		struct tm localTime {};
-		time_t curTime = time(nullptr);
-		localtime_s(&localTime, &curTime);
+        time_t curTime = time(nullptr);
+#ifdef _MSC_VER
+        struct tm localTime {};
+	    localtime_s(&localTime, &curTime);
+#else
+	    tm localTime = *localtime(&curTime);
+#endif
 
 		const std::string filePath = "../data/logs/";
 		std::ostringstream dateTime;
