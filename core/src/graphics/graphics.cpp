@@ -38,123 +38,145 @@ namespace neko
 {
 Renderer::Renderer()
 {
-    currentCommandBuffer_.reserve(MAX_COMMAND_NMB);
-    nextCommandBuffer_.reserve(MAX_COMMAND_NMB);
+	currentCommandBuffer_.reserve(MAX_COMMAND_NMB);
+	nextCommandBuffer_.reserve(MAX_COMMAND_NMB);
 }
 
 
 void Renderer::Render(RenderCommandInterface* command)
 {
-    nextCommandBuffer_.push_back(command);
+	nextCommandBuffer_.push_back(command);
 }
 
 void Renderer::RenderAll()
 {
 #ifdef EASY_PROFILE_USE
-    EASY_BLOCK("RenderAllCPU");
+	EASY_BLOCK("RenderAllCPU");
 #endif
-    for (auto* renderCommand : currentCommandBuffer_)
-    {
-        renderCommand->Render();
-    }
+	for (auto* renderCommand : currentCommandBuffer_)
+	{
+		renderCommand->Render();
+	}
 }
 
 void Renderer::Sync()
 {
 #ifdef EASY_PROFILE_USE
-    EASY_BLOCK("EngineRenderSync");
+	EASY_BLOCK("EngineRenderSync");
+	EASY_BLOCK("EngineAppWaiting");
+	EASY_BLOCK("AcquireRenderLock");
 #endif
-
-    std::unique_lock lock(renderMutex_);
-    flags_ |= IS_APP_WAITING;
+	std::unique_lock lock(renderMutex_);
+#ifdef EASY_PROFILE_USE
+	EASY_END_BLOCK;
+#endif
+	flags_ |= IS_APP_WAITING;
+#ifdef EASY_PROFILE_USE
+	EASY_BLOCK("WaitForRenderSignal");
+#endif
 #ifndef EMSCRIPTEN
-    cv_.wait(lock);
+	cv_.wait(lock);
 #endif
-    std::swap(currentCommandBuffer_, nextCommandBuffer_);
-    nextCommandBuffer_.clear();
-    BasicEngine::GetInstance()->ManageEvent();
-    window_->LeaveCurrentContext();
-    //TODO copy all the new transform3d?
+#ifdef EASY_PROFILE_USE
+	EASY_END_BLOCK;
+	EASY_END_BLOCK;
+	EASY_BLOCK("SwapRenderCommand");
+#endif
+	std::swap(currentCommandBuffer_, nextCommandBuffer_);
+	nextCommandBuffer_.clear();
+	//TODO copy all the new transform3d?
+	flags_ &= ~IS_APP_WAITING;
 }
 
 void Renderer::RenderLoop()
 {
 #ifndef EMSCRIPTEN
-    flags_ |= IS_RUNNING;
-    window_->LeaveCurrentContext();
-    renderThread_ = std::thread([this]{
-        BeforeRenderLoop();
+	flags_ |= IS_RUNNING;
+	window_->LeaveCurrentContext();
+	renderThread_ = std::thread([this] {
+		BeforeRenderLoop();
 
-        std::chrono::time_point<std::chrono::system_clock> clock = std::chrono::system_clock::now();
-        while (flags_ & IS_RUNNING)
-        {
-            const auto start = std::chrono::system_clock::now();
-            const auto dt = std::chrono::duration_cast<seconds>(start - clock);
-            dt_ = dt.count();
-        	clock = start;
-        	
-           Update();
-        }
-        AfterRenderLoop();
-    });
+		std::chrono::time_point<std::chrono::system_clock> clock = std::chrono::system_clock::now();
+		while (flags_ & IS_RUNNING)
+		{
+			const auto start = std::chrono::system_clock::now();
+			const auto dt = std::chrono::duration_cast<seconds>(start - clock);
+			dt_ = dt.count();
+			clock = start;
+
+			Update();
+		}
+		AfterRenderLoop();
+		});
 #endif
 }
 
 void Renderer::Destroy()
 {
 #ifdef EASY_PROFILE_USE
-    EASY_BLOCK("ClosingFromEngine");
+	EASY_BLOCK("ClosingFromEngine");
 #endif
-    flags_ &= ~IS_RUNNING;
-    renderThread_.join();
+	flags_ &= ~IS_RUNNING;
+	renderThread_.join();
 }
 
 void Renderer::SetFlag(Renderer::RendererFlag flag)
 {
-    flags_ |= flag;
+	flags_ |= flag;
 }
 
 void Renderer::SetWindow(Window* window)
 {
-    window_ = window;
+	window_ = window;
 }
 
 void Renderer::Update()
 {
 #ifdef EASY_PROFILE_USE
-    EASY_BLOCK("RenderFullUpdateCPU");
+	EASY_BLOCK("RenderFullUpdateCPU");
 #endif
 
 
-    auto* engine = BasicEngine::GetInstance();
-    {
-        std::lock_guard<std::mutex> lock(renderMutex_);
+	auto* engine = BasicEngine::GetInstance();
+	{
+		std::unique_lock<std::mutex> lock(renderMutex_);
 #ifdef EASY_PROFILE_USE
-        EASY_BLOCK("RenderUpdateCPU");
+		EASY_BLOCK("RenderUpdateCPU");
 #endif
-        window_->MakeCurrentContext();
-        ClearScreen();
-        engine->GenerateUiFrame();
-        RenderAll();
-        window_->RenderUi();
+		ClearScreen();
+		engine->GenerateUiFrame();
+		RenderAll();
+		lock.unlock();
+		window_->RenderUi();
+	}
+	{
 
-
-    }
-    window_->SwapBuffer();
-
-    window_->LeaveCurrentContext();
-    while (!(flags_ & IS_APP_WAITING) && (flags_ & IS_RUNNING))
-    {
-    }
-    cv_.notify_one();
+#ifdef EASY_PROFILE_USE
+		EASY_BLOCK("RenderSwapBufferCPU");
+#endif
+		window_->SwapBuffer();
+	}
+	{
+#ifdef EASY_PROFILE_USE
+		EASY_BLOCK("WaitForAppCPU");
+#endif
+		while (!(flags_ & IS_APP_WAITING) && (flags_ & IS_RUNNING))
+		{
+			cv_.notify_one();
+		}
+		//while (flags_ & (IS_APP_WAITING | IS_RUNNING))
+		{
+			cv_.notify_one();
+		}
+	}
 }
 void Renderer::BeforeRenderLoop()
 {
-    window_->MakeCurrentContext();
+	window_->MakeCurrentContext();
 }
 void Renderer::AfterRenderLoop()
 {
-    window_->LeaveCurrentContext();
+	window_->LeaveCurrentContext();
 }
 
 
