@@ -150,7 +150,9 @@ class NullLogManager final : public LogManagerInterface
 	{
 		std::cerr << "Impossible to get log history from a null LogManager\n";
 		assert(false);
+#ifdef _MSC_VER
 		return {};
+#endif
 	}
 };
 
