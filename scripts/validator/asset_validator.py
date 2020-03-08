@@ -14,8 +14,11 @@ def create_out_subdirectories(data_out):
         parent_dirs.append(data_path)
     for p in parent_dirs[::-1]:
         print(str(p.absolute()))
-        if not p.exists():
+        try:
             os.mkdir(str(p.absolute()))
+        except FileExistsError:
+            pass
+
 
 class AssetType(Enum):
     UNKNOWN = -1
@@ -36,6 +39,7 @@ def define_asset_type(filename) -> AssetType:
     if extension == '.obj':
         return AssetType.OBJ
     return AssetType.UNKNOWN
+
 
 
 if __name__ == "__main__":
