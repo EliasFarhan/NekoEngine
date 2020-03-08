@@ -29,9 +29,8 @@ namespace neko {
     //-----------------------------------------------------------------------------
     // Constructors
     //-----------------------------------------------------------------------------
-    String::String(Allocator* allocator, const size_t sizeInBytes)
+    String::String()
     {
-        allocator = nullptr;
 
         length = 0;
         data = new char[0];
@@ -46,15 +45,15 @@ namespace neko {
     String::String(const char* c)
     {
         if (c){
-            unsigned n = 0;
+            int n = 0;
 
             while (c[n] != '\0') {
                 n++;
                 length = n;
                 data = new char[n];
 
-                for (unsigned j = 0; j < n; j++) {
-                    data[j] = c[j];
+                for (int i = 0; i < n; i++) {
+                    data[i] = c[i];
                 }
             }
         }
@@ -69,8 +68,8 @@ namespace neko {
     {
         length = s.Length();
         data = new char[length];
-        for (unsigned j = 0; j < length; j++) {
-            data[j] = s[j];
+        for (int i = 0; i < length; i++) {
+            data[i] = s[i];
         }
     }
 
@@ -92,8 +91,8 @@ namespace neko {
     {
         if (s.Length() > 0)
         {
-            for (unsigned j = 0; j < s.Length(); j++) {
-                os << s[j];
+            for (int i = 0; i < s.Length(); i++) {
+                os << s[i];
             }
         }
         else os << "";
@@ -129,13 +128,16 @@ namespace neko {
 
     String& String::operator= (const String& rhs)
     {
-        if (this == &rhs) return *this;
+        if (this == &rhs) { return *this;}
 
         delete data;
         length = rhs.Length();
         data = new char[length];
-        for (unsigned j = 0; j < length; j++)
-            data[j] = rhs[j];
+
+        for (int i = 0; i < length; i++) {
+            data[i] = rhs[i];
+        }
+
         return *this;
     }
 
@@ -146,12 +148,12 @@ namespace neko {
         unsigned len = length + rhs.Length();
         char* str = new char[len];
 
-        for (unsigned j = 0; j < length; j++) {
-            str[j] = data[j];
+        for (int i = 0; i < length; i++) {
+            str[i] = data[i];
         }
 
-        for (unsigned i = 0; i < rhs.Length(); i++) {
-            str[length + i] = rhs[i];
+        for (unsigned j = 0; j < rhs.Length(); j++) {
+            str[length + j] = rhs[j];
         }
 
         delete data;
@@ -190,8 +192,8 @@ namespace neko {
             return false;
         }
 
-        unsigned cap = lhs.Length();
-        unsigned   n = 0;
+        int cap = lhs.Length();
+        int n = 0;
         while ((n < cap) && (lhs[n] == rhs[n])) {
             n++;
         }

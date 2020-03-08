@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iso646.h>
 #include <memory>
 #include "engine/assert.h"
 

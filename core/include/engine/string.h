@@ -12,15 +12,22 @@ public:
     // Constructors
     //-----------------------------------------------------------------------------
 
-    String(Allocator* allocator, const size_t sizeInBytes);
+    /// \brief Empty String Constructor
+    String();
+
+    /// \brief Single-character String Constructor
     String(char c);
 
+    /// \brief char* String Constructor
     String(const char* c);
 
+    /// \brief Copy String Constructor
     String(const String& s);
 
+    /// \brief Default String Destructor
     ~String();
 
+    /// \brief String length
     unsigned Length() const;
 
     //-----------------------------------------------------------------------------
