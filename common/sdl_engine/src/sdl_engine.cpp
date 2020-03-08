@@ -71,7 +71,6 @@ void SdlEngine::ManageEvent()
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("Manage Event");
 #endif
-    window_->MakeCurrentContext();
     SDL_Event event;
     while (SDL_PollEvent(&event))
     {
@@ -92,7 +91,6 @@ void SdlEngine::ManageEvent()
         }
     }
     onEventAction_.Execute(event);
-    window_->LeaveCurrentContext();
 }
 
 void SdlEngine::GenerateUiFrame()

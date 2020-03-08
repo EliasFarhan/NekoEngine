@@ -83,9 +83,7 @@ void BasicEngine::Update(seconds dt)
 		EASY_BLOCK("Application Update");
 #endif
 
-#ifdef EMSCRIPTEN
 		ManageEvent();
-#endif
 		updateAction_.Execute(dt);
 	}
 #ifdef EMSCRIPTEN
