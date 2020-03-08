@@ -21,6 +21,7 @@ file(GLOB_RECURSE SHADER_FILES
         )
 file(GLOB_RECURSE IMG_FILES
         "${PROJECT_SOURCE_DIR}/data/*.jpg"
+        "${PROJECT_SOURCE_DIR}/data/*.JPG"
         "${PROJECT_SOURCE_DIR}/data/*.png"
         "${PROJECT_SOURCE_DIR}/data/*.jpeg"
         "${PROJECT_SOURCE_DIR}/data/*.bmp"
