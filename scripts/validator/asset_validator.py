@@ -2,7 +2,7 @@ import json
 import sys
 import os
 from pathlib import Path
-
+from enum import Enum
 
 def create_out_subdirectories(data_out):
     parent_dirs = []
@@ -17,8 +17,26 @@ def create_out_subdirectories(data_out):
         if not p.exists():
             os.mkdir(str(p.absolute()))
 
-def define_asset_type(filename):
-    pass
+class AssetType(Enum):
+    UNKNOWN = -1
+    MTL = 0
+    OBJ = 1
+    TEXTURE = 2
+    SCENE = 3
+    SHADER = 4
+
+def define_asset_type(filename) -> AssetType:
+    path = Path(filename)
+    extension = path.suffix.lower
+
+    if extension == ".jpg"  or extension == ".jpeg":
+        return AssetType.TEXTURE
+    if extension == '.mtl':
+        return AssetType.MTL
+    if extension == '.obj':
+        return AssetType.OBJ
+    return AssetType.UNKNOWN
+
 
 if __name__ == "__main__":
     arguments = ", ".join(sys.argv)
