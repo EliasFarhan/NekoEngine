@@ -40,7 +40,7 @@ struct Obb2d {
     }
 
     /// Set the center, the extent and the rotation of the OBB.
-    void SetCenterExtentRot(Vec2f center, Vec2f extent, float rot) {
+    void SetCenterExtentRot(Vec2f center, Vec2f extent, degree_t rot) {
         lowerLeftBound = center - extent;
         upperRightBound = center + extent;
 		rotation = rot;
@@ -77,7 +77,6 @@ struct Obb2d {
 
     float GetExtentOnAxis(Vec2f axis) {
         float extent;
-		float rotationToAxis;
 
         if (axis == CalculateDirection()) {
             extent = upperRightBound.y - lowerLeftBound.y;
@@ -87,21 +86,22 @@ struct Obb2d {
             extent = upperRightBound.x - lowerLeftBound.x;
         }
 		
-		rotationToAxis = Vec2f::AngleBetween(axis, CalculateDirection()).value;
-		rotationToAxis = rotationToAxis % PI;
+		float rotationToAxis = Vec2f::AngleBetween(axis, CalculateDirection()).
+            value();
+		rotationToAxis = std::fmod(rotationToAxis, PI);
 
 		if((rotationToAxis >= 0 && rotationToAxis <= PI / 2) || (rotationToAxis >= -PI && rotationToAxis <= -PI / 2))
 		{
 			Vec2f lowerLeftToTopRight = lowerLeftBound - upperRightBound;
 
-			extent = (lowerLeftToTopRight.Magnitude() * Vec2f::AngleBetween(lowerLeftToTopRight, axis)).value;
+			extent = (lowerLeftToTopRight.Magnitude() * Vec2f::AngleBetween(lowerLeftToTopRight, axis)).value();
 		}
 		else
 		{
 			Vec2f upperLeftBound = GetOppositeBound(upperRightBound, true);
 			Vec2 lowerRightToUpperLeft = (upperLeftBound - GetCenter()) * 2;
 
-			extent = (lowerRightToUpperLeft.Magnitude() * Vec2f::AngleBetween(lowerRightToUpperLeft, axis)).value;
+			extent = (lowerRightToUpperLeft.Magnitude() * Vec2f::AngleBetween(lowerRightToUpperLeft, axis)).value();
 		}
 
         return extent;
@@ -117,7 +117,7 @@ struct Obb2d {
 		{
             centerToProjectionOnDir =
                 CalculateDirection() * (centerToBound).Magnitude() *
-                std::cosf(Vec2f::AngleBetween(centerToBound, CalculateDirection()).value);
+                Cos(Vec2f::AngleBetween(centerToBound, CalculateDirection()));
             boundToOppositeBound =
                 GetCenter() + centerToProjectionOnDir - bound;
             oppositeBound = upperRightBound + boundToOppositeBound +
@@ -126,7 +126,7 @@ struct Obb2d {
 		{
             centerToProjectionOnDir =
                 CalculateDirection() * (centerToBound).Magnitude() *
-                std::cosf(Vec2f::AngleBetween(centerToBound, CalculateDirection()).value) * -1;
+                Cos(Vec2f::AngleBetween(centerToBound, CalculateDirection())) * -1;
             boundToOppositeBound =
                 GetCenter() + centerToProjectionOnDir - bound;
             oppositeBound = upperRightBound + boundToOppositeBound +
@@ -139,20 +139,20 @@ struct Obb2d {
 	Vec2f CalculateDirection()	///< return the normal of the upper side
 	{
 		Vec2f direction;
-		direction.x = std::cosf(rotation);
-		direction.y = std::sinf(rotation);
+		direction.x = Cos(rotation);
+		direction.y = Sin(rotation);
 		return direction;
 	}
 
     Vec2f lowerLeftBound;	///< the lower vertex
     Vec2f upperRightBound;	///< the upper vertex
-	float rotation;       ///< the angle of rotation in rd
+    degree_t rotation;       ///< the angle of rotation in rd
 };
 
 struct Obb3d {
 
 	/// Set the center, the extent and the rotations of the OBB.
-	void SetCenterExtentRotZRotX(Vec3f center, Vec3f extent, float rotz, float rotx) {
+	void SetCenterExtentRotZRotX(Vec3f center, Vec3f extent, degree_t rotz, degree_t rotx) {
 		lowerLeftBound = center - extent;
 		upperRightBound = center + extent;
 		rotationZ = rotz;
@@ -160,7 +160,7 @@ struct Obb3d {
 	}
 
 	Vec3f CalculateDirection(){
-		return Vec3f(cosf(rotationZ), sinf(rotationX) + sinf(rotationZ), cos(rotationX));		// TODO normalize vec3f
+		return Vec3f(Cos(rotationZ), Sin(rotationX) + Sin(rotationZ), Cos(rotationX)).Normalized();		// TODO normalize vec3f
 	}
 
 	bool IntersectObb(Obb3d obb)
@@ -177,9 +177,9 @@ struct Obb3d {
 
 	Vec3f GetDirection()
 	{
-		float x = cosf(rotationZ);
-		float y = sinf(rotationZ)+sinf(rotationX);
-		float z = cosf(rotationX);
+		float x = Cos(rotationZ);
+		float y = Sin(rotationZ)+Sin(rotationX);
+		float z = Cos(rotationX);
 		// return Vec3f(x, y, z).Normalized;
 	}
 
@@ -195,8 +195,8 @@ struct Obb3d {
 
 	Vec3f lowerLeftBound;	///< the lower vertex
 	Vec3f upperRightBound;	///< the upper vertex
-	float rotationZ;       ///< the angle of rotation on the Z axis in rd
-	float rotationX;       ///< the angle of rotation on the X axis in rd
+	degree_t rotationZ;       ///< the angle of rotation on the Z axis in rd
+	degree_t rotationX;       ///< the angle of rotation on the X axis in rd
 };
 
 
@@ -225,8 +225,8 @@ struct Aabb2d {
         corners[1] = Vec2f(lowerLeftBound.x, upperRightBound.y);
         corners[2] = Vec2f(upperRightBound.x, lowerLeftBound.y);
         corners[3] = upperRightBound;
-        const float cosAngle = std::cos(newAngle.value());
-        const float sinAngle = std::sin(newAngle.value());
+        const float cosAngle = Cos(newAngle);
+        const float sinAngle = Sin(newAngle);
         for (const Vec2f corner : corners) {
             const float x = corner.x * cosAngle - corner.y * sinAngle;
             const float y = corner.x * sinAngle + corner.y * cosAngle;
@@ -292,8 +292,8 @@ struct Aabb2d {
     }
 
 
-    Vec2f lowerLeftBound = Vec2f::Zero; // the lower vertex
-    Vec2f upperRightBound = Vec2f::Zero; // the upper vertex
+    Vec2f lowerLeftBound = Vec2f::zero; // the lower vertex
+    Vec2f upperRightBound = Vec2f::zero; // the upper vertex
 };
 
 struct Aabb3d {
@@ -307,7 +307,7 @@ struct Aabb3d {
     void FromCenterExtends(
         const Vec3f center,
         const Vec3f extends,
-        const Vec3f rotation = Vec3f::Zero) {
+        const Vec3f rotation = Vec3f::zero) {
         lowerLeftBound = center - extends;
         upperRightBound = center + extends;
     }
@@ -329,12 +329,12 @@ struct Aabb3d {
         corners[3] = Vec3f(lowerLeftBound.x, lowerLeftBound.y, upperRightBound.z);
         corners[4] = Vec3f(upperRightBound.x, lowerLeftBound.y, lowerLeftBound.z);
         corners[5] = Vec3f(upperRightBound.x, upperRightBound.y, lowerLeftBound.z);
-        const float cosAngleX = std::cos(newAngle.x.value());
-        const float sinAngleX = std::sin(newAngle.x.value());
-        const float cosAngleY = std::cos(newAngle.y.value());
-        const float sinAngleY = std::sin(newAngle.y.value());
-        const float cosAngleZ = std::cos(newAngle.z.value());
-        const float sinAngleZ = std::sin(newAngle.z.value());
+        const float cosAngleX = Cos(newAngle.x);
+        const float sinAngleX = Sin(newAngle.x);
+        const float cosAngleY = Cos(newAngle.y);
+        const float sinAngleY = Sin(newAngle.y);
+        const float cosAngleZ = Cos(newAngle.z);
+        const float sinAngleZ = Sin(newAngle.z);
         for (Vec3f corner : corners) {
             //Rotate around X
             float x = corner.x * cosAngleX - corner.y * sinAngleX;
@@ -361,7 +361,7 @@ struct Aabb3d {
 
     ////\brief Set the AABB3d from OBB3d.
     //void FromObb(Obb3d obb) {
-    //	FromCenterExtendsRotation(0.5f * (obb.upperRightBound - obb.lowerLeftBound), obb.GetCenter(), Vec3f::AngleBetween<>(Vec3f(0, 1), obb.direction));
+    //	FromCenterExtendsRotation(obb.GetCenter(), obb.GetExtends(), Vec3f::AngleBetween<>(Vec3f(0, 1)));
     //}
 
     bool ContainsPoint(const Vec3f point) const {
@@ -427,8 +427,8 @@ struct Aabb3d {
         return std::abs(s) <= r;
     }
 
-    Vec3f lowerLeftBound = Vec3f::Zero; // the lower vertex
-    Vec3f upperRightBound = Vec3f::Zero; // the upper vertex
+    Vec3f lowerLeftBound = Vec3f::zero; // the lower vertex
+    Vec3f upperRightBound = Vec3f::zero; // the upper vertex
 };
 
 }

@@ -108,3 +108,65 @@ TEST(Engine, TestMatrix4)
     EXPECT_TRUE(neko::Mat4f::MatrixDifference(m1.MultiplyIntrinsincs(m1), result)<0.01f);
     EXPECT_TRUE(neko::Mat4f::MatrixDifference(m1.MultiplyNaive(m1), m1.MultiplyIntrinsincs(m1))<0.01f);
 }
+
+
+TEST(Engine, TestAabb)
+{
+    neko::Aabb2d aabb1;
+    aabb1.FromCenterExtends(neko::Vec2f(0, 0), neko::Vec2f(0.5, 0.5));
+    neko::Aabb2d aabb2;
+    aabb2.FromCenterExtends(neko::Vec2f(1, 1), neko::Vec2f(1, 1));
+    std::cout << "AABB1 (" << aabb1.lowerLeftBound << " , " << aabb1.upperRightBound << "); AABB2 (" << aabb2.lowerLeftBound << " , " << aabb2.upperRightBound << ")  Contains :" << aabb1.ContainsAabb(aabb2) << "  Intersect :" << aabb1.IntersectAabb(aabb2) << "\n";
+    EXPECT_FALSE(aabb1.ContainsAabb(aabb2));
+    EXPECT_TRUE(aabb1.IntersectAabb(aabb2));
+
+    neko::Vec2f origin1 = neko::Vec2f(-1, -1);
+    neko::Vec2f dir1 = neko::Vec2f(1, 1);
+    std::cout << "AABB1 (" << aabb1.lowerLeftBound << " , " << aabb1.upperRightBound << "); Ray (" << origin1 << " , " << dir1 << ")  Intersect :" << aabb1.IntersectRay(dir1, origin1) << "\n";
+    EXPECT_TRUE(aabb1.IntersectRay(dir1, origin1));
+
+    neko::radian_t angle = static_cast<neko::radian_t>(neko::PI / 4);
+    neko::Obb2d obb1;
+    obb1.SetCenterExtentRot(neko::Vec2f(0, 0), neko::Vec2f(0.5, 0.5), angle);
+    neko::Obb2d obb2;
+    obb2.SetCenterExtentRot(neko::Vec2f(1, 1), neko::Vec2f(0.5, 0.5), angle);
+    std::cout << "OBB1 (" << obb1.lowerLeftBound << " , " << obb1.upperRightBound << "); OBB2 (" << obb2.lowerLeftBound << " , " << obb2.upperRightBound << ")  Intersect :" << obb1.IntersectObb(obb2) << "\n";
+    //EXPECT_FALSE(obb1.IntersectObb(obb2));
+
+    aabb1.FromObb(obb1);
+    aabb2.FromObb(obb2);
+    std::cout << "AABB1 (" << aabb1.lowerLeftBound << " , " << aabb1.upperRightBound << "); AABB2 (" << aabb2.lowerLeftBound << " , " << aabb2.upperRightBound << ")  Contains :" << aabb1.ContainsAabb(aabb2) << "  Intersect :" << aabb1.IntersectAabb(aabb2) << "\n";
+    //EXPECT_FALSE(aabb1.ContainsAabb(aabb2));
+    //EXPECT_TRUE(aabb1.IntersectAabb(aabb2));
+
+    neko::Aabb3d aabb3;
+    aabb3.FromCenterExtends(neko::Vec3f(0, 0, 0), neko::Vec3f(1, 1, 1));
+    neko::Aabb3d aabb4;
+    aabb4.FromCenterExtends(neko::Vec3f(1, 1, 1), neko::Vec3f(1, 1, 1));
+    std::cout << "AABB1 (" << aabb3.lowerLeftBound << " , " << aabb3.upperRightBound << "); AABB2 (" << aabb4.lowerLeftBound << " , " << aabb4.upperRightBound << ")  Contains :" << aabb3.ContainsAabb(aabb4) << "  Intersect :" << aabb3.IntersectAabb(aabb4) << "\n";
+    EXPECT_FALSE(aabb3.ContainsAabb(aabb4));
+    EXPECT_TRUE(aabb3.IntersectAabb(aabb4));
+
+    neko::Vec3f origin2 = neko::Vec3f(-2, -2, -2);
+    neko::Vec3f dir2 = neko::Vec3f(1, 0, 1);
+    std::cout << "AABB1 (" << aabb3.lowerLeftBound << " , " << aabb3.upperRightBound << "); Ray (" << origin2 << " , " << dir2 << ")  Intersect :" << aabb3.IntersectRay(dir2, origin2) << "\n";
+    EXPECT_FALSE(aabb3.IntersectRay(dir2, origin2));
+
+    neko::Vec3f origin3 = neko::Vec3f(-10, 0, -2);
+    neko::Vec3f normal3 = neko::Vec3f(1, 1, 0);
+    std::cout << "AABB1 (" << aabb3.lowerLeftBound << " , " << aabb3.upperRightBound << "); Plane (" << origin3 << " , " << normal3 << ")  Intersect :" << aabb3.IntersectPlane(normal3, origin3) << "\n";
+    EXPECT_FALSE(aabb3.IntersectPlane(normal3, origin3));
+
+    neko::Obb2d obb3;
+    obb3.SetCenterExtentRot(neko::Vec2f(0, 0), neko::Vec2f(0.5, 0.5), angle);
+    neko::Obb2d obb4;
+    obb4.SetCenterExtentRot(neko::Vec2f(1, 1), neko::Vec2f(0.5, 0.5), angle);
+    std::cout << "OBB1 (" << obb3.lowerLeftBound << " , " << obb3.upperRightBound << "); OBB2 (" << obb4.lowerLeftBound << " , " << obb4.upperRightBound << ")  Intersect :" << obb3.IntersectObb(obb4) << "\n";
+    //EXPECT_FALSE(obb3.IntersectObb(obb4));
+
+    //aabb3.FromObb(obb3);
+    //aabb4.FromObb(obb4);
+    //std::cout << "AABB1 (" << aabb3.lowerLeftBound << " , " << aabb3.upperRightBound << "); AABB2 (" << aabb4.lowerLeftBound << " , " << aabb4.upperRightBound << ")  Contains :" << aabb3.ContainsAabb(aabb4) << "  Intersect :" << aabb3.IntersectAabb(aabb4) << "\n";
+    //EXPECT_FALSE(aabb1.ContainsAabb(aabb2));
+    //EXPECT_TRUE(aabb1.IntersectAabb(aabb2));
+}
