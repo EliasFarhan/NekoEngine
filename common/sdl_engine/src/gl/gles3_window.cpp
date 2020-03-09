@@ -46,7 +46,7 @@ void Gles3Window::Init()
     SdlWindow::Init();
     
     std::string videoDriver = SDL_GetCurrentVideoDriver();
-    logDebug(videoDriver);
+    LogDebug(videoDriver);
     
     glContext_ = SDL_GL_CreateContext(window_);
     MakeCurrentContext();
@@ -55,7 +55,7 @@ void Gles3Window::Init()
 #ifndef __EMSCRIPTEN__
     if (!gladLoadGLES2Loader((GLADloadproc) SDL_GL_GetProcAddress))
     {
-        logDebug("Failed to initialize OpenGL context\n");
+        LogDebug("Failed to initialize OpenGL context\n");
         assert(false);
     }
 #endif

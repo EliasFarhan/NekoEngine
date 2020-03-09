@@ -38,7 +38,7 @@ void SceneManager::ParseSceneJson(const json& sceneJson)
         {
             std::ostringstream oss;
             oss << "[Warning] Scene Path in scene: "<<currentScene_.sceneName<<" contains a bad scene path";
-            logDebug(oss.str());
+            LogDebug(oss.str());
         }
     }
 
