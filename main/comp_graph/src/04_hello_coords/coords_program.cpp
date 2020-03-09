@@ -21,6 +21,8 @@ void HelloCoordsProgram::Init()
     view = Mat4f::Translate(view, Vec3f(0.0f, 0.0f, -3.0f));
 
 
+    glEnable(GL_DEPTH_TEST);
+
 }
 
 

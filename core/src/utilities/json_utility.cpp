@@ -32,29 +32,30 @@ SOFTWARE.
 namespace neko
 {
 
-bool IsJsonValueNumeric(const json::value_type & jsonValue)
+bool IsJsonValueNumeric(const json::value_type& jsonValue)
 {
-	return jsonValue.type() == json::value_t::number_float || 
-		   jsonValue.type() == json::value_t::number_integer || 
-		   jsonValue.type() == json::value_t::number_unsigned;
+    return jsonValue.type() == json::value_t::number_float ||
+           jsonValue.type() == json::value_t::number_integer ||
+           jsonValue.type() == json::value_t::number_unsigned;
 }
 
-bool CheckJsonExists(const json & jsonObject, std::string parameterName)
+bool CheckJsonExists(const json& jsonObject, std::string parameterName)
 {
-	return jsonObject.find(parameterName) != jsonObject.end();
+    return jsonObject.find(parameterName) != jsonObject.end();
 }
 
 bool CheckJsonParameter(const json& jsonObject, std::string parameterName, json::value_t expectedType)
 {
-	return CheckJsonExists(jsonObject, parameterName) && jsonObject[parameterName].type() == expectedType;
+    return CheckJsonExists(jsonObject, parameterName) && jsonObject[parameterName].type() == expectedType;
 }
 
 bool CheckJsonNumber(const json& jsonObject, std::string parameterName)
 {
-	return CheckJsonParameter(jsonObject, parameterName, json::value_t::number_float) or
-		   CheckJsonParameter(jsonObject, parameterName, json::value_t::number_integer) or
-		   CheckJsonParameter(jsonObject, parameterName, json::value_t::number_unsigned);
+    return CheckJsonParameter(jsonObject, parameterName, json::value_t::number_float) or
+           CheckJsonParameter(jsonObject, parameterName, json::value_t::number_integer) or
+           CheckJsonParameter(jsonObject, parameterName, json::value_t::number_unsigned);
 }
+
 Vec2f GetVectorFromJson(const json& jsonObject, std::string parameterName)
 {
     Vec2f vector = Vec2f();
@@ -92,26 +93,16 @@ json LoadJson(const std::string_view jsonPath)
 {
 
     json jsonContent;
-	if (!neko::FileExists(jsonPath))
-	{
-		logDebug("[Error] File does not exist: " + std::string(jsonPath));
-		return jsonContent;
-	}
-	
-	try
-	{
-		const auto jsonStrContent = LoadFile(jsonPath.data());
-		jsonContent = json::parse(jsonStrContent, nullptr, false);
-	}
-	catch (json::parse_error& e)
-	{
-		
-		std::ostringstream oss;
-		oss << "[Error] File: " << jsonPath << " is not json\n" << e.what();
-		logDebug(oss.str());
-		
-	}
-	return jsonContent;
+    if (!neko::FileExists(jsonPath))
+    {
+        logDebug("[Error] File does not exist: " + std::string(jsonPath));
+        return jsonContent;
+    }
+
+    const auto jsonStrContent = LoadFile(jsonPath.data());
+    jsonContent = json::parse(jsonStrContent, nullptr, false);
+
+    return jsonContent;
 }
 
 }

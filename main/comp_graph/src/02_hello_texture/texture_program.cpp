@@ -19,6 +19,8 @@ void HelloTextureProgram::Init()
 
     auto texturePath = config.dataRootPath + "data/sprites/wall.jpg";
     textureId_ = neko::gl::stbCreateTexture(texturePath.c_str());
+
+    glEnable(GL_DEPTH_TEST);
 }
 
 void HelloTextureProgram::Update(seconds dt)
