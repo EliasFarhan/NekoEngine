@@ -67,11 +67,10 @@ void SdlEngine::Destroy()
 
 void SdlEngine::ManageEvent()
 {
-    std::lock_guard<std::mutex> lock(renderer_->GetRenderMutex());
+    
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("Manage Event");
 #endif
-    window_->MakeCurrentContext();
     SDL_Event event;
     while (SDL_PollEvent(&event))
     {
@@ -86,13 +85,12 @@ void SdlEngine::ManageEvent()
         {
             if (event.window.event == SDL_WINDOWEVENT_RESIZED)
             {
-                config.windowSize = Vec2i(event.window.data1, event.window.data2);
-                window_->OnResize(Vec2u(event.window.data1, event.window.data2));
+                config.windowSize = Vec2u(event.window.data1, event.window.data2);
+                window_->OnResize(config.windowSize);
             }
         }
     }
     onEventAction_.Execute(event);
-    window_->LeaveCurrentContext();
 }
 
 void SdlEngine::GenerateUiFrame()

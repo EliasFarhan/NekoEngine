@@ -11,12 +11,17 @@ file(GLOB_RECURSE TEXT_FILES
         "${PROJECT_SOURCE_DIR}/data/*.txt"
         "${PROJECT_SOURCE_DIR}/data/*.scene"
         )
+file(GLOB_RECURSE MODEL_FILES
+    "${PROJECT_SOURCE_DIR}/data/*.obj"
+    "${PROJECT_SOURCE_DIR}/data/*.mtl"
+    )
 file(GLOB_RECURSE SHADER_FILES
         "${PROJECT_SOURCE_DIR}/data/*.vert"
         "${PROJECT_SOURCE_DIR}/data/*.frag"
         )
 file(GLOB_RECURSE IMG_FILES
         "${PROJECT_SOURCE_DIR}/data/*.jpg"
+        "${PROJECT_SOURCE_DIR}/data/*.JPG"
         "${PROJECT_SOURCE_DIR}/data/*.png"
         "${PROJECT_SOURCE_DIR}/data/*.jpeg"
         "${PROJECT_SOURCE_DIR}/data/*.bmp"
@@ -38,22 +43,21 @@ source_group("Data\\Text"           FILES ${TEXT_FILES})
 source_group("Data\\Img"            FILES ${IMG_FILES})
 source_group("Data\\Snd"			FILES ${SND_FILES})
 source_group("Data\\Shaders"		FILES ${SHADER_FILES})
-
-LIST(APPEND DATA_FILES ${IMG_FILES} ${SND_FILES} ${TEXT_FILES} ${SHADER_FILES})
+source_group("DATA\\Model" FILES ${MODEL_FILES})
+LIST(APPEND DATA_FILES ${IMG_FILES} ${MODEL_FILES} ${SND_FILES} ${TEXT_FILES} ${SHADER_FILES})
 
 foreach(DATA ${DATA_FILES})
     get_filename_component(FILE_NAME ${DATA} NAME)
     get_filename_component(PATH_NAME ${DATA} DIRECTORY)
     get_filename_component(EXTENSION ${DATA} EXT)
     file(RELATIVE_PATH PATH_NAME "${PROJECT_SOURCE_DIR}" ${PATH_NAME})
-    MESSAGE("DATA: ${FILE_NAME} ${PATH_NAME} ${EXTENSION}")
     set(DATA_OUTPUT "${PROJECT_BINARY_DIR}/${PATH_NAME}/${FILE_NAME}")
 
     add_custom_command(
             OUTPUT ${DATA_OUTPUT}
             DEPENDS ${DATA}
-            COMMAND ${CMAKE_COMMAND} -E make_directory "${PROJECT_BINARY_DIR}/${PATH_NAME}"
-            COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/scripts/validator/asset_validator.py"  "${DATA}"
+            DEPENDS 
+            COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/scripts/validator/asset_validator.py"  "${DATA}" "${DATA_OUTPUT}"
             COMMAND ${CMAKE_COMMAND} -E copy ${DATA} "${PROJECT_BINARY_DIR}/${PATH_NAME}/${FILE_NAME}"
     )
     list(APPEND DATA_BINARY_FILES ${DATA_OUTPUT})

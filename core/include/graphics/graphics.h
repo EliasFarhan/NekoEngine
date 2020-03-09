@@ -81,6 +81,7 @@ public:
         IS_RUNNING = 1u << 0u,
         IS_APP_WAITING = 1u << 1u,
         IS_RENDERING_UI = 1u << 2u,
+    	IS_APP_SWAPPING = 1u << 3u
     };
 
     Renderer();
@@ -106,7 +107,6 @@ public:
     void SetFlag(RendererFlag flag);
     void SetWindow(Window* window);
     float GetDeltaTime() const { return dt_; }
-    std::mutex& GetRenderMutex(){ return renderMutex_;}
 protected:
     virtual void ClearScreen() = 0;
 
@@ -119,9 +119,13 @@ protected:
     std::thread renderThread_;
 
     //Used to synchronize the EngineLoop with the RenderLoop
+#ifndef EMSCRIPTEN
     std::mutex renderMutex_;
-    std::atomic<std::uint8_t> flags_{IS_RENDERING_UI};
+
     std::condition_variable cv_;
+#endif
+
+    std::atomic<std::uint8_t> flags_{IS_RENDERING_UI};
     std::atomic<float> dt_{0.0f};
 
     std::vector<RenderCommandInterface*> currentCommandBuffer_ = {};

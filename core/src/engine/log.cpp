@@ -27,8 +27,8 @@
 static std::vector<std::string> logs;
 void logDebug(const std::string& msg)
 {
-	std::cout << msg << '\n';
-	logs.push_back(msg);
+	std::cout << msg << std::endl;
+	//logs.push_back(msg);
 }
 
 const std::vector<std::string>& getLog()
