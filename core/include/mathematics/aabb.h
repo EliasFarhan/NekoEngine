@@ -39,10 +39,10 @@ struct Obb2d {
 		return Vec2f(CalculateDirection().y,-CalculateDirection().x);
     }
 
-    /// Set the center, the extent and the rotation of the OBB.
-    void SetCenterExtentRot(Vec2f center, Vec2f extent, degree_t rot) {
-        lowerLeftBound = center - extent;
-        upperRightBound = center + extent;
+    /// Set the center, the extends and the rotation of the OBB.
+    void SetCenterExtendsRot(Vec2f center, Vec2f extends, degree_t rot) {
+        lowerLeftBound = center - extends;
+        upperRightBound = center + extends;
 		rotation = rot;
     }
 
@@ -55,35 +55,37 @@ struct Obb2d {
 
 		float centersDistance = (GetCenter() - obb.GetCenter()).Magnitude();
 
-		if(2*centersDistance <= GetExtentOnAxis(axis1) + obb.GetExtentOnAxis(axis1))
+		if(centersDistance <= GetExtendOnAxis(axis1) + obb.GetExtendOnAxis(axis1))
 		{
-			return false;
+			return true;
 		}
-		if (2 * centersDistance <= GetExtentOnAxis(axis2) + obb.GetExtentOnAxis(axis2))
+		if (centersDistance <= GetExtendOnAxis(axis2) + obb.GetExtendOnAxis(axis2))
 		{
-			return false;
+			return true;
 		}
-		if (2 * centersDistance <= GetExtentOnAxis(axis3) + obb.GetExtentOnAxis(axis3))
+		if (centersDistance <= GetExtendOnAxis(axis3) + obb.GetExtendOnAxis(axis3))
 		{
-			return false;
+			return true;
 		}
-		if (2 * centersDistance <= GetExtentOnAxis(axis4) + obb.GetExtentOnAxis(axis4))
+		if (centersDistance <= GetExtendOnAxis(axis4) + obb.GetExtendOnAxis(axis4))
 		{
-			return false;
+			return true;
 		}
 
-        return true;
+        return false;
     }
 
-    float GetExtentOnAxis(Vec2f axis) {
-        float extent;
+    float GetExtendOnAxis(Vec2f axis) {
+        float extend;
 
         if (axis == CalculateDirection()) {
-            extent = upperRightBound.y - lowerLeftBound.y;
+            extend = 0.5f * (upperRightBound.y - lowerLeftBound.y);
+            return extend;
         }
 
         if (axis == GetRight()) {
-            extent = upperRightBound.x - lowerLeftBound.x;
+            extend = 0.5f * (upperRightBound.x - lowerLeftBound.x);
+            return extend;
         }
 		
 		float rotationToAxis = Vec2f::AngleBetween(axis, CalculateDirection()).
@@ -94,17 +96,17 @@ struct Obb2d {
 		{
 			Vec2f lowerLeftToTopRight = lowerLeftBound - upperRightBound;
 
-			extent = (lowerLeftToTopRight.Magnitude() * Vec2f::AngleBetween(lowerLeftToTopRight, axis)).value();
+            extend = (lowerLeftToTopRight.Magnitude() * Vec2f::AngleBetween(lowerLeftToTopRight, axis)).value();
 		}
 		else
 		{
 			Vec2f upperLeftBound = GetOppositeBound(upperRightBound, true);
 			Vec2 lowerRightToUpperLeft = (upperLeftBound - GetCenter()) * 2;
 
-			extent = (lowerRightToUpperLeft.Magnitude() * Vec2f::AngleBetween(lowerRightToUpperLeft, axis)).value();
+            extend = (lowerRightToUpperLeft.Magnitude() * Vec2f::AngleBetween(lowerRightToUpperLeft, axis)).value();
 		}
 
-        return extent;
+        return extend;
     }
 
     Vec2f GetOppositeBound(Vec2f bound, bool isUpper) {
@@ -146,15 +148,15 @@ struct Obb2d {
 
     Vec2f lowerLeftBound;	///< the lower vertex
     Vec2f upperRightBound;	///< the upper vertex
-    degree_t rotation;       ///< the angle of rotation in rd
+    radian_t rotation;       ///< the angle of rotation in rd
 };
 
 struct Obb3d {
 
-	/// Set the center, the extent and the rotations of the OBB.
-	void SetCenterExtentRotZRotX(Vec3f center, Vec3f extent, degree_t rotz, degree_t rotx) {
-		lowerLeftBound = center - extent;
-		upperRightBound = center + extent;
+	/// Set the center, the extend and the rotations of the OBB.
+	void SetCenterExtendsRotZRotX(Vec3f center, Vec3f extend, degree_t rotz, degree_t rotx) {
+		lowerLeftBound = center - extend;
+		upperRightBound = center + extend;
 		rotationZ = rotz;
 		rotationX = rotx;
 	}
@@ -209,39 +211,41 @@ struct Aabb2d {
     Vec2f CalculateExtends() const { return 0.5f * (upperRightBound - lowerLeftBound); }
 
     ///\brief Set the AABB from the center, extends.
-    void FromCenterExtends(const Vec2f center, const Vec2f extend) {
-        lowerLeftBound = center - extend;
-        upperRightBound = center + extend;
+    void FromCenterExtends(const Vec2f center, const Vec2f extends) {
+        lowerLeftBound = center - extends;
+        upperRightBound = center + extends;
     }
 
     ///\brief Enlarge AABB after a rotation
     void FromCenterExtendsRotation(
         const Vec2f center,
-        const Vec2f extend,
+        const Vec2f extends,
         const degree_t rotation) {
+        Vec2f relativeLowerLeftBound = extends *-1.0f;
+        Vec2f relativeUpperRightBound = extends;
         radian_t newAngle = rotation;
         std::array<Vec2f, 4> corners;
-        corners[0] = lowerLeftBound;
-        corners[1] = Vec2f(lowerLeftBound.x, upperRightBound.y);
-        corners[2] = Vec2f(upperRightBound.x, lowerLeftBound.y);
-        corners[3] = upperRightBound;
+        corners[0] = relativeLowerLeftBound.Rotate(newAngle);
+        corners[1] = Vec2f(relativeLowerLeftBound.x, relativeUpperRightBound.y).Rotate(newAngle);
+        corners[2] = Vec2f(relativeUpperRightBound.x, relativeLowerLeftBound.y).Rotate(newAngle);
+        corners[3] = relativeUpperRightBound.Rotate(newAngle);
         const float cosAngle = Cos(newAngle);
         const float sinAngle = Sin(newAngle);
         for (const Vec2f corner : corners) {
-            const float x = corner.x * cosAngle - corner.y * sinAngle;
-            const float y = corner.x * sinAngle + corner.y * cosAngle;
-            if (x > upperRightBound.x) { upperRightBound.x = x; }
-            if (x < lowerLeftBound.x) { lowerLeftBound.x = x; }
-            if (y > upperRightBound.y) { upperRightBound.y = y; }
-            if (y < lowerLeftBound.y) { lowerLeftBound.y = y; }
+            if (corner.x > relativeUpperRightBound.x) { relativeUpperRightBound.x = corner.x; }
+            if (corner.x < relativeLowerLeftBound.x) { relativeLowerLeftBound.x = corner.x; }
+            if (corner.y > relativeUpperRightBound.y) { relativeUpperRightBound.y = corner.y; }
+            if (corner.y < relativeLowerLeftBound.y) { relativeLowerLeftBound.y = corner.y; }
         }
+        upperRightBound = relativeUpperRightBound + center;
+        lowerLeftBound = relativeLowerLeftBound + center;
     }
 
     ///\brief Set the AABB from OBB.
     void FromObb(Obb2d obb) {
         FromCenterExtendsRotation(
             obb.GetCenter(),
-            Vec2f(obb.GetExtentOnAxis(obb.GetRight()), obb.GetExtentOnAxis(obb.CalculateDirection())),
+            Vec2f(obb.GetExtendOnAxis(obb.GetRight()), obb.GetExtendOnAxis(obb.CalculateDirection())),
             static_cast<degree_t>(obb.rotation));
     }
 
@@ -317,18 +321,18 @@ struct Aabb3d {
         const Vec3f center,
         const Vec3f extends,
         const EulerAngles rotation) {
-        lowerLeftBound = center - extends;
-        upperRightBound = center + extends;
+        Vec3f relativeLowerLeftBound = extends * -1.0f;
+        Vec3f relativeUpperRightBound = extends;
         Vec3<radian_t> newAngle = Vec3<radian_t>{
         rotation.x, rotation.y, rotation.z
         };
         std::array<Vec3f, 6> corners;
-        corners[0] = lowerLeftBound;
+        corners[0] = relativeLowerLeftBound;
         corners[1] = upperRightBound;
-        corners[2] = Vec3f(lowerLeftBound.x, upperRightBound.y, upperRightBound.z);
-        corners[3] = Vec3f(lowerLeftBound.x, lowerLeftBound.y, upperRightBound.z);
-        corners[4] = Vec3f(upperRightBound.x, lowerLeftBound.y, lowerLeftBound.z);
-        corners[5] = Vec3f(upperRightBound.x, upperRightBound.y, lowerLeftBound.z);
+        corners[2] = Vec3f(relativeLowerLeftBound.x, relativeUpperRightBound.y, relativeUpperRightBound.z);
+        corners[3] = Vec3f(relativeLowerLeftBound.x, relativeLowerLeftBound.y, relativeUpperRightBound.z);
+        corners[4] = Vec3f(relativeUpperRightBound.x, relativeLowerLeftBound.y, relativeLowerLeftBound.z);
+        corners[5] = Vec3f(relativeUpperRightBound.x, relativeUpperRightBound.y, relativeLowerLeftBound.z);
         const float cosAngleX = Cos(newAngle.x);
         const float sinAngleX = Sin(newAngle.x);
         const float cosAngleY = Cos(newAngle.y);
@@ -350,13 +354,15 @@ struct Aabb3d {
             x = corner.x;
             y = corner.y * cosAngleZ - corner.z * sinAngleZ;
             z = corner.y * sinAngleZ + corner.z * cosAngleZ;
-            if (x > upperRightBound.x) { upperRightBound.x = x; }
-            if (x < lowerLeftBound.x) { lowerLeftBound.x = x; }
-            if (y > upperRightBound.y) { upperRightBound.y = y; }
-            if (y < lowerLeftBound.y) { lowerLeftBound.y = y; }
-            if (z > upperRightBound.z) { upperRightBound.z = z; }
-            if (z < lowerLeftBound.z) { lowerLeftBound.z = z; }
+            if (x > relativeUpperRightBound.x) { relativeUpperRightBound.x = x; }
+            if (x < relativeLowerLeftBound.x) { relativeLowerLeftBound.x = x; }
+            if (y > relativeUpperRightBound.y) { relativeUpperRightBound.y = y; }
+            if (y < relativeLowerLeftBound.y) { relativeLowerLeftBound.y = y; }
+            if (z > relativeUpperRightBound.z) { relativeUpperRightBound.z = z; }
+            if (z < relativeLowerLeftBound.z) { relativeLowerLeftBound.z = z; }
         }
+        lowerLeftBound = relativeLowerLeftBound + center;
+        upperRightBound = relativeUpperRightBound + center;
     }
 
     ////\brief Set the AABB3d from OBB3d.

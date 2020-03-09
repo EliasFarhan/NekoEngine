@@ -127,17 +127,17 @@ TEST(Engine, TestAabb)
 
     neko::radian_t angle = static_cast<neko::radian_t>(neko::PI / 4);
     neko::Obb2d obb1;
-    obb1.SetCenterExtentRot(neko::Vec2f(0, 0), neko::Vec2f(0.5, 0.5), angle);
+    obb1.SetCenterExtendsRot(neko::Vec2f(0, 0), neko::Vec2f(0.5, 0.5), angle);
     neko::Obb2d obb2;
-    obb2.SetCenterExtentRot(neko::Vec2f(1, 1), neko::Vec2f(0.5, 0.5), angle);
-    std::cout << "OBB1 (" << obb1.lowerLeftBound << " , " << obb1.upperRightBound << "); OBB2 (" << obb2.lowerLeftBound << " , " << obb2.upperRightBound << ")  Intersect :" << obb1.IntersectObb(obb2) << "\n";
-    //EXPECT_FALSE(obb1.IntersectObb(obb2));
+    obb2.SetCenterExtendsRot(neko::Vec2f(1, 1), neko::Vec2f(0.5, 0.5), angle);
+    std::cout << "OBB1 (" << obb1.lowerLeftBound << " , " << obb1.upperRightBound << " , " << obb1.rotation << "); OBB2 (" << obb2.lowerLeftBound << " , " << obb2.upperRightBound << " , " << obb2.rotation << ")  Intersect :" << obb1.IntersectObb(obb2) << "\n";
+    EXPECT_FALSE(obb1.IntersectObb(obb2));
 
     aabb1.FromObb(obb1);
     aabb2.FromObb(obb2);
     std::cout << "AABB1 (" << aabb1.lowerLeftBound << " , " << aabb1.upperRightBound << "); AABB2 (" << aabb2.lowerLeftBound << " , " << aabb2.upperRightBound << ")  Contains :" << aabb1.ContainsAabb(aabb2) << "  Intersect :" << aabb1.IntersectAabb(aabb2) << "\n";
-    //EXPECT_FALSE(aabb1.ContainsAabb(aabb2));
-    //EXPECT_TRUE(aabb1.IntersectAabb(aabb2));
+    EXPECT_FALSE(aabb1.ContainsAabb(aabb2));
+    EXPECT_TRUE(aabb1.IntersectAabb(aabb2));
 
     neko::Aabb3d aabb3;
     aabb3.FromCenterExtends(neko::Vec3f(0, 0, 0), neko::Vec3f(1, 1, 1));
@@ -148,19 +148,19 @@ TEST(Engine, TestAabb)
     EXPECT_TRUE(aabb3.IntersectAabb(aabb4));
 
     neko::Vec3f origin2 = neko::Vec3f(-2, -2, -2);
-    neko::Vec3f dir2 = neko::Vec3f(1, 0, 1);
+    neko::Vec3f dir2 = neko::Vec3f(1, 1, 1);
     std::cout << "AABB1 (" << aabb3.lowerLeftBound << " , " << aabb3.upperRightBound << "); Ray (" << origin2 << " , " << dir2 << ")  Intersect :" << aabb3.IntersectRay(dir2, origin2) << "\n";
-    EXPECT_FALSE(aabb3.IntersectRay(dir2, origin2));
+    EXPECT_TRUE(aabb3.IntersectRay(dir2, origin2));
 
-    neko::Vec3f origin3 = neko::Vec3f(-10, 0, -2);
+    neko::Vec3f origin3 = neko::Vec3f(-2, 0, -2);
     neko::Vec3f normal3 = neko::Vec3f(1, 1, 0);
     std::cout << "AABB1 (" << aabb3.lowerLeftBound << " , " << aabb3.upperRightBound << "); Plane (" << origin3 << " , " << normal3 << ")  Intersect :" << aabb3.IntersectPlane(normal3, origin3) << "\n";
-    EXPECT_FALSE(aabb3.IntersectPlane(normal3, origin3));
+    EXPECT_TRUE(aabb3.IntersectPlane(normal3, origin3));
 
     neko::Obb2d obb3;
-    obb3.SetCenterExtentRot(neko::Vec2f(0, 0), neko::Vec2f(0.5, 0.5), angle);
+    obb3.SetCenterExtendsRot(neko::Vec2f(0, 0), neko::Vec2f(0.5, 0.5), angle);
     neko::Obb2d obb4;
-    obb4.SetCenterExtentRot(neko::Vec2f(1, 1), neko::Vec2f(0.5, 0.5), angle);
+    obb4.SetCenterExtendsRot(neko::Vec2f(1, 1), neko::Vec2f(0.5, 0.5), angle);
     std::cout << "OBB1 (" << obb3.lowerLeftBound << " , " << obb3.upperRightBound << "); OBB2 (" << obb4.lowerLeftBound << " , " << obb4.upperRightBound << ")  Intersect :" << obb3.IntersectObb(obb4) << "\n";
     //EXPECT_FALSE(obb3.IntersectObb(obb4));
 
