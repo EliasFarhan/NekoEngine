@@ -60,6 +60,7 @@ public:
                 return true;
             }
         }
+        // assert("Could not add to map!"); // TEMPORARY for testing purposes!
         return false;
     }
 
@@ -142,6 +143,7 @@ public:
                 return pairs_[i].second;
             }
         }
+        // assert("Value not found!"); // TEMPORARY for testing purposes!
         return 0;
     }
 

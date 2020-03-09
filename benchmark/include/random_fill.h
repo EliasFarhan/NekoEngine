@@ -1,5 +1,6 @@
 #pragma once
 
+#include <random>
 #include "mathematics/vector.h"
 #include "mathematics/matrix.h"
 
