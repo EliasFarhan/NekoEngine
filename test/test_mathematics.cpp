@@ -41,51 +41,50 @@ TEST(Engine, TestMathematics)
     std::cout << "Error margin for sinFuncTable with resolution 512: "<<error<<"\n";
 }
 
-TEST(Engine, TestQuaternion)
+TEST(Engine, Quaternion_Dot)
 {
-    //Variables
-    neko::Quaternion quaternionA = neko::Quaternion(0.71, 0, 0, 0.71);
-    neko::Quaternion quaternionB = neko::Quaternion(0, 0, 0, 1);
-    neko::Quaternion quaternionACopy;
-
-    //Display start variables
-    std::cout << "QuaternionA"<<quaternionA<<'\n';
-    std::cout << std::endl;
-    std::cout <<"QuaternionB"<< quaternionB<<'\n';
-    std::cout << std::endl << std::endl;
-
-    //Dot Product Test
-    std::cout << "Dot product: " << neko::Quaternion::Dot(quaternionA, quaternionB) << std::endl << std::endl;
-
-    //Normalize Test
-    std::cout << "Normalize: ";
-    std::cout << "NormalizedQuaternionA" << neko::Quaternion::Normalized(quaternionA) << '\n';
-    std::cout << std::endl << std::endl;
-
-    //Magnitude Test
-    std::cout << "Magnitude: " << neko::Quaternion::Magnitude(quaternionA) <<'\n'<<'\n';
-
-    //AngleAxis Test
-    std::cout << "AngleAxis: " << "Cannot be tested right now"<<'\n'<<'\n';
-
-    //Angle Test
-    std::cout << "Angle: " << neko::Quaternion::Angle(quaternionA, quaternionB) <<'\n'<<'\n';
-
-    //Conjugate Test
-    quaternionACopy = quaternionA;
-    std::cout << "Conjugate: ";
-    std::cout <<"QuaternionAConjugate"<< quaternionACopy.Conjugate()<<'\n';
-    std::cout <<'\n'<<'\n';
-
-    //Inverse Test
-    quaternionACopy = quaternionA;
-    std::cout << "Inverse: ";
-    std::cout <<"QuaternionAInverse"<< quaternionACopy.Inverse()<<'\n';
-    std::cout << std::endl << std::endl;
-
-    //FromEuler
-    std::cout << "Euler: " << "Cannot be tested right now" <<'\n'<<'\n';
+    neko::Quaternion q1 = neko::Quaternion(1,0,0,0);
+    neko::Quaternion q2 = neko::Quaternion(1,0,0,0);
+    float expectedDot = 1;
+    float dotQ1Q2 = neko::Quaternion::Dot(q1, q2);
+    EXPECT_TRUE(expectedDot - dotQ1Q2 < 0.001f);
 }
+
+TEST(Engine, Quaternion_Normalized)
+{
+    //TODO
+}
+
+TEST(Engine, Quaternion_Magnitude)
+{
+    //TODO
+}
+
+TEST(Engine, Quaternion_AngleAxis)
+{
+    //TODO
+}
+
+TEST(Engine, Quaternion_Angle)
+{
+    //TODO
+}
+
+TEST(Engine, Quaternion_Conjugate)
+{
+    //TODO
+}
+
+TEST(Engine, Quaternion_Inverse)
+{
+    //TODO
+}
+
+TEST(Engine, Quaternion_FromEuler)
+{
+    //TODO
+}
+
 TEST(Engine, TestMatrix4)
 {
     neko::Mat4f m1 (std::array<neko::Vec4f,4>

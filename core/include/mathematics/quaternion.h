@@ -132,6 +132,11 @@ struct Quaternion
 		);
 	}
 
+	static Quaternion Identity()
+	{
+		return Quaternion(0, 0, 0, 1);
+	}
+	
 	//Operators
 	Quaternion operator/(Quaternion rhs) const
 	{
