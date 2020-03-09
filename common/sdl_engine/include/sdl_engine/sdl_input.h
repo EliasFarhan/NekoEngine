@@ -280,7 +280,7 @@ namespace neko
 
         Vec2f GetMousePosition() const;
 
-        /*bool IsKeyHeld(KeyCode key) const;
+        /*
         bool IsButtonDown(ButtonCode button) const;
 
         bool IsButtonReleased(ButtonCode button) const;
