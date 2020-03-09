@@ -114,9 +114,12 @@ TEST(Engine, Map)
     const size_t sizeInBytes = 512;
 
     void* mem = malloc(sizeInBytes);
+    void* mem2 = malloc(sizeInBytes);
     const auto allocator = neko::PoolAllocator<std::pair<xxh::hash_t<64>, double>>(sizeInBytes, mem);
+    const auto allocator2 = neko::PoolAllocator<std::pair<xxh::hash_t<64>, double>>(sizeInBytes, mem);
 
     neko::Map<std::uint8_t, double> map((neko::Allocator*) &allocator, sizeInBytes);
+    neko::NonVectMap<std::uint8_t, double> nonVectMap((neko::Allocator*) &allocator, sizeInBytes);
 
     {// Set / retrieve.
         const uint8_t key[] = {1u, 2u, 3u, 4u, 5u};
@@ -124,11 +127,14 @@ TEST(Engine, Map)
         for (uint8_t i = 0; i < 5u ; i++)
         {
             const bool result = map.Add(key[i], value[i]);
+            const bool result2 = nonVectMap.Add(key[i], value[i]);
             EXPECT_TRUE(result);
+            EXPECT_TRUE(result2);
         }
         for (uint8_t i = 0; i < 5 ; i++)
         {
             EXPECT_EQ(value[i], map.FindValue(key[i]));
+            EXPECT_EQ(value[i], nonVectMap.FindValue(key[i]));
         }
     }
 
@@ -136,50 +142,69 @@ TEST(Engine, Map)
         const double value = map.FindValue(1u);
         const double expectedSum = 1.0 + 2.0 + 3.0 + 4.0 + 5.0;
         double sum = 0.0;
+        double sum2 = 0.0;
         for (uint8_t i = 1u; i < 5u; i++)
         {
             const bool result = map.Swap(i, i+1u);
+            const bool result2 = nonVectMap.Swap(i, i+1u);
             EXPECT_TRUE(result);
+            EXPECT_TRUE(result2);
         }
         for (uint8_t i = 1u; i < 6u; i++)
         {
             sum += map.FindValue(i);
+            sum2 += nonVectMap.FindValue(i);
         }
         EXPECT_EQ(value, map.FindValue(5u));
+        EXPECT_EQ(value, nonVectMap.FindValue(5u));
         EXPECT_EQ(expectedSum, sum);
+        EXPECT_EQ(expectedSum, sum2);
     }
 
     {// Clear, remove and add.
         map.Clear();
+        nonVectMap.Clear();
         const uint8_t key[] = {1u, 2u, 3u, 4u, 5u};
         const double value[] = {1.0, 2.0, 3.0, 4.0, 5.0};
         for (uint8_t i = 0; i < 5u ; i++)
         {
             map.Add(key[i], value[i]);
+            nonVectMap.Add(key[i], value[i]);
         }
 
         map.Remove(2u);
+        nonVectMap.Remove(2u);
         map.Remove(4u);
+        nonVectMap.Remove(4u);
 
         double expectedSum = 1.0 + 3.0 + 5.0;
         double sum = 0.0;
+        double sum2 = 0.0;
         for (uint8_t i = 1u; i < 6u; i++)
         {
             sum += map.FindValue(i);
+            sum2 += nonVectMap.FindValue(i);
         }
         EXPECT_EQ(expectedSum, sum);
+        EXPECT_EQ(expectedSum, sum2);
 
         map.Add(2u, 2.0);
+        nonVectMap.Add(2u, 2.0);
         map.Add(4u, 4.0);
+        nonVectMap.Add(4u, 4.0);
 
         expectedSum = 1.0 + 2.0 + 3.0 + 4.0 + 5.0;
         sum = 0.0;
+        sum2 = 0.0;
         for (uint8_t i = 1u; i < 6u; i++)
         {
             sum += map.FindValue(i);
+            sum += nonVectMap.FindValue(i);
         }
         EXPECT_EQ(expectedSum, sum);
+        EXPECT_EQ(expectedSum, sum2);
     }
 
     free(mem);
+    free(mem2);
 }
