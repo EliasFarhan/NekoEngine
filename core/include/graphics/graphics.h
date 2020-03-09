@@ -119,9 +119,13 @@ protected:
     std::thread renderThread_;
 
     //Used to synchronize the EngineLoop with the RenderLoop
+#ifndef EMSCRIPTEN
     std::mutex renderMutex_;
-    std::atomic<std::uint8_t> flags_{IS_RENDERING_UI};
+
     std::condition_variable cv_;
+#endif
+
+    std::atomic<std::uint8_t> flags_{IS_RENDERING_UI};
     std::atomic<float> dt_{0.0f};
 
     std::vector<RenderCommandInterface*> currentCommandBuffer_ = {};

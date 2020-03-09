@@ -113,7 +113,11 @@ public:
 
     Mat4<T> operator*(const Mat4<T>& rhs) const noexcept
     {
+#ifdef EMSCRIPTEN
+        return MultiplyNaive(rhs);
+#else
         return MultiplyIntrinsincs(rhs);
+#endif
     }
 
     inline Mat4<T> MultiplyNaive(const Mat4<T>& rhs) const noexcept

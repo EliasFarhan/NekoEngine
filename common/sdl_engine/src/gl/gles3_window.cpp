@@ -48,14 +48,15 @@ void Gles3Window::Init()
 	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
 	SdlWindow::Init();
-
+#ifndef __EMSCRIPTEN__
 	SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
+
 	std::string videoDriver = SDL_GetCurrentVideoDriver();
 	logDebug(videoDriver);
+#endif
 
 	glRenderContext_ = SDL_GL_CreateContext(window_);
 	MakeCurrentContext();
-
 	SDL_GL_SetSwapInterval(config.vSync);
 #ifndef __EMSCRIPTEN__
 	if (!gladLoadGLES2Loader((GLADloadproc)SDL_GL_GetProcAddress))
@@ -136,6 +137,7 @@ void Gles3Window::OnResize(Vec2u newWindowSize)
 void Gles3Window::MakeCurrentContext()
 {
 	SDL_GL_MakeCurrent(window_, glRenderContext_);
+#ifndef EMSCRIPTEN
 	const auto currentContext = SDL_GL_GetCurrentContext();
 	std::ostringstream oss;
 	oss << "Current Context: " << currentContext << " Render Context: " << glRenderContext_ << " from Thread: " << std::this_thread::get_id();
@@ -144,12 +146,13 @@ void Gles3Window::MakeCurrentContext()
 		oss << "\nSDL Error: " << SDL_GetError();
 	}
 	logDebug(oss.str());
+#endif
 }
 
 void Gles3Window::LeaveCurrentContext()
 {
 	SDL_GL_MakeCurrent(window_, nullptr);
-
+#ifndef EMSCRIPTEN
 	const auto currentContext = SDL_GL_GetCurrentContext();
 
 	std::ostringstream oss;
@@ -159,6 +162,7 @@ void Gles3Window::LeaveCurrentContext()
 		oss << "[Error] After Leave Current Context, context: " << currentContext;
 	}
 	logDebug(oss.str());
+#endif
 }
 }
 

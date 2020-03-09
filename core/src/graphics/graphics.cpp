@@ -61,6 +61,7 @@ void Renderer::RenderAll()
 
 void Renderer::Sync()
 {
+#ifndef EMSCRIPTEN
 #ifdef EASY_PROFILE_USE
 	EASY_BLOCK("EngineRenderSync");
 	EASY_BLOCK("EngineAppWaiting");
@@ -82,9 +83,11 @@ void Renderer::Sync()
 	EASY_END_BLOCK;
 	EASY_BLOCK("SwapRenderCommand");
 #endif
+#endif
 	std::swap(currentCommandBuffer_, nextCommandBuffer_);
 	nextCommandBuffer_.clear();
 	//TODO copy all the new transform3d?
+
 	flags_ &= ~IS_APP_WAITING;
 }
 
@@ -117,7 +120,9 @@ void Renderer::Destroy()
 	EASY_BLOCK("ClosingFromEngine");
 #endif
 	flags_ &= ~IS_RUNNING;
+#ifndef EMSCRIPTEN
 	renderThread_.join();
+#endif
 }
 
 void Renderer::SetFlag(Renderer::RendererFlag flag)
@@ -139,14 +144,18 @@ void Renderer::Update()
 
 	auto* engine = BasicEngine::GetInstance();
 	{
+#ifndef EMSCRIPTEN
 		std::unique_lock<std::mutex> lock(renderMutex_);
+#endif
 #ifdef EASY_PROFILE_USE
 		EASY_BLOCK("RenderUpdateCPU");
 #endif
 		ClearScreen();
 		engine->GenerateUiFrame();
 		RenderAll();
+#ifndef EMSCRIPTEN
 		lock.unlock();
+#endif
 		window_->RenderUi();
 	}
 	{
@@ -160,23 +169,29 @@ void Renderer::Update()
 #ifdef EASY_PROFILE_USE
 		EASY_BLOCK("WaitForAppCPU");
 #endif
+#ifndef EMSCRIPTEN
 		while (!(flags_ & IS_APP_WAITING) && (flags_ & IS_RUNNING))
 		{
 			cv_.notify_one();
 		}
-		//while (flags_ & (IS_APP_WAITING | IS_RUNNING))
+
 		{
 			cv_.notify_one();
 		}
+#endif
 	}
 }
 void Renderer::BeforeRenderLoop()
 {
+#ifndef EMSCRIPTEN
 	window_->MakeCurrentContext();
+#endif
 }
 void Renderer::AfterRenderLoop()
 {
+#ifndef EMSCRIPTEN
 	window_->LeaveCurrentContext();
+#endif
 }
 
 
