@@ -52,32 +52,53 @@ TEST(Engine, Quaternion_Dot)
 
 TEST(Engine, Quaternion_Normalized)
 {
-    //TODO
+    neko::Quaternion q = neko::Quaternion(1, 0, 0, 0);
+    neko::Quaternion expectedNormalized = neko::Quaternion(1,0,0,0);
+    neko::Quaternion normalized = neko::Quaternion::Normalized(q);
+    EXPECT_EQ(expectedNormalized, normalized);
 }
 
 TEST(Engine, Quaternion_Magnitude)
 {
-    //TODO
+    neko::Quaternion q = neko::Quaternion(1, 0, 0, 0);
+    float expectedMagnitude = 1;
+    float magnitude = neko::Quaternion::Magnitude(q);
+    EXPECT_TRUE(expectedMagnitude - magnitude < 0.001f);
 }
 
 TEST(Engine, Quaternion_AngleAxis)
 {
-    //TODO
+    neko::Quaternion q = neko::Quaternion::Identity();
+    neko::radian_t rad(30);
+    neko::Vec3f axis(1, 1, 1);
+    neko::Quaternion expectedAngleAxisQuaternion = neko::Quaternion(0, 0, 0, 1);    //TODO: Calculate the expected value
+    q = q.AngleAxis(rad, axis);
+    //EXPECT_EQ(q, expectedAngleAxisQuaternion);
 }
 
 TEST(Engine, Quaternion_Angle)
 {
-    //TODO
+    neko::Quaternion q1 = neko::Quaternion::Identity();
+    neko::Quaternion q2 = neko::Quaternion::Identity();
+    neko::degree_t expectedAngle(0);
+    neko::degree_t angle(neko::Quaternion::Angle(q1, q2));
+    EXPECT_EQ(expectedAngle, angle);
 }
 
 TEST(Engine, Quaternion_Conjugate)
 {
-    //TODO
+    neko::Quaternion q = neko::Quaternion(8, 10, 888, 2);
+    neko::Quaternion expectedQuaternion = neko::Quaternion(-8, -10, -888, 2);
+    q = q.Conjugate();
+    EXPECT_EQ(q, expectedQuaternion);
 }
 
 TEST(Engine, Quaternion_Inverse)
 {
-    //TODO
+    neko::Quaternion q = neko::Quaternion(1, 0.5, 0.5, 0);
+    neko::Quaternion expectedInverse = neko::Quaternion(-0.6666666f, -0.3333333f, -0.3333333f, 0);
+    q = q.Inverse();
+    EXPECT_TRUE(q.x - expectedInverse.x < 0.001f && q.y - expectedInverse.y < 0.001f && q.z - expectedInverse.z < 0.001f && q.w - expectedInverse.w < 0.001f);
 }
 
 TEST(Engine, Quaternion_FromEuler)

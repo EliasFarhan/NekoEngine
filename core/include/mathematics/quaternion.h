@@ -75,11 +75,11 @@ struct Quaternion
 	Quaternion AngleAxis(radian_t rad, neko::Vec3f axis) const
 	{
 		if (axis.SquareMagnitude() == 0.0f)
-			return Quaternion(0, 0, 0, 1);
+			return Quaternion::Identity();
 
-		Quaternion result = Quaternion(0,0,0,1);
-		//TODO: axis.Normalize();
-		axis = axis * Sin(rad);
+		Quaternion result = Quaternion::Identity();
+		axis = axis.Normalized();
+		axis *= Sin(rad);
 		result.x = axis.x;
 		result.y = axis.y;
 		result.z = axis.z;
