@@ -21,6 +21,7 @@ public:
     std::string GetResource(ResourceId resourceId);
     ResourceId LoadResource(Path assetPath);
 private:
+    //std::unordered_map<ResourceId, std::promise<const char*>> resourceFutures_;
     std::unordered_map<ResourceId, std::string> resourceLoaded_;
     std::unordered_map<ResourceId, Path> resourcePath_;
     std::vector<ResourceId> idQueue_;
