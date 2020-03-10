@@ -108,6 +108,11 @@ if(Neko_Benchmark)
 
 endif()
 
+#physfs
+set(PHYSFS_VERSION "3.0.2" CACHE INTERNAL "")
+set(PHYSFS_ROOT "${EXTERNAL_DIR}/physfs-${PHYSFS_VERSION}" CACHE INTERNAL "")
+add_subdirectory("${PHYSFS_ROOT}")
+
 set(main_project_dir "main/")
 file(GLOB main_projects "${main_project_dir}/*")
 

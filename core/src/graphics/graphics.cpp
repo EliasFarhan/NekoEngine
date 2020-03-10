@@ -135,7 +135,7 @@ void Renderer::Update()
     {
         std::ostringstream oss;
         oss << "Count Wait: "<<countWait<<'\n';
-        logDebug(oss.str());
+        LogDebug(oss.str());
     }
 
     auto* engine = BasicEngine::GetInstance();
