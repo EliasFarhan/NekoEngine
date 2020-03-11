@@ -9,7 +9,8 @@ add_executable(Neko_TEST ${TEST_FILES})
 
 include_directories(${NEKO_CORE_DIR}/include)
 
-target_link_libraries(Neko_TEST gtest gtest_main Neko_Core sdl_engine gles3_wrapper)
+target_link_libraries(Neko_TEST gtest gtest_main Neko_Core sdl_engine gles3_wrapper physfs)
+
 neko_bin_config(Neko_TEST)
 if(UNIX)
 #target_compile_options(Neko_TEST PUBLIC "--coverage")
