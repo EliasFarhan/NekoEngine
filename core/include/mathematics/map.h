@@ -375,20 +375,32 @@ public:
     PoolAllocatorMap(const uint8_t sizeInCacheLines){
         mem_ = malloc((64 * sizeInCacheLines) + 1);
         allocator_ = PoolAllocator<Pair>((64 * sizeInCacheLines) + 1, mem_);
+        pairs_.resize(64 * sizeInCacheLines);
     }
 
     void Add(const Key key, const Value value){
         Pair* pair = static_cast<Pair*>(allocator_.Allocate(sizeof(Pair), alignof(Pair)));
         pair->first = xxh::xxhash<64>(&key, sizeof(Key));
         pair->second = value;
-        pairs_.push_back(pair);
+        pairs_[pairs_.size()] = pair;
     }
 
     Value Retrieve(const Key key){
         const auto hash = xxh::xxhash<64>(&key, sizeof(key));
         for (Pair* pair : pairs_){
             if (pair->first == hash){
-                // Retreive.
+                return pair->second;
+            }
+        }
+        return Value();
+    }
+
+    void Remove(const Key key){
+        const auto hash = xxh::xxhash<64>(&key, sizeof(key));
+        for (Pair* pair : pairs_){
+            if (pair->first == hash){
+                pair->first = 0;
+                pair->second = Value();
             }
         }
     }
@@ -399,7 +411,8 @@ public:
 private:
     void* mem_ = nullptr; // 8 bytes
     PoolAllocator<Pair> allocator_ = nullptr; // 40 bytes
-    std::vector<Pair*> pairs_;
+public: // FOR TESTING PURPOSES
+    std::vector<Pair*> pairs_; // 24 bytes?
 };
 
 }// !neko

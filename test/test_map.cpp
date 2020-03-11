@@ -129,4 +129,37 @@ TEST(Engine, MinimalMap)
     }
 }*/
 
+TEST(Engine, PoolAllocatorMap)
+{
+    const uint8_t sizeInNumberOfCacheLines = 1;
+    const size_t sizeOfCacheLine = 64;
+    const size_t sizeOfPair = sizeof(std::pair<xxh::hash_t<64>, float>);
+
+    PoolAllocatorMap<unsigned int, float> map(sizeInNumberOfCacheLines);
+
+    std::vector<float> values;
+    for (size_t i = 0; i < (sizeOfCacheLine * sizeInNumberOfCacheLines) / sizeOfPair; i++)
+    {
+        values.push_back(rand());
+    }
+
+    // Addition.
+    for (unsigned int i = 0; i < (sizeOfCacheLine * sizeInNumberOfCacheLines) / sizeOfPair; i++)
+    {
+        map.Add(i, values[i]);
+    }
+
+    float sum = 0;
+    for (auto* pair : map.pairs_){
+        sum += pair->second;
+    }
+    float expected = 0;
+    for (auto value : values){
+        expected += value;
+    }
+    EXPECT_EQ(sum, expected);
+
+    // Retrieval.
+}
+
 }// !neko
