@@ -3,6 +3,7 @@
 #include <engine/custom_allocator.h>
 #include <vector> // TODO: replace this with neko's own container.
 #include <xxhash.hpp>
+#include <array>
 
 namespace neko
 {
@@ -152,7 +153,7 @@ private:
     size_t count_ = 0;
 };
 
-template <typename Key, typename Value>
+/*template <typename Key, typename Value>
 class NonVectMap{
 public:
     // Constructor / destructor.
@@ -298,6 +299,107 @@ private:
     size_t sizeInBytes_ = 0;
     Allocator* allocator_ = nullptr;
     std::pair<xxh::hash_t<64>, Value>* pairs_[];
+};*/
+/*
+template <typename Key, typename Value>
+class MinimalMap {
+    using Hash = xxh::hash_t<64>;
+    using Pair = std::pair<Hash, Value>;
+
+public:
+    MinimalMap(const size_t sizeInNumberOfCacheLines = 1){
+
+        sizeInNumverOfCacheLines_ = sizeInNumberOfCacheLines;
+        assert(64 * sizeInNumverOfCacheLines_ >= sizeof(Value)); // Assume a single pair to fit inside a cache line.
+
+        pairs_ = static_cast<Pair*>(malloc(64 * sizeInNumverOfCacheLines_));
+        const int len = (64 * sizeInNumverOfCacheLines_) / sizeof(Pair);
+        for (int i = 0; i < len; ++i)
+        {
+            *(pairs_ + (i * sizeof(Pair))) = Pair(Hash(), Value()); // Set memory to 0.
+        }
+    }
+
+    inline bool Add(const Key key, const Value value)
+    {
+        for (int i = 0; i < (64 * sizeInNumverOfCacheLines_) / sizeof(Pair); ++i) // Vectorizable.
+        {
+            if ((pairs_ + (i * sizeof(Pair)))->first == 0){
+                (pairs_ + (i * sizeof(Pair)))->first = xxh::xxhash<64>(&key, sizeof(Key)); // Q: sizeof(Key) is const at runtime?
+                (pairs_ + (i * sizeof(Pair)))->second = value;
+                return true; // Early exit.
+            }
+        }
+        return false;
+    }
+
+     inline bool Remove(const Key key){
+        auto hash = xxh::xxhash<64>(&key, sizeof(Key));
+        for (int i = 0; i < (64 * sizeInNumverOfCacheLines_) / sizeof(Pair); ++i)
+        {
+            if ((pairs_ + (i * sizeof(Pair)))->first == hash){
+                (pairs_ + (i * sizeof(Pair)))->first = 0;
+                (pairs_ + (i * sizeof(Pair)))->second = Value();
+                return true; // Early exit.
+            }
+        }
+        return false;
+    }
+
+    inline Value Retrieve(const Key key) const
+    {
+        auto hash = xxh::xxhash<64>(&key, sizeof(Key));
+        for (int i = 0; i < (64 * sizeInNumverOfCacheLines_) / sizeof(Pair); ++i)
+        {
+            if ((pairs_ + (i * sizeof(Pair)))->first == hash){
+                return (pairs_ + (i * sizeof(Pair)))->second;
+            }
+        }
+        return Value();
+    }
+
+    ~MinimalMap(){
+        free(pairs_);
+    }
+private:
+    size_t sizeInNumverOfCacheLines_;
+    Pair* pairs_; // Actual values are on heap, ptrs on stack.
+};*/
+
+template <typename Key, typename Value>
+class PoolAllocatorMap{
+    using Hash = xxh::hash_t<64>;
+    using Pair = std::pair<Hash, Value>;
+
+public:
+    PoolAllocatorMap(const uint8_t sizeInCacheLines){
+        mem_ = malloc((64 * sizeInCacheLines) + 1);
+        allocator_ = PoolAllocator<Pair>((64 * sizeInCacheLines) + 1, mem_);
+    }
+
+    void Add(const Key key, const Value value){
+        Pair* pair = static_cast<Pair*>(allocator_.Allocate(sizeof(Pair), alignof(Pair)));
+        pair->first = xxh::xxhash<64>(&key, sizeof(Key));
+        pair->second = value;
+        pairs_.push_back(pair);
+    }
+
+    Value Retrieve(const Key key){
+        const auto hash = xxh::xxhash<64>(&key, sizeof(key));
+        for (Pair* pair : pairs_){
+            if (pair->first == hash){
+                // Retreive.
+            }
+        }
+    }
+
+    ~PoolAllocatorMap(){
+        free(mem_);
+    }
+private:
+    void* mem_ = nullptr; // 8 bytes
+    PoolAllocator<Pair> allocator_ = nullptr; // 40 bytes
+    std::vector<Pair*> pairs_;
 };
 
 }// !neko
