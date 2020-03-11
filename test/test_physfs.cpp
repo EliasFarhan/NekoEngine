@@ -16,29 +16,19 @@ TEST(IO, TestPhysFSTwoArchive)
     LogManager logger;
 	
     physfs::InitPhysFs();
-    const std::string filename = "sprites/wall.jpg";
+    const std::string_view filename = "sprites/wall.jpg";
 	
-    LogDebug(LogCategory::IO, "Mounting 'data1.zip'...");
-    PHYSFS_mount("../../data/data1.zip", nullptr, 0);
-    if (PHYSFS_exists(filename.c_str())) {
-        LogDebug(LogCategory::IO, filename + " exists!");
-    }
-    else
-    {
-        LogError(LogCategory::IO, filename + " does NOT exist!");
-    }
+    physfs::OpenArchive("../../data/data1.zip");
+    physfs::FileExists(filename);
 
-    LogDebug(LogCategory::IO, "Mounting 'data2.zip'...");
-    PHYSFS_mount("../../data/data2.zip", nullptr, 0);
-    if (PHYSFS_exists(filename.c_str())) {
-        LogDebug(LogCategory::IO, filename + " exists!");
-    }
-    else
-    {
-        LogError(LogCategory::IO, filename + " does NOT exist!");
-    }
+    physfs::OpenArchive("../../data/data2.zip");
+    physfs::FileExists(filename);
 	
-    PHYSFS_setWriteDir("/");
-    physfs::WriteStringToFile("test.txt", "hello");
+    physfs::SetWriteDir("../../data/saves/");
+    physfs::WriteStringToFile("save1.txt", "hello");
+    const std::string output = physfs::ReadFile("test.txt");
+    std::cout << output;
+
+    logger.Wait();
 }
 }
