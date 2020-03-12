@@ -5,7 +5,7 @@
 #include <SDL.h>
 #include <SDL_keycode.h>
 
-typedef SDL_Scancode KeyCode;
+typedef SDL_KeyCode KeyCode;
 
 namespace neko
 {
@@ -31,7 +31,7 @@ namespace neko
 
         bool IsKeyDown(KeyCode key) const;
 
-        auto IsKeyUp(KeyCode key) const -> bool;
+        bool IsKeyUp(KeyCode key) const;
 
         bool IsKeyHeld(KeyCode key) const;
     	
@@ -53,7 +53,7 @@ namespace neko
         inline static int joyAxisUpdate = false;
     private:
 
-        std::vector<SDL_EventType> keyPressedStates = std::vector<SDL_EventType>(static_cast<int>(SDL_NUM_SCANCODES));
+        std::vector<SDL_EventType> keyPressedStates = std::vector<SDL_EventType>(SDL_NUM_SCANCODES);
         std::vector<SDL_EventType> buttonPressedStates = std::vector<SDL_EventType>(static_cast<int>(SDL_LASTEVENT));
         const uint8_t* keyboard_;
         uint32_t mouse_;

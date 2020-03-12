@@ -16,16 +16,7 @@ void InputProgram::Init()
 
 void InputProgram::Update(seconds dt)
 {
-    inputManager.OnPreUserInputs();
-	
-    if (inputManager.IsKeyDown(KeyCode::SDL_SCANCODE_W))
-    {
-        std::cout << "W KEY PRESSED" << '\n';
-    }
-	if (inputManager.IsKeyUp(KeyCode::SDL_SCANCODE_W))
-    {
-        std::cout << "W KEY RELEASED" << '\n';
-    }
+    
 }
 
 	
@@ -46,7 +37,7 @@ void InputProgram::DrawImGui()
     ImGui::Begin("Input text");
     ImGui::InputText("input text", buf, IM_ARRAYSIZE(buf));
     inputManager.OnPreUserInputs();
-    if (inputManager.IsKeyDown(KeyCode::SDL_SCANCODE_W))
+    if (inputManager.IsKeyDown(SDLK_w))
     {
         ImGui::BeginChild("Text");
         ImGui::Text("W KEY PRESSED");
@@ -57,6 +48,24 @@ void InputProgram::DrawImGui()
 
 void InputProgram::OnEvent(const SDL_Event& event)
 {
-
+	switch (event.type)
+	{
+    case SDL_KEYDOWN:
+    {
+        if (event.key.state == inputManager.IsKeyDown(SDLK_w))
+        {
+            std::cout << "event w key pressed" << '\n';
+        }
+    }
+		break;
+    case SDL_KEYUP:
+    {
+        if (event.key.state == inputManager.IsKeyUp(SDLK_w))
+        {
+            std::cout << "event w key released" << '\n';
+        }
+    }
+		break;
+	}
 }
 }

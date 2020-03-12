@@ -7,19 +7,16 @@ namespace neko
 
     void InputManager::OnPreUserInputs()
 	{
-    	
-        for (size_t i = 0; i < static_cast<int>(SDL_NUM_SCANCODES) ; i++)
+    	//for (auto& keyStates : keyPressedStates)
+        for (size_t i = 0; i < SDL_NUM_SCANCODES ; i++)
         {
-            if (keyPressedStates[i] == SDL_KEYUP)
-            {
-                keyPressedStates[i] = SDL_KEYUP;
-            }
+            
             if (keyPressedStates[i] == SDL_KEYDOWN)
             {
-                keyPressedStates[i] = SDL_KEYDOWN;
+                keyPressedStates[i] == SDL_PRESSED;
             }
         }
-        for (size_t i = 0; i < static_cast<int>(SDL_LASTEVENT); i++) 
+        for (size_t i = 0; i < SDL_LASTEVENT; i++) 
         {
 	        if (buttonPressedStates[i] == SDL_MOUSEBUTTONDOWN)
 	        {
@@ -48,15 +45,14 @@ namespace neko
             case SDL_KEYDOWN:
             {
                 this->keyboard_ = SDL_GetKeyboardState(nullptr);
-                const int index = event.key.keysym.scancode;
+                const auto index = event.key.keysym.scancode;
             	keyPressedStates[index] = SDL_KEYDOWN;
             }
             	break;
-                 
             case SDL_KEYUP:
             {
                 this->keyboard_ = SDL_GetKeyboardState(nullptr);
-                const int index = event.key.keysym.scancode;
+                const auto index = event.key.keysym.scancode;
                 keyPressedStates[index] = SDL_KEYUP;
 			}
                 break;
