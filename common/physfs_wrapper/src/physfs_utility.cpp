@@ -1,4 +1,4 @@
-#include <utilities/physfs_utility.h>
+#include <physfs_utility.h>
 #include <engine/log.h>
 
 #include <physfs.h>
@@ -36,19 +36,7 @@ bool OpenArchive(const std::string& path)
 	return false;
 }
 
-bool SetWriteDir(const std::string& path)
-{
-	if (PHYSFS_setWriteDir(path.data()))
-	{
-		LogDebug(LogCategory::IO, "WriteDir set to '" + path + "'");
-		return true;
-	}
-
-	LogError(LogCategory::IO, "Could not set writeDir to '" + path + "'");
-	return false;
-}
-
-std::string ReadFile(const std::string& path)
+const char* ReadFile(const std::string& path)
 {
 	PHYSFS_File* file = PHYSFS_openRead(path.data());
 
@@ -59,28 +47,9 @@ std::string ReadFile(const std::string& path)
 
 	const PHYSFS_sint64 len = PHYSFS_fileLength(file);
 	PHYSFS_seek(file, 0);
-	auto* buffer = new char[len + 1];
-	PHYSFS_readBytes(file, buffer, len);
-	buffer[len] = 0;
-	std::string output = buffer;
-	delete[] buffer;
-	return output;
-}
-
-int WriteStringToFile(const std::string& path, std::string_view content)
-{
-	PHYSFS_File* file = PHYSFS_openWrite(path.data());
-
-	if (file == nullptr) {
-		LogError(LogCategory::IO, "Could not open file '" + path + "'");
-		return 0;
-	}
-
-	return PHYSFS_writeBytes(file, content.data(), content.length());
-}
-
-const char* GetLastError()
-{
-	return PHYSFS_getLastError();
+	void* buffer[len + 1];
+	PHYSFS_readBytes(file, &buffer, len);
+	const char* result = (const char*) buffer;
+	return result;
 }
 }

@@ -5,9 +5,7 @@
 #include <gtest/gtest.h>
 #include <engine/log.h>
 #include <utilities/file_utility.h>
-#include <utilities/physfs_utility.h>
-
-#include <physfs.h>
+#include <physfs_utility.h>
 
 namespace neko
 {
@@ -23,11 +21,9 @@ TEST(IO, TestPhysFSTwoArchive)
 
     physfs::OpenArchive("../../data/data2.zip");
     physfs::FileExists(filename);
-	
-    physfs::SetWriteDir("../../data/saves/");
-    physfs::WriteStringToFile("save1.txt", "hello");
-    const std::string output = physfs::ReadFile("test.txt");
-    std::cout << output;
+
+    auto output = physfs::ReadFile("test.txt");
+    std::cout << output << '\n';
 
     logger.Wait();
 }

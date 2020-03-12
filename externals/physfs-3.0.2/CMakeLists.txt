@@ -150,7 +150,6 @@ add_library(physfs STATIC ${PHYSFS_SRCS})
 #  library named "physfs.lib" which would conflict; Unix tend to like the
 #  same library name with a different extension for static libs, but
 #  Windows can just have a separate name.
-set_target_properties (physfs PROPERTIES FOLDER Externals)
 if(NOT MSVC)
     set_target_properties(physfs PROPERTIES OUTPUT_NAME "physfs")
 endif()

@@ -14,6 +14,7 @@ set(Neko_Profile OFF CACHE BOOL "Activate Profiling with Easy Profile")
 set(Neko_GLES3 ON CACHE BOOL "Activate OpenGL ES 3.0")
 set(Neko_SDL2 ON CACHE BOOL "Activate SDL2")
 set(Neko_Box2D OFF CACHE BOOL "Activate Box2D")
+set(Neko_PhysFS ON CACHE BOOL "Activate PhysicsFS")
 set(Neko_Test ON CACHE BOOL "Activate Test")
 set(Neko_Assert ON CACHE BOOL "Activate Neko Assertion")
 set(Neko_Benchmark ON CACHE BOOL "Activate Benchmark")
@@ -97,7 +98,7 @@ if(Neko_Test)
     add_subdirectory("test/")
 endif()
 
-if(Neko_Benchmark)
+if(Neko_Benchmark AND NOT Emscripten)
     #Google benchmark
     set(GOOGLE_BENCH_DIR "${EXTERNAL_DIR}/benchmark-1.5.0" CACHE STRING "")
 
@@ -108,10 +109,18 @@ if(Neko_Benchmark)
 
 endif()
 
-#physfs
-set(PHYSFS_VERSION "3.0.2" CACHE INTERNAL "")
-set(PHYSFS_ROOT "${EXTERNAL_DIR}/physfs-${PHYSFS_VERSION}" CACHE INTERNAL "")
-add_subdirectory("${PHYSFS_ROOT}")
+if(Neko_PhysFS)
+    #physfs
+    set(PHYSFS_VERSION "3.0.2" CACHE INTERNAL "")
+    set(PHYSFS_ROOT "${EXTERNAL_DIR}/physfs-${PHYSFS_VERSION}" CACHE INTERNAL "")
+    if(NOT Emscripten)
+        add_subdirectory("${PHYSFS_ROOT}")
+    ENDIF()
+    include_directories(${PHYSFS_ROOT}/src)
+
+    add_subdirectory("common/physfs_wrapper")
+
+endif()
 
 set(main_project_dir "main/")
 file(GLOB main_projects "${main_project_dir}/*")

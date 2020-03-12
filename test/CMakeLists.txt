@@ -5,11 +5,18 @@
 
 SET(Neko_TEST_DIR ${CMAKE_SOURCE_DIR}/test)
 file(GLOB TEST_FILES ${Neko_TEST_DIR}/*.cpp)
+if(Neko_PhysFS)
+    file(GLOB TEST_FILES ${Neko_TEST_DIR}/physfs/*.cpp)
+endif()
 add_executable(Neko_TEST ${TEST_FILES})
 
 include_directories(${NEKO_CORE_DIR}/include)
 
-target_link_libraries(Neko_TEST gtest gtest_main Neko_Core sdl_engine gles3_wrapper physfs)
+target_link_libraries(Neko_TEST gtest gtest_main Neko_Core sdl_engine gles3_wrapper)
+
+if(Neko_PhysFS)
+    target_link_libraries(Neko_TEST physfs_wrapper)
+endif()
 
 neko_bin_config(Neko_TEST)
 if(UNIX)
