@@ -19,6 +19,8 @@ void HelloTextureProgram::Init()
 
     auto texturePath = config.dataRootPath + "data/sprites/wall.jpg";
     textureId_ = neko::gl::stbCreateTexture(texturePath.c_str());
+
+    glEnable(GL_DEPTH_TEST);
 }
 
 void HelloTextureProgram::Update(seconds dt)
@@ -31,10 +33,13 @@ void HelloTextureProgram::Destroy()
     quad_.Destroy();
     shader_.Destroy();
     gl::DestroyTexture(textureId_);
+    textureId_ = 0;
 }
 
 void HelloTextureProgram::Render()
 {
+    if(shader_.GetProgram() == 0)
+        return;
     shader_.Bind();
     shader_.SetInt("outTexture", 0);
     glActiveTexture(GL_TEXTURE0);
@@ -42,7 +47,7 @@ void HelloTextureProgram::Render()
     quad_.Draw();
 }
 
-void HelloTextureProgram::DrawUi(seconds dt)
+void HelloTextureProgram::DrawImGui()
 {
 
 }
