@@ -8,7 +8,7 @@ namespace neko
 
 TEST(Engine, FixedMap)
 {
-    const size_t MAP_SIZE = 512;
+    const size_t MAP_SIZE = 4;
 
     FixedMap<unsigned int, float, MAP_SIZE> map = FixedMap<unsigned int, float, MAP_SIZE>();
     float expectedSum = 0;
@@ -30,7 +30,7 @@ TEST(Engine, FixedMap)
     // [] testing.
     for (size_t i = 1; i < MAP_SIZE + 1; i++)
     {
-        sum += map[i - 1];
+        sum += map[i];
     }
     EXPECT_EQ(expectedSum, sum);
     sum = 0;
