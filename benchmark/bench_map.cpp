@@ -13,7 +13,7 @@ const double AccessStdMap(std::map<int, double>& map, const int key)
     return map[key];
 }
 
-const double AccessNekoMap(neko::Map<int, double>& map, const int key)
+const double AccessNekoMap(neko::FixedMap<int, double>& map, const int key)
 {
     return map.FindValue(key);
 }
@@ -45,7 +45,7 @@ static void BM_NekoMap_Retrieval(benchmark::State& s)
     const size_t len = s.range(0);
 
     const size_t sizeInBytes = (sizeof(int) + sizeof(double)) * len;
-    neko::Map<int, double> nekoMap(nullptr, sizeInBytes);
+    neko::FixedMap<int, double> nekoMap(nullptr, sizeInBytes);
 
     for (int i = 0; i < len; ++i)
     {
@@ -73,7 +73,7 @@ void InsertStdMap(std::map<int, double>& map,const int key,const double value)
     map.insert({key,value});
 }
 
-void InsertNekoMap(neko::Map<int, double>& map,const int key,const double value)
+void InsertNekoMap(neko::FixedMap<int, double>& map, const int key, const double value)
 {
     map.Add(key,value);
 }
@@ -111,7 +111,7 @@ static void BM_NekoMap_Insertion(benchmark::State& s)
         values[i] = RandomFloat();
     }
 
-    neko::Map<int, double> nekoMap(nullptr, (sizeof(int) + sizeof(double)) * len);
+    neko::FixedMap<int, double> nekoMap(nullptr, (sizeof(int) + sizeof(double)) * len);
 
     for (auto _ : s)
     {
