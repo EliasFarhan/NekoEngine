@@ -55,6 +55,8 @@ void HelloTriangleProgram::Init()
             );
     quad_.Init();
     circle_.Init();
+
+    glEnable(GL_DEPTH_TEST);
 }
 
 void HelloTriangleProgram::Update(seconds dt)
