@@ -26,6 +26,56 @@
 #include <functional>
 #include "engine/log.h"
 
+#if defined(__ANDROID__)
+#include <android/asset_manager.h>
+#include <android/asset_manager_jni.h>
+
+
+static AAssetManager* assetManager = nullptr;
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_swiss_sae_gpr5300_MainActivity_load(JNIEnv *env, jclass clazz, jobject mgr) {
+    // TODO: implement load()
+    assetManager = AAssetManager_fromJava(env, mgr);
+}
+namespace neko
+{
+	bool FileExists(const std::string_view path)
+	{
+        AAsset* file = AAssetManager_open(assetManager, path.data(), AASSET_MODE_BUFFER);
+        return file != nullptr;
+	}
+    std::string GetFilenameExtension(const std::string_view path)
+    {
+        const std::string extension = path.data();
+        return extension.substr(extension.find_last_of("."));
+    }
+    std::string GetCurrentPath()
+    {
+        return "";
+}
+    const std::string LoadFile(const std::string& path)
+    {
+        AAsset* file = AAssetManager_open(assetManager, path.c_str(), AASSET_MODE_BUFFER);
+
+        // Get the file length
+        const  size_t fileLength = static_cast<const size_t>(AAsset_getLength(file));
+
+        // Allocate memory to read your file
+        char* fileContent = new char[fileLength + 1];
+
+        // Read your file
+        AAsset_read(file, fileContent, fileLength);
+        AAsset_close(file);
+        std::string str(fileContent);
+        delete[] fileContent;
+        return str;
+    }
+}
+
+#else+
+
 #ifdef __APPLE__
 
 #include <boost/filesystem.hpp>
@@ -133,13 +183,6 @@ bool RemoveDirectory(const std::string_view dirname, bool removeAll)
     }
 }
 
-const std::string LoadFile(const std::string_view& path)
-{
-    std::ifstream t(path);
-    std::string str((std::istreambuf_iterator<char>(t)),
-                    std::istreambuf_iterator<char>());
-    return str;
-}
 
 std::string GetFilenameExtension(const std::string_view path)
 {
@@ -202,7 +245,7 @@ std::string MakeGeneric(const std::string_view path)
 std::string GetRelativePath(const std::string_view path, const std::string_view relative)
 {
     fs::path p = fs::path(path);
-	//LogDebug(std::string("Relative path from: ") + path.data() + " to: " + relative.data());
+	//logDebug(std::string("Relative path from: ") + path.data() + " to: " + relative.data());
     return MakeGeneric(fs::relative(p, relative).string());
 }
 
@@ -210,4 +253,19 @@ std::string GetCurrentPath()
 {
     return fs::current_path().string();
 }
+
+const std::string LoadFile(const std::string& path)
+{
+    std::ifstream t(path);
+    std::string str((std::istreambuf_iterator<char>(t)),
+        std::istreambuf_iterator<char>());
+    return str;
+}
+}
+#endif
+
+namespace neko
+{
+
+
 }

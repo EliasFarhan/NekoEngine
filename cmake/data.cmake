@@ -1,6 +1,9 @@
 
-
+if(CMAKE_MINOR_VERSION LESS 11)
+find_package(PythonInterp)
+else()
 find_package (Python3 REQUIRED COMPONENTS Interpreter)
+endif()
 MESSAGE("Python Interpreter: ${Python3_EXECUTABLE}")
 
 file(GLOB_RECURSE SCRIPT_FILES scripts/*.py)
@@ -65,7 +68,7 @@ endforeach(DATA)
 
 add_custom_target(
         DataTarget
-        DEPENDS ${DATA_BINARY_FILES})
+        DEPENDS ${DATA_BINARY_FILES} ${DATA_FILES})
 
 set_target_properties (DataTarget PROPERTIES FOLDER Neko)
 
