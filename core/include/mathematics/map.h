@@ -9,7 +9,7 @@ namespace neko
 {
 
 template<typename Key, typename Value, const size_t Size>
-class FixedMap
+class FixedMap // 24 bytes
 {
 public:
     using Hash = xxh::hash_t<64>;
@@ -66,7 +66,7 @@ public:
     }
 
 private:
-    std::vector<Pair> pairs_; // TODO: Replace this with neko's container when it's ready.
+    std::vector<Pair> pairs_; // 24 bytes // TODO: Replace this with neko's container when it's ready.
     // Allocator& allocator_;
 };
 
