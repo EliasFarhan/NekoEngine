@@ -40,10 +40,10 @@ std::string RandomString()
     static std::uniform_int_distribution<int> dist{0, 255};
 
     const size_t LEN = (static_cast<size_t>(dist(g))) % MAX_LEN + MIN_LEN;
-    char* c_str[LEN];
+    char c_str[LEN];
     for (size_t i = 0; i < LEN; i++)
     {
-        *c_str[i] = static_cast<unsigned char>(dist(g));
+        c_str[i] = static_cast<unsigned char>(dist(g));
     }
 
     const char* const_c_str = c_str;

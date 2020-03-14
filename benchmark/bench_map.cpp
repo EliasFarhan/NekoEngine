@@ -1,4 +1,4 @@
-#include <benchmark/benchmark.h>
+/*#include <benchmark/benchmark.h>
 #include <mathematics/map.h> // FixedMap = 24 bytes
 #include <map> // 48 bytes
 #include <unordered_map> // 56 bytes
@@ -80,11 +80,11 @@ std::unordered_map<Key, Value> InitStdUnorderedMap(const size_t size)
     return returnValue;
 }
 
-template<size_t SIZE>
+/*template<size_t SIZE>
 FixedMap<Key, Value, SIZE> InitFixedMap()
 {
     return FixedMap<Key, Value, SIZE>();
-}
+}*/
 
 // ----------------------------------------------------------------
 // Benches
@@ -94,27 +94,27 @@ static void BM_InitStdMap(benchmark::State& s)
 {
     for (auto _ : s)
     {
-        benchmark::DoNotOptimize(InitStdMap());
+        InitStdMap();
     }
 }
 
 static void BM_InitStdUnorderedMap(benchmark::State& s)
 {
-    size_t size = s.range(0);
+    const size_t size = s.range(0);
     for (auto _ : s)
     {
-        benchmark::DoNotOptimize(InitStdUnorderedMap(size));
+        InitStdUnorderedMap(size);
     }
 }
 
-static void BM_InitFixedMap(benchmark::State& s)
+/*static void BM_InitFixedMap(benchmark::State& s)
 {
-    size_t size = s.range(0);
+    const size_t size = s.range(0);
     for (auto _ : s)
     {
-        benchmark::DoNotOptimize(InitFixedMap<size>());
+        InitFixedMap<size>();
     }
-}
+}*/
 
 static void BM_AccessStdMap(benchmark::State& s)
 {
@@ -124,12 +124,12 @@ static void BM_AccessStdMap(benchmark::State& s)
 
     for (auto& key : keys)
     {
-        keys.emplace_back(RandomString());
+        keys.emplace_back(RandomString<FROM,TO>());
         map.insert({
                            keys.back(),
                            DummyStruct{
-                                   RandomInt(),
-                                   RandomInt(),
+                                   RandomInt<FROM,TO>(),
+                                   RandomInt<FROM,TO>(),
                                    RandomChar()}});
     }
 
@@ -137,7 +137,7 @@ static void BM_AccessStdMap(benchmark::State& s)
     {
         for (auto key : keys)
         {
-            benchmark::DoNotOptimize(AccessStdMap(map, key));
+            AccessStdMap(map, key);
         }
     }
 }
@@ -150,12 +150,12 @@ static void BM_AccessStdUnorderedMap(benchmark::State& s)
 
     for (auto& key : keys)
     {
-        keys.emplace_back(RandomString());
+        keys.emplace_back(RandomString<FROM,TO>());
         map.insert({
                            keys.back(),
                            DummyStruct{
-                                   RandomInt(),
-                                   RandomInt(),
+                                   RandomInt<FROM,TO>(),
+                                   RandomInt<FROM,TO>(),
                                    RandomChar()}});
     }
 
@@ -163,26 +163,26 @@ static void BM_AccessStdUnorderedMap(benchmark::State& s)
     {
         for (auto key : keys)
         {
-            benchmark::DoNotOptimize(AccessStdUnorderedMap(map, key));
+            AccessStdUnorderedMap(map, key);
         }
     }
 }
 
 static void BM_AccessFixedMap(benchmark::State& s)
 {
-    size_t len = s.range(0);
+    const size_t len = s.range(0);
     FixedMap<Key, Value, len> map;
     std::vector<Key> keys;
     keys.resize(s.range(0));
 
     for (auto& key : keys)
     {
-        keys.emplace_back(RandomString());
+        keys.emplace_back(RandomString<FROM,TO>());
         map.Append(
                 keys.back(),
                 DummyStruct{
-                        RandomInt(),
-                        RandomInt(),
+                        RandomInt<FROM,TO>(),
+                        RandomInt<FROM,TO>(),
                         RandomChar()});
     }
 
@@ -190,7 +190,7 @@ static void BM_AccessFixedMap(benchmark::State& s)
     {
         for (auto key : keys)
         {
-            benchmark::DoNotOptimize(AccessFixedMap<len>(map, key));
+            AccessFixedMap<len>(map, key);
         }
     }
 }
@@ -204,10 +204,10 @@ static void BM_InsertStdMap(benchmark::State& s)
     for (auto& pair : pairs)
     {
         pairs.emplace_back({
-                                   RandomString(),
+                                   RandomString<FROM,TO>(),
                                    DummyStruct{
-                                           RandomInt(),
-                                           RandomInt(),
+                                           RandomInt<FROM,TO>(),
+                                           RandomInt<FROM,TO>(),
                                            RandomChar()}});
     }
 
@@ -215,7 +215,7 @@ static void BM_InsertStdMap(benchmark::State& s)
     {
         for (auto pair : pairs)
         {
-            benchmark::DoNotOptimize(InsertStdMap(map, pair.first, pair.second));
+            InsertStdMap(map, pair.first, pair.second);
         }
     }
 }
@@ -230,10 +230,10 @@ static void BM_InsertStdUnorderedMap(benchmark::State& s)
     for (auto& pair : pairs)
     {
         pairs.emplace_back({
-                                   RandomString(),
+                                   RandomString<FROM,TO>(),
                                    DummyStruct{
-                                           RandomInt(),
-                                           RandomInt(),
+                                           RandomInt<FROM,TO>(),
+                                           RandomInt<FROM,TO>(),
                                            RandomChar()}});
     }
 
@@ -241,14 +241,14 @@ static void BM_InsertStdUnorderedMap(benchmark::State& s)
     {
         for (auto pair : pairs)
         {
-            benchmark::DoNotOptimize(InsertStdUnorderedMap(map, pair.first, pair.second));
+            InsertStdUnorderedMap(map, pair.first, pair.second);
         }
     }
 }
 
 static void BM_InsertFixedMap(benchmark::State& s)
 {
-    size_t len = s.range(0);
+    const size_t len = s.range(0);
     FixedMap<Key, Value, len> map;
     std::vector<std::pair<Key, Value>> pairs;
     pairs.resize(len);
@@ -256,10 +256,10 @@ static void BM_InsertFixedMap(benchmark::State& s)
     for (auto& pair : pairs)
     {
         pairs.emplace_back({
-                                   RandomString(),
+                                   RandomString<FROM,TO>(),
                                    DummyStruct{
-                                           RandomInt(),
-                                           RandomInt(),
+                                           RandomInt<FROM,TO>(),
+                                           RandomInt<FROM,TO>(),
                                            RandomChar()}});
     }
 
@@ -267,7 +267,7 @@ static void BM_InsertFixedMap(benchmark::State& s)
     {
         for (auto pair : pairs)
         {
-            benchmark::DoNotOptimize(InsertFixedMap<len>(map, pair.first, pair.second));
+            InsertFixedMap<len>(map, pair.first, pair.second);
         }
     }
 }
@@ -285,3 +285,4 @@ BENCHMARK(BM_InsertFixedMap)->Range(FROM, TO);
 BENCHMARK_MAIN();
 
 }// !neko
+*/
