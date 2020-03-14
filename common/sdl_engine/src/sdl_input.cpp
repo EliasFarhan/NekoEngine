@@ -208,12 +208,12 @@ namespace neko
 	    return mousePos_;
     }
 
-    bool InputManager::IsButtonDown(ButtonCode button) const
+    bool InputManager::IsButtonDown(ControllerCode button) const
     {
 	    return buttonPressedStates[static_cast<int>(button)] == SDL_MOUSEBUTTONDOWN;
     }
 
-    bool InputManager::IsButtonUp(ButtonCode button) const
+    bool InputManager::IsButtonUp(ControllerCode button) const
     {
 	    return buttonPressedStates[static_cast<int>(button)] == SDL_MOUSEBUTTONUP;
     }
