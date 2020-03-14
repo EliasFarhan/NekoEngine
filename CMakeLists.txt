@@ -26,6 +26,7 @@ endif()
 
 if(UNIX)
     EXECUTE_PROCESS(COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE)
+    MESSAGE("UNIX Architecture: ${ARCHITECTURE}")
     if("${ARCHITECTURE}" MATCHES "arm")
         include(cmake/platforms/arm.cmake)
     endif()

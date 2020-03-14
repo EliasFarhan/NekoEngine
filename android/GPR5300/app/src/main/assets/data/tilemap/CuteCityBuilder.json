@@ -1,0 +1,144 @@
+{
+  "image": "data/tilemap/CuteCityBuilder.png",
+  "imageheight": 120,
+  "imagewidth": 160,
+  "tileheight": 20,
+  "tilewidth": 20,
+  "tile_elements": [
+    {
+      "type": "grass",
+      "center": [ 10, 10 ],
+      "rect": [ 0, 0, 20, 20 ]
+    },
+    {
+      "type": "water_vertical",
+      "center": [ 10, 10 ],
+      "rect": [ 140, 100, 20, 20 ]
+    },
+    {
+      "type": "water_horizontal",
+      "center": [ 10, 10 ],
+      "rect": [ 140, 80, 20, 20 ]
+    },
+    {
+      "type": "water_down_left",
+      "center": [ 10, 10 ],
+      "rect": [ 120, 80, 20, 20 ]
+    },
+    {
+      "type": "water_down_right",
+      "center": [ 10, 10 ],
+      "rect": [ 100, 80, 20, 20 ]
+    },
+    {
+      "type": "water_up_left",
+      "center": [ 10, 10 ],
+      "rect": [ 120, 100, 20, 20 ]
+    },
+    {
+      "type": "water_up_right",
+      "center": [ 10, 10 ],
+      "rect": [ 100, 100, 20, 20 ]
+    },
+    {
+      "type": "trees",
+      "center": [ 10, 20 ],
+      "rect": [ 100, 20, 20, 40 ]
+    },
+    {
+      "type": "road_line",
+      "center": [ 10, 10 ],
+      "rect": [ 20, 0, 20, 20 ]
+    },
+    {
+      "type": "road_turn",
+      "center": [ 10, 10 ],
+      "rect": [ 40, 0, 20, 20 ]
+    },
+    {
+      "type": "cross_road",
+      "center": [ 10, 10 ],
+      "rect": [ 60, 0, 20, 20 ]
+    },
+    {
+      "type": "road_t",
+      "center": [ 10, 10 ],
+      "rect": [ 80, 0, 20, 20 ]
+    },
+    {
+      "type": "road_bridge_horizontal",
+      "center": [ 10, 20 ],
+      "rect": [ 0, 20, 20, 40 ]
+    },
+    {
+      "type": "road_bridge_vertical",
+      "center": [ 10, 20 ],
+      "rect": [ 20, 20, 20, 40 ]
+    },
+    {
+      "type": "rail_line",
+      "center": [ 10, 10 ],
+      "rect": [ 140, 20, 20, 20 ]
+    },
+    {
+      "type": "rail_turn",
+      "center": [ 10, 10 ],
+      "rect": [ 120, 20, 20, 20 ]
+    },
+    {
+      "type": "train_station",
+      "center": [ 50, 30 ],
+      "rect": [ 0, 60, 100, 60 ]
+    },
+    {
+      "type": "school",
+      "center": [50,50],
+      "rect": [300,0,100,100]
+    },
+    {
+      "type": "office1",
+      "center": [ 10, 20 ],
+      "rect": [ 120, 40, 20, 40 ]
+    },
+    {
+      "type": "office2",
+      "center": [ 30, 50 ],
+      "rect": [ 0, 120, 60, 100 ]
+    },
+    {
+      "type": "office3",
+      "center": [ 30, 50 ],
+      "rect": [ 60, 120, 60, 100 ]
+    },
+    {
+      "type": "office4",
+      "center": [ 30, 50 ],
+      "rect": [ 120, 120, 60, 100 ]
+    },
+    {
+      "type": "office5",
+      "center": [30,50],
+      "rect": [180,120,60,100]
+    },
+    {
+      "type": "house1",
+      "center": [10,20],
+      "rect": [140,40,20,40]
+    },
+    {
+      "type": "house2",
+      "center": [10,20],
+      "rect": [380,0,20,40]
+    },
+    {
+      "type": "house3",
+      "center": [10,10],
+      "rect": [400,0,20,20]
+    },
+    {
+      "type": "house4",
+      "center": [10,10],
+      "rect": [400,20,20,20]
+    }
+  ]
+}

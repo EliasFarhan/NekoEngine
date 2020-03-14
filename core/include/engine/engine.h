@@ -49,8 +49,10 @@ struct Configuration
     bool fullscreen = false;
     bool vSync = true;
     unsigned int framerateLimit = 0u;
-#ifdef EMSCRIPTEN
+#if defined(EMSCRIPTEN)
     std::string dataRootPath = "./";
+#elif defined(__ANDROID__)
+    std::string dataRootPath = "";
 #else
     std::string dataRootPath = "../../";
 #endif
