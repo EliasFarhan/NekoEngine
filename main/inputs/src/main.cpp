@@ -4,7 +4,7 @@
 #include <gl/graphics.h>
 
 #include "gl/gles3_window.h"
-#include "input_engine.h"
+#include "input/input_engine.h"
 
 
 int main(int argc, char** argv)

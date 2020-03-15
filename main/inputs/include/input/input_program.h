@@ -1,6 +1,6 @@
 #pragma once
 
-#include <sample_program.h>
+#include <input/sample_program.h>
 #include <sdl_engine/sdl_input.h>
 
 namespace neko
@@ -22,6 +22,6 @@ public:
     void OnEvent(const SDL_Event& event) override;
 
 private:
-    InputManager inputManager_;
+    InputManager inputManager_ = InputManager();
 };
 }

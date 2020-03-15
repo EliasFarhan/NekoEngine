@@ -8,7 +8,7 @@
 namespace neko
 {
 
-class InputProgram : public SampleProgram
+class TextureProgram : public SampleProgram
 {
 public:
     void Init() override;

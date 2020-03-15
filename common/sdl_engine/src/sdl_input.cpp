@@ -164,7 +164,7 @@ namespace neko
 
     }
 
-    void InputManager::BindfromJson()
+    void InputManager::BindFromJson()
     {
     }
 
@@ -198,17 +198,19 @@ namespace neko
 	    return buttonPressedStates_[static_cast<int>(button)] == ButtonState::DOWN;
     }
 
-	bool InputManager::IsActionButtonDown(ActionInput button) const
+	bool InputManager::IsActionButtonDown(InputAction button) const
+	{
+        const int actionIndex = static_cast<int>(button);
+
+    	return false;
+	}
+
+	bool InputManager::IsActionButtonUp(InputAction button) const
 	{
 		return false;
 	}
 
-	bool InputManager::IsActionButtonUp(ActionInput button) const
-	{
-		return false;
-	}
-
-	bool InputManager::IsActionButtonHeld(ActionInput button) const
+	bool InputManager::IsActionButtonHeld(InputAction button) const
 	{
 		return false;
 	}

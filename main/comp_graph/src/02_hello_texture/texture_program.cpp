@@ -9,7 +9,7 @@
 namespace neko
 {
 
-void InputProgram::Init()
+void TextureProgram::Init()
 {
     const auto& config = BasicEngine::GetInstance()->config;
     shader_.LoadFromFile(
@@ -23,12 +23,12 @@ void InputProgram::Init()
     glEnable(GL_DEPTH_TEST);
 }
 
-void InputProgram::Update(seconds dt)
+void TextureProgram::Update(seconds dt)
 {
     
 }
 
-void InputProgram::Destroy()
+void TextureProgram::Destroy()
 {
     quad_.Destroy();
     shader_.Destroy();
@@ -36,7 +36,7 @@ void InputProgram::Destroy()
     textureId_ = 0;
 }
 
-void InputProgram::Render()
+void TextureProgram::Render()
 {
     if(shader_.GetProgram() == 0)
         return;
@@ -47,12 +47,12 @@ void InputProgram::Render()
     quad_.Draw();
 }
 
-void InputProgram::DrawImGui()
+void TextureProgram::DrawImGui()
 {
 	
 }
 
-void InputProgram::OnEvent(const SDL_Event& event)
+void TextureProgram::OnEvent(const SDL_Event& event)
 {
 
 }

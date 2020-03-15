@@ -3,10 +3,10 @@
 //
 
 #include <imgui.h>
-#include "sample_browser.h"
+#include "input/sample_browser.h"
 
 
-#include "input_program.h"
+#include "input/input_program.h"
 
 
 namespace neko

@@ -18,7 +18,7 @@ namespace neko
 void SampleBrowser::Init()
 {
     RegisterRenderProgram("01 Hello Triangle", std::make_unique<HelloTriangleProgram>());
-    RegisterRenderProgram("02 Hello Texture", std::make_unique<InputProgram>());
+    RegisterRenderProgram("02 Hello Texture", std::make_unique<TextureProgram>());
     RegisterRenderProgram("03 Hello Transform", std::make_unique<HelloTransformProgram>());
     RegisterRenderProgram("04 Hello Coords", std::make_unique<HelloCoordsProgram>());
     programs_[currentProgramIndex_]->Init();

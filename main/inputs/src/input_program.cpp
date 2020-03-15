@@ -3,7 +3,7 @@
 //
 
 #include <engine/engine.h>
-#include <input_program.h>
+#include <input/input_program.h>
 #include <imgui.h>
 namespace neko
 {
@@ -11,6 +11,7 @@ namespace neko
 void InputProgram::Init()
 {
     const auto& config = BasicEngine::GetInstance()->config;
+    inputManager_.PreUserInputs();
 
 }
 
@@ -44,10 +45,10 @@ void InputProgram::DrawImGui()
     }
     ImGui::End();
 }
-
+	
 void InputProgram::OnEvent(const SDL_Event& event)
 {
-	switch (event.type)
+	switch (event.key.type)
 	{
     case SDL_KEYDOWN:
     {
@@ -59,12 +60,13 @@ void InputProgram::OnEvent(const SDL_Event& event)
 		break;
     case SDL_KEYUP:
     {
-        if (event.key.state == inputManager_.IsKeyUp(KeyCode::W))
+        if (event.key.type == inputManager_.IsKeyUp(KeyCode::W))
         {
             std::cout << "event w key released" << '\n';
         }
     }
 		break;
+	default: ;
 	}
 }
 }
