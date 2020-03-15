@@ -11,13 +11,12 @@ namespace neko
 void InputProgram::Init()
 {
     const auto& config = BasicEngine::GetInstance()->config;
-    inputManager_.PreUserInputs();
 
 }
 
 void InputProgram::Update(seconds dt)
 {
-    
+    inputManager_.PreUserInputs();
 }
 
 	
