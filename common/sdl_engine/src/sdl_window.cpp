@@ -23,6 +23,9 @@ void sdl::SdlWindow::Init()
     EASY_BLOCK("InitSdlWindow");
 #endif
     auto& config = BasicEngine::GetInstance()->config;
+#if defined(__ANDROID__)
+    config.fullscreen = true;
+#endif
 
     auto flags = SDL_WINDOW_RESIZABLE|
 #ifdef NEKO_GLES3
@@ -32,21 +35,26 @@ void sdl::SdlWindow::Init()
     auto windowSize = config.windowSize;
     if (config.fullscreen)
     {
+        windowSize = Vec2u::zero;
+        flags |= SDL_WINDOW_FULLSCREEN;
+    }
+    window_ = SDL_CreateWindow(
+            config.windowName.c_str(),
+            SDL_WINDOWPOS_UNDEFINED,
+            SDL_WINDOWPOS_UNDEFINED,
+            windowSize.x,
+            windowSize.y,
+            flags
+    );
+	if(config.fullscreen)
+	{
         int windowSizeW = 0;
         int windowSizeH = 0;
         SDL_GetWindowSize(window_, &windowSizeW, &windowSizeH);
         windowSize.x = windowSizeW;
         windowSize.y = windowSizeH;
-        flags |= SDL_WINDOW_FULLSCREEN;
-    }
-    window_ = SDL_CreateWindow(
-            config.windowName.c_str(),
-            SDL_WINDOWPOS_CENTERED,
-            SDL_WINDOWPOS_CENTERED,
-            windowSize.x,
-            windowSize.y,
-            flags
-    );
+        config.windowSize = windowSize;
+	}
     // Check that everything worked out okay
     if (window_ == nullptr)
     {
