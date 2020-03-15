@@ -51,7 +51,7 @@ void HelloTriangleProgram::Init()
 
     nekoShader_.LoadFromFile(
             config.dataRootPath+"data/shaders/01_hello_triangle/hello_neko_quad.vert",
-            config.dataRootPath+"/data/shaders/01_hello_triangle/hello_triangle.frag"
+            config.dataRootPath+"data/shaders/01_hello_triangle/hello_triangle.frag"
             );
     quad_.Init();
     circle_.Init();
