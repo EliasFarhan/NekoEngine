@@ -49,11 +49,7 @@ void InputProgram::Render()
 
 void InputProgram::DrawImGui()
 {
-	inputManager.OnPreUserInputs();
-    if (inputManager.IsKeyDown(neko::KeyCode::W))
-    {
-        std::cout << "Touche W appuyé" << '\n';
-    }
+	
 }
 
 void InputProgram::OnEvent(const SDL_Event& event)

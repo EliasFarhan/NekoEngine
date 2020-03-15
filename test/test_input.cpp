@@ -9,16 +9,5 @@
 
 TEST(Engine, TestInput)
 {
-	neko::sdl::SdlEngine engine = neko::sdl::SdlEngine(nullptr);
 	
-	neko::InputManager inputManager;
-	SDL_Init(SDL_INIT_EVENTS);
-	while (true)
-	{
-		inputManager.OnPreUserInputs();
-		if (inputManager.IsKeyDown(neko::KeyCode::W))
-		{
-			std::cout << "Touche W appuyé" << '\n';
-		}
-	}
 }

@@ -1,40 +1,50 @@
 #include <sdl_engine/sdl_input.h>
 namespace neko
 {
-    InputManager::InputManager() = default;
 
-    InputManager::~InputManager() = default;
-
-    void InputManager::OnPreUserInputs()
+    void InputManager::PreUserInputs()
 	{
-    	//for (auto& keyStates : keyPressedStates)
-        for (size_t i = 0; i < SDL_NUM_SCANCODES ; i++)
+        const size_t keyboardLength = static_cast<size_t>(KeyCode::LENGTH);
+
+        for (size_t i = 0; i < keyboardLength; i++)
         {
             
-            if (keyPressedStates[i] == SDL_KEYDOWN)
+            if (keyPressedStates_[i] == ButtonState::DOWN)
             {
-                keyPressedStates[i] == SDL_PRESSED;
+                keyPressedStates_[i] = ButtonState::HELD;
+            }
+            if (keyPressedStates_[i] == ButtonState::UP)
+            {
+                keyPressedStates_[i] = ButtonState::NONE;
             }
         }
-        for (size_t i = 0; i < SDL_LASTEVENT; i++) 
+
+        const size_t controllerLength = static_cast<size_t>(ControllerCode::LENGTH);
+
+        for (size_t i = 0; i < controllerLength; i++) 
         {
-	        if (buttonPressedStates[i] == SDL_MOUSEBUTTONDOWN)
+	        if (buttonPressedStates_[i] == ButtonState::DOWN)
 	        {
-                buttonPressedStates[i] == SDL_RELEASED;
+                buttonPressedStates_[i] = ButtonState::HELD;
 	        }
-	        if (buttonPressedStates[i] == SDL_MOUSEBUTTONDOWN)
+	        if (buttonPressedStates_[i] == ButtonState::UP)
 	        {
-                buttonPressedStates[i] == SDL_PRESSED;
+                buttonPressedStates_[i] = ButtonState::NONE;
 	        }
         }
 
-        if (!joyAxisUpdate) {
-            joyAxisLX = 0;
-            joyAxisLY = 0;
-            joyAxisRX = 0;
-            joyAxisRY = 0;
+        const size_t switchLength = static_cast<size_t>(SwitchButton::LENGTH);
+        for (size_t i = 0; i < switchLength; i++)
+        {
+            if (switchButtonState_[i] == ButtonState::DOWN)
+            {
+                switchButtonState_[i] = ButtonState::HELD;
+            }
+            if (switchButtonState_[i] == ButtonState::UP)
+            {
+                switchButtonState_[i] = ButtonState::NONE;
+            }
         }
-        else { joyAxisUpdate = false; }
 
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
@@ -44,16 +54,16 @@ namespace neko
             // SDL2's new way of handling input
             case SDL_KEYDOWN:
             {
-                this->keyboard_ = SDL_GetKeyboardState(nullptr);
+                this->states_ = SDL_GetKeyboardState(nullptr);
                 const auto index = event.key.keysym.scancode;
-            	keyPressedStates[index] = SDL_KEYDOWN;
+            	keyPressedStates_[index] = ButtonState::DOWN;
             }
             	break;
             case SDL_KEYUP:
             {
-                this->keyboard_ = SDL_GetKeyboardState(nullptr);
+                this->states_ = SDL_GetKeyboardState(nullptr);
                 const auto index = event.key.keysym.scancode;
-                keyPressedStates[index] = SDL_KEYUP;
+                keyPressedStates_[index] = ButtonState::UP;
 			}
                 break;
             case SDL_MOUSEMOTION:
@@ -65,33 +75,29 @@ namespace neko
                 this->mouse_ = SDL_GetMouseState(NULL, NULL);
 
                 if (event.button.button == SDL_BUTTON_LEFT)
-                    buttonPressedStates[static_cast<int>(SDL_BUTTON_LEFT)] = SDL_MOUSEBUTTONDOWN;
+                    buttonPressedStates_[static_cast<int>(SDL_BUTTON_LEFT)] = ButtonState::DOWN;
 
                 else if (event.button.button == SDL_BUTTON_RIGHT)
-                    buttonPressedStates[static_cast<int>(SDL_BUTTON_RIGHT)] = SDL_MOUSEBUTTONDOWN;
+                    buttonPressedStates_[static_cast<int>(SDL_BUTTON_RIGHT)] = ButtonState::DOWN;
 
                 else if (event.button.button == SDL_BUTTON_MIDDLE)
-                    buttonPressedStates[static_cast<int>(SDL_BUTTON_MIDDLE)] = SDL_MOUSEBUTTONDOWN;
+                    buttonPressedStates_[static_cast<int>(SDL_BUTTON_MIDDLE)] = ButtonState::DOWN;
                 break;
 
             case SDL_MOUSEBUTTONUP:
                 this->mouse_ = SDL_GetMouseState(NULL, NULL);
 
                 if (event.button.button == SDL_BUTTON_LEFT)
-                    buttonPressedStates[static_cast<int>(SDL_BUTTON_LEFT)] = SDL_MOUSEBUTTONUP;
+                    buttonPressedStates_[static_cast<int>(SDL_BUTTON_LEFT)] = ButtonState::UP;
 
                 else if (event.button.button == SDL_BUTTON_RIGHT)
-                    buttonPressedStates[static_cast<int>(SDL_BUTTON_RIGHT)] = SDL_MOUSEBUTTONUP;
+                    buttonPressedStates_[static_cast<int>(SDL_BUTTON_RIGHT)] = ButtonState::UP;
 
                 else if (event.button.button == SDL_BUTTON_MIDDLE)
-                    buttonPressedStates[static_cast<int>(SDL_BUTTON_MIDDLE)] = SDL_MOUSEBUTTONUP;
+                    buttonPressedStates_[static_cast<int>(SDL_BUTTON_MIDDLE)] = ButtonState::UP;
                 break;
 
             case SDL_MOUSEWHEEL:
-                scrollX = event.wheel.y;
-                scrollY = event.wheel.y;
-
-                scrollUpdate = true;
                 break;
 
             case SDL_JOYDEVICEREMOVED:
@@ -112,22 +118,6 @@ namespace neko
             break;
 
             case SDL_JOYAXISMOTION:
-                switch (event.jaxis.axis)
-            	{
-                case 0:
-                    joyAxisLX = event.jaxis.value;
-                    break;
-                case 1:
-                    joyAxisLY = event.jaxis.value;
-                    break;
-                case 2:
-                    joyAxisRX = event.jaxis.value;
-                    break;
-                case 3:
-                    joyAxisRY = event.jaxis.value;
-                    break;
-                }
-                joyAxisUpdate = true;
                 break;
             case SDL_JOYHATMOTION:
             {
@@ -171,52 +161,57 @@ namespace neko
             }
          }
 
-        if (!scrollUpdate) {
-            scrollX = 0;
-            scrollY = 0;
-        }
-        else
-        {
-	        scrollUpdate = false;
-        }
 
+    }
 
+    void InputManager::BindfromJson()
+    {
     }
 
     bool InputManager::IsKeyDown(KeyCode key) const
     {
-	    return keyPressedStates[static_cast<int>(key)] == SDL_KEYDOWN;
+	    return keyPressedStates_[static_cast<int>(key)] == ButtonState::DOWN;
     }
 
     bool InputManager::IsKeyUp(KeyCode key) const
     {
-	    return keyPressedStates[static_cast<int>(key)] == SDL_KEYUP;
+	    return keyPressedStates_[static_cast<int>(key)] == ButtonState::UP;
     }
 
     bool InputManager::IsKeyHeld(KeyCode key) const
     {
-        if (!keyboard_ || keyboard_ == nullptr)
+        if (!states_ || states_ == nullptr)
         {
             return false;
         }
         const auto keyHeld = static_cast<int>(key);
-	    return keyboard_[keyHeld] != 0;
-    }
-
-    Vec2f InputManager::GetMousePosition() const
-    {
-	    return mousePos_;
+	    return states_[keyHeld] != 0;
     }
 
     bool InputManager::IsButtonDown(ControllerCode button) const
     {
-	    return buttonPressedStates[static_cast<int>(button)] == SDL_MOUSEBUTTONDOWN;
+	    return buttonPressedStates_[static_cast<int>(button)] == ButtonState::DOWN;
     }
 
     bool InputManager::IsButtonUp(ControllerCode button) const
     {
-	    return buttonPressedStates[static_cast<int>(button)] == SDL_MOUSEBUTTONUP;
+	    return buttonPressedStates_[static_cast<int>(button)] == ButtonState::DOWN;
     }
+
+	bool InputManager::IsActionButtonDown(ActionInput button) const
+	{
+		return false;
+	}
+
+	bool InputManager::IsActionButtonUp(ActionInput button) const
+	{
+		return false;
+	}
+
+	bool InputManager::IsActionButtonHeld(ActionInput button) const
+	{
+		return false;
+	}
 	
 }
 

@@ -3,10 +3,10 @@
 //
 
 #include <imgui.h>
-#include "input/sample_browser.h"
+#include "sample_browser.h"
 
 
-#include "01_Input/input_program.h"
+#include "input_program.h"
 
 
 namespace neko
@@ -15,7 +15,7 @@ namespace neko
 
 void SampleBrowser::Init()
 {
-    RegisterRenderProgram("02 Hello Texture", std::make_unique<InputProgram>());
+    RegisterRenderProgram("01 input", std::make_unique<InputProgram>());
     programs_[currentProgramIndex_]->Init();
 }
 

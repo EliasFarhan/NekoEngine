@@ -3,7 +3,7 @@
 #include <vector>
 #include <memory>
 #include <SDL_events.h>
-#include "input/sample_program.h"
+#include "sample_program.h"
 #include "sdl_engine/sdl_engine.h"
 
 namespace neko

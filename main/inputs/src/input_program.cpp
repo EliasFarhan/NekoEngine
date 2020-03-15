@@ -3,8 +3,8 @@
 //
 
 #include <engine/engine.h>
-#include "01_Input/input_program.h"
-
+#include <input_program.h>
+#include <imgui.h>
 namespace neko
 {
 
@@ -36,8 +36,7 @@ void InputProgram::DrawImGui()
 
     ImGui::Begin("Input text");
     ImGui::InputText("input text", buf, IM_ARRAYSIZE(buf));
-    inputManager.OnPreUserInputs();
-    if (inputManager.IsKeyDown(SDLK_w))
+    if (inputManager_.IsKeyDown(KeyCode::W))
     {
         ImGui::BeginChild("Text");
         ImGui::Text("W KEY PRESSED");
@@ -52,7 +51,7 @@ void InputProgram::OnEvent(const SDL_Event& event)
 	{
     case SDL_KEYDOWN:
     {
-        if (event.key.state == inputManager.IsKeyDown(SDLK_w))
+        if (event.key.state == inputManager_.IsKeyDown(KeyCode::W))
         {
             std::cout << "event w key pressed" << '\n';
         }
@@ -60,7 +59,7 @@ void InputProgram::OnEvent(const SDL_Event& event)
 		break;
     case SDL_KEYUP:
     {
-        if (event.key.state == inputManager.IsKeyUp(SDLK_w))
+        if (event.key.state == inputManager_.IsKeyUp(KeyCode::W))
         {
             std::cout << "event w key released" << '\n';
         }

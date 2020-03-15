@@ -1,7 +1,7 @@
 #pragma once
 
 #include "sdl_engine/sdl_engine.h"
-#include "input/sample_browser.h"
+#include "sample_browser.h"
 
 namespace neko
 {

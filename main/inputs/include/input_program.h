@@ -1,11 +1,7 @@
 #pragma once
 
-#include <input/sample_program.h>
+#include <sample_program.h>
 #include <sdl_engine/sdl_input.h>
-#include <imgui.h>
-#include "gl/shape.h"
-#include "gl/shader.h"
-#include "gl/texture.h"
 
 namespace neko
 {
@@ -25,8 +21,7 @@ public:
 
     void OnEvent(const SDL_Event& event) override;
 
-
 private:
-    InputManager inputManager;
+    InputManager inputManager_;
 };
 }
