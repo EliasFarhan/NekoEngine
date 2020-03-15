@@ -1,7 +1,47 @@
 #ifndef _AUDIO_ENGINE_H_	//Prevents multiple definition of the objects
 #define _AUDIO_ENGINE_H_
 
-#include <fmod_studio.hpp>
+#include <mathematics/vector.h>
+#include <string_view>
+
+template<typename Sound, typename Channel, typename  Event, typename Bank, typename LoadBankFlag, typename LoadEventFlag, typename LoadSoundFlag, typename PlaySoundFlag, typename PlayEventFlag>
+class AudioEngine
+{
+public:
+    AudioEngine();
+    ~AudioEngine();
+
+    void Update();
+
+    //Loading
+    void LoadBank(_STRING_VIEW_ bankName, LoadBankFlag flag);
+    void LoadEvent(_STRING_VIEW_ eventName, LoadEventFlag flag);
+    void LoadSound(_STRING_VIEW_ soundName, LoadSoundFlag flag);
+    void UnloadSound(_STRING_VIEW_ soundName);
+
+    //Playing/Stopping
+    void PlaySound(_STRING_VIEW_ soundName, PlaySoundFlag flag);
+    void PlayEvent(_STRING_VIEW_ eventName, PlayEventFlag flag);
+    void StopChannel(int channelID);
+    void StopEvent(_STRING_VIEW_ eventName);
+    void StopAllChannels();
+
+    bool IsPlaying(Channel channelID);
+    bool IsEventPlaying(_STRING_VIEW_ eventName);
+	
+private:
+    typedef std::map<std::string, Sound*> SoundMap;
+    typedef std::map<std::string, Channel*> ChannelMap;
+    typedef std::map<std::string, Event*> EventMap;
+    typedef std::map<std::string, Bank*> BankMap;
+
+    SoundMap soundMap;
+    ChannelMap channelMap;
+    EventMap eventMap;
+    BankMap bankMap;
+};
+
+/*#include <fmod_studio.hpp>
 #include <fmod.hpp>
 #include <iostream>
 #include <map>
@@ -56,5 +96,5 @@ private:
     EventMap eventMap;
     BankMap bankMap;
     int nextChannelID;
-};
+};*/
 #endif
