@@ -33,7 +33,7 @@ void Shader::LoadFromFile(const std::string_view vertexShaderPath, const std::st
 {
     if(!FileExists(vertexShaderPath))
     {
-        LogDebug(std::string("[Error] Vertex shader: ") + vertexShaderPath.data() + " does not exist");
+        logDebug(std::string("[Error] Vertex shader: ")+vertexShaderPath.data()+" does not exist");
     }
     const unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
 
@@ -51,13 +51,13 @@ void Shader::LoadFromFile(const std::string_view vertexShaderPath, const std::st
     {
         glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
         std::ostringstream oss;
-        oss << "[Error] Vertex shader at: " << vertexShaderPath <<" compilation failed: \n" << infoLog;
-        LogDebug(oss.str());
+        oss << "[Error] Vertex shader at: " << vertexShaderPath <<" compilation failed: \n" << infoLog<<'\n'<<vertexShaderChar;
+        logDebug(oss.str());
         return;
     }
     if(!FileExists(fragmentShaderPath))
     {
-        LogDebug(std::string("[Error] Fragment shader: ") + fragmentShaderPath.data() + " does not exist");
+        logDebug(std::string("[Error] Fragment shader: ")+fragmentShaderPath.data()+" does not exist");
     }
     const unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     auto fragmentShaderProgram = LoadFile(fragmentShaderPath.data());
@@ -70,8 +70,8 @@ void Shader::LoadFromFile(const std::string_view vertexShaderPath, const std::st
     {
         glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
         std::ostringstream oss;
-        oss << "[Error] Fragment shader at: " << fragmentShaderPath <<" compilation failed\n" << infoLog;
-        LogDebug(oss.str());
+        oss << "[Error] Fragment shader at: " << fragmentShaderPath <<" compilation failed\n" << infoLog << '\n' << fragmentShaderChar;
+        logDebug(oss.str());
         return;
     }
 

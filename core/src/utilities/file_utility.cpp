@@ -38,13 +38,22 @@ JNIEXPORT void JNICALL
 Java_swiss_sae_gpr5300_MainActivity_load(JNIEnv *env, jclass clazz, jobject mgr) {
     // TODO: implement load()
     assetManager = AAssetManager_fromJava(env, mgr);
+    logDebug("Asset Manager from JNI loaded!");
 }
 namespace neko
 {
 	bool FileExists(const std::string_view path)
 	{
-        AAsset* file = AAssetManager_open(assetManager, path.data(), AASSET_MODE_BUFFER);
-        return file != nullptr;
+        {
+            std::ostringstream oss;
+            oss << "Checking file exists: "<<path;
+            logDebug(oss.str());
+        }
+        AAsset* file = AAssetManager_open(assetManager, path.data(), AASSET_MODE_STREAMING);
+        bool exist = file != nullptr;
+        if(exist)
+            AAsset_close(file);
+        return exist;
 	}
     std::string GetFilenameExtension(const std::string_view path)
     {
@@ -58,15 +67,17 @@ namespace neko
     const std::string LoadFile(const std::string& path)
     {
         AAsset* file = AAssetManager_open(assetManager, path.c_str(), AASSET_MODE_BUFFER);
-
+        if(file == nullptr)
+            return "";
         // Get the file length
-        const  size_t fileLength = static_cast<const size_t>(AAsset_getLength(file));
+        const  size_t fileLength = static_cast<const size_t>(AAsset_getLength64(file));
 
         // Allocate memory to read your file
         char* fileContent = new char[fileLength + 1];
 
         // Read your file
         AAsset_read(file, fileContent, fileLength);
+        fileContent[fileLength] = '\0';
         AAsset_close(file);
         std::string str(fileContent);
         delete[] fileContent;
