@@ -1,4 +1,3 @@
-
 #include <engine/transform.h>
 #include <engine/engine.h>
 #include <imgui.h>
@@ -25,7 +24,9 @@ void HelloTransformProgram::Init()
 
 void HelloTransformProgram::Render()
 {
-
+    if(shaderProgram_.GetProgram() == 0)
+        return;
+    std::lock_guard<std::mutex> lock(updateMutex_);
 
     shaderProgram_.Bind();
 
@@ -45,6 +46,8 @@ void HelloTransformProgram::Render()
             break;
     }
 
+    glEnable(GL_DEPTH_TEST);
+
 }
 
 void HelloTransformProgram::Destroy()
@@ -57,12 +60,11 @@ void HelloTransformProgram::Destroy()
 
 void HelloTransformProgram::Update(seconds dt)
 {
+    std::lock_guard<std::mutex> lock(updateMutex_);
     transform_ = Mat4f::Identity;
-    transform_ = Mat4f::Translate(transform_, position_);
     transform_ = Mat4f::Scale(transform_, scale_);
     switch(shape_)
     {
-
         case ShapeType::PLANE:
             transform_ = Mat4f::Rotate(transform_, degree_t(angle_), Vec3f(0.0f, 0.0f, 1.0f));
             break;
@@ -73,17 +75,20 @@ void HelloTransformProgram::Update(seconds dt)
             break;
     }
 
+    transform_ = Mat4f::Translate(transform_, position_);
 }
 
-void HelloTransformProgram::DrawUi(seconds dt)
+void HelloTransformProgram::DrawImGui()
 {
+
+    ImGui::SetNextWindowPos(ImVec2(0, 400), ImGuiCond_FirstUseEver);
     ImGui::Begin("Transform Window");
-    const char* items[static_cast<size_t>(ShapeType::LENGTH)]= {
+    const char* items[static_cast<size_t>(ShapeType::LENGTH)] = {
             "Plane",
             "Cube",
     };
     int currentIndex = static_cast<int>(shape_);
-    if(ImGui::Combo("Render Types", &currentIndex, items, (size_t)ShapeType::LENGTH))
+    if (ImGui::Combo("Render Types", &currentIndex, items, (size_t) ShapeType::LENGTH))
     {
         shape_ = static_cast<ShapeType>(currentIndex);
     }
@@ -92,10 +97,10 @@ void HelloTransformProgram::DrawUi(seconds dt)
     switch (shape_)
     {
         case ShapeType::PLANE:
-            ImGui::InputFloat("Rotation", &angle_);
+            ImGui::InputFloat("Rotation", (float*) &angle_);
             break;
         case ShapeType::CUBE:
-            ImGui::InputFloat3("Euler Angles", (float*)&eulerAngle_[0]);
+            ImGui::InputFloat3("Euler Angles", (float*) &eulerAngle_[0]);
             break;
         default:
             break;

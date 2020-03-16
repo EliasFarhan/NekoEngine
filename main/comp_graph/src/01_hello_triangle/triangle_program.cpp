@@ -49,20 +49,27 @@ void HelloTriangleProgram::Init()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboProgram_.EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(eboProgram_.indices), eboProgram_.indices, GL_STATIC_DRAW);
 
-    quadShader_.LoadFromFile(
+    nekoShader_.LoadFromFile(
             config.dataRootPath+"data/shaders/01_hello_triangle/hello_neko_quad.vert",
-            config.dataRootPath+"/data/shaders/01_hello_triangle/hello_triangle.frag"
+            config.dataRootPath+"data/shaders/01_hello_triangle/hello_triangle.frag"
             );
     quad_.Init();
+    circle_.Init();
+
+    glEnable(GL_DEPTH_TEST);
 }
 
 void HelloTriangleProgram::Update(seconds dt)
 {
+    std::lock_guard<std::mutex> lock(updateMutex_);
     timeSinceInit_ += dt;
 }
 
 void HelloTriangleProgram::Render()
 {
+    if(shader_.GetProgram() == 0)
+        return;
+    std::lock_guard<std::mutex> lock(updateMutex_);
     switch (renderType_)
     {
 
@@ -90,13 +97,21 @@ void HelloTriangleProgram::Render()
         }
         case RenderType::NekoQuad:
         {
-            quadShader_.Bind();
+            nekoShader_.Bind();
             const float colorValue = (std::cos(timeSinceInit_.count()) + 1.0f) / 2.0f;
-            quadShader_.SetFloat("colorCoeff", colorValue);
-            quadShader_.SetVec4("aColor", Vec4f(1.0f,0.5f,0.0f,1.0f));
+            nekoShader_.SetFloat("colorCoeff", colorValue);
+            nekoShader_.SetVec4("aColor", Vec4f(1.0f, 0.5f, 0.0f, 1.0f));
             quad_.Draw();
 
             break;
+        }
+        case RenderType::NekoCircle:
+        {
+            nekoShader_.Bind();
+            const float colorValue = (std::cos(timeSinceInit_.count()) + 1.0f) / 2.0f;
+            nekoShader_.SetFloat("colorCoeff", colorValue);
+            nekoShader_.SetVec4("aColor", Vec4f(1.0f, 0.5f, 0.0f, 1.0f));
+            circle_.Draw();
         }
         default:
             break;
@@ -115,18 +130,25 @@ void HelloTriangleProgram::Destroy()
     glDeleteVertexArrays(1, &vaoProgam_.VAO);
     glDeleteBuffers(2, &vaoProgam_.VBO[0]);
 
+    quad_.Destroy();
+    circle_.Destroy();
+
     shader_.Destroy();
-    quadShader_.Destroy();
+    nekoShader_.Destroy();
+
+
 }
 
-void HelloTriangleProgram::DrawUi(seconds dt)
+void HelloTriangleProgram::DrawImGui()
 {
+
+    ImGui::SetNextWindowPos(ImVec2(0, 400), ImGuiCond_FirstUseEver);
     ImGui::Begin("Hello Triangle Program");
-    ImGui::Text("FPS: %f", 1.0f / dt.count());
     const char* items[(size_t)RenderType::Length]= {
             "Simple Vao Program",
             "Simple Vbo Program",
-            "Neko Quad"
+            "Neko Quad",
+            "Neko Circle"
     };
     int currentIndex = static_cast<int>(renderType_);
     if(ImGui::Combo("Render Types", &currentIndex, items, (size_t)RenderType::Length))

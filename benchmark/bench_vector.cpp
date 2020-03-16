@@ -13,25 +13,25 @@ const float end = 100.0f;
 float accumulate_magnitude_v3(const std::vector<neko::Vec3f>& v)
 {
     return std::accumulate(v.cbegin(), v.cend(), 0.0f, [](float total, const neko::Vec3f& b)
-    { return total + b.GetMagnitude(); });
+    { return total + b.Magnitude(); });
 }
 
 float accumulate_magnitude_v4(const std::vector<neko::Vec4f>& v)
 {
     return std::accumulate(v.cbegin(), v.cend(), 0.0f, [](float total, const neko::Vec4f& b)
-    { return total + b.GetMagnitude(); });
+    { return total + b.Magnitude(); });
 }
 
 float accumulate_then_magnitude_v3(const std::vector<neko::Vec3f>& v)
 {
-    const auto total= std::accumulate(v.cbegin(), v.cend(), neko::Vec3f::Zero);
-    return total.GetMagnitude();
+    const auto total= std::accumulate(v.cbegin(), v.cend(), neko::Vec3f::zero);
+    return total.Magnitude();
 }
 
 float accumulate_then_magnitude_v4(const std::vector<neko::Vec4f>& v)
 {
-    const auto total =  std::accumulate(v.cbegin(), v.cend(), neko::Vec4f::Zero);
-    return total.GetMagnitude();
+    const auto total =  std::accumulate(v.cbegin(), v.cend(), neko::Vec4f::zero);
+    return total.Magnitude();
 }
 
 static void BM_Vec3fAccumulateMagnitude(benchmark::State& state)

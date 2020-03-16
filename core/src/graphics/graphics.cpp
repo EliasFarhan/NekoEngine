@@ -23,56 +23,179 @@
  */
 #include <graphics/graphics.h>
 #include <algorithm>
+#include <chrono>
+#include <sstream>
 #include <engine/globals.h>
+#include <engine/window.h>
+#include <engine/engine.h>
 #include "engine/log.h"
 
+#ifdef EASY_PROFILE_USE
+#include "easy/profiler.h"
+#endif
 
 namespace neko
 {
-GraphicsManager::GraphicsManager()
+Renderer::Renderer()
 {
-	commandBuffer_.resize(MAX_COMMAND_NMB);
+	currentCommandBuffer_.reserve(MAX_COMMAND_NMB);
+	nextCommandBuffer_.reserve(MAX_COMMAND_NMB);
 }
 
 
-void GraphicsManager::Render(RenderCommand* command)
+void Renderer::Render(RenderCommandInterface* command)
 {
-	if (renderLength_ >= MAX_COMMAND_NMB)
+	nextCommandBuffer_.push_back(command);
+}
+
+void Renderer::RenderAll()
+{
+#ifdef EASY_PROFILE_USE
+	EASY_BLOCK("RenderAllCPU");
+#endif
+	for (auto* renderCommand : currentCommandBuffer_)
 	{
-		logDebug("[Error] Max Number of Graphics Command");
-		return;
+		renderCommand->Render();
 	}
-	commandBuffer_[renderLength_] = command;
-	renderLength_++;
 }
 
-void GraphicsManager::RenderAll()
+void Renderer::Sync()
 {
-    std::sort(commandBuffer_.begin(), commandBuffer_.begin() + renderLength_, [](RenderCommand* c1, RenderCommand* c2)
-    {
-        return c1->GetLayer() < c2->GetLayer();
-    });
-    for(Index i = 0; i < renderLength_;i++)
-    {
-        if(commandBuffer_[i])
-        {
-            commandBuffer_[i]->Render();
-        }
-    }
-    renderLength_ = 0;
+#if !defined(NEKO_SAMETHREAD)
+#ifdef EASY_PROFILE_USE
+	EASY_BLOCK("EngineRenderSync");
+	EASY_BLOCK("EngineAppWaiting");
+	EASY_BLOCK("AcquireRenderLock");
+#endif
+	std::unique_lock lock(renderMutex_);
+#ifdef EASY_PROFILE_USE
+	EASY_END_BLOCK;
+#endif
+	flags_ |= IS_APP_WAITING;
+#ifdef EASY_PROFILE_USE
+	EASY_BLOCK("WaitForRenderSignal");
+#endif
+	cv_.wait(lock);
+#ifdef EASY_PROFILE_USE
+	EASY_END_BLOCK;
+	EASY_END_BLOCK;
+	EASY_BLOCK("SwapRenderCommand");
+#endif
+#endif
+	std::swap(currentCommandBuffer_, nextCommandBuffer_);
+	nextCommandBuffer_.clear();
+	//TODO copy all the new transform3d?
+	auto* engine = BasicEngine::GetInstance();
+	engine->ManageEvent();
+	flags_ &= ~IS_APP_WAITING;
 }
 
-
-
-int RenderCommand::GetLayer() const
+void Renderer::RenderLoop()
 {
-    return layer_;
+#if !defined(NEKO_SAMETHREAD)
+	flags_ |= IS_RUNNING;
+	window_->LeaveCurrentContext();
+	renderThread_ = std::thread([this] {
+		BeforeRenderLoop();
+
+		std::chrono::time_point<std::chrono::system_clock> clock = std::chrono::system_clock::now();
+		while (flags_ & IS_RUNNING)
+		{
+			const auto start = std::chrono::system_clock::now();
+			const auto dt = std::chrono::duration_cast<seconds>(start - clock);
+			dt_ = dt.count();
+			clock = start;
+
+			Update();
+		}
+		AfterRenderLoop();
+		});
+#endif
 }
 
-void RenderCommand::SetLayer(int layer)
+void Renderer::Destroy()
 {
-    layer_ = layer;
+#ifdef EASY_PROFILE_USE
+	EASY_BLOCK("ClosingFromEngine");
+#endif
+	flags_ &= ~IS_RUNNING;
+#if !defined(NEKO_SAMETHREAD)
+	renderThread_.join();
+#endif
 }
+
+void Renderer::SetFlag(Renderer::RendererFlag flag)
+{
+	flags_ |= flag;
+}
+
+void Renderer::SetWindow(Window* window)
+{
+	window_ = window;
+}
+
+void Renderer::Update()
+{
+#ifdef EASY_PROFILE_USE
+	EASY_BLOCK("RenderFullUpdateCPU");
+#endif
+
+
+	auto* engine = BasicEngine::GetInstance();
+	{
+#if !defined(NEKO_SAMETHREAD)
+		std::unique_lock<std::mutex> lock(renderMutex_);
+#endif
+#ifdef EASY_PROFILE_USE
+		EASY_BLOCK("RenderUpdateCPU");
+#endif
+		ClearScreen();
+		engine->GenerateUiFrame();
+		RenderAll();
+#if !defined(NEKO_SAMETHREAD)
+		lock.unlock();
+#endif
+		window_->RenderUi();
+	}
+	{
+#if !defined(NEKO_SAMETHREAD)
+		std::unique_lock<std::mutex> lock(renderMutex_);
+#endif
+#ifdef EASY_PROFILE_USE
+		EASY_BLOCK("RenderSwapBufferCPU");
+#endif
+		window_->SwapBuffer();
+	}
+	{
+#ifdef EASY_PROFILE_USE
+		EASY_BLOCK("WaitForAppCPU");
+#endif
+#if !defined(NEKO_SAMETHREAD)
+		while (!(flags_ & IS_APP_WAITING) && (flags_ & IS_RUNNING))
+		{
+			cv_.notify_one();
+		}
+
+		{
+			cv_.notify_one();
+		}
+#endif
+
+	}
+}
+void Renderer::BeforeRenderLoop()
+{
+#if !defined(NEKO_SAMETHREAD)
+	window_->MakeCurrentContext();
+#endif
+}
+void Renderer::AfterRenderLoop()
+{
+#if !defined(NEKO_SAMETHREAD)
+	window_->LeaveCurrentContext();
+#endif
+}
+
 
 
 }

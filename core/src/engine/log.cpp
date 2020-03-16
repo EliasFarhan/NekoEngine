@@ -23,12 +23,18 @@
  */
 #include <engine/log.h>
 #include <iostream>
-
+#if defined(__ANDROID__)
+#include <android/log.h>
+#endif
 static std::vector<std::string> logs;
 void logDebug(const std::string& msg)
 {
-	std::cout << msg << '\n';
-	logs.push_back(msg);
+#if defined(__ANDROID__)
+    __android_log_print(ANDROID_LOG_INFO, "NekoEngine", "%s", msg.c_str());
+#else
+	std::cout << msg << std::endl;
+	//logs.push_back(msg);
+#endif
 }
 
 const std::vector<std::string>& getLog()

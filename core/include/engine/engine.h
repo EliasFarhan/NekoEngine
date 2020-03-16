@@ -23,18 +23,20 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-
+#include <mutex>
 #include <string>
 #include <engine/system.h>
 #include <utilities/action_utility.h>
 #include <graphics/color.h>
 #include <utilities/time_utility.h>
 #include <mathematics/vector.h>
+#include <atomic>
 
 
 namespace neko
 {
-struct Collider;
+class Renderer;
+class Window;
 
 /**
  * \brief store various Engine constant or global values
@@ -42,13 +44,15 @@ struct Collider;
 struct Configuration
 {
 	std::string windowName = "NekoEngine 0.1";
-    Vec2i windowSize = Vec2i(1024, 1024);
-    std::pair<unsigned, unsigned> gameWindowSize = std::pair<unsigned, unsigned>(1280, 720);
+    Vec2u windowSize = Vec2u(1024, 1024);
+    Vec2u gameWindowSize{1280, 720};
     bool fullscreen = false;
-    bool vSync = true;
+    bool vSync = false;
     unsigned int framerateLimit = 0u;
-#ifdef EMSCRIPTEN
+#if defined(EMSCRIPTEN)
     std::string dataRootPath = "./";
+#elif defined(__ANDROID__)
+    std::string dataRootPath = "";
 #else
     std::string dataRootPath = "../../";
 #endif
@@ -58,31 +62,44 @@ struct Configuration
 /**
  * \brief basic engine class with no graphics manager implementation
  */
-class BasicEngine : public System
+class BasicEngine : public SystemInterface
 {
 public:
     explicit BasicEngine(Configuration* config = nullptr);
 	BasicEngine() = delete;
-    ~BasicEngine() override;
+    ~BasicEngine();
     void Init() override;
-
+    void Update(seconds dt) final;
     void Destroy() override;
+
+    //Update functions
+    virtual void ManageEvent() = 0;
+    virtual void GenerateUiFrame();
 
     void EngineLoop();
 
+    void SetWindowAndRenderer(Window* window, Renderer* renderer);
 
     Configuration config;
 
-    static BasicEngine* GetInstance(){return instance_;};
+    void RegisterSystem(SystemInterface& system);
+    void RegisterOnDrawUi(DrawImGuiInterface& drawUi);
+
+    float GetDeltaTime() const { return dt_; };
+	
+    static BasicEngine* GetInstance(){return instance_;}
+
     //template <typename T = BasicEngine>
     //static T* GetInstance(){ return dynamic_cast<T*>(instance_);};
 protected:
     static BasicEngine* instance_;
+    Renderer* renderer_ = nullptr;
+    Window* window_ = nullptr;
 	bool isRunning_;
+    std::atomic<float> dt_;
     Action<> initAction_;
     Action<seconds> updateAction_;
-    Action<seconds> drawUiAction_;
-    Action<> drawAction_;
+    Action<> drawImGuiAction_;
     Action<> destroyAction_;
 
 };
