@@ -25,27 +25,27 @@ namespace neko
 			return pairs_.capacity();
 		}
 
-		Value& operator[](Key key) {
-			const Hash hash = xxh::xxhash<64>(&key, sizeof(Key));
+		Value& operator[](const Key key) {
+			const Hash hash = xxh::xxhash<64>(&key, sizeof(Key), 42, xxh::endianness::littleEndian);
 			auto it = std::find_if(pairs_.begin(), pairs_.end(), [hash](Pair& p) { return p.first == hash; });
 
 			neko_assert(it != pairs_.end(),
-				"neko::Map<Key,Value>::operator[](const Key): Key passed to operator not found.");
+				"neko::FixedMap<Key,Value>::operator[](const Key): Key passed to operator not found.");
 			return it->second;
 		}
 
-		bool Contains(Key key) const {
+		bool Contains(const Key key) const {
 			const Hash hash = xxh::xxhash<64>(&key, sizeof(Key));
 			return std::find_if(pairs_.begin(), pairs_.end(), [hash](Pair p) { return p.first == hash; }) != pairs_.end();
 		}
 
-		void Append(Key key, Value value) {
+		void Append(const Key key, const Value value) {
 			neko_assert(!Contains(key),
-				"neko::Map<Key,Value>::Append(const Key, const Value): Map already contains Key passed.");
+				"neko::FixedMap<Key,Value>::Append(const Key, const Value): Map already contains Key passed.");
 			auto it = std::find_if(pairs_.begin(), pairs_.end(), [](Pair& p) { return p.first == 0; });
 			neko_assert(it != pairs_.end(),
-				"neko::Map<Key,Value>::Append(const Key, const Value): No more free slots in map.")
-				it->first = xxh::xxhash<64>(&key, sizeof(Key));
+				"neko::FixedMap<Key,Value>::Append(const Key, const Value): No more free slots in map.")
+				it->first = xxh::xxhash<64>(&key, sizeof(Key), 42, xxh::endianness::littleEndian);
 			it->second = value;
 		}
 

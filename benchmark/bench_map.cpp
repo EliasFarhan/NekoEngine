@@ -1,6 +1,4 @@
-// TODO: Find a way to profile maps of a defined size. Currnetly profiling maps of SIZE * numOfGoogleIterations...
-
-/*#include <benchmark/benchmark.h>
+#include <benchmark/benchmark.h>
 #include <mathematics/map.h> // FixedMap = 24 bytes
 #include <map> // 48 bytes
 #include <unordered_map> // 56 bytes
@@ -12,289 +10,279 @@
 namespace neko
 {
 
-const size_t FIXED_MAP_SIZE = 512;
+// ----------------------------------------------------------------
+// Compile time definitions.
+// ----------------------------------------------------------------
 
-struct DummyStruct // 12 bytes
+const size_t SIZE = 1;
+using Key = unsigned long long;
+using Value = unsigned long long;
+using Pair = std::pair<Key, Value>;
+using StdMapType = std::map<Key, Value>;
+using StdUnorderedMapType = std::unordered_map<Key, Value>;
+using FixedMapType = FixedMap<Key, Value, SIZE>;
+unsigned long long NextUnsignedLongLong = 0;
+
+// ----------------------------------------------------------------
+// Init.
+// ----------------------------------------------------------------
+
+inline StdMapType StdMap_Init()
 {
-    int a; // 4 bytes
-    int b; // 4 bytes // Size of a ptr: 8 bytes
-    char c; // 1 byte
-    // 3 bytes padding
-};
-
-using Key = unsigned long int;
-using Value = DummyStruct; // 12 bytes
-
-static Key GetNextChar()
-{
-    static Key c = 0;
-    return ++c;
+    return StdMapType();
 }
 
-static void ClearStdMap(std::map<Key, Value>& map)
+inline StdUnorderedMapType StdUnorderedMap_Init()
 {
-    map.clear();
+    auto returnValue = StdUnorderedMapType();
+    returnValue.reserve(SIZE);
+    return returnValue;
 }
 
-static void ClearStdUnorderedMap(std::unordered_map<Key, Value>& map)
+inline FixedMapType FixedMap_Init()
 {
-    map.clear();
+    return FixedMapType();
 }
 
-static void ClearFixedMap(FixedMap<Key, Value, FIXED_MAP_SIZE>& map)
+// ----------------------------------------------------------------
+// Init benches.
+// ----------------------------------------------------------------
+
+void BM_StdMap_Init(benchmark::State& s)
 {
-    std::for_each(map.begin(), map.end(), [](std::pair<Key, Value>& p) {
+    for (auto _ : s)
+    {
+        benchmark::DoNotOptimize(StdMap_Init());
+    }
+}
+
+void BM_StdUnorderedMap_Init(benchmark::State& s)
+{
+    for (auto _ : s)
+    {
+        benchmark::DoNotOptimize(StdUnorderedMap_Init());
+    }
+}
+
+void BM_FixedMap_Init(benchmark::State& s)
+{
+    for (auto _ : s)
+    {
+        benchmark::DoNotOptimize(FixedMap_Init());
+    }
+}
+
+// ----------------------------------------------------------------
+// Fill out.
+// ----------------------------------------------------------------
+inline void StdMap_FillOut(StdMapType& map)
+{
+    for (size_t i = 0; i < SIZE; i++)
+    {
+        map.insert({NextUnsignedLongLong++, NextUnsignedLongLong++});
+    }
+}
+
+inline void StdUnorderedMap_FillOut(StdUnorderedMapType& map)
+{
+    for (size_t i = 0; i < SIZE; i++)
+    {
+        map.insert({NextUnsignedLongLong++, NextUnsignedLongLong++});
+    }
+}
+
+inline void FixedMap_FillOut(FixedMapType& map)
+{
+    for (size_t i = 0; i < SIZE; i++)
+    {
+        map.Append(NextUnsignedLongLong++, NextUnsignedLongLong++);
+    }
+}
+
+// ----------------------------------------------------------------
+// Fill out benches.
+// ----------------------------------------------------------------
+
+void BM_StdMap_InitAndFillOut(benchmark::State& s)
+{
+    for (auto _ : s)
+    {
+        StdMapType map = StdMap_Init();
+        StdMap_FillOut(map);
+    }
+}
+
+void BM_StdUnorderedMap_InitAndFillOut(benchmark::State& s)
+{
+    for (auto _ : s)
+    {
+        StdUnorderedMapType map = StdUnorderedMap_Init();
+        StdUnorderedMap_FillOut(map);
+    }
+}
+
+void BM_FixedMap_InitAndFillOut(benchmark::State& s)
+{
+    for (auto _ : s)
+    {
+        FixedMapType map = FixedMap_Init();
+        FixedMap_FillOut(map);
+    }
+}
+
+// ----------------------------------------------------------------
+// Clear.
+// ----------------------------------------------------------------
+
+inline void StdMap_Clear(StdMapType& map)
+{
+    return map.clear();
+}
+
+inline void StdUnorderedMap_Clear(StdUnorderedMapType& map)
+{
+    return map.clear();
+}
+
+inline void FixedMap_Clear(FixedMapType& map)
+{
+    std::for_each(map.begin(), map.end(), [](std::pair<xxh::hash_t<64>, Value>& p) {
         p.first = 0;
-        p.second = {0, 0, 0};
+        p.second = 0;
     });
 }
 
 // ----------------------------------------------------------------
-// Access
+// Clear benches.
 // ----------------------------------------------------------------
 
-DummyStruct const AccessStdMap(std::map<Key, Value>& map, const Key key)
+void BM_StdMap_InitFillOutAndClear(benchmark::State& s)
+{
+    for (auto _ : s)
+    {
+        StdMapType map = StdMap_Init();
+        StdMap_FillOut(map);
+        StdMap_Clear(map);
+    }
+}
+
+void BM_StdUnorderedMap_InitFillOutAndClear(benchmark::State& s)
+{
+    for (auto _ : s)
+    {
+        StdUnorderedMapType map = StdUnorderedMap_Init();
+        StdUnorderedMap_FillOut(map);
+        StdUnorderedMap_Clear(map);
+    }
+}
+
+void BM_FixedMap_InitFillOutAndClear(benchmark::State& s)
+{
+    for (auto _ : s)
+    {
+        FixedMapType map = FixedMap_Init();
+        FixedMap_FillOut(map);
+        FixedMap_Clear(map);
+    }
+}
+
+// ----------------------------------------------------------------
+// Access.
+// ----------------------------------------------------------------
+
+inline Value StdMap_Access(StdMapType& map, const Key key)
 {
     return map[key];
 }
 
-DummyStruct const AccessStdUnorderedMap(std::unordered_map<Key, Value>& map, const Key key)
+inline Value StdUnorderedMap_Access(StdUnorderedMapType& map, const Key key)
 {
     return map[key];
 }
 
-DummyStruct const AccessFixedMap(FixedMap<Key, Value, FIXED_MAP_SIZE>& map, const Key key)
+inline Value FixedMap_Access(FixedMapType& map, const Key key)
 {
     return map[key];
 }
 
 // ----------------------------------------------------------------
-// Insert
+// Access benches.
 // ----------------------------------------------------------------
 
-void InsertStdMap(std::map<Key, Value>& map, const Key key, const Value value)
+void BM_StdMap_Access(benchmark::State& s)
 {
-    map.insert({key, value});
-}
-
-void InsertStdUnorderedMap(std::unordered_map<Key, Value>& map, const Key key, const Value value)
-{
-    map.insert({key, value});
-}
-
-void InsertFixedMap(FixedMap<Key, Value, FIXED_MAP_SIZE>& map, const Key key, const Value value)
-{
-    map.Append(key, value);
-}
-
-// ----------------------------------------------------------------
-// Init
-// ----------------------------------------------------------------
-
-std::map<Key, Value> InitStdMap()
-{
-    return std::map<Key, Value>();
-}
-
-std::unordered_map<Key, Value> InitStdUnorderedMap(const size_t size)
-{
-    auto returnValue = std::unordered_map<Key, Value>();
-    returnValue.reserve(size);
-    return returnValue;
-}
-
-FixedMap<Key, Value, FIXED_MAP_SIZE> InitFixedMap()
-{
-    return FixedMap<Key, Value, FIXED_MAP_SIZE>();
-}
-
-// ----------------------------------------------------------------
-// Benches
-// ----------------------------------------------------------------
-
-static void BM_InitStdMap(benchmark::State& s)
-{
-    for (auto _ : s)
-    {
-        InitStdMap();
-    }
-}
-
-static void BM_InitStdUnorderedMap(benchmark::State& s)
-{
-    for (auto _ : s)
-    {
-        InitStdUnorderedMap(FIXED_MAP_SIZE);
-    }
-}
-
-static void BM_InitFixedMap(benchmark::State& s)
-{
-    for (auto _ : s)
-    {
-        InitFixedMap();
-    }
-}
-
-static void BM_AccessStdMap(benchmark::State& s)
-{
-    std::map<Key, Value> map;
-    std::vector<Key> keys;
-    keys.resize(FIXED_MAP_SIZE);
-
+    StdMapType map = StdMap_Init();
+    std::vector<Key> keys(SIZE);
     for (auto& key : keys)
     {
-        keys.emplace_back(GetNextChar());
-        map.insert({
-                           keys.back(),
-                           DummyStruct{
-                                   RandomInt<2, 512>(),
-                                   RandomInt<2, 512>(),
-                                   RandomChar()}});
+        key = NextUnsignedLongLong++;
+        map.insert({key, NextUnsignedLongLong++});
     }
 
     for (auto _ : s)
     {
         for (auto key : keys)
         {
-            AccessStdMap(map, key);
+            benchmark::DoNotOptimize(StdMap_Access(map, key));
         }
     }
 }
 
-static void BM_AccessStdUnorderedMap(benchmark::State& s)
+void BM_StdUnorderedMap_Access(benchmark::State& s)
 {
-    std::unordered_map<Key, Value> map;
-    std::vector<Key> keys;
-    keys.resize(FIXED_MAP_SIZE);
-
+    StdUnorderedMapType map = StdUnorderedMap_Init();
+    std::vector<Key> keys(SIZE);
     for (auto& key : keys)
     {
-        keys.emplace_back(GetNextChar());
-        map.insert({
-                           keys.back(),
-                           DummyStruct{
-                                   RandomInt<2, 512>(),
-                                   RandomInt<2, 512>(),
-                                   RandomChar()}});
+        key = NextUnsignedLongLong++;
+        map.insert({key, NextUnsignedLongLong++});
     }
 
     for (auto _ : s)
     {
         for (auto key : keys)
         {
-            AccessStdUnorderedMap(map, key);
+            benchmark::DoNotOptimize(StdUnorderedMap_Access(map, key));
         }
     }
 }
 
-static void BM_AccessFixedMap(benchmark::State& s)
+void BM_FixedMap_Access(benchmark::State& s)
 {
-    const size_t len = FIXED_MAP_SIZE;
-    FixedMap<Key, Value, len> map;
-    std::vector<Key> keys;
-    keys.resize(len);
-
+    FixedMapType map = FixedMap_Init();
+    std::vector<Key> keys(SIZE);
     for (auto& key : keys)
     {
-        keys.emplace_back(GetNextChar());
-        map.Append(
-                keys.back(),
-                DummyStruct{
-                        RandomInt<2, 512>(),
-                        RandomInt<2, 512>(),
-                        RandomChar()});
-
+        key = NextUnsignedLongLong++;
+        map.Append(key, NextUnsignedLongLong++);
     }
 
     for (auto _ : s)
     {
         for (auto key : keys)
         {
-            AccessFixedMap(map, key);
+            benchmark::DoNotOptimize(FixedMap_Access(map, key));
         }
     }
 }
 
-static void BM_InsertStdMap(benchmark::State& s)
-{
-    std::map<Key, Value> map;
-    std::vector<std::pair<Key, Value>> pairs; // pair = 8 + 12 => 20 bytes // Q: alignof pair? 12? if so => sizeof pair = 24 bytes
-    pairs.resize(FIXED_MAP_SIZE);
+// ----------------------------------------------------------------
+// Register benches and run them.
+// ----------------------------------------------------------------
 
-    for (auto& pair : pairs)
-    {
-        pair.first = GetNextChar();
-        pair.second = DummyStruct{RandomInt<2, 512>(), RandomInt<2, 512>(), RandomChar()};
-    }
-
-    for (auto _ : s)
-    {
-        for (auto pair : pairs)
-        {
-            InsertStdMap(map, pair.first, pair.second);
-        }
-        ClearStdMap(map);
-    }
-}
-
-static void BM_InsertStdUnorderedMap(benchmark::State& s)
-{
-    std::unordered_map<Key, Value> map;
-    std::vector<std::pair<Key, Value>> pairs;
-    pairs.resize(FIXED_MAP_SIZE);
-    map.reserve(FIXED_MAP_SIZE);
-
-    for (auto& pair : pairs)
-    {
-        pair.first = GetNextChar();
-        pair.second = DummyStruct{RandomInt<2, 512>(), RandomInt<2, 512>(), RandomChar()};
-    }
-
-    for (auto _ : s)
-    {
-        for (auto pair : pairs)
-        {
-            InsertStdUnorderedMap(map, pair.first, pair.second);
-        }
-        ClearStdUnorderedMap(map);
-    }
-}
-
-static void BM_InsertFixedMap(benchmark::State& s)
-{
-    const size_t len = FIXED_MAP_SIZE;
-    FixedMap<Key, Value, len> map;
-    std::vector<std::pair<Key, Value>> pairs;
-    pairs.resize(len);
-
-    for (auto& pair : pairs)
-    {
-        pair.first = GetNextChar();
-        pair.second = DummyStruct{RandomInt<2, 512>(), RandomInt<2, 512>(), RandomChar()};
-    }
-
-    for (auto _ : s)
-    {
-        for (auto pair : pairs)
-        {
-            InsertFixedMap(map, pair.first, pair.second);
-        }
-        ClearFixedMap(map);
-    }
-}
-
-BENCHMARK(BM_InitStdMap);
-BENCHMARK(BM_InitStdUnorderedMap);
-BENCHMARK(BM_InitFixedMap);
-BENCHMARK(BM_InsertStdMap);
-BENCHMARK(BM_InsertStdUnorderedMap);
-BENCHMARK(BM_InsertFixedMap);
-BENCHMARK(BM_AccessStdMap);
-BENCHMARK(BM_AccessStdUnorderedMap);
-BENCHMARK(BM_AccessFixedMap);
+// BENCHMARK(BM_StdMap_Init);
+// BENCHMARK(BM_StdUnorderedMap_Init);
+// BENCHMARK(BM_FixedMap_Init);
+// BENCHMARK(BM_StdMap_InitAndFillOut);
+// BENCHMARK(BM_StdUnorderedMap_InitAndFillOut);
+// BENCHMARK(BM_FixedMap_InitAndFillOut);
+// BENCHMARK(BM_StdMap_InitFillOutAndClear);
+// BENCHMARK(BM_StdUnorderedMap_InitFillOutAndClear);
+// BENCHMARK(BM_FixedMap_InitFillOutAndClear);
+// BENCHMARK(BM_StdMap_Access);
+// BENCHMARK(BM_StdUnorderedMap_Access);
+BENCHMARK(BM_FixedMap_Access);
 
 BENCHMARK_MAIN();
 
 }// !neko
-*/
