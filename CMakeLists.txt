@@ -14,6 +14,7 @@ set(Neko_Remotery OFF CACHE BOOL "Activate Remotery")
 set(Neko_GLES3 ON CACHE BOOL "Activate OpenGL ES 3.0")
 set(Neko_SDL2 ON CACHE BOOL "Activate SDL2")
 set(Neko_Box2D OFF CACHE BOOL "Activate Box2D")
+set(Neko_Fmod ON CACHE BOOL "Activate Fmod")
 set(Neko_Test ON CACHE BOOL "Activate Test")
 set(Neko_Benchmark ON CACHE BOOL "Activate Benchmark")
 
@@ -71,7 +72,9 @@ if(Neko_SDL2)
     add_subdirectory("common/sdl_engine")
 
 endif()
-
+if(Neko_Fmod)
+add_subdirectory("${EXTERNAL_DIR}/Fmod-2.00.08")
+endif()
 if(Neko_Test)
     enable_testing()
     set(GOOGLE_TEST_DIR ${EXTERNAL_DIR}/googletest-1.8.1)
