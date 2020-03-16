@@ -9,7 +9,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS On)
 include(cmake/neko_executable.cmake)
 
 
-
+set(Neko_SameThread OFF CACHE BOOL "Used for Emscripten and other system when render and engine has to be in the same thread")
 set(Neko_Profile OFF CACHE BOOL "Activate Profiling with Easy Profile")
 set(Neko_GLES3 ON CACHE BOOL "Activate OpenGL ES 3.0")
 set(Neko_SDL2 ON CACHE BOOL "Activate SDL2")
@@ -42,6 +42,10 @@ set(UTILITIES_DIR "${EXTERNAL_DIR}/utilities" CACHE INTERNAL "")
 
 if(Neko_Assert)
     add_compile_definitions("NEKO_ASSERT=1")
+endif()
+
+if(Neko_SameThread)
+add_compile_definitions("NEKO_SAME_THREAD=1")
 endif()
 
 if(Neko_Profile)

@@ -23,20 +23,24 @@ void sdl::SdlWindow::Init()
     EASY_BLOCK("InitSdlWindow");
 #endif
     auto& config = BasicEngine::GetInstance()->config;
-#if defined(__ANDROID__)
-    config.fullscreen = true;
-#endif
 
-    auto flags = SDL_WINDOW_RESIZABLE|
+
+    auto flags = SDL_WINDOW_RESIZABLE |
 #ifdef NEKO_GLES3
-            SDL_WINDOW_OPENGL
+        SDL_WINDOW_OPENGL
+#endif
+        ;
+#if defined(__ANDROID__)
+    //config.fullscreen = true;
+    config.windowSize = Vec2u(1280, 720);
+    config.fullscreen = true;
 #endif
                     ;
     auto windowSize = config.windowSize;
     if (config.fullscreen)
     {
         windowSize = Vec2u::zero;
-        flags |= SDL_WINDOW_FULLSCREEN;
+        flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
     }
     window_ = SDL_CreateWindow(
             config.windowName.c_str(),

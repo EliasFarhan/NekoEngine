@@ -61,7 +61,7 @@ void Renderer::RenderAll()
 
 void Renderer::Sync()
 {
-#ifndef EMSCRIPTEN
+#if !defined(NEKO_SAMETHREAD)
 #ifdef EASY_PROFILE_USE
 	EASY_BLOCK("EngineRenderSync");
 	EASY_BLOCK("EngineAppWaiting");
@@ -75,9 +75,7 @@ void Renderer::Sync()
 #ifdef EASY_PROFILE_USE
 	EASY_BLOCK("WaitForRenderSignal");
 #endif
-#ifndef EMSCRIPTEN
 	cv_.wait(lock);
-#endif
 #ifdef EASY_PROFILE_USE
 	EASY_END_BLOCK;
 	EASY_END_BLOCK;
@@ -87,13 +85,14 @@ void Renderer::Sync()
 	std::swap(currentCommandBuffer_, nextCommandBuffer_);
 	nextCommandBuffer_.clear();
 	//TODO copy all the new transform3d?
-
+	auto* engine = BasicEngine::GetInstance();
+	engine->ManageEvent();
 	flags_ &= ~IS_APP_WAITING;
 }
 
 void Renderer::RenderLoop()
 {
-#ifndef EMSCRIPTEN
+#if !defined(NEKO_SAMETHREAD)
 	flags_ |= IS_RUNNING;
 	window_->LeaveCurrentContext();
 	renderThread_ = std::thread([this] {
@@ -120,7 +119,7 @@ void Renderer::Destroy()
 	EASY_BLOCK("ClosingFromEngine");
 #endif
 	flags_ &= ~IS_RUNNING;
-#ifndef EMSCRIPTEN
+#if !defined(NEKO_SAMETHREAD)
 	renderThread_.join();
 #endif
 }
@@ -144,7 +143,7 @@ void Renderer::Update()
 
 	auto* engine = BasicEngine::GetInstance();
 	{
-#ifndef EMSCRIPTEN
+#if !defined(NEKO_SAMETHREAD)
 		std::unique_lock<std::mutex> lock(renderMutex_);
 #endif
 #ifdef EASY_PROFILE_USE
@@ -153,13 +152,15 @@ void Renderer::Update()
 		ClearScreen();
 		engine->GenerateUiFrame();
 		RenderAll();
-#ifndef EMSCRIPTEN
+#if !defined(NEKO_SAMETHREAD)
 		lock.unlock();
 #endif
 		window_->RenderUi();
 	}
 	{
-
+#if !defined(NEKO_SAMETHREAD)
+		std::unique_lock<std::mutex> lock(renderMutex_);
+#endif
 #ifdef EASY_PROFILE_USE
 		EASY_BLOCK("RenderSwapBufferCPU");
 #endif
@@ -169,7 +170,7 @@ void Renderer::Update()
 #ifdef EASY_PROFILE_USE
 		EASY_BLOCK("WaitForAppCPU");
 #endif
-#ifndef EMSCRIPTEN
+#if !defined(NEKO_SAMETHREAD)
 		while (!(flags_ & IS_APP_WAITING) && (flags_ & IS_RUNNING))
 		{
 			cv_.notify_one();
@@ -179,17 +180,18 @@ void Renderer::Update()
 			cv_.notify_one();
 		}
 #endif
+
 	}
 }
 void Renderer::BeforeRenderLoop()
 {
-#ifndef EMSCRIPTEN
+#if !defined(NEKO_SAMETHREAD)
 	window_->MakeCurrentContext();
 #endif
 }
 void Renderer::AfterRenderLoop()
 {
-#ifndef EMSCRIPTEN
+#if !defined(NEKO_SAMETHREAD)
 	window_->LeaveCurrentContext();
 #endif
 }

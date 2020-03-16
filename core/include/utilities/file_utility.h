@@ -30,8 +30,19 @@
 #include <string_view>
 #include <fstream>
 
+
 namespace neko
 {
+
+	struct BufferFile
+	{
+        char* dataBuffer = nullptr;
+        size_t dataLength = 0;
+
+        void Load(std::string_view path);
+        void Destroy();
+		
+	};
 
 bool FileExists(const std::string_view filename);
 
@@ -41,7 +52,7 @@ bool IsDirectory(const std::string_view filename);
 
 void IterateDirectory(const std::string_view dirname, std::function<void(const std::string_view)> func, bool recursive=false);
 
-std::ifstream::pos_type CalculateFileSize(const std::string& filename);
+	size_t CalculateFileSize(const std::string& filename);
 
 std::string GetCurrentPath();
 
@@ -50,6 +61,7 @@ bool CreateDirectory(const std::string_view dirname);
 bool RemoveDirectory(const std::string_view dirname, bool removeAll = true);
 
 const std::string LoadFile(const std::string_view& path);
+
 
 std::string LinkFolderAndFile(const std::string_view folderPath, const std::string_view filePath);
 std::string GetRelativePath(const std::string_view path, const std::string_view relative);
