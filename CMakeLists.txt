@@ -19,10 +19,14 @@ set(Neko_Test ON CACHE BOOL "Activate Test")
 set(Neko_Assert ON CACHE BOOL "Activate Neko Assertion")
 set(Neko_Benchmark ON CACHE BOOL "Activate Benchmark")
 
-if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
+MESSAGE("CMAKE SYSTEM NAME: ${CMAKE_SYSTEM_NAME}")
+
+if ("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
     include(cmake/platforms/emscripten.cmake)
     set(CMAKE_EXECUTABLE_SUFFIX ".html")
     set(CMAKE_STATIC_LIBRARY_SUFFIX ".a")
+    set(Neko_SameThread ON CACHE BOOL "Used for Emscripten and other system when render and engine has to be in the same thread")
+    mark_as_advanced(Neko_SameThread)
 endif()
 
 if(UNIX)
@@ -45,7 +49,8 @@ if(Neko_Assert)
 endif()
 
 if(Neko_SameThread)
-add_compile_definitions("NEKO_SAME_THREAD=1")
+    MESSAGE("Neko Update and Render will be on the same thread")
+    add_compile_definitions("NEKO_SAMETHREAD=1")
 endif()
 
 if(Neko_Profile)
