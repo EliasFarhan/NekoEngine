@@ -1,6 +1,7 @@
 package swiss.sae.gpr5300;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.app.Activity;
@@ -15,7 +16,7 @@ public class MainActivity extends SDLActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
         mgr = getResources().getAssets();
         load(mgr);
     }
