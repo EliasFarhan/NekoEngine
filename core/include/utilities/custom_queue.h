@@ -1,10 +1,13 @@
+#pragma once
 #include <vector>
 
 namespace neko
 {
-	template<class ... T>
+	template<typename T>
 	class custom_queue
 	{
+	private:
+		custom_queue MyQueue;
 	public:
 		std::vector<T> CreateQueue();
 		void PushQueue(std::vector<T> queue, T element);
@@ -13,8 +16,7 @@ namespace neko
 		T FrontQueue(std::vector<T> queue);
 		T BackQueue(std::vector<T> queue);
 		int SizeQueue(std::vector<T> queue);
-	private:
-		custom_queue MyQueue;
+
 	};
 
 }
