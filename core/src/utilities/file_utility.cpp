@@ -319,7 +319,7 @@ std::string GetCurrentPath()
 	return fs::current_path().string();
 }
 
-const std::string LoadFile(const std::string& path)
+std::string LoadFile(const std::string_view& path)
 {
 	std::ifstream t(path);
 	std::string str((std::istreambuf_iterator<char>(t)),

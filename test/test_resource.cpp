@@ -2,7 +2,7 @@
 #include <engine/resource.h>
 
 #include "sole.hpp"
-#include "utilities/file_utility.h"
+#include <utilities/file_utility.h>
 
 TEST(Engine, TestResource)
 {
