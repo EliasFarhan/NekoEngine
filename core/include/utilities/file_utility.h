@@ -49,7 +49,7 @@ bool CreateDirectory(const std::string_view dirname);
 
 bool RemoveDirectory(const std::string_view dirname, bool removeAll = true);
 
-const std::string LoadFile(const std::string& path);
+const std::string LoadFile(const std::string_view& path);
 
 std::string LinkFolderAndFile(const std::string_view folderPath, const std::string_view filePath);
 std::string GetRelativePath(const std::string_view path, const std::string_view relative);

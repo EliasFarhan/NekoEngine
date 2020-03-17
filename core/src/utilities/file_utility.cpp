@@ -133,7 +133,7 @@ bool RemoveDirectory(const std::string_view dirname, bool removeAll)
     }
 }
 
-const std::string LoadFile(const std::string& path)
+const std::string LoadFile(const std::string_view& path)
 {
     std::ifstream t(path);
     std::string str((std::istreambuf_iterator<char>(t)),

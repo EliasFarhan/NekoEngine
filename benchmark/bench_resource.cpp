@@ -28,7 +28,7 @@ static void BM_ResourceThread(benchmark::State& state)
         while (resources.size()<resourcesId.size()) {
             for (int n = 0; n < size; n++)
             {
-                if(resources.find(resourcesId[n]) != resources.end()) {
+                if (resources.find(resourcesId[n]) != resources.end()) {
                     continue;
                 }
                 if (resourceManager.IsResourceReady(resourcesId[n])) {
@@ -40,7 +40,7 @@ static void BM_ResourceThread(benchmark::State& state)
             }
         }
     }
-    resourceManager.Close();
+    resourceManager.Destroy();
 }
 
 
