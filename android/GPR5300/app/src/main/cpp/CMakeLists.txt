@@ -31,7 +31,7 @@ set(NEKO_SRC_DIR ${CMAKE_SOURCE_DIR}/../../../../../../)
 
 add_definitions(-DXXH_FORCE_MEMORY_ACCESS=0)
 add_definitions(-DNEKO_GLES3=1)
-
+add_definitions(-DNEKO_SAMETHREAD=1)
 include_directories(${NEKO_SRC_DIR}/externals/utilities)
 include_directories(${NEKO_SRC_DIR}/externals/imgui-1.74)
 #SDL_ENGINE
@@ -58,10 +58,8 @@ include_directories( ${COMP_GRAPH_DIR}/include)
 file(GLOB_RECURSE comp_graph_src ${COMP_GRAPH_DIR}/*.cpp)
 add_library( # Sets the name of the library.
         main
-
         # Sets the library as a shared library.
         SHARED
-
         # Provides a relative path to your source file(s).
         ${comp_graph_src})
 # Specifies libraries CMake should link to your target library. You

@@ -17,8 +17,8 @@ void TextureProgram::Init()
             config.dataRootPath + "data/shaders/02_hello_texture/texture.frag");
     quad_.Init();
 
-    auto texturePath = config.dataRootPath + "data/sprites/wall.jpg";
-    textureId_ = neko::gl::stbCreateTexture(texturePath.c_str());
+    const auto texturePath = config.dataRootPath + "data/sprites/wall.jpg";
+    textureId_ = neko::gl::stbCreateTexture(texturePath);
 
     glEnable(GL_DEPTH_TEST);
 }
