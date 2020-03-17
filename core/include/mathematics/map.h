@@ -1,7 +1,6 @@
 #pragma once
 
 #include <engine/custom_allocator.h>
-#include <vector> // TODO: replace this with neko's own container.
 #include <xxhash.hpp>
 #include <algorithm>
 
@@ -9,7 +8,7 @@ namespace neko
 {
 
 	template<typename Key, typename Value, const size_t Size>
-	class FixedMap // 24 bytes
+	class FixedMap
 	{
 	public:
 		using Hash = xxh::hash_t<64>;
@@ -80,8 +79,8 @@ namespace neko
 		}
 
 	private:
-		std::vector<Pair> pairs_; // 24 bytes // TODO: Replace this with neko's container when it's ready.
-		// Allocator& allocator_;
+	    std::vector<Pair> pairs_; // 24 bytes // TODO: Replace this with neko's container when it's ready.
+		// TODO: use Allocator& allocator_;
 	};
 
 	template<typename Key, typename Value, const size_t Size>
@@ -153,7 +152,7 @@ namespace neko
 		}
 		
 	private:
-		std::array<Pair, 0> pairs_;
+		std::array<Pair, 0> pairs_; // Oleg@Seb: wat? pq 0? deverait être Size du template
 		
 	};
 
@@ -217,65 +216,6 @@ namespace neko
 		}
 	private:
 		std::vector<Pair> pairs_;		// TODO: Replace this with neko's container when it's ready.
-	};
-
-	template<typename Key, typename Value, const size_t Size>
-	class SmallDynamicMap
-	{
-	public:
-		using Hash = xxh::hash_t<64>;
-		using Pair = std::pair<Hash, Value>;
-		SmallDynamicMap() {
-			pairs_.size() = 0;
-		}
-		~SmallDynamicMap() = default;
-
-		Value& operator[](Key key) {
-			const Hash hash = xxh::xxhash<64>(&key, sizeof(Key));
-			auto it = std::find_if(pairs_.begin(), pairs_.end(), [hash](Pair& p) { return p.first == hash; });
-
-			neko_assert(it != pairs_.end(),
-				"neko::SmallDynamicMap<Key,Value>::operator[](const Key): Key passed to operator not found.");
-			return it->second;
-		}
-
-		bool Contains(Key key) const {
-			const Hash hash = xxh::xxhash<64>(&key, sizeof(Key));
-			return std::find_if(pairs_.begin(), pairs_.end(), [hash](Pair p) { return p.first == hash; }) != pairs_.end();
-		}
-
-		void Append(Key key, Value value) {
-			neko_assert(!Contains(key), "neko::SmallDynamicMap<Key,Value>::Append(const Key, const Value): SmallDynamicMap already contains Key passed.");
-			//TODO: Append
-		}
-
-		void Remove(Key key)
-		{
-			
-		}
-
-		void Clear()
-		{
-
-		}
-		
-		typename std::array<Pair, Size>::iterator begin() {
-			return pairs_.begin();
-		}
-
-		typename std::array<Pair, Size>::iterator end() {
-			return pairs_.end();
-		}
-
-		typename std::array<Pair, Size>::const_iterator cbegin() const {
-			return pairs_.cbegin();
-		}
-
-		typename std::array<Pair, Size>::const_iterator cend() const {
-			return pairs_.cend();
-		}
-	private:
-		std::array<Pair, Size> pairs_;
 	};
 
 }// !neko

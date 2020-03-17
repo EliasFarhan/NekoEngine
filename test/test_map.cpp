@@ -40,19 +40,45 @@ TEST(Engine, FixedMap)
     {
         map[i] = values[i - 1];
     }
-    for (size_t i = 0; i < MAP_SIZE; ++i)
+    for (size_t i = 1; i < MAP_SIZE + 1; ++i)
     {
-        sum -= values[i];
+        sum -= map[i];
     }
     EXPECT_EQ(expectedSum, sum);
     sum = 0;
 
     // Iterators testing.
+    FixedMap<unsigned int, float, MAP_SIZE> map1 = map;
     std::for_each(map.begin(), map.end(), [](std::pair<xxh::hash_t<64>, float>& p) {
         p.first = 0;
         p.second = 0;
     });
     std::for_each(map.begin(), map.end(), [&sum](std::pair<xxh::hash_t<64>, float>& p) { sum += p.second; });
+    EXPECT_EQ(0, sum);
+
+    // Assignment testing.
+    map = map1;
+    std::for_each(map.begin(), map.end(), [&sum](std::pair<xxh::hash_t<64>, float>& p) {
+        sum -= p.second;
+    });
+    EXPECT_EQ(expectedSum, sum);
+    sum = 0;
+
+    // Remove and clear testing.
+    for (auto& key : keys)
+    {
+        map.Remove(key);
+    }
+    std::for_each(map.begin(), map.end(), [&sum](std::pair<xxh::hash_t<64>, float>& p) {
+        sum += p.second;
+    });
+    EXPECT_EQ(0, sum);
+
+    map = map1;
+    map.Clear();
+    std::for_each(map.begin(), map.end(), [&sum](std::pair<xxh::hash_t<64>, float>& p) {
+        sum += p.second;
+    });
     EXPECT_EQ(0, sum);
 }
 
