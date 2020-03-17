@@ -1,11 +1,12 @@
 #include <gtest/gtest.h>
 #include <xxhash.hpp>
 #include <engine/assert.h>
+#include <vector>
 
 namespace neko
 {
 
-TEST(Engine, Hashing)
+TEST(Engine, HashingSingleAddress)
 {
     const size_t ITERATIONS = 4096;
     const size_t KEY = rand();
@@ -23,6 +24,18 @@ TEST(Engine, Hashing)
         hash1 = xxh::xxhash<64>(&KEY, sizeof(size_t));
     }
     EXPECT_EQ(hash0sum, hash1sum);
+}
+
+TEST(Engine, HashingDifferentAddress)
+{
+    const size_t KEY_VALUE = 1;
+
+    const size_t key0 = KEY_VALUE;
+    const size_t key1 = KEY_VALUE;
+
+    const auto hash0 = xxh::xxhash<64>(&key0, 1);
+    const auto hash1 = xxh::xxhash<64>(&key1, 1);
+    neko_assert(hash0 == hash1, "Same key but different hashes!");
 }
 
 }// !neko

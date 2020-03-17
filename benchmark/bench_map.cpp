@@ -14,14 +14,22 @@ namespace neko
 // Compile time definitions.
 // ----------------------------------------------------------------
 
-const size_t SIZE = 1;
+const size_t SIZE = 512;
 using Key = unsigned long long;
 using Value = unsigned long long;
 using Pair = std::pair<Key, Value>;
 using StdMapType = std::map<Key, Value>;
 using StdUnorderedMapType = std::unordered_map<Key, Value>;
 using FixedMapType = FixedMap<Key, Value, SIZE>;
-unsigned long long NextUnsignedLongLong = 0;
+
+// ----------------------------------------------------------------
+// Utility functions.
+// ----------------------------------------------------------------
+
+Key GetNextKey(){
+    static Key k = 0;
+    return ++k;
+}
 
 // ----------------------------------------------------------------
 // Init.
@@ -34,9 +42,7 @@ inline StdMapType StdMap_Init()
 
 inline StdUnorderedMapType StdUnorderedMap_Init()
 {
-    auto returnValue = StdUnorderedMapType();
-    returnValue.reserve(SIZE);
-    return returnValue;
+    return StdUnorderedMapType(SIZE);
 }
 
 inline FixedMapType FixedMap_Init()
@@ -79,7 +85,7 @@ inline void StdMap_FillOut(StdMapType& map)
 {
     for (size_t i = 0; i < SIZE; i++)
     {
-        map.insert({NextUnsignedLongLong++, NextUnsignedLongLong++});
+        map.insert({GetNextKey(), GetNextKey()});
     }
 }
 
@@ -87,7 +93,7 @@ inline void StdUnorderedMap_FillOut(StdUnorderedMapType& map)
 {
     for (size_t i = 0; i < SIZE; i++)
     {
-        map.insert({NextUnsignedLongLong++, NextUnsignedLongLong++});
+        map.insert({GetNextKey(), GetNextKey()});
     }
 }
 
@@ -95,7 +101,7 @@ inline void FixedMap_FillOut(FixedMapType& map)
 {
     for (size_t i = 0; i < SIZE; i++)
     {
-        map.Append(NextUnsignedLongLong++, NextUnsignedLongLong++);
+        map.Append(GetNextKey(), GetNextKey());
     }
 }
 
@@ -215,8 +221,8 @@ void BM_StdMap_Access(benchmark::State& s)
     std::vector<Key> keys(SIZE);
     for (auto& key : keys)
     {
-        key = NextUnsignedLongLong++;
-        map.insert({key, NextUnsignedLongLong++});
+        key = GetNextKey();
+        map.insert({key, GetNextKey()});
     }
 
     for (auto _ : s)
@@ -234,8 +240,8 @@ void BM_StdUnorderedMap_Access(benchmark::State& s)
     std::vector<Key> keys(SIZE);
     for (auto& key : keys)
     {
-        key = NextUnsignedLongLong++;
-        map.insert({key, NextUnsignedLongLong++});
+        key = GetNextKey();
+        map.insert({key, GetNextKey()});
     }
 
     for (auto _ : s)
@@ -253,8 +259,8 @@ void BM_FixedMap_Access(benchmark::State& s)
     std::vector<Key> keys(SIZE);
     for (auto& key : keys)
     {
-        key = NextUnsignedLongLong++;
-        map.Append(key, NextUnsignedLongLong++);
+        key = GetNextKey();
+        map.Append(key, GetNextKey());
     }
 
     for (auto _ : s)
@@ -270,17 +276,17 @@ void BM_FixedMap_Access(benchmark::State& s)
 // Register benches and run them.
 // ----------------------------------------------------------------
 
-// BENCHMARK(BM_StdMap_Init);
-// BENCHMARK(BM_StdUnorderedMap_Init);
-// BENCHMARK(BM_FixedMap_Init);
-// BENCHMARK(BM_StdMap_InitAndFillOut);
-// BENCHMARK(BM_StdUnorderedMap_InitAndFillOut);
-// BENCHMARK(BM_FixedMap_InitAndFillOut);
-// BENCHMARK(BM_StdMap_InitFillOutAndClear);
-// BENCHMARK(BM_StdUnorderedMap_InitFillOutAndClear);
-// BENCHMARK(BM_FixedMap_InitFillOutAndClear);
-// BENCHMARK(BM_StdMap_Access);
-// BENCHMARK(BM_StdUnorderedMap_Access);
+BENCHMARK(BM_StdMap_Init);
+BENCHMARK(BM_StdUnorderedMap_Init);
+BENCHMARK(BM_FixedMap_Init);
+BENCHMARK(BM_StdMap_InitAndFillOut);
+BENCHMARK(BM_StdUnorderedMap_InitAndFillOut);
+BENCHMARK(BM_FixedMap_InitAndFillOut);
+BENCHMARK(BM_StdMap_InitFillOutAndClear);
+BENCHMARK(BM_StdUnorderedMap_InitFillOutAndClear);
+BENCHMARK(BM_FixedMap_InitFillOutAndClear);
+BENCHMARK(BM_StdMap_Access);
+BENCHMARK(BM_StdUnorderedMap_Access);
 BENCHMARK(BM_FixedMap_Access);
 
 BENCHMARK_MAIN();

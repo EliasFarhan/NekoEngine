@@ -26,7 +26,7 @@ namespace neko
 		}
 
 		Value& operator[](const Key key) {
-			const Hash hash = xxh::xxhash<64>(&key, sizeof(Key), 42, xxh::endianness::littleEndian);
+			const Hash hash = xxh::xxhash<64>(&key, 1);
 			auto it = std::find_if(pairs_.begin(), pairs_.end(), [hash](Pair& p) { return p.first == hash; });
 
 			neko_assert(it != pairs_.end(),
@@ -35,7 +35,7 @@ namespace neko
 		}
 
 		bool Contains(const Key key) const {
-			const Hash hash = xxh::xxhash<64>(&key, sizeof(Key));
+			const Hash hash = xxh::xxhash<64>(&key, 1);
 			return std::find_if(pairs_.begin(), pairs_.end(), [hash](Pair p) { return p.first == hash; }) != pairs_.end();
 		}
 
@@ -45,14 +45,14 @@ namespace neko
 			auto it = std::find_if(pairs_.begin(), pairs_.end(), [](Pair& p) { return p.first == 0; });
 			neko_assert(it != pairs_.end(),
 				"neko::FixedMap<Key,Value>::Append(const Key, const Value): No more free slots in map.")
-				it->first = xxh::xxhash<64>(&key, sizeof(Key), 42, xxh::endianness::littleEndian);
+				it->first = xxh::xxhash<64>(&key, 1);
 			it->second = value;
 		}
 
 		void Remove(Key key)
 		{
 			neko_assert(Contains(key), "neko::FixedMap<Key, Value>::Remove(const Key): Key doesn't exist");
-			const Hash hash = xxh::xxhash<64>(&key, sizeof(Key));
+			const Hash hash = xxh::xxhash<64>(&key, 1);
 			auto it = std::find_if(pairs_.begin(), pairs_.end(), [hash](Pair p) { return p.first == hash; });
 			it->first = 0;
 			it->second = 0;
