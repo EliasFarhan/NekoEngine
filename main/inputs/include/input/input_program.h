@@ -22,6 +22,8 @@ public:
     void OnEvent(const SDL_Event& event) override;
 
 private:
+
+    Uint8 key[static_cast<int>(KeyCode::LENGTH)] = { static_cast<int>(KeyCode::UNKNOWN)};
     InputManager inputManager_ = InputManager();
 };
 }

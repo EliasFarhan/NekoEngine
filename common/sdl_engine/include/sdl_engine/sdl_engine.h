@@ -24,6 +24,7 @@
  */
 
 #include "engine/engine.h"
+#include <sdl_engine/sdl_input.h>
 #include <SDL.h>
 
 namespace neko::sdl
@@ -51,7 +52,7 @@ public:
 
 protected:
     Action<const SDL_Event&> onEventAction_;
-    
+    InputManager inputManager_;
 
 };
 

@@ -3,18 +3,20 @@
 #include <vector>
 #include <mathematics/vector.h>
 #include <SDL.h>
-#include <sdl_engine/sdl_engine.h>
 
 #define PC_INPUT
 #define SWITCH_INPUT
 
 namespace neko
 {
-	/*
-	 * \b enum all the key on an US keyboard
+	/**
+	 * \brief enum all the key on an US keyboard
 	 */
-	enum class KeyCode : int
+	
+	enum class KeyCode : Uint8
 	{
+		UNKNOWN = SDL_SCANCODE_UNKNOWN,
+		
 		A = SDL_SCANCODE_A,
 		B = SDL_SCANCODE_B,
 		C = SDL_SCANCODE_C,
@@ -57,13 +59,21 @@ namespace neko
 		ARROW_KEY_LEFT = SDL_SCANCODE_LEFT,
 		ARROW_KEY_DOWN = SDL_SCANCODE_DOWN,
 		ARROW_KEY_UP = SDL_SCANCODE_UP,
-		LENGTH
+		L_SHIFT = SDL_SCANCODE_LSHIFT,
+		L_CTRL = SDL_SCANCODE_LCTRL,
+		L_ALT = SDL_SCANCODE_LALT,
+		TAB = SDL_SCANCODE_TAB,
+		R_ALT = SDL_SCANCODE_RALT,
+		R_CTRL = SDL_SCANCODE_RCTRL,
+		R_SHIFT = SDL_SCANCODE_RSHIFT,
+		LENGTH = 230
 	};
+	
 
 	/*
 	 * \b enum of the controller button
 	 */
-	enum class ControllerCode
+	enum class ControllerButton
     {
 		BUTTON_A = 0,
 		BUTTON_B = 1,
@@ -116,22 +126,25 @@ namespace neko
 		LENGTH //define the array bounds
 	};
 	
-	enum class InputAction {
-		UP = 0,
-		DOWN = 1,
-		LEFT = 2,
-		RIGHT = 3,
-		ACTION_1 = 4,
-		ACTION_2 = 5,
-		ACTION_3 = 6,
-		LENGTH = 7 //define the array bounds
+	enum class InputAction : char
+	{
+		NONE = 0,
+		UP = 1,
+		DOWN = 2,
+		LEFT = 3,
+		RIGHT = 4,
+		ACTION_1 = 5,
+		ACTION_2 = 6,
+		ACTION_3 = 7,
+		LENGTH = 8//define the array bounds
 	};
+	
 	enum class ButtonState
 	{
 		NONE,
-		UP,
 		DOWN,
-		HELD
+		HELD,
+		UP
 	};
 	
 	class IInputManager
@@ -139,9 +152,11 @@ namespace neko
 	public:
 		
 		IInputManager() = default;
+
+		virtual void Init() = 0;
 		
 		virtual void PreUserInputs() = 0;
-
+			
 		virtual void BindFromJson() = 0;
 		
 		virtual bool IsKeyDown(KeyCode key) const = 0;
@@ -150,54 +165,60 @@ namespace neko
 
 		virtual bool IsKeyHeld(KeyCode key) const = 0;
 
-		virtual bool IsButtonDown(ControllerCode button) const = 0;
+		virtual bool IsButtonDown(ControllerButton button) const = 0;
 
-		virtual bool IsButtonUp(ControllerCode button) const = 0;
+		virtual bool IsButtonUp(ControllerButton button) const = 0;
 
 		virtual bool IsActionButtonDown(InputAction button) const = 0;
 
 		virtual bool IsActionButtonUp(InputAction button) const = 0;
 
 		virtual bool IsActionButtonHeld(InputAction button) const = 0;
+
+		virtual Uint8 KeyBind(SDL_Event &event) = 0;
 	};
     /**
      * \brief Manage inputs
      */;
-    class InputManager final : public IInputManager
-	{
-    public:
-    	
-        void PreUserInputs() override;
+	 class InputManager final : public IInputManager
+	 {
+	 public:
 
-		void BindFromJson() override;
-    	
-        bool IsKeyDown(KeyCode key) const override;
+		 void Init() override;
+	 	
+		 void PreUserInputs() override;
+	 	
+		 void BindFromJson() override;
 
-        bool IsKeyUp(KeyCode key) const override;
+		 bool IsKeyDown(KeyCode key) const override;
 
-        bool IsKeyHeld(KeyCode key) const override;
-    	
-        bool IsButtonDown(ControllerCode button) const override;
+		 bool IsKeyUp(KeyCode key) const override;
 
-        bool IsButtonUp(ControllerCode button) const override;
+		 bool IsKeyHeld(KeyCode key) const override;
 
-		bool IsActionButtonDown(InputAction button) const override;
-    	
-        bool IsActionButtonUp(InputAction button) const override;
+		 bool IsButtonDown(ControllerButton button) const override;
 
-        bool IsActionButtonHeld(InputAction button) const override;
-    	
-    private:
+		 bool IsButtonUp(ControllerButton button) const override;
 
-		std::vector<ButtonState> keyPressedStates_ = std::vector<ButtonState>(static_cast<int>(KeyCode::LENGTH));
-        std::vector<ButtonState> buttonPressedStates_ = std::vector<ButtonState>(static_cast<int>(ControllerCode::LENGTH));
+		 bool IsActionButtonDown(InputAction button) const override;
+
+		 bool IsActionButtonUp(InputAction button) const override;
+
+		 bool IsActionButtonHeld(InputAction button) const override;
+
+		 Uint8 KeyBind(SDL_Event &event) override;
+	 private:
+
+		Uint8 previousKeyStates[static_cast<size_t>(KeyCode::LENGTH)] = { static_cast<size_t>(KeyCode::UNKNOWN) };
+		Uint8 currentKeyStates[static_cast<size_t>(KeyCode::LENGTH)] = { static_cast<size_t>(KeyCode::UNKNOWN) };
+        std::vector<ButtonState> controllerButtonStates_ = std::vector<ButtonState>(static_cast<int>(ControllerButton::LENGTH));
 		std::vector<ButtonState>switchButtonState_ = std::vector<ButtonState>(static_cast<int>(SwitchButton::LENGTH));
 
-		std::vector<int>bindPcInput = std::vector<int>(static_cast<int>(KeyCode::LENGTH));
+		Uint8 bindPcInput[static_cast<size_t>(InputAction::LENGTH)] = {static_cast<size_t>(InputAction::NONE)};
     	
-        const uint8_t* states_;
-        uint32_t mouse_;
+        const uint8_t* states_ = nullptr;
+        uint32_t mouse_ = 0u;
         Vec2f mousePos_;
-        SDL_Joystick* joystick_;
+        SDL_Joystick* joystick_ = nullptr;
 	};
 }

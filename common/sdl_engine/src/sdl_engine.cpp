@@ -53,6 +53,7 @@ void SdlEngine::Init()
     SDL_Init(SDL_INIT_VIDEO);
     window_->Init();
     initAction_.Execute();
+    inputManager_.Init();
 }
 
 void SdlEngine::Destroy()
