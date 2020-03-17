@@ -23,53 +23,39 @@
  */
 
 #include <engine/string.h>
-#include <iostream>
 
 namespace neko {
     //-----------------------------------------------------------------------------
     // Constructors
     //-----------------------------------------------------------------------------
-    String::String()
+    String::String(FreeListAllocator& allocator)
     {
-
         length = 0;
-        data = new char[0];
+        allocator.Allocate(sizeof(neko::String), alignof(neko::String));
     }
 
-    String::String(char c)
-    {
-        length = 1;
-        data = new char(c);
-    }
-
-    String::String(const char* c)
+    String::String(FreeListAllocator& allocator, const char* c)
     {
         if (c){
-            int n = 0;
+            unsigned n = 0;
 
             while (c[n] != '\0') {
                 n++;
                 length = n;
                 data = new char[n];
 
-                for (int i = 0; i < n; i++) {
+                for (unsigned i = 0; i < n; i++) {
                     data[i] = c[i];
                 }
             }
+
+            allocator.Allocate(sizeof(neko::String) + length, alignof(neko::String));
         }
         else
         {
             length = 0;
             data = new char[0];
-        }
-    }
-
-    String::String(const String& s)
-    {
-        length = s.Length();
-        data = new char[length];
-        for (int i = 0; i < length; i++) {
-            data[i] = s[i];
+            allocator.Allocate(sizeof(neko::String), alignof(neko::String));
         }
     }
 
@@ -78,7 +64,7 @@ namespace neko {
         delete[] data;
     }
 
-    unsigned String::Length() const
+    size_t String::Length() const
     {
         return length;
     }
@@ -91,7 +77,7 @@ namespace neko {
     {
         if (s.Length() > 0)
         {
-            for (int i = 0; i < s.Length(); i++) {
+            for (unsigned i = 0; i < s.Length(); i++) {
                 os << s[i];
             }
         }
@@ -99,18 +85,6 @@ namespace neko {
 
         return os;
     }
-
-    std::istream& operator>> (std::istream& is, String& s)
-    {
-        char* c = new char[1000];
-        is >> c;
-        s = String(c);
-        delete[] c;
-
-        return is;
-    }
-
-
 
     char String::operator[] (unsigned rhs) const
     {
@@ -134,7 +108,7 @@ namespace neko {
         length = rhs.Length();
         data = new char[length];
 
-        for (int i = 0; i < length; i++) {
+        for (unsigned i = 0; i < length; i++) {
             data[i] = rhs[i];
         }
 
@@ -148,7 +122,7 @@ namespace neko {
         unsigned len = length + rhs.Length();
         char* str = new char[len];
 
-        for (int i = 0; i < length; i++) {
+        for (unsigned i = 0; i < length; i++) {
             str[i] = data[i];
         }
 
@@ -162,14 +136,9 @@ namespace neko {
         return *this;
     }
 
-    String operator+ (const String& lhs, const String& rhs)
+   /* String operator+ (const String& lhs, const String& rhs)
     {
         return String(lhs) += rhs;
-    }
-
-    String operator+ (const String& lhs, char rhs)
-    {
-        return String(lhs) += String(rhs);
     }
 
     String operator+ (const String& lhs, const char* rhs)
@@ -177,10 +146,6 @@ namespace neko {
         return String(lhs) += String(rhs);
     }
 
-    String operator+ (char lhs, const String& rhs)
-    {
-        return String(lhs) += rhs;
-    }
     String operator+ (const char* lhs, const String& rhs)
     {
         return String(lhs) += rhs;
@@ -199,25 +164,16 @@ namespace neko {
         }
         return (n == cap);
     }
-
-    bool operator== (const String& lhs, char rhs)
-    {
-        return (lhs == String(rhs));
-    }
+    //TODO STRNCOMP
 
     bool operator== (const String& lhs, const char* rhs)
     {
         return (lhs == String(rhs));
     }
 
-    bool operator== (char lhs, const String& rhs)
-    {
-        return (String(lhs) == rhs);
-    }
-
     bool operator== (const char* lhs, const String& rhs)
     {
         return (String(lhs) == rhs);
-    }
+    }*/
 
 }
