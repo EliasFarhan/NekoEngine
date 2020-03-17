@@ -47,9 +47,9 @@ const char* ReadFile(const std::string& path)
 
 	const PHYSFS_sint64 len = PHYSFS_fileLength(file);
 	PHYSFS_seek(file, 0);
-	void* buffer[len + 1];
+	void* buffer = new void*[len + 1];
 	PHYSFS_readBytes(file, &buffer, len);
-	const char* result = (const char*) buffer;
+	const char* result = static_cast<const char*>(buffer);
 	return result;
 }
 }

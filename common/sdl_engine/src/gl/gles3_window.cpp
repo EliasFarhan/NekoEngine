@@ -24,7 +24,7 @@ namespace neko::sdl
 	{
 		std::ostringstream oss;
 		oss << "Resize window with new size: " << newWindowSize_;
-		logDebug(oss.str());
+		LogDebug(oss.str());
 		glViewport(0, 0, newWindowSize_.x, newWindowSize_.y);
 	}
 
@@ -55,7 +55,7 @@ void Gles3Window::Init()
 	SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
 
 	std::string videoDriver = SDL_GetCurrentVideoDriver();
-	logDebug(videoDriver);
+	LogDebug(videoDriver);
 #endif
 
 	glRenderContext_ = SDL_GL_CreateContext(window_);
@@ -64,7 +64,7 @@ void Gles3Window::Init()
 #ifndef __EMSCRIPTEN__
 	if (!gladLoadGLES2Loader((GLADloadproc)SDL_GL_GetProcAddress))
 	{
-		logDebug("Failed to initialize OpenGL context\n");
+		LogDebug("Failed to initialize OpenGL context\n");
 		assert(false);
 	}
 #endif
@@ -148,7 +148,7 @@ void Gles3Window::MakeCurrentContext()
 	{
 		oss << "\nSDL Error: " << SDL_GetError();
 	}
-	logDebug(oss.str());
+	LogDebug(oss.str());
 #endif
 }
 
@@ -164,7 +164,7 @@ void Gles3Window::LeaveCurrentContext()
 	{
 		oss << "[Error] After Leave Current Context, context: " << currentContext;
 	}
-	logDebug(oss.str());
+	LogDebug(oss.str());
 #endif
 }
 }

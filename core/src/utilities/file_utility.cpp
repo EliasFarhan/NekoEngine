@@ -137,7 +137,7 @@ void BufferFile::Load(std::string_view path)
 	{
 		std::ostringstream oss;
 		oss << "[Error] Could not open file: " << path << " for BufferFile";
-		logDebug(oss.str());
+		LogDebug(oss.str());
 		return;
 	}
 	if(is)

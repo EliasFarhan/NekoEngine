@@ -4,12 +4,13 @@
 
 #include <gtest/gtest.h>
 #include <engine/log.h>
+#include <engine/prefab.h>
 #include <utilities/file_utility.h>
 #include <physfs_utility.h>
 
 namespace neko
 {
-TEST(IO, TestPhysFSTwoArchive)
+TEST(PhysFS, TestPhysFSTwoArchive)
 {
     LogManager logger;
 	
@@ -22,7 +23,7 @@ TEST(IO, TestPhysFSTwoArchive)
     physfs::OpenArchive("../../data/data2.zip");
     physfs::FileExists(filename);
 
-    auto output = physfs::ReadFile("test.txt");
+    const auto output = physfs::ReadFile("test.txt");
     std::cout << output << '\n';
 
     logger.Wait();

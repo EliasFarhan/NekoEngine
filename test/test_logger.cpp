@@ -5,8 +5,6 @@
 #include <gtest/gtest.h>
 #include <engine/log.h>
 
-#include "engine/engine.h"
-
 namespace neko
 {
 TEST(Logs, TestLogsBasic)
