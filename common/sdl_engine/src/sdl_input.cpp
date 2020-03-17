@@ -28,41 +28,11 @@ namespace neko
             switch (event.type)
             {
             case SDL_KEYDOWN:
+            {
                 std::cout << "Bind up key : ";
                 KeyBind(event);
-                break;
-                /*case SDL_MOUSEMOTION:
-                    break;
-
-                case SDL_MOUSEBUTTONDOWN:
-                    this->mouse_ = SDL_GetMouseState(NULL, NULL);
-
-                    if (event.button.button == SDL_BUTTON_LEFT)
-                        controllerButtonStates_[static_cast<int>(SDL_BUTTON_LEFT)] = ButtonState::DOWN;
-
-                    else if (event.button.button == SDL_BUTTON_RIGHT)
-                        controllerButtonStates_[static_cast<int>(SDL_BUTTON_RIGHT)] = ButtonState::DOWN;
-
-                    else if (event.button.button == SDL_BUTTON_MIDDLE)
-                        controllerButtonStates_[static_cast<int>(SDL_BUTTON_MIDDLE)] = ButtonState::DOWN;
-                    break;
-
-                    case SDL_CONTROLLERBUTTONDOWN:
-                    this->joystick_ = SDL_JoystickBu(NULL, NULL);
-
-                    if (event.button.button == SDL_BUTTON_LEFT)
-                        controllerButtonStates_[static_cast<int>(SDL_BUTTON_LEFT)] = ButtonState::UP;
-
-                    else if (event.button.button == SDL_BUTTON_RIGHT)
-                        controllerButtonStates_[static_cast<int>(SDL_BUTTON_RIGHT)] = ButtonState::UP;
-
-                    else if (event.button.button == SDL_BUTTON_MIDDLE)
-                        controllerButtonStates_[static_cast<int>(SDL_BUTTON_MIDDLE)] = ButtonState::UP;
-                    break;
-
-                case SDL_MOUSEWHEEL:
-                    break;*/
-
+            }
+            break;
             case SDL_JOYDEVICEREMOVED:
 
                 SDL_JoystickClose(joystick_);

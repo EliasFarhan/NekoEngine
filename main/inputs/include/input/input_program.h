@@ -23,7 +23,7 @@ public:
 
 private:
 
-    Uint8 key[static_cast<int>(KeyCode::LENGTH)] = { static_cast<int>(KeyCode::UNKNOWN)};
+    Uint8 key[static_cast<int>(KeyCode::LENGTH)] = { static_cast<int>(InputAction::NONE) };
     InputManager inputManager_ = InputManager();
 };
 }

@@ -18,7 +18,6 @@ namespace neko
     void InputProgram::Update(seconds dt)
     {
     	inputManager_.PreUserInputs();        
-        
         //inputManager_.UpdateInputStates();
         /*if (inputManager_.IsKeyDown(SDL_SCANCODE_W))
         {
