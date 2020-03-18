@@ -4,43 +4,47 @@
 
 namespace neko
 {
+
 	template<typename T>
-	std::vector<T> custom_queue<T>::CreateQueue()
+	CustomQueue<T>::CustomQueue()
 	{
-		return std::vector<T>();
+		queueVector.resize(0);
+	}
+
+	template<typename T>
+	void CustomQueue<T>::PushQueue(T element)
+	{
+		queueVector.push_back(element);
 	}
 	template<typename T>
-	void custom_queue<T>::PushQueue(std::vector<T> queue, T element)
+	void CustomQueue<T>::DeleteQueue()
 	{
-		queue.push_back(element);
-	}
-	template<typename T>
-	void custom_queue<T>::DeleteQueue(std::vector<T> queue)
-	{
-		queue._Destroy();
+		queueVector._Destroy();
 	}
 	template <typename T>
-	T custom_queue<T>::PopQueue(std::vector<T> queue)
+	T CustomQueue<T>::PopQueue()
 	{
-		//todo
+		T returnValue = queueVector[0];
+		queueVector.erase(0);
+		return returnValue;
 	}
 
 	template<typename T>
-	T custom_queue<T>::FrontQueue(std::vector<T> queue)
+	T CustomQueue<T>::FrontQueue()
 	{
-		return queue.begin();
+		return queueVector.begin();
 	}
 
 	template<typename T>
-	T custom_queue<T>::BackQueue(std::vector<T> queue)
+	T CustomQueue<T>::BackQueue()
 	{
-		return queue.end();
+		return queueVector.end();
 	}
 
 	template<typename T>
-	int custom_queue<T>::SizeQueue(std::vector<T> queue)
+	int CustomQueue<T>::SizeQueue()
 	{
-		return queue.size();
+		return queueVector.size();
 	}
 	
 	
