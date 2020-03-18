@@ -6,6 +6,33 @@
 namespace neko
 {
 
+/*TEST(Engine, AllocatorUsingFixedMap){
+    const size_t SIZE = 4;
+    using Hash = xxh::hash_t<64>;
+    using Key = unsigned int;
+    using Value = unsigned int;
+    using Pair = std::pair<Key, Value>;
+    using HashPair = std::pair<Hash, Value>;
+    using Map = FixedMap<Key,Value,SIZE>;
+    const size_t HASH_PAIR_SIZE = sizeof(HashPair);
+
+    std::array<Key, SIZE> keys{1,2,3,4};
+    std::array<Value, SIZE> values{1,2,3,4};
+
+    const size_t TOTAL_NEEDED_SIZE = (HASH_PAIR_SIZE * SIZE) + 1;
+    void* mem = malloc(TOTAL_NEEDED_SIZE);
+    LinearAllocator allocator(TOTAL_NEEDED_SIZE, mem);
+
+    Map map(allocator);
+    for (size_t i = 0; i < SIZE; i++)
+    {
+        map.Append({keys[i], values[i]});
+    }
+
+    allocator.Clear();
+    free(mem);
+}*/
+
 TEST(Engine, FixedMap)
 {
     const size_t MAP_SIZE = 4;
