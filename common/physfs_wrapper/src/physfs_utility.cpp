@@ -42,7 +42,7 @@ const char* ReadFile(const std::string& path)
 
 	if (file == nullptr) {
 		LogError(LogCategory::IO, "Could not open file '" + path + "'");
-		return "";
+		return nullptr;
 	}
 
 	const PHYSFS_sint64 len = PHYSFS_fileLength(file);
