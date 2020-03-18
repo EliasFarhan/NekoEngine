@@ -15,7 +15,7 @@ TEST(Engine, TestCustomAllocatorAlignment)
     EXPECT_EQ(neko::Allocator::CalculateAlignForwardAdjustment((int*) ((std::uint64_t) ptr + 1), alignof(int)), 3);
     EXPECT_EQ(neko::Allocator::CalculateAlignForwardAdjustment((int*) ((std::uint64_t) ptr + 2), alignof(int)), 2);
     EXPECT_EQ(neko::Allocator::CalculateAlignForwardAdjustment((int*) ((std::uint64_t) ptr + 3), alignof(int)), 1);
-
+    EXPECT_EQ(neko::Allocator::CalculateAlignForwardAdjustment((int*)((std::uint64_t) ptr + 4), alignof(int)), 0);
     std::uint16_t header = 365;
 
     EXPECT_EQ(neko::Allocator::CalculateAlignForwardAdjustmentWithHeader(ptr, alignof(int), sizeof(header)), 4);
