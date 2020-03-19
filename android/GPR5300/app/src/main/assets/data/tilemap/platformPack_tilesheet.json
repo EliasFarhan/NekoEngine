@@ -1,0 +1,14 @@
+{ "columns":28,
+ "image":"platformPack_tilesheet.png",
+ "imageheight":448,
+ "imagewidth":896,
+ "margin":0,
+ "name":"platformPack_tilesheet",
+ "spacing":0,
+ "tilecount":392,
+ "tiledversion":"1.2.3",
+ "tileheight":32,
+ "tilewidth":32,
+ "type":"tileset",
+ "version":1.2
+}

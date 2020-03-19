@@ -1,0 +1,39 @@
+{
+  "image": "data/tilemap/car.json",
+  "imageheight": 96,
+  "imagewidth": 32,
+  "tileheight": 16,
+  "tilewidth": 32,
+  "elements": [
+    {
+      "type": "bus",
+      "center": [ 16, 8 ],
+      "rect": [ 0, 0, 32, 16 ]
+    },
+    {
+      "type": "truck",
+      "center": [ 16, 8 ],
+      "rect": [ 0, 16, 32, 16 ]
+    },
+    {
+      "type": "big_car",
+      "center": [ 16, 8 ],
+      "rect": [ 0, 32, 32, 16 ]
+    },
+    {
+      "type": "long_car",
+      "center": [ 16, 8 ],
+      "rect": [ 0, 48, 32, 16 ]
+    },
+    {
+      "type": "avg_car",
+      "center": [ 16, 8 ],
+      "rect": [ 0, 64, 32, 16 ]
+    },
+    {
+      "type": "small_car",
+      "center": [ 16, 8 ],
+      "rect": [ 0, 80, 32, 16 ]
+    }
+  ]
+}

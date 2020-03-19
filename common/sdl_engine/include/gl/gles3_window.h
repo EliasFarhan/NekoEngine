@@ -6,8 +6,19 @@
 #include <mathematics/vector.h>
 #include "gl/gles3_include.h"
 #include "sdl_engine/sdl_window.h"
+#include "graphics/graphics.h"
 namespace neko::sdl
 {
+
+class OnResizeRenderCommand : public neko::RenderCommandInterface
+{
+public:
+	void Render() override;
+    void SetWindowSize(Vec2u newWindowSize) { newWindowSize_ = newWindowSize; }
+protected:
+    Vec2u newWindowSize_;
+};
+	
 class Gles3Window : public SdlWindow
 {
 public:
@@ -30,7 +41,8 @@ public:
 protected:
     std::atomic<std::uint8_t> flags_{0};
     void RenderUi() override;
-    SDL_GLContext glContext_{};
+    SDL_GLContext glRenderContext_{};
+    OnResizeRenderCommand onResizeCommand_;
 };
 }
 #endif
