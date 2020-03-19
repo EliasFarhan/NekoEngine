@@ -23,7 +23,8 @@
  SOFTWARE.
  */
 #include <iostream>
-#include "FreeListAllocator.h" 
+#include "engine/custom_allocator.h" 
+#include "engine/assert.h"
 
 class IntArray
 {
@@ -37,7 +38,7 @@ public:
 	IntArray(int length) :
 		m_length{ length }
 	{
-		assert(length >= 0);
+		neko_assert(length >= 0);
 
 		if (length > 0)
 			m_data = new int[length] {};
@@ -60,7 +61,7 @@ public:
 
 	int& operator[](int index)
 	{
-		assert(index >= 0 && index < m_length);
+		neko_assert(index >= 0 && index < m_length);
 		return m_data[index];
 	}
 
@@ -126,17 +127,18 @@ public:
 		m_length = newLength;
 	}
 
-}
+};
 
 
-class DynArray {
-	int* arr;
+class DynArray
+{
+	int* arr = nullptr;
 
 	// capacity is the total storage capacity
-	int capacity;
+	size_t capacity;
 
 	// size is the current number of elements 
-	int size;
+	size_t size;
 
 public:
 
