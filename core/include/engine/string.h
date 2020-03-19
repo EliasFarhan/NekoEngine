@@ -12,10 +12,10 @@ public:
     //-----------------------------------------------------------------------------
 
     /// \brief Empty String Constructor
-    String(FreeListAllocator& allocator);
+    String(FreeListAllocator& alloc);
 
     /// \brief char* String Constructor
-    String(FreeListAllocator& allocator, const char* c);
+    String(FreeListAllocator& alloc, const char* c);
 
     /// \brief Default String Destructor
     ~String();
@@ -36,7 +36,6 @@ public:
 
     String& operator= (const String& rhs);
 
-
     String& operator+= (const String& rhs);
 
 
@@ -52,6 +51,7 @@ public:
 private :
     char* data = nullptr;
     unsigned length;
+    void* allocator;
 };
 
 }
