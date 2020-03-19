@@ -3,7 +3,7 @@
 //
 
 #include "engine/custom_allocator.h"
-#include "engine/string.h"
+#include "custom_container//string.h"
 #include "gtest/gtest.h"
 #include <random>
 
@@ -26,18 +26,16 @@ TEST(Engine, TestCustomAllocatorAlignment)
 TEST(Engine, TestLinearAllocator)
 {
     const size_t length = 100;
-    void* data = calloc(length + 1, sizeof(neko::String));
-    neko::LinearAllocator allocator = neko::LinearAllocator(sizeof(neko::String) * (length + 1), data);
+    void* data = calloc(length + 1, sizeof(int));
+    neko::LinearAllocator allocator = neko::LinearAllocator(sizeof(int) * (length + 1), data);
 
     for (size_t i = 0; i < length; i++)
     {
-        neko::String* s1 = (neko::String*) allocator.Allocate(sizeof(neko::String), alignof(neko::String));
-
-        *s1 = rand();
-
+        int* v = (int*)allocator.Allocate(sizeof(int), alignof(int));
+        *v = rand();
     }
     std::cout << "Used Memory: " << allocator.GetUsedMemory() << "B for total size: " << allocator.GetSize() << "B"
-              << std::endl;
+        << std::endl;
     allocator.Clear();
     free(data);
 
