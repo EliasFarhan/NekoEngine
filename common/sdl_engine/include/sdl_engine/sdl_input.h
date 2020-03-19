@@ -73,15 +73,16 @@ namespace neko
 	/*
 	 * \b enum of the controller button
 	 */
-	enum class ControllerButton
+	enum class ControllerButton : Uint8
     {
-		BUTTON_A = 0,
-		BUTTON_B = 1,
-		BUTTON_X = 2,
-		BUTTON_Y = 3,
-		LEFT_BUMPER = 4,
-		RIGHT_BUMPER = 5,
-		BUTTON_SELECT = 6,
+		NONE,
+		BUTTON_A = 1,
+		BUTTON_B = 2,
+		BUTTON_X = 3,
+		BUTTON_Y = 4,
+		LEFT_BUMPER = 5,
+		RIGHT_BUMPER = 6,
+		BUTTON_SELECT = 7,
 		BUTTON_START = 7,
 		PRESS_LEFT_STICK = 8,
 		PRESS_RIGHT_STICK = 9,
@@ -101,6 +102,7 @@ namespace neko
 	 */
 	enum class SwitchButton
 	{
+		NONE,
 		PAD_HORIZONTAL,
 		PAD_VERTICAL,
 		BUTTON_A,
@@ -126,10 +128,10 @@ namespace neko
 		LENGTH //define the array bounds
 	};
 	
-	enum class InputAction : char
+	enum class InputAction
 	{
 		NONE = 0,
-		UP = 1,
+		UP,
 		DOWN = 2,
 		LEFT = 3,
 		RIGHT = 4,
@@ -165,10 +167,12 @@ namespace neko
 
 		virtual bool IsKeyHeld(KeyCode key) const = 0;
 
-		virtual bool IsButtonDown(ControllerButton button) const = 0;
+		virtual bool IsControllerButtonDown(ControllerButton button) const = 0;
 
-		virtual bool IsButtonUp(ControllerButton button) const = 0;
+		virtual bool IsControllerButtonUp(ControllerButton button) const = 0;
 
+		virtual bool IsControllerButtonHeld(ControllerButton button) const = 0;
+		
 		virtual bool IsActionButtonDown(InputAction button) const = 0;
 
 		virtual bool IsActionButtonUp(InputAction button) const = 0;
@@ -176,6 +180,8 @@ namespace neko
 		virtual bool IsActionButtonHeld(InputAction button) const = 0;
 
 		virtual Uint8 KeyBind(SDL_Event &event) = 0;
+		virtual Uint8 ControllerButtonBind(SDL_Event& event) = 0;
+
 	};
     /**
      * \brief Manage inputs
@@ -196,10 +202,12 @@ namespace neko
 
 		 bool IsKeyHeld(KeyCode key) const override;
 
-		 bool IsButtonDown(ControllerButton button) const override;
+		 bool IsControllerButtonDown(ControllerButton button) const override;
 
-		 bool IsButtonUp(ControllerButton button) const override;
+		 bool IsControllerButtonUp(ControllerButton button) const override;
 
+		 bool IsControllerButtonHeld(ControllerButton button) const override;
+	 	
 		 bool IsActionButtonDown(InputAction button) const override;
 
 		 bool IsActionButtonUp(InputAction button) const override;
@@ -207,15 +215,22 @@ namespace neko
 		 bool IsActionButtonHeld(InputAction button) const override;
 
 		 Uint8 KeyBind(SDL_Event &event) override;
+	 	
+		 Uint8 ControllerButtonBind(SDL_Event& event) override;
 	 private:
 
 		Uint8 previousKeyStates[static_cast<size_t>(KeyCode::LENGTH)] = { static_cast<size_t>(KeyCode::UNKNOWN) };
 		Uint8 currentKeyStates[static_cast<size_t>(KeyCode::LENGTH)] = { static_cast<size_t>(KeyCode::UNKNOWN) };
-        std::vector<ButtonState> controllerButtonStates_ = std::vector<ButtonState>(static_cast<int>(ControllerButton::LENGTH));
-		std::vector<ButtonState>switchButtonState_ = std::vector<ButtonState>(static_cast<int>(SwitchButton::LENGTH));
+
+		int previousControllerBtnyStates[static_cast<size_t>(ControllerButton::LENGTH)] = { static_cast<size_t>(ControllerButton::NONE) };
+		int currentControllerBtnStates[static_cast<size_t>(ControllerButton::LENGTH)] = { static_cast<size_t>(ControllerButton::NONE) };
+
+	 	Uint8 previousSwitchBtnyStates[static_cast<size_t>(SwitchButton::LENGTH)] = { static_cast<size_t>(SwitchButton::NONE) };
+		Uint8 currentSwitchBtnStates[static_cast<size_t>(SwitchButton::LENGTH)] = { static_cast<size_t>(SwitchButton::NONE) };
 
 		Uint8 bindPcInput[static_cast<size_t>(InputAction::LENGTH)] = {static_cast<size_t>(InputAction::NONE)};
-    	
+		Uint8 bindControllerInput[static_cast<size_t>(InputAction::LENGTH)] = { static_cast<size_t>(InputAction::NONE) };
+
         const uint8_t* states_ = nullptr;
         uint32_t mouse_ = 0u;
         Vec2f mousePos_;

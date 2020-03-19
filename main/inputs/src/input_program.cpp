@@ -17,26 +17,20 @@ namespace neko
 
     void InputProgram::Update(seconds dt)
     {
-    	inputManager_.PreUserInputs();        
-        //inputManager_.UpdateInputStates();
-        /*if (inputManager_.IsKeyDown(SDL_SCANCODE_W))
+    	inputManager_.PreUserInputs();
+       
+        if (inputManager_.IsKeyHeld(KeyCode::Q) && inputManager_.IsKeyHeld(KeyCode::A))
         {
-        }
-        
-        if (inputManager_.IsKeyHeld(SDL_SCANCODE_Q) && inputManager_.IsKeyHeld(SDL_SCANCODE_A))
-        {
-
             std::cout << " q and a key held" << '\n';
-        }*/
+        }
     	if (inputManager_.IsKeyUp(KeyCode::E))
         {
             std::cout << " e key released" << '\n';
         }
     	
-    	
         if (inputManager_.IsActionButtonDown(InputAction::UP))
         {
-            std::cout << " w key pressed" << '\n';
+            std::cout << " UP action pressed" << '\n';
         }
     }
     void InputProgram::Destroy()
@@ -54,8 +48,6 @@ namespace neko
 
         ImGui::Begin("Input text");
         ImGui::InputText("input text", buf, IM_ARRAYSIZE(buf));
-
-        ImGui::EndChild();
         ImGui::End();
     }
 
