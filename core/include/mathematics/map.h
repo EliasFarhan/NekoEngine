@@ -7,7 +7,7 @@
 namespace neko
 {
 
-/*template<typename Key, typename Value, const size_t Size>
+template<typename Key, typename Value, const size_t Capacity>
 class FixedMap
 {
     using Hash = xxh::hash_t<64>;
@@ -16,22 +16,17 @@ class FixedMap
 public:
     FixedMap(Allocator& allocator) : allocator_(allocator)
     {
-        pairs_.fill(nullptr);
+        allocator_.Allocate(sizeof(Pair) * Capacity, alignof(Pair));
     }
 
     ~FixedMap()
     {
-        std::for_each(pairs_.begin(), pairs_.end(), [this](Pair* p) {
-            if (p != nullptr)
-            {
-                this->allocator_.Deallocate(p);
-            }
-        });
-        pairs_.fill(nullptr);
+        allocator_.Deallocate(pairs_);
     }
 
     void Append(const std::pair<Key, Value> pair)
     {
+        neko_assert(size_ < Capacity, "FixedMap is overcapacity");
         const auto it = std::find_if(pairs_.begin(), pairs_.end(), [](const Pair* p) { return p == nullptr; });
         neko_assert(it != pairs_.end(), "neko::FixedMap<Key,Value,Size>::Append(Pair&): No more place in map.");
         (*it) = static_cast<Pair*>(allocator_.Allocate(sizeof(Pair), alignof(Pair)));
@@ -40,11 +35,34 @@ public:
                 pair.second};
     }
 
-private:
-    std::array<Pair*, Size> pairs_;
-    Allocator& allocator_;
-};*/
+    typename FixedMap::iterator begin()
+	{
+        return pairs_;
+    }
 
+	//End size not capacity
+    typename FixedMap::iterator end()
+	{
+        return begin() + size_;
+    }
+
+    typename FixedMap::const_iterator cbegin() const
+	{
+        return pairs_;
+    }
+	
+    //End size not capacity
+    typename FixedMap::const_iterator cend() const
+	{
+        return cbegin() + size_;
+    }
+
+private:
+    size_t size_ = 0;
+    Pair* pairs_ = nullptr;
+    Allocator& allocator_;
+};
+/*
 template<typename Key, typename Value, const size_t Size>
 class FixedMap
 {
@@ -81,7 +99,7 @@ public:
             "neko::FixedMap<Key,Value>::Append(const Key, const Value): Map already contains Key passed.");
         auto it = std::find_if(pairs_.begin(), pairs_.end(), [](Pair& p) { return p.first == 0; });
         neko_assert(it != pairs_.end(),
-            "neko::FixedMap<Key,Value>::Append(const Key, const Value): No more free slots in map.")
+            "neko::FixedMap<Key,Value>::Append(const Key, const Value): No more free slots in map.");
             it->first = xxh::xxhash<64>(&key, 1);
         it->second = value;
     }
@@ -120,20 +138,20 @@ private:
     std::vector<Pair> pairs_; // 24 bytes // TODO: Replace this with neko's container when it's ready.
     // TODO: use Allocator& allocator_;
 };
-
-template<typename Key, typename Value, const size_t Size>
-class SmallFixedMap
+*/
+template<typename Key, typename Value, const size_t Capacity>
+class SmallMap
 {
 public:
     using Hash = xxh::hash_t<64>;
     using Pair = std::pair<Hash, Value>;
 
-    SmallFixedMap()
+    SmallMap()
     {
-        pairs_.size(Size);
+        pairs_.size(Capacity);
     }
 
-    ~SmallFixedMap() = default;
+    ~SmallMap() = default;
 
     [[nodiscard]] size_t Capacity() const
     {
@@ -153,7 +171,7 @@ public:
     bool Contains(Key key) const
     {
         const Hash hash = xxh::xxhash<64>(&key, sizeof(Key));
-        return std::find_if(pairs_.begin(), pairs_.end(), [hash](Pair p) { return p.first == hash; }) != pairs_.end();
+        return std::find_if(begin(), end(), [hash](Pair p) { return p.first == hash; }) != pairs_.end();
     }
 
     void Append(Key key, Value value)
@@ -171,43 +189,43 @@ public:
     {
         neko_assert(Contains(key), "neko::SmallFixedMap<Key, Value>::Remove(const Key): Key doesn't exist");
         const Hash hash = xxh::xxhash<64>(&key, sizeof(Key));
-        auto it = std::find_if(pairs_.begin(), pairs_.end(), [hash](Pair p) { return p.first == hash; });
+        auto it = std::find_if(begin(), end(), [hash](Pair p) { return p.first == hash; });
         it->first = 0;
         it->second = 0;
     }
 
     void Clear()
     {
-        std::for_each(pairs_.rbegin(), pairs_.rend(), [](Pair& p) {
+        std::for_each(begin(), end(), [](Pair& p) {
             p.first = 0;
             p.second = 0;
             return;
         });
     }
 
-    typename std::array<Pair, Size>::iterator begin()
+    typename SmallMap::iterator begin()
     {
         return pairs_.begin();
     }
 
-    typename std::array<Pair, Size>::iterator end()
+    typename SmallMap::iterator end()
     {
-        return pairs_.end();
+        return pairs_.begin()+size_;
     }
 
-    typename std::array<Pair, Size>::const_iterator cbegin() const
+    typename SmallMap::const_iterator cbegin() const
     {
         return pairs_.cbegin();
     }
 
-    typename std::array<Pair, Size>::const_iterator cend() const
+    typename SmallMap::const_iterator cend() const
     {
-        return pairs_.cend();
+        return pairs_.cbegin()+size_;
     }
 
 private:
-    std::array<Pair, 0> pairs_; // Oleg@Seb: wat? pq 0? deverait être Size du template
-
+    std::array<Pair, Capacity> pairs_; // Oleg@Seb: wat? pq 0? deverait être Size du template
+    size_t size_ = 0;
 };
 
 template<typename Key, typename Value, const size_t Size>
@@ -260,7 +278,7 @@ public:
         pairs_.clear();
     }
 
-    typename std::vector<Pair>::iterator begin()
+    typename DynamicMap::iterator begin()
     {
         return pairs_.begin();
     }
