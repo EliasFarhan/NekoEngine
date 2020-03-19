@@ -16,7 +16,7 @@ TEST(PhysFS, TestTwoArchive)
 {
     LogManager logger;
 
-    Configuration config;
+    const Configuration config;
 	
     physfs::InitPhysFs();
     const std::string_view filename = "sprites/wall.jpg";
@@ -37,6 +37,6 @@ TEST(PhysFS, TestOpenFile)
 	
     const char* output = physfs::ReadFile("test.txt");
     EXPECT_NE(output, nullptr);
-    std::cout << output << '\n';
+	if (output != nullptr) std::cout << output << '\n';
 }
 }
