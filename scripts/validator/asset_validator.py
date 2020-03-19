@@ -44,7 +44,7 @@ def define_asset_type(filename) -> AssetType:
 
 if __name__ == "__main__":
     arguments = ", ".join(sys.argv)
-    print("Data validaot rarugments: "+arguments)
+    print("Data validator arugments: "+arguments)
     data_src = sys.argv[1]
     data_out = sys.argv[2]
     create_out_subdirectories(data_out)

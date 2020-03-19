@@ -4,8 +4,9 @@
 
 #include "engine/custom_allocator.h"
 #include "gtest/gtest.h"
+#include <random>
 
-TEST(Engine, TestCustomAllocator)
+TEST(Engine, TestCustomAllocatorAlignment)
 {
     int value = 3;
     int* ptr = &value;
@@ -14,7 +15,7 @@ TEST(Engine, TestCustomAllocator)
     EXPECT_EQ(neko::Allocator::CalculateAlignForwardAdjustment((int*) ((std::uint64_t) ptr + 1), alignof(int)), 3);
     EXPECT_EQ(neko::Allocator::CalculateAlignForwardAdjustment((int*) ((std::uint64_t) ptr + 2), alignof(int)), 2);
     EXPECT_EQ(neko::Allocator::CalculateAlignForwardAdjustment((int*) ((std::uint64_t) ptr + 3), alignof(int)), 1);
-
+    EXPECT_EQ(neko::Allocator::CalculateAlignForwardAdjustment((int*)((std::uint64_t) ptr + 4), alignof(int)), 0);
     std::uint16_t header = 365;
 
     EXPECT_EQ(neko::Allocator::CalculateAlignForwardAdjustmentWithHeader(ptr, alignof(int), sizeof(header)), 4);
@@ -82,6 +83,9 @@ TEST(Engine, TestFreeListAllocator)
     }
     std::cout << "Used Memory: " << allocator.GetUsedMemory() << "B for total size: " << allocator.GetSize() << "B"
               << std::endl;
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(ptr.begin(), ptr.end(), g);
     std::for_each(ptr.begin(), ptr.end(), [&allocator](int* p) { allocator.Deallocate(p); });
     free(data);
 
@@ -108,6 +112,9 @@ TEST(Engine, TestPoolAllocator)
     }
     std::cout << "Used Memory: " << allocator.GetUsedMemory() << "B for total size: " << allocator.GetSize() << "B"
               << std::endl;
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(ptr.begin(), ptr.end(), g);
     std::for_each(ptr.begin(), ptr.end(), [&allocator](Prout* p) { allocator.Deallocate(p); });
     free(data);
 

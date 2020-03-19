@@ -51,7 +51,7 @@ void Shader::LoadFromFile(const std::string_view vertexShaderPath, const std::st
     {
         glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
         std::ostringstream oss;
-        oss << "[Error] Vertex shader at: " << vertexShaderPath <<" compilation failed: \n" << infoLog;
+        oss << "[Error] Vertex shader at: " << vertexShaderPath <<" compilation failed: \n" << infoLog<<'\n'<<vertexShaderChar;
         logDebug(oss.str());
         return;
     }
@@ -70,7 +70,7 @@ void Shader::LoadFromFile(const std::string_view vertexShaderPath, const std::st
     {
         glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
         std::ostringstream oss;
-        oss << "[Error] Fragment shader at: " << fragmentShaderPath <<" compilation failed\n" << infoLog;
+        oss << "[Error] Fragment shader at: " << fragmentShaderPath <<" compilation failed\n" << infoLog << '\n' << fragmentShaderChar;
         logDebug(oss.str());
         return;
     }

@@ -26,44 +26,46 @@ SOFTWARE.
 #include <xxhash.hpp>
 #include <sole.hpp>
 #include <gtest/gtest.h>
+#include "utilities/file_utility.h"
+#include "engine/engine.h"
+
+TEST(Engine, TestUUIDToStringToUUID)
+{
+	const sole::uuid id = sole::uuid0();
+	const auto idStr = id.str();
+	const auto convertId = sole::rebuild(idStr);
+	EXPECT_TRUE(id == convertId);
+}
 
 TEST(Engine, TestAssetImport)
 {
-	sole::uuid id = sole::uuid0();
-	auto idStr = id.str();
-	auto convertId = sole::rebuild(idStr);
-	EXPECT_TRUE(id == convertId);
-	std::vector<std::string> filenames{
-		"data/sprites/platform.png",
-		"data/editor/play.png",
-		"data/editor/star.png",
-		"fake/path/file.png",
-		"other/fake/path/file.png",
+	neko::Configuration config;
+	config.dataRootPath = "../";
+	std::vector<std::string> filenames =
+	{
+		config.dataRootPath+"data/sprites/platform.jpg",
+		config.dataRootPath+"data/sprites/wall.jpg",
+		config.dataRootPath+"data/sprites/icons/icons8-road-48.png",
+		config.dataRootPath+"fake/path/file.png",
+		config.dataRootPath+"other/fake/path/file.png",
 	};
+	std::vector<xxh::hash_t<64>> fileHashes;
+	fileHashes.reserve(filenames.size());
 	for (auto& filename : filenames)
 	{
 		xxh::hash_state_t<64> hash_stream(0);
 		hash_stream.update(filename);
-		if (std::ifstream input{ filename , std::ios::binary })
+		neko::BufferFile bufferFile;
+		bufferFile.Load(filename);
+		if (bufferFile.dataBuffer != nullptr)
 		{
-			input.unsetf(std::ios::skipws);
-			input.seekg(0, std::ios::end);
-			auto fileSize = input.tellg();
-			input.seekg(0, std::ios::beg);
-			std::vector<char> content;
-			content.reserve(fileSize);
-
-			// read the data:
-			content.insert(content.begin(),
-				std::istream_iterator<char>(input),
-				std::istream_iterator<char>());
-			hash_stream.update(content);
+			hash_stream.update(bufferFile.dataBuffer, bufferFile.dataLength);
 		}
-		else
-		{
-			std::cerr << "Could not open filename: " << filename << std::endl;
-		}
+		bufferFile.Destroy();
 		const xxh::hash_t<64> final_hash = hash_stream.digest();
-		std::cout << "Filename: " << filename << " Hash: " << final_hash << std::endl;
+		fileHashes.push_back(final_hash);
 	}
+	EXPECT_NE(fileHashes[0], fileHashes[1]);
+	EXPECT_NE(fileHashes[1], fileHashes[2]);
+	EXPECT_NE(fileHashes[2], fileHashes[0]);
 }
