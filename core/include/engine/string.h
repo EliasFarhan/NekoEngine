@@ -6,16 +6,20 @@ namespace neko
 
 class String
 {
+    char* data = nullptr;
+    unsigned length;
+    FreeListAllocator& allocator_;
+
 public:
     //-----------------------------------------------------------------------------
     // Constructors
     //-----------------------------------------------------------------------------
 
     /// \brief Empty String Constructor
-    String(FreeListAllocator& alloc);
+    String(FreeListAllocator& allocator);
 
     /// \brief char* String Constructor
-    String(FreeListAllocator& alloc, const char* c);
+    String(FreeListAllocator& allocator, const char* c);
 
     /// \brief Default String Destructor
     ~String();
@@ -49,9 +53,7 @@ public:
 
     //TODO UTF-8
 private :
-    char* data = nullptr;
-    unsigned length;
-    void* allocator;
+
 };
 
 }

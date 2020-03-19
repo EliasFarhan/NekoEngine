@@ -28,13 +28,13 @@ namespace neko {
     //-----------------------------------------------------------------------------
     // Constructors
     //-----------------------------------------------------------------------------
-    String::String(FreeListAllocator& alloc)
+    String::String(FreeListAllocator& allocator): allocator_(allocator)
     {
         length = 0;
-        allocator = alloc.Allocate(sizeof(neko::String), alignof(neko::String));
+        allocator_.Allocate(sizeof(neko::String), alignof(neko::String));
     }
-
-    String::String(FreeListAllocator& alloc, const char* c)
+    
+    String::String(FreeListAllocator& allocator, const char* c): allocator_(allocator)
     {
         if (c){
             unsigned n = 0;
@@ -49,13 +49,13 @@ namespace neko {
                 }
             }
 
-            allocator = alloc.Allocate(sizeof(neko::String) + length, alignof(neko::String));
+            allocator_.Allocate(sizeof(neko::String) + length, alignof(neko::String));
         }
         else
         {
             length = 0;
             data = new char[0];
-            allocator = alloc.Allocate(sizeof(neko::String), alignof(neko::String));
+            allocator_.Allocate(sizeof(neko::String), alignof(neko::String));
         }
     }
 
