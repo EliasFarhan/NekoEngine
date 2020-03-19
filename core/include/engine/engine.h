@@ -47,10 +47,12 @@ struct Configuration
     Vec2u windowSize = Vec2u(1024, 1024);
     Vec2u gameWindowSize{1280, 720};
     bool fullscreen = false;
-    bool vSync = true;
+    bool vSync = false;
     unsigned int framerateLimit = 0u;
-#ifdef EMSCRIPTEN
+#if defined(EMSCRIPTEN)
     std::string dataRootPath = "./";
+#elif defined(__ANDROID__)
+    std::string dataRootPath = "";
 #else
     std::string dataRootPath = "../../";
 #endif

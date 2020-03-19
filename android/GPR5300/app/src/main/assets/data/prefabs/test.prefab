@@ -1,0 +1,63 @@
+{
+    "entities": [
+        {
+            "components": [],
+            "entity": 0,
+            "entityNameHash": 10507123911029571047,
+            "name": "Root Entity",
+            "parent": -1,
+            "prefab": false
+        },
+        {
+            "components": [
+                {
+                    "component": 2,
+                    "position": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "component": 4,
+                    "scale": [
+                        1.0,
+                        1.0
+                    ]
+                },
+                {
+                    "angle": 0.0,
+                    "component": 8
+                },
+                {
+                    "component": 128,
+                    "layer": 0,
+                    "texture": "data/sprites/platform.jpg",
+                    "textureId": 5897672519565449307
+                }
+            ],
+            "entity": 1,
+            "entityNameHash": 7516658693466177232,
+            "name": "Entity 1",
+            "parent": 0,
+            "prefab": false
+        },
+        {
+            "components": [],
+            "entity": 2,
+            "entityNameHash": 11307653658717303779,
+            "name": "Entity 2",
+            "parent": 0,
+            "prefab": false
+        },
+        {
+            "components": [],
+            "entity": 3,
+            "entityNameHash": 4210025514229008271,
+            "name": "Entity 3",
+            "parent": 0,
+            "prefab": false
+        }
+    ],
+    "prefabId": "42f29ce0-e830-0037-7cf1-000000000000",
+    "sceneId": "00000000-0000-0000-0000-000000000000"
+}
