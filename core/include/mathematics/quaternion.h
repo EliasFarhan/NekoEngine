@@ -72,14 +72,14 @@ struct Quaternion
 	}
 
 	//Rotates the Quaternion of angle degrees around axis.
-	Quaternion AngleAxis(radian_t rad, neko::Vec3f axis) const
+	static Quaternion AngleAxis(radian_t rad, neko::Vec3f axis)
 	{
 		if (axis.SquareMagnitude() == 0.0f)
-			return Quaternion(0, 0, 0, 1);
+			return Quaternion::Identity();
 
-		Quaternion result = Quaternion(0,0,0,1);
-		//TODO: axis.Normalize();
-		axis = axis * Sin(rad);
+		Quaternion result = Quaternion::Identity();
+		axis = axis.Normalized();
+		axis *= Sin(rad);
 		result.x = axis.x;
 		result.y = axis.y;
 		result.z = axis.z;
@@ -132,6 +132,11 @@ struct Quaternion
 		);
 	}
 
+	static Quaternion Identity()
+	{
+		return Quaternion(0, 0, 0, 1);
+	}
+	
 	//Operators
 	Quaternion operator/(Quaternion rhs) const
 	{
@@ -146,11 +151,13 @@ struct Quaternion
 			w / rhs);
 	}
 
-	void operator/=(const float rhs) {
+	Quaternion& operator+=(const float rhs)
+	{
 		x /= rhs;
 		y /= rhs;
 		z /= rhs;
 		w /= rhs;
+		return *this;
 	}
 
 	Quaternion operator-(const Quaternion& rhs) const
@@ -161,12 +168,13 @@ struct Quaternion
 			z - rhs.z, 
 			w - rhs.w);
 	}
-
-	void operator-=(const float rhs) {
-		x -= rhs;
-		y -= rhs;
-		z -= rhs;
-		w -= rhs;
+	Quaternion& operator-=(const Quaternion& rhs)
+	{
+		x -= rhs.x;
+		y -= rhs.y;
+		z -= rhs.z;
+		w -= rhs.w;
+		return *this;
 	}
 
 	Quaternion operator+(const Quaternion& rhs) const
@@ -178,12 +186,15 @@ struct Quaternion
 			w + rhs.w);
 	}
 
-	void operator+=(const float rhs) {
-		x += rhs;
-		y += rhs;
-		z += rhs;
-		w += rhs;
+	Quaternion& operator+=(const Quaternion& rhs)
+	{
+		x += rhs.x;
+		y += rhs.y;
+		z += rhs.z;
+		w += rhs.w;
+		return *this;
 	}
+	
 
 	Quaternion operator*(const Quaternion& rhs) const
 	{
@@ -202,11 +213,13 @@ struct Quaternion
 			w * rhs);
 	}
 	
-	void operator*=(const float rhs) {
-		x *= rhs;
-		y *= rhs;
-		z *= rhs;
-		w *= rhs;
+	Quaternion& operator*=(const Quaternion& rhs)
+	{
+		x *= rhs.x;
+		y *= rhs.y;
+		z *= rhs.z;
+		w *= rhs.w;
+		return *this;
 	}
 	
 	bool operator==(const Quaternion& right) const
