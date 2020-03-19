@@ -64,7 +64,7 @@ add_subdirectory(${NEKO_CORE_DIR})
 
 #imgui
 set(IMGUI_VERSION "1.74" CACHE INTERNAL "")
-set(IMGUI_ROOT "${EXTERNAL_DIR}/imgui-${IMGUI_VERSION}" CACHE INTERNAL "")
+set(IMGUI_ROOT "${EXTERNAL_DIR}/imgui-${IMGUI_VERSION}" CACHE STRING "")
 add_subdirectory("${IMGUI_ROOT}")
 
 

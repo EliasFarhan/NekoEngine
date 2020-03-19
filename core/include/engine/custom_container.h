@@ -23,49 +23,52 @@
  SOFTWARE.
  */
 #include <iostream>
-#include "engine/custom_allocator.h" 
-#include "engine/assert.h"
+#include <engine/custom_allocator.h>
+#include <engine/assert.h>
+
+namespace neko
+{
 
 class IntArray
 {
 private:
-	int m_length{};
-	int* m_data{};
+	size_t length_{};
+	int* data_{};
 
 public:
 	IntArray() = default;
 
-	IntArray(int length) :
-		m_length{ length }
+	IntArray(size_t length) :
+		length_{ length }
 	{
-		neko_assert(length >= 0);
+		neko_assert(length_ >= 0);
 
-		if (length > 0)
-			m_data = new int[length] {};
+		if (length_ > 0)
+			data_ = new int[length] {};
 	}
 
 	~IntArray()
 	{
-		delete[] m_data;
+		delete[] data_;
 		// we don't need to set m_data to null or m_length to 0 here, since the object will be destroyed immediately after this function anyway
 	}
 
 	void erase()
 	{
-		delete[] m_data;
+		delete[] data_;
 		// We need to make sure we set m_data to nullptr here, otherwise it will
 		// be left pointing at deallocated memory!
-		m_data = nullptr;
-		m_length = 0;
+		data_ = nullptr;
+		length_ = 0;
 	}
 
 	int& operator[](int index)
 	{
-		neko_assert(index >= 0 && index < m_length);
-		return m_data[index];
+		neko_assert(index >= 0 && index < length_, "[Error] Out of scope access");
+		return data_[index];
 	}
 
-	int getLength() const { return m_length; }
+	int getLength() const { return length_; }
 
 	// reallocate resizes the array.  Any existing elements will be destroyed.  This function operates quickly.
 	void reallocate(int newLength)
@@ -78,15 +81,15 @@ public:
 			return;
 
 		// Then we have to allocate new elements
-		m_data = new int[newLength];
-		m_length = newLength;
+		data_ = new int[newLength];
+		length_ = newLength;
 	}
 
 	// resize resizes the array.  Any existing elements will be kept.  This function operates slowly.
 	void resize(int newLength)
 	{
 		// if the array is already the right length, we're done
-		if (newLength == m_length)
+		if (newLength == length_)
 			return;
 
 		// If we are resizing to an empty array, do that and return
@@ -108,94 +111,86 @@ public:
 		// Then we have to figure out how many elements to copy from the existing
 		// array to the new array.  We want to copy as many elements as there are
 		// in the smaller of the two arrays.
-		if (m_length > 0)
+		if (length_ > 0)
 		{
-			int elementsToCopy{ (newLength > m_length) ? m_length : newLength };
+			int elementsToCopy{ (newLength > length_) ? length_ : newLength };
 
 			// Now copy the elements one by one
 			for (int index{ 0 }; index < elementsToCopy; ++index)
-				data[index] = m_data[index];
+				data[index] = data_[index];
 		}
 
 		// Now we can delete the old array because we don't need it any more
-		delete[] m_data;
+		delete[] data_;
 
 		// And use the new array instead!  Note that this simply makes m_data point
 		// to the same address as the new array we dynamically allocated.  Because
 		// data was dynamically allocated, it won't be destroyed when it goes out of scope.
-		m_data = data;
-		m_length = newLength;
+		data_ = data;
+		length_ = newLength;
 	}
 
 };
 
-
+template<typename T>
 class DynArray
 {
-	int* arr = nullptr;
+	Allocator& allocator_; //Please don't use Linear or Stack Allocator
+	T* buffer_ = nullptr;
 
 	// capacity is the total storage capacity
-	size_t capacity;
+	size_t capacity = 0;
 
 	// size is the current number of elements 
-	size_t size;
+	size_t size = 0;
 
 public:
 
-	DynArray()
+	DynArray(Allocator& allocator) : allocator_(allocator)
 	{
-		arr = new int[1];
-		capacity = 1;
+		capacity = 0;
 		size = 0;
 	}
 
-	void Push(int data)
+	T& operator[](size_t index)
+	{
+		neko_assert(index >= 0 && index < size, "[Error] Out of scope access");
+		return m_data[index];
+	}
+	void Push(T elem)
 	{
 		if (size == capacity) {
-			int* temp = new int[2 * capacity];
+			T* temp = allocator_.Allocate(2*capacity, alignof(T));
 
-			for (int i = 0; i < capacity; i++) {
-				temp[i] = arr[i];
+			for (size_t i = 0; i < size; i++) {
+				temp[i] = buffer_[i];
 			}
-
-			delete[] arr;
+			allocator_.Deallocate(buffer_);
 			capacity *= 2;
-			arr = temp;
+			buffer_ = temp;
 		}
 
-		arr[size] = data;
+		buffer_[size] = elem;
 		size++;
 	}
 
-	void Push(int data, int index)
+	void Insert(T data, size_t index)
 	{
 		if (index == capacity)
 			Push(data);
 		else
-			arr[index] = data;
+			buffer_[index] = data;
 	}
 
-	int Get(int index)
-	{
-		if (index < size)
-			return arr[index];
-	}
-
-	int Size()
+	size_t Size() const
 	{
 		return size;
 	}
 
-	int GetCapacity()
+	size_t Capacity() const
 	{
 		return capacity;
 	}
 
-	void Print()
-	{
-		for (int i = 0; i < size; i++) {
-			cout << arr[i] << " ";
-		}
-		cout << endl;
-	}
 };
+}
