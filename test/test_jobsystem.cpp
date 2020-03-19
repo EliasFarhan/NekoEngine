@@ -6,35 +6,36 @@
 namespace neko
 {
 
-void IncrementMem(std::atomic<unsigned int>& mem)
+void Task(std::atomic<unsigned int>& currentDoneTasks)
 {
-    const unsigned int TASK_WORK_TIME = 1;
+    const auto TASK_WORK_TIME = std::chrono::seconds(1);
 
 #ifdef USING_EASY_PROFILER
     EASY_BLOCK("JOBSYSTEM_DO_NOTHING");
 #endif
-    std::this_thread::sleep_for(std::chrono::seconds(TASK_WORK_TIME));
-    mem++;
+    std::this_thread::sleep_for(TASK_WORK_TIME);
+    ++currentDoneTasks;
 }
 
 TEST(Engine, TestJobSystem)
 {
     const unsigned int TASKS_COUNT = 16;
-    std::atomic<unsigned int> tasksDone = 0;
+    std::atomic<unsigned int> doneTasks = 0;
 
     {// JobSystem
 #ifdef USING_EASY_PROFILER
         EASY_PROFILER_ENABLE;
-        EASY_BLOCK("JOBSYSTEM_MAIN_THREAD"){
+        EASY_BLOCK("JOBSYSTEM_MAIN_THREAD")
+    	{
 #endif
-            JobSystem system;
-            for (size_t i = 0; i < TASKS_COUNT; ++i)
-            {
-                system.KickJob(std::function<void()>{[&tasksDone] { IncrementMem(tasksDone); }});
-            }
-
+		    JobSystem jobSystem;
+		    for (size_t i = 0; i < TASKS_COUNT; ++i)
+		    {
+		        jobSystem.KickJob(std::function<void()>{[&doneTasks] { Task(doneTasks); }});
+		    }
 #ifdef USING_EASY_PROFILER
-        } EASY_END_BLOCK;
+        }
+    	EASY_END_BLOCK;
 #endif
     }// !JobSystem
 
@@ -43,7 +44,7 @@ TEST(Engine, TestJobSystem)
 #endif
 
     // JobSystem must make main thread wait until all tasks are done before self-destructing.
-    EXPECT_EQ(TASKS_COUNT, tasksDone);
+    EXPECT_EQ(TASKS_COUNT, doneTasks);
 }
 
 }

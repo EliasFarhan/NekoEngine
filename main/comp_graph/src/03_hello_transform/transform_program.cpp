@@ -46,6 +46,8 @@ void HelloTransformProgram::Render()
             break;
     }
 
+    glEnable(GL_DEPTH_TEST);
+
 }
 
 void HelloTransformProgram::Destroy()

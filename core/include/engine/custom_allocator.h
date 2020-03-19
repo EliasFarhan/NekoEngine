@@ -231,7 +231,7 @@ PoolAllocator<T>::PoolAllocator(size_t size, void* mem) : Allocator(size, mem)
 template<typename T>
 void* PoolAllocator<T>::Allocate(size_t allocatedSize, [[maybe_unused]]size_t alignment)
 {
-    neko_assert(allocatedSize == sizeof(T) and alignment == alignof(T), "Pool Allocator can only allocate one Object pooled at once");
+    neko_assert(allocatedSize == sizeof(T) && alignment == alignof(T), "Pool Allocator can only allocate one Object pooled at once");
     if(freeBlocks_ == nullptr)
     {
         neko_assert(false, "Pool Allocator is full");

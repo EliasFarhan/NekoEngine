@@ -83,12 +83,9 @@ void BasicEngine::Update(seconds dt)
 		EASY_BLOCK("Application Update");
 #endif
 
-#ifdef EMSCRIPTEN
-		ManageEvent();
-#endif
 		updateAction_.Execute(dt);
 	}
-#ifdef EMSCRIPTEN
+#if defined(NEKO_SAMETHREAD)
 	renderer_->Update();
 #endif
 
@@ -130,6 +127,7 @@ void BasicEngine::EngineLoop()
 		const auto dt = std::chrono::duration_cast<seconds>(start - clock);
 		clock = start;
 		Update(dt);
+
 	}
 #endif
 	Destroy();
@@ -150,7 +148,7 @@ void BasicEngine::GenerateUiFrame()
 
 	std::ostringstream oss;
 	oss << "App FPS: " << 1.0f / GetDeltaTime() << '\n'
-#ifndef EMSCRIPTEN
+#if !defined(NEKO_SAME_THREAD)
 		<< "Render FPS: " << 1.0f / renderer_->GetDeltaTime()
 #endif
 		<< '\n';
