@@ -17,8 +17,10 @@ void HelloTextureProgram::Init()
             config.dataRootPath + "data/shaders/02_hello_texture/texture.frag");
     quad_.Init();
 
-    auto texturePath = config.dataRootPath + "data/sprites/wall.jpg";
-    textureId_ = neko::gl::stbCreateTexture(texturePath.c_str());
+    const auto texturePath = config.dataRootPath + "data/sprites/wall.jpg";
+    textureId_ = neko::gl::stbCreateTexture(texturePath);
+
+    glEnable(GL_DEPTH_TEST);
 }
 
 void HelloTextureProgram::Update(seconds dt)
@@ -45,7 +47,7 @@ void HelloTextureProgram::Render()
     quad_.Draw();
 }
 
-void HelloTextureProgram::DrawUi()
+void HelloTextureProgram::DrawImGui()
 {
 
 }

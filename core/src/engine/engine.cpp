@@ -82,10 +82,10 @@ void BasicEngine::Update(seconds dt)
 #ifdef EASY_PROFILE_USE
 		EASY_BLOCK("Application Update");
 #endif
-		ManageEvent();
+
 		updateAction_.Execute(dt);
 	}
-#ifdef EMSCRIPTEN
+#if defined(NEKO_SAMETHREAD)
 	renderer_->Update();
 #endif
 
@@ -94,7 +94,7 @@ void BasicEngine::Update(seconds dt)
 
 void BasicEngine::Destroy()
 {
-	renderer_->Close();
+    renderer_->Destroy();
 	instance_ = nullptr;
 }
 
@@ -127,6 +127,7 @@ void BasicEngine::EngineLoop()
 		const auto dt = std::chrono::duration_cast<seconds>(start - clock);
 		clock = start;
 		Update(dt);
+
 	}
 #endif
 	Destroy();
@@ -142,17 +143,30 @@ void BasicEngine::SetWindowAndRenderer(Window* window, Renderer* renderer)
 
 void BasicEngine::GenerateUiFrame()
 {
+	ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_FirstUseEver);
 	ImGui::Begin("Neko Window");
 
 	std::ostringstream oss;
 	oss << "App FPS: " << 1.0f / GetDeltaTime() << '\n'
-#ifndef EMSCRIPTEN
+#if !defined(NEKO_SAME_THREAD)
 		<< "Render FPS: " << 1.0f / renderer_->GetDeltaTime()
 #endif
 		<< '\n';
-	ImGui::Text(oss.str().c_str());
+	ImGui::Text("%s", oss.str().c_str());
 	ImGui::End();
-	drawUiAction_.Execute();
+	drawImGuiAction_.Execute();
+}
+
+void BasicEngine::RegisterSystem(SystemInterface& system)
+{
+    initAction_.RegisterCallback([&system]{system.Init();});
+    updateAction_.RegisterCallback([&system](seconds dt){system.Update(dt);});
+    destroyAction_.RegisterCallback([&system]{system.Destroy();});
+}
+
+void BasicEngine::RegisterOnDrawUi(DrawImGuiInterface& drawUi)
+{
+    drawImGuiAction_.RegisterCallback([&drawUi]{ drawUi.DrawImGui();});
 }
 
 

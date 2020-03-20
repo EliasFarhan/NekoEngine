@@ -23,7 +23,6 @@
  SOFTWARE.
  */
 
-#include "cmath"
 #include "mathematics/vector.h"
 #include "mathematics/matrix.h"
 #include "const.h"
@@ -62,14 +61,13 @@ inline Mat4f const Transform3d::ScalingMatrixFrom(const Vec3f scale)
 template<>
 inline Mat4f const Transform3d::RotationMatrixFrom(const degree_t angle, const Vec3f axis)
 {
-    const float angleAsFloat = static_cast<radian_t>(angle).to<float>();
-    const Vec3f normalizedAxis = axis / axis.GetMagnitude();
+    const Vec3f normalizedAxis = axis.Normalized();
 
     const float x = axis[0];
     const float y = axis[1];
     const float z = axis[2];
-    const float c = std::cos(angleAsFloat);
-    const float s = std::sin(angleAsFloat);
+    const float c = Cos(angle);
+    const float s = Sin(angle);
     const float t = 1.0f - c;
     const float txx = t * x * x;
     const float tyy = t * y * y;
@@ -93,14 +91,13 @@ inline Mat4f const Transform3d::RotationMatrixFrom(const degree_t angle, const V
 template<>
 inline Mat4f const Transform3d::RotationMatrixFrom(const radian_t angle, const Vec3f axis)
 {
-    const float angleAsFloat = angle.to<float>();
-    const Vec3f normalizedAxis = axis / axis.GetMagnitude();
+    const Vec3f normalizedAxis = axis.Normalized();
 
     const float x = axis[0];
     const float y = axis[1];
     const float z = axis[2];
-    const float c = std::cos(angleAsFloat);
-    const float s = std::sin(angleAsFloat);
+    const float c = Cos(angle);
+    const float s = Sin(angle);
     const float t = 1.0f - c;
     const float txx = t * x * x;
     const float tyy = t * y * y;
@@ -127,12 +124,12 @@ inline Mat4<float> const Transform3d::RotationMatrixFrom(const EulerAngles cardi
     const radian_t rotX = cardinalRotation[0];
     const radian_t rotY = cardinalRotation[1];
     const radian_t rotZ = cardinalRotation[2];
-    const float cosX = std::cos(rotX.value());
-    const float sinX = std::sin(rotX.value());
-    const float cosY = std::cos(rotY.value());
-    const float sinY = std::sin(rotY.value());
-    const float cosZ = std::cos(rotZ.value());
-    const float sinZ = std::sin(rotZ.value());
+    const float cosX = Cos(rotX);
+    const float sinX = Sin(rotX);
+    const float cosY = Cos(rotY);
+    const float sinY = Sin(rotY);
+    const float cosZ = Cos(rotZ);
+    const float sinZ = Sin(rotZ);
 
     const Mat4f matX = Mat4f(
             std::array<Vec4f, 4>
@@ -191,6 +188,8 @@ inline Mat4f const Transform3d::RotationMatrixFrom(const Quaternion& quaternion)
                             Vec4f(0, 0, 0, 1)
                     });
 }
+
+
 
 template<>
 inline Transform3d Transform3d::Translate(const Transform3d& transform, const Vec3f translation)

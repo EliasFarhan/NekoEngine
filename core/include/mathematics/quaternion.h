@@ -1,8 +1,7 @@
 #pragma once
-#include <mathematics/matrix.h>
 #include <engine/component.h>
 #include <mathematics/vector.h>
-#include <cmath>
+#include "mathematics/trigo.h"
 
 
 //DATE : 19.02.2020
@@ -60,7 +59,7 @@ struct Quaternion
 	}
 
 	//Converts this quaternion to one with the same orientation but with a magnitude of 1.
-	Quaternion Normalize(Quaternion quaternion) const
+	static Quaternion Normalized(Quaternion quaternion)
 	{
 		return quaternion / Magnitude(quaternion);
 	}
@@ -74,28 +73,28 @@ struct Quaternion
 	}
 
 	//Rotates the Quaternion of angle degrees around axis.
-	Quaternion AngleAxis(radian_t rad, neko::Vec3f axis) const
+	static Quaternion AngleAxis(radian_t rad, neko::Vec3f axis)
 	{
-		if (axis.GetSquareMagnitude() == 0.0f)
-			return Quaternion(0, 0, 0, 1);
+		if (axis.SquareMagnitude() == 0.0f)
+			return Quaternion::Identity();
 
-		Quaternion result = Quaternion(0,0,0,1);
-		//TODO: axis.Normalize();
-		axis = axis * std::sin(rad.value());
+		Quaternion result = Quaternion::Identity();
+		axis = axis.Normalized();
+		axis *= Sin(rad);
 		result.x = axis.x;
 		result.y = axis.y;
 		result.z = axis.z;
-		result.w = std::cos(rad.value());
+		result.w = Cos(rad);
 
-		return Normalize(result);
+		return Normalized(result);
 	}
 
 
 	//Returns the angle in degrees between two rotations a and b.
-	static float Angle(Quaternion a, Quaternion b)
+	static degree_t Angle(Quaternion a, Quaternion b)
 	{
 		
-		return 2.0f * std::acos(std::abs(Dot(a, b)));
+		return 2.0f * Acos(std::abs(Dot(a, b)));
 	}
 
 	Quaternion Conjugate() const
@@ -119,12 +118,12 @@ struct Quaternion
 	*/
 	static Quaternion FromEuler(EulerAngles angle)
 	{
-		float cy = std::cos((angle.x.value() * 0.5f));
-		float sy = std::sin((angle.x.value() * 0.5f));
-		float cp = std::cos((angle.y.value() * 0.5f));
-		float sp = std::sin((angle.y.value() * 0.5f));
-		float cr = std::cos((angle.z.value() * 0.5f));
-		float sr = std::sin((angle.z.value() * 0.5f));
+		const auto cy = Cos(angle.x * 0.5f);
+		const auto sy = Sin(angle.x * 0.5f);
+		const auto cp = Cos(angle.y * 0.5f);
+		const auto sp = Sin(angle.y * 0.5f);
+		const auto cr = Cos(angle.z * 0.5f);
+		const auto sr = Sin(angle.z * 0.5f);
 
 		return Quaternion(
 			cy * cp * cr + sy * sp * sr,
@@ -134,6 +133,11 @@ struct Quaternion
 		);
 	}
 
+	static Quaternion Identity()
+	{
+		return Quaternion(0, 0, 0, 1);
+	}
+	
 	//Operators
 	Quaternion operator/(Quaternion rhs) const
 	{
@@ -148,11 +152,13 @@ struct Quaternion
 			w / rhs);
 	}
 
-	void operator/=(const float rhs) {
+	Quaternion& operator+=(const float rhs)
+	{
 		x /= rhs;
 		y /= rhs;
 		z /= rhs;
 		w /= rhs;
+		return *this;
 	}
 
 	Quaternion operator-(const Quaternion& rhs) const
@@ -163,12 +169,13 @@ struct Quaternion
 			z - rhs.z, 
 			w - rhs.w);
 	}
-
-	void operator-=(const float rhs) {
-		x -= rhs;
-		y -= rhs;
-		z -= rhs;
-		w -= rhs;
+	Quaternion& operator-=(const Quaternion& rhs)
+	{
+		x -= rhs.x;
+		y -= rhs.y;
+		z -= rhs.z;
+		w -= rhs.w;
+		return *this;
 	}
 
 	Quaternion operator+(const Quaternion& rhs) const
@@ -180,12 +187,15 @@ struct Quaternion
 			w + rhs.w);
 	}
 
-	void operator+=(const float rhs) {
-		x += rhs;
-		y += rhs;
-		z += rhs;
-		w += rhs;
+	Quaternion& operator+=(const Quaternion& rhs)
+	{
+		x += rhs.x;
+		y += rhs.y;
+		z += rhs.z;
+		w += rhs.w;
+		return *this;
 	}
+	
 
 	Quaternion operator*(const Quaternion& rhs) const
 	{
@@ -204,11 +214,13 @@ struct Quaternion
 			w * rhs);
 	}
 	
-	void operator*=(const float rhs) {
-		x *= rhs;
-		y *= rhs;
-		z *= rhs;
-		w *= rhs;
+	Quaternion& operator*=(const Quaternion& rhs)
+	{
+		x *= rhs.x;
+		y *= rhs.y;
+		z *= rhs.z;
+		w *= rhs.w;
+		return *this;
 	}
 	
 	bool operator==(const Quaternion& right) const
@@ -220,5 +232,11 @@ struct Quaternion
 	{
 		return !(*this == right);
 	}
+
+    friend std::ostream& operator<<(std::ostream& os, const Quaternion& quat)
+    {
+        os << "Quaternion(" << quat.x << "," << quat.y << "," << quat.z << "," << quat.w << ")";
+        return os;
+    }
 };
 }

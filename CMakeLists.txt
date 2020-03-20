@@ -9,22 +9,28 @@ set_property(GLOBAL PROPERTY USE_FOLDERS On)
 include(cmake/neko_executable.cmake)
 
 
-
+set(Neko_SameThread OFF CACHE BOOL "Used for Emscripten and other system when render and engine has to be in the same thread")
 set(Neko_Profile OFF CACHE BOOL "Activate Profiling with Easy Profile")
 set(Neko_GLES3 ON CACHE BOOL "Activate OpenGL ES 3.0")
 set(Neko_SDL2 ON CACHE BOOL "Activate SDL2")
 set(Neko_Box2D OFF CACHE BOOL "Activate Box2D")
 set(Neko_Test ON CACHE BOOL "Activate Test")
+set(Neko_Assert ON CACHE BOOL "Activate Neko Assertion")
 set(Neko_Benchmark ON CACHE BOOL "Activate Benchmark")
 
-if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
+MESSAGE("CMAKE SYSTEM NAME: ${CMAKE_SYSTEM_NAME}")
+
+if ("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
     include(cmake/platforms/emscripten.cmake)
     set(CMAKE_EXECUTABLE_SUFFIX ".html")
     set(CMAKE_STATIC_LIBRARY_SUFFIX ".a")
+    set(Neko_SameThread ON CACHE BOOL "Used for Emscripten and other system when render and engine has to be in the same thread")
+    mark_as_advanced(Neko_SameThread)
 endif()
 
 if(UNIX)
     EXECUTE_PROCESS(COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE)
+    MESSAGE("UNIX Architecture: ${ARCHITECTURE}")
     if("${ARCHITECTURE}" MATCHES "arm")
         include(cmake/platforms/arm.cmake)
     endif()
@@ -36,6 +42,15 @@ endif()
 
 set(EXTERNAL_DIR ${CMAKE_SOURCE_DIR}/externals CACHE INTERNAL "Externals folder")
 set(UTILITIES_DIR "${EXTERNAL_DIR}/utilities" CACHE INTERNAL "")
+
+if(Neko_Assert)
+    add_compile_definitions("NEKO_ASSERT=1")
+endif()
+
+if(Neko_SameThread)
+    MESSAGE("Neko Update and Render will be on the same thread")
+    add_compile_definitions("NEKO_SAMETHREAD=1")
+endif()
 
 if(Neko_Profile)
     set(EASY_PROFILE_DIR "${EXTERNAL_DIR}/easy_profiler-2.1.0")
@@ -49,7 +64,7 @@ add_subdirectory(${NEKO_CORE_DIR})
 
 #imgui
 set(IMGUI_VERSION "1.74" CACHE INTERNAL "")
-set(IMGUI_ROOT "${EXTERNAL_DIR}/imgui-${IMGUI_VERSION}" CACHE INTERNAL "")
+set(IMGUI_ROOT "${EXTERNAL_DIR}/imgui-${IMGUI_VERSION}" CACHE STRING "")
 add_subdirectory("${IMGUI_ROOT}")
 
 
@@ -71,9 +86,10 @@ if(Neko_SDL2)
     set(SDL_SHARED OFF CACHE INTERNAL "")
     set(SDL_ENGINE_DIR ON CACHE INTERNAL "")
     if(NOT Emscripten)
-    add_subdirectory(${SDL_DIR})
+        add_subdirectory(${SDL_DIR})
     ENDIF()
     include_directories(${SDL_DIR}/include ${SDL_DIR}/src)
+
     add_subdirectory("common/sdl_engine")
 
 endif()

@@ -44,13 +44,15 @@ class Window;
 struct Configuration
 {
 	std::string windowName = "NekoEngine 0.1";
-    Vec2i windowSize = Vec2i(1024, 1024);
-    Vec2i gameWindowSize{1280, 720};
+    Vec2u windowSize = Vec2u(1024, 1024);
+    Vec2u gameWindowSize{1280, 720};
     bool fullscreen = false;
     bool vSync = false;
     unsigned int framerateLimit = 0u;
-#ifdef EMSCRIPTEN
+#if defined(EMSCRIPTEN)
     std::string dataRootPath = "./";
+#elif defined(__ANDROID__)
+    std::string dataRootPath = "";
 #else
     std::string dataRootPath = "../../";
 #endif
@@ -80,6 +82,8 @@ public:
 
     Configuration config;
 
+    void RegisterSystem(SystemInterface& system);
+    void RegisterOnDrawUi(DrawImGuiInterface& drawUi);
 
     float GetDeltaTime() const { return dt_; };
 	
@@ -95,7 +99,7 @@ protected:
     std::atomic<float> dt_;
     Action<> initAction_;
     Action<seconds> updateAction_;
-    Action<> drawUiAction_;
+    Action<> drawImGuiAction_;
     Action<> destroyAction_;
 
 };

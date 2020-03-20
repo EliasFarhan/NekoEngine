@@ -67,28 +67,17 @@ void SdlEngine::Destroy()
 
 void SdlEngine::ManageEvent()
 {
-    std::lock_guard<std::mutex> lock(renderer_->GetRenderMutex());
+    
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("Manage Event");
 #endif
-    window_->MakeCurrentContext();
     SDL_Event event;
     while (SDL_PollEvent(&event))
     {
-        OnEvent(event);
         ImGui_ImplSDL2_ProcessEvent(&event);
         if (event.type == SDL_QUIT)
         {
             isRunning_ = false;
-        }
-
-        if (event.type == SDL_KEYDOWN)
-        {
-            switch (event.key.keysym.scancode)
-            {
-                default:
-                    break;
-            }
         }
 
         auto& config = BasicEngine::GetInstance()->config;
@@ -96,18 +85,23 @@ void SdlEngine::ManageEvent()
         {
             if (event.window.event == SDL_WINDOWEVENT_RESIZED)
             {
-                config.windowSize = Vec2i(event.window.data1, event.window.data2);
-                window_->OnResize(Vec2u(event.window.data1, event.window.data2));
+                config.windowSize = Vec2u(event.window.data1, event.window.data2);
+                window_->OnResize(config.windowSize);
             }
         }
     }
-    window_->LeaveCurrentContext();
+    onEventAction_.Execute(event);
 }
 
 void SdlEngine::GenerateUiFrame()
 {
     window_->GenerateUiFrame();
     BasicEngine::GenerateUiFrame();
+}
+
+void SdlEngine::RegisterOnEvent(SdlEventSystemInterface& eventInterface)
+{
+    onEventAction_.RegisterCallback([&eventInterface](const SDL_Event& event){eventInterface.OnEvent(event);});
 }
 
 }

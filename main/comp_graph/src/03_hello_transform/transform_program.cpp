@@ -1,4 +1,3 @@
-
 #include <engine/transform.h>
 #include <engine/engine.h>
 #include <imgui.h>
@@ -47,6 +46,8 @@ void HelloTransformProgram::Render()
             break;
     }
 
+    glEnable(GL_DEPTH_TEST);
+
 }
 
 void HelloTransformProgram::Destroy()
@@ -77,8 +78,10 @@ void HelloTransformProgram::Update(seconds dt)
     transform_ = Mat4f::Translate(transform_, position_);
 }
 
-void HelloTransformProgram::DrawUi()
+void HelloTransformProgram::DrawImGui()
 {
+
+    ImGui::SetNextWindowPos(ImVec2(0, 400), ImGuiCond_FirstUseEver);
     ImGui::Begin("Transform Window");
     const char* items[static_cast<size_t>(ShapeType::LENGTH)] = {
             "Plane",
@@ -94,7 +97,7 @@ void HelloTransformProgram::DrawUi()
     switch (shape_)
     {
         case ShapeType::PLANE:
-            ImGui::InputFloat("Rotation", &angle_);
+            ImGui::InputFloat("Rotation", (float*) &angle_);
             break;
         case ShapeType::CUBE:
             ImGui::InputFloat3("Euler Angles", (float*) &eulerAngle_[0]);

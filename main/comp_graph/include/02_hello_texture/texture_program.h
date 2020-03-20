@@ -19,12 +19,12 @@ public:
 
     void Render() override;
 
-    void DrawUi() override;
+    void DrawImGui() override;
 
     void OnEvent(const SDL_Event& event) override;
 
 private:
-    neko::gl::Quad quad_{Vec2f::Zero, Vec2f::One};
+    gl::RenderQuad quad_{Vec3f::zero, Vec2f::one};
     gl::Shader shader_;
 
     gl::TextureId textureId_ = 0u;
