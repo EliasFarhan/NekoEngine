@@ -239,9 +239,9 @@ inline Vec3f Transform3d::Scale(const Mat4<float>& transform)
 {
     const Transform3d transposed = transform.Transpose();
     return Vec3f(
-            transposed[0].GetMagnitude(),
-            transposed[1].GetMagnitude(),
-            transposed[2].GetMagnitude());
+            transposed[0].Magnitude(),
+            transposed[1].Magnitude(),
+            transposed[2].Magnitude());
 }
 
 template<>
