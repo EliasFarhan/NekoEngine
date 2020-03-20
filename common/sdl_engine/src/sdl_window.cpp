@@ -10,12 +10,18 @@
 
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
+#ifdef EASY_PROFILE_USE
+#include "easy/profiler.h"
+#endif
 namespace neko
 {
 
 void sdl::SdlWindow::Init()
 {
 
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("InitSdlWindow");
+#endif
     auto& config = BasicEngine::GetInstance()->config;
 
     auto flags = SDL_WINDOW_RESIZABLE|
@@ -47,54 +53,56 @@ void sdl::SdlWindow::Init()
         logDebug("[Error] Unable to create window\n");
         return;
     }
-
 }
 
 void sdl::SdlWindow::InitImGui()
 {
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("InitSdlImGui");
+#endif
 // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
     (void) io;
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
+	
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Keyboard Gamepad
 
     // Setup Dear ImGui style
     //ImGui::StyleColorsDark();
     ImGui::StyleColorsClassic();
 }
 
-void sdl::SdlWindow::OnEvent(const SDL_Event& event)
-{
-    auto& config = BasicEngine::GetInstance()->config;
-    if (event.type == SDL_WINDOWEVENT)
-    {
-        if (event.window.event == SDL_WINDOWEVENT_RESIZED)
-        {
-            config.windowSize = Vec2i(event.window.data1,event.window.data2);
-        }
-    }
-}
 
 void sdl::SdlWindow::ImguiNewFrame()
 {
     ImGui_ImplSDL2_NewFrame(window_);
+    ImGui::NewFrame();
 }
 
-void sdl::SdlWindow::ImguiRender()
-{
-    ImGui::Render();
-}
 
 void sdl::SdlWindow::Destroy()
 {
-
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("DestroySdlWindow");
+#endif
     ImGui_ImplSDL2_Shutdown();
     ImGui::DestroyContext();
     // Destroy our window
     SDL_DestroyWindow(window_);
 
 
+}
+
+void sdl::SdlWindow::SwapBuffer()
+{
+
+}
+
+void sdl::SdlWindow::RenderUi()
+{
+    ImGui::Render();
 }
 
 }

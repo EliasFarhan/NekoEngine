@@ -1,49 +1,47 @@
 #pragma once
 
 #include <mathematics/vector.h>
+#include <graphics/shape.h>
 
 namespace neko::gl
 {
-class VertexArrayObject
+struct VertexArrayObject
 {
-public:
-    virtual void Init() = 0;
-    virtual void Draw() = 0;
-    virtual void Destroy() = 0;
-protected:
-    unsigned int VAO;
-    unsigned int EBO;
-    unsigned int VBO[2];
+    unsigned int VAO = 0;
+    unsigned int EBO = 0;
+    unsigned int VBO[2]{};
 };
 
-
-class Quad : public VertexArrayObject
+class RenderCircle : public neko::RenderCircle, public VertexArrayObject
 {
 public:
-    explicit Quad(Vec2f origin, Vec2f size);
-
+    using neko::RenderCircle::RenderCircle;
     void Init() override;
 
-    void Draw() override;
+    void Draw() const override;
 
     void Destroy() override;
-
-protected:
-    Vec2f origin_;
-    Vec2f size_;
 };
 
-class Cuboid : public  VertexArrayObject
+class RenderQuad : public neko::RenderQuad, public VertexArrayObject
 {
 public:
-    explicit Cuboid(Vec3f origin, Vec3f size);
+    using neko::RenderQuad::RenderQuad;
     void Init() override;
 
-    void Draw() override;
+    void Draw() const override;
 
     void Destroy() override;
-protected:
-    Vec3f origin_;
-    Vec3f size_;
+};
+
+class RenderCuboid : public neko::RenderCuboid, public VertexArrayObject
+{
+public:
+    using neko::RenderCuboid::RenderCuboid;
+    void Init() override;
+
+    void Draw() const override;
+
+    void Destroy() override;
 };
 }

@@ -14,7 +14,7 @@ public:
             const std::string_view fragmentShaderPath) override;
 
 
-    void Bind();
+    void Bind() const;
 
     void Destroy();
 

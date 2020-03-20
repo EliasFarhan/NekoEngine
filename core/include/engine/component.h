@@ -29,7 +29,6 @@
 #include <engine/globals.h>
 #include <utilities/vector_utility.h>
 #include <utilities/json_utility.h>
-#include <set>
 
 
 namespace neko

@@ -96,7 +96,7 @@ void Shader::LoadFromFile(const std::string_view vertexShaderPath, const std::st
 
 
 
-void Shader::Bind()
+void Shader::Bind() const
 {
     glUseProgram(shaderProgram_);
 }
@@ -163,6 +163,7 @@ void Shader::SetVec4(const std::string& name, float x, float y, float z, float w
 void Shader::Destroy()
 {
     glDeleteProgram(shaderProgram_);
+    shaderProgram_ = 0;
 }
 
 /*
