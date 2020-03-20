@@ -85,9 +85,9 @@ if(Neko_SDL2)
     add_subdirectory("common/sdl_engine")
 
 endif()
-if(Neko_Fmod)
-add_subdirectory("${EXTERNAL_DIR}/Fmod-2.00.08")
-endif()
+
+
+
 if(Neko_Test)
     enable_testing()
     set(GOOGLE_TEST_DIR ${EXTERNAL_DIR}/googletest-1.8.1)
@@ -113,9 +113,10 @@ if(Neko_Benchmark)
 endif()
 
 if(Neko_Fmod)
+
 set(Fmod_VERSION 2.00.08)
-set(Fmod_DIR $(EXTERNAL_DIR, Fmod(Fmod_VERSION)/)
-add_subdirectory("fmod/")
+set(Fmod_DIR $(EXTERNAL_DIR, Fmod(Fmod_VERSION)/))
+add_subdirectory("externals/Fmod-2.00.08/")
 
 endif()
 
