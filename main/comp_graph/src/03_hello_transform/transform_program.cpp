@@ -62,20 +62,20 @@ void HelloTransformProgram::Update(seconds dt)
 {
     std::lock_guard<std::mutex> lock(updateMutex_);
     transform_ = Mat4f::Identity;
-    transform_ = Mat4f::Scale(transform_, scale_);
+    transform_.Scale(scale_);
     switch(shape_)
     {
         case ShapeType::PLANE:
-            transform_ = Mat4f::Rotate(transform_, degree_t(angle_), Vec3f(0.0f, 0.0f, 1.0f));
+            transform_.Rotate(degree_t(angle_), Vec3f(0.0f, 0.0f, 1.0f));
             break;
         case ShapeType::CUBE:
-            transform_ = Mat4f::Rotate(transform_, eulerAngle_);
+            transform_.Rotate(eulerAngle_);
             break;
         default:
             break;
     }
 
-    transform_ = Mat4f::Translate(transform_, position_);
+    transform_.Translate(position_);
 }
 
 void HelloTransformProgram::DrawImGui()

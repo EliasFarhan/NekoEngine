@@ -537,6 +537,8 @@ using Vec3u = Vec3<unsigned int>;
 using EulerAngles = Vec3<degree_t>;
 using RadianAngles = Vec3<radian_t>;
 
+// TODO: Oleg@Simon: Matrices use Capital letters for static fields, don't you want to change that? (ex: Vec3f::Zero? )
+
 template<typename T>
 inline Vec3<T> const Vec3<T>::zero = Vec3<T>(0, 0, 0);
 template<typename T>

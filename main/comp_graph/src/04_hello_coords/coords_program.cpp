@@ -18,7 +18,7 @@ void HelloCoordsProgram::Init()
 
     // note that we're translating the scene in the reverse direction of where we want to move
     view = Mat4f::Identity;
-    view = Mat4f::Translate(view, Vec3f(0.0f, 0.0f, -3.0f));
+    view.Translate(Vec3f(0.0f, 0.0f, -3.0f));
 
 
     glEnable(GL_DEPTH_TEST);
@@ -54,10 +54,10 @@ void HelloCoordsProgram::Render()
     for (auto cubePosition : cubePositions)
     {
         Mat4f model = Mat4f::Identity; //model transform matrix
-        model = Mat4f::Rotate(model, degree_t(timeSinceInit_.count()*45.0f), Vec3f(1.0f, 0.0f, 0.0f));
-        model = Mat4f::Rotate(model, degree_t(timeSinceInit_.count()*45.0f), Vec3f(0.0f, 1.0f, 0.0f));
+        model.Rotate(degree_t(timeSinceInit_.count()*45.0f), Vec3f(1.0f, 0.0f, 0.0f));
+        model.Rotate(degree_t(timeSinceInit_.count()*45.0f), Vec3f(0.0f, 1.0f, 0.0f));
 
-        model = Mat4f::Translate(model, cubePosition);
+        model.Translate(cubePosition);
         shader_.SetMat4("model", model);
         cube_.Draw();
     }

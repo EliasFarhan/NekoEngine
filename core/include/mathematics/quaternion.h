@@ -133,6 +133,7 @@ struct Quaternion
 		);
 	}
 
+	// TODO: Oleg@Seb: Tu veux pas juste faire "static Quaternion(0,0,0,1);" ?
 	static Quaternion Identity()
 	{
 		return Quaternion(0, 0, 0, 1);

@@ -23,11 +23,12 @@
  SOFTWARE.
  */
 
-#include "mathematics/vector.h"
-#include "mathematics/matrix.h"
-#include "const.h"
-#include "angle.h"
-#include "mathematics/quaternion.h"
+#include <mathematics/vector.h>
+#include <mathematics/matrix.h>
+#include <mathematics/const.h>
+#include <mathematics/angle.h>
+#include <mathematics/quaternion.h>
+#include <engine/assert.h>
 
 namespace neko
 {
@@ -61,37 +62,8 @@ inline Mat4f const Transform3d::ScalingMatrixFrom(const Vec3f scale)
 template<>
 inline Mat4f const Transform3d::RotationMatrixFrom(const degree_t angle, const Vec3f axis)
 {
-    const Vec3f normalizedAxis = axis.Normalized();
-
-    const float x = axis[0];
-    const float y = axis[1];
-    const float z = axis[2];
-    const float c = Cos(angle);
-    const float s = Sin(angle);
-    const float t = 1.0f - c;
-    const float txx = t * x * x;
-    const float tyy = t * y * y;
-    const float tzz = t * z * z;
-    const float txy = t * x * y;
-    const float txz = t * x * z;
-    const float tyz = t * y * z;
-    const float sx = s * x;
-    const float sy = s * y;
-    const float sz = s * z;
-
-    return Mat4f(
-            std::array<Vec4f, 4>
-                    {
-                            Vec4f(txx + c, txy - sz, txz + sy, 0),
-                            Vec4f(txy + sz, tyy + c, tyz - sx, 0),
-                            Vec4f(txz - sy, tyz + sx, tzz + c, 0),
-                            Vec4f(0, 0, 0, 1)});
-}
-
-template<>
-inline Mat4f const Transform3d::RotationMatrixFrom(const radian_t angle, const Vec3f axis)
-{
-    const Vec3f normalizedAxis = axis.Normalized();
+    neko_assert(axis.Magnitude() == 1.0f,
+                "neko::Transform3d::RotationMatrixFrom(degree_t angle, Vec3f axis): Axis passed is not normalized.")
 
     const float x = axis[0];
     const float y = axis[1];
@@ -157,12 +129,6 @@ inline Mat4<float> const Transform3d::RotationMatrixFrom(const EulerAngles cardi
 }
 
 template<>
-inline Mat4<float> const Transform3d::RotationMatrixFrom(const RadianAngles cardinalRotation)
-{
-    return RotationMatrixFrom(cardinalRotation);
-}
-
-template<>
 inline Mat4f const Transform3d::RotationMatrixFrom(const Quaternion& quaternion)
 {
     const float x = quaternion.x;
@@ -190,54 +156,47 @@ inline Mat4f const Transform3d::RotationMatrixFrom(const Quaternion& quaternion)
 }
 
 
-
 template<>
-inline Transform3d Transform3d::Translate(const Transform3d& transform, const Vec3f translation)
+inline void Transform3d::Translate(const Vec3f translation)
 {
-    return TranslationMatrixFrom(translation) * transform;
+    *this = TranslationMatrixFrom(translation) * (*this);
 }
 
 template<>
-inline Transform3d Transform3d::Scale(const Transform3d& transform, const Vec3f scale)
+inline void Transform3d::Scale(const Vec3f scale)
 {
-    return ScalingMatrixFrom(scale) * transform;
+    *this = ScalingMatrixFrom(scale) * (*this);
 }
 
 template<>
-inline Transform3d Transform3d::Rotate(const Transform3d& transform, const degree_t angle, const Vec3f axis)
+inline void Transform3d::Rotate(const degree_t angle, const Vec3f axis)
 {
-    return RotationMatrixFrom(angle, axis) * transform;
+    *this = RotationMatrixFrom(angle, axis) * (*this);
 }
 
 template<>
-inline Transform3d Transform3d::Rotate(const Transform3d& transform, const radian_t angle, const Vec3f axis)
+inline void Transform3d::Rotate(const Quaternion& quaternion)
 {
-    return RotationMatrixFrom(angle, axis) * transform;
+    *this = RotationMatrixFrom(quaternion) * (*this);
 }
 
 template<>
-inline Transform3d Transform3d::Rotate(const Transform3d& transform, const Quaternion& quaternion)
+inline void Transform3d::Rotate(const EulerAngles eulerAngles)
 {
-    return RotationMatrixFrom(quaternion) * transform;
+    *this = RotationMatrixFrom(eulerAngles) * (*this);
 }
 
 template<>
-inline Transform3d Transform3d::Rotate(const Transform3d& transform, const EulerAngles eulerAngles)
+inline Vec3f Transform3d::Position() const
 {
-    return RotationMatrixFrom(eulerAngles) * transform;
-}
-
-template<>
-inline Vec3f Transform3d::Position(const Mat4<float>& transform)
-{
-    const Vec4f column = transform[3];
+    const Vec4f column = columns_[3];
     return Vec3f(column[0], column[1], column[2]);
 }
 
 template<>
-inline Vec3f Transform3d::Scale(const Mat4<float>& transform)
+inline Vec3f Transform3d::Scale() const
 {
-    const Transform3d transposed = transform.Transpose();
+    const Transform3d transposed = Transpose();
     return Vec3f(
             transposed[0].Magnitude(),
             transposed[1].Magnitude(),
@@ -245,19 +204,16 @@ inline Vec3f Transform3d::Scale(const Mat4<float>& transform)
 }
 
 template<>
-inline Mat4<float> const Transform3d::RotationMatrix(const Mat4<float>& transform)
+inline Mat4<float> const Transform3d::RotationMatrix() const
 {
-    // TODO: This doesn't work.
-    const Vec3f scale = Scale(transform);
-    const Transform3d transposed = transform.Transpose();
-    return Transform3d(
+    const Vec3f scale = Scale();
+    return Mat4f(
             std::array<Vec4f, 4>
                     {
-                            Vec4f(transposed[0][0] / scale.x, transposed[0][1] / scale.y, transposed[0][2] / scale.z, 0),
-                            Vec4f(transposed[1][0] / scale.x, transposed[1][1] / scale.y, transposed[1][2] / scale.y, 0),
-                            Vec4f(transposed[2][0] / scale.x, transposed[2][1] / scale.y, transposed[2][2] / scale.y, 0),
-                            Vec4f(0, 0, 0, 1)}
-            );
+                            Vec4f(columns_[0][0] / scale[0], columns_[0][1] / scale[0], columns_[0][2] / scale[0], 0),
+                            Vec4f(columns_[1][0] / scale[1], columns_[1][1] / scale[1], columns_[1][2] / scale[1], 0),
+                            Vec4f(columns_[2][0] / scale[2], columns_[2][1] / scale[2], columns_[2][2] / scale[2], 0),
+                            Vec4f(0, 0, 0, 1)});
 }
 
 }

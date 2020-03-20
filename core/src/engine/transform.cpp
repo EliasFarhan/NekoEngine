@@ -37,9 +37,9 @@ Index Scale2dManager::AddComponent(Entity entity)
 void Transform3dManager::UpdateTransform(Entity entity)
 {
     Mat4f transform = Mat4f::Identity;
-    transform = Mat4f::Translate(transform, position3DManager_.GetComponent(entity));
-    transform = Mat4f::Scale(transform, scale3DManager_.GetComponent(entity));
-    transform = Mat4f::Rotate(transform, rotation3DManager_.GetComponent(entity));
+    transform.Translate(position3DManager_.GetComponent(entity));
+    transform.Scale(scale3DManager_.GetComponent(entity));
+    transform.Rotate(rotation3DManager_.GetComponent(entity));
 
 }
 }

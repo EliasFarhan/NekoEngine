@@ -168,37 +168,37 @@ public:
         return result;
     };
 
-    static Mat4<float> Translate(const Mat4<float>& transform, const Vec3f pos);
+    void Translate(Vec3f pos);
 
-    static Mat4<float> Scale(const Mat4<float>& transform, const Vec3f scale);
+    void Scale(Vec3f scale);
 
-    static Mat4<float> Rotate(const Mat4<float>& transform, const degree_t angle, const Vec3f axis);
+    void Rotate(degree_t angle, Vec3f axis);
 
-    static Mat4<float> Rotate(const Mat4<float>& transform, const radian_t angle, const Vec3f axis);
+    void Rotate(radian_t angle, Vec3f axis);
 
-    static Mat4<float> Rotate(const Mat4<float>& transform, const Quaternion& quaternion);
+    void Rotate(const Quaternion& quaternion);
 
-    static Mat4<float> Rotate(const Mat4<float>& transform, const EulerAngles eulerAngles);
+    void Rotate(EulerAngles eulerAngles);
 
-    static Mat4<float> const TranslationMatrixFrom(const Vec3f translation);
+    static Mat4<float> const TranslationMatrixFrom(Vec3f translation);
 
-    static Mat4<float> const ScalingMatrixFrom(const Vec3f scale);
+    static Mat4<float> const ScalingMatrixFrom(Vec3f scale);
 
-    static Mat4<float> const RotationMatrixFrom(const degree_t angle, const Vec3f axis);
+    static Mat4<float> const RotationMatrixFrom(degree_t angle, Vec3f axis);
 
-    static Mat4<float> const RotationMatrixFrom(const radian_t angle, const Vec3f axis);
+    static Mat4<float> const RotationMatrixFrom(radian_t angle, Vec3f axis);
 
-    static Mat4<float> const RotationMatrixFrom(const EulerAngles cardinalRotation);
+    static Mat4<float> const RotationMatrixFrom(EulerAngles cardinalRotation);
 
-    static Mat4<float> const RotationMatrixFrom(const RadianAngles cardinalRotation);
+    static Mat4<float> const RotationMatrixFrom(RadianAngles cardinalRotation);
 
     static Mat4<float> const RotationMatrixFrom(const Quaternion& quaternion);
 
-    static Vec3f Position(const Mat4<float>& transform);
+    Vec3f Position() const;
 
-    static Vec3f Scale(const Mat4<float>& transform);
+    Vec3f Scale() const;
 
-    static Mat4<float> const RotationMatrix(const Mat4<float>& transform);
+    Mat4<float> const RotationMatrix() const;
 
     static Mat4<T> Perspective(radian_t fovy, float aspect, float near, float far);
 
