@@ -204,7 +204,7 @@ inline Vec3f Transform3d::Scale() const
 }
 
 template<>
-inline Mat4<float> const Transform3d::RotationMatrix() const
+inline Mat4<float> Transform3d::RotationMatrix() const
 {
     const Vec3f scale = Scale();
     return Mat4f(

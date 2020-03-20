@@ -66,7 +66,7 @@ TEST (Transforms, RotationMatrixFromAngleAxis)
 {
     const degree_t degree(180);
     const radian_t radian(degree); // PI
-    const Vec3f axis = Vec3f::one.Normalized(); // [1/3 ; 1/3; 1/3]
+    const Vec3f axis = Vec3f::one.Normalized(); // [1/3 ; 1/3; 1/3] WRONG!!!
 
     const float a = 2.0f / 9.0f;
     const float b = a - 1.0f;
@@ -92,7 +92,7 @@ TEST (Transforms, RotationMatrixFromEulerAngles)
     const radian_t radian(degree); // PI
 
     const auto matDegree = Transform3d::RotationMatrixFrom(EulerAngles(degree, degree, degree));
-    const auto matRadian = Transform3d::RotationMatrixFrom(RadianAngles (radian, radian, radian));
+    const auto matRadian = Transform3d::RotationMatrixFrom(EulerAngles (RadianAngles (radian, radian, radian)));
 
     // Starting mat == rotated mat for rotations of PI on all axis.
     EXPECT_LT(MatrixDifference(Transform3d::Identity, matDegree), TOLERATED_MATRIX_DIFFERENCE);
@@ -306,16 +306,16 @@ TEST (Transforms, RotateThenTranslate)
     const Vec3f axis = Vec3f::one.Normalized();
     const Vec3f expectedTranslation(2,3,5);
 
+    const float a = 2.0f / 9.0f;
+    const float b = a - 1.0f;
     const Transform3d expected(
             std::array<Vec4f, 4>
                     {
-                            Vec4f(1, 0, 0, 0),
-                            Vec4f(0, 1, 0, 0),
-                            Vec4f(0, 0, 1, 0),
-                            Vec4f(0, 0, 0, 1)});
+                            Vec4f(b, a, a, 0),
+                            Vec4f(a, b, a, 0),
+                            Vec4f(a, a, b, 0),
+                            Vec4f(a, b, -25.0f / 9.0f, 1)});
 
-    const float a = 2.0f / 9.0f;
-    const float b = a - 1.0f;
     const Transform3d expectedRotationMat(
             std::array<Vec4f, 4>
                     {
@@ -335,11 +335,22 @@ TEST (Transforms, RotateThenTranslate)
     EXPECT_LT(VectorDifference(expectedTranslation, positionDegree), TOLERATED_VECTOR_DIFFERENCE);
     EXPECT_LT(VectorDifference(expectedTranslation, positionRadian), TOLERATED_VECTOR_DIFFERENCE);
     EXPECT_EQ(VectorDifference(expectedTranslation, positionDegree), VectorDifference(expectedTranslation, positionRadian));
+
+    const Transform3d rotationMatDegree = matDegree.RotationMatrix();
+    const Transform3d rotationMatRadian = matRadian.RotationMatrix();
+
+    EXPECT_LT(MatrixDifference(expectedRotationMat, rotationMatDegree), TOLERATED_MATRIX_DIFFERENCE);
+    EXPECT_LT(MatrixDifference(expectedRotationMat, rotationMatRadian), TOLERATED_MATRIX_DIFFERENCE);
+    EXPECT_EQ(MatrixDifference(expectedRotationMat, rotationMatDegree), MatrixDifference(expectedRotationMat, rotationMatRadian));
+
+    EXPECT_LT(MatrixDifference(expected, matDegree), TOLERATED_MATRIX_DIFFERENCE);
+    EXPECT_LT(MatrixDifference(expected, matRadian), TOLERATED_MATRIX_DIFFERENCE);
+    EXPECT_EQ(MatrixDifference(expected, matDegree), MatrixDifference(expected, matRadian));
 }
 
 TEST (Transforms, ScaleThenRotateThenTranslate)
 {
-
+    // TODO
 }
 
 }// !neko

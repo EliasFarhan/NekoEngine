@@ -174,8 +174,6 @@ public:
 
     void Rotate(degree_t angle, Vec3f axis);
 
-    void Rotate(radian_t angle, Vec3f axis);
-
     void Rotate(const Quaternion& quaternion);
 
     void Rotate(EulerAngles eulerAngles);
@@ -186,11 +184,7 @@ public:
 
     static Mat4<float> const RotationMatrixFrom(degree_t angle, Vec3f axis);
 
-    static Mat4<float> const RotationMatrixFrom(radian_t angle, Vec3f axis);
-
     static Mat4<float> const RotationMatrixFrom(EulerAngles cardinalRotation);
-
-    static Mat4<float> const RotationMatrixFrom(RadianAngles cardinalRotation);
 
     static Mat4<float> const RotationMatrixFrom(const Quaternion& quaternion);
 
@@ -198,7 +192,7 @@ public:
 
     Vec3f Scale() const;
 
-    Mat4<float> const RotationMatrix() const;
+    Mat4<float> RotationMatrix() const;
 
     static Mat4<T> Perspective(radian_t fovy, float aspect, float near, float far);
 
