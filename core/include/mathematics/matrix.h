@@ -188,10 +188,13 @@ public:
 
     static Mat4<float> const RotationMatrixFrom(const Quaternion& quaternion);
 
+    // TODO: Works only with simple matrices! Not ones that combine multiple transformations!
     Vec3f Position() const;
 
+    // TODO: Works only with simple matrices! Not ones that combine multiple transformations!
     Vec3f Scale() const;
 
+    // TODO: Works only with simple matrices! Not ones that combine multiple transformations!
     Mat4<float> RotationMatrix() const;
 
     static Mat4<T> Perspective(radian_t fovy, float aspect, float near, float far);

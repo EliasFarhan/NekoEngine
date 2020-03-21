@@ -62,7 +62,7 @@ inline Mat4f const Transform3d::ScalingMatrixFrom(const Vec3f scale)
 template<>
 inline Mat4f const Transform3d::RotationMatrixFrom(const degree_t angle, const Vec3f axis)
 {
-    neko_assert(axis.Magnitude() == 1.0f,
+    neko_assert(axis.Magnitude() - 1.0f < 0.0001f,
                 "neko::Transform3d::RotationMatrixFrom(degree_t angle, Vec3f axis): Axis passed is not normalized.")
 
     const float x = axis[0];
@@ -113,9 +113,9 @@ inline Mat4<float> const Transform3d::RotationMatrixFrom(const EulerAngles cardi
     const Mat4f matY = Mat4f(
             std::array<Vec4f, 4>
                     {
-                            Vec4f(cosY, 0, 0, -sinY),
+                            Vec4f(cosY, 0, -sinY, 0),
                             Vec4f(0, 1, 0, 0),
-                            Vec4f(sinY, 0, 1, cosY),
+                            Vec4f(sinY, 0, cosY, 0),
                             Vec4f(0, 0, 0, 1)});
     const Mat4f matZ = Mat4f(
             std::array<Vec4f, 4>
@@ -186,6 +186,7 @@ inline void Transform3d::Rotate(const EulerAngles eulerAngles)
     *this = RotationMatrixFrom(eulerAngles) * (*this);
 }
 
+// TODO: Works only with simple matrices! Not ones that combine multiple transformations!
 template<>
 inline Vec3f Transform3d::Position() const
 {
@@ -193,6 +194,7 @@ inline Vec3f Transform3d::Position() const
     return Vec3f(column[0], column[1], column[2]);
 }
 
+// TODO: Works only with simple matrices! Not ones that combine multiple transformations!
 template<>
 inline Vec3f Transform3d::Scale() const
 {
@@ -203,6 +205,7 @@ inline Vec3f Transform3d::Scale() const
             transposed[2].Magnitude());
 }
 
+// TODO: Works only with simple matrices! Not ones that combine multiple transformations!
 template<>
 inline Mat4<float> Transform3d::RotationMatrix() const
 {

@@ -9,9 +9,9 @@ using namespace neko;
 const long from = 2;
 const long to = 1024;
 
-const Transform3d& Translate(const Transform3d& mat, const Vec3f translation)
+void Translate(Transform3d& mat, const Vec3f translation)
 {
-    return Transform3d::Translate(mat, translation);
+    mat.Translate(translation);
 }
 
 static void BM_Translate(benchmark::State& s)
@@ -37,9 +37,9 @@ static void BM_Translate(benchmark::State& s)
 
 BENCHMARK(BM_Translate)->Range(from, to);
 
-const Transform3d& Scale(const Transform3d& mat, const Vec3f scale)
+void Scale(Transform3d& mat, const Vec3f scale)
 {
-    return Transform3d::Scale(mat, scale);
+    mat.Scale(scale);
 }
 
 static void BM_Scale(benchmark::State& s)
@@ -65,9 +65,9 @@ static void BM_Scale(benchmark::State& s)
 
 BENCHMARK(BM_Scale)->Range(from, to);
 
-const Transform3d& RotateAroundAxisDegrees(const Transform3d& mat, const degree_t angle, const Vec3f axis)
+void RotateAroundAxisDegrees(Transform3d& mat, const degree_t angle, const Vec3f axis)
 {
-    return Transform3d::Rotate(mat, angle, axis);
+    mat.Rotate(angle, axis);
 }
 
 static void BM_RotateAroundAxisDegrees(benchmark::State& s)
@@ -79,7 +79,7 @@ static void BM_RotateAroundAxisDegrees(benchmark::State& s)
 
     for (int i = 0; i < arraySize; ++i)
     {
-        axes[i] = Vec3f(rand(), rand(), rand());
+        axes[i] = Vec3f(rand(), rand(), rand()).Normalized();
         transforms[i] = Transform3d::Identity;
         angles[i] = degree_t(rand());
     }
@@ -95,9 +95,9 @@ static void BM_RotateAroundAxisDegrees(benchmark::State& s)
 
 BENCHMARK(BM_RotateAroundAxisDegrees)->Range(from, to);
 
-const Transform3d& RotateAroundAxisRadians(const Transform3d& mat, const radian_t angle, const Vec3f axis)
+void RotateAroundAxisRadians(Transform3d& mat, const radian_t angle, const Vec3f axis)
 {
-    return Transform3d::Rotate(mat, angle, axis);
+    mat.Rotate(angle, axis);
 }
 
 static void BM_RotateAroundAxisRadians(benchmark::State& s)
@@ -109,7 +109,7 @@ static void BM_RotateAroundAxisRadians(benchmark::State& s)
 
     for (int i = 0; i < arraySize; ++i)
     {
-        axes[i] = Vec3f(rand(), rand(), rand());
+        axes[i] = Vec3f(rand(), rand(), rand()).Normalized();
         transforms[i] = Transform3d::Identity;
         angles[i] = radian_t(rand());
     }
@@ -125,9 +125,9 @@ static void BM_RotateAroundAxisRadians(benchmark::State& s)
 
 BENCHMARK(BM_RotateAroundAxisRadians)->Range(from, to);
 
-const Transform3d& RotateUsingCardinals(const Transform3d& mat, const EulerAngles angles)
+void RotateUsingCardinals(Transform3d& mat, const EulerAngles angles)
 {
-    return Transform3d::Rotate(mat, angles);
+    mat.Rotate(angles);
 }
 
 static void BM_RotateUsingCardinals(benchmark::State& s)
@@ -153,9 +153,9 @@ static void BM_RotateUsingCardinals(benchmark::State& s)
 
 BENCHMARK(BM_RotateUsingCardinals)->Range(from, to);
 
-const Transform3d& RotateUsingQuaternion(const Transform3d& mat, const Quaternion q)
+void RotateUsingQuaternion(Transform3d& mat, const Quaternion q)
 {
-    return Transform3d::Rotate(mat, q);
+    mat.Rotate(q);
 }
 
 static void BM_RotateUsingQuaternion(benchmark::State& s)
