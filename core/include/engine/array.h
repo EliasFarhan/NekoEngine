@@ -41,7 +41,7 @@ public:
 	IntArray(size_t length) :
 		length_{ length }
 	{
-		neko_assert(length_ >= 0);
+		neko_assert(length_ >= 0, "");
 
 		if (length_ > 0)
 			data_ = new int[length] {};
@@ -113,7 +113,7 @@ public:
 		// in the smaller of the two arrays.
 		if (length_ > 0)
 		{
-			int elementsToCopy{ (newLength > length_) ? length_ : newLength };
+			int elementsToCopy{ (newLength > (int)length_) ? (int)length_ : newLength };
 
 			// Now copy the elements one by one
 			for (int index{ 0 }; index < elementsToCopy; ++index)
@@ -135,7 +135,7 @@ public:
 template<typename T>
 class DynArray
 {
-	Allocator& allocator_; //Please don't use Linear or Stack Allocator
+	FreeListAllocator& allocator_; //Please don't use Linear or Stack Allocator
 	T* buffer_ = nullptr;
 
 	// capacity is the total storage capacity
@@ -145,22 +145,59 @@ class DynArray
 	size_t size = 0;
 
 public:
+    typedef T* iterator;
+    typedef const T* const_iterator;
 
-	DynArray(Allocator& allocator) : allocator_(allocator)
+	DynArray(FreeListAllocator& allocator) : allocator_(allocator)
 	{
 		capacity = 0;
 		size = 0;
 	}
+	~DynArray(){
+	    allocator_.Deallocate(buffer_);
+	}
+
+    iterator begin(){
+	    return (std::uint64_t)buffer_;
+	}
+
+    iterator end(){
+        return buffer_ + static_cast<T*>(size);
+    }
 
 	T& operator[](size_t index)
 	{
 		neko_assert(index >= 0 && index < size, "[Error] Out of scope access");
-		return m_data[index];
+		return buffer_[index];
 	}
 	void Push(T elem)
 	{
-		if (size == capacity) {
-			T* temp = allocator_.Allocate(2*capacity, alignof(T));
+	    if (buffer_ == nullptr){
+	        capacity = 2;
+	        buffer_ = static_cast<T*>(allocator_.Allocate(capacity, alignof(T)));
+	        buffer_[0] = elem;
+	        size++;
+	    }else{
+	        if (size + 1 > capacity){
+                T temp[size];
+                memcpy(temp, buffer_, size);
+
+                allocator_.Deallocate(buffer_);
+                capacity *= 2;
+                allocator_.Allocate(capacity, alignof(T));
+                for (int i = 0; i < size; ++i)
+                {
+                    buffer_[i] = temp[i];
+                }
+                buffer_[size++] = elem;
+            }else{
+	            buffer_[size++] = elem;
+	        }
+
+	    }
+
+		/*if (size == capacity) {
+			T* temp = static_cast<T*>(allocator_.Allocate(2*capacity, alignof(T)));
 
 			for (size_t i = 0; i < size; i++) {
 				temp[i] = buffer_[i];
@@ -171,7 +208,7 @@ public:
 		}
 
 		buffer_[size] = elem;
-		size++;
+		size++;*/
 	}
 
 	void Insert(T data, size_t index)
