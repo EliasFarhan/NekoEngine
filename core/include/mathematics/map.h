@@ -14,6 +14,26 @@ class FixedMap
     using Pair = std::pair<Hash, Value>;
 
 public:
+    class iterator
+    {
+    public:
+        typedef iterator self_type;
+        typedef Pair value_type;
+        typedef Pair& reference;
+        typedef Pair* pointer;
+        typedef std::forward_iterator_tag iterator_category;
+        typedef int difference_type;
+        iterator(pointer ptr) : ptr_(ptr) { }
+        self_type operator++() { self_type i = *this; ptr_++; return i; }
+        self_type operator++(int junk) { ptr_++; return *this; }
+        reference operator*() { return *ptr_; }
+        pointer operator->() { return ptr_; }
+        bool operator==(const self_type& rhs) { return ptr_ == rhs.ptr_; }
+        bool operator!=(const self_type& rhs) { return ptr_ != rhs.ptr_; }
+    private:
+        pointer ptr_;
+    };
+
     FixedMap(Allocator& allocator) : allocator_(allocator)
     {
         allocator_.Allocate(sizeof(Pair) * Capacity, alignof(Pair));
@@ -27,34 +47,23 @@ public:
     void Append(const std::pair<Key, Value> pair)
     {
         neko_assert(size_ < Capacity, "FixedMap is overcapacity");
-        const auto it = std::find_if(pairs_.begin(), pairs_.end(), [](const Pair* p) { return p == nullptr; });
-        neko_assert(it != pairs_.end(), "neko::FixedMap<Key,Value,Size>::Append(Pair&): No more place in map.");
+        const auto it = std::find_if(begin(), end(), [](const Pair* p) { return p == nullptr; });
+        neko_assert(it != end(), "neko::FixedMap<Key,Value,Size>::Append(Pair&): No more place in map.");
         (*it) = static_cast<Pair*>(allocator_.Allocate(sizeof(Pair), alignof(Pair)));
         *(*it) = Pair{
                 xxh::xxhash<64>(&(pair.first), 1),
                 pair.second};
     }
 
-    typename FixedMap::iterator begin()
+    iterator begin()
 	{
-        return pairs_;
+        return iterator{pairs_};
     }
 
 	//End size not capacity
-    typename FixedMap::iterator end()
+    iterator end()
 	{
-        return begin() + size_;
-    }
-
-    typename FixedMap::const_iterator cbegin() const
-	{
-        return pairs_;
-    }
-	
-    //End size not capacity
-    typename FixedMap::const_iterator cend() const
-	{
-        return cbegin() + size_;
+        return iterator{pairs_ + (void*)size_};
     }
 
 private:
@@ -153,11 +162,6 @@ public:
 
     ~SmallMap() = default;
 
-    [[nodiscard]] size_t Capacity() const
-    {
-        return pairs_.size();
-    }
-
     Value& operator[](Key key)
     {
         const Hash hash = xxh::xxhash<64>(&key, sizeof(Key));
@@ -171,7 +175,7 @@ public:
     bool Contains(Key key) const
     {
         const Hash hash = xxh::xxhash<64>(&key, sizeof(Key));
-        return std::find_if(begin(), end(), [hash](Pair p) { return p.first == hash; }) != pairs_.end();
+        return std::find_if(pairs_.begin(), pairs_.end(), [hash](Pair p) { return p.first == hash; }) != pairs_.end();
     }
 
     void Append(Key key, Value value)
@@ -189,38 +193,18 @@ public:
     {
         neko_assert(Contains(key), "neko::SmallFixedMap<Key, Value>::Remove(const Key): Key doesn't exist");
         const Hash hash = xxh::xxhash<64>(&key, sizeof(Key));
-        auto it = std::find_if(begin(), end(), [hash](Pair p) { return p.first == hash; });
+        auto it = std::find_if(pairs_.begin(), pairs_.end(), [hash](Pair p) { return p.first == hash; });
         it->first = 0;
         it->second = 0;
     }
 
     void Clear()
     {
-        std::for_each(begin(), end(), [](Pair& p) {
+        std::for_each(pairs_.begin(), pairs_.end(), [](Pair& p) {
             p.first = 0;
             p.second = 0;
             return;
         });
-    }
-
-    typename SmallMap::iterator begin()
-    {
-        return pairs_.begin();
-    }
-
-    typename SmallMap::iterator end()
-    {
-        return pairs_.begin()+size_;
-    }
-
-    typename SmallMap::const_iterator cbegin() const
-    {
-        return pairs_.cbegin();
-    }
-
-    typename SmallMap::const_iterator cend() const
-    {
-        return pairs_.cbegin()+size_;
     }
 
 private:
@@ -276,26 +260,6 @@ public:
     void Clear()
     {
         pairs_.clear();
-    }
-
-    typename DynamicMap::iterator begin()
-    {
-        return pairs_.begin();
-    }
-
-    typename std::vector<Pair>::iterator end()
-    {
-        return pairs_.end();
-    }
-
-    typename std::vector<Pair>::const_iterator cbegin() const
-    {
-        return pairs_.cbegin();
-    }
-
-    typename std::vector<Pair>::const_iterator cend() const
-    {
-        return pairs_.cend();
     }
 
 private:
