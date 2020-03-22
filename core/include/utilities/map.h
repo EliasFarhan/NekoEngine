@@ -125,7 +125,7 @@ public:
 
         neko_assert(it != end(), "neko::FixedMap<Key,Value,Capacity>::operator[](Key): Key not found.");
 
-        return *it;
+        return it->second;
     }
 
     void insert(const Pair& pair)

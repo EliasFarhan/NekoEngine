@@ -1,9 +1,22 @@
 #include <gtest/gtest.h>
 #include <engine/custom_allocator.h>
 #include <utilities/map.h>
+#include <vector>
 
 namespace neko
 {
+
+using Key = char;
+using Value = char;
+
+static Key NextKey(){
+    static Key k = 0;
+    return k++;
+}
+static Value NextValue(){
+    static Value v = 0;
+    return v++;
+}
 
 class MallocRAII
 {
@@ -29,8 +42,6 @@ TEST(Map, FixedMap_InstanciationAndDestruction)
 {
     try // TRY_DESTRUCTOR
     {
-        using Key = char;
-        using Value = char;
         const size_t ALLOCATOR_HEADER_SIZE = 16; // bytes
         const size_t ALIGNMENT_PADDING = 1; // byte
         const size_t PAIRS_NUMBER = 64; // pairs
@@ -57,8 +68,6 @@ TEST(Map, FixedMap_InstanciationAndDestruction)
 
 TEST(Map, FixedMap_Insertion)
 {
-    using Key = char;
-    using Value = char;
     const size_t ALLOCATOR_HEADER_SIZE = 16; // bytes
     const size_t ALIGNMENT_PADDING = 1; // byte
     const size_t PAIRS_NUMBER = 64; // pairs
@@ -74,7 +83,7 @@ TEST(Map, FixedMap_Insertion)
     {
         for (size_t i = 0; i < PAIRS_NUMBER; i++)
         {
-            map.insert({'a', 'b'});
+            map.insert({NextKey(), NextValue()});
         }
     }
     catch (const std::exception& e)
@@ -85,8 +94,6 @@ TEST(Map, FixedMap_Insertion)
 
 TEST(Map, FixedMap_Access)
 {
-    using Key = char;
-    using Value = char;
     const size_t ALLOCATOR_HEADER_SIZE = 16; // bytes
     const size_t ALIGNMENT_PADDING = 1; // byte
     const size_t PAIRS_NUMBER = 64; // pairs
@@ -97,16 +104,23 @@ TEST(Map, FixedMap_Access)
     FreeListAllocator allocator(TOTAL_BYTES, mem.data());
 
     FixedMap<Key, Value, PAIRS_NUMBER> map(allocator);
+    std::vector<Key> keys;
+    std::vector<Value> values;
     for (size_t i = 0; i < PAIRS_NUMBER; i++)
     {
-        map.insert({'a', 'b'});
+        keys.push_back(NextKey());
+        values.push_back(NextValue());
+        map.insert({keys.back(), values.back()});
     }
 
     try // TRY_ACCESS
     {
         for (size_t i = 0; i < PAIRS_NUMBER; i++)
         {
-            // const char value = map[];
+            EXPECT_EQ(values[i], map[keys[i]]);
+            const Value nextValue = NextValue();
+            map[keys[i]] = nextValue;
+            EXPECT_EQ(nextValue, map[keys[i]]);
         }
     }
     catch (const std::exception& e)
