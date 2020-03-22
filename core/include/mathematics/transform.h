@@ -190,6 +190,7 @@ inline void Transform3d::Rotate(const EulerAngles eulerAngles)
 template<>
 inline Vec3f Transform3d::Position() const
 {
+    // Possible solution:: https://www.gamedev.net/forums/topic/467665-decomposing-rotationtranslationscale-from-matrix/#entry4076502
     const Vec4f column = columns_[3];
     return Vec3f(column[0], column[1], column[2]);
 }
@@ -198,6 +199,7 @@ inline Vec3f Transform3d::Position() const
 template<>
 inline Vec3f Transform3d::Scale() const
 {
+    // Possible solution:: https://www.gamedev.net/forums/topic/467665-decomposing-rotationtranslationscale-from-matrix/#entry4076502
     const Transform3d transposed = Transpose();
     return Vec3f(
             transposed[0].Magnitude(),
@@ -209,6 +211,7 @@ inline Vec3f Transform3d::Scale() const
 template<>
 inline Mat4<float> Transform3d::RotationMatrix() const
 {
+    // Possible solution:: https://www.gamedev.net/forums/topic/467665-decomposing-rotationtranslationscale-from-matrix/#entry4076502
     const Vec3f scale = Scale();
     return Mat4f(
             std::array<Vec4f, 4>
