@@ -1,5 +1,5 @@
 #include <benchmark/benchmark.h>
-#include <mathematics/map.h> // FixedMap = 24 bytes
+#include <utilities/map.h> // FixedMap = 24 bytes
 #include <map> // 48 bytes
 #include <unordered_map> // 56 bytes
 #include <random_fill.h>
