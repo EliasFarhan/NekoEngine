@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <engine/custom_allocator.h>
-#include <utilities/map.h>
+#include <custom_container/map.h>
 #include <vector>
 #include <numeric>
 
@@ -84,7 +84,7 @@ TEST(Map, FixedMap_Insertion)
     {
         for (size_t i = 0; i < PAIRS_NUMBER; i++)
         {
-            map.insert({NextKey(), NextValue()});
+            map.Insert({NextKey(), NextValue()});
         }
     }
     catch (const std::exception& e)
@@ -111,7 +111,7 @@ TEST(Map, FixedMap_Access)
     {
         keys.push_back(NextKey());
         values.push_back(NextValue());
-        map.insert({keys.back(), values.back()});
+        map.Insert({keys.back(), values.back()});
     }
 
     try // TRY_ACCESS
@@ -145,13 +145,13 @@ TEST(Map, FixedMap_Clear)
     FixedMap<Key, Value, PAIRS_NUMBER> map(allocator);
     for (size_t i = 0; i < PAIRS_NUMBER; i++)
     {
-        map.insert({NextKey(), NextValue()});
+        map.Insert({NextKey(), NextValue()});
     }
 
     try // TRY_CLEAR
     {
-        map.clear();
-        EXPECT_EQ(map.size(), 0);
+        map.Clear();
+        EXPECT_EQ(map.Size(), 0);
     }
     catch (const std::exception& e)
     {
@@ -182,16 +182,16 @@ TEST(Map, FixedMap_Iterators)
     {
         keys.push_back(NextKey());
         values.push_back(NextValue());
-        map.insert({k++,0});
+        map.Insert({k++, 0});
     }
 
     try // TRY_FOREACH
     {
         int i = 0;
-        std::for_each(map.begin(), map.end(), [&i, &keys, &values] (InternalPair& p) { p = InternalPair{keys[i], values[i++]};} );
+        std::for_each(map.Begin(), map.End(), [&i, &keys, &values] (InternalPair& p) { p = InternalPair{keys[i], values[i++]};} );
 
         i = 0;
-        std::for_each(map.begin(), map.end(), [&i](const InternalPair p){ i += p.second; });
+        std::for_each(map.Begin(), map.End(), [&i](const InternalPair p){ i += p.second; });
         const int expectedSum = std::accumulate(values.begin(), values.end(), 0);
 
         EXPECT_EQ(expectedSum, i);

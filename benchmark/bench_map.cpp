@@ -1,5 +1,5 @@
 #include <benchmark/benchmark.h>
-#include <utilities/map.h> // FixedMap = 24 bytes
+#include <custom_container/map.h> // FixedMap = 24 bytes
 #include <map> // 48 bytes
 #include <unordered_map> // 56 bytes
 #include <random_fill.h>
@@ -84,7 +84,7 @@ inline void FixedMap_FillOut(FixedMapType& map)
 {
     for (size_t i = 0; i < SIZE; i++)
     {
-        map.insert({GetNextKey(), GetNextKey()});
+        map.Insert({GetNextKey(), GetNextKey()});
     }
 }
 
@@ -104,7 +104,7 @@ inline void StdUnorderedMap_Clear(StdUnorderedMapType& map)
 
 inline void FixedMap_Clear(FixedMapType& map)
 {
-    return map.clear();
+    return map.Clear();
 }
 
 // ----------------------------------------------------------------
@@ -209,7 +209,7 @@ void BM_FixedMap_Access(benchmark::State& s)
     for (auto& key : keys)
     {
         key = GetNextKey();
-        map.insert({key, GetNextKey()});
+        map.Insert({key, GetNextKey()});
     }
 
     for (auto _ : s)
