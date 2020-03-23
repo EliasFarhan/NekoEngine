@@ -1,8 +1,10 @@
-#include <gtest/gtest.h>
-#include <engine/custom_allocator.h>
-#include <custom_container/map.h>
+#pragma once
 #include <vector>
 #include <numeric>
+#include <gtest/gtest.h>
+
+#include <engine/custom_allocator.h>
+#include <custom_container/map.h>
 
 namespace neko
 {
