@@ -7,10 +7,12 @@
 namespace neko
 {
 
+#define HASH_SIZE 32 // 32 bits hash
+
 template<typename Key, typename Value, const size_t Capacity>
 class FixedMap
 {
-    using Hash = xxh::hash_t<64>;
+    using Hash = xxh::hash_t<HASH_SIZE>;
     using Pair = std::pair<Key, Value>;
     using InternalPair = std::pair<Hash, Value>;
 
@@ -18,43 +20,42 @@ public:
     class Iterator
     {
     public:
-        typedef Iterator self_type;
-        typedef InternalPair value_type;
-        typedef InternalPair& reference;
-        typedef InternalPair* pointer;
-        typedef std::forward_iterator_tag iterator_category;
-        typedef int difference_type;
+        typedef InternalPair value_type; // mandatory for std lib
+        typedef InternalPair& reference; // mandatory for std lib
+        typedef InternalPair* pointer; // mandatory for std lib
+        typedef std::forward_iterator_tag iterator_category; // mandatory for std lib
+        typedef int difference_type; // mandatory for std lib
 
-        Iterator(pointer ptr) : ptr_(ptr)
+        Iterator(InternalPair* ptr) : ptr_(ptr)
         {}
 
-        self_type operator++()
+        Iterator operator++()
         {
-            self_type i = *this;
+            Iterator i = *this;
             ptr_++;
             return i;
         }
 
-        self_type operator++(int junk)
+        Iterator operator++(int junk)
         {
             ptr_++;
             return *this;
         }
 
-        reference operator*()
+        InternalPair& operator*()
         { return *ptr_; }
 
-        pointer operator->()
+        inline InternalPair* operator->()
         { return ptr_; }
 
-        bool operator==(const self_type& rhs)
+        bool operator==(const Iterator& rhs)
         { return ptr_ == rhs.ptr_; }
 
-        bool operator!=(const self_type& rhs)
+        bool operator!=(const Iterator& rhs)
         { return ptr_ != rhs.ptr_; }
 
     private:
-        pointer ptr_;
+        InternalPair* ptr_;
     };
 
     // Constructors / destructors / copy and move.
@@ -82,10 +83,10 @@ public:
 
     FixedMap<Key, Value, Capacity>& operator=(const FixedMap<Key, Value, Capacity>&& other) = delete;
 
-    Value& operator[](const Key key)
+    inline Value& operator[](const Key& key)
     {
-        const auto hash = xxh::xxhash<64>(&key, 1);
-        auto it = std::find_if(Begin(), End(), [&hash](const InternalPair p) { return p.first == hash; });
+        const auto hash = xxh::xxhash<HASH_SIZE>(&key, 1);
+        auto it = std::find_if(Begin(), End(), [hash](const InternalPair p) { return p.first == hash; }); // it cannot be made const because returning non const value
 
         neko_assert(it != End(), "neko::FixedMap<Key,Value,Capacity>::operator[](Key): Key not found.");
 
@@ -97,21 +98,21 @@ public:
         neko_assert(Size() < Capacity, "neko::FixedMap<Key,Value,Capacity>::insert(Pair&): Map is full.");
 
 #ifdef NEKO_ASSERT
-        const auto hash = xxh::xxhash<64>(&pair.first, 1);
+        const auto hash = xxh::xxhash<HASH_SIZE>(&pair.first, 1);
         auto it = std::find_if(Begin(), End(), [&hash](const InternalPair p){return p.first == hash;});
         neko_assert(it == End(), "neko::FixedMap<Key,Value,Capacity>::insert(Pair&): Map already contains key.");
 #endif // !NEKO_ASSERT
 
-        *end_ = InternalPair{xxh::xxhash<64>(&(pair.first), 1), pair.second};
+        *end_ = InternalPair{xxh::xxhash<HASH_SIZE>(&(pair.first), 1), pair.second};
         end_++;
     }
 
-    Iterator Begin() const
+    inline Iterator Begin() const
     {
         return Iterator{begin_};
     }
 
-    Iterator End() const
+    inline Iterator End() const
     {
         return Iterator{end_};
     }
@@ -131,5 +132,7 @@ private:
     InternalPair* end_ = nullptr;
     Allocator& allocator_;
 };
+
+#undef HASH_SIZE
 
 }// !neko

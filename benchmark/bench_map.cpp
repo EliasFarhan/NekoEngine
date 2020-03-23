@@ -5,20 +5,20 @@
 #include <random_fill.h>
 #include <string>
 
-// DISABLE NEKO_ASSERT FOR BENCHMARKING!
-
 namespace neko
 {
+
+#define HASH_SIZE 32
 
 // ----------------------------------------------------------------
 // Compile time definitions.
 // ----------------------------------------------------------------
 
-const size_t SIZE = 512;
-using Key = unsigned long long;
-using Value = unsigned long long;
+const size_t SIZE = 128; // max nbr of distinct chars
+using Key = unsigned char;
+using Value = unsigned char;
 using Pair = std::pair<Key, Value>;
-using InternalPair = std::pair<xxh::hash_t<64>, Value>;
+using InternalPair = std::pair<xxh::hash_t<HASH_SIZE>, Value>;
 using StdMapType = std::map<Key, Value>;
 using StdUnorderedMapType = std::unordered_map<Key, Value>;
 using FixedMapType = FixedMap<Key, Value, SIZE>;
@@ -233,5 +233,7 @@ BENCHMARK(BM_StdUnorderedMap_Access);
 BENCHMARK(BM_FixedMap_Access);
 
 BENCHMARK_MAIN();
+
+#undef HASH_SIZE
 
 }// !neko

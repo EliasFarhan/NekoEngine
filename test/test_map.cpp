@@ -9,6 +9,8 @@
 namespace neko
 {
 
+#define HASH_SIZE 32
+
 using Key = char;
 using Value = char;
 
@@ -48,7 +50,7 @@ TEST(Map, FixedMap_InstanciationAndDestruction)
         const size_t ALLOCATOR_HEADER_SIZE = 16; // bytes
         const size_t ALIGNMENT_PADDING = 1; // byte
         const size_t PAIRS_NUMBER = 64; // pairs
-        const size_t INTERNAL_PAIR_SIZE = sizeof(std::pair<xxh::hash_t<64>, Value>); // 9 bytes used, aligned on 8 bytes => 16 bytes total.
+        const size_t INTERNAL_PAIR_SIZE = sizeof(std::pair<xxh::hash_t<HASH_SIZE>, Value>); // 9 bytes used, aligned on 8 bytes => 16 bytes total. for 64 bits hash
         const size_t TOTAL_BYTES = ALLOCATOR_HEADER_SIZE + (PAIRS_NUMBER * INTERNAL_PAIR_SIZE) + ALIGNMENT_PADDING;
 
         MallocRAII mem(malloc(TOTAL_BYTES));
@@ -74,7 +76,7 @@ TEST(Map, FixedMap_Insertion)
     const size_t ALLOCATOR_HEADER_SIZE = 16; // bytes
     const size_t ALIGNMENT_PADDING = 1; // byte
     const size_t PAIRS_NUMBER = 64; // pairs
-    const size_t INTERNAL_PAIR_SIZE = sizeof(std::pair<xxh::hash_t<64>, Value>); // 9 bytes used, aligned on 8 bytes => 16 bytes total.
+    const size_t INTERNAL_PAIR_SIZE = sizeof(std::pair<xxh::hash_t<HASH_SIZE>, Value>); // 9 bytes used, aligned on 8 bytes => 16 bytes total.
     const size_t TOTAL_BYTES = ALLOCATOR_HEADER_SIZE + (PAIRS_NUMBER * INTERNAL_PAIR_SIZE) + ALIGNMENT_PADDING;
 
     MallocRAII mem(malloc(TOTAL_BYTES));
@@ -100,7 +102,7 @@ TEST(Map, FixedMap_Access)
     const size_t ALLOCATOR_HEADER_SIZE = 16; // bytes
     const size_t ALIGNMENT_PADDING = 1; // byte
     const size_t PAIRS_NUMBER = 64; // pairs
-    const size_t INTERNAL_PAIR_SIZE = sizeof(std::pair<xxh::hash_t<64>, Value>); // 9 bytes used, aligned on 8 bytes => 16 bytes total.
+    const size_t INTERNAL_PAIR_SIZE = sizeof(std::pair<xxh::hash_t<HASH_SIZE>, Value>); // 9 bytes used, aligned on 8 bytes => 16 bytes total.
     const size_t TOTAL_BYTES = ALLOCATOR_HEADER_SIZE + (PAIRS_NUMBER * INTERNAL_PAIR_SIZE) + ALIGNMENT_PADDING;
 
     MallocRAII mem(malloc(TOTAL_BYTES));
@@ -138,7 +140,7 @@ TEST(Map, FixedMap_Clear)
     const size_t ALLOCATOR_HEADER_SIZE = 16; // bytes
     const size_t ALIGNMENT_PADDING = 1; // byte
     const size_t PAIRS_NUMBER = 64; // pairs
-    const size_t INTERNAL_PAIR_SIZE = sizeof(std::pair<xxh::hash_t<64>, Value>); // 9 bytes used, aligned on 8 bytes => 16 bytes total.
+    const size_t INTERNAL_PAIR_SIZE = sizeof(std::pair<xxh::hash_t<HASH_SIZE>, Value>); // 9 bytes used, aligned on 8 bytes => 16 bytes total.
     const size_t TOTAL_BYTES = ALLOCATOR_HEADER_SIZE + (PAIRS_NUMBER * INTERNAL_PAIR_SIZE) + ALIGNMENT_PADDING;
 
     MallocRAII mem(malloc(TOTAL_BYTES));
@@ -168,9 +170,9 @@ TEST(Map, FixedMap_Iterators)
     const size_t ALLOCATOR_HEADER_SIZE = 16; // bytes
     const size_t ALIGNMENT_PADDING = 1; // byte
     const size_t PAIRS_NUMBER = 64; // pairs
-    const size_t INTERNAL_PAIR_SIZE = sizeof(std::pair<xxh::hash_t<64>, Value>); // 9 bytes used, aligned on 8 bytes => 16 bytes total.
+    const size_t INTERNAL_PAIR_SIZE = sizeof(std::pair<xxh::hash_t<HASH_SIZE>, Value>); // 9 bytes used, aligned on 8 bytes => 16 bytes total.
     const size_t TOTAL_BYTES = ALLOCATOR_HEADER_SIZE + (PAIRS_NUMBER * INTERNAL_PAIR_SIZE) + ALIGNMENT_PADDING;
-    using InternalPair = std::pair<xxh::hash_t<64>, Value>;
+    using InternalPair = std::pair<xxh::hash_t<HASH_SIZE>, Value>;
 
     MallocRAII mem(malloc(TOTAL_BYTES));
     FreeListAllocator allocator(TOTAL_BYTES, mem.data());
@@ -204,5 +206,7 @@ TEST(Map, FixedMap_Iterators)
     }// !TRY_FOREACH
 
 }
+
+#undef HASH_SIZE
 
 }// !neko
