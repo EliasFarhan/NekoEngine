@@ -22,7 +22,7 @@ const size_t arraySize = 1024;
 BENCHMARK(BM_Normalized)->Range(fromRange, toRange);
  */
 
-/*static void BM_Quaternion(benchmark::State& state)
+static void BM_Quaternion(benchmark::State& state)
 {
     neko::Quaternion q;
     for (auto s : state)
@@ -64,11 +64,11 @@ static void BM_Normalized(benchmark::State& state)
         }
     }
 }
-BENCHMARK(BM_Normalized)->Range(fromRange, toRange);*/
+BENCHMARK(BM_Normalized)->Range(fromRange, toRange);
 
-/*static void BM_AngleAxis(benchmark::State& state)
+static void BM_AngleAxis(benchmark::State& state)
 {
-    neko::radian_t rad = units::unit_t<rad, RandomFloat(), >;
+    neko::radian_t rad = neko::radian_t(RandomFloat());
 	
     neko::Vec3f vec3;
     RandomFill(vec3);
@@ -76,13 +76,13 @@ BENCHMARK(BM_Normalized)->Range(fromRange, toRange);*/
     {
         for (int i = 0; i < state.range(); i++)
         {
-            benchmark::DoNotOptimize(neko::Quaternion::AngleAxis());
+            benchmark::DoNotOptimize(neko::Quaternion::AngleAxis(rad, vec3));
         }
     }
 }
-BENCHMARK(BM_AngleAxis)->Range(fromRange, toRange);*/
+BENCHMARK(BM_AngleAxis)->Range(fromRange, toRange);
 
-/*static void BM_Conjugate(benchmark::State& state)
+static void BM_Conjugate(benchmark::State& state)
 {
     neko::Vec4f v;
     RandomFill(v);
@@ -140,7 +140,7 @@ static void BM_Magnitude(benchmark::State& state)
         }
     }
 }
-BENCHMARK(BM_Magnitude)->Range(fromRange, toRange);*/
+BENCHMARK(BM_Magnitude)->Range(fromRange, toRange);
 
 static void BM_Angle(benchmark::State& state)
 {
@@ -166,7 +166,7 @@ static void BM_Angle(benchmark::State& state)
 }
 BENCHMARK(BM_Angle)->Range(fromRange, toRange);
 
-/*static void BM_Inverse(benchmark::State& state)
+static void BM_Inverse(benchmark::State& state)
 {
     for (auto s : state)
     {
@@ -183,19 +183,20 @@ BENCHMARK(BM_Inverse)->Range(fromRange, toRange);
 
 static void BM_FromEuler(benchmark::State& state)
 {
+    neko::EulerAngles angle = neko::Vec3<neko::degree_t>(neko::degree_t(RandomFloat()));
     neko::Vec3f v3;
     RandomFill(v3);
     for (auto s : state)
     {
         for (int i = 0; i < state.range(); i++)
         {
-            benchmark::DoNotOptimize(neko::Quaternion::FromEuler());
+            benchmark::DoNotOptimize(neko::Quaternion::FromEuler(angle));
         }
     }
 }
-BENCHMARK(BM_FromEuler)->Range(fromRange, toRange);*/
+BENCHMARK(BM_FromEuler)->Range(fromRange, toRange);
 
-/*static void BM_Identity(benchmark::State& state)
+static void BM_Identity(benchmark::State& state)
 {
     for (auto s : state)
     {
@@ -206,6 +207,6 @@ BENCHMARK(BM_FromEuler)->Range(fromRange, toRange);*/
         }
     }
 }
-BENCHMARK(BM_Identity)->Range(fromRange, toRange);*/
+BENCHMARK(BM_Identity)->Range(fromRange, toRange);
 
 BENCHMARK_MAIN();
