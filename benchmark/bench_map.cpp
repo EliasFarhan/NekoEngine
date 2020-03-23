@@ -18,9 +18,14 @@ const size_t SIZE = 512;
 using Key = unsigned long long;
 using Value = unsigned long long;
 using Pair = std::pair<Key, Value>;
+using InternalPair = std::pair<xxh::hash_t<64>, Value>;
 using StdMapType = std::map<Key, Value>;
 using StdUnorderedMapType = std::unordered_map<Key, Value>;
 using FixedMapType = FixedMap<Key, Value, SIZE>;
+const size_t ALLOCATOR_HEADER_SIZE = 16;
+const size_t ALIGNMENT_PADDING = 1;
+const size_t INTERNAL_PAIR_SIZE = sizeof(InternalPair);
+const size_t HEAP_SIZE = ALLOCATOR_HEADER_SIZE + (SIZE * INTERNAL_PAIR_SIZE) + ALIGNMENT_PADDING;
 
 // ----------------------------------------------------------------
 // Utility functions.
@@ -30,6 +35,12 @@ Key GetNextKey(){
     static Key k = 0;
     return ++k;
 }
+
+// ----------------------------------------------------------------
+// Benchmark wide allocator.
+// ----------------------------------------------------------------
+
+FreeListAllocator allocator(HEAP_SIZE, malloc(HEAP_SIZE));
 
 // ----------------------------------------------------------------
 // Init.
@@ -47,35 +58,7 @@ inline StdUnorderedMapType StdUnorderedMap_Init()
 
 inline FixedMapType FixedMap_Init()
 {
-    return FixedMapType();
-}
-
-// ----------------------------------------------------------------
-// Init benches.
-// ----------------------------------------------------------------
-
-void BM_StdMap_Init(benchmark::State& s)
-{
-    for (auto _ : s)
-    {
-        benchmark::DoNotOptimize(StdMap_Init());
-    }
-}
-
-void BM_StdUnorderedMap_Init(benchmark::State& s)
-{
-    for (auto _ : s)
-    {
-        benchmark::DoNotOptimize(StdUnorderedMap_Init());
-    }
-}
-
-void BM_FixedMap_Init(benchmark::State& s)
-{
-    for (auto _ : s)
-    {
-        benchmark::DoNotOptimize(FixedMap_Init());
-    }
+    return FixedMapType(allocator);
 }
 
 // ----------------------------------------------------------------
@@ -101,38 +84,7 @@ inline void FixedMap_FillOut(FixedMapType& map)
 {
     for (size_t i = 0; i < SIZE; i++)
     {
-        map.Append(GetNextKey(), GetNextKey());
-    }
-}
-
-// ----------------------------------------------------------------
-// Fill out benches.
-// ----------------------------------------------------------------
-
-void BM_StdMap_InitAndFillOut(benchmark::State& s)
-{
-    for (auto _ : s)
-    {
-        StdMapType map = StdMap_Init();
-        StdMap_FillOut(map);
-    }
-}
-
-void BM_StdUnorderedMap_InitAndFillOut(benchmark::State& s)
-{
-    for (auto _ : s)
-    {
-        StdUnorderedMapType map = StdUnorderedMap_Init();
-        StdUnorderedMap_FillOut(map);
-    }
-}
-
-void BM_FixedMap_InitAndFillOut(benchmark::State& s)
-{
-    for (auto _ : s)
-    {
-        FixedMapType map = FixedMap_Init();
-        FixedMap_FillOut(map);
+        map.insert({GetNextKey(), GetNextKey()});
     }
 }
 
@@ -152,14 +104,11 @@ inline void StdUnorderedMap_Clear(StdUnorderedMapType& map)
 
 inline void FixedMap_Clear(FixedMapType& map)
 {
-    std::for_each(map.begin(), map.end(), [](std::pair<xxh::hash_t<64>, Value>& p) {
-        p.first = 0;
-        p.second = 0;
-    });
+    return map.clear();
 }
 
 // ----------------------------------------------------------------
-// Clear benches.
+// InitFillOutAndClear benches.
 // ----------------------------------------------------------------
 
 void BM_StdMap_InitFillOutAndClear(benchmark::State& s)
@@ -260,7 +209,7 @@ void BM_FixedMap_Access(benchmark::State& s)
     for (auto& key : keys)
     {
         key = GetNextKey();
-        map.Append(key, GetNextKey());
+        map.insert({key, GetNextKey()});
     }
 
     for (auto _ : s)
@@ -276,12 +225,6 @@ void BM_FixedMap_Access(benchmark::State& s)
 // Register benches and run them.
 // ----------------------------------------------------------------
 
-BENCHMARK(BM_StdMap_Init);
-BENCHMARK(BM_StdUnorderedMap_Init);
-BENCHMARK(BM_FixedMap_Init);
-BENCHMARK(BM_StdMap_InitAndFillOut);
-BENCHMARK(BM_StdUnorderedMap_InitAndFillOut);
-BENCHMARK(BM_FixedMap_InitAndFillOut);
 BENCHMARK(BM_StdMap_InitFillOutAndClear);
 BENCHMARK(BM_StdUnorderedMap_InitFillOutAndClear);
 BENCHMARK(BM_FixedMap_InitFillOutAndClear);

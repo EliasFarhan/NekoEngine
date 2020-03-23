@@ -106,6 +106,12 @@ public:
         end_ = begin_;
     }
 
+    FixedMap(Allocator&& allocator) : allocator_(allocator)
+    {
+        begin_ = (InternalPair*) allocator_.Allocate(sizeof(InternalPair) * Capacity, alignof(InternalPair));
+        end_ = begin_;
+    }
+
     ~FixedMap()
     {
         allocator_.Deallocate(begin_);
