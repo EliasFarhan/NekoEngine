@@ -21,6 +21,14 @@ void RandomFill(neko::Vec4f& v)
     }
 }
 
+void RandomFill(neko::Vec3f& v)
+{
+    for (int i = 0; i < 3; i++)
+    {
+        v[i] = RandomFloat();
+    }
+}
+
 void RandomFill(neko::Mat4f& m)
 {
     std::array<neko::Vec4f, 4> v;
