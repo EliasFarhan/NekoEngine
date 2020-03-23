@@ -90,10 +90,10 @@ struct Quaternion
 
 
 	//Returns the angle in degrees between two rotations a and b.
-	static degree_t Angle(Quaternion a, Quaternion b)
+	static degree_t Angle(const Quaternion& a, const Quaternion& b)
 	{
 		
-		return 2.0f * Acos(std::abs(Dot(a, b)));
+		return 2.0f * Acos(std::abs(Dot(a, b)));		//Todo change with neko::Acos
 	}
 
 	Quaternion Conjugate() const
