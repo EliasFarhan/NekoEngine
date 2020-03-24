@@ -60,8 +60,8 @@ void* StackAllocator::Allocate(size_t allocatedSize, size_t alignment)
 
 void StackAllocator::Deallocate(void* p)
 {
-    // neko_assert(p != nullptr, "Stack allocator requires valid pointer to deallocate");
-    // neko_assert(p == prevPos_, "Stack allocator needs to deallocate from the top");
+    neko_assert(p != nullptr, "Stack allocator requires valid pointer to deallocate");
+    neko_assert(p == prevPos_, "Stack allocator needs to deallocate from the top");
     //Access the AllocationHeader in the bytes before p
     auto* header = (AllocationHeader*) ((std::uint64_t) p - sizeof(AllocationHeader));
 #if defined(NEKO_ASSERT)

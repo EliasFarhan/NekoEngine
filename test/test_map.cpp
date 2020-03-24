@@ -10,9 +10,14 @@ namespace neko
 {
 
 #define HASH_SIZE 32
-
 using Key = char;
 using Value = char;
+using AllocatorType = LinearAllocator;
+const size_t ALLOCATOR_HEADER_SIZE = 0; // bytes
+const size_t ALIGNMENT_PADDING = 1; // byte
+const size_t PAIRS_NUMBER = 64; // pairs
+const size_t PAIR_SIZE = sizeof(xxh::hash_t<HASH_SIZE>) + sizeof(Value);
+const size_t TOTAL_BYTES = ALLOCATOR_HEADER_SIZE + (PAIRS_NUMBER * PAIR_SIZE) + ALIGNMENT_PADDING;
 
 static Key NextKey(){
     static Key k = 0;
@@ -47,14 +52,8 @@ TEST(Map, FixedMap_InstanciationAndDestruction)
 {
     try // TRY_DESTRUCTOR
     {
-        const size_t ALLOCATOR_HEADER_SIZE = 16; // bytes
-        const size_t ALIGNMENT_PADDING = 1; // byte
-        const size_t PAIRS_NUMBER = 64; // pairs
-        const size_t INTERNAL_PAIR_SIZE = sizeof(std::pair<xxh::hash_t<HASH_SIZE>, Value>); // 9 bytes used, aligned on 8 bytes => 16 bytes total. for 64 bits hash
-        const size_t TOTAL_BYTES = ALLOCATOR_HEADER_SIZE + (PAIRS_NUMBER * INTERNAL_PAIR_SIZE) + ALIGNMENT_PADDING;
-
         MallocRAII mem(malloc(TOTAL_BYTES));
-        FreeListAllocator allocator(TOTAL_BYTES, mem.data());
+        AllocatorType allocator(TOTAL_BYTES, mem.data());
 
         try // TRY_CONSTRUCTOR
         {
@@ -73,14 +72,8 @@ TEST(Map, FixedMap_InstanciationAndDestruction)
 
 TEST(Map, FixedMap_Insertion)
 {
-    const size_t ALLOCATOR_HEADER_SIZE = 16; // bytes
-    const size_t ALIGNMENT_PADDING = 1; // byte
-    const size_t PAIRS_NUMBER = 64; // pairs
-    const size_t INTERNAL_PAIR_SIZE = sizeof(std::pair<xxh::hash_t<HASH_SIZE>, Value>); // 9 bytes used, aligned on 8 bytes => 16 bytes total.
-    const size_t TOTAL_BYTES = ALLOCATOR_HEADER_SIZE + (PAIRS_NUMBER * INTERNAL_PAIR_SIZE) + ALIGNMENT_PADDING;
-
     MallocRAII mem(malloc(TOTAL_BYTES));
-    FreeListAllocator allocator(TOTAL_BYTES, mem.data());
+    AllocatorType allocator(TOTAL_BYTES, mem.data());
 
     FixedMap<Key, Value, PAIRS_NUMBER> map(allocator);
 
@@ -99,14 +92,8 @@ TEST(Map, FixedMap_Insertion)
 
 TEST(Map, FixedMap_Access)
 {
-    const size_t ALLOCATOR_HEADER_SIZE = 16; // bytes
-    const size_t ALIGNMENT_PADDING = 1; // byte
-    const size_t PAIRS_NUMBER = 64; // pairs
-    const size_t INTERNAL_PAIR_SIZE = sizeof(std::pair<xxh::hash_t<HASH_SIZE>, Value>); // 9 bytes used, aligned on 8 bytes => 16 bytes total.
-    const size_t TOTAL_BYTES = ALLOCATOR_HEADER_SIZE + (PAIRS_NUMBER * INTERNAL_PAIR_SIZE) + ALIGNMENT_PADDING;
-
     MallocRAII mem(malloc(TOTAL_BYTES));
-    FreeListAllocator allocator(TOTAL_BYTES, mem.data());
+    AllocatorType allocator(TOTAL_BYTES, mem.data());
 
     FixedMap<Key, Value, PAIRS_NUMBER> map(allocator);
     std::vector<Key> keys;
@@ -136,15 +123,8 @@ TEST(Map, FixedMap_Access)
 
 TEST(Map, FixedMap_Clear)
 {
-
-    const size_t ALLOCATOR_HEADER_SIZE = 16; // bytes
-    const size_t ALIGNMENT_PADDING = 1; // byte
-    const size_t PAIRS_NUMBER = 64; // pairs
-    const size_t INTERNAL_PAIR_SIZE = sizeof(std::pair<xxh::hash_t<HASH_SIZE>, Value>); // 9 bytes used, aligned on 8 bytes => 16 bytes total.
-    const size_t TOTAL_BYTES = ALLOCATOR_HEADER_SIZE + (PAIRS_NUMBER * INTERNAL_PAIR_SIZE) + ALIGNMENT_PADDING;
-
     MallocRAII mem(malloc(TOTAL_BYTES));
-    FreeListAllocator allocator(TOTAL_BYTES, mem.data());
+    AllocatorType allocator(TOTAL_BYTES, mem.data());
 
     FixedMap<Key, Value, PAIRS_NUMBER> map(allocator);
     for (size_t i = 0; i < PAIRS_NUMBER; i++)
@@ -164,10 +144,10 @@ TEST(Map, FixedMap_Clear)
 
 }
 
-TEST(Map, FixedMap_Iterators)
+/*TEST(Map, FixedMap_Iterators)
 {
-
-    const size_t ALLOCATOR_HEADER_SIZE = 16; // bytes
+    using AllocatorType = LinearAllocator;
+    const size_t ALLOCATOR_HEADER_SIZE = 0; // bytes
     const size_t ALIGNMENT_PADDING = 1; // byte
     const size_t PAIRS_NUMBER = 64; // pairs
     const size_t INTERNAL_PAIR_SIZE = sizeof(std::pair<xxh::hash_t<HASH_SIZE>, Value>); // 9 bytes used, aligned on 8 bytes => 16 bytes total.
@@ -175,7 +155,7 @@ TEST(Map, FixedMap_Iterators)
     using InternalPair = std::pair<xxh::hash_t<HASH_SIZE>, Value>;
 
     MallocRAII mem(malloc(TOTAL_BYTES));
-    FreeListAllocator allocator(TOTAL_BYTES, mem.data());
+    AllocatorType allocator(TOTAL_BYTES, mem.data());
 
     FixedMap<Key, Value, PAIRS_NUMBER> map(allocator);
     std::vector<Key> keys;
@@ -205,7 +185,7 @@ TEST(Map, FixedMap_Iterators)
         std::cerr << e.what() << '\n';
     }// !TRY_FOREACH
 
-}
+}*/
 
 #undef HASH_SIZE
 

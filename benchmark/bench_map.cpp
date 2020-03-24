@@ -22,10 +22,11 @@ using InternalPair = std::pair<xxh::hash_t<HASH_SIZE>, Value>;
 using StdMapType = std::map<Key, Value>;
 using StdUnorderedMapType = std::unordered_map<Key, Value>;
 using FixedMapType = FixedMap<Key, Value, SIZE>;
-const size_t ALLOCATOR_HEADER_SIZE = 16;
+const size_t ALLOCATOR_HEADER_SIZE = 0;
 const size_t ALIGNMENT_PADDING = 1;
 const size_t INTERNAL_PAIR_SIZE = sizeof(InternalPair);
 const size_t HEAP_SIZE = ALLOCATOR_HEADER_SIZE + (SIZE * INTERNAL_PAIR_SIZE) + ALIGNMENT_PADDING;
+using AllocatorType = LinearAllocator;
 
 // ----------------------------------------------------------------
 // Utility functions.
@@ -40,7 +41,7 @@ Key GetNextKey(){
 // Benchmark wide allocator.
 // ----------------------------------------------------------------
 
-FreeListAllocator allocator(HEAP_SIZE, malloc(HEAP_SIZE));
+AllocatorType allocator(HEAP_SIZE, malloc(HEAP_SIZE));
 
 // ----------------------------------------------------------------
 // Init.
