@@ -10,6 +10,7 @@ namespace neko
 class String
 {
     char* buffer_ = nullptr;
+    const char* cstr_ = nullptr;
     size_t length_ = 0;
     FreeListAllocator& allocator_;
 
@@ -32,13 +33,6 @@ public:
 
 
     //-----------------------------------------------------------------------------
-    // Functions
-    //-----------------------------------------------------------------------------
-    
-    /// \brief String to C String
-    const char* c_str(const String& rhs);
-
-    //-----------------------------------------------------------------------------
     // Operators
     //-----------------------------------------------------------------------------
 
@@ -51,14 +45,7 @@ public:
 
     String& operator+= (const String& rhs);
 
-
-    /*friend String operator+ (const String& lhs, const String& rhs);
-    friend String operator+ (const String& lhs, const char* rhs);
-    friend String operator+ (const char* lhs, const String& rhs);
-
     friend bool operator== (const String& lhs, const String& rhs);
-    friend bool operator== (const String& lhs, const char* rhs);
-    friend bool operator== (const char* lhs, const String& rhs);*/
 
     //TODO UTF-8
 private :

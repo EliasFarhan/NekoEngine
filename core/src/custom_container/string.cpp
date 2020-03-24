@@ -42,6 +42,14 @@ namespace neko
 	            sizeof(char) * str.size(),
 	            alignof(char)));
             length_ = str.size();
+
+            char* cstr = new char[length_];
+
+            for (unsigned i = 0; i < length_; i++) {
+                cstr[i] = buffer_[i];
+            }
+
+            cstr_ = cstr;
         }
 
     }
@@ -125,51 +133,7 @@ namespace neko
         return *this;
     }
 
-    const char* String::c_str(const String& rhs) {
-        unsigned len = rhs.Length();
-        char* cstr = new char[len];
-        for (unsigned i = 0; i < len; i++) {
-            cstr[i] = rhs.buffer_[i];
-        }
-        return cstr;
+    bool operator==(const String& lhs, const String& rhs) {
+        return strcmp(lhs.cstr_, rhs.cstr_);
     }
-
-   /* String operator+ (const String& lhs, const String& rhs)
-    {
-   
-    }
-
-    String operator+ (const String& lhs, const char* rhs)
-    {
-    }
-
-    String operator+ (const char* lhs, const String& rhs)
-    {
-    }
-
-    bool operator== (const String& lhs, const String& rhs)
-    {
-        if (lhs.Length() != rhs.Length()) {
-            return false;
-        }
-
-        int cap = lhs.Length();
-        int n = 0;
-        while ((n < cap) && (lhs[n] == rhs[n])) {
-            n++;
-        }
-        return (n == cap);
-    }
-    //TODO STRNCOMP
-
-    bool operator== (const String& lhs, const char* rhs)
-    {
-        return (lhs == String(rhs));
-    }
-
-    bool operator== (const char* lhs, const String& rhs)
-    {
-        return (String(lhs) == rhs);
-    }*/
-
 }
