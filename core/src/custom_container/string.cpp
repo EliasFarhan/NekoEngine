@@ -125,6 +125,15 @@ namespace neko
         return *this;
     }
 
+    const char* String::c_str(const String& rhs) {
+        unsigned len = rhs.Length();
+        char* cstr = new char[len];
+        for (unsigned i = 0; i < len; i++) {
+            cstr[i] = rhs.buffer_[i];
+        }
+        return cstr;
+    }
+
    /* String operator+ (const String& lhs, const String& rhs)
     {
    

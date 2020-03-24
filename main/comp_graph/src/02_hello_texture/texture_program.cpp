@@ -8,7 +8,7 @@
 #include <string.h>
 #include <imgui.h>
 
-#include "engine/string.h"
+#include "custom_container/string.h"
 
 namespace neko
 {
@@ -55,9 +55,7 @@ void HelloTextureProgram::Render()
 
 void HelloTextureProgram::DrawImGui()
 {
-   if(ImGui::Button("Print")) {
-       std::cout << neko::String("Test") << std::endl;
-   }
+
 }
 
 void HelloTextureProgram::OnEvent(const SDL_Event& event)
