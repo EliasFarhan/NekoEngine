@@ -1,10 +1,9 @@
-
 if(UNIX)
 file(GLOB_RECURSE fmod_src "/linux/api/core/include/*.h" "/linux/api/core/src/*.cpp")
 else()
 file(GLOB_RECURSE fmod_src "/win/api/core/include/*.h" "/win/api/core/src/*.cpp")
 endif()
-add_library(fmod STATIC ${fmod_src})
+add_library(fmod "/linux/api/core/lib/x86/*.so.11")
 if(UNIX)
 include_directories("${CMAKE_SOURCE_DIR}/externals/Fmod-2.00.08/linux/api/core/lib/x86/" "${CMAKE_SOURCE_DIR}/externals/Fmod-2.00.08/linux/api/studio/inc/x86/")
 
