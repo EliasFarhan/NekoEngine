@@ -17,6 +17,7 @@ namespace neko
 	{
 		
 	};
+	//TODO Change name to DynamicQueue and use dynamic array
 	template<typename T>
 	class CustomQueue
 	{
