@@ -28,10 +28,12 @@ static void BM_ResourceThread(benchmark::State& state)
         while (resources.size()<resourcesId.size()) {
             for (int n = 0; n < size; n++)
             {
-                if (resources.find(resourcesId[n]) != resources.end()) {
+                if (resources.find(resourcesId[n]) != resources.end())
+                {
                     continue;
                 }
-                if (resourceManager.IsResourceReady(resourcesId[n])) {
+                if (resourceManager.IsResourceReady(resourcesId[n]))
+                {
                     resources[resourcesId[n]] = resourceManager.GetResource(resourcesId[n]);
                     if (test != resources[resourcesId[n]]) {
                         std::cout << "Error Loading" << '\n';

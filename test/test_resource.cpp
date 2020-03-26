@@ -11,12 +11,11 @@ TEST(Engine, TestResource)
     neko::ResourceManager resourceManager;
     neko::ResourceId resourceId = resourceManager.LoadResource(path);
     int count = 0;
-    while (!resourceManager.IsResourceReady(resourceId)) {
+    while (!resourceManager.IsResourceReady(resourceId)) 
+    {
         count++;
     }
-    //std::cout << count << "   " << resourceManager.GetResource(resourceId);
-    EXPECT_TRUE(resourceManager.GetResource(resourceId) == test);
+    EXPECT_TRUE(std::string(resourceManager.GetResource(resourceId).dataBuffer) == test);
     EXPECT_FALSE(resourceManager.IsResourceReady(sole::uuid0()));
-    EXPECT_FALSE(resourceManager.GetResource(sole::uuid0()) == test);
     resourceManager.Destroy();
 }

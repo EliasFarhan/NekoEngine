@@ -3,6 +3,7 @@
 #include <map>
 #include <future>
 #include "sole.hpp"
+#include "utilities/file_utility.h"
 
 namespace neko
 {
@@ -16,7 +17,7 @@ const ResourceId INVALID_RESOURCE_ID = sole::uuid();
  * \brief Custom promise waiting for a resource
  */
 struct LoadPromise {
-    std::string resource = "";
+    BufferFile resource;
     Path path = "";
     bool ready = false;
     LoadPromise(Path newPath) : path(newPath) {}
@@ -29,7 +30,7 @@ public:
     ResourceManager();
     void Destroy();
     bool IsResourceReady(ResourceId resourceId);
-    std::string GetResource(ResourceId resourceId);
+    BufferFile GetResource(ResourceId resourceId);
     ResourceId LoadResource(Path assetPath);
 private:
     void LoadingLoop();
