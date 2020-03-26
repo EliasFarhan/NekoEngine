@@ -10,9 +10,8 @@ namespace neko
 class String
 {
     char* buffer_ = nullptr;
-    char* data_ = new char[0];
     size_t length_ = 0;
-    FreeListAllocator& allocator_;
+    Allocator& allocator_;
 
 public:
     //-----------------------------------------------------------------------------
@@ -20,10 +19,10 @@ public:
     //-----------------------------------------------------------------------------
 
     /// \brief Empty String Constructor
-    String(FreeListAllocator& allocator);
+    String(Allocator& allocator);
 
     /// \brief char* String Constructor
-    String(FreeListAllocator& allocator, const std::string_view str);
+    String(Allocator& allocator, const std::string_view str);
 
     /// \brief Default String Destructor
     ~String();
@@ -46,7 +45,10 @@ public:
     String& operator+= (const String& rhs);
 
     friend bool operator== (const String& lhs, const String& rhs);
+    friend bool operator== (const String& lhs, const char rhs[]);
+
     friend bool operator!= (const String& lhs, const String& rhs);
+    friend bool operator!= (const String& lhs, const char rhs[]);
 
     //TODO UTF-8
 private :
