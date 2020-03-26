@@ -42,14 +42,10 @@ namespace neko
 	            sizeof(char) * str.size(),
 	            alignof(char)));
             length_ = str.size();
-
-            char* cstr = new char[length_];
-
-            for (unsigned i = 0; i < length_; i++) {
-                cstr[i] = buffer_[i];
+            data_ = new char[length_];
+            for(int i = 0; i < length_; i++) {
+                data_[i] = str.at(i);
             }
-
-            cstr_ = cstr;
         }
 
     }
@@ -68,6 +64,7 @@ namespace neko
         return length_;
     }
 
+
     //-----------------------------------------------------------------------------
     // Operators
     //-----------------------------------------------------------------------------
@@ -77,7 +74,7 @@ namespace neko
         if (s.Length() > 0)
         {
             for (unsigned i = 0; i < s.Length(); i++) {
-                os << s[i];
+                os << s.data_[i];
             }
         }
         else os << "";
@@ -112,6 +109,20 @@ namespace neko
         return *this;
     }
 
+    String& String::operator=(const char rhs[]) {
+        delete buffer_;
+        length_ = sizeof(rhs);
+        buffer_ = new char[length_];
+
+        for(unsigned i = 0; i < length_;i++) {
+            buffer_[i] = rhs[i];
+        }
+
+        return *this;
+    }
+
+
+
 
 
     String& String::operator+= (const String& rhs)
@@ -133,7 +144,14 @@ namespace neko
         return *this;
     }
 
+
+
     bool operator==(const String& lhs, const String& rhs) {
-        return strcmp(lhs.cstr_, rhs.cstr_);
+        return lhs.data_ == rhs.data_;
+        //return strcmp(lhs.data_, rhs.data_);
+    }
+
+    bool operator!=(const String& lhs, const String& rhs) {
+        return !strcmp(lhs.data_, rhs.data_);
     }
 }
