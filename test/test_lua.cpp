@@ -4,5 +4,5 @@
 TEST(Engine, TestLua)
 {
 	neko::LuaEngine luaEngine;
-	luaEngine.InterpretLine("print(\"Hello World\")");
+	luaEngine.InterpretLine("print(\"Hello From Lua\")");
 }
