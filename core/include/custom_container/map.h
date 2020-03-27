@@ -86,43 +86,33 @@ public:
     {
         const auto hash = xxh::xxhash<HASH_SIZE>(&key, 1);
 
-/*#ifdef NEKO_ASSERT
+#ifdef NEKO_ASSERT
+        for (size_t i = 0; i < size_ - 1; i++)
+        {
+            if (begin_[i] > begin_[i + 1])
+            {
+                neko_assert(false,
+                            "neko::FixedMap<Key,Value,Capacity>::operator[](Key&): Map is not sorted. Use Rearrange() before trying to retrieve anything.");
+            }
+        }
+
         auto it = std::find_if(Iterator{begin_}, Iterator{end_},
                                [hash](const InternalPair& p) { return p.first == hash; });
-        neko_assert(it != Iterator{end_}, "Key is not in map.");
-#endif*/
+        neko_assert(it != Iterator{end_}, "neko::FixedMap<Key,Value,Capacity>::operator[](Key&): Key is not in map.");
+#endif
 
         return BinarySearch(begin_, end_, hash);
-    }
-
-    Value& BinarySearch(InternalPair* begin, InternalPair* end, const Hash lookingFor) const
-    {
-        InternalPair* middle = begin + ((end - begin) >> 1);
-
-        if (middle->first == lookingFor)
-        {
-            return middle->second;
-        }
-
-        if (middle->first > lookingFor)
-        {
-            return BinarySearch(begin, middle - 1, lookingFor);
-        }
-        else
-        {
-            return BinarySearch(middle + 1, end, lookingFor);
-        }
     }
 
     void Insert(const Pair& pair)
     {
 
-/*#ifdef NEKO_ASSERT
+#ifdef NEKO_ASSERT
         const auto hash = xxh::xxhash<HASH_SIZE>(&pair.first, 1);
         auto it = std::find_if(Iterator{begin_}, Iterator{end_},
                                [hash](const InternalPair& p) { return p.first == hash; });
-        neko_assert(it == Iterator{end_}, "Key already in map.");
-#endif*/
+        neko_assert(it == Iterator{end_}, "neko::FixedMap<Key,Value,Capacity>::operator[](Key&): Key already in map.");
+#endif
 
         *end_++ = InternalPair{xxh::xxhash<HASH_SIZE>(&pair.first, 1), pair.second};
         size_++;
@@ -175,6 +165,25 @@ public:
     }
 
 private:
+    Value& BinarySearch(InternalPair* begin, InternalPair* end, const Hash lookingFor) const
+    {
+        InternalPair* middle = begin + ((end - begin) >> 1);
+
+        if (middle->first == lookingFor)
+        {
+            return middle->second;
+        }
+
+        if (middle->first > lookingFor)
+        {
+            return BinarySearch(begin, middle - 1, lookingFor);
+        }
+        else
+        {
+            return BinarySearch(middle + 1, end, lookingFor);
+        }
+    }
+
     InternalPair* begin_ = nullptr; // 8 bytes
     InternalPair* end_ = nullptr; // 8 bytes
     LinearAllocator& allocator_; // 8 bytes
