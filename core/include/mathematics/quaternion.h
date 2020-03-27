@@ -238,4 +238,13 @@ struct Quaternion
         return os;
     }
 };
+
+	struct QuaternionsVector
+	{
+	private:
+		std::vector<float> x;
+		std::vector<float> y;
+		std::vector<float> z;
+		std::vector<float> w;
+	};
 }
