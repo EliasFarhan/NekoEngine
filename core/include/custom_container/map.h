@@ -4,87 +4,74 @@
 #include <xxhash.hpp>
 #include <algorithm>
 #include <cmath>
+#include <utility>
 
 // TODO: @Oleg: Calculate absolute best case possible for retrieval allowed by hardware.
 
 namespace neko
 {
 
-#define HASH_SIZE 32 // 32 bits hash
+static const size_t HASH_SIZE = 32; // bits
 
 template<typename Key, typename Value, const size_t Capacity>
-class FixedMap
+class FixedMap // 32 bytes size, 8 bytes aligned
 {
     using Hash = xxh::hash_t<HASH_SIZE>;
     using Pair = std::pair<Key, Value>;
     using InternalPair = std::pair<Hash, Value>;
 
 public:
-    /*class Iterator
+    class Iterator
     {
     public:
-        typedef InternalPair value_type; // mandatory for std lib
-        typedef InternalPair& reference; // mandatory for std lib
-        typedef InternalPair* pointer; // mandatory for std lib
-        typedef std::forward_iterator_tag iterator_category; // mandatory for std lib
-        typedef int difference_type; // mandatory for std lib
+        typedef Iterator self_type;
+        typedef InternalPair value_type;
+        typedef InternalPair& reference;
+        typedef InternalPair* pointer;
+        typedef std::forward_iterator_tag iterator_category;
+        typedef int difference_type;
 
-        Iterator(InternalPair* ptr) : ptr_(ptr)
+        Iterator(pointer ptr) : ptr_(ptr)
         {}
 
-        Iterator operator++()
+        self_type operator++()
         {
-            Iterator i = *this;
+            self_type i = *this;
             ptr_++;
             return i;
         }
 
-        Iterator operator++(int junk)
+        self_type operator++(int junk)
         {
             ptr_++;
             return *this;
         }
 
-        InternalPair& operator*()
+        reference operator*()
         { return *ptr_; }
 
-        inline InternalPair* operator->()
+        pointer operator->()
         { return ptr_; }
 
-        bool operator==(const Iterator& rhs)
+        bool operator==(const self_type& rhs)
         { return ptr_ == rhs.ptr_; }
 
-        bool operator!=(const Iterator& rhs)
+        bool operator!=(const self_type& rhs)
         { return ptr_ != rhs.ptr_; }
 
     private:
-        InternalPair* ptr_;
-    };*/
+        pointer ptr_;
+    };
 
     // Constructors / destructors / copy and move.
     FixedMap(LinearAllocator& allocator) : allocator_(allocator)
     {
-        const float SIZE_OF_VALUE = sizeof(Value);
-        const float SIZE_OF_HASH = sizeof(Hash);
-        const float SIZE_OF_CACHE_LINE = 64;
-        const size_t PAIRS_IN_CACHE_LINE = std::floor(SIZE_OF_CACHE_LINE / (SIZE_OF_HASH + SIZE_OF_VALUE));
-        const size_t OCCUPIED_CACHE_LINE = 64 - (PAIRS_IN_CACHE_LINE * (SIZE_OF_HASH + SIZE_OF_VALUE));
-        const size_t UNUSED_CACHE_LINE = 64 - OCCUPIED_CACHE_LINE;
-
-        keysBegin_ = (Hash*) allocator_.Allocate((sizeof(Hash) + sizeof(Value)) * Capacity, 64);
+        begin_ = (InternalPair*) allocator_.Allocate(Capacity * sizeof(InternalPair), alignof(InternalPair));
+        end_ = begin_;
     }
-
-    /*FixedMap(LinearAllocator&& allocator) : allocator_(allocator)
-    {
-        keysBegin_ = (Hash*) allocator_.Allocate(sizeof(Hash) * Capacity, alignof(Hash));
-        keysEnd_ = keysBegin_;
-        valuesBegin_ = (Value*) allocator_.Allocate(sizeof(Value) * Capacity, alignof(Value));
-        valuesEnd_ = valuesBegin_;
-    }*/
 
     ~FixedMap()
     {
-        // allocator_.Deallocate(begin_);
         allocator_.Clear();
     }
 
@@ -98,61 +85,100 @@ public:
     inline Value& operator[](const Key& key)
     {
         const auto hash = xxh::xxhash<HASH_SIZE>(&key, 1);
-        const size_t size = Size();
-        for (size_t i = 0; i < size; i++)
+
+/*#ifdef NEKO_ASSERT
+        auto it = std::find_if(Iterator{begin_}, Iterator{end_},
+                               [hash](const InternalPair& p) { return p.first == hash; });
+        neko_assert(it != Iterator{end_}, "Key is not in map.");
+#endif*/
+
+        return BinarySearch(begin_, end_, hash);
+    }
+
+    Value& BinarySearch(InternalPair* begin, InternalPair* end, const Hash lookingFor) const
+    {
+        InternalPair* middle = begin + ((end - begin) >> 1);
+
+        if (middle->first == lookingFor)
         {
-            if (keysBegin_[i] == hash){
-                return valuesBegin_[i];
-            }
+            return middle->second;
         }
-        neko_assert(false, "neko::FixedMap<Key,Value,Capacity>::operator[](Key): Key not found.");
+
+        if (middle->first > lookingFor)
+        {
+            return BinarySearch(begin, middle - 1, lookingFor);
+        }
+        else
+        {
+            return BinarySearch(middle + 1, end, lookingFor);
+        }
     }
 
     void Insert(const Pair& pair)
     {
-        neko_assert(Size() < Capacity, "neko::FixedMap<Key,Value,Capacity>::insert(Pair&): Map is full.");
 
-#ifdef NEKO_ASSERT
+/*#ifdef NEKO_ASSERT
         const auto hash = xxh::xxhash<HASH_SIZE>(&pair.first, 1);
-        const auto it = std::find(keysBegin_, keysEnd_, hash);
-        neko_assert(it == keysEnd_, "neko::FixedMap<Key,Value,Capacity>::insert(Pair&): Map already contains key.");
-#endif // !NEKO_ASSERT
+        auto it = std::find_if(Iterator{begin_}, Iterator{end_},
+                               [hash](const InternalPair& p) { return p.first == hash; });
+        neko_assert(it == Iterator{end_}, "Key already in map.");
+#endif*/
 
-        *keysEnd_ = xxh::xxhash<HASH_SIZE>(&(pair.first), 1); // InternalPair{xxh::xxhash<HASH_SIZE>(&(pair.first), 1), pair.second};
-        *valuesEnd_ = pair.second;
-        keysEnd_++;
-        valuesEnd_++;
+        *end_++ = InternalPair{xxh::xxhash<HASH_SIZE>(&pair.first, 1), pair.second};
+        size_++;
     }
 
-    /*inline Iterator Begin() const
+    inline void Clear()
+    {
+        end_ = begin_;
+        size_ = 0;
+    }
+
+    inline size_t Size() const
+    {
+        return size_;
+    }
+
+    // Sort the map elements in ascending order by key.
+    void Rearrange()
+    {
+        std::vector<InternalPair> temp(begin_, end_);
+        std::sort(temp.begin(), temp.end(),
+                  [](const InternalPair& a, const InternalPair& b) { return a.first < b.first; });
+        const size_t len = size_;
+        for (size_t i = 0; i < len; i++)
+        {
+            begin_[i] = temp[i];
+        }
+    }
+
+    inline Iterator Begin() const
     {
         return Iterator{begin_};
+    }
+
+    // Used by for auto
+    inline Iterator begin() const
+    {
+        return Begin();
     }
 
     inline Iterator End() const
     {
         return Iterator{end_};
-    }*/
-
-    void Clear()
-    {
-        keysEnd_ = keysBegin_;
-        valuesEnd_ = valuesBegin_;
     }
 
-    inline size_t Size() const
+    // Used by for auto
+    inline Iterator end() const
     {
-        return (size_t) ((((std::uint64_t) keysEnd_) - ((std::uint64_t) keysBegin_)) / (std::uint64_t) sizeof(Hash));
+        return End();
     }
 
 private:
-    // InternalPair* begin_ = nullptr;
-    // InternalPair* end_ = nullptr;
-    LinearAllocator& allocator_;
-    Hash* keysBegin_ = nullptr;
-    Hash* keysEnd_ = nullptr;
-    Value* valuesBegin_ = nullptr;
-    Value* valuesEnd_ = nullptr;
+    InternalPair* begin_ = nullptr; // 8 bytes
+    InternalPair* end_ = nullptr; // 8 bytes
+    LinearAllocator& allocator_; // 8 bytes
+    size_t size_ = 0; // 8 bytes
 };
 
 #undef HASH_SIZE
