@@ -222,8 +222,8 @@ namespace neko
 		Uint8 previousKeyStates[static_cast<size_t>(KeyCode::LENGTH)] = { static_cast<size_t>(KeyCode::UNKNOWN) };
 		Uint8 currentKeyStates[static_cast<size_t>(KeyCode::LENGTH)] = { static_cast<size_t>(KeyCode::UNKNOWN) };
 
-		int previousControllerBtnyStates[static_cast<size_t>(ControllerButton::LENGTH)] = { static_cast<size_t>(ControllerButton::NONE) };
-		int currentControllerBtnStates[static_cast<size_t>(ControllerButton::LENGTH)] = { static_cast<size_t>(ControllerButton::NONE) };
+		Uint8 previousControllerBtnyStates[static_cast<size_t>(ControllerButton::LENGTH)] = { static_cast<size_t>(ControllerButton::NONE) };
+		Uint8 currentControllerBtnStates[static_cast<size_t>(ControllerButton::LENGTH)] = { static_cast<size_t>(ControllerButton::NONE) };
 
 	 	Uint8 previousSwitchBtnyStates[static_cast<size_t>(SwitchButton::LENGTH)] = { static_cast<size_t>(SwitchButton::NONE) };
 		Uint8 currentSwitchBtnStates[static_cast<size_t>(SwitchButton::LENGTH)] = { static_cast<size_t>(SwitchButton::NONE) };
@@ -232,8 +232,6 @@ namespace neko
 		Uint8 bindControllerInput[static_cast<size_t>(InputAction::LENGTH)] = { static_cast<size_t>(InputAction::NONE) };
 
         const uint8_t* states_ = nullptr;
-        uint32_t mouse_ = 0u;
-        Vec2f mousePos_;
         SDL_Joystick* joystick_ = nullptr;
 	};
 }
