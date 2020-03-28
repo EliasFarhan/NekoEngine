@@ -11,9 +11,11 @@ int main(int argc, char** argv)
 	neko::editor::EditorEngine engine;
 
 	neko::editor::CustomAllocatorViewer customAllocatorViewer;
+	neko::editor::CustomAllocatorTester customAllocatorTester(customAllocatorViewer);
 
 	engine.RegisterOnDrawUi(customAllocatorViewer);
-	
+	engine.RegisterOnDrawUi(customAllocatorTester);
+
 	engine.SetWindowAndRenderer(&window, &renderer);
 	engine.Init();
 	engine.EngineLoop();
