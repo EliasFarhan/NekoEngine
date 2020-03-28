@@ -78,6 +78,9 @@ public:
         return size_;
     }
 
+
+    virtual void Profile() {}
+
 protected:
     void* start_ = nullptr;
     size_t size_ = 0;
@@ -174,6 +177,7 @@ public:
     void* Allocate(size_t allocatedSize, size_t alignment) override;
 
     void Deallocate(void* p) override;
+
 
 protected:
     struct AllocationHeader
