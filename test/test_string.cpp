@@ -21,7 +21,6 @@ TEST(Engine, TestString)
     String str3 = String(allocator, "A");
     String str4 = String(allocator, "D");
 
-
 	EXPECT_TRUE(str1 == "A");
     EXPECT_TRUE(str1 != "Z");
     EXPECT_TRUE(str1 == str3);
@@ -36,6 +35,6 @@ TEST(Engine, TestString)
     EXPECT_TRUE(str1 == "AB");
     EXPECT_TRUE(str5 == str1);
 
-   // free(data);
+    free(data);
 }
 }
