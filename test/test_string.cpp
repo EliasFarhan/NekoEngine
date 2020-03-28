@@ -14,7 +14,7 @@ TEST(Engine, TestString)
 {
     size_t memorySize = 1024;
     void* data = malloc(memorySize);
-    neko::FreeListAllocator allocator = neko::FreeListAllocator(memorySize, data);
+    FreeListAllocator allocator = FreeListAllocator(memorySize, data);
 
     String str1 = String(allocator, "A");
     String str2 = String(allocator, "B");
