@@ -71,6 +71,14 @@ struct Quaternion
 					quaternion.w * quaternion.w);
 	}
 
+	static float SquareMagnitude(Quaternion quaternion)
+	{
+		return (quaternion.x * quaternion.x +
+			quaternion.y * quaternion.y +
+			quaternion.z * quaternion.z +
+			quaternion.w * quaternion.w);
+	}
+
 	//Rotates the Quaternion of angle degrees around axis.
 	static Quaternion AngleAxis(radian_t rad, neko::Vec3f axis)
 	{
@@ -105,9 +113,9 @@ struct Quaternion
 	Quaternion Inverse() const
 	{
 		const Quaternion conj = Conjugate();
-		const float mag = Magnitude(*this);
+		const float sMag = SquareMagnitude(*this);
 
-		return conj / (mag * mag);
+		return conj / sMag;
 	}
 
 	/*
@@ -239,8 +247,64 @@ struct Quaternion
     }
 };
 
+using QuaternionIndex = std::uint32_t;
 	struct QuaternionsVector
 	{
+		QuaternionsVector()
+		{
+			
+		}
+
+		float Dot(QuaternionIndex ia, QuaternionIndex ib)
+		{
+			
+		}
+
+		QuaternionsVector Normalized(QuaternionIndex i)
+		{
+			
+		}
+
+		float Magnitude(QuaternionIndex i)
+		{
+			
+		}
+
+		float SquareMagnitude(QuaternionIndex i)
+		{
+			
+		}
+
+		QuaternionsVector AngleAxis(radian_t rad, neko::Vec3f axis, QuaternionIndex i)
+		{
+			
+		}
+
+		degree_t Angle(QuaternionIndex ai, QuaternionIndex bi)
+		{
+			
+		}
+
+		QuaternionsVector Conjugate(QuaternionIndex i)
+		{
+			
+		}
+
+		QuaternionsVector Inverse(QuaternionIndex i)
+		{
+			
+		}
+
+		QuaternionsVector FromEuler(EulerAngles angle, QuaternionIndex i)
+		{
+			
+		}
+
+		/*QuaternionsVector Identity()
+		{
+			
+		}*/
+		
 	private:
 		std::vector<float> x;
 		std::vector<float> y;
