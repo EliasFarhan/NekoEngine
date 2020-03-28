@@ -32,7 +32,7 @@
 #include <engine/log.h>
 #include <utilities/file_utility.h>
 #include "graphics/graphics.h"
-#include "imgui.h"
+#include <imgui.h>
 #ifdef EASY_PROFILE_USE
 #include <easy/profiler.h>
 #endif

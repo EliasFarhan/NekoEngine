@@ -51,7 +51,7 @@ target_compile_definitions(Neko_Core PUBLIC SOURCE_PATH="${CMAKE_SOURCE_DIR}")
 
 set_target_properties (Neko_Core PROPERTIES FOLDER Neko)
 
-target_include_directories(Neko_Core PUBLIC ${IMGUI_ROOT})
+target_include_directories(Neko_Core PUBLIC "${IMGUI_ROOT}")
 target_include_directories(Neko_Core PUBLIC include/)
 target_include_directories(Neko_Core PUBLIC ${UTILITIES_DIR})
 neko_lib_config(Neko_Core)
