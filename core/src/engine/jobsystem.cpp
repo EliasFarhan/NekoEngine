@@ -1,4 +1,5 @@
 #include <engine/jobsystem.h>
+#include <engine/assert.h>
 
 namespace neko
 {
@@ -6,7 +7,8 @@ namespace neko
 JobSystem::JobSystem()
 {
     numberOfWorkers = std::thread::hardware_concurrency() - OCCUPIED_THREADS;
-    //TODO@Oleg: Add neko assert to check number of worker threads is valid!
+    neko_assert(numberOfWorkers > 0,
+                "neko::JobSystem::JobSystem(): Retrieved number of worker threads is less than one.")
     workers_.resize(numberOfWorkers);
 
     const size_t len = numberOfWorkers;
@@ -19,7 +21,8 @@ JobSystem::JobSystem()
 JobSystem::~JobSystem()
 {
     // Spin-lock waiting for all threads to become ready for shutdown.
-    while (initializedWorkers_ != numberOfWorkers || !tasks_.empty()){} // WARNING: Not locking mutex for task_ access here!
+    while (initializedWorkers_ != numberOfWorkers || !tasks_.empty())
+    {} // WARNING: Not locking mutex for task_ access here!
 
     status_ = 0u; // Atomic assign.
     cv_.notify_all(); // Wake all workers.
