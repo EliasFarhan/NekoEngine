@@ -1,0 +1,100 @@
+{
+    "entities": [
+        {
+            "components": [
+                {
+                    "component": 2,
+                    "position": [
+                        5.0,
+                        5.0
+                    ]
+                },
+                {
+                    "component": 4,
+                    "scale": [
+                        1.0,
+                        1.0
+                    ]
+                },
+                {
+                    "angle": 0.0,
+                    "component": 8
+                },
+                {
+                    "atlas": "data/spine/cat_noarm.atlas.txt",
+                    "component": 256,
+                    "layer": 0,
+                    "skeletonData": "data/spine/cat_noarm.json",
+                    "spine": "data/spine/cat_noarm.spine"
+                }
+            ],
+            "entity": 0,
+            "entityNameHash": 14283152187571352318,
+            "name": "PlayerCharacter",
+            "parent": -1,
+            "prefab": false
+        },
+        {
+            "components": [
+                {
+                    "component": 2,
+                    "position": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "component": 4,
+                    "scale": [
+                        1.0,
+                        1.0
+                    ]
+                },
+                {
+                    "angle": 0.0,
+                    "component": 8
+                },
+                {
+                    "atlas": "data/spine//cat_arm.atlas.txt",
+                    "component": 256,
+                    "layer": 3,
+                    "skeletonData": "data/spine//cat_arm.json",
+                    "spine": "data/spine/cat_arm.spine"
+                }
+            ],
+            "entity": 1,
+            "entityNameHash": 4341688754060118016,
+            "name": "Arm",
+            "parent": 2,
+            "prefab": false
+        },
+        {
+            "components": [
+                {
+                    "component": 2,
+                    "position": [
+                        -0.5732651948928833,
+                        -1.128129243850708
+                    ]
+                },
+                {
+                    "angle": 0.0,
+                    "component": 8
+                },
+                {
+                    "boneName": "BN_armright",
+                    "component": 16384,
+                    "followingEntity": 0
+                }
+            ],
+            "entity": 2,
+            "entityNameHash": 2156079603342440690,
+            "name": "ArmRoot",
+            "parent": 0,
+            "prefab": false
+        }
+    ],
+    "sceneId": "50cf4f93-e626-0037-8e84-7824af33bc86",
+    "sceneName": "test",
+    "scenePath": "../data/scenes/test.scene"
+}

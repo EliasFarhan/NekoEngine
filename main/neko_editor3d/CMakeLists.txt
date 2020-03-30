@@ -3,7 +3,7 @@ include_directories("include/")
 file(GLOB_RECURSE neko_editor3d_src include/*.h src/*.cpp)
 
 add_executable(neko_editor3d ${neko_editor3d_src})
-target_link_libraries(neko_editor3d PUBLIC Neko_Core sdl_engine gles3_wrapper Box2D)
+target_link_libraries(neko_editor3d PUBLIC Neko_Core sdl_engine gles3_wrapper)
 neko_bin_config(neko_editor3d)
 
 if(EMSCRIPTEN)
@@ -11,3 +11,4 @@ if(EMSCRIPTEN)
     set_target_properties(neko_editor3d PROPERTIES LINK_FLAGS
             "${bin_link_flags} -s USE_SDL=2 -s USE_WEBGL2=1 ")
 endif()
+set_target_properties (neko_editor3d PROPERTIES FOLDER Neko)

@@ -30,9 +30,11 @@
 #include "imgui_impl_sdl.h"
 
 #ifdef NEKO_GLES3
-
 #include "gl/gles3_window.h"
+#endif
 
+#ifdef EASY_PROFILE_USE
+#include "easy/profiler.h"
 #endif
 
 namespace neko::sdl
@@ -44,63 +46,62 @@ SdlEngine::SdlEngine(Configuration* config) : BasicEngine(config)
 void SdlEngine::Init()
 {
     BasicEngine::Init();
-
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("InitSdl");
+#endif
     assert(window_ != nullptr);
     SDL_Init(SDL_INIT_VIDEO);
     window_->Init();
-    window_->InitImGui();
     initAction_.Execute();
 }
 
-void SdlEngine::Update([[maybe_unused]]seconds dt)
+void SdlEngine::Destroy()
 {
+    BasicEngine::Destroy();
+    destroyAction_.Execute();
+    window_->Destroy();
+
+    // Shutdown SDL 2
+    SDL_Quit();
+}
+
+void SdlEngine::ManageEvent()
+{
+    
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("Manage Event");
+#endif
     SDL_Event event;
     while (SDL_PollEvent(&event))
     {
-        window_->OnEvent(event);
-        OnEvent(event);
         ImGui_ImplSDL2_ProcessEvent(&event);
         if (event.type == SDL_QUIT)
         {
             isRunning_ = false;
         }
 
-        if (event.type == SDL_KEYDOWN)
+        auto& config = BasicEngine::GetInstance()->config;
+        if (event.type == SDL_WINDOWEVENT)
         {
-            switch (event.key.keysym.scancode)
+            if (event.window.event == SDL_WINDOWEVENT_RESIZED)
             {
-                default:
-                    break;
+                config.windowSize = Vec2u(event.window.data1, event.window.data2);
+                window_->OnResize(config.windowSize);
             }
         }
     }
-
-    updateAction_.Execute(dt);
-    window_->ClearScreen();
-    drawAction_.Execute();
-
-    // Start the Dear ImGui frame
-    window_->ImguiNewFrame();
-    ImGui::NewFrame();
-
-    drawUiAction_.Execute(dt);
-    window_->ImguiRender();
-
-    window_->FinishFrame();
+    onEventAction_.Execute(event);
 }
 
-void SdlEngine::Destroy()
+void SdlEngine::GenerateUiFrame()
 {
-    destroyAction_.Execute();
-    window_->Destroy();
-
-    BasicEngine::Destroy();
-    // Shutdown SDL 2
-    SDL_Quit();
+    window_->GenerateUiFrame();
+    BasicEngine::GenerateUiFrame();
 }
 
-void SdlEngine::SetWindow(SdlWindow* window)
+void SdlEngine::RegisterOnEvent(SdlEventSystemInterface& eventInterface)
 {
-    SdlEngine::window_ = window;
+    onEventAction_.RegisterCallback([&eventInterface](const SDL_Event& event){eventInterface.OnEvent(event);});
 }
+
 }

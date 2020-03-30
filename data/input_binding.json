@@ -1,0 +1,33 @@
+[
+  {
+    "Actions": 1,
+    "ControllerInput": 0,
+    "PcInput": 26,
+    "SwitchInput": 1
+  },
+  {
+    "Actions": 2,
+    "ControllerInput": 1,
+    "PcInput": 22,
+    "SwitchInput": 0
+  },
+  {
+    "Actions": 3,
+    "ControllerInput": 2,
+    "PcInput": 4,
+    "SwitchInput": 0
+  },
+  {
+    "Actions": 4,
+    "ControllerInput": 3,
+    "PcInput": 7,
+    "SwitchInput": 2
+  },
+  {
+    "Actions": 5,
+    "ControllerInput": 17,
+    "PcInput": 0,
+    "SwitchInput": 0
+  }
+
+]
