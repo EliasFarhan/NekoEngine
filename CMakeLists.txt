@@ -133,7 +133,7 @@ foreach(main_project_path ${main_projects} )
     get_filename_component(main_project_name ${main_project_path} NAME )
 
     message("Main project path: ${main_project_path} and name: ${main_project_name}")
-    set(${main_project_name} OFF CACHE BOOL "")
+    set(${main_project_name} ON CACHE BOOL "")
 
     if(${main_project_name})
         add_subdirectory(${main_project_path})
