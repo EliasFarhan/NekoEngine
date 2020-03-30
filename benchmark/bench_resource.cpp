@@ -3,6 +3,8 @@
 #include "random_fill.h"
 #include <benchmark/benchmark.h>
 
+
+#include "engine/assert.h"
 #include "engine/resource.h"
 #include "utilities/file_utility.h"
 
@@ -35,9 +37,7 @@ static void BM_ResourceThread(benchmark::State& state)
                 if (resourceManager.IsResourceReady(resourcesId[n]))
                 {
                     resources[resourcesId[n]] = resourceManager.GetResource(resourcesId[n]);
-                    if (test != resources[resourcesId[n]]) {
-                        std::cout << "Error Loading" << '\n';
-                    }
+                    neko_assert(test == resources[resourcesId[n]], "Error Loading");
                 }
             }
         }
@@ -59,9 +59,7 @@ static void BM_ResourceNonThread(benchmark::State& state)
         for (int i = 0; i < size; i++)
         {
             resources.push_back(neko::LoadFile(path));
-            if (test != resources.back()) {
-                std::cout << "Error Loading" << '\n';
-            }
+            neko_assert(test == resources.back(), "Error Loading");
         }
     }
 }

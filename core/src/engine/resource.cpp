@@ -59,12 +59,12 @@ bool neko::ResourceManager::IsResourceReady(ResourceId resourceId)
 }
 
 
-neko::BufferFile neko::ResourceManager::GetResource(ResourceId resourceId)
+std::string neko::ResourceManager::GetResource(ResourceId resourceId)
 {
     const std::lock_guard<std::mutex> lockGuard(loadingMutex_);
     if (resourcePromises_[resourceId].ready)
     {
-        return resourcePromises_[resourceId].resource;
+        return resourcePromises_[resourceId].resource.dataBuffer;
     } else
     {
         neko_assert(true, "Resource not ready");

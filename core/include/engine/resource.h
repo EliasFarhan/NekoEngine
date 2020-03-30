@@ -30,7 +30,7 @@ public:
     ResourceManager();
     void Destroy();
     bool IsResourceReady(ResourceId resourceId);
-    BufferFile GetResource(ResourceId resourceId);
+    std::string GetResource(ResourceId resourceId);
     ResourceId LoadResource(Path assetPath);
 private:
     void LoadingLoop();
