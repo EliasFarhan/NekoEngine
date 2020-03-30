@@ -28,6 +28,7 @@ class ResourceManager
 {
 public:
     ResourceManager();
+    void Init();
     void Destroy();
     bool IsResourceReady(ResourceId resourceId);
     std::string GetResource(ResourceId resourceId);
