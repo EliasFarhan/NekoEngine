@@ -50,7 +50,7 @@ void SdlEngine::Init()
     EASY_BLOCK("InitSdl");
 #endif
     assert(window_ != nullptr);
-    SDL_Init(SDL_INIT_VIDEO);
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK);
     window_->Init();
     initAction_.Execute();
     inputManager_.Init();

@@ -346,7 +346,7 @@ SDL_GameControllerGetAxis(SDL_GameController *gamecontroller,
 typedef enum
 {
     SDL_CONTROLLER_BUTTON_INVALID = -1,
-    SDL_CONTROLLER_BUTTON_A,
+    SDL_CONTROLLER_BUTTON_A,    
     SDL_CONTROLLER_BUTTON_B,
     SDL_CONTROLLER_BUTTON_X,
     SDL_CONTROLLER_BUTTON_Y,

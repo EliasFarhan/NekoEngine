@@ -3,9 +3,11 @@
 #include <vector>
 #include <mathematics/vector.h>
 #include <SDL.h>
+#include <json.hpp>
 
 #define PC_INPUT
 #define SWITCH_INPUT
+
 
 namespace neko
 {
@@ -16,7 +18,6 @@ namespace neko
 	enum class KeyCode : Uint8
 	{
 		UNKNOWN = SDL_SCANCODE_UNKNOWN,
-		
 		A = SDL_SCANCODE_A,
 		B = SDL_SCANCODE_B,
 		C = SDL_SCANCODE_C,
@@ -75,28 +76,34 @@ namespace neko
 	 */
 	enum class ControllerButton : Uint8
     {
-		NONE,
-		BUTTON_A = 1,
-		BUTTON_B = 2,
-		BUTTON_X = 3,
-		BUTTON_Y = 4,
-		LEFT_BUMPER = 5,
-		RIGHT_BUMPER = 6,
-		BUTTON_SELECT = 7,
-		BUTTON_START = 7,
-		PRESS_LEFT_STICK = 8,
-		PRESS_RIGHT_STICK = 9,
-		HORIZONTAL_LEFT_AXIS = 10,//X AXIS
-		VERTICAL_LEFT_AXIS = 11,//Y AXIS
-		VERTICAL_RIGHT_AXIS = 12,//4th axis
-		HORIZONTAL_RIGHT_AXIS = 13,//5th axis
-		PAD_HORIZONTAL = 14,//6th axis
-		PAD_VERTICAL = 15,//7th axis
-		LEFT_TRIGGER = 16,//9th axis	
-		RIGHT_TRIGGER = 17,//10th axis
+		NONE = SDL_CONTROLLER_BUTTON_INVALID,
+		BUTTON_A = SDL_CONTROLLER_BUTTON_A,
+		BUTTON_B = SDL_CONTROLLER_BUTTON_B,
+		BUTTON_X = SDL_CONTROLLER_BUTTON_X,
+		BUTTON_Y = SDL_CONTROLLER_BUTTON_Y,
+		BUTTON_SELECT = SDL_CONTROLLER_BUTTON_BACK,
+		XBOX_BUTTON = SDL_CONTROLLER_BUTTON_GUIDE,
+		BUTTON_START = SDL_CONTROLLER_BUTTON_START,
+		PRESS_LEFT_STICK = SDL_CONTROLLER_BUTTON_LEFTSTICK,
+		PRESS_RIGHT_STICK = SDL_CONTROLLER_BUTTON_RIGHTSTICK,
+		LEFT_BUMPER = SDL_CONTROLLER_BUTTON_LEFTSHOULDER,
+		RIGHT_BUMPER = SDL_CONTROLLER_BUTTON_RIGHTSHOULDER,
+		PAD_UP = SDL_CONTROLLER_BUTTON_DPAD_UP,
+		PAD_DOWN = SDL_CONTROLLER_BUTTON_DPAD_DOWN,
+		PAD_LEFT = SDL_CONTROLLER_BUTTON_DPAD_LEFT,
+		PAD_RIGHT = SDL_CONTROLLER_BUTTON_DPAD_RIGHT,
 		LENGTH //define the array bounds
     };
 
+	enum class ControllerAxis
+	{
+		HORIZONTAL_LEFT_AXIS = SDL_CONTROLLER_AXIS_LEFTX,//X AXIS
+		VERTICAL_LEFT_AXIS = SDL_CONTROLLER_AXIS_LEFTY,//Y AXIS
+		VERTICAL_RIGHT_AXIS = SDL_CONTROLLER_AXIS_RIGHTX,//4th axis
+		HORIZONTAL_RIGHT_AXIS = SDL_CONTROLLER_AXIS_RIGHTY,//5th axis
+		LEFT_TRIGGER = SDL_CONTROLLER_AXIS_TRIGGERLEFT,//9th axis	
+		RIGHT_TRIGGER = SDL_CONTROLLER_AXIS_TRIGGERRIGHT,//10th axis
+	};
 	/*
 	 * \b enum all the button on a switch controller
 	 */
@@ -131,22 +138,11 @@ namespace neko
 	enum class InputAction
 	{
 		NONE = 0,
-		UP,
+		UP = 1,
 		DOWN = 2,
 		LEFT = 3,
 		RIGHT = 4,
-		ACTION_1 = 5,
-		ACTION_2 = 6,
-		ACTION_3 = 7,
-		LENGTH = 8//define the array bounds
-	};
-	
-	enum class ButtonState
-	{
-		NONE,
-		DOWN,
-		HELD,
-		UP
+		LENGTH //define the array bounds
 	};
 	
 	class IInputManager
@@ -179,8 +175,6 @@ namespace neko
 
 		virtual bool IsActionButtonHeld(InputAction button) const = 0;
 
-		virtual Uint8 KeyBind(SDL_Event &event) = 0;
-		virtual Uint8 ControllerButtonBind(SDL_Event& event) = 0;
 
 	};
     /**
@@ -214,24 +208,24 @@ namespace neko
 
 		 bool IsActionButtonHeld(InputAction button) const override;
 
-		 Uint8 KeyBind(SDL_Event &event) override;
-	 	
-		 Uint8 ControllerButtonBind(SDL_Event& event) override;
+
 	 private:
 
 		Uint8 previousKeyStates[static_cast<size_t>(KeyCode::LENGTH)] = { static_cast<size_t>(KeyCode::UNKNOWN) };
 		Uint8 currentKeyStates[static_cast<size_t>(KeyCode::LENGTH)] = { static_cast<size_t>(KeyCode::UNKNOWN) };
 
-		Uint8 previousControllerBtnyStates[static_cast<size_t>(ControllerButton::LENGTH)] = { static_cast<size_t>(ControllerButton::NONE) };
+		Uint8 previousControllerBtnStates[static_cast<size_t>(ControllerButton::LENGTH)] = { static_cast<size_t>(ControllerButton::NONE) };
 		Uint8 currentControllerBtnStates[static_cast<size_t>(ControllerButton::LENGTH)] = { static_cast<size_t>(ControllerButton::NONE) };
-
-	 	Uint8 previousSwitchBtnyStates[static_cast<size_t>(SwitchButton::LENGTH)] = { static_cast<size_t>(SwitchButton::NONE) };
+	 	
+	 	Uint8 previousSwitchBtnStates[static_cast<size_t>(SwitchButton::LENGTH)] = { static_cast<size_t>(SwitchButton::NONE) };
 		Uint8 currentSwitchBtnStates[static_cast<size_t>(SwitchButton::LENGTH)] = { static_cast<size_t>(SwitchButton::NONE) };
 
-		Uint8 bindPcInput[static_cast<size_t>(InputAction::LENGTH)] = {static_cast<size_t>(InputAction::NONE)};
-		Uint8 bindControllerInput[static_cast<size_t>(InputAction::LENGTH)] = { static_cast<size_t>(InputAction::NONE) };
+		KeyCode bindPcInput[static_cast<size_t>(InputAction::LENGTH)] = { KeyCode::UNKNOWN };
+		ControllerButton bindControllerInput[static_cast<size_t>(InputAction::LENGTH)] = { ControllerButton::NONE };
 
         const uint8_t* states_ = nullptr;
+		SDL_GameController* controller_ = nullptr;
         SDL_Joystick* joystick_ = nullptr;
+		int wichController_ = -1;
 	};
 }

@@ -2,18 +2,22 @@
 
 #include <imgui.h>
 
-#include "imgui_impl_sdl.h"
+#include "utilities/json_utility.h"
+
 
 namespace neko
 {
 
     void InputManager::Init()
     {
+        BindFromJson();
         memset(previousKeyStates, 0, sizeof(Uint8) * static_cast<size_t>(KeyCode::LENGTH));
         memcpy(currentKeyStates, SDL_GetKeyboardState(NULL), sizeof(Uint8) * static_cast<size_t>(KeyCode::LENGTH));
-    	
 
-        SDL_Init(SDL_INIT_GAMECONTROLLER);
+        memset(currentControllerBtnStates, 0, sizeof(Uint8) * static_cast<size_t>(ControllerButton::LENGTH));
+        memset(previousControllerBtnStates, 0, sizeof(Uint8) * static_cast<size_t>(ControllerButton::LENGTH));
+    	
+        SDL_JoystickEventState(SDL_ENABLE);
     }
 
     void InputManager::PreUserInputs()
@@ -21,7 +25,14 @@ namespace neko
         memcpy(previousKeyStates, currentKeyStates, sizeof(Uint8) * static_cast<size_t>(KeyCode::LENGTH));
         memcpy(currentKeyStates, SDL_GetKeyboardState(NULL), sizeof(Uint8) * static_cast<size_t>(KeyCode::LENGTH));
     	
+        memcpy(&previousControllerBtnStates, &currentControllerBtnStates, sizeof(Uint8) * static_cast<size_t>(ControllerButton::LENGTH));
 
+        SDL_GameControllerUpdate();
+
+        const auto controllerLength = static_cast<int>(ControllerButton::LENGTH);
+        for (int b = 0; b < controllerLength; ++b) {
+            currentControllerBtnStates[b] = SDL_JoystickGetButton(joystick_, b);
+        }
         SDL_Event event;
 
         while (SDL_PollEvent(&event))
@@ -31,10 +42,6 @@ namespace neko
             {
             case SDL_KEYDOWN:
             {
-	            
-                currentKeyStates[KeyBind(event)] = static_cast<int>(InputAction::UP);
-
-            	
             }
             break;
             case SDL_JOYDEVICEREMOVED:
@@ -46,15 +53,19 @@ namespace neko
 
             case SDL_JOYDEVICEADDED:
             {
-                const int device = event.jdevice.which;
+                /*const int device = event.jdevice.which;
                 joystick_ = SDL_JoystickOpen(device);
                 if (joystick_ != nullptr) {
                     SDL_assert(SDL_JoystickFromInstanceID(SDL_JoystickInstanceID(joystick_)) == joystick_);
-                }
+                }*/
+                wichController_ = event.jdevice.which;
+                joystick_ = SDL_JoystickOpen(wichController_);
+                memset(currentControllerBtnStates, 0, sizeof(Uint8) * static_cast<size_t>(ControllerButton::LENGTH));
+                memset(previousControllerBtnStates, 0, sizeof(Uint8) * static_cast<size_t>(ControllerButton::LENGTH));
             }
             break;
 
-            case SDL_JOYAXISMOTION:
+            case SDL_JOYAXISMOTION: 
                 break;
             case SDL_JOYHATMOTION:
             {
@@ -77,8 +88,6 @@ namespace neko
 
                 break;
             case SDL_JOYBUTTONDOWN:
-                std::cout << "Bind up button : ";
-                currentControllerBtnStates[ControllerButtonBind(event)] = static_cast<int>(InputAction::UP);
                 // First button triggers a 0.5 second full strength rumble #2#
                 if (event.jbutton.button == 0) {
                     SDL_JoystickRumble(joystick_, 0xFFFF, 0xFFFF, 500);
@@ -103,7 +112,14 @@ namespace neko
 
     void InputManager::BindFromJson()
     {
+        json inputBindingFile = LoadJson("./../../data/input_binding.json");
+        for (int i = 0; i < static_cast<size_t>(InputAction::LENGTH); ++i)
+        {
+            bindPcInput[inputBindingFile[i]["Actions"]] = static_cast<KeyCode>(inputBindingFile[i]["PcInput"]);
+            bindControllerInput[inputBindingFile[i]["Actions"]] = static_cast<ControllerButton>(inputBindingFile[i]["ControllerInput"]);
+        }
     }
+	
     bool InputManager::IsKeyDown(KeyCode key) const
     {
         return currentKeyStates[static_cast<int>(key)] == 1
@@ -120,57 +136,66 @@ namespace neko
     {
         return currentKeyStates[static_cast<int>(key)] == 1;
     }
-
+   
     bool InputManager::IsControllerButtonDown(ControllerButton button) const
     {
-        const auto buttonIndex = static_cast<int> (button);
+        const auto buttonIndex = static_cast<int>(button);
         return currentControllerBtnStates[buttonIndex] == 1
-            && previousControllerBtnyStates[buttonIndex] == 0;
+            && previousControllerBtnStates[buttonIndex] == 0;
     }
 
     bool InputManager::IsControllerButtonUp(ControllerButton button) const
     {
         const auto buttonIndex = static_cast<int> (button);
         return currentControllerBtnStates[buttonIndex] == 0
-            && previousControllerBtnyStates[buttonIndex] == 1;
+            && previousControllerBtnStates[buttonIndex] == 1;
     }
 
 	bool InputManager::IsControllerButtonHeld(ControllerButton button) const
 	{
         const auto buttonIndex = static_cast<int>(button);
-        return currentControllerBtnStates[buttonIndex];
+        return currentControllerBtnStates[buttonIndex] == 1;
 	}
 
 
     bool InputManager::IsActionButtonDown(InputAction button) const
     {
         const int actionIndex = static_cast<int>(button);
-        const auto keyboardLength = static_cast<int>(KeyCode::LENGTH);
-         if (bindPcInput[actionIndex] < keyboardLength || bindControllerInput[actionIndex])
+    	
+        if (bindPcInput[actionIndex] < KeyCode::LENGTH 
+            || bindControllerInput[actionIndex] < ControllerButton::LENGTH)
          {
-            return IsKeyDown(static_cast<KeyCode>(currentKeyStates[actionIndex]));
+            return IsKeyDown(bindPcInput[actionIndex])
+        	|| IsControllerButtonDown(bindControllerInput[actionIndex]);
         }
         return false;
     }
 
     bool InputManager::IsActionButtonUp(InputAction button) const
     {
+        const int actionIndex = static_cast<int>(button);
+
+        if (bindPcInput[actionIndex] < KeyCode::LENGTH
+            || bindControllerInput[actionIndex] < ControllerButton::LENGTH)
+        {
+            return IsKeyUp(bindPcInput[actionIndex])
+                || IsControllerButtonUp(bindControllerInput[actionIndex]);
+        }
         return false;
     }
 
     bool InputManager::IsActionButtonHeld(InputAction button) const
     {
+        const int actionIndex = static_cast<int>(button);
+
+        if (bindPcInput[actionIndex] < KeyCode::LENGTH
+            || bindControllerInput[actionIndex] < ControllerButton::LENGTH)
+        {
+            return IsKeyHeld(bindPcInput[actionIndex])
+                || IsControllerButtonHeld(bindControllerInput[actionIndex]);
+        }
         return false;
     }
 
-    Uint8 InputManager::KeyBind(SDL_Event &event)
-    {    	
-        return bindPcInput[event.key.keysym.scancode];
-    }
-
-    Uint8 InputManager::ControllerButtonBind(SDL_Event& event)
-    {
-        return bindControllerInput[event.cbutton.button];
-    }
 
 }

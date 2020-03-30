@@ -12,25 +12,24 @@ namespace neko
     void InputProgram::Init()
     {
         const auto& config = BasicEngine::GetInstance()->config;
-        
+        inputManager_.BindFromJson();
     }
 
     void InputProgram::Update(seconds dt)
     {
     	inputManager_.PreUserInputs();
        
-        if (inputManager_.IsKeyHeld(KeyCode::Q) && inputManager_.IsKeyHeld(KeyCode::A))
-        {
-            std::cout << " q and a key held" << '\n';
-        }
-    	if (inputManager_.IsKeyUp(KeyCode::E))
-        {
-            std::cout << " e key released" << '\n';
-        }
-    	
         if (inputManager_.IsActionButtonDown(InputAction::UP))
         {
-            std::cout << " UP action pressed" << '\n';
+            std::cout << " UP action pressed\n";
+        }
+        if (inputManager_.IsActionButtonUp(InputAction::LEFT))
+        {
+            std::cout << " LEFT action released\n";
+        }
+        if (inputManager_.IsActionButtonHeld(InputAction::DOWN))
+        {
+            std::cout << " RIGHT action held\n";
         }
     }
     void InputProgram::Destroy()
