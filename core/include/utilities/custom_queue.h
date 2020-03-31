@@ -3,19 +3,33 @@
 
 namespace neko
 {
-	template<typename T>
-	class custom_queue
+	template<typename T, size_t capacity>
+	class SmallQueue
 	{
+	private:
+		T* start_ = nullptr, end_ = nullptr;
+		std::array<T, capacity> buffer_;
+	};
 
+	template<typename T, size_t capacity>
+	class FixedQueue
+	{
+		
+	};
+	//TODO Change name to DynamicQueue and use dynamic array
+	template<typename T>
+	class CustomQueue
+	{
+		
 	public:
-		custom_queue();
-		~custom_queue() = default;
-		void PushQueue(T element);
-		void DeleteQueue();
-		T PopQueue();
-		T FrontQueue();
-		T BackQueue();
-		int SizeQueue();
+		CustomQueue();
+		~CustomQueue() = default;
+		void Push(T element);
+		void Clear();
+		T Pop();
+		T Front();
+		T Back();
+		int Size();
 	private:
 		std::vector<T> queueVector;
 	};
