@@ -67,7 +67,7 @@ namespace neko
 
     	static bool IsPlanCircleIntersects(const Circle<Vec3f> sphere, const Vec3f normal, const Vec3f pos)
         {
-            const float p = Vec3f::Dot(sphere.center - pos, normal) / normal.GetMagnitude();
+            const float p = Vec3f::Dot(sphere.center - pos, normal) / normal.Magnitude();
         	
             return p < sphere.radius && p > -sphere.radius;
         }

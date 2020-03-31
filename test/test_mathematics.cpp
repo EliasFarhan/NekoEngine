@@ -1,27 +1,20 @@
 //
 // Created by efarhan on 11/16/19.
 //
-<<<<<<< HEAD
 #define _USE_MATH_DEFINES
-=======
 #ifdef WIN32
 #define _USE_MATH_DEFINES
 #endif
->>>>>>> develop
 #include <cmath>
 #include <random>
 #include <gtest/gtest.h>
 #include <mathematics/func_table.h>
-<<<<<<< HEAD
 #include <mathematics/circle.h>
-=======
-
 #include <mathematics/quaternion.h>
 #include <mathematics/matrix.h>
 #include "mathematics/vector.h"
 
 
->>>>>>> develop
 const float maxNmb = 100.0f;
 
 void RandomFill(std::vector<float>& numbers, float start = -maxNmb, float end = maxNmb)
@@ -116,51 +109,22 @@ TEST(Engine, Quaternion_FromEuler)
 
 TEST(Engine, TestMatrix4)
 {
-	neko::Mat4f m1(std::array<neko::Vec4f, 4>
-	{
-		neko::Vec4f{ 1,2,3,4 },
-			neko::Vec4f{ -1,-2,-3,-4 },
-			neko::Vec4f{ 4,2,2,1 },
-			neko::Vec4f{ -4,-3,-2,-1 }
-	});
-
-<<<<<<< HEAD
-    float error = 0.0f;
-    for(auto v : localNumbers)
+    neko::Mat4f m1(std::array<neko::Vec4f, 4>
     {
-        error += sinFuncTable.GetValue(v) - sinf(v);
-    }
-    error /= float(sampleSize);
-    std::cout << "Error margin for sinFuncTable with resolution 512: "<<error<<"\n";
-}
+        neko::Vec4f{ 1,2,3,4 },
+            neko::Vec4f{ -1,-2,-3,-4 },
+            neko::Vec4f{ 4,2,2,1 },
+            neko::Vec4f{ -4,-3,-2,-1 }
+    });
 
-TEST(Engine, TestContact)
-{
-	
-    neko::Circle2D circleA(neko::Vec2f(2,2), 2);
-    neko::Circle2D circleB(neko::Vec2f(3, 3), 3);
-
-    neko::Sphere3D sphere1(neko::Vec3f(2, 2, 2), 2);
-    neko::Sphere3D sphere2(neko::Vec3f(3, 3, 2), 2);
-
-    neko::Rect2f rect(neko::Vec2f(3, 3), neko::Vec2f(2, 2));
-    neko::Circle2D circleC(neko::Vec2f(4, 3), 2);
-	
-    std::cout << "Circle vs circle : " << circleA.CirclesIntersect(circleB) << "\n";
-    std::cout << "Sphere vs sphere : " << sphere1.CirclesIntersect(sphere2) << "\n";
-    std::cout << "Circle vs rect : " << circleC.RectCircleIntersect(rect) << "\n";
-
-    std::cout << "Sphere vs plan : " << neko::Sphere3D::IsPlanCircleContact(sphere1, neko::Vec3f(0, 1, 0), neko::Vec3f(1, 1, 1)) << "\n";
-=======
-	neko::Mat4f result = neko::Mat4f(std::array<neko::Vec4f, 4>{
-		neko::Vec4f(-5, 5, 6, -5),
-			neko::Vec4f(-8, 8, 5, -3),
-			neko::Vec4f(-5, 5, 8, -5),
-			neko::Vec4f(-5, 5, 9, -5)
-	});
-	result = result.Transpose();
-	EXPECT_LT(neko::Mat4f::MatrixDifference(m1.MultiplyNaive(m1), result), 0.01f);
-	EXPECT_LT(neko::Mat4f::MatrixDifference(m1.MultiplyIntrinsincs(m1), result), 0.01f);
-	EXPECT_LT(neko::Mat4f::MatrixDifference(m1.MultiplyNaive(m1), m1.MultiplyIntrinsincs(m1)), 0.01f);
->>>>>>> develop
+    neko::Mat4f result = neko::Mat4f(std::array<neko::Vec4f, 4>{
+        neko::Vec4f(-5, 5, 6, -5),
+            neko::Vec4f(-8, 8, 5, -3),
+            neko::Vec4f(-5, 5, 8, -5),
+            neko::Vec4f(-5, 5, 9, -5)
+    });
+    result = result.Transpose();
+    EXPECT_LT(neko::Mat4f::MatrixDifference(m1.MultiplyNaive(m1), result), 0.01f);
+    EXPECT_LT(neko::Mat4f::MatrixDifference(m1.MultiplyIntrinsincs(m1), result), 0.01f);
+    EXPECT_LT(neko::Mat4f::MatrixDifference(m1.MultiplyNaive(m1), m1.MultiplyIntrinsincs(m1)), 0.01f);
 }
