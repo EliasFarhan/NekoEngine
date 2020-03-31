@@ -2,6 +2,7 @@
 
 #include "mathematics/vector.h"
 #include "mathematics/matrix.h"
+#include "mathematics/quaternion.h"
 
 
 float RandomFloat()
@@ -38,3 +39,17 @@ void RandomFill(neko::Mat4f& m)
     }
     m = neko::Mat4f(v);
 }
+
+void RandomFill(neko::Quaternion& q)
+{
+    neko::Vec4f v = neko::Vec4f::zero;
+    RandomFill(v);
+    q = neko::Quaternion(v);
+}
+
+/*void RandomFill(neko::Vec4fQuaternion& q)
+{
+    neko::Vec4f v = neko::Vec4f::zero;
+    RandomFill(v);
+    q = neko::Vec4fQuaternion(v);
+}*/

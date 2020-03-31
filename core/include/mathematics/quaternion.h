@@ -2,6 +2,7 @@
 #include <engine/component.h>
 #include <mathematics/vector.h>
 #include "mathematics/trigo.h"
+#include <mathematics/vector_nvec.h>
 
 
 //DATE : 19.02.2020
@@ -36,6 +37,13 @@ struct Quaternion
 	{
 	}
 
+	Quaternion(neko::Vec4f& v)
+	{
+		x = v.x;
+		y = v.y;
+		z = v.z;
+		w = v.w;
+	}
 
 	const float& operator[](size_t p_axis) const
 	{
@@ -246,69 +254,209 @@ struct Quaternion
         return os;
     }
 };
-
-using QuaternionIndex = std::uint32_t;
-	struct QuaternionsVector
+	
+struct IntrinsicsQuaternion
+{
+	IntrinsicsQuaternion()
 	{
-		QuaternionsVector()
-		{
-			
-		}
+		//fourVec4_ = FourVec4f::Zero;		//TODO
+	}
 
-		float Dot(QuaternionIndex ia, QuaternionIndex ib)
-		{
-			
-		}
+	/*IntrinsicsQuaternion(float X, float Y, float Z, float W)
+	{
+		vec4_.x = X;
+		vec4_.y = Y;
+		vec4_.z = Z;
+		vec4_.w = W;
+	}*/
 
-		QuaternionsVector Normalized(QuaternionIndex i)
-		{
-			
-		}
+	IntrinsicsQuaternion(FourVec4f v)
+	{
+		fourVec4_ = v;
+	}
 
-		float Magnitude(QuaternionIndex i)
-		{
-			
-		}
+	/*const float& operator[](size_t p_axis) const
+	{
+		return coord[p_axis];
+	}
 
-		float SquareMagnitude(QuaternionIndex i)
-		{
-			
-		}
+	float& operator[](size_t p_axis)
+	{
 
-		QuaternionsVector AngleAxis(radian_t rad, neko::Vec3f axis, QuaternionIndex i)
-		{
-			
-		}
+		return coord[p_axis];
+	}*/
 
-		degree_t Angle(QuaternionIndex ai, QuaternionIndex bi)
-		{
-			
-		}
+	//The dot product between two rotations.
+	static std::array<float, 4> Dot(IntrinsicsQuaternion a, IntrinsicsQuaternion b)
+	{
+		return	FourVec4f::DotIntrinsics(a.fourVec4_, b.fourVec4_);
+	}
 
-		QuaternionsVector Conjugate(QuaternionIndex i)
-		{
-			
-		}
+	//Converts this quaternion to one with the same orientation but with a magnitude of 1.
+	static IntrinsicsQuaternion Normalized(IntrinsicsQuaternion quaternion)
+	{
+		//return quaternion / Magnitude(quaternion);
+		//TODO
+	}
 
-		QuaternionsVector Inverse(QuaternionIndex i)
-		{
-			
-		}
+	static std::array<float, 4> Magnitude(IntrinsicsQuaternion quaternion)
+	{
+		return quaternion.fourVec4_.MagnitudeIntrinsics();
+	}
 
-		QuaternionsVector FromEuler(EulerAngles angle, QuaternionIndex i)
-		{
-			
-		}
+	static std::array<float, 4> SquareMagnitude(IntrinsicsQuaternion quaternion)
+	{
+		return quaternion.fourVec4_.SquareMagnitudeIntrinsics();
+	}
 
-		/*QuaternionsVector Identity()
-		{
-			
-		}*/
-		
-	private:
-		std::vector<float> x;
-		std::vector<float> y;
-		std::vector<float> z;
-		std::vector<float> w;
-	};
+	//Rotates the Quaternion of angle degrees around axis.
+	static IntrinsicsQuaternion AngleAxis(radian_t rad, neko::Vec3f axis)
+	{
+		/*if (axis.SquareMagnitude() == 0.0f)
+			return IntrinsicsQuaternion::Identity();
+
+		IntrinsicsQuaternion result = IntrinsicsQuaternion::Identity();
+		axis = axis.Normalized();
+		axis *= Sin(rad);
+		result.vec4_.x = axis.x;
+		result.vec4_.y = axis.y;
+		result.vec4_.z = axis.z;
+		result.vec4_.w = Cos(rad);
+
+		return Normalized(result);*/
+		//TODO Intrinsics this
+	}
+
+
+	//Returns the angle in degrees between two rotations a and b.
+	static degree_t Angle(const IntrinsicsQuaternion& a, const IntrinsicsQuaternion& b)
+	{
+
+		//return 2.0f * Acos(std::abs(Dot(a, b)));		//Todo change with neko::Acos
+		//TODO Intrinsics this
+	}
+
+	IntrinsicsQuaternion Conjugate() const
+	{
+		//return IntrinsicsQuaternion(-vec4_.x, -vec4_.y, -vec4_.z, vec4_.w);
+		//TODO Intrinsics this
+	}
+
+	//Returns the Inverse of rotation.
+	IntrinsicsQuaternion Inverse() const
+	{
+		/*const IntrinsicsQuaternion conj = Conjugate();
+		const float sMag = SquareMagnitude(*this);
+
+		return conj / sMag;*/
+		//TODO Intrinsics this
+	}
+
+	/*
+	Returns a rotation that rotates z degrees around the z axis,
+	x degrees around the x axis, and y degrees around the y axis;
+	applied in that order
+	*/
+	static IntrinsicsQuaternion FromEuler(EulerAngles angle)
+	{
+		/*const auto cy = Cos(angle.x * 0.5f);
+		const auto sy = Sin(angle.x * 0.5f);
+		const auto cp = Cos(angle.y * 0.5f);
+		const auto sp = Sin(angle.y * 0.5f);
+		const auto cr = Cos(angle.z * 0.5f);
+		const auto sr = Sin(angle.z * 0.5f);
+
+		return IntrinsicsQuaternion(
+			cy * cp * cr + sy * sp * sr,
+			cy * cp * sr - sy * sp * cr,
+			sy * cp * sr + cy * sp * cr,
+			sy * cp * cr - cy * sp * sr
+		);*/
+		//TODO Intrinsics this
+	}
+
+	static IntrinsicsQuaternion Identity()
+	{
+		//return IntrinsicsQuaternion(0, 0, 0, 1);
+		//TODO Intrinsics this
+	}
+
+	//Operators
+	IntrinsicsQuaternion operator/(IntrinsicsQuaternion rhs) const
+	{
+		return *this * rhs.Inverse();
+	}
+
+	IntrinsicsQuaternion operator/(const float rhs) const {
+		/*return IntrinsicsQuaternion(
+			vec4_ / rhs);*/ //TODO
+	}
+
+	/*IntrinsicsQuaternion& operator+=(const float rhs)
+	{
+		vec4_ += rhs;
+		return *this;
+	}*/
+
+	IntrinsicsQuaternion operator-(const IntrinsicsQuaternion& rhs) const
+	{
+		/*return IntrinsicsQuaternion(
+			vec4_ - rhs.vec4_);*/ //TODO
+	}
+	IntrinsicsQuaternion& operator-=(const IntrinsicsQuaternion& rhs)
+	{
+		/*vec4_ -= rhs.vec4_;
+		return *this;*/ //TODO
+	}
+
+	IntrinsicsQuaternion operator+(const IntrinsicsQuaternion& rhs) const
+	{
+		/*return IntrinsicsQuaternion(
+			vec4_ - rhs.vec4_);*/ //TODO
+	}
+
+	IntrinsicsQuaternion& operator+=(const IntrinsicsQuaternion& rhs)
+	{
+		/*vec4_ += rhs.vec4_;
+		return *this;*/ //TODO
+	}
+
+
+	IntrinsicsQuaternion operator*(const IntrinsicsQuaternion& rhs) const
+	{
+		//return IntrinsicsQuaternion(vec4_ * rhs.vec4_);
+		//TODO
+	}
+
+	IntrinsicsQuaternion operator*(const float rhs) const {
+		//return IntrinsicsQuaternion(vec4_ * rhs);
+		//TODO
+	}
+
+	/*IntrinsicsQuaternion& operator*=(const IntrinsicsQuaternion& rhs)
+	{
+		vec4_ *= rhs.vec4_; 
+		return *this;
+	}*/
+
+	bool operator==(const IntrinsicsQuaternion& right) const
+	{
+		//return vec4_ == right.vec4_;
+		//TODO
+	}
+
+	bool operator!=(const IntrinsicsQuaternion& right) const
+	{
+		return !(*this == right);
+	}
+
+	/*friend std::ostream& operator<<(std::ostream& os, const IntrinsicsQuaternion& quat)
+	{
+		os << "Quaternion(" << quat.x << "," << quat.y << "," << quat.z << "," << quat.w << ")";
+		return os;
+	}*/
+	
+private:
+	neko::FourVec4f fourVec4_;
+};
 }
