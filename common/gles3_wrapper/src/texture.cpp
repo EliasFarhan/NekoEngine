@@ -9,9 +9,9 @@
 namespace neko::gl
 {
 
-unsigned stbCreateTexture(const char* filename, TextureFlags flags)
+unsigned stbCreateTexture(const std::string_view filename, TextureFlags flags)
 {
-    std::string extension = GetFilenameExtension(filename);
+	const std::string extension = GetFilenameExtension(filename);
     if(!FileExists(filename))
     {
         std::ostringstream oss;
@@ -27,15 +27,23 @@ unsigned stbCreateTexture(const char* filename, TextureFlags flags)
     else if (extension == ".png")
         reqComponents = 4;
 
+    BufferFile textureFile;
+    textureFile.Load(filename);
     void *data = nullptr;
     if(extension == ".hdr")
     {
-        data = stbi_loadf(filename, &width, &height, &reqComponents, 0);
+        //data = stbi_loadf(filename.data(), &width, &height, &reqComponents, 0);
+        data = stbi_loadf_from_memory((unsigned char*)(textureFile.dataBuffer),
+            textureFile.dataLength, &width, &height, &reqComponents, 0);
     }
     else
     {
-        data = stbi_load(filename, &width, &height, &nrChannels, reqComponents);
+        //data = stbi_load(filename.data(), &width, &height, &nrChannels, reqComponents);
+    	data = stbi_load_from_memory((unsigned char*)(textureFile.dataBuffer),
+            textureFile.dataLength, &width, &height, &nrChannels, reqComponents);
     }
+
+    textureFile.Destroy();
     if (data == nullptr)
     {
         std::ostringstream oss;
@@ -74,7 +82,6 @@ unsigned stbCreateTexture(const char* filename, TextureFlags flags)
     {
         glGenerateMipmap(GL_TEXTURE_2D);
     }
-
     stbi_image_free(data);
     return texture;
 }

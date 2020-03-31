@@ -32,7 +32,7 @@ public:
             case LightType::LIGHT_POSITION:
             {
                 radius_ = range_;
-                aabb_ = neko::Rect3f(neko::Vec3f::Zero, neko::Vec3f(range_));
+                aabb_ = neko::Rect3f(neko::Vec3f::zero, neko::Vec3f(range_));
                 break;
             }
             case LightType::AREA_LIGHT:
@@ -53,7 +53,7 @@ public:
             default:
             {
                 break;
-            }fac
+            }
         }
     }
 
@@ -64,7 +64,7 @@ protected:
     float radius_ = 0.0f;
     float range_ = 0.0f;
     float tanHalfAngle_ = 0.0f;
-    neko::Rect3f aabb_{neko::Vec3f::Zero, neko::Vec3f::Zero};
+    neko::Rect3f aabb_{neko::Vec3f::zero, neko::Vec3f::zero};
 };
 
 class PositionLight : public Light
@@ -78,13 +78,13 @@ public:
     void virtualLightBounds() override
     {
         radius_ = range_;
-        aabb_ = neko::Rect3f(neko::Vec3f::Zero, neko::Vec3f(range_));
+        aabb_ = neko::Rect3f(neko::Vec3f::zero, neko::Vec3f(range_));
     }
 
     void ownLightBounds()
     {
         radius_ = range_;
-        aabb_ = neko::Rect3f(neko::Vec3f::Zero, neko::Vec3f(range_));
+        aabb_ = neko::Rect3f(neko::Vec3f::zero, neko::Vec3f(range_));
     }
 
 };

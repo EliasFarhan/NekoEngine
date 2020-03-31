@@ -25,12 +25,28 @@
 
 #include <ostream>
 #include <array>
-#include <cmath>
 #include "mathematics/const.h"
 #include <mathematics/intrinsincs.h>
+#include "mathematics/angle.h"
+#include "trigo.h"
 
 namespace neko
 {
+//-----------------------------------------------------------------------------
+// Forward Declarations
+//-----------------------------------------------------------------------------
+template<typename T>
+struct Vec2;
+
+template<typename T>
+class Vec3;
+
+template<typename T>
+class alignas(4 * sizeof(T)) Vec4;
+
+//-----------------------------------------------------------------------------
+// Vec2
+//-----------------------------------------------------------------------------
 template<typename T>
 struct Vec2
 {
@@ -45,15 +61,24 @@ struct Vec2
         T coord[2];
     };
 
+    const static Vec2 zero;
+    const static Vec2 one;
+    const static Vec2 up;
+    const static Vec2 down;
+    const static Vec2 left;
+    const static Vec2 right;
+
+    //-----------------------------------------------------------------------------
+    // Constructors
+    //-----------------------------------------------------------------------------
     Vec2()
+            : x(0), y(0)
     {
-        x = y = 0;
     }
 
     explicit Vec2(T same)
             : x(same), y(same)
     {
-
     }
 
     Vec2(T X, T Y) noexcept
@@ -63,32 +88,28 @@ struct Vec2
 
     template<typename U>
     explicit Vec2(const Vec2<U>& vector)
-            : x(static_cast<T>(vector.x)), y(static_cast<T>(vector.y))
+            : x(static_cast<T>(vector.x)),
+              y(static_cast<T>(vector.y))
     {
     }
 
-    const T& operator[](size_t p_axis) const
+    template<typename U>
+    explicit Vec2(const Vec3<U>& vec3)
+            : x(static_cast<T>(vec3.x)),
+              y(static_cast<T>(vec3.y))
     {
-
-        return coord[p_axis];
     }
 
-    T& operator[](size_t p_axis)
+    template<typename U>
+    explicit Vec2(const Vec4<U>& vec4)
+            : x(static_cast<T>(vec4.x)),
+              y(static_cast<T>(vec4.y))
     {
-
-        return coord[p_axis];
     }
 
-    T GetSquareMagnitude()
-    {
-        return x * x + y * y;
-    }
-
-    static T Dot(const Vec2<T>& v1, const Vec2<T>& v2)
-    {
-        return v1.x * v2.x + v1.y * v2.y;
-    }
-
+    //-----------------------------------------------------------------------------
+    // Operators
+    //-----------------------------------------------------------------------------
     Vec2<T> operator+(const Vec2<T>& rhs) const
     {
         return Vec2<T>(x + rhs.x, y + rhs.y);
@@ -152,18 +173,16 @@ struct Vec2
         return !(*this == right);
     }
 
-    T GetMagnitude() const;
-
-    Vec2<T> Normalized() const
+    const T& operator[](size_t p_axis) const
     {
-        return (*this) / (*this).GetMagnitude();
+
+        return coord[p_axis];
     }
 
-    Vec2<T> Rotate(T angle) const;
-
-    static Vec2<T> Lerp(const Vec2<T>& v1, const Vec2<T>& v2, T t)
+    T& operator[](size_t p_axis)
     {
-        return v1 + (v2 - v1) * t;
+
+        return coord[p_axis];
     }
 
     friend std::ostream& operator<<(std::ostream& os, const Vec2<T>& dt)
@@ -174,26 +193,107 @@ struct Vec2
 
     //Used to specialize in case of other kind of vector
     template<typename U>
-    explicit Vec2(const U& v);
-
-    //Used to specialize in case of other kind of vector
-    template<typename U>
     explicit operator U() const;
 
-    template<typename U = float>
-    static U AngleBetween(const Vec2& v1, const Vec2& v2);
+    //-----------------------------------------------------------------------------
+    // Formulas
+    //-----------------------------------------------------------------------------
+    /// \brief Calculates the dot product from two vectors.
+    static T Dot(const Vec2<T>& v1, const Vec2<T>& v2)
+    {
+        return v1.x * v2.x + v1.y * v2.y;
+    }
 
-    const static Vec2 Zero;
-    const static Vec2 One;
+    /// \brief Calculates the square magnitude.
+    T SquareMagnitude() const
+    {
+        return Dot(*this, *this);
+    }
+
+    /// \brief Calculates the magnitude.
+    T Magnitude() const
+    {
+        return std::sqrt(SquareMagnitude());
+    }
+
+    /// \brief Calculates the normalized vector.
+    Vec2<T> Normalized() const
+    {
+        return (*this) / (*this).Magnitude();
+    }
+
+    /// \brief Interpolate between two vectors.
+    /// \param t The interpolation amount.
+    static Vec2<T> Lerp(const Vec2<T>& v1, const Vec2<T>& v2, T t)
+    {
+        return v1 + (v2 - v1) * t;
+    }
+
+    /// \brief Reflect the inVec using the normal given (doesn't need to be normalized).
+    /// \param inVec The vector to reflect.
+    /// \param normal The normal vector of the line to reflect off.
+    static Vec2<T> Reflect(const Vec2<T>& inVec, const Vec2<T>& normal)
+    {
+        return inVec - normal * 2 * Dot(inVec, normal);
+    }
+
+    /// \brief Project v1 on v2 (doesn't need to be normalized).
+    /// \param v1 The vector to project.
+    /// \param v2 The vector to project on.
+    static Vec2<T> Project(const Vec2<T>& v1, const Vec2<T>& v2)
+    {
+        const auto dot = Dot(v1, v2);
+        const auto mag = v2.SquareMagnitude();
+        return {(dot / mag) * v2.x,
+                (dot / mag) * v2.y};
+    }
+
+    /// \brief Calculates the angle between two vectors.
+    static neko::radian_t AngleBetween(const Vec2& v1, const Vec2& v2);
+
+    /// \brief Rotates the Vec2 from the given angle (in degrees).
+    Vec2<T> Rotate(neko::radian_t angle) const
+    {
+        return {x * Cos(angle) - y * Sin(angle),
+                x * Sin(angle) + y * Cos(angle)};
+    }
+
+    //-----------------------------------------------------------------------------
+    // Other
+    //-----------------------------------------------------------------------------
+    //Used to specialize in case of other kind of vector
+    template<typename U>
+    explicit Vec2(const U& v);
 };
+//-----------------------------------------------------------------------------
+// Vec2 Aliases
+//-----------------------------------------------------------------------------
+using Vec2f = Vec2<float>;
+using Vec2i = Vec2<int>;
+using Vec2u = Vec2<unsigned>;
 
 template<typename T>
-template<typename U>
-U Vec2<T>::AngleBetween(const Vec2& v1, const Vec2& v2)
+inline Vec2<T> const Vec2<T>::zero = Vec2<T>(0, 0);
+template<typename T>
+inline Vec2<T> const Vec2<T>::one = Vec2<T>(1, 1);
+template<typename T>
+inline Vec2<T> const Vec2<T>::up = Vec2<T>(0, 1);
+template<typename T>
+inline Vec2<T> const Vec2<T>::down = Vec2<T>(0, -1);
+template<typename T>
+inline Vec2<T> const Vec2<T>::left = Vec2<T>(-1, 0);
+template<typename T>
+inline Vec2<T> const Vec2<T>::right = Vec2<T>(1, 0);
+
+//-----------------------------------------------------------------------------
+// Vec2 Implementations
+//-----------------------------------------------------------------------------
+template<typename T>
+neko::radian_t Vec2<T>::AngleBetween(const Vec2& v1, const Vec2& v2)
 {
-    const U dot = Vec2<T>::Dot(v1, v2) / v1.GetMagnitude() / v2.GetMagnitude();
-    const U det = v1.x * v2.y - v1.y * v2.x;
-    const U angle = atan2(det, dot) / float(M_PI) * 180.0f;
+    const float dot = Vec2<T>::Dot(v1, v2) / v1.Magnitude() / v2.Magnitude();
+    const float det = v1.x * v2.y - v1.y * v2.x;
+    const neko::radian_t angle = Atan2(det, dot);
     return angle;
 }
 
@@ -203,21 +303,9 @@ Vec2<T> operator*(T lhs, const Vec2<T>& rhs)
     return Vec2<T>(rhs.x * lhs, rhs.y * lhs);
 }
 
-using Vec2f = Vec2<float>;
-using Vec2i = Vec2<int>;
-using Vec2u = Vec2<unsigned>;
-
-template <>
-inline Vec2f const Vec2f::Zero = Vec2f(0.0f,0.0f);
-template <>
-inline Vec2f const Vec2f::One = Vec2f(1.0f,1.0f);
-
-template<>
-inline float Vec2f::GetMagnitude() const
-{
-    return sqrtf(x * x + y * y);
-}
-
+//-----------------------------------------------------------------------------
+// Vec3
+//-----------------------------------------------------------------------------
 template<typename T>
 class Vec3
 {
@@ -232,11 +320,20 @@ public:
         };
         T coord[3];
     };
-    const static Vec3 Zero;
-    const static Vec3 One;
 
-    Vec3()
-            : x(0), y(0), z(0)
+    const static Vec3 zero;
+    const static Vec3 one;
+    const static Vec3 up;
+    const static Vec3 down;
+    const static Vec3 left;
+    const static Vec3 right;
+    const static Vec3 forward;
+    const static Vec3 back;
+
+    //-----------------------------------------------------------------------------
+    // Constructors
+    //-----------------------------------------------------------------------------
+    Vec3() : x(0), y(0), z(0)
     {
     }
 
@@ -253,6 +350,15 @@ public:
     }
 
     template<typename U>
+    explicit Vec3(const Vec2<U>& vec2)
+            : x(static_cast<T>(vec2.x)),
+              y(static_cast<T>(vec2.y)),
+              z(static_cast<T>(0))
+    {
+
+    }
+
+    template<typename U>
     explicit
     Vec3(const Vec3<U>& vector)
             : x(static_cast<T>(vector.x)),
@@ -263,7 +369,6 @@ public:
 
     const T& operator[](size_t p_axis) const
     {
-
         return coord[p_axis];
     }
 
@@ -273,22 +378,22 @@ public:
         return coord[p_axis];
     }
 
-    T GetSquareMagnitude() const
-    {
-        return Dot(*this, *this);
-    }
 
-    template<typename ReturnT = float>
-    ReturnT GetMagnitude() const
+    template<typename U>
+    explicit Vec3(const Vec4<U>& vec4)
+            : x(static_cast<T>(vec4.x)),
+              y(static_cast<T>(vec4.y)),
+              z(static_cast<T>(vec4.z))
     {
-        return std::sqrt(GetSquareMagnitude());
     }
-
-    static T Dot(const Vec3<T> v1, const Vec3<T> v2)
-    {
-        return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
-    }
+<<<<<<< HEAD
     
+=======
+
+    //-----------------------------------------------------------------------------
+    // Operators
+    //-----------------------------------------------------------------------------
+>>>>>>> develop
     Vec3<T> operator+(const Vec3<T>& rhs) const
     {
         return Vec3<T>(x + rhs.x, y + rhs.y, z + rhs.z);
@@ -354,33 +459,120 @@ public:
         return !(*this == right);
     }
 
-    template<typename U = float>
-    static U AngleBetween(const Vec3& v1, const Vec3& v2);
+    friend std::ostream& operator<<(std::ostream& os, const Vec3<T>& dt)
+    {
+        os << "Vec3(" << dt.x << "," << dt.y << "," << dt.z << ")";
+        return os;
+    }
 
+
+    //-----------------------------------------------------------------------------
+    // Formulas
+    //-----------------------------------------------------------------------------
+    /// \brief Calculates the dot product from two vectors.
+    static T Dot(const Vec3<T> v1, const Vec3<T> v2)
+    {
+        return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+    }
+
+    /// \brief Calculates the cross product from two Vec3.
+    static Vec3<T> Cross(const Vec3<T> v1, const Vec3<T> v2)
+    {
+        return Vec3<T>(v1.y * v2.z - v1.z * v2.y,
+                       v1.z * v2.x - v1.x * v2.z,
+                       v1.x * v2.y - v1.y * v2.x);
+    }
+
+    /// \brief Calculates the square magnitude.
+    T SquareMagnitude() const
+    {
+        return Dot(*this, *this);
+    }
+
+    /// \brief Calculates the magnitude.
+    template<typename ReturnT = float>
+    ReturnT Magnitude() const
+    {
+        return std::sqrt(SquareMagnitude());
+    }
+
+    /// \brief Calculates the normalized vector.
+    Vec3<T> Normalized() const
+    {
+        return (*this) / (*this).Magnitude();
+    }
+
+    /// \brief Interpolate between two vectors.
+    /// \param t the interpolation amount.
+    static Vec3<T> Lerp(const Vec3<T>& v1, const Vec3<T>& v2, T t)
+    {
+        return v1 + (v2 - v1) * t;
+    }
+
+    /// \brief Reflect the inVec using the normal given (doesn't need to be normalized).
+    /// \param inVec the vector to reflect.
+    /// \param normal the normal vector of the line to reflect off.
+    static Vec3<T> Reflect(const Vec3<T>& inVec, const Vec3<T>& normal)
+    {
+        Vec3<T> normalized = normal.Normalized();
+        return inVec - normalized * 2 * Dot(inVec, normalized);
+    }
+
+    /// \brief Project v1 on v2 (doesn't need to be normalized).
+    /// \param v1 the vector to project.
+    /// \param v2 the vector to project on.
+    static Vec3<T> Project(const Vec3<T>& v1, const Vec3<T>& v2)
+    {
+        const auto dot = Dot(v1, v2);
+        const auto mag = v2.SquareMagnitude();
+        return {(dot / mag) * v2.x,
+                (dot / mag) * v2.y,
+                (dot / mag) * v2.z};
+    }
+
+    static neko::radian_t AngleBetween(const Vec3& v1, const Vec3& v2);
 };
-
-template<typename T>
-template<typename U>
-U Vec3<T>::AngleBetween(const Vec3& v1, const Vec3& v2)
-{
-    const U dot = Vec3<T>::Dot(v1, v2) / v1.GetMagnitude() / v2.GetMagnitude();
-    const U det = v1.x * v2.y - v1.y * v2.x;
-    const U angle = atan2(det, dot) / float(M_PI) * 180.0f;
-    return angle;
-}
-
-
-
-
+//-----------------------------------------------------------------------------
+// Vec3 Aliases
+//-----------------------------------------------------------------------------
 using Vec3f = Vec3<float>;
 using Vec3i = Vec3<int>;
 using Vec3u = Vec3<unsigned int>;
+using EulerAngles = Vec3<degree_t>;
+using RadianAngles = Vec3<radian_t>;
 
-template <>
-Vec3f inline const Vec3f::Zero = Vec3f(0.0f,0.0f, 0.0f);
-template <>
-Vec3f inline const Vec3f::One = Vec3f(1.0f,1.0f,1.0f);
+template<typename T>
+inline Vec3<T> const Vec3<T>::zero = Vec3<T>(0, 0, 0);
+template<typename T>
+inline Vec3<T> const Vec3<T>::one = Vec3<T>(1, 1, 1);
+template<typename T>
+inline Vec3<T> const Vec3<T>::up = Vec3<T>(0, 1, 0);
+template<typename T>
+inline Vec3<T> const Vec3<T>::down = Vec3<T>(0, -1, 0);
+template<typename T>
+inline Vec3<T> const Vec3<T>::left = Vec3<T>(-1, 0, 0);
+template<typename T>
+inline Vec3<T> const Vec3<T>::right = Vec3<T>(1, 0, 0);
+template<typename T>
+inline Vec3<T> const Vec3<T>::forward = Vec3<T>(0, 0, 1);
+template<typename T>
+inline Vec3<T> const Vec3<T>::back = Vec3<T>(0, 0, -1);
 
+//-----------------------------------------------------------------------------
+// Vec3 Implementations
+//-----------------------------------------------------------------------------
+template<typename T>
+neko::radian_t Vec3<T>::AngleBetween(const Vec3& v1, const Vec3& v2)
+{
+    const float dot = Vec3<T>::Dot(v1, v2) / v1.Magnitude() / v2.Magnitude();
+    const float det = v1.x * v2.y - v1.y * v2.x;
+    const neko::radian_t angle = Atan2(det, dot);
+    return angle;
+}
+
+//-----------------------------------------------------------------------------
+// Vec4
+//-----------------------------------------------------------------------------
 template<typename T>
 class alignas(4 * sizeof(T)) Vec4
 {
@@ -397,9 +589,13 @@ public:
         };
         T coord[4];
     };
-    const static Vec4 Zero;
-    const static Vec4 One;
 
+    const static Vec4 zero;
+    const static Vec4 one;
+
+    //-----------------------------------------------------------------------------
+    // Constructors
+    //-----------------------------------------------------------------------------
     Vec4() noexcept
             : x(0), y(0), z(0), w(0)
     {
@@ -419,11 +615,28 @@ public:
         }
     }
 
-
     Vec4(T X, T Y, T Z, T W)
             : x(X), y(Y), z(Z), w(W)
     {
 
+    }
+
+    template<typename U>
+    explicit Vec4(const Vec2<U>& vec2)
+            : x(static_cast<T>(vec2.x)),
+              y(static_cast<T>(vec2.y)),
+              z(static_cast<T>(0)),
+              w(static_cast<T>(0))
+    {
+    }
+
+    template<typename U>
+    explicit Vec4(const Vec3<U>& vec3)
+            : x(static_cast<T>(vec3.x)),
+              y(static_cast<T>(vec3.y)),
+              z(static_cast<T>(vec3.z)),
+              w(static_cast<T>(0))
+    {
     }
 
     template<typename U>
@@ -435,39 +648,9 @@ public:
     {
     }
 
-    const T& operator[](size_t p_axis) const
-    {
-
-        return coord[p_axis];
-    }
-
-    T& operator[](size_t p_axis)
-    {
-
-        return coord[p_axis];
-    }
-
-    T GetSquareMagnitude() const
-    {
-        return Dot(*this, *this);
-    }
-
-    template<typename ReturnT = float>
-    ReturnT GetMagnitude() const
-    {
-        return std::sqrt(GetSquareMagnitude());
-    }
-
-    static inline T Dot(const Vec4<T> v1, const Vec4<T> v2)
-    {
-        return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z + v1.w * v2.w;
-    }
-
-    static T Dot3(const Vec4<T> v1, const Vec4<T> v2)
-    {
-        return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
-    }
-
+    //-----------------------------------------------------------------------------
+    // Operators
+    //-----------------------------------------------------------------------------
     Vec4<T> operator+(const Vec4<T>& rhs) const
     {
         return Vec4<T>(x + rhs.x, y + rhs.y, z + rhs.z, w + rhs.w);
@@ -536,39 +719,89 @@ public:
         return !(*this == right);
     }
 
-    static Vec4<T> AngleAxis(T angle, Vec3<T> axis);
-    static Vec4<T> FromEulerAngles(Vec3<T> axisX);
+    const T& operator[](size_t p_axis) const
+    {
 
+        return coord[p_axis];
+    }
+
+    T& operator[](size_t p_axis)
+    {
+        return coord[p_axis];
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const Vec4<T>& dt)
+    {
+        os << "Vec4(" << dt.x << "," << dt.y << "," << dt.z << "," << dt.w << ")";
+        return os;
+    }
+
+    //-----------------------------------------------------------------------------
+    // Formulas
+    //-----------------------------------------------------------------------------
+    /// \brief Calculates the dot product from two vectors.
+    static inline T Dot(const Vec4<T> v1, const Vec4<T> v2)
+    {
+        return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z + v1.w * v2.w;
+    }
+
+    /// \brief Calculates the 3D dot product from two vectors.
+    static T Dot3(const Vec4<T> v1, const Vec4<T> v2)
+    {
+        return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+    }
+
+    /// \brief Calculates the square magnitude.
+    T SquareMagnitude() const
+    {
+        return Dot(*this, *this);
+    }
+
+    /// \brief Calculates the magnitude.
+    template<typename ReturnT = float>
+    ReturnT Magnitude() const
+    {
+        return std::sqrt(SquareMagnitude());
+    }
+
+    /// \brief Calculates the normalized vector.
+    Vec4<T> Normalized() const
+    {
+        return (*this) / (*this).Magnitude();
+    }
+
+    /// \brief Interpolate between two vectors.
+    /// \param t the interpolation amount.
+    static Vec4<T> Lerp(const Vec4<T>& v1, const Vec4<T>& v2, T t)
+    {
+        return v1 + (v2 - v1) * t;
+    }
+
+    /// \brief Project v1 on v2 (doesn't need to be normalized).
+    /// \param v1 the vector to project.
+    /// \param v2 the vector to project on.
+    static Vec4<T> Project(const Vec4<T>& v1, const Vec4<T>& v2)
+    {
+        const auto dot = Dot(v1, v2);
+        const auto mag = v2.SquareMagnitude();
+        return {(dot / mag) * v2.x,
+                (dot / mag) * v2.y,
+                (dot / mag) * v2.z,
+                (dot / mag) * v2.w};
+    }
 };
-
+//-----------------------------------------------------------------------------
+// Vec4 Aliases
+//-----------------------------------------------------------------------------
 using Vec4f = Vec4<float>;
-using Quaternion = Vec4f;
 
+template<typename T>
+inline Vec4<T> const Vec4<T>::zero = Vec4<T>(0);
+template<typename T>
+inline Vec4<T> const Vec4<T>::one = Vec4<T>(1);
 
-
-
-template <>
-Vec4f inline const Vec4f::Zero = Vec4f(0.0f,0.0f, 0.0f, 0.0f);
-template <>
-Vec4f inline const Vec4f::One = Vec4f(1.0f,1.0f,1.0f, 1.0f);
-
-//TODO Implement quaternion specific method
-template<>
-inline Quaternion Quaternion::AngleAxis(float angle, Vec3f axis)
-{
-    (void)angle;
-    (void)axis;
-    return Zero;
-}
-
-template<>
-inline Quaternion Quaternion::FromEulerAngles(Vec3f eulerAngles)
-{
-    (void) eulerAngles;
-    return Zero;
-}
-
-
-
+//-----------------------------------------------------------------------------
+// Vec4 Implementations
+//-----------------------------------------------------------------------------
 
 }

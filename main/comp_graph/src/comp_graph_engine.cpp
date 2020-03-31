@@ -4,34 +4,14 @@ namespace neko
 {
 CompGraphEngine::CompGraphEngine(Configuration* config) : SdlEngine(config)
 {
-    initAction_.RegisterCallback(
-            [this](void)
-            {
-                sampleBrowser_.Init();
-            });
-    updateAction_.RegisterCallback(
-            [this](seconds dt)
-            {
-                sampleBrowser_.Update(dt);
-            });
-    destroyAction_.RegisterCallback(
-            [this](void)
-            {
-                sampleBrowser_.Destroy();
-            });
-    drawAction_.RegisterCallback(
-            [this]()
-            {
-                sampleBrowser_.Render();
-            });
-    drawUiAction_.RegisterCallback(
-            [this](seconds dt){
-                sampleBrowser_.DrawGui(dt);
-            });
+    RegisterSystem(sampleBrowser_);
+    RegisterOnDrawUi(sampleBrowser_);
+    RegisterOnEvent(sampleBrowser_);
 }
 
-void CompGraphEngine::OnEvent(const SDL_Event& event)
+void CompGraphEngine::Destroy()
 {
-    sampleBrowser_.OnEvent(event);
+    sampleBrowser_.Destroy();
+    SdlEngine::Destroy();
 }
 }

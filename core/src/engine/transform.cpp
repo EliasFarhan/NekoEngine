@@ -30,7 +30,7 @@ namespace neko
 
 Index Scale2dManager::AddComponent(Entity entity)
 {
-	ResizeIfNecessary(components_, entity, Vec2f::One);
+	ResizeIfNecessary(components_, entity, Vec2f::one);
 	return ComponentManager::AddComponent(entity);
 }
 

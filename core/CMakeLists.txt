@@ -1,9 +1,3 @@
-
-
-
-
-
-
 #source files
 file(GLOB_RECURSE Neko_ENGINE_SRC src/engine/*.cpp include/engine/*.h)
 file(GLOB_RECURSE Neko_GRAPHICS_SRC src/graphics/*.cpp include/graphics/*.h)
@@ -38,6 +32,10 @@ add_library(Neko_Core STATIC ${Neko_SRC})
 if (APPLE)
     target_link_libraries(Neko_Core PUBLIC ${Boost_LIBRARIES})
 endif(APPLE)
+
+if(Neko_Profile)
+    target_link_libraries(Neko_Core PUBLIC easy_profiler)
+endif()
 target_compile_options(Neko_Core PRIVATE $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
         -Wall -Wextra>
         $<$<CXX_COMPILER_ID:MSVC>:
@@ -50,7 +48,7 @@ target_compile_definitions(Neko_Core PUBLIC SOURCE_PATH="${CMAKE_SOURCE_DIR}")
 
 set_target_properties (Neko_Core PROPERTIES FOLDER Neko)
 
-target_include_directories(Neko_Core PUBLIC ${IMGUI_ROOT})
+target_include_directories(Neko_Core PUBLIC "${IMGUI_ROOT}")
 target_include_directories(Neko_Core PUBLIC include/)
 target_include_directories(Neko_Core PUBLIC ${UTILITIES_DIR})
 neko_lib_config(Neko_Core)
