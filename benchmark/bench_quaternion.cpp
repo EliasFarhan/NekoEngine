@@ -144,8 +144,8 @@ BENCHMARK(BM_Dot)->Range(fromRange, toRange);
 static void BM_Intrinsics_Dot(benchmark::State& state)
 {
     const size_t n = state.range(0);
-    std::vector<neko::IntrinsicsQuaternion> v1(n, neko::IntrinsicsQuaternion::Identity());
-    std::vector<neko::IntrinsicsQuaternion> v2(n, neko::IntrinsicsQuaternion::Identity());
+    std::vector<neko::IntrinsicsQuaternion> v1(n, neko::IntrinsicsQuaternion());
+    std::vector<neko::IntrinsicsQuaternion> v2(n, neko::IntrinsicsQuaternion());
     std::for_each(v1.begin(), v1.end(), [](neko::IntrinsicsQuaternion& q) {RandomFill(q); });
     std::for_each(v2.begin(), v2.end(), [](neko::IntrinsicsQuaternion& q) {RandomFill(q); });
 
