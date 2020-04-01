@@ -19,12 +19,12 @@ namespace neko
 	};
 	//TODO Change name to DynamicQueue and use dynamic array
 	template<typename T>
-	class CustomQueue
+	class DynamicQueue
 	{
 		
 	public:
-		CustomQueue();
-		~CustomQueue() = default;
+		DynamicQueue();
+		~DynamicQueue() = default;
 		void Push(T element);
 		void Clear();
 		T Pop();

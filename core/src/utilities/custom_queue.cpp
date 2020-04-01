@@ -6,23 +6,23 @@ namespace neko
 {
 
 	template<typename T>
-	CustomQueue<T>::CustomQueue()
+	DynamicQueue<T>::DynamicQueue()
 	{
 		queueVector.resize(0);
 	}
 
 	template<typename T>
-	void CustomQueue<T>::Push(T element)
+	void DynamicQueue<T>::Push(T element)
 	{
 		queueVector.push_back(element);
 	}
 	template<typename T>
-	void CustomQueue<T>::Clear()
+	void DynamicQueue<T>::Clear()
 	{
 		queueVector._Destroy();
 	}
 	template <typename T>
-	T CustomQueue<T>::Pop()
+	T DynamicQueue<T>::Pop()
 	{
 		T returnValue = queueVector[0];
 		queueVector.erase(0);
@@ -30,19 +30,19 @@ namespace neko
 	}
 
 	template<typename T>
-	T CustomQueue<T>::Front()
+	T DynamicQueue<T>::Front()
 	{
 		return queueVector.begin();
 	}
 
 	template<typename T>
-	T CustomQueue<T>::Back()
+	T DynamicQueue<T>::Back()
 	{
 		return queueVector.end();
 	}
 
 	template<typename T>
-	int CustomQueue<T>::Size()
+	int DynamicQueue<T>::Size()
 	{
 		return queueVector.size();
 	}
