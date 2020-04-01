@@ -18,7 +18,7 @@ TEST(Engine, TestResource)
     EASY_BLOCK("TestResource");
 #endif
 
-    const sole::uuid randomUuid = sole::uuid0();
+    const sole::uuid randomUuid = sole::uuid4();
     neko::Configuration config;
     std::string path = config.dataRootPath + "data/test/test.txt";
     std::string fileContent = neko::LoadFile(path);
@@ -27,7 +27,14 @@ TEST(Engine, TestResource)
     EASY_BLOCK("InitResource");
 #endif
     resourceManager.Init();
+#ifdef EASY_PROFILE_USE
+    EASY_END_BLOCK;
+    EASY_BLOCK("LoadResource");
+#endif
     neko::ResourceId resourceId = resourceManager.LoadResource(path);
+#ifdef EASY_PROFILE_USE
+    EASY_END_BLOCK;
+#endif
     int count = 0;
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("WaitingResource");
@@ -55,7 +62,6 @@ TEST(Engine, TestResource)
     resourceManager.Destroy();
 #ifdef EASY_PROFILE_USE
     EASY_END_BLOCK;
-    EASY_END_BLOCK;
-    profiler::dumpBlocksToFile("test_profile.prof");
+    profiler::dumpBlocksToFile("resource_profile.prof");
 #endif
 }

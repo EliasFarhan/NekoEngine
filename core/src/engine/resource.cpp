@@ -116,9 +116,6 @@ std::string neko::ResourceManager::GetResource(ResourceId resourceId)
 
 neko::ResourceId neko::ResourceManager::LoadResource(const Path assetPath)
 {
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Add to queue");
-#endif
     const std::lock_guard<std::mutex> lockGuard(loadingMutex_);
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("Generate UUID", profiler::colors::Red200);
@@ -126,6 +123,9 @@ neko::ResourceId neko::ResourceManager::LoadResource(const Path assetPath)
     const ResourceId resourceId = sole::uuid4();
 #ifdef EASY_PROFILE_USE
     EASY_END_BLOCK;
+#endif
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("Add to queue");
 #endif
     idQueue_.push_back(resourceId);
     resourcePromises_[resourceId] = LoadPromise(assetPath);
