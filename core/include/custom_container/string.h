@@ -34,7 +34,7 @@ public:
     // Operators
     //-----------------------------------------------------------------------------
 
-    friend std::ostream& operator<< (std::ostream& so, const String& s);
+    friend std::ostream& operator<< (std::ostream& os, const String& s);
 
     char  operator[] (unsigned rhs) const;
     char& operator[] (unsigned rhs);

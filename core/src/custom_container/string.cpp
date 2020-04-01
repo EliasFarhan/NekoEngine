@@ -31,13 +31,18 @@ namespace neko
     //-----------------------------------------------------------------------------
     String::String(Allocator& allocator): allocator_(allocator)
     {
+        //std::cout << "String Created (empty)" << std::endl;
         length_ = 0;
+        buffer_ = static_cast<char*>(allocator_.Allocate(
+            sizeof(char),
+            alignof(char)));
     }
     
     String::String(Allocator& allocator, std::string_view str): allocator_(allocator)
     {
         if (!str.empty())
         {
+            //std::cout << "String Created" << std::endl;
             buffer_ = static_cast<char*>(allocator_.Allocate(
 	            sizeof(char) * str.size()+1,
 	            alignof(char)));
@@ -56,6 +61,7 @@ namespace neko
     	{
             allocator_.Deallocate(buffer_);
             length_ = 0;
+            //std::cout << "String destroyed" << std::endl;
     	}
     }
 

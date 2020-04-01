@@ -21,14 +21,13 @@ TEST(Engine, TestString)
         String str3 = String(allocator, "A");
         String str4 = String(allocator, "D");
 
-
         EXPECT_TRUE(str1 == "A");
         EXPECT_TRUE(str1 != "Z");
         EXPECT_TRUE(str1 == str3);
         EXPECT_TRUE(str1 != str4);
 
         str1 += str2;
-        String str5 = String(allocator, "TEST");
+        String str5 = String(allocator);
         str5 = "";
         str5 += str3;
         str5 += str2;
