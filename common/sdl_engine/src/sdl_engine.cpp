@@ -33,9 +33,11 @@
 #include "gl/gles3_window.h"
 #endif
 
+/*
 #ifdef EASY_PROFILE_USE
 #include "easy/profiler.h"
 #endif
+*/
 
 namespace neko::sdl
 {
