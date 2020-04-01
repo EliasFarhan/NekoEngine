@@ -117,6 +117,7 @@ if(Neko_Fmod)
 	set(Fmod_VERSION 2.00.08)
 	set(Fmod_DIR "${EXTERNAL_DIR}/Fmod-${Fmod_VERSION}")
 	add_subdirectory("${Fmod_DIR}")
+    add_subdirectory("common/fmod_wrapper")
 
 endif()
 

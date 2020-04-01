@@ -1,11 +1,11 @@
 #pragma once
-
 #include <fmod_studio.hpp>
 #include <fmod.hpp>
 #include <iostream>
 #include <map>
 #include <vector>
 #include <string_view>
+
 
 //Vector3 struct to place sound in 3D space
 struct Vector3		//TODO: Change with Neko Vector3s
@@ -51,6 +51,7 @@ public:
     float DbToVolume(float dB);
     float VolumeToDb(float volume);
     FMOD_VECTOR Vec3ToFmod(const Vector3& position);
+  
 private:
     FMOD::Studio::System* fmodStudioSystem;
     FMOD::System* fmodSystem;
