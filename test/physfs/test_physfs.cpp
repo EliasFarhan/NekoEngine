@@ -34,8 +34,10 @@ TEST(PhysFS, TestOpenFile)
 {
     LogManager logger;
     physfs::InitPhysFs();
+
+    const Configuration config;
 	
-    const char* output = physfs::ReadFile("test.txt");
+    const char* output = physfs::ReadFile(config.dataRootPath + "data/test.txt");
     EXPECT_NE(output, nullptr);
 	if (output != nullptr) std::cout << output << '\n';
 }
