@@ -18,7 +18,7 @@ set(Neko_Fmod ON CACHE BOOL "Activate Fmod")
 set(Neko_Test ON CACHE BOOL "Activate Test")
 set(Neko_Assert ON CACHE BOOL "Activate Neko Assertion")
 set(Neko_Benchmark ON CACHE BOOL "Activate Benchmark")
-set(Neko_Fmod ON CACHE BOOL "Activate Fmod")
+
 
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
     include(cmake/platforms/emscripten.cmake)
@@ -114,9 +114,9 @@ endif()
 
 if(Neko_Fmod)
 
-set(Fmod_VERSION 2.00.08)
-set(Fmod_DIR $(EXTERNAL_DIR, Fmod(Fmod_VERSION)/))
-add_subdirectory("externals/Fmod-2.00.08/")
+	set(Fmod_VERSION 2.00.08)
+	set(Fmod_DIR "${EXTERNAL_DIR}/Fmod-${Fmod_VERSION}")
+	add_subdirectory("${Fmod_DIR}")
 
 endif()
 
