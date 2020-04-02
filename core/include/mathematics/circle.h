@@ -28,10 +28,9 @@
 
 namespace neko
 {
-    template<class T = Vec2f>
-    struct Circle
+    struct Circle2D
     {
-        explicit Circle(T Center, float Radius) : center(Center), radius(Radius)
+        explicit Circle2D(Vec2f Center, float Radius) : center(Center), radius(Radius)
         {
 
         }
@@ -41,16 +40,16 @@ namespace neko
             return radius;
         }
 
-    	bool Intersects(Circle<T> circle) const
+    	bool Intersects(Circle2D circle) const
         {
-            const T distanceVector = circle.center - center;
+            const Vec2f distanceVector = circle.center - center;
         	
             return distanceVector.Magnitude() <= circle.radius + radius;
         }
 
         bool RectCircleIntersects(Rect2f rect) const
         {
-			const T distanceVector = rect.center - center;
+			const Vec2f distanceVector = rect.center - center;
             const float magnitude = distanceVector.Magnitude();
         	
 			if (magnitude <= rect.halfSize.x + radius)
@@ -66,17 +65,52 @@ namespace neko
             return false;
         }
 
-    	static bool IsPlanCircleIntersects(const Circle<Vec3f> sphere, const Vec3f normal, const Vec3f pos)
-        {
-            const float p = Vec3f::Dot(sphere.center - pos, normal) / normal.Magnitude();
-        	
-            return p < sphere.radius && p > -sphere.radius;
-        }
-    	
-    	T center;
+    	Vec2f center;
         const float radius = 0;
     };
+    struct Plan3D
+    {
+        explicit Plan3D(Vec3f Center, Vec3f Normal) : center(Center), normal(Normal)
+        {
+            normal = normal.Normalized();
+        }
 
-    using Circle2D = Circle<Vec2f>;
-    using Sphere3D = Circle<Vec3f>;
+        Vec3f center;
+        Vec3f normal;
+    };
+    //TODO add Sphere3D structure
+    struct Sphere3D
+    {
+        explicit Sphere3D(Vec3f Center, float Radius) : center(Center), radius(Radius)
+        {
+
+        }
+
+        float GetRadius() const
+        {
+            return radius;
+        }
+		
+        bool Intersects(Sphere3D sphere) const
+        {
+            const Vec3f distanceVector = sphere.center - center;
+
+            return distanceVector.Magnitude() <= sphere.radius + radius;
+        }
+		
+        bool IsPlanCircleIntersects(Plan3D plan) const
+        {
+            const float p = Vec3f::Dot(center - plan.center, plan.normal) / plan.normal.Magnitude();
+
+            return p < radius && p > -radius;
+        }
+		
+        Vec3f center;
+        float radius;
+    };
+    
+    using Circle = Circle2D;
+    using Sphere = Sphere3D;
+    using Plan = Plan3D;
+	
 }
