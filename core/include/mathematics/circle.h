@@ -23,14 +23,16 @@
  SOFTWARE.
  */
 
+#include <vector>
+
 #include "mathematics/vector.h"
 #include "rect.h"
 
 namespace neko
 {
-    struct Circle2D
+    struct Circle
     {
-        explicit Circle2D(Vec2f Center, float Radius) : center(Center), radius(Radius)
+        explicit Circle(Vec2f Center, float Radius) : center(Center), radius(Radius)
         {
 
         }
@@ -40,13 +42,23 @@ namespace neko
             return radius;
         }
 
-    	bool Intersects(Circle2D circle) const
+        bool Intersects(Circle circle) const
+        {
+            const float distanceX = center.x - circle.center.x;
+            const float distanceY = center.y - circle.center.y;
+            const float radiusSum = circle.radius + radius;
+        	
+            return distanceX * distanceX + distanceY * distanceY <= radiusSum * radiusSum;
+        }
+    	
+        bool IntersectsOther(Circle circle)
         {
             const Vec2f distanceVector = circle.center - center;
-        	
-            return distanceVector.Magnitude() <= circle.radius + radius;
-        }
+            const float magnitude = Vec2f::Dot(distanceVector,distanceVector)*2;
 
+            return magnitude <= circle.radius + radius;
+        }
+    	
         bool RectCircleIntersects(Rect2f rect) const
         {
 			const Vec2f distanceVector = rect.center - center;
@@ -68,20 +80,19 @@ namespace neko
     	Vec2f center;
         const float radius = 0;
     };
-    struct Plan3D
+    struct Plan
     {
-        explicit Plan3D(Vec3f Pos, Vec3f Normal) : pos(Pos), normal(Normal)
+        explicit Plan(Vec3f Pos, Vec3f Normal) : pos(Pos), normal(Normal)
         {
-            normal = normal.Normalized();
         }
 
         Vec3f pos;
         Vec3f normal;
     };
-    //TODO add Sphere3D structure
-    struct Sphere3D
+
+	struct Sphere
     {
-        explicit Sphere3D(Vec3f Center, float Radius) : center(Center), radius(Radius)
+        explicit Sphere(Vec3f Center, float Radius) : center(Center), radius(Radius)
         {
 
         }
@@ -91,16 +102,30 @@ namespace neko
             return radius;
         }
 		
-        bool Intersects(Sphere3D sphere) const
+        bool Intersects(Sphere sphere) const
         {
-            const Vec3f distanceVector = sphere.center - center;
+            const float distanceX = center.x - sphere.center.x;
+            const float distanceY = center.y - sphere.center.y;
+            const float distanceZ = center.z - sphere.center.z;
+        	
+            const float radiusSum = sphere.radius + radius;
 
-            return distanceVector.Magnitude() <= sphere.radius + radius;
+            return distanceX * distanceX + distanceY * distanceY + distanceZ * distanceZ <= radiusSum * radiusSum;
         }
 		
-        bool IsPlanCircleIntersects(Plan3D plan) const
+        bool IntersectsOther(Sphere sphere) const
         {
-            const float p = Vec3f::Dot(center - plan.pos, plan.normal) / plan.normal.Magnitude();
+            const Vec3f distanceVector = sphere.center - center;
+            const float magnitude = distanceVector.Magnitude();
+            return magnitude <= sphere.radius + radius;
+        }
+		
+        bool IsPlanSphereIntersects(Plan plan) const
+        {
+            const float normMagnitude = plan.normal.Magnitude();
+            const float dot = Vec3f::Dot(center - plan.pos, plan.normal);
+        	
+            const float p = dot / normMagnitude;
 
             return p < radius && p > -radius;
         }
@@ -109,8 +134,5 @@ namespace neko
         float radius;
     };
     
-    using Circle = Circle2D;
-    using Sphere = Sphere3D;
-    using Plan = Plan3D;
 	
 }

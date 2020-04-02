@@ -4,8 +4,9 @@
 #include <iostream>
 
 const long fromRange = 8;
-const long toRange = 1 << 17;
+const long toRange = 1 << 20;
 const float maxNmb = 100.0f;
+
 
 float RandomFloat()
 {
@@ -40,6 +41,30 @@ static void BM_CircleIntersects(benchmark::State& state)
 }
 BENCHMARK(BM_CircleIntersects)->Range(fromRange, toRange);
 
+static void BM_CircleIntersectsOther(benchmark::State& state)
+{
+    const size_t n = state.range(0);
+    std::vector<neko::Circle> v1;
+	std::vector<neko::Circle> v2;
+    v1.reserve(n);
+	v2.reserve(n);
+	
+    for (size_t i = 0; i < n; i++)
+    {
+        v1.push_back( neko::Circle(neko::Vec2f(RandomFloat(), RandomFloat()), RandomFloat()));
+        v2.push_back( neko::Circle(neko::Vec2f(RandomFloat(), RandomFloat()), RandomFloat()));
+    }
+	
+    for (auto _ : state)
+    {
+        for (size_t i = 0; i < n; i++)
+        {
+            benchmark::DoNotOptimize(v1[i].IntersectsOther(v2[i]));
+        }
+    }
+}
+BENCHMARK(BM_CircleIntersectsOther)->Range(fromRange, toRange);
+
 static void BM_SphereIntersects(benchmark::State& state)
 {
     const size_t n = state.range(0);
@@ -64,6 +89,30 @@ static void BM_SphereIntersects(benchmark::State& state)
 }
 BENCHMARK(BM_SphereIntersects)->Range(fromRange, toRange);
 
+static void BM_SphereIntersectsOther(benchmark::State& state)
+{
+    const size_t n = state.range(0);
+    std::vector<neko::Sphere> v1;
+    std::vector<neko::Sphere> v2;
+    v1.reserve(n);
+    v2.reserve(n);
+
+    for (size_t i = 0; i < n; i++)
+    {
+        v1.push_back(neko::Sphere(neko::Vec3f(RandomFloat(), RandomFloat(), RandomFloat()), RandomFloat()));
+        v2.push_back(neko::Sphere(neko::Vec3f(RandomFloat(), RandomFloat(), RandomFloat()), RandomFloat()));
+    }
+
+    for (auto _ : state)
+    {
+        for (size_t i = 0; i < n; i++)
+        {
+            benchmark::DoNotOptimize(v1[i].IntersectsOther(v2[i]));
+        }
+    }
+}
+BENCHMARK(BM_SphereIntersectsOther)->Range(fromRange, toRange);
+
 static void BM_RectCircleIntersects(benchmark::State& state)
 {
     const size_t n = state.range(0);
@@ -83,10 +132,12 @@ static void BM_RectCircleIntersects(benchmark::State& state)
         for (size_t i = 0; i < n; i++)
         {
             benchmark::DoNotOptimize(v1[i].RectCircleIntersects(v2[i]));
+        	
         }
     }
 }
 BENCHMARK(BM_RectCircleIntersects)->Range(fromRange, toRange);
+
 
 static void BM_PlanCircleIntersects(benchmark::State& state)
 {
@@ -99,14 +150,14 @@ static void BM_PlanCircleIntersects(benchmark::State& state)
     for (size_t i = 0; i < n; i++)
     {
         v1.push_back(neko::Sphere(neko::Vec3f(RandomFloat(), RandomFloat(), RandomFloat()), RandomFloat()));
-        v2.push_back(neko::Plan(neko::Vec3f(RandomFloat(), RandomFloat(), RandomFloat()), neko::Vec3f(RandomFloat(),RandomFloat(),RandomFloat())));
+        v2.push_back(neko::Plan(neko::Vec3f(RandomFloat(), RandomFloat(), RandomFloat()), neko::Vec3f(RandomFloat(),RandomFloat(), RandomFloat()).Normalized()));
     }
 	
     for (auto _ : state)
     {
         for (size_t i = 0; i < n; i++)
         {
-            benchmark::DoNotOptimize(v1[i].IsPlanCircleIntersects(v2[i]));
+            benchmark::DoNotOptimize(v1[i].IsPlanSphereIntersects(v2[i]));
         }
     }
 }
