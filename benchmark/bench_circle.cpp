@@ -99,7 +99,7 @@ static void BM_PlanCircleIntersects(benchmark::State& state)
     for (size_t i = 0; i < n; i++)
     {
         v1.push_back(neko::Sphere(neko::Vec3f(RandomFloat(), RandomFloat(), RandomFloat()), RandomFloat()));
-        v2.push_back(neko::Plan(neko::Vec3f(RandomFloat(), RandomFloat(), RandomFloat()), neko::Vec3f(RandomFloat(),RandomFloat(),RandomFloat()).Normalized()));
+        v2.push_back(neko::Plan(neko::Vec3f(RandomFloat(), RandomFloat(), RandomFloat()), neko::Vec3f(RandomFloat(),RandomFloat(),RandomFloat())));
     }
 	
     for (auto _ : state)

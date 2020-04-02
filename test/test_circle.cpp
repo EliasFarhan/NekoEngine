@@ -13,13 +13,14 @@ TEST(Engine, TestCircle)
     const neko::Sphere3D sphere2(neko::Vec3f(3, 3, 2), 2);
 
 	const neko::Rect2f rect(neko::Vec2f(1, 1), neko::Vec2f(2, 2));
-	
+	const neko::Plan plan(neko::Vec3f(0, 2, 0), neko::Vec3f(0, 1, 0));
 	EXPECT_TRUE(circleA.Intersects(circleB));
 	EXPECT_TRUE(circleB.Intersects(circleC));
 	EXPECT_TRUE(circleA.Intersects(circleD));
 	EXPECT_FALSE(circleC.Intersects(circleD));
 	
     EXPECT_TRUE(sphere1.Intersects(sphere2));
+	
 	EXPECT_TRUE(circleA.RectCircleIntersects(rect));
-    EXPECT_TRUE(neko::Sphere3D::IsPlanCircleIntersects(sphere1, neko::Vec3f(0, 1, 0), neko::Vec3f(0, 2, 0)));
+    EXPECT_TRUE(sphere1.IsPlanCircleIntersects(plan));
 }

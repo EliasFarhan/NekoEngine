@@ -70,12 +70,12 @@ namespace neko
     };
     struct Plan3D
     {
-        explicit Plan3D(Vec3f Center, Vec3f Normal) : center(Center), normal(Normal)
+        explicit Plan3D(Vec3f Pos, Vec3f Normal) : pos(Pos), normal(Normal)
         {
             normal = normal.Normalized();
         }
 
-        Vec3f center;
+        Vec3f pos;
         Vec3f normal;
     };
     //TODO add Sphere3D structure
@@ -100,7 +100,7 @@ namespace neko
 		
         bool IsPlanCircleIntersects(Plan3D plan) const
         {
-            const float p = Vec3f::Dot(center - plan.center, plan.normal) / plan.normal.Magnitude();
+            const float p = Vec3f::Dot(center - plan.pos, plan.normal) / plan.normal.Magnitude();
 
             return p < radius && p > -radius;
         }
