@@ -1,4 +1,3 @@
-set_target_properties (Fmod PROPERTIES FOLDER Externals)
 LIST(APPEND fmod_wrapper_libs Fmod)
 file(GLOB_RECURSE fmod_wrapper_src include/*.h src/*.cpp)
 add_library(fmod_wrapper STATIC ${fmod_wrapper_src})

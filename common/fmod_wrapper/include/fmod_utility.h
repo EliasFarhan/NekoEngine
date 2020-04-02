@@ -16,9 +16,6 @@ struct Vector3		//TODO: Change with Neko Vector3s
 };
 
 
-
-
-
 //It will do calls to the Implementation struct to start, stop and update FMOD
 using ChannelId = std::uint32_t;
 class AudioEngine
