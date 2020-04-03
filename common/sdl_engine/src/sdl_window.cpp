@@ -29,6 +29,9 @@ void sdl::SdlWindow::Init()
 #ifdef NEKO_GLES3
         SDL_WINDOW_OPENGL
 #endif
+#ifdef NEKO_VULKAN
+	SDL_WINDOW_VULKAN
+#endif
         ;
 #if defined(__ANDROID__)
     //config.fullscreen = true;

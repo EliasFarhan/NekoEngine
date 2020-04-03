@@ -18,6 +18,10 @@ if(Neko_GLES3)
     LIST(APPEND sdl_engine_libs gles3_wrapper)
 endif()
 
+if(Neko_Vulkan)
+    LIST(APPEND sdl_engine_libs vulkan_wrapper)
+endif()
+
 #imgui sdl
 file(GLOB_RECURSE sdl_engine_src include/*.h src/*.cpp)
 

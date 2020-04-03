@@ -42,7 +42,6 @@ class SdlEngine : public BasicEngine
 {
 public:
 	explicit SdlEngine(Configuration* config = nullptr);
-	SdlEngine() = delete;
 	void Init() override;
 	void Destroy() override;
 
