@@ -20,7 +20,7 @@ void Task(std::atomic<unsigned int>& currentDoneTasks)
 
 TEST(Engine, TestJobSystem)
 {
-    const unsigned int TASKS_COUNT = 4;
+    const unsigned int TASKS_COUNT = 16;
     std::atomic<unsigned int> doneTasks = 0;
 
     {// JobSystem
