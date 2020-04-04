@@ -46,6 +46,18 @@ void JobSystem::Work()
 {
     initializedWorkers_++; // Atomic increment.
 
+    // Do tasks before going to sleep.
+    {// CRITICAL
+        std::function<void()> task;
+        std::unique_lock<std::mutex> lock(mutex_);
+        if (!tasks_.empty())
+        {
+            task = tasks_.front();
+            tasks_.pop();
+            task();
+        }
+    }// !CRITICAL
+
     while (status_ & Status::RUNNING) // Atomic check.
     {
         {// Sleep
@@ -61,10 +73,7 @@ void JobSystem::Work()
                 task = tasks_.front();
                 tasks_.pop();
             }
-            else
-            {
-                continue;
-            }
+            else continue;
         }// !CRITICAL
         task();
     }
