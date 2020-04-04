@@ -1,5 +1,0 @@
-if(UNIX)
-link_directories("${CMAKE_SOURCE_DIR}/externals/Fmod-2.00.08/linux/api/core/inc/" "${CMAKE_SOURCE_DIR}/externals/Fmod-2.00.08/linux/api/studio/inc/")
-else()
-link_directories("${CMAKE_SOURCE_DIR}/externals/Fmod-2.00.08/win/api/core/inc/" "${CMAKE_SOURCE_DIR}/externals/Fmod-2.00.08/win/api/studio/inc/")
-endif()
