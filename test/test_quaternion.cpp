@@ -1,5 +1,6 @@
 #ifdef WIN32
 #define _USE_MATH_DEFINES
+#define  __SSE__
 #endif
 #include <cmath>
 #include <random>
@@ -17,6 +18,37 @@ TEST(Engine, Quaternion_Dot)
     float expectedDot = 1;
     float dotQ1Q2 = neko::Quaternion::Dot(q1, q2);
     EXPECT_TRUE(expectedDot - dotQ1Q2 < 0.001f);
+}
+
+TEST(Engine,Quaternion_Intrinsics_Dot)
+{
+    std::array<float, 4> x1{ 5,6,42,29 };
+    std::array<float, 4> y1{ 7,3,666,382 };
+    std::array<float, 4> z1{ 30,2,69,4729 };
+    std::array<float, 4> w1{ 8,1,13,773 };
+    std::array<float, 4> x2{7,7,7,7};
+    std::array<float, 4> y2{3,3,3,3};
+    std::array<float, 4> z2{1,1,1,1};
+    std::array<float, 4> w2{9,9,9,9};
+    neko::Quaternion q1a = neko::Quaternion(x1[0], y1[0], z1[0], w1[0]);
+    neko::Quaternion q1b = neko::Quaternion(x1[1], y1[1], z1[1], w1[1]);
+    neko::Quaternion q1c = neko::Quaternion(x1[2], y1[2], z1[2], w1[2]);
+    neko::Quaternion q1d = neko::Quaternion(x1[3], y1[3], z1[3], w1[3]);
+    neko::Quaternion q2 = neko::Quaternion(x2[0], y2[0], z2[0], w2[0]);
+    float quaternionDotQ1aQ2 = neko::Quaternion::Dot(q1a, q2);
+    float quaternionDotQ1bQ2 = neko::Quaternion::Dot(q1b, q2);
+    float quaternionDotQ1cQ2 = neko::Quaternion::Dot(q1c, q2);
+    float quaternionDotQ1dQ2 = neko::Quaternion::Dot(q1d, q2);
+	
+    neko::FourQuaternion fqa = neko::FourQuaternion(x1, y1, z1, w1);
+    neko::FourQuaternion fqb = neko::FourQuaternion(x2, y2, z2, w2);
+    std::array<float, 4> quaternionDotIntrinsics = neko::FourQuaternion::DotIntrinsics(fqa, fqb);
+    EXPECT_TRUE(quaternionDotQ1aQ2 - quaternionDotIntrinsics[0] < 0.001f &&
+        quaternionDotQ1bQ2 - quaternionDotIntrinsics[1] < 0.001f &&
+        quaternionDotQ1cQ2 - quaternionDotIntrinsics[2] < 0.001f &&
+        quaternionDotQ1dQ2 - quaternionDotIntrinsics[3] < 0.001f);
+	
+
 }
 
 TEST(Engine, Quaternion_Normalized)

@@ -1,8 +1,10 @@
+#ifdef WIN32
+#define __SSE__
 #include <iostream>
 #include <random>
 #include "random_fill.h"
 #include <benchmark/benchmark.h>
-#include "mathematics/quaternion.h"
+#include <mathematics/quaternion.h>
 
 const long fromRange = 2;
 const long toRange = 2048;
@@ -22,7 +24,7 @@ const size_t arraySize = 1024;
 BENCHMARK(BM_Normalized)->Range(fromRange, toRange);
  */
 
-static void BM_Quaternion(benchmark::State& state)
+/*static void BM_Quaternion(benchmark::State& state)
 {
     neko::Quaternion q;
     for (auto s : state)
@@ -95,7 +97,7 @@ static void BM_Conjugate(benchmark::State& state)
         }
     }
 }
-BENCHMARK(BM_Conjugate)->Range(fromRange, toRange);
+BENCHMARK(BM_Conjugate)->Range(fromRange, toRange);*/
 
 /*static void BM_Dot(benchmark::State& state)
 {
@@ -141,24 +143,45 @@ static void BM_Dot(benchmark::State& state)
 }
 BENCHMARK(BM_Dot)->Range(fromRange, toRange);
 
-static void BM_Intrinsics_Dot(benchmark::State& state)
+static void BM_Four_Dot(benchmark::State& state)
 {
-    const size_t n = state.range(0);
-    std::vector<neko::IntrinsicsQuaternion> v1(n, neko::IntrinsicsQuaternion());
-    std::vector<neko::IntrinsicsQuaternion> v2(n, neko::IntrinsicsQuaternion());
-    std::for_each(v1.begin(), v1.end(), [](neko::IntrinsicsQuaternion& q) {RandomFill(q); });
-    std::for_each(v2.begin(), v2.end(), [](neko::IntrinsicsQuaternion& q) {RandomFill(q); });
+    neko::Quaternion q1a = neko::Quaternion(5, 7, 30, 8);
+    neko::Quaternion q1b = neko::Quaternion(6, 3, 2, 1);
+    neko::Quaternion q1c = neko::Quaternion(42, 666, 69, 13);
+    neko::Quaternion q1d = neko::Quaternion(29, 382, 4729, 773);
+    neko::Quaternion q2 = neko::Quaternion(7, 3, 1, 9);
 
     size_t iterations = 0;
-	for (auto _ : state)
-	{
-		for (size_t i = 0; i < n; i++)
-		{
-            benchmark::DoNotOptimize(neko::IntrinsicsQuaternion::Dot(v1[i],v2[i]));
-		}
-	}
+    for (auto _ : state)
+    {
+        benchmark::DoNotOptimize(neko::Quaternion::Dot(q1a, q2));
+        benchmark::DoNotOptimize(neko::Quaternion::Dot(q1b, q2));
+        benchmark::DoNotOptimize(neko::Quaternion::Dot(q1c, q2));
+        benchmark::DoNotOptimize(neko::Quaternion::Dot(q1d, q2));
+    }
 }
-BENCHMARK(BM_Intrinsics_Dot)->Range(fromRange, toRange);
+BENCHMARK(BM_Four_Dot)->Range(fromRange, toRange);
+
+static void BM_Four_Intrinsics_Dot(benchmark::State& state)
+{
+    std::array<float, 4> x1{ 5,6,42,29 };
+    std::array<float, 4> y1{ 7,3,666,382 };
+    std::array<float, 4> z1{ 30,2,69,4729 };
+    std::array<float, 4> w1{ 8,1,13,773 };
+    std::array<float, 4> x2{ 7,7,7,7 };
+    std::array<float, 4> y2{ 3,3,3,3 };
+    std::array<float, 4> z2{ 1,1,1,1 };
+    std::array<float, 4> w2{ 9,9,9,9 };
+
+    neko::FourQuaternion fqa = neko::FourQuaternion(x1, y1, z1, w1);
+    neko::FourQuaternion fqb = neko::FourQuaternion(x2, y2, z2, w2);
+    size_t iterations = 0;
+    for (auto _ : state)
+    {
+        benchmark::DoNotOptimize(neko::FourQuaternion::DotIntrinsics(fqa, fqb));
+    }
+}
+BENCHMARK(BM_Four_Intrinsics_Dot)->Range(fromRange, toRange);
 
 static void BM_Magnitude(benchmark::State& state)
 {
@@ -178,7 +201,7 @@ static void BM_Magnitude(benchmark::State& state)
         }
     }
 }
-BENCHMARK(BM_Magnitude)->Range(fromRange, toRange);
+/*BENCHMARK(BM_Magnitude)->Range(fromRange, toRange);
 
 static void BM_Angle(benchmark::State& state)
 {
@@ -245,6 +268,7 @@ static void BM_Identity(benchmark::State& state)
         }
     }
 }
-BENCHMARK(BM_Identity)->Range(fromRange, toRange);
+BENCHMARK(BM_Identity)->Range(fromRange, toRange);*/
 
 BENCHMARK_MAIN();
+#endif

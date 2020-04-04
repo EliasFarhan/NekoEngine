@@ -47,12 +47,12 @@ void RandomFill(neko::Quaternion& q)
     q = neko::Quaternion(v);
 }
 
-void RandomFill(neko::IntrinsicsQuaternion q)
+/*void RandomFill(neko::IntrinsicsQuaternion q)
 {
     neko::FourVec4f v;
 
     q = neko::IntrinsicsQuaternion(v);
-}
+}*/
 
 /*void RandomFill(neko::Vec4fQuaternion& q)
 {

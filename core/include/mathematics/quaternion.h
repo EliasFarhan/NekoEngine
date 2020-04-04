@@ -256,7 +256,7 @@ struct Quaternion
 };
 	
 #ifdef  __SSE__
-
+	
 struct FourQuaternion				//64 bytes
 {
 
@@ -268,19 +268,18 @@ struct FourQuaternion				//64 bytes
 		w = qw;
 	}
 
-	inline std::array<float, 4> DotIntrinsics(FourVec4f v1, FourVec4f v2)
+	static inline std::array<float, 4> DotIntrinsics(FourQuaternion q1, FourQuaternion q2)		//TODO Rename
 	{
-		alignas(4 * sizeof(float))
-			std::array<float, 4> result;
-		auto x1 = _mm_load_ps(v1.xs.data());
-		auto y1 = _mm_load_ps(v1.ys.data());
-		auto z1 = _mm_load_ps(v1.zs.data());
-		auto w1 = _mm_load_ps(v1.ws.data());
+		alignas(4 * sizeof(float)) std::array<float, 4> result;
+		auto x1 = _mm_load_ps(q1.x.data());
+		auto y1 = _mm_load_ps(q1.y.data());
+		auto z1 = _mm_load_ps(q1.z.data());
+		auto w1 = _mm_load_ps(q1.w.data());
 
-		auto x2 = _mm_load_ps(v2.xs.data());
-		auto y2 = _mm_load_ps(v2.ys.data());
-		auto z2 = _mm_load_ps(v2.zs.data());
-		auto w2 = _mm_load_ps(v2.ws.data());
+		auto x2 = _mm_load_ps(q2.x.data());
+		auto y2 = _mm_load_ps(q2.y.data());
+		auto z2 = _mm_load_ps(q2.z.data());
+		auto w2 = _mm_load_ps(q2.w.data());
 
 		x1 = _mm_mul_ps(x1, x2);
 		y1 = _mm_mul_ps(y1, y2);
@@ -293,6 +292,352 @@ struct FourQuaternion				//64 bytes
 		_mm_store_ps(result.data(), x1);
 		return result;
 	}
+
+	//Converts this quaternion to one with the same orientation but with a magnitude of 1.
+	static FourQuaternion Normalized(FourQuaternion quaternion)
+	{
+		//TODO Test if it's working
+		return quaternion / Magnitude(quaternion);
+	}
+
+	static inline std::array<float, 4> Magnitude(FourQuaternion quaternion)
+	{
+		alignas(4 * sizeof(float)) std::array<float, 4> result;
+		auto x1 = _mm_load_ps(quaternion.x.data());
+		auto y1 = _mm_load_ps(quaternion.y.data());
+		auto z1 = _mm_load_ps(quaternion.z.data());
+		auto w1 = _mm_load_ps(quaternion.w.data());
+
+		x1 = _mm_mul_ps(x1, x1);
+		y1 = _mm_mul_ps(y1, y1);
+		z1 = _mm_mul_ps(z1, z1);
+		w1 = _mm_mul_ps(w1, w1);
+
+		x1 = _mm_add_ps(x1, y1);
+		z1 = _mm_add_ps(z1, w1);
+		x1 = _mm_add_ps(x1, z1);
+
+		x1 = _mm_sqrt_ps(x1);
+
+		_mm_store_ps(result.data(), x1);
+		return result;
+		//TODO: Test if it is working
+	}
+
+	static inline std::array<float, 4> SquareMagnitude(FourQuaternion quaternion)
+	{
+		alignas(4 * sizeof(float)) std::array<float, 4> result;
+		auto x1 = _mm_load_ps(quaternion.x.data());
+		auto y1 = _mm_load_ps(quaternion.y.data());
+		auto z1 = _mm_load_ps(quaternion.z.data());
+		auto w1 = _mm_load_ps(quaternion.w.data());
+
+		x1 = _mm_mul_ps(x1, x1);
+		y1 = _mm_mul_ps(y1, y1);
+		z1 = _mm_mul_ps(z1, z1);
+		w1 = _mm_mul_ps(w1, w1);
+
+		x1 = _mm_add_ps(x1, y1);
+		z1 = _mm_add_ps(z1, w1);
+		x1 = _mm_add_ps(x1, z1);
+
+		_mm_store_ps(result.data(), x1);
+		return result;
+		//TODO: Test if it is working
+	}
+
+	//Rotates the Quaternion of angle degrees around axis.
+	static FourQuaternion AngleAxis(std::array<radian_t, 4> rad, neko::FourVec3f axis)
+	{
+		
+		//TODO
+		/*if (axis.SquareMagnitude() == 0.0f)
+			return Quaternion::Identity();
+
+		Quaternion result = Quaternion::Identity();
+		axis = axis.Normalized();
+		axis *= Sin(rad);
+		result.x = axis.x;
+		result.y = axis.y;
+		result.z = axis.z;
+		result.w = Cos(rad);
+
+		return Normalized(result);*/
+	}
+
+
+	//Returns the angle in degrees between two rotations a and b.
+	static std::array<degree_t, 4> Angle(const FourQuaternion a, const FourQuaternion b)
+	{
+		std::array<float, 4> dot = DotIntrinsics(a, b);
+		dot = std::array<float, 4>{std::abs(dot[0]), std::abs(dot[1]), std::abs(dot[2]), std::abs(dot[3])};
+		const std::array<float, 4> f{ 2.0f, 2.0f, 2.0f, 2.0f};
+		alignas(4 * sizeof(degree_t)) std::array<degree_t, 4> result;
+
+		auto x1 = _mm_load_ps(dot.data());
+		auto x2 = _mm_load_ps(f.data());
+		
+		x1 = _mm_acos_ps(x1);
+
+		x1 = _mm_mul_ps(x1, x2);
+
+		_mm_store_ps(result.data(), x1);
+		return result;
+		//TODO End
+		//return 2.0f * Acos(std::abs(Dot(a, b)));		//Todo change with neko::Acos
+	}
+
+	FourQuaternion Conjugate() const
+	{
+		//TODO
+		return FourQuaternion(-x, -y, -z, w);
+	}
+
+	//Returns the Inverse of rotation.
+	FourQuaternion Inverse() const
+	{
+		//TODO
+		const FourQuaternion conj = Conjugate();
+		const std::array<float, 4> sMag = SquareMagnitude(*this);
+
+		return conj / sMag;
+	}
+
+	/*
+	Returns a rotation that rotates z degrees around the z axis,
+	x degrees around the x axis, and y degrees around the y axis;
+	applied in that order
+	*/
+	static FourQuaternion FromEuler(std::array<EulerAngles, 4> angle)
+	{
+		//TODO
+		const auto cy = Cos(angle.x * 0.5f);
+		const auto sy = Sin(angle.x * 0.5f);
+		const auto cp = Cos(angle.y * 0.5f);
+		const auto sp = Sin(angle.y * 0.5f);
+		const auto cr = Cos(angle.z * 0.5f);
+		const auto sr = Sin(angle.z * 0.5f);
+
+		return FourQuaternion(
+			cy * cp * cr + sy * sp * sr,
+			cy * cp * sr - sy * sp * cr,
+			sy * cp * sr + cy * sp * cr,
+			sy * cp * cr - cy * sp * sr
+		);
+	}
+
+	static FourQuaternion Identity()
+	{
+		//TODO
+		return FourQuaternion(0, 0, 0, 1);
+	}
+
+	//Operators
+	FourQuaternion operator/(FourQuaternion rhs) const
+	{
+		//TODO
+		return *this * rhs.Inverse();
+	}
+
+	/*
+	 * alignas(4 * sizeof(float)) std::array<float, 4> result;
+		auto x1 = _mm_load_ps(q1.x.data());
+		auto y1 = _mm_load_ps(q1.y.data());
+		auto z1 = _mm_load_ps(q1.z.data());
+		auto w1 = _mm_load_ps(q1.w.data());
+
+		auto x2 = _mm_load_ps(q2.x.data());
+		auto y2 = _mm_load_ps(q2.y.data());
+		auto z2 = _mm_load_ps(q2.z.data());
+		auto w2 = _mm_load_ps(q2.w.data());
+
+		x1 = _mm_mul_ps(x1, x2);
+		y1 = _mm_mul_ps(y1, y2);
+		z1 = _mm_mul_ps(z1, z2);
+		w1 = _mm_mul_ps(w1, w2);
+
+		x1 = _mm_add_ps(x1, y1);
+		z1 = _mm_add_ps(z1, w1);
+		x1 = _mm_add_ps(x1, z1);
+		_mm_store_ps(result.data(), x1);
+		return result;
+	 */
+
+	inline std::array<float, 4> DivideFourFloat(const std::array<float, 4> dividend, const std::array<float, 4> divisor) const
+	{
+		alignas(4 * sizeof(float)) std::array<float, 4> result;
+		auto x1 = _mm_load_ps(dividend.data());
+		auto x2 = _mm_load_ps(divisor.data());
+
+		x1 = _mm_div_ps(x1, x2);
+		
+		_mm_store_ps(result.data(), x1);
+		return result;
+	}
+
+	inline std::array<float, 4> MultiplyFourFloat(const std::array<float, 4> dividend, const std::array<float, 4> divisor) const
+	{
+		alignas(4 * sizeof(float)) std::array<float, 4> result;
+		auto x1 = _mm_load_ps(dividend.data());
+		auto x2 = _mm_load_ps(divisor.data());
+
+		x1 = _mm_mul_ps(x1, x2);
+
+		_mm_store_ps(result.data(), x1);
+		return result;
+	}
+
+	inline std::array<float, 4> AddFourFloat(const std::array<float, 4> dividend, const std::array<float, 4> divisor) const
+	{
+		alignas(4 * sizeof(float)) std::array<float, 4> result;
+		auto x1 = _mm_load_ps(dividend.data());
+		auto x2 = _mm_load_ps(divisor.data());
+
+		x1 = _mm_add_ps(x1, x2);
+
+		_mm_store_ps(result.data(), x1);
+		return result;
+	}
+
+	inline std::array<float, 4> SubFourFloat(const std::array<float, 4> dividend, const std::array<float, 4> divisor) const
+	{
+		alignas(4 * sizeof(float)) std::array<float, 4> result;
+		auto x1 = _mm_load_ps(dividend.data());
+		auto x2 = _mm_load_ps(divisor.data());
+
+		x1 = _mm_sub_ps(x1, x2);
+
+		_mm_store_ps(result.data(), x1);
+		return result;
+	}
+	
+	inline FourQuaternion operator/(const std::array<float, 4> rhs) const {
+		return FourQuaternion(
+			DivideFourFloat(x, rhs),
+			DivideFourFloat(y, rhs),
+			DivideFourFloat(z, rhs),
+			DivideFourFloat(w, rhs));
+		
+	}
+
+	//TODO
+	/*Quaternion& operator+=(const float rhs)	
+	{
+		x /= rhs;
+		y /= rhs;
+		z /= rhs;
+		w /= rhs;
+		return *this;
+	}*/
+
+	FourQuaternion operator-(const FourQuaternion& rhs) const
+	{
+		return FourQuaternion(
+			SubFourFloat(x, rhs.x),
+			SubFourFloat(y, rhs.y),
+			SubFourFloat(z, rhs.z),
+			SubFourFloat(w, rhs.w));
+	}
+
+	//TODO
+	/*Quaternion& operator-=(const Quaternion& rhs)
+	{
+		x -= rhs.x;
+		y -= rhs.y;
+		z -= rhs.z;
+		w -= rhs.w;
+		return *this;
+	}*/
+
+	FourQuaternion operator+(const FourQuaternion& rhs) const
+	{
+		return FourQuaternion(
+			AddFourFloat(x, rhs.x),
+			AddFourFloat(y, rhs.y),
+			AddFourFloat(z, rhs.z),
+			AddFourFloat(w, rhs.w));
+	}
+
+	//TODO
+	/*Quaternion& operator+=(const Quaternion& rhs)
+	{
+		x += rhs.x;
+		y += rhs.y;
+		z += rhs.z;
+		w += rhs.w;
+		return *this;
+	}*/
+
+
+	FourQuaternion operator*(const FourQuaternion& rhs) const
+	{
+		//TODO Polish Code
+		return FourQuaternion(
+			AddFourFloat(
+				AddFourFloat(
+					MultiplyFourFloat(w, rhs.x), MultiplyFourFloat(x, rhs.w)),
+				AddFourFloat(
+					MultiplyFourFloat(y, rhs.z), MultiplyFourFloat(z, rhs.y))),
+			AddFourFloat(
+				AddFourFloat(
+					MultiplyFourFloat(w, rhs.y), MultiplyFourFloat(y, rhs.w)),
+				AddFourFloat(
+					MultiplyFourFloat(z, rhs.x), MultiplyFourFloat(x, rhs.z))),
+			AddFourFloat(
+				AddFourFloat(
+					MultiplyFourFloat(w, rhs.z), MultiplyFourFloat(z, rhs.w)),
+				AddFourFloat(
+					MultiplyFourFloat(x, rhs.y), MultiplyFourFloat(y, rhs.x))),
+			AddFourFloat(
+				AddFourFloat(
+					MultiplyFourFloat(w, rhs.w), MultiplyFourFloat(x, rhs.x)),
+				AddFourFloat(
+					MultiplyFourFloat(y, rhs.y), MultiplyFourFloat(z, rhs.z)))
+		);
+		
+		/*return Quaternion(
+			w * rhs.x + x * rhs.w + y * rhs.z - z * rhs.y,
+			w * rhs.y + y * rhs.w + z * rhs.x - x * rhs.z,
+			w * rhs.z + z * rhs.w + x * rhs.y - y * rhs.x,
+			w * rhs.w - x * rhs.x - y * rhs.y - z * rhs.z);*/
+	}
+
+	FourQuaternion operator*(const std::array<float, 4> rhs) const {
+		return FourQuaternion(
+			MultiplyFourFloat(x, rhs),
+			MultiplyFourFloat(y, rhs),
+			MultiplyFourFloat(z, rhs),
+			MultiplyFourFloat(w, rhs));
+	}
+
+	//TODO
+	/*Quaternion& operator*=(const Quaternion& rhs)
+	{
+		x *= rhs.x;
+		y *= rhs.y;
+		z *= rhs.z;
+		w *= rhs.w;
+		return *this;
+	}*/
+
+	/*bool operator==(const Quaternion& right) const
+	{
+		//TODO
+		return x == right.x && y == right.y && z == right.z && w == right.w;
+	}
+
+	bool operator!=(const Quaternion& right) const
+	{
+		//TODO
+		return !(*this == right);
+	}*/
+
+	/*friend std::ostream& operator<<(std::ostream& os, const Quaternion& quat)
+	{
+		//TODO
+		os << "Quaternion(" << quat.x << "," << quat.y << "," << quat.z << "," << quat.w << ")";
+		return os;
+	}*/
 
 	std::array<float, 4> x;		//16 bytes
 	std::array<float, 4> y;		//16 bytes
