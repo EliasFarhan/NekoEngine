@@ -89,7 +89,7 @@ public:
 #ifdef NEKO_ASSERT
         for (size_t i = 0; i < size_ - 1; i++)
         {
-            if (begin_[i] > begin_[i + 1])
+            if (begin_[i] >= begin_[i + 1])
             {
                 neko_assert(false,
                             "neko::FixedMap<Key,Value,Capacity>::operator[](Key&): Map is not sorted. Use Rearrange() before trying to retrieve anything.");
@@ -108,13 +108,38 @@ public:
     {
 
 #ifdef NEKO_ASSERT
+        neko_assert(size_ < Capacity, "neko::FixedMap<Key,Value,Capacity>::operator[](Key&): Map is full.")
         const auto hash = xxh::xxhash<HASH_SIZE>(&pair.first, 1);
         auto it = std::find_if(Iterator{begin_}, Iterator{end_},
                                [hash](const InternalPair& p) { return p.first == hash; });
         neko_assert(it == Iterator{end_}, "neko::FixedMap<Key,Value,Capacity>::operator[](Key&): Key already in map.");
 #endif
 
-        *end_++ = InternalPair{xxh::xxhash<HASH_SIZE>(&pair.first, 1), pair.second};
+        const InternalPair newPair = InternalPair{xxh::xxhash<HASH_SIZE>(&pair.first, 1), pair.second};
+        if (begin_ == end_){
+            *end_ = newPair;
+            end_++;
+            return;
+        }
+
+        InternalPair* back = end_ - 1;
+
+        if (newPair.first >= back->first) // Current pair should go after the one with currently biggest hash.
+        {
+            *back = newPair;
+            end_++;
+        }else // Current pair should go before the one with the currently biggest hash.
+        {
+            auto it = std::find_if(Iterator{begin_}, Iterator{end_}, [newPair](const InternalPair p){return p.first > newPair.first;}); // Find insertion point.
+
+            InternalPair* source = &(*it);
+            InternalPair* destination = source + 1;
+            memmove(destination, source, (end_ - source) * sizeof(InternalPair)); // Move right the part of the memory to make room for the new element.
+            end_++;
+
+            *source = newPair; // Assign new element.
+        }
+
         size_++;
     }
 
@@ -127,19 +152,6 @@ public:
     inline size_t Size() const
     {
         return size_;
-    }
-
-    // Sort the map elements in ascending order by key.
-    void Rearrange()
-    {
-        std::vector<InternalPair> temp(begin_, end_);
-        std::sort(temp.begin(), temp.end(),
-                  [](const InternalPair& a, const InternalPair& b) { return a.first < b.first; });
-        const size_t len = size_;
-        for (size_t i = 0; i < len; i++)
-        {
-            begin_[i] = temp[i];
-        }
     }
 
     inline Iterator Begin() const
@@ -165,6 +177,19 @@ public:
     }
 
 private:
+    // Sort the map elements in ascending order by key.
+    void Rearrange()
+    {
+        std::vector<InternalPair> temp(begin_, end_);
+        std::sort(temp.begin(), temp.end(),
+                  [](const InternalPair& a, const InternalPair& b) { return a.first < b.first; });
+        const size_t len = size_;
+        for (size_t i = 0; i < len; i++)
+        {
+            begin_[i] = temp[i];
+        }
+    }
+
     Value& BinarySearch(InternalPair* begin, InternalPair* end, const Hash lookingFor) const
     {
         InternalPair* middle = begin + ((end - begin) >> 1);

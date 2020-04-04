@@ -33,9 +33,9 @@ void LinearAllocator::Clear()
 	currentPos_ = start_;
 }
 
-void LinearAllocator::Profile()
+/*void LinearAllocator::Profile()
 {
-	const float totalWidth = ImGui::GetContentRegionAvailWidth();
+	const float totalWidth = ImGui::GetContentRegionAvail().x;
 	ImGui::LabelText("Type", "Linear Allocator");
 
 	bool selected = true;
@@ -49,7 +49,7 @@ void LinearAllocator::Profile()
 	const float availableWidth = (size_ - usedMemory_) * totalWidth / size_;
 	ImGui::Selectable("Available Memory", &selected, 0, ImVec2(availableWidth, 20));
 
-}
+}*/
 
 void* StackAllocator::Allocate(size_t allocatedSize, size_t alignment)
 {
@@ -90,10 +90,10 @@ void StackAllocator::Deallocate(void* p)
 	numAllocations_--;
 }
 
-void StackAllocator::Profile()
+/*void StackAllocator::Profile()
 {
 	ImGui::LabelText("Type", "Stack Allocator");
-	const float totalWidth = ImGui::GetContentRegionAvailWidth();
+	const float totalWidth = ImGui::GetContentRegionAvail().x;
 	ImGui::LabelText("Type", "Linear Allocator");
 
 	bool selected = true;
@@ -106,7 +106,7 @@ void StackAllocator::Profile()
 	selected = false;
 	const float availableWidth = (size_ - usedMemory_) * totalWidth / size_;
 	ImGui::Selectable("Available Memory", &selected, 0, ImVec2(availableWidth, 20));
-}
+}*/
 
 void* FreeListAllocator::Allocate(size_t allocatedSize, size_t alignment)
 {
@@ -209,12 +209,12 @@ void FreeListAllocator::Deallocate(void* p)
 	usedMemory_ -= blockSize;
 }
 
-void FreeListAllocator::Profile()
+/*void FreeListAllocator::Profile()
 {
 	ImGui::LabelText("Type", "FreeList Allocator");
 
 
-	const float totalWidth = ImGui::GetContentRegionAvailWidth();
+	const float totalWidth = ImGui::GetContentRegionAvail().x;
 	const auto start = (size_t)start_;
 	const auto end = ((size_t)start_ + size_);
 	FreeBlock* freeBlock = freeBlocks_;
@@ -263,9 +263,9 @@ void FreeListAllocator::Profile()
 		}
 		freeBlock = freeBlock->next;
 	}
-}
+}*/
 
-void* ProxyAllocator::Allocate(size_t allocatedSize, size_t alignment)
+void* neko::ProxyAllocator::Allocate(size_t allocatedSize, size_t alignment)
 {
 	numAllocations_++;
 	size_t mem = allocator_.GetUsedMemory();
@@ -282,8 +282,8 @@ void ProxyAllocator::Deallocate(void* p)
 	usedMemory_ -= mem - allocator_.GetUsedMemory();
 }
 
-void ProxyAllocator::Profile()
+/*void ProxyAllocator::Profile()
 {
 	ImGui::LabelText("Type", "Proxy Allocator");
-}
+}*/
 }

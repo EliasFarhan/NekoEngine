@@ -110,7 +110,7 @@ TEST(Map, FixedMap_Insertion)
     }// !TRY_INSERT
 }
 
-TEST(Map, Rearrange)
+/*TEST(Map, Rearrange)
 {
     MallocRAII mem(malloc(TOTAL_BYTES));
     AllocatorType allocator(TOTAL_BYTES, mem.data());
@@ -145,7 +145,7 @@ TEST(Map, Rearrange)
     {
         EXPECT_EQ(hashes[i], sortedMapHashes[i]);
     }
-}
+}*/
 
 TEST(Map, FixedMap_Access)
 {
@@ -161,7 +161,7 @@ TEST(Map, FixedMap_Access)
         values.push_back(NextValue());
         map.Insert({keys.back(), values.back()});
     }
-    map.Rearrange();
+    // map.Rearrange();
 
     try // TRY_ACCESS
     {
@@ -189,7 +189,7 @@ TEST(Map, FixedMap_Clear)
     {
         map.Insert({NextKey(), NextValue()});
     }
-    map.Rearrange();
+    // map.Rearrange();
 
     try // TRY_CLEAR
     {
@@ -219,7 +219,7 @@ TEST(Map, FixedMap_Iterators)
         values.push_back(NextValue());
         map.Insert({k++, 0});
     }
-    map.Rearrange();
+    // map.Rearrange();
 
     try // TRY_FOREACH
     {

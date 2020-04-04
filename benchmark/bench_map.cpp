@@ -212,7 +212,7 @@ void BM_FixedMap_Access(benchmark::State& s)
         key = GetNextKey();
         map.Insert({key, GetNextKey()});
     }
-    map.Rearrange();
+    // map.Rearrange();
 
     for (auto _ : s)
     {

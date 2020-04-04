@@ -2,7 +2,7 @@
 
 #include <memory>
 #include "engine/assert.h"
-#include <imgui.h>
+// #include <imgui.h>
 #include <vector>
 
 namespace neko
@@ -81,7 +81,7 @@ public:
 	}
 
 
-	virtual void Profile() = 0;
+	// virtual void Profile() = 0;
 
 protected:
 	void* start_ = nullptr;
@@ -113,7 +113,7 @@ public:
 
 	void Clear();
 
-	void Profile() override;
+	// void Profile() override;
 protected:
 	void* currentPos_ = nullptr;
 };
@@ -142,7 +142,7 @@ public:
 
 	void Deallocate(void* p) override;
 
-	void Profile() override;
+	// void Profile() override;
 
 	struct AllocationHeader
 	{
@@ -184,7 +184,7 @@ public:
 	void Deallocate(void* p) override;
 
 
-	void Profile() override;
+	// void Profile() override;
 protected:
 	struct AllocationHeader
 	{
@@ -216,7 +216,7 @@ public:
 
 	void Deallocate(void* p) override;
 
-	void Profile() override;
+	// void Profile() override;
 protected:
 	struct FreeBlock
 	{
@@ -265,10 +265,10 @@ void PoolAllocator<T>::Deallocate(void* p)
 	numAllocations_--;
 }
 
-template <typename T>
+/*template <typename T>
 void PoolAllocator<T>::Profile()
 {
-	const float totalWidth = ImGui::GetContentRegionAvailWidth();
+	const float totalWidth = ImGui::GetContentRegionAvail().x;
 	ImGui::LabelText("Type", "Pool Allocator");
 	const auto adjustment = CalculateAlignForwardAdjustment(start_, alignof(T));
 	static std::vector<char> availablePool((size_ - adjustment) / sizeof(T));
@@ -292,7 +292,7 @@ void PoolAllocator<T>::Profile()
 		ImGui::Selectable(selected ? "Used" : "Free", &selected, 0, ImVec2(totalWidth * sizeof(T) / size_, 0));
 		ImGui::PopID();
 	}
-}
+}*/
 
 class ProxyAllocator : public Allocator
 {
@@ -309,7 +309,7 @@ public:
 
 	void Deallocate(void* p) override;
 
-	void Profile() override;
+	// void Profile() override;
 protected:
 	Allocator& allocator_;
 };
