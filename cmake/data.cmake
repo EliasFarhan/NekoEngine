@@ -74,14 +74,14 @@ set_target_properties (DataTarget PROPERTIES FOLDER Neko)
 
 if(MSVC)
     if (${CMAKE_HOST_SYSTEM_PROCESSOR} STREQUAL "AMD64")
-        set(GLSL_VALIDATOR "$ENV{VULKAN_SDK}/Bin/glslangValidator.exe")
+        set(GLSL_VALIDATOR "$ENV{VULKAN_SDK}/Bin/glslangValidator.exe" CACHE STRING "")
     else()
-        set(GLSL_VALIDATOR "$ENV{VULKAN_SDK}/Bin32/glslangValidator.exe")
+        set(GLSL_VALIDATOR "$ENV{VULKAN_SDK}/Bin32/glslangValidator.exe" CACHE STRING "")
     endif()
 
 elseif(UNIX)
 
-    set(GLSL_VALIDATOR "glslangValidator")
+    set(GLSL_VALIDATOR "glslangValidator" CACHE STRING "")
 endif()
 
 find_program(GLSL_VALIDATOR_FOUND ${GLSL_VALIDATOR})

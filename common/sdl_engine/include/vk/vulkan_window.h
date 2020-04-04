@@ -42,6 +42,8 @@ protected:
 	void CreateLogicalDevice();
 	void CreateSurface();
 	void CreateSwapChain();
+	void CreateImageViews();
+	void CreateGraphicsPipeline();
 	
 	//Vulkan utility methods
 	std::vector<const char*> GetRequiredExtensions();
@@ -64,6 +66,7 @@ protected:
 	std::vector<VkImage> swapChainImages_;
 	VkFormat swapChainImageFormat_;
 	VkExtent2D swapChainExtent_;
+	std::vector<VkImageView> swapChainImageViews_;
 
 
 	//Vulkan debug members
