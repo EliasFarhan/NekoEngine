@@ -63,6 +63,7 @@ bool RemoveDirectory(const std::string_view dirname, bool removeAll = true);
 std::string LoadFile(const std::string_view& path);
 
 
+
 std::string LinkFolderAndFile(const std::string_view folderPath, const std::string_view filePath);
 std::string GetRelativePath(const std::string_view path, const std::string_view relative);
 std::string GetFilenameExtension(const std::string_view path);
