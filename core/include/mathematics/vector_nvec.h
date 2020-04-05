@@ -550,9 +550,9 @@ public:
         std::array<T, N> dot = Dot(inVec, normal);
         for (int i = 0; i < N; i++)
         {
-            result.xs[i] = inVec.xs[i] - normalized.xs[i] * 2 * dot[i];
-            result.ys[i] = inVec.ys[i] - normalized.ys[i] * 2 * dot[i];
-            result.zs[i] = inVec.zs[i] - normalized.zs[i] * 2 * dot[i];
+            result.xs[i] = inVec.xs[i] - normalized.xs[i] * 2.0f * dot[i];
+            result.ys[i] = inVec.ys[i] - normalized.ys[i] * 2.0f * dot[i];
+            result.zs[i] = inVec.zs[i] - normalized.zs[i] * 2.0f * dot[i];
         }
         return result;
     }
@@ -642,18 +642,10 @@ inline std::array<float, 4> FourVec3f::MagnitudeIntrinsics() const
 {
     alignas(4 * sizeof(float))
     std::array<float, 4> result;
-    auto x = _mm_load_ps(xs.data());
-    auto y = _mm_load_ps(ys.data());
-    auto z = _mm_load_ps(zs.data());
-
-    x = _mm_mul_ps(x, x);
-    y = _mm_mul_ps(y, y);
-    z = _mm_mul_ps(z, z);
-
-    x = _mm_add_ps(x, y);
-    x = _mm_add_ps(x, z);
-    x = _mm_sqrt_ps(x);
-    _mm_store_ps(result.data(), x);
+    auto mag = _mm_load_ps(SquareMagnitudeIntrinsics().data());
+	
+    mag = _mm_sqrt_ps(mag);
+    _mm_store_ps(result.data(), mag);
     return result;
 }
 template<>
@@ -691,12 +683,11 @@ inline FourVec3f FourVec3f::ReflectIntrinsics(FourVec3f inVec, FourVec3f normal)
     auto xn = _mm_load_ps(normal.xs.data());
     auto yn = _mm_load_ps(normal.ys.data());
     auto zn = _mm_load_ps(normal.zs.data());
-    const float multiplier = 2.0f;
-    const auto twos = _mm_load1_ps(&multiplier);
 
-    xn = _mm_mul_ps(xn, twos);
-    yn = _mm_mul_ps(yn, twos);
-    zn = _mm_mul_ps(zn, twos);
+    const __m128 scalar = _mm_set1_ps(2.0f);
+    xn = _mm_mul_ps(xn, scalar);
+    yn = _mm_mul_ps(yn, scalar);
+    zn = _mm_mul_ps(zn, scalar);
 
     xn = _mm_mul_ps(xn, dot);
     yn = _mm_mul_ps(yn, dot);
@@ -720,21 +711,21 @@ inline std::array<float, 8> EightVec3f::DotIntrinsics(EightVec3f v1, EightVec3f 
 {
     alignas(8 * sizeof(float))
     std::array<float, 8> result;
-    auto x1 = _mm_load_ps(v1.xs.data());
-    auto y1 = _mm_load_ps(v1.ys.data());
-    auto z1 = _mm_load_ps(v1.zs.data());
+    auto x1 = _mm256_load_ps(v1.xs.data());
+    auto y1 = _mm256_load_ps(v1.ys.data());
+    auto z1 = _mm256_load_ps(v1.zs.data());
 
-    auto x2 = _mm_load_ps(v2.xs.data());
-    auto y2 = _mm_load_ps(v2.ys.data());
-    auto z2 = _mm_load_ps(v2.zs.data());
+    auto x2 = _mm256_load_ps(v2.xs.data());
+    auto y2 = _mm256_load_ps(v2.ys.data());
+    auto z2 = _mm256_load_ps(v2.zs.data());
 
-    x1 = _mm_mul_ps(x1, x2);
-    y1 = _mm_mul_ps(y1, y2);
-    z1 = _mm_mul_ps(z1, z2);
+    x1 = _mm256_mul_ps(x1, x2);
+    y1 = _mm256_mul_ps(y1, y2);
+    z1 = _mm256_mul_ps(z1, z2);
 
-    x1 = _mm_add_ps(x1, y1);
-    x1 = _mm_add_ps(x1, z1);
-    _mm_store_ps(result.data(), x1);
+    x1 = _mm256_add_ps(x1, y1);
+    x1 = _mm256_add_ps(x1, z1);
+    _mm256_store_ps(result.data(), x1);
     return result;
 }
 template <>
@@ -742,21 +733,21 @@ inline std::array<float, 8> EightVec3f::DotIntrinsics(EightVec3f v1, Vec3f v2)
 {
     alignas(8 * sizeof(float))
     std::array<float, 8> result;
-    auto x1 = _mm_load_ps(v1.xs.data());
-    auto y1 = _mm_load_ps(v1.ys.data());
-    auto z1 = _mm_load_ps(v1.zs.data());
+    auto x1 = _mm256_load_ps(v1.xs.data());
+    auto y1 = _mm256_load_ps(v1.ys.data());
+    auto z1 = _mm256_load_ps(v1.zs.data());
 
-    auto x2 = _mm_load_ps(&v2.x);
-    auto y2 = _mm_load_ps(&v2.y);
-    auto z2 = _mm_load_ps(&v2.z);
+    auto x2 = _mm256_load_ps(&v2.x);
+    auto y2 = _mm256_load_ps(&v2.y);
+    auto z2 = _mm256_load_ps(&v2.z);
 
-    x1 = _mm_mul_ps(x1, x2);
-    y1 = _mm_mul_ps(y1, y2);
-    z1 = _mm_mul_ps(z1, z2);
+    x1 = _mm256_mul_ps(x1, x2);
+    y1 = _mm256_mul_ps(y1, y2);
+    z1 = _mm256_mul_ps(z1, z2);
 
-    x1 = _mm_add_ps(x1, y1);
-    x1 = _mm_add_ps(x1, z1);
-    _mm_store_ps(result.data(), x1);
+    x1 = _mm256_add_ps(x1, y1);
+    x1 = _mm256_add_ps(x1, z1);
+    _mm256_store_ps(result.data(), x1);
     return result;
 }
 template<>
@@ -782,37 +773,29 @@ inline std::array<float, 8> EightVec3f::MagnitudeIntrinsics() const
 {
     alignas(8 * sizeof(float))
     std::array<float, 8> result;
-    auto x = _mm256_load_ps(xs.data());
-    auto y = _mm256_load_ps(ys.data());
-    auto z = _mm256_load_ps(zs.data());
-
-    x = _mm256_mul_ps(x, x);
-    y = _mm256_mul_ps(y, y);
-    z = _mm256_mul_ps(z, z);
-
-    x = _mm256_add_ps(x, y);
-    x = _mm256_add_ps(x, z);
-    x = _mm256_sqrt_ps(x);
-    _mm256_store_ps(result.data(), x);
+    auto mag = _mm256_load_ps(SquareMagnitudeIntrinsics().data());
+	
+    mag = _mm256_sqrt_ps(mag);
+    _mm256_store_ps(result.data(), mag);
     return result;
 }
 template<>
 inline EightVec3f EightVec3f::NormalizedIntrinsics()
 {
     EightVec3f result;
-    auto x = _mm_load_ps(xs.data());
-    auto y = _mm_load_ps(ys.data());
-    auto z = _mm_load_ps(zs.data());
+    auto x = _mm256_load_ps(xs.data());
+    auto y = _mm256_load_ps(ys.data());
+    auto z = _mm256_load_ps(zs.data());
 
-    auto mag = _mm_load_ps(MagnitudeIntrinsics().data());
+    auto mag = _mm256_load_ps(MagnitudeIntrinsics().data());
 
-    x = _mm_div_ps(x, mag);
-    y = _mm_div_ps(y, mag);
-    z = _mm_div_ps(z, mag);
+    x = _mm256_div_ps(x, mag);
+    y = _mm256_div_ps(y, mag);
+    z = _mm256_div_ps(z, mag);
 
-    _mm_store_ps(result.xs.data(), x);
-    _mm_store_ps(result.ys.data(), y);
-    _mm_store_ps(result.zs.data(), z);
+    _mm256_store_ps(result.xs.data(), x);
+    _mm256_store_ps(result.ys.data(), y);
+    _mm256_store_ps(result.zs.data(), z);
 
     return result;
 }
@@ -822,31 +805,32 @@ inline EightVec3f EightVec3f::ReflectIntrinsics(EightVec3f inVec, EightVec3f nor
     EightVec3f result;
     normal = normal.NormalizedIntrinsics();
 
-    auto xi = _mm_load_ps(inVec.xs.data());
-    auto yi = _mm_load_ps(inVec.ys.data());
-    auto zi = _mm_load_ps(inVec.zs.data());
+    auto xi = _mm256_load_ps(inVec.xs.data());
+    auto yi = _mm256_load_ps(inVec.ys.data());
+    auto zi = _mm256_load_ps(inVec.zs.data());
 
-    auto dot = _mm_load_ps(DotIntrinsics(inVec, normal).data());
+    auto dot = _mm256_load_ps(DotIntrinsics(inVec, normal).data());
 
-    auto xn = _mm_load_ps(normal.xs.data());
-    auto yn = _mm_load_ps(normal.ys.data());
-    auto zn = _mm_load_ps(normal.zs.data());
-    const float multiplier = 2.0f;
-    const auto twos = _mm_load1_ps(&multiplier);
-    xn = _mm_mul_ps(xn, twos);
-    yn = _mm_mul_ps(yn, twos);
-    zn = _mm_mul_ps(zn, twos);
-    xn = _mm_mul_ps(xn, dot);
-    yn = _mm_mul_ps(yn, dot);
-    zn = _mm_mul_ps(zn, dot);
+    auto xn = _mm256_load_ps(normal.xs.data());
+    auto yn = _mm256_load_ps(normal.ys.data());
+    auto zn = _mm256_load_ps(normal.zs.data());
+	
+    const __m256 scalar = _mm256_set1_ps(2.0f);
+    xn = _mm256_mul_ps(xn, scalar);
+    yn = _mm256_mul_ps(yn, scalar);
+    zn = _mm256_mul_ps(zn, scalar);
+	
+    xn = _mm256_mul_ps(xn, dot);
+    yn = _mm256_mul_ps(yn, dot);
+    zn = _mm256_mul_ps(zn, dot);
 
-    xi = _mm_sub_ps(xi, xn);
-    yi = _mm_sub_ps(yi, yn);
-    zi = _mm_sub_ps(zi, zn);
+    xi = _mm256_sub_ps(xi, xn);
+    yi = _mm256_sub_ps(yi, yn);
+    zi = _mm256_sub_ps(zi, zn);
 
-    _mm_store_ps(result.xs.data(), xi);
-    _mm_store_ps(result.ys.data(), yi);
-    _mm_store_ps(result.zs.data(), zi);
+    _mm256_store_ps(result.xs.data(), xi);
+    _mm256_store_ps(result.ys.data(), yi);
+    _mm256_store_ps(result.zs.data(), zi);
 
     return result;
 }
@@ -1128,21 +1112,10 @@ inline std::array<float, 4> FourVec4f::MagnitudeIntrinsics() const
 {
     alignas(4 * sizeof(float))
     std::array<float, 4> result;
-    auto x = _mm_load_ps(xs.data());
-    auto y = _mm_load_ps(ys.data());
-    auto z = _mm_load_ps(zs.data());
-    auto w = _mm_load_ps(ws.data());
-
-    x = _mm_mul_ps(x, x);
-    y = _mm_mul_ps(y, y);
-    z = _mm_mul_ps(z, z);
-    w = _mm_mul_ps(w, w);
-
-    x = _mm_add_ps(x, y);
-    z = _mm_add_ps(z, w);
-    x = _mm_add_ps(x, z);
-    x = _mm_sqrt_ps(x);
-    _mm_store_ps(result.data(), x);
+    auto mag = _mm_load_ps(SquareMagnitudeIntrinsics().data());
+	
+    mag = _mm_sqrt_ps(mag);
+    _mm_store_ps(result.data(), mag);
     return result;
 }
 template<>
@@ -1246,40 +1219,29 @@ inline std::array<float, 8> EightVec4f::MagnitudeIntrinsics() const
 {
     alignas(8 * sizeof(float))
     std::array<float, 8> result;
-    auto x = _mm256_load_ps(xs.data());
-    auto y = _mm256_load_ps(ys.data());
-    auto z = _mm256_load_ps(zs.data());
-    auto w = _mm256_load_ps(ws.data());
-
-    x = _mm256_mul_ps(x, x);
-    y = _mm256_mul_ps(y, y);
-    z = _mm256_mul_ps(z, z);
-    w = _mm256_mul_ps(w, w);
-
-    x = _mm256_add_ps(x, y);
-    z = _mm256_add_ps(z, w);
-    x = _mm256_add_ps(x, z);
-    x = _mm256_sqrt_ps(x);
-    _mm256_store_ps(result.data(), x);
+    auto mag = _mm256_load_ps(SquareMagnitudeIntrinsics().data());
+	
+    mag = _mm256_sqrt_ps(mag);
+    _mm256_store_ps(result.data(), mag);
     return result;
 }
 template<>
 inline EightVec4f EightVec4f::NormalizedIntrinsics()
 {
     EightVec4f result;
-    auto x = _mm_load_ps(xs.data());
-    auto y = _mm_load_ps(ys.data());
-    auto z = _mm_load_ps(zs.data());
+    auto x = _mm256_load_ps(xs.data());
+    auto y = _mm256_load_ps(ys.data());
+    auto z = _mm256_load_ps(zs.data());
 
-    auto mag = _mm_load_ps(MagnitudeIntrinsics().data());
+    auto mag = _mm256_load_ps(MagnitudeIntrinsics().data());
 
-    x = _mm_div_ps(x, mag);
-    y = _mm_div_ps(y, mag);
-    z = _mm_div_ps(z, mag);
+    x = _mm256_div_ps(x, mag);
+    y = _mm256_div_ps(y, mag);
+    z = _mm256_div_ps(z, mag);
 
-    _mm_store_ps(result.xs.data(), x);
-    _mm_store_ps(result.ys.data(), y);
-    _mm_store_ps(result.zs.data(), z);
+    _mm256_store_ps(result.xs.data(), x);
+    _mm256_store_ps(result.ys.data(), y);
+    _mm256_store_ps(result.zs.data(), z);
 
     return result;
 }

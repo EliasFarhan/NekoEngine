@@ -13,9 +13,9 @@ TEST(Engine, TestVector)
 {
     std::array<Vec4f, 4> array;
     array.fill(Vec4f(5, 1, 3, 9));
-    FourVec4f test(array);
+    const FourVec4f fourVec4(array);
 
-    auto result = test.MagnitudeIntrinsics();
+    auto result = fourVec4.MagnitudeIntrinsics();
 
     for (auto& tet : result) {
         std::cout << tet << "\n";
