@@ -23,9 +23,9 @@ using StdMapType = std::map<Key, Value>;
 using StdUnorderedMapType = std::unordered_map<Key, Value>;
 using FixedMapType = FixedMap<Key, Value, SIZE>;
 const size_t ALLOCATOR_HEADER_SIZE = 0;
-const size_t ALIGNMENT_PADDING = 1;
+const size_t EXTRA_PADDING = 1;
 const size_t INTERNAL_PAIR_SIZE = sizeof(InternalPair);
-const size_t HEAP_SIZE = ALLOCATOR_HEADER_SIZE + (SIZE * INTERNAL_PAIR_SIZE) + ALIGNMENT_PADDING;
+const size_t HEAP_SIZE = ALLOCATOR_HEADER_SIZE + (SIZE * INTERNAL_PAIR_SIZE) + EXTRA_PADDING;
 using AllocatorType = LinearAllocator;
 
 // ----------------------------------------------------------------
@@ -212,7 +212,6 @@ void BM_FixedMap_Access(benchmark::State& s)
         key = GetNextKey();
         map.Insert({key, GetNextKey()});
     }
-    // map.Rearrange();
 
     for (auto _ : s)
     {

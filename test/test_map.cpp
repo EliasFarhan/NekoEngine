@@ -10,17 +10,17 @@
 namespace neko
 {
 
-#define HASH_SIZE 32
+const size_t HASH_SIZE = 32; // bits
 using Key = char;
 using Value = char;
-using Hash = xxh::hash_t < HASH_SIZE>;
+using Hash = xxh::hash_t<HASH_SIZE>;
 using AllocatorType = LinearAllocator;
+using InternalPair = std::pair<xxh::hash_t<HASH_SIZE>, Value>;
 const size_t ALLOCATOR_HEADER_SIZE = 0; // bytes
-const size_t ALIGNMENT_PADDING = 1; // byte
+const size_t EXTRA_PADDING = 1; // byte
 const size_t PAIRS_NUMBER = 64; // pairs
-const size_t PAIR_SIZE = sizeof(std::pair<xxh::hash_t < HASH_SIZE>, Value >);
-const size_t TOTAL_BYTES = ALLOCATOR_HEADER_SIZE + (PAIRS_NUMBER * PAIR_SIZE) + ALIGNMENT_PADDING;
-using InternalPair = std::pair<xxh::hash_t < HASH_SIZE>, Value>;
+const size_t PAIR_SIZE = sizeof(InternalPair);
+const size_t TOTAL_BYTES = ALLOCATOR_HEADER_SIZE + (PAIRS_NUMBER * PAIR_SIZE) + EXTRA_PADDING;
 
 static Key NextKey()
 {
@@ -110,43 +110,6 @@ TEST(Map, FixedMap_Insertion)
     }// !TRY_INSERT
 }
 
-/*TEST(Map, Rearrange)
-{
-    MallocRAII mem(malloc(TOTAL_BYTES));
-    AllocatorType allocator(TOTAL_BYTES, mem.data());
-
-    FixedMap <Key, Value, PAIRS_NUMBER> map(allocator);
-    std::vector<Key> keys;
-    std::vector<Hash> hashes;
-
-    for (size_t _ = 0; _ < PAIRS_NUMBER; _++)
-    {
-        keys.push_back(RandomNewKey());
-        hashes.push_back(xxh::xxhash<HASH_SIZE>(&keys.back(), 1));
-        map.Insert({keys.back(), 0});
-    }
-    std::sort(hashes.begin(), hashes.end(), [](const Hash a, const Hash b){ return a < b;});
-
-    try // TRY_REARRANGE
-    {
-        map.Rearrange();
-    }
-    catch (const std::exception& e)
-    {
-        std::cerr << e.what() << '\n';
-    }// !TRY_REARRANGE
-
-    std::vector<Hash> sortedMapHashes;
-    for (const auto& pair : map){
-        sortedMapHashes.push_back(pair.first);
-    }
-
-    for (size_t i = 0; i < PAIRS_NUMBER; i++)
-    {
-        EXPECT_EQ(hashes[i], sortedMapHashes[i]);
-    }
-}*/
-
 TEST(Map, FixedMap_Access)
 {
     MallocRAII mem(malloc(TOTAL_BYTES));
@@ -161,7 +124,6 @@ TEST(Map, FixedMap_Access)
         values.push_back(NextValue());
         map.Insert({keys.back(), values.back()});
     }
-    // map.Rearrange();
 
     try // TRY_ACCESS
     {
@@ -189,7 +151,6 @@ TEST(Map, FixedMap_Clear)
     {
         map.Insert({NextKey(), NextValue()});
     }
-    // map.Rearrange();
 
     try // TRY_CLEAR
     {
@@ -219,7 +180,6 @@ TEST(Map, FixedMap_Iterators)
         values.push_back(NextValue());
         map.Insert({k++, 0});
     }
-    // map.Rearrange();
 
     try // TRY_FOREACH
     {
