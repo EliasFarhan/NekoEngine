@@ -35,7 +35,7 @@ void LinearAllocator::Clear()
 
 void LinearAllocator::Profile()
 {
-	const float totalWidth = ImGui::GetContentRegionAvailWidth();
+	const float totalWidth = ImGui::GetContentRegionAvail().x;
 	ImGui::LabelText("Type", "Linear Allocator");
 
 	bool selected = true;
@@ -93,7 +93,7 @@ void StackAllocator::Deallocate(void* p)
 void StackAllocator::Profile()
 {
 	ImGui::LabelText("Type", "Stack Allocator");
-	const float totalWidth = ImGui::GetContentRegionAvailWidth();
+	const float totalWidth = ImGui::GetContentRegionAvail().x;
 	ImGui::LabelText("Type", "Linear Allocator");
 
 	bool selected = true;
@@ -214,7 +214,7 @@ void FreeListAllocator::Profile()
 	ImGui::LabelText("Type", "FreeList Allocator");
 
 
-	const float totalWidth = ImGui::GetContentRegionAvailWidth();
+	const float totalWidth = ImGui::GetContentRegionAvail().x;
 	const auto start = (size_t)start_;
 	const auto end = ((size_t)start_ + size_);
 	FreeBlock* freeBlock = freeBlocks_;
@@ -265,7 +265,7 @@ void FreeListAllocator::Profile()
 	}
 }
 
-void* ProxyAllocator::Allocate(size_t allocatedSize, size_t alignment)
+void* neko::ProxyAllocator::Allocate(size_t allocatedSize, size_t alignment)
 {
 	numAllocations_++;
 	size_t mem = allocator_.GetUsedMemory();

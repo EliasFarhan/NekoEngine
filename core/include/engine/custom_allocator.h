@@ -268,7 +268,7 @@ void PoolAllocator<T>::Deallocate(void* p)
 template <typename T>
 void PoolAllocator<T>::Profile()
 {
-	const float totalWidth = ImGui::GetContentRegionAvailWidth();
+	const float totalWidth = ImGui::GetContentRegionAvail().x;
 	ImGui::LabelText("Type", "Pool Allocator");
 	const auto adjustment = CalculateAlignForwardAdjustment(start_, alignof(T));
 	static std::vector<char> availablePool((size_ - adjustment) / sizeof(T));
