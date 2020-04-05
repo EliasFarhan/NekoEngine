@@ -22,6 +22,8 @@ using InternalPair = std::pair<xxh::hash_t<HASH_SIZE>, Value>;
 using StdMapType = std::map<Key, Value>;
 using StdUnorderedMapType = std::unordered_map<Key, Value>;
 using FixedMapType = FixedMap<Key, Value, SIZE>;
+using DynamicMapType = DynamicMap<Key, Value>;
+using SmallMapType = SmallMap<Key, Value, SIZE>;
 const size_t ALLOCATOR_HEADER_SIZE = 0;
 const size_t EXTRA_PADDING = 1;
 const size_t INTERNAL_PAIR_SIZE = sizeof(InternalPair);
@@ -33,8 +35,9 @@ using AllocatorType = LinearAllocator;
 // ----------------------------------------------------------------
 
 Key GetNextKey(){
-    static Key k = 0;
-    return ++k;
+    static Key k = 1;
+    if (++k == 0) k++;
+    return k;
 }
 
 // ----------------------------------------------------------------
@@ -60,6 +63,16 @@ inline StdUnorderedMapType StdUnorderedMap_Init()
 inline FixedMapType FixedMap_Init()
 {
     return FixedMapType(allocator);
+}
+
+inline DynamicMapType DynamicMap_Init()
+{
+    return DynamicMapType(allocator);
+}
+
+inline SmallMapType SmallMap_Init()
+{
+    return SmallMapType();
 }
 
 // ----------------------------------------------------------------
@@ -88,6 +101,21 @@ inline void FixedMap_FillOut(FixedMapType& map)
         map.Insert({GetNextKey(), GetNextKey()});
     }
 }
+inline void DynamicMap_FillOut(DynamicMapType& map)
+{
+    for (size_t i = 0; i < SIZE; i++)
+    {
+        map.Insert({GetNextKey(), GetNextKey()});
+    }
+}
+
+inline void SmallMap_FillOut(SmallMapType& map)
+{
+    for (size_t i = 0; i < SIZE; i++)
+    {
+        map.Insert({GetNextKey(), GetNextKey()});
+    }
+}
 
 // ----------------------------------------------------------------
 // Clear.
@@ -104,6 +132,16 @@ inline void StdUnorderedMap_Clear(StdUnorderedMapType& map)
 }
 
 inline void FixedMap_Clear(FixedMapType& map)
+{
+    return map.Clear();
+}
+
+inline void DynamicMap_Clear(DynamicMapType& map)
+{
+    return map.Clear();
+}
+
+inline void SmallMap_Clear(SmallMapType& map)
 {
     return map.Clear();
 }
@@ -142,6 +180,26 @@ void BM_FixedMap_InitFillOutAndClear(benchmark::State& s)
     }
 }
 
+void BM_DynamicMap_InitFillOutAndClear(benchmark::State& s)
+{
+    for (auto _ : s)
+    {
+        DynamicMapType map = DynamicMap_Init();
+        DynamicMap_FillOut(map);
+        DynamicMap_Clear(map);
+    }
+}
+
+void BM_SmallMap_InitFillOutAndClear(benchmark::State& s)
+{
+    for (auto _ : s)
+    {
+        SmallMapType map = SmallMap_Init();
+        SmallMap_FillOut(map);
+        SmallMap_Clear(map);
+    }
+}
+
 // ----------------------------------------------------------------
 // Access.
 // ----------------------------------------------------------------
@@ -157,6 +215,16 @@ inline Value StdUnorderedMap_Access(StdUnorderedMapType& map, const Key key)
 }
 
 inline Value FixedMap_Access(FixedMapType& map, const Key key)
+{
+    return map[key];
+}
+
+inline Value DynamicMap_Access(DynamicMapType& map, const Key key)
+{
+    return map[key];
+}
+
+inline Value SmallMap_Access(SmallMapType& map, const Key key)
 {
     return map[key];
 }
@@ -222,6 +290,44 @@ void BM_FixedMap_Access(benchmark::State& s)
     }
 }
 
+void BM_DynamicMap_Access(benchmark::State& s)
+{
+    DynamicMapType map = DynamicMap_Init();
+    std::vector<Key> keys(SIZE);
+    for (auto& key : keys)
+    {
+        key = GetNextKey();
+        map.Insert({key, GetNextKey()});
+    }
+
+    for (auto _ : s)
+    {
+        for (auto key : keys)
+        {
+            benchmark::DoNotOptimize(DynamicMap_Access(map, key));
+        }
+    }
+}
+
+void BM_SmallMap_Access(benchmark::State& s)
+{
+    SmallMapType map = SmallMap_Init();
+    std::vector<Key> keys(SIZE);
+    for (auto& key : keys)
+    {
+        key = GetNextKey();
+        map.Insert({key, GetNextKey()});
+    }
+
+    for (auto _ : s)
+    {
+        for (auto key : keys)
+        {
+            benchmark::DoNotOptimize(SmallMap_Access(map, key));
+        }
+    }
+}
+
 // ----------------------------------------------------------------
 // Register benches and run them.
 // ----------------------------------------------------------------
@@ -229,9 +335,13 @@ void BM_FixedMap_Access(benchmark::State& s)
 BENCHMARK(BM_StdMap_InitFillOutAndClear);
 BENCHMARK(BM_StdUnorderedMap_InitFillOutAndClear);
 BENCHMARK(BM_FixedMap_InitFillOutAndClear);
+BENCHMARK(BM_DynamicMap_InitFillOutAndClear);
+BENCHMARK(BM_SmallMap_InitFillOutAndClear);
 BENCHMARK(BM_StdMap_Access);
 BENCHMARK(BM_StdUnorderedMap_Access);
 BENCHMARK(BM_FixedMap_Access);
+BENCHMARK(BM_DynamicMap_Access);
+BENCHMARK(BM_SmallMap_Access);
 
 BENCHMARK_MAIN();
 
