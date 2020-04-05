@@ -33,7 +33,7 @@ void LinearAllocator::Clear()
 	currentPos_ = start_;
 }
 
-/*void LinearAllocator::Profile()
+void LinearAllocator::Profile()
 {
 	const float totalWidth = ImGui::GetContentRegionAvail().x;
 	ImGui::LabelText("Type", "Linear Allocator");
@@ -49,7 +49,7 @@ void LinearAllocator::Clear()
 	const float availableWidth = (size_ - usedMemory_) * totalWidth / size_;
 	ImGui::Selectable("Available Memory", &selected, 0, ImVec2(availableWidth, 20));
 
-}*/
+}
 
 void* StackAllocator::Allocate(size_t allocatedSize, size_t alignment)
 {
@@ -90,7 +90,7 @@ void StackAllocator::Deallocate(void* p)
 	numAllocations_--;
 }
 
-/*void StackAllocator::Profile()
+void StackAllocator::Profile()
 {
 	ImGui::LabelText("Type", "Stack Allocator");
 	const float totalWidth = ImGui::GetContentRegionAvail().x;
@@ -106,7 +106,7 @@ void StackAllocator::Deallocate(void* p)
 	selected = false;
 	const float availableWidth = (size_ - usedMemory_) * totalWidth / size_;
 	ImGui::Selectable("Available Memory", &selected, 0, ImVec2(availableWidth, 20));
-}*/
+}
 
 void* FreeListAllocator::Allocate(size_t allocatedSize, size_t alignment)
 {
@@ -209,7 +209,7 @@ void FreeListAllocator::Deallocate(void* p)
 	usedMemory_ -= blockSize;
 }
 
-/*void FreeListAllocator::Profile()
+void FreeListAllocator::Profile()
 {
 	ImGui::LabelText("Type", "FreeList Allocator");
 
@@ -263,7 +263,7 @@ void FreeListAllocator::Deallocate(void* p)
 		}
 		freeBlock = freeBlock->next;
 	}
-}*/
+}
 
 void* neko::ProxyAllocator::Allocate(size_t allocatedSize, size_t alignment)
 {
@@ -282,8 +282,8 @@ void ProxyAllocator::Deallocate(void* p)
 	usedMemory_ -= mem - allocator_.GetUsedMemory();
 }
 
-/*void ProxyAllocator::Profile()
+void ProxyAllocator::Profile()
 {
 	ImGui::LabelText("Type", "Proxy Allocator");
-}*/
+}
 }
