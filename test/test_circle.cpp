@@ -17,7 +17,7 @@ TEST(Engine, TestCircle)
 	
 	auto start = std::chrono::steady_clock::now();
 
-	EXPECT_TRUE(circleA.Intersects(circleB);
+	EXPECT_TRUE(circleA.Intersects(circleB));
 	EXPECT_TRUE(circleB.Intersects(circleC));
 	EXPECT_TRUE(circleA.Intersects(circleD));
 	EXPECT_FALSE(circleC.Intersects(circleD));

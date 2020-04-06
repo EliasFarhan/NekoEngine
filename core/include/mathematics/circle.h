@@ -330,6 +330,7 @@ namespace neko
             {
                 results[i] = true;
             }
+        }
         // One or more of the distances were less-than-or-equal-to the maximum,
         // so we have something to draw.
         /*
