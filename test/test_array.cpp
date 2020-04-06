@@ -2,7 +2,7 @@
 #include <engine/array.h>
 
 namespace neko{
-
+	
 TEST(Array, MemoryLayout){
     const size_t ALLOCATOR_HEADER_SIZE = 16;
     const size_t SIZE = 64;
@@ -21,11 +21,19 @@ TEST(Array, MemoryLayout){
     DynArray<char>::iterator actualEnd = array.end();
     EXPECT_EQ(expectedEnd, actualEnd);
 }
+	
 
 TEST(Array, Iterators){
     // TODO
 
     // std::find_if(arra.begin(), arra.end(). []{})
+}
+
+TEST(Array, SmallVectorOperator){
+	SmallVector<double> intVec = SmallVector<double>(5);
+	intVec[4] = 18.58484845;
+	EXPECT_EQ(intVec[4], 18.58484845);
+	
 }
 
 }// !neko

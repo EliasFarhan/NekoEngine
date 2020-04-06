@@ -20,7 +20,7 @@ JobSystem::~JobSystem()
 {
     // Spin-lock waiting for all threads to become ready for shutdown.
     while (initializedWorkers_ != numberOfWorkers || !tasks_.empty()){} // WARNING: Not locking mutex for task_ access here!
-
+	
     status_ = 0u; // Atomic assign.
     cv_.notify_all(); // Wake all workers.
     const size_t len = numberOfWorkers;

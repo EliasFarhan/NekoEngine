@@ -29,107 +29,39 @@
 namespace neko
 {
 
-class IntArray
+template<typename T>
+class SmallVector
 {
 private:
 	size_t length_{};
-	int* data_{};
+	T* data_{};
 
 public:
-	IntArray() = default;
+	typedef T* iterator;
+	typedef const T* const_iterator;
 
-	IntArray(size_t length) :
-		length_{ length }
+	SmallVector() = default;
+
+	SmallVector(size_t length) : length_{ length }
 	{
-		neko_assert(length_ >= 0, "");
+		neko_assert(length_ >= 0, "[Error] Small Vector initialized with negative size");
 
 		if (length_ > 0)
-			data_ = new int[length] {};
+			data_ = new T[length] {};
 	}
 
-	~IntArray()
+	~SmallVector()
 	{
 		delete[] data_;
-		// we don't need to set m_data to null or m_length to 0 here, since the object will be destroyed immediately after this function anyway
 	}
 
-	void erase()
-	{
-		delete[] data_;
-		// We need to make sure we set m_data to nullptr here, otherwise it will
-		// be left pointing at deallocated memory!
-		data_ = nullptr;
-		length_ = 0;
-	}
-
-	int& operator[](int index)
+	T& operator[](int index)
 	{
 		neko_assert(index >= 0 && index < length_, "[Error] Out of scope access");
 		return data_[index];
 	}
 
-	int getLength() const { return length_; }
-
-	// reallocate resizes the array.  Any existing elements will be destroyed.  This function operates quickly.
-	void reallocate(int newLength)
-	{
-		// First we delete any existing elements
-		erase();
-
-		// If our array is going to be empty now, return here
-		if (newLength <= 0)
-			return;
-
-		// Then we have to allocate new elements
-		data_ = new int[newLength];
-		length_ = newLength;
-	}
-
-	// resize resizes the array.  Any existing elements will be kept.  This function operates slowly.
-	void resize(int newLength)
-	{
-		// if the array is already the right length, we're done
-		if (newLength == length_)
-			return;
-
-		// If we are resizing to an empty array, do that and return
-		if (newLength <= 0)
-		{
-			erase();
-			return;
-		}
-
-		// Now we can assume newLength is at least 1 element.  This algorithm
-		// works as follows: First we are going to allocate a new array.  Then we
-		// are going to copy elements from the existing array to the new array.
-		// Once that is done, we can destroy the old array, and make m_data
-		// point to the new array.
-
-		// First we have to allocate a new array
-		int* data{ new int[newLength] };
-
-		// Then we have to figure out how many elements to copy from the existing
-		// array to the new array.  We want to copy as many elements as there are
-		// in the smaller of the two arrays.
-		if (length_ > 0)
-		{
-			int elementsToCopy{ (newLength > (int)length_) ? (int)length_ : newLength };
-
-			// Now copy the elements one by one
-			for (int index{ 0 }; index < elementsToCopy; ++index)
-				data[index] = data_[index];
-		}
-
-		// Now we can delete the old array because we don't need it any more
-		delete[] data_;
-
-		// And use the new array instead!  Note that this simply makes m_data point
-		// to the same address as the new array we dynamically allocated.  Because
-		// data was dynamically allocated, it won't be destroyed when it goes out of scope.
-		data_ = data;
-		length_ = newLength;
-	}
-
+	int GetLength() const { return length_; }
 };
 
 template<typename T>
@@ -187,7 +119,7 @@ public:
                 allocator_.Allocate(capacity, alignof(T));
                 for (int i = 0; i < size; ++i)
                 {
-                    buffer_[i] = temp[i];
+					buffer_[i] = temp[i];
                 }
                 buffer_[size++] = elem;
             }else{
@@ -196,7 +128,7 @@ public:
 
 	    }
 
-		/*if (size == capacity) {
+		if (size == capacity) {
 			T* temp = static_cast<T*>(allocator_.Allocate(2*capacity, alignof(T)));
 
 			for (size_t i = 0; i < size; i++) {
@@ -208,7 +140,7 @@ public:
 		}
 
 		buffer_[size] = elem;
-		size++;*/
+		size++;
 	}
 
 	void Insert(T data, size_t index)
@@ -230,4 +162,5 @@ public:
 	}
 
 };
+
 }
