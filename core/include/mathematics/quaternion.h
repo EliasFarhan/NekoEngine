@@ -99,7 +99,7 @@ struct Quaternion
 		result.x = axis.x;
 		result.y = axis.y;
 		result.z = axis.z;
-		result.w = Cos(rad);
+		result.w = Cos(rad);	//Todo change with neko::Acos
 
 		return Normalized(result);
 	}
@@ -268,7 +268,7 @@ struct FourQuaternion				//64 bytes
 		w = qw;
 	}
 
-	static inline std::array<float, 4> DotIntrinsics(FourQuaternion q1, FourQuaternion q2)		//TODO Rename
+	static inline std::array<float, 4> Dot(FourQuaternion q1, FourQuaternion q2)
 	{
 		alignas(4 * sizeof(float)) std::array<float, 4> result;
 		auto x1 = _mm_load_ps(q1.x.data());
@@ -331,7 +331,7 @@ struct FourQuaternion				//64 bytes
 		auto y1 = _mm_load_ps(quaternion.y.data());
 		auto z1 = _mm_load_ps(quaternion.z.data());
 		auto w1 = _mm_load_ps(quaternion.w.data());
-
+		
 		x1 = _mm_mul_ps(x1, x1);
 		y1 = _mm_mul_ps(y1, y1);
 		z1 = _mm_mul_ps(z1, z1);
@@ -346,61 +346,65 @@ struct FourQuaternion				//64 bytes
 		//TODO: Test if it is working
 	}
 
-	//Rotates the Quaternion of angle degrees around axis.
+	//Rotates the Quaternion of angle radians around axis.
 	static FourQuaternion AngleAxis(std::array<radian_t, 4> rad, neko::FourVec3f axis)
 	{
-		
-		//TODO
-		/*if (axis.SquareMagnitude() == 0.0f)
-			return Quaternion::Identity();
-
-		Quaternion result = Quaternion::Identity();
+		FourQuaternion result = FourQuaternion::Identity();
 		axis = axis.Normalized();
-		axis *= Sin(rad);
-		result.x = axis.x;
-		result.y = axis.y;
-		result.z = axis.z;
-		result.w = Cos(rad);
+		result.x = axis.xs;
+		result.y = axis.ys;
+		result.z = axis.zs;
 
-		return Normalized(result);*/
+		std::array<float, 4> radf { rad[0].value, rad[1].value, rad[2].value, rad[3].value };
+		
+		auto x1 = _mm_load_ps(radf.data());
+
+		x1 = _mm_cos_ps(x1);
+
+		_mm_store_ps(result.w.data(), x1);
+
+		return Normalized(result);
+		//TODO: Test if working
 	}
-
-
-	//Returns the angle in degrees between two rotations a and b.
+	
 	static std::array<degree_t, 4> Angle(const FourQuaternion a, const FourQuaternion b)
 	{
-		std::array<float, 4> dot = DotIntrinsics(a, b);
+		std::array<float, 4> dot = Dot(a, b);
 		dot = std::array<float, 4>{std::abs(dot[0]), std::abs(dot[1]), std::abs(dot[2]), std::abs(dot[3])};
-		const std::array<float, 4> f{ 2.0f, 2.0f, 2.0f, 2.0f};
-		alignas(4 * sizeof(degree_t)) std::array<degree_t, 4> result;
+		const std::array<float, 4> f{ 2.0f, 2.0f, 2.0f, 2.0f };
+		alignas(4 * sizeof(float)) std::array<float, 4> resultf;
 
 		auto x1 = _mm_load_ps(dot.data());
 		auto x2 = _mm_load_ps(f.data());
-		
+
 		x1 = _mm_acos_ps(x1);
 
 		x1 = _mm_mul_ps(x1, x2);
+		_mm_store_ps(resultf.data(), x1);
 
-		_mm_store_ps(result.data(), x1);
+		std::array<degree_t, 4> result = resultf;	//TODO: Correct this
 		return result;
-		//TODO End
-		//return 2.0f * Acos(std::abs(Dot(a, b)));		//Todo change with neko::Acos
 	}
 
 	FourQuaternion Conjugate() const
 	{
-		//TODO
-		return FourQuaternion(-x, -y, -z, w);
+		return FourQuaternion(
+			std::array<float, 4> {-x[0], -x[1], -x[2], -x[3]},
+			std::array<float, 4> {-y[0], -y[1], -y[2], -y[3]},
+			std::array<float, 4> {-z[0], -z[1], -z[2], -z[3]},
+			w);
+		//TODO Test if working
+		//TODO Try to find a better optimisation
 	}
 
 	//Returns the Inverse of rotation.
 	FourQuaternion Inverse() const
 	{
-		//TODO
 		const FourQuaternion conj = Conjugate();
 		const std::array<float, 4> sMag = SquareMagnitude(*this);
 
 		return conj / sMag;
+		//TODO Test if working
 	}
 
 	/*
@@ -410,58 +414,88 @@ struct FourQuaternion				//64 bytes
 	*/
 	static FourQuaternion FromEuler(std::array<EulerAngles, 4> angle)
 	{
-		//TODO
-		const auto cy = Cos(angle.x * 0.5f);
-		const auto sy = Sin(angle.x * 0.5f);
-		const auto cp = Cos(angle.y * 0.5f);
-		const auto sp = Sin(angle.y * 0.5f);
-		const auto cr = Cos(angle.z * 0.5f);
-		const auto sr = Sin(angle.z * 0.5f);
+		std::array<float, 4> eulerAngleX { angle[0].x.value, angle[1].x.value, angle[2].x.value, angle[3].x.value };
+		std::array<float, 4> eulerAngleY { angle[0].y.value, angle[1].y.value, angle[2].y.value, angle[3].y.value };
+		std::array<float, 4> eulerAngleZ { angle[0].z.value, angle[1].z.value, angle[2].z.value, angle[3].z.value };
+		std::array<float, 4> const0p5{ 0.5f, 0.5f, 0.5f, 0.5f };
 
-		return FourQuaternion(
-			cy * cp * cr + sy * sp * sr,
-			cy * cp * sr - sy * sp * cr,
-			sy * cp * sr + cy * sp * cr,
-			sy * cp * cr - cy * sp * sr
-		);
+		alignas(4 * sizeof(float)) std::array<float, 4> resultX;
+		alignas(4 * sizeof(float)) std::array<float, 4> resultY;
+		alignas(4 * sizeof(float)) std::array<float, 4> resultZ;
+		alignas(4 * sizeof(float)) std::array<float, 4> resultW;
+
+		auto x = _mm_load_ps(eulerAngleX.data());
+		auto y = _mm_load_ps(eulerAngleY.data());
+		auto z = _mm_load_ps(eulerAngleZ.data());
+		auto w = _mm_load_ps(const0p5.data());
+
+		auto cy = _mm_mul_ps(x, w);	//Todo: See if possible to use only one mul
+		cy = _mm_cos_ps(cy);
+		auto sy = _mm_mul_ps(x, w);
+		sy = _mm_sin_ps(sy);
+		
+		auto cp = _mm_mul_ps(y, w);	//Todo: See if possible to use only one mul
+		cp = _mm_cos_ps(cp);
+		auto sp = _mm_mul_ps(y, w);
+		sp = _mm_sin_ps(sp);
+		
+		auto cr = _mm_mul_ps(z, w);	//Todo: See if possible to use only one mul
+		cr = _mm_cos_ps(cr);
+		auto sr = _mm_mul_ps(z, w);
+		sr = _mm_sin_ps(sr);
+
+		x = _mm_mul_ps(cy, cp);
+		x = _mm_mul_ps(x, cr);
+		y = _mm_mul_ps(sy, sp);
+		y = _mm_mul_ps(y, sr);
+		x = _mm_add_ps(x, y);
+
+		_mm_store_ps(resultX.data(), x);
+		
+		x = _mm_mul_ps(cy, cp);
+		x = _mm_mul_ps(x, sr);
+		y = _mm_mul_ps(sy, sp);
+		y = _mm_mul_ps(y, cr);
+		x = _mm_min_ps(x, y);
+
+		_mm_store_ps(resultY.data(), x);
+
+		x = _mm_mul_ps(sy, cp);
+		x = _mm_mul_ps(x, sr);
+		y = _mm_mul_ps(cy, sp);
+		y = _mm_mul_ps(y, cr);
+		x = _mm_add_ps(x, y);
+
+		_mm_store_ps(resultZ.data(), x);
+
+		x = _mm_mul_ps(sy, cp);
+		x = _mm_mul_ps(x, cr);
+		y = _mm_mul_ps(cy, sp);
+		y = _mm_mul_ps(y, sr);
+		x = _mm_min_ps(x, y);
+
+		_mm_store_ps(resultW.data(), x);
+
+		return FourQuaternion(resultX, resultY, resultZ, resultW);
+		//TODO Test if working
 	}
 
 	static FourQuaternion Identity()
 	{
-		//TODO
-		return FourQuaternion(0, 0, 0, 1);
+		return FourQuaternion(
+			std::array<float, 4> {0,0,0,0},
+			std::array<float, 4> {0,0,0,0},
+			std::array<float, 4> {0,0,0,0},
+			std::array<float, 4> {1,1,1,1});
+		//TODO Test if working
 	}
 
 	//Operators
 	FourQuaternion operator/(FourQuaternion rhs) const
 	{
-		//TODO
 		return *this * rhs.Inverse();
+		//TODO Test if working
 	}
-
-	/*
-	 * alignas(4 * sizeof(float)) std::array<float, 4> result;
-		auto x1 = _mm_load_ps(q1.x.data());
-		auto y1 = _mm_load_ps(q1.y.data());
-		auto z1 = _mm_load_ps(q1.z.data());
-		auto w1 = _mm_load_ps(q1.w.data());
-
-		auto x2 = _mm_load_ps(q2.x.data());
-		auto y2 = _mm_load_ps(q2.y.data());
-		auto z2 = _mm_load_ps(q2.z.data());
-		auto w2 = _mm_load_ps(q2.w.data());
-
-		x1 = _mm_mul_ps(x1, x2);
-		y1 = _mm_mul_ps(y1, y2);
-		z1 = _mm_mul_ps(z1, z2);
-		w1 = _mm_mul_ps(w1, w2);
-
-		x1 = _mm_add_ps(x1, y1);
-		z1 = _mm_add_ps(z1, w1);
-		x1 = _mm_add_ps(x1, z1);
-		_mm_store_ps(result.data(), x1);
-		return result;
-	 */
 
 	inline std::array<float, 4> DivideFourFloat(const std::array<float, 4> dividend, const std::array<float, 4> divisor) const
 	{
@@ -610,6 +644,7 @@ struct FourQuaternion				//64 bytes
 			MultiplyFourFloat(w, rhs));
 	}
 
+	//TODO Finish the other functions
 	//TODO
 	/*Quaternion& operator*=(const Quaternion& rhs)
 	{

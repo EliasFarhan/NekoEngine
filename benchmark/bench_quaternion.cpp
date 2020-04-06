@@ -126,7 +126,7 @@ BENCHMARK(BM_Dot)->Range(fromRange, toRange);*/
 
 static void BM_Dot(benchmark::State& state)
 {
-    const size_t n = state.range(0);
+    const size_t n = state.range(0)*4;
     std::vector<neko::Quaternion> v1(n, neko::Quaternion::Identity());
     std::vector<neko::Quaternion> v2(n, neko::Quaternion::Identity());
     std::for_each(v1.begin(), v1.end(), [](neko::Quaternion& q) {RandomFill(q); });
@@ -143,8 +143,30 @@ static void BM_Dot(benchmark::State& state)
 }
 BENCHMARK(BM_Dot)->Range(fromRange, toRange);
 
-static void BM_Four_Dot(benchmark::State& state)
+static void BM_Dot_Intrinsics(benchmark::State& state)
 {
+    const size_t n = state.range(0);
+    std::vector<neko::FourQuaternion> v1(n, neko::FourQuaternion::Identity());
+    std::vector<neko::FourQuaternion> v2(n, neko::FourQuaternion::Identity());
+    std::for_each(v1.begin(), v1.end(), [](neko::FourQuaternion& q) {RandomFill(q); });
+    std::for_each(v2.begin(), v2.end(), [](neko::FourQuaternion& q) {RandomFill(q); });
+
+    size_t iterations = 0;
+    for (auto _ : state)
+    {
+        for (size_t i = 0; i < n; i++)
+        {
+            benchmark::DoNotOptimize(neko::FourQuaternion::Dot(v1[i], v2[i]));
+        }
+    }
+}
+BENCHMARK(BM_Dot_Intrinsics)->Range(fromRange, toRange);
+
+/*static void BM_Four_Dot(benchmark::State& state)
+{
+    //const size_t n = state.range(0);
+    //std::vector<neko::Quaternion> qV1(n*4, neko::Quaternion::Identity());
+	
     neko::Quaternion q1a = neko::Quaternion(5, 7, 30, 8);
     neko::Quaternion q1b = neko::Quaternion(6, 3, 2, 1);
     neko::Quaternion q1c = neko::Quaternion(42, 666, 69, 13);
@@ -181,7 +203,7 @@ static void BM_Four_Intrinsics_Dot(benchmark::State& state)
         benchmark::DoNotOptimize(neko::FourQuaternion::DotIntrinsics(fqa, fqb));
     }
 }
-BENCHMARK(BM_Four_Intrinsics_Dot)->Range(fromRange, toRange);
+BENCHMARK(BM_Four_Intrinsics_Dot)->Range(fromRange, toRange);*/
 
 static void BM_Magnitude(benchmark::State& state)
 {

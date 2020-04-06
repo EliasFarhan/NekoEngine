@@ -42,7 +42,7 @@ TEST(Engine,Quaternion_Intrinsics_Dot)
 	
     neko::FourQuaternion fqa = neko::FourQuaternion(x1, y1, z1, w1);
     neko::FourQuaternion fqb = neko::FourQuaternion(x2, y2, z2, w2);
-    std::array<float, 4> quaternionDotIntrinsics = neko::FourQuaternion::DotIntrinsics(fqa, fqb);
+    std::array<float, 4> quaternionDotIntrinsics = neko::FourQuaternion::Dot(fqa, fqb);
     EXPECT_TRUE(quaternionDotQ1aQ2 - quaternionDotIntrinsics[0] < 0.001f &&
         quaternionDotQ1bQ2 - quaternionDotIntrinsics[1] < 0.001f &&
         quaternionDotQ1cQ2 - quaternionDotIntrinsics[2] < 0.001f &&
@@ -59,12 +59,33 @@ TEST(Engine, Quaternion_Normalized)
     EXPECT_EQ(expectedNormalized, normalized);
 }
 
+TEST(Engine, Quaternion_Intrinsics_Normalized)
+{
+	//TODO	
+}
+
+
 TEST(Engine, Quaternion_Magnitude)
 {
     neko::Quaternion q = neko::Quaternion(1, 0, 0, 0);
     float expectedMagnitude = 1;
     float magnitude = neko::Quaternion::Magnitude(q);
     EXPECT_TRUE(expectedMagnitude - magnitude < 0.001f);
+}
+
+TEST(Engine, Quaternion_Intrinsics_Magnitude)
+{
+    //TODO
+}
+
+TEST(Engine, Quaternion_Square_Magnitude)
+{
+    //TODO
+}
+
+TEST(Engine, Quaternion_Intrinsics_Square_Magnitude)
+{
+    //TODO
 }
 
 TEST(Engine, Quaternion_AngleAxis)
@@ -77,6 +98,11 @@ TEST(Engine, Quaternion_AngleAxis)
     //EXPECT_EQ(q, expectedAngleAxisQuaternion);
 }
 
+TEST(Engine, Quaternion_Intrinsics_AngleAxis)
+{
+    //TODO
+}
+
 TEST(Engine, Quaternion_Angle)
 {
     neko::Quaternion q1 = neko::Quaternion::Identity();
@@ -84,6 +110,11 @@ TEST(Engine, Quaternion_Angle)
     neko::degree_t expectedAngle(0);
     neko::degree_t angle(neko::Quaternion::Angle(q1, q2));
     EXPECT_EQ(expectedAngle, angle);
+}
+
+TEST(Engine, Quaternion_Intrinsics_Angle)
+{
+    //TODO
 }
 
 TEST(Engine, Quaternion_Conjugate)
@@ -94,6 +125,11 @@ TEST(Engine, Quaternion_Conjugate)
     EXPECT_EQ(q, expectedQuaternion);
 }
 
+TEST(Engine, Quaternion_Intrinsics_Conjugate)
+{
+    //TODO
+}
+
 TEST(Engine, Quaternion_Inverse)
 {
     neko::Quaternion q = neko::Quaternion(1, 0.5, 0.5, 0);
@@ -102,7 +138,37 @@ TEST(Engine, Quaternion_Inverse)
     EXPECT_TRUE(q.x - expectedInverse.x < 0.001f && q.y - expectedInverse.y < 0.001f && q.z - expectedInverse.z < 0.001f && q.w - expectedInverse.w < 0.001f);
 }
 
+TEST(Engine, Quaternion_Intrinsics_Inverse)
+{
+    //TODO
+}
+
 TEST(Engine, Quaternion_FromEuler)
+{
+    //TODO
+}
+
+TEST(Engine, Quaternion_Intrinsics_FromEuler)
+{
+    //TODO
+}
+
+TEST(Engine, Quaternion_Identity)
+{
+    //TODO
+}
+
+TEST(Engine, Quaternion_Intrinsics_Identity)
+{
+    //TODO
+}
+
+TEST(Engine, Quaternion_Operations)
+{
+    //TODO
+}
+
+TEST(Engine, Quaternion_Intrinsics_Operations)
 {
     //TODO
 }

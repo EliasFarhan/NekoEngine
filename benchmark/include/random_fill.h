@@ -47,6 +47,15 @@ void RandomFill(neko::Quaternion& q)
     q = neko::Quaternion(v);
 }
 
+void RandomFill(neko::FourQuaternion& q)
+{
+    std::array<float, 4> x{ RandomFloat(), RandomFloat(), RandomFloat(), RandomFloat() };
+    std::array<float, 4> y{ RandomFloat(), RandomFloat(), RandomFloat(), RandomFloat() };
+    std::array<float, 4> z{ RandomFloat(), RandomFloat(), RandomFloat(), RandomFloat() };
+    std::array<float, 4> w{ RandomFloat(), RandomFloat(), RandomFloat(), RandomFloat() };
+    q = neko::FourQuaternion(x, y, z, w);
+}
+
 /*void RandomFill(neko::IntrinsicsQuaternion q)
 {
     neko::FourVec4f v;
