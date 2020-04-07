@@ -17,7 +17,6 @@ set(Neko_Box2D OFF CACHE BOOL "Activate Box2D")
 set(Neko_Test ON CACHE BOOL "Activate Test")
 set(Neko_Assert ON CACHE BOOL "Activate Neko Assertion")
 set(Neko_Benchmark ON CACHE BOOL "Activate Benchmark")
-set(Neko_Lua ON CACHE BOOL "Activate Lua Wrapper")
 
 MESSAGE("CMAKE SYSTEM NAME: ${CMAKE_SYSTEM_NAME}")
 
@@ -66,16 +65,9 @@ add_subdirectory(${NEKO_CORE_DIR})
 #imgui
 set(IMGUI_VERSION "1.74" CACHE INTERNAL "")
 set(IMGUI_ROOT "${EXTERNAL_DIR}/imgui-${IMGUI_VERSION}" CACHE STRING "")
-include_directories("${IMGUI_ROOT}")
 add_subdirectory("${IMGUI_ROOT}")
 
-if(Neko_Lua)
-    set(LUA_VERSION "5.3.5")
-    set(LUA_DIR "${EXTERNAL_DIR}/lua-${LUA_VERSION}")
-    add_subdirectory(${LUA_DIR})
-    set(LUA_WRAPPER_DIR "${CMAKE_SOURCE_DIR}/common/lua_wrapper" CACHE INTERNAL "")
-    add_subdirectory(${LUA_WRAPPER_DIR})
-endif()
+
 
 if(Neko_GLES3)
     add_compile_definitions("NEKO_GLES3=1")
@@ -134,7 +126,7 @@ foreach(main_project_path ${main_projects} )
     get_filename_component(main_project_name ${main_project_path} NAME )
 
     message("Main project path: ${main_project_path} and name: ${main_project_name}")
-    set(${main_project_name} ON CACHE BOOL "")
+    set(${main_project_name} OFF CACHE BOOL "")
 
     if(${main_project_name})
         add_subdirectory(${main_project_path})
