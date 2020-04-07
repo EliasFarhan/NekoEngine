@@ -95,11 +95,11 @@ struct Quaternion
 
 		Quaternion result = Quaternion::Identity();
 		axis = axis.Normalized();
-		axis *= Sin(rad);
+		axis *= neko::Sin(rad);
 		result.x = axis.x;
 		result.y = axis.y;
 		result.z = axis.z;
-		result.w = Cos(rad);	//Todo change with neko::Acos
+		result.w = neko::Cos(rad);
 
 		return Normalized(result);
 	}
@@ -109,7 +109,7 @@ struct Quaternion
 	static degree_t Angle(const Quaternion& a, const Quaternion& b)
 	{
 		
-		return 2.0f * Acos(std::abs(Dot(a, b)));		//Todo change with neko::Acos
+		return 2.0f * neko::Acos(std::abs(Dot(a, b)));
 	}
 
 	Quaternion Conjugate() const
@@ -133,12 +133,12 @@ struct Quaternion
 	*/
 	static Quaternion FromEuler(EulerAngles angle)
 	{
-		const auto cy = Cos(angle.x * 0.5f);
-		const auto sy = Sin(angle.x * 0.5f);
-		const auto cp = Cos(angle.y * 0.5f);
-		const auto sp = Sin(angle.y * 0.5f);
-		const auto cr = Cos(angle.z * 0.5f);
-		const auto sr = Sin(angle.z * 0.5f);
+		const auto cy = neko::Cos(angle.x * 0.5f);
+		const auto sy = neko::Sin(angle.x * 0.5f);
+		const auto cp = neko::Cos(angle.y * 0.5f);
+		const auto sp = neko::Sin(angle.y * 0.5f);
+		const auto cr = neko::Cos(angle.z * 0.5f);
+		const auto sr = neko::Sin(angle.z * 0.5f);
 
 		return Quaternion(
 			cy * cp * cr + sy * sp * sr,
@@ -355,7 +355,7 @@ struct FourQuaternion				//64 bytes
 		result.y = axis.ys;
 		result.z = axis.zs;
 
-		std::array<float, 4> radf { rad[0].value, rad[1].value, rad[2].value, rad[3].value };
+		std::array<float, 4> radf { rad[0].value(), rad[1].value(), rad[2].value(), rad[3].value() };
 		
 		auto x1 = _mm_load_ps(radf.data());
 
@@ -382,8 +382,9 @@ struct FourQuaternion				//64 bytes
 		x1 = _mm_mul_ps(x1, x2);
 		_mm_store_ps(resultf.data(), x1);
 
-		std::array<degree_t, 4> result = resultf;	//TODO: Correct this
+		std::array<degree_t, 4> result{ static_cast<degree_t>(resultf[0]), static_cast<degree_t>(resultf[1]), static_cast<degree_t>(resultf[2]), static_cast<degree_t>(resultf[3])};
 		return result;
+		//TODO: Test if working
 	}
 
 	FourQuaternion Conjugate() const
@@ -414,9 +415,9 @@ struct FourQuaternion				//64 bytes
 	*/
 	static FourQuaternion FromEuler(std::array<EulerAngles, 4> angle)
 	{
-		std::array<float, 4> eulerAngleX { angle[0].x.value, angle[1].x.value, angle[2].x.value, angle[3].x.value };
-		std::array<float, 4> eulerAngleY { angle[0].y.value, angle[1].y.value, angle[2].y.value, angle[3].y.value };
-		std::array<float, 4> eulerAngleZ { angle[0].z.value, angle[1].z.value, angle[2].z.value, angle[3].z.value };
+		std::array<float, 4> eulerAngleX { angle[0].x.value(), angle[1].x.value(), angle[2].x.value(), angle[3].x.value() };
+		std::array<float, 4> eulerAngleY { angle[0].y.value(), angle[1].y.value(), angle[2].y.value(), angle[3].y.value() };
+		std::array<float, 4> eulerAngleZ { angle[0].z.value(), angle[1].z.value(), angle[2].z.value(), angle[3].z.value() };
 		std::array<float, 4> const0p5{ 0.5f, 0.5f, 0.5f, 0.5f };
 
 		alignas(4 * sizeof(float)) std::array<float, 4> resultX;
