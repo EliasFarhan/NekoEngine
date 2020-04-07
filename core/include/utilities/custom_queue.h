@@ -14,7 +14,17 @@ namespace neko
 	template<typename T, size_t capacity>
 	class FixedQueue
 	{
-		
+	public:
+		FixedQueue();
+		~FixedQueue() = default;
+		void Push(T element); //need
+		void Clear(); //need
+		T Pop(); //need
+		T Front(); //need
+		T Back(); //need
+		int Size(); //useful ?
+	private:
+		std::allocator<int> allocator;
 	};
 	//TODO Change name to DynamicQueue and use dynamic array
 	template<typename T>
