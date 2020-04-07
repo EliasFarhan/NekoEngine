@@ -8,7 +8,17 @@ namespace neko
 	template<typename T, size_t capacity>
 	class FixedQueue
 	{
-		// Tristan
+	public:
+		FixedQueue();
+		~FixedQueue() = default;
+		void Push(T element); //need
+		void Clear(); //need
+		T Pop(); //need
+		T Front(); //need
+		T Back(); //need
+		int Size(); //useful ?
+	private:
+		std::allocator<int> allocator;
 	};
 	template<typename T, size_t capacity>
 	class SmallQueue
@@ -100,7 +110,6 @@ namespace neko
 	template<typename T>
 	class DynamicQueue
 	{
-
 	public:
 		DynamicQueue()= default;
 		
