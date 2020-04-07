@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <engine/jobsystem.h>
-#include <easy/profiler.h>
+//#include <easy/profiler.h>
 
 namespace neko
 {
