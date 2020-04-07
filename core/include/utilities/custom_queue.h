@@ -184,7 +184,7 @@ namespace neko
 	{
 
 	public:
-		DynamicQueue2();
+		DynamicQueue2() = default;
 		~DynamicQueue2() = default;
 		void PushBack(T element)
 		{
