@@ -38,7 +38,6 @@ namespace neko
 		T* data_ = nullptr;;
 
 	public:
-		
 		typedef T* iterator;
 		typedef const T* const_iterator;
 
@@ -59,7 +58,7 @@ namespace neko
 			neko_assert(index >= 0 && index < size_, "[Error] Out of scope access");
 			return data_[index];
 		}
-
+		//Always use push to add new elements
 		void Push(T elem) {
 			if (size_ + 1 > capacity_) {
 				neko_assert(size_ + 1 <= capacity_, "[Error] Out of scope access");
@@ -83,7 +82,6 @@ namespace neko
 		T* data_ = nullptr;
 
 	public:
-
 		class iterator
 		{
 		public:
@@ -118,7 +116,6 @@ namespace neko
 		iterator end() {
 			return iterator(data_ + size_);
 		}
-
 
 		T& operator[](size_t index) {
 			neko_assert(index >= 0 && index < size_, "[Error] Out of scope access");
@@ -176,29 +173,25 @@ namespace neko
 		T* data_ = nullptr;;
 
 	public:
-
 		typedef T* iterator;
 		typedef const T* const_iterator;
 
-		FixedVector(size_t capacity, FreeListAllocator& allocator) : capacity_{ capacity }, allocator_ {allocator}
-		{
+		FixedVector(size_t capacity, FreeListAllocator& allocator) : capacity_{ capacity }, allocator_ {allocator}{
 			neko_assert(capacity_ >= 0, "[Error] Fixed Vector initialized with negative size");
 
 			if (capacity_ > 0)
 				data_ = new T[capacity_]{};
 		}
 
-		~FixedVector()
-		{
+		~FixedVector(){
 			delete[] data_;
 		}
 
-		T& operator[](int index)
-		{
+		T& operator[](int index){
 			neko_assert(index >= 0 && index < size_, "[Error] Out of scope access");
 			return data_[index];
 		}
-
+		//Always use push to add new elements
 		void Push(T elem) {
 			if (data_ == nullptr) {
 
