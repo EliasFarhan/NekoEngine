@@ -15,7 +15,7 @@ public:
     void Update();
 
     //Loading
-    void LoadBank(std::string_view bankName);
+    void LoadBank(std::string_view bankName); 
     void LoadEvent(std::string_view eventName);
     void LoadSound(std::string_view soundName);
     void UnloadSound(std::string_view soundName);
