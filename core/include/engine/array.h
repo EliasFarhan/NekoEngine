@@ -41,8 +41,6 @@ namespace neko
 		typedef T* iterator;
 		typedef const T* const_iterator;
 
-		SmallVector() = default;
-
 		SmallVector(size_t capacity) : capacity_{ capacity }{
 			neko_assert(capacity >= 0, "[Error] Small Vector initialized with negative size");
 
