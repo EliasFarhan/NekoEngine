@@ -2,7 +2,7 @@
 #include <engine/array.h>
 
 namespace neko {
-	/*
+	
 TEST(Array, MemoryLayout){
 	const size_t ALLOCATOR_HEADER_SIZE = 16;
 	const size_t SIZE = 64;
@@ -20,7 +20,7 @@ TEST(Array, MemoryLayout){
 	std::uint64_t expectedEnd = (std::uint64_t)start + (std::uint64_t)SIZE + (std::uint64_t)ALLOCATOR_HEADER_SIZE;
 	DynArray<char>::iterator actualEnd = array.end();
 	EXPECT_EQ(expectedEnd, actualEnd);
-}*/
+}
 
 
 	TEST(Array, Iterators) {
