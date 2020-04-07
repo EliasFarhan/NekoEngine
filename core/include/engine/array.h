@@ -29,205 +29,126 @@
 namespace neko
 {
 
-class IntArray
-{
-private:
-	size_t length_{};
-	int* data_{};
-
-public:
-	IntArray() = default;
-
-	IntArray(size_t length) :
-		length_{ length }
+	template<typename T>
+	class SmallVector
 	{
-		neko_assert(length_ >= 0, "");
+	private:
+		size_t size_ = 0;
+		T* data_ = nullptr;;
 
-		if (length_ > 0)
-			data_ = new int[length] {};
-	}
+	public:
+		typedef T* iterator;
+		typedef const T* const_iterator;
 
-	~IntArray()
-	{
-		delete[] data_;
-		// we don't need to set m_data to null or m_length to 0 here, since the object will be destroyed immediately after this function anyway
-	}
+		SmallVector() = default;
 
-	void erase()
-	{
-		delete[] data_;
-		// We need to make sure we set m_data to nullptr here, otherwise it will
-		// be left pointing at deallocated memory!
-		data_ = nullptr;
-		length_ = 0;
-	}
-
-	int& operator[](int index)
-	{
-		neko_assert(index >= 0 && index < length_, "[Error] Out of scope access");
-		return data_[index];
-	}
-
-	int getLength() const { return length_; }
-
-	// reallocate resizes the array.  Any existing elements will be destroyed.  This function operates quickly.
-	void reallocate(int newLength)
-	{
-		// First we delete any existing elements
-		erase();
-
-		// If our array is going to be empty now, return here
-		if (newLength <= 0)
-			return;
-
-		// Then we have to allocate new elements
-		data_ = new int[newLength];
-		length_ = newLength;
-	}
-
-	// resize resizes the array.  Any existing elements will be kept.  This function operates slowly.
-	void resize(int newLength)
-	{
-		// if the array is already the right length, we're done
-		if (newLength == length_)
-			return;
-
-		// If we are resizing to an empty array, do that and return
-		if (newLength <= 0)
+		SmallVector(size_t size) : size_{ size }
 		{
-			erase();
-			return;
+			neko_assert(size_ <= 0, "[Error] Small Vector initialized with negative size");
+
+			if (size_ > 0)
+				data_ = new T[size]{};
 		}
 
-		// Now we can assume newLength is at least 1 element.  This algorithm
-		// works as follows: First we are going to allocate a new array.  Then we
-		// are going to copy elements from the existing array to the new array.
-		// Once that is done, we can destroy the old array, and make m_data
-		// point to the new array.
-
-		// First we have to allocate a new array
-		int* data{ new int[newLength] };
-
-		// Then we have to figure out how many elements to copy from the existing
-		// array to the new array.  We want to copy as many elements as there are
-		// in the smaller of the two arrays.
-		if (length_ > 0)
+		~SmallVector()
 		{
-			int elementsToCopy{ (newLength > (int)length_) ? (int)length_ : newLength };
-
-			// Now copy the elements one by one
-			for (int index{ 0 }; index < elementsToCopy; ++index)
-				data[index] = data_[index];
+			delete[] data_;
 		}
 
-		// Now we can delete the old array because we don't need it any more
-		delete[] data_;
+		T& operator[](int index)
+		{
+			neko_assert(index >= 0 && index < size_, "[Error] Out of scope access");
+			return data_[index];
+		}
 
-		// And use the new array instead!  Note that this simply makes m_data point
-		// to the same address as the new array we dynamically allocated.  Because
-		// data was dynamically allocated, it won't be destroyed when it goes out of scope.
-		data_ = data;
-		length_ = newLength;
-	}
+		int GetSize() const { return size_; }
+	};
 
-};
-
-template<typename T>
-class DynArray
-{
-	FreeListAllocator& allocator_; //Please don't use Linear or Stack Allocator
-	T* buffer_ = nullptr;
-
-	// capacity is the total storage capacity
-	size_t capacity = 0;
-
-	// size is the current number of elements 
-	size_t size = 0;
-
-public:
-    typedef T* iterator;
-    typedef const T* const_iterator;
-
-	DynArray(FreeListAllocator& allocator) : allocator_(allocator)
+	template<typename T>
+	class DynArray
 	{
-		capacity = 0;
-		size = 0;
-	}
-	~DynArray(){
-	    allocator_.Deallocate(buffer_);
-	}
+	private:
+		FreeListAllocator& allocator_ = FreeListAllocator();
+		size_t capacity_ = 0;
+		size_t size_ = 0;
+		T* data_ = nullptr;
 
-    iterator begin(){
-	    return (std::uint64_t)buffer_;
-	}
+	public:
+		typedef T* iterator;
+		typedef const T* const_iterator;
 
-    iterator end(){
-        return buffer_ + static_cast<T*>(size);
-    }
+		DynArray(FreeListAllocator& allocator) : allocator_(allocator) {
+		}
 
-	T& operator[](size_t index)
-	{
-		neko_assert(index >= 0 && index < size, "[Error] Out of scope access");
-		return buffer_[index];
-	}
-	void Push(T elem)
-	{
-	    if (buffer_ == nullptr){
-	        capacity = 2;
-	        buffer_ = static_cast<T*>(allocator_.Allocate(capacity, alignof(T)));
-	        buffer_[0] = elem;
-	        size++;
-	    }else{
-	        if (size + 1 > capacity){
-                T temp[size];
-                memcpy(temp, buffer_, size);
+		~DynArray() {
+			allocator_.Deallocate(data_);
+		}
 
-                allocator_.Deallocate(buffer_);
-                capacity *= 2;
-                allocator_.Allocate(capacity, alignof(T));
-                for (int i = 0; i < size; ++i)
-                {
-                    buffer_[i] = temp[i];
-                }
-                buffer_[size++] = elem;
-            }else{
-	            buffer_[size++] = elem;
-	        }
+		iterator begin() {
+			return (std::uint64_t)data_;
+		}
 
-	    }
+		iterator end() {
+			return data_ + static_cast<T*>(size_);
+		}
 
-		/*if (size == capacity) {
-			T* temp = static_cast<T*>(allocator_.Allocate(2*capacity, alignof(T)));
 
-			for (size_t i = 0; i < size; i++) {
-				temp[i] = buffer_[i];
+		T& operator[](size_t index) {
+			neko_assert(index >= 0 && index < size_, "[Error] Out of scope access");
+			return data_[index];
+		}
+
+		void Push(T elem) {
+			if (data_ == nullptr) {
+				capacity_ = 2;
+				data_ = (T*)(allocator_.Allocate(sizeof(T) * capacity_, alignof(T)));
+				data_[0] = elem;
+				size_++;
 			}
-			allocator_.Deallocate(buffer_);
-			capacity *= 2;
-			buffer_ = temp;
+			else {
+				if (size_ + 1 > capacity_) {
+					SmallVector<T> temp(size_);
+					for (int i = 0; i < size_; ++i) {
+						temp[i] = data_[i];
+					}
+
+					allocator_.Deallocate(data_);
+					capacity_ *= 2;
+					data_ = (T*)allocator_.Allocate(sizeof(T) * capacity_, alignof(T));
+
+					for (int i = 0; i < size_; ++i) {
+						data_[i] = temp[i];
+					}
+
+					data_[size_ + 1] = elem;
+					size_++;
+				}
+				else {
+					data_[size_ + 1] = elem;
+					size_++;
+				}
+			}
 		}
 
-		buffer_[size] = elem;
-		size++;*/
-	}
+		void Insert(T data, size_t index) {
+			if (index == capacity_)
+				Push(data);
+			else {
+				for (int i = size_; i == index; i--) {
+					data_[i] = data_[i - 1];
+				}
+				data_[index] = data;
+				size_++;
+			}
+		}
 
-	void Insert(T data, size_t index)
-	{
-		if (index == capacity)
-			Push(data);
-		else
-			buffer_[index] = data;
-	}
+		size_t Size() const {
+			return size_;
+		}
 
-	size_t Size() const
-	{
-		return size;
-	}
+		size_t Capacity() const {
+			return capacity_;
+		}
+	};
 
-	size_t Capacity() const
-	{
-		return capacity;
-	}
-
-};
 }
