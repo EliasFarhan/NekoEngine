@@ -12,7 +12,7 @@ add_executable(Neko_TEST ${TEST_FILES} ${PHYSFS_TEST_FILES})
 
 include_directories(${NEKO_CORE_DIR}/include)
 
-target_link_libraries(Neko_TEST gtest gtest_main Neko_Core sdl_engine gles3_wrapper)
+target_link_libraries(Neko_TEST gtest gtest_main Neko_Core sdl_engine gles3_wrapper lua_wrapper)
 
 if(Neko_PhysFS)
     target_link_libraries(Neko_TEST physfs_wrapper)

@@ -4,10 +4,10 @@
 #include <gtest/gtest.h>
 #include <mathematics/transform.h>
 
-using namespace neko;
 
 TEST(Engine, TestTransforms)
 {
+
     // Pitch = X, Yaw = Y, Roll = Z
 
     // Translation
