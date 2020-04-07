@@ -44,7 +44,7 @@ namespace neko
 
 		SmallVector(size_t size) : size_{ size }
 		{
-			neko_assert(size_ <= 0, "[Error] Small Vector initialized with negative size");
+			neko_assert(size >= 0, "[Error] Small Vector initialized with negative size");
 
 			if (size_ > 0)
 				data_ = new T[size]{};
