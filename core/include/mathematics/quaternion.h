@@ -1,11 +1,11 @@
 #pragma once
 #include <engine/component.h>
 #include <mathematics/vector.h>
-#include "mathematics/trigo.h"
+#include <mathematics/trigo.h>
 #include <mathematics/vector_nvec.h>
 
 
-//DATE : 19.02.2020
+//DATE : 07.04.2020
 
 namespace neko
 {
@@ -27,17 +27,17 @@ struct Quaternion
 		x = y = z = w = 0;
 	}
 
-	explicit Quaternion(float same)
+	explicit Quaternion(const float same)
 		: x(same), y(same), z(same), w(same)
 	{
 	}
 
-	Quaternion(float X, float Y, float Z, float W) noexcept
+	Quaternion(const float X, const float Y, const float Z, const float W) noexcept
 		: x(X), y(Y), z(Z), w(W)
 	{
 	}
 
-	Quaternion(neko::Vec4f& v)
+	Quaternion(const neko::Vec4f& v)
 	{
 		x = v.x;
 		y = v.y;
@@ -45,19 +45,19 @@ struct Quaternion
 		w = v.w;
 	}
 
-	const float& operator[](size_t p_axis) const
+	const float& operator[](const size_t p_axis) const
 	{
 		return coord[p_axis];
 	}
 
-	float& operator[](size_t p_axis)
+	float& operator[](const size_t p_axis)
 	{
 
 		return coord[p_axis];
 	}
 
 	//The dot product between two rotations.
-	static float Dot(Quaternion a, Quaternion b)
+	static float Dot(const Quaternion& a, const Quaternion& b)
 	{
 		return	a.x * b.x +
 				a.y * b.y +
@@ -66,12 +66,12 @@ struct Quaternion
 	}
 
 	//Converts this quaternion to one with the same orientation but with a magnitude of 1.
-	static Quaternion Normalized(Quaternion quaternion)
+	static Quaternion Normalized(const Quaternion& quaternion)
 	{
 		return quaternion / Magnitude(quaternion);
 	}
 
-	static float Magnitude(Quaternion quaternion)
+	static float Magnitude(const Quaternion& quaternion)
 	{
 		return std::sqrt(quaternion.x * quaternion.x +
 					quaternion.y * quaternion.y +
@@ -79,7 +79,7 @@ struct Quaternion
 					quaternion.w * quaternion.w);
 	}
 
-	static float SquareMagnitude(Quaternion quaternion)
+	static float SquareMagnitude(const Quaternion& quaternion)
 	{
 		return (quaternion.x * quaternion.x +
 			quaternion.y * quaternion.y +
@@ -88,7 +88,7 @@ struct Quaternion
 	}
 
 	//Rotates the Quaternion of angle degrees around axis.
-	static Quaternion AngleAxis(radian_t rad, neko::Vec3f axis)
+	static Quaternion AngleAxis(const radian_t rad, neko::Vec3f axis)
 	{
 		if (axis.SquareMagnitude() == 0.0f)
 			return Quaternion::Identity();
@@ -131,7 +131,7 @@ struct Quaternion
 	x degrees around the x axis, and y degrees around the y axis; 
 	applied in that order
 	*/
-	static Quaternion FromEuler(EulerAngles angle)
+	static Quaternion FromEuler(const EulerAngles angle)
 	{
 		const auto cy = neko::Cos(angle.x * 0.5f);
 		const auto sy = neko::Sin(angle.x * 0.5f);
@@ -154,7 +154,7 @@ struct Quaternion
 	}
 	
 	//Operators
-	Quaternion operator/(Quaternion rhs) const
+	Quaternion operator/(const Quaternion rhs) const
 	{
 		return *this * rhs.Inverse();
 	}
@@ -260,7 +260,7 @@ struct Quaternion
 struct FourQuaternion				//64 bytes
 {
 
-	explicit FourQuaternion(std::array<float, 4> qx, std::array<float, 4> qy, std::array<float, 4> qz, std::array<float, 4> qw)
+	explicit FourQuaternion(const std::array<float, 4> qx, const std::array<float, 4> qy, const std::array<float, 4> qz, const std::array<float, 4> qw)
 	{
 		x = qx;
 		y = qy;
@@ -268,7 +268,7 @@ struct FourQuaternion				//64 bytes
 		w = qw;
 	}
 
-	static inline std::array<float, 4> Dot(FourQuaternion q1, FourQuaternion q2)
+	static inline std::array<float, 4> Dot(const FourQuaternion& q1, const FourQuaternion& q2)
 	{
 		alignas(4 * sizeof(float)) std::array<float, 4> result;
 		auto x1 = _mm_load_ps(q1.x.data());
@@ -294,13 +294,12 @@ struct FourQuaternion				//64 bytes
 	}
 
 	//Converts this quaternion to one with the same orientation but with a magnitude of 1.
-	static FourQuaternion Normalized(FourQuaternion quaternion)
+	static FourQuaternion Normalized(const FourQuaternion& quaternion)
 	{
-		//TODO Test if it's working
 		return quaternion / Magnitude(quaternion);
 	}
 
-	static inline std::array<float, 4> Magnitude(FourQuaternion quaternion)
+	static inline std::array<float, 4> Magnitude(const FourQuaternion& quaternion)
 	{
 		alignas(4 * sizeof(float)) std::array<float, 4> result;
 		auto x1 = _mm_load_ps(quaternion.x.data());
@@ -321,10 +320,9 @@ struct FourQuaternion				//64 bytes
 
 		_mm_store_ps(result.data(), x1);
 		return result;
-		//TODO: Test if it is working
 	}
 
-	static inline std::array<float, 4> SquareMagnitude(FourQuaternion quaternion)
+	static inline std::array<float, 4> SquareMagnitude(const FourQuaternion& quaternion)
 	{
 		alignas(4 * sizeof(float)) std::array<float, 4> result;
 		auto x1 = _mm_load_ps(quaternion.x.data());
@@ -343,11 +341,10 @@ struct FourQuaternion				//64 bytes
 
 		_mm_store_ps(result.data(), x1);
 		return result;
-		//TODO: Test if it is working
 	}
 
 	//Rotates the Quaternion of angle radians around axis.
-	static FourQuaternion AngleAxis(std::array<radian_t, 4> rad, neko::FourVec3f axis)
+	static FourQuaternion AngleAxis(const std::array<radian_t, 4> rad, neko::FourVec3f axis)
 	{
 		FourQuaternion result = FourQuaternion::Identity();
 		axis = axis.Normalized();
@@ -364,10 +361,9 @@ struct FourQuaternion				//64 bytes
 		_mm_store_ps(result.w.data(), x1);
 
 		return Normalized(result);
-		//TODO: Test if working
 	}
 	
-	static std::array<degree_t, 4> Angle(const FourQuaternion a, const FourQuaternion b)
+	static std::array<degree_t, 4> Angle(const FourQuaternion& a, const FourQuaternion& b)
 	{
 		std::array<float, 4> dot = Dot(a, b);
 		dot = std::array<float, 4>{std::abs(dot[0]), std::abs(dot[1]), std::abs(dot[2]), std::abs(dot[3])};
@@ -384,7 +380,6 @@ struct FourQuaternion				//64 bytes
 
 		std::array<degree_t, 4> result{ static_cast<degree_t>(resultf[0]), static_cast<degree_t>(resultf[1]), static_cast<degree_t>(resultf[2]), static_cast<degree_t>(resultf[3])};
 		return result;
-		//TODO: Test if working
 	}
 
 	FourQuaternion Conjugate() const
@@ -394,8 +389,6 @@ struct FourQuaternion				//64 bytes
 			std::array<float, 4> {-y[0], -y[1], -y[2], -y[3]},
 			std::array<float, 4> {-z[0], -z[1], -z[2], -z[3]},
 			w);
-		//TODO Test if working
-		//TODO Try to find a better optimisation
 	}
 
 	//Returns the Inverse of rotation.
@@ -405,7 +398,6 @@ struct FourQuaternion				//64 bytes
 		const std::array<float, 4> sMag = SquareMagnitude(*this);
 
 		return conj / sMag;
-		//TODO Test if working
 	}
 
 	/*
@@ -413,7 +405,7 @@ struct FourQuaternion				//64 bytes
 	x degrees around the x axis, and y degrees around the y axis;
 	applied in that order
 	*/
-	static FourQuaternion FromEuler(std::array<EulerAngles, 4> angle)
+	static FourQuaternion FromEuler(const std::array<EulerAngles, 4> angle)
 	{
 		std::array<float, 4> eulerAngleX { angle[0].x.value(), angle[1].x.value(), angle[2].x.value(), angle[3].x.value() };
 		std::array<float, 4> eulerAngleY { angle[0].y.value(), angle[1].y.value(), angle[2].y.value(), angle[3].y.value() };
@@ -430,17 +422,17 @@ struct FourQuaternion				//64 bytes
 		auto z = _mm_load_ps(eulerAngleZ.data());
 		auto w = _mm_load_ps(const0p5.data());
 
-		auto cy = _mm_mul_ps(x, w);	//Todo: See if possible to use only one mul
+		auto cy = _mm_mul_ps(x, w);
 		cy = _mm_cos_ps(cy);
 		auto sy = _mm_mul_ps(x, w);
 		sy = _mm_sin_ps(sy);
 		
-		auto cp = _mm_mul_ps(y, w);	//Todo: See if possible to use only one mul
+		auto cp = _mm_mul_ps(y, w);
 		cp = _mm_cos_ps(cp);
 		auto sp = _mm_mul_ps(y, w);
 		sp = _mm_sin_ps(sp);
 		
-		auto cr = _mm_mul_ps(z, w);	//Todo: See if possible to use only one mul
+		auto cr = _mm_mul_ps(z, w);
 		cr = _mm_cos_ps(cr);
 		auto sr = _mm_mul_ps(z, w);
 		sr = _mm_sin_ps(sr);
@@ -478,7 +470,6 @@ struct FourQuaternion				//64 bytes
 		_mm_store_ps(resultW.data(), x);
 
 		return FourQuaternion(resultX, resultY, resultZ, resultW);
-		//TODO Test if working
 	}
 
 	static FourQuaternion Identity()
@@ -488,14 +479,11 @@ struct FourQuaternion				//64 bytes
 			std::array<float, 4> {0,0,0,0},
 			std::array<float, 4> {0,0,0,0},
 			std::array<float, 4> {1,1,1,1});
-		//TODO Test if working
 	}
 
-	//Operators
-	FourQuaternion operator/(FourQuaternion rhs) const
+	FourQuaternion operator/(const FourQuaternion& rhs) const
 	{
 		return *this * rhs.Inverse();
-		//TODO Test if working
 	}
 
 	inline std::array<float, 4> DivideFourFloat(const std::array<float, 4> dividend, const std::array<float, 4> divisor) const
@@ -555,16 +543,6 @@ struct FourQuaternion				//64 bytes
 		
 	}
 
-	//TODO
-	/*Quaternion& operator+=(const float rhs)	
-	{
-		x /= rhs;
-		y /= rhs;
-		z /= rhs;
-		w /= rhs;
-		return *this;
-	}*/
-
 	FourQuaternion operator-(const FourQuaternion& rhs) const
 	{
 		return FourQuaternion(
@@ -573,16 +551,6 @@ struct FourQuaternion				//64 bytes
 			SubFourFloat(z, rhs.z),
 			SubFourFloat(w, rhs.w));
 	}
-
-	//TODO
-	/*Quaternion& operator-=(const Quaternion& rhs)
-	{
-		x -= rhs.x;
-		y -= rhs.y;
-		z -= rhs.z;
-		w -= rhs.w;
-		return *this;
-	}*/
 
 	FourQuaternion operator+(const FourQuaternion& rhs) const
 	{
@@ -593,20 +561,8 @@ struct FourQuaternion				//64 bytes
 			AddFourFloat(w, rhs.w));
 	}
 
-	//TODO
-	/*Quaternion& operator+=(const Quaternion& rhs)
-	{
-		x += rhs.x;
-		y += rhs.y;
-		z += rhs.z;
-		w += rhs.w;
-		return *this;
-	}*/
-
-
 	FourQuaternion operator*(const FourQuaternion& rhs) const
 	{
-		//TODO Polish Code
 		return FourQuaternion(
 			AddFourFloat(
 				AddFourFloat(
@@ -629,12 +585,6 @@ struct FourQuaternion				//64 bytes
 				AddFourFloat(
 					MultiplyFourFloat(y, rhs.y), MultiplyFourFloat(z, rhs.z)))
 		);
-		
-		/*return Quaternion(
-			w * rhs.x + x * rhs.w + y * rhs.z - z * rhs.y,
-			w * rhs.y + y * rhs.w + z * rhs.x - x * rhs.z,
-			w * rhs.z + z * rhs.w + x * rhs.y - y * rhs.x,
-			w * rhs.w - x * rhs.x - y * rhs.y - z * rhs.z);*/
 	}
 
 	FourQuaternion operator*(const std::array<float, 4> rhs) const {
@@ -644,36 +594,6 @@ struct FourQuaternion				//64 bytes
 			MultiplyFourFloat(z, rhs),
 			MultiplyFourFloat(w, rhs));
 	}
-
-	//TODO Finish the other functions
-	//TODO
-	/*Quaternion& operator*=(const Quaternion& rhs)
-	{
-		x *= rhs.x;
-		y *= rhs.y;
-		z *= rhs.z;
-		w *= rhs.w;
-		return *this;
-	}*/
-
-	/*bool operator==(const Quaternion& right) const
-	{
-		//TODO
-		return x == right.x && y == right.y && z == right.z && w == right.w;
-	}
-
-	bool operator!=(const Quaternion& right) const
-	{
-		//TODO
-		return !(*this == right);
-	}*/
-
-	/*friend std::ostream& operator<<(std::ostream& os, const Quaternion& quat)
-	{
-		//TODO
-		os << "Quaternion(" << quat.x << "," << quat.y << "," << quat.z << "," << quat.w << ")";
-		return os;
-	}*/
 
 	std::array<float, 4> x;		//16 bytes
 	std::array<float, 4> y;		//16 bytes
