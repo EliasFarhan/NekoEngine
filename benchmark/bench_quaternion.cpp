@@ -70,6 +70,27 @@ static void BM_AngleAxis(benchmark::State& state)
 }
 BENCHMARK(BM_AngleAxis)->Range(fromRange, toRange);
 
+static void BM_AngleAxis_Intrinsics(benchmark::State& state)
+{
+    const size_t n = state.range(0);
+    std::array<neko::radian_t, 4> rads;
+    std::array<neko::Vec3f, 4> vec3s;
+    std::for_each(rads.begin(), rads.end(), [](neko::radian_t& rad) {rad = neko::radian_t(RandomFloat()); });
+    std::for_each(vec3s.begin(), vec3s.end(), [](neko::Vec3f& vec) {RandomFill(vec); });
+    neko::FourVec3f vec = neko::FourVec3f(vec3s);
+	
+    size_t iterations = 0;
+    for (auto _ : state)
+    {
+        for (size_t i = 0; i < n; i++)
+        {
+            benchmark::DoNotOptimize(neko::FourQuaternion::AngleAxis(rads, vec));
+        }
+    }
+}
+BENCHMARK(BM_AngleAxis_Intrinsics)->Range(fromRange, toRange);
+
+
 static void BM_Conjugate(benchmark::State& state)
 {
     neko::Vec4f v;
@@ -87,13 +108,12 @@ BENCHMARK(BM_Conjugate)->Range(fromRange, toRange);
 
 static void BM_Dot(benchmark::State& state)
 {
-    const size_t n = state.range(0)*4;
+    const size_t n = state.range(0);
     std::vector<neko::Quaternion> v1(n, neko::Quaternion::Identity());
     std::vector<neko::Quaternion> v2(n, neko::Quaternion::Identity());
     std::for_each(v1.begin(), v1.end(), [](neko::Quaternion& q) {RandomFill(q); });
     std::for_each(v2.begin(), v2.end(), [](neko::Quaternion& q) {RandomFill(q); });
 
-    size_t iterations = 0;
     for (auto _ : state)
     {
         for (size_t i = 0; i < n; i++)
@@ -112,7 +132,6 @@ static void BM_Dot_Intrinsics(benchmark::State& state)
     std::for_each(v1.begin(), v1.end(), [](neko::FourQuaternion& q) {RandomFill(q); });
     std::for_each(v2.begin(), v2.end(), [](neko::FourQuaternion& q) {RandomFill(q); });
 
-    size_t iterations = 0;
     for (auto _ : state)
     {
         for (size_t i = 0; i < n; i++)
@@ -167,6 +186,24 @@ static void BM_Angle(benchmark::State& state)
 }
 BENCHMARK(BM_Angle)->Range(fromRange, toRange);
 
+static void BM_Angle_Intrinsics(benchmark::State& state)
+{
+    const size_t n = state.range(0);
+    std::vector<neko::FourQuaternion> v1(n, neko::FourQuaternion::Identity());
+    std::vector<neko::FourQuaternion> v2(n, neko::FourQuaternion::Identity());
+    std::for_each(v1.begin(), v1.end(), [](neko::FourQuaternion& q) {RandomFill(q); });
+    std::for_each(v2.begin(), v2.end(), [](neko::FourQuaternion& q) {RandomFill(q); });
+
+    for (auto _ : state)
+    {
+        for (size_t i = 0; i < n; i++)
+        {
+            benchmark::DoNotOptimize(neko::FourQuaternion::Angle(v1[i], v2[i]));
+        }
+    }
+}
+BENCHMARK(BM_Angle_Intrinsics)->Range(fromRange, toRange);
+
 static void BM_Inverse(benchmark::State& state)
 {
     for (auto s : state)
@@ -185,8 +222,6 @@ BENCHMARK(BM_Inverse)->Range(fromRange, toRange);
 static void BM_FromEuler(benchmark::State& state)
 {
     neko::EulerAngles angle = neko::Vec3<neko::degree_t>(neko::degree_t(RandomFloat()));
-    neko::Vec3f v3;
-    RandomFill(v3);
     for (auto s : state)
     {
         for (int i = 0; i < state.range(); i++)
@@ -196,6 +231,23 @@ static void BM_FromEuler(benchmark::State& state)
     }
 }
 BENCHMARK(BM_FromEuler)->Range(fromRange, toRange);
+
+static void BM_FromEuler_Intrinsics(benchmark::State& state)
+{
+    const size_t n = state.range(0);
+    std::array<neko::EulerAngles, 4> angles;
+    std::for_each(angles.begin(), angles.end(), [](neko::EulerAngles& a) {a = neko::Vec3<neko::degree_t>(neko::degree_t(RandomFloat())); });
+    std::for_each(angles.begin(), angles.end(), [](neko::EulerAngles& a) {a = neko::Vec3<neko::degree_t>(neko::degree_t(RandomFloat())); });
+
+    for (auto _ : state)
+    {
+        for (size_t i = 0; i < n; i++)
+        {
+            benchmark::DoNotOptimize(neko::FourQuaternion::FromEuler(angles));
+        }
+    }
+}
+BENCHMARK(BM_FromEuler_Intrinsics)->Range(fromRange, toRange);
 
 static void BM_Identity(benchmark::State& state)
 {

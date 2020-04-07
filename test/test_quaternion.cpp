@@ -147,11 +147,6 @@ TEST(Engine, Quaternion_AngleAxis)
     EXPECT_TRUE(q.x - expectedAngleAxisQuaternion.x < 0.001f && q.y - expectedAngleAxisQuaternion.y < 0.001f && q.z - expectedAngleAxisQuaternion.z < 0.001f && q.w - expectedAngleAxisQuaternion.w < 0.001f);
 }
 
-TEST(Engine, Quaternion_Intrinsics_AngleAxis)
-{
-    //TODO
-}
-
 TEST(Engine, Quaternion_Angle)
 {
     neko::Quaternion q1 = neko::Quaternion::Identity();
@@ -159,11 +154,6 @@ TEST(Engine, Quaternion_Angle)
     neko::degree_t expectedAngle(0);
     neko::degree_t angle(neko::Quaternion::Angle(q1, q2));
     EXPECT_EQ(expectedAngle, angle);
-}
-
-TEST(Engine, Quaternion_Intrinsics_Angle)
-{
-    //TODO
 }
 
 TEST(Engine, Quaternion_Conjugate)
@@ -174,22 +164,12 @@ TEST(Engine, Quaternion_Conjugate)
     EXPECT_EQ(q, expectedQuaternion);
 }
 
-TEST(Engine, Quaternion_Intrinsics_Conjugate)
-{
-    //TODO
-}
-
 TEST(Engine, Quaternion_Inverse)
 {
     neko::Quaternion q = neko::Quaternion(1, 0.5, 0.5, 0);
     neko::Quaternion expectedInverse = neko::Quaternion(-0.6666666f, -0.3333333f, -0.3333333f, 0);
     q = q.Inverse();
     EXPECT_TRUE(q.x - expectedInverse.x < 0.001f && q.y - expectedInverse.y < 0.001f && q.z - expectedInverse.z < 0.001f && q.w - expectedInverse.w < 0.001f);
-}
-
-TEST(Engine, Quaternion_Intrinsics_Inverse)
-{
-    //TODO
 }
 
 TEST(Engine, Quaternion_FromEuler)
@@ -201,11 +181,6 @@ TEST(Engine, Quaternion_FromEuler)
     neko::Quaternion expectedEuler = neko::Quaternion(0.58965, 0.56841, 0.42060, -0.39028);
     EXPECT_TRUE(q.x - expectedEuler.x < 0.001f && q.y - expectedEuler.y < 0.001f && q.z - expectedEuler.z < 0.001f && q.w - expectedEuler.w < 0.001f);
 
-}
-
-TEST(Engine, Quaternion_Intrinsics_FromEuler)
-{
-    //TODO
 }
 
 TEST(Engine, Quaternion_Operations)
@@ -221,9 +196,4 @@ TEST(Engine, Quaternion_Operations)
     EXPECT_EQ(q1 - q2, result);
     result = neko::Quaternion(24,28,16, 28);
     EXPECT_EQ(q2 * q1, result);
-}
-
-TEST(Engine, Quaternion_Intrinsics_Operations)
-{
-    //TODO
 }
