@@ -136,16 +136,7 @@ namespace neko
 {
 void BufferFile::Load(std::string_view path)
 {
-#ifdef EASY_PROFILE_USE
-	EASY_BLOCK("LoadFunction", profiler::colors::Blue600);
-#endif
-#ifdef EASY_PROFILE_USE
-	EASY_BLOCK("Ifstream", profiler::colors::Blue600);
-#endif
 	std::ifstream is(path.data(),std::ifstream::binary);
-#ifdef EASY_PROFILE_USE
-	EASY_END_BLOCK;
-#endif
 	if(!is)
 	{
 		std::ostringstream oss;
@@ -155,9 +146,6 @@ void BufferFile::Load(std::string_view path)
 	}
 	if(is)
 	{
-#ifdef EASY_PROFILE_USE
-		EASY_BLOCK("Read", profiler::colors::Blue600);
-#endif
 		is.seekg(0, is.end);
 		dataLength = is.tellg();
 		is.seekg(0, is.beg);
@@ -165,13 +153,7 @@ void BufferFile::Load(std::string_view path)
 		dataBuffer[dataLength] = 0;
 		is.read(dataBuffer, dataLength);
 		is.close();
-#ifdef EASY_PROFILE_USE
-		EASY_END_BLOCK;
-#endif
 	}
-#ifdef EASY_PROFILE_USE
-	EASY_END_BLOCK;
-#endif
 }
 
 void BufferFile::Destroy()

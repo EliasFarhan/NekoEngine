@@ -34,18 +34,19 @@ public:
     neko::BufferFile GetResource(const ResourceId resourceId);
     ResourceId LoadResource(const Path assetPath);
     void DeleteResource(const ResourceId resourceId);
+
 private:
     void LoadingLoop();
+
     enum ResourceManagerStatus : std::uint8_t
     {
-        IS_RUNNING = 1, //To check if the ResourceManager is running
-        IS_NOT_EMPTY = 10, //To check if the ResourceManager has tasks
-        IS_WAITING = 100, //To check if the ResourceManager has tasks
+        IS_RUNNING = 1 << 1, //To check if the ResourceManager is running
+        IS_NOT_EMPTY = 1 << 2, //To check if the ResourceManager has no tasks
     };
     std::unordered_map<ResourceId, LoadPromise> resourcePromises_;
     std::vector<ResourceId> idQueue_;
-    std::thread loadingThread_;
     std::atomic<std::uint8_t> status_;
+    std::thread loadingThread_;
     std::condition_variable cv_;
     std::mutex loadingMutex_;
     

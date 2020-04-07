@@ -46,9 +46,13 @@ TEST(Resource, TestResourceSmall)
 #endif
     }
 #ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Loading", profiler::colors::Gold);
+    EASY_BLOCK("Do some stuff", profiler::colors::Gold);
 #endif
-    fileContent.Load(path);
+    for (int i = 0; i < nbTest; i++)
+    {
+        fileContent.Load(path);
+        float isqrt = sqrt(i);
+    }
 #ifdef EASY_PROFILE_USE
     EASY_END_BLOCK;
 #endif
@@ -83,7 +87,7 @@ TEST(Resource, TestResourceSmall)
     resourceManager.Destroy();
 #ifdef EASY_PROFILE_USE
     EASY_END_BLOCK;
-    profiler::dumpBlocksToFile("resourcesmall_profile.prof");
+    //profiler::dumpBlocksToFile("resourcesmall_profile.prof");
 #endif
 }
 
@@ -120,9 +124,13 @@ TEST(Resource, TestResourceBig)
 #endif
     }
 #ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Loading");
+    EASY_BLOCK("Do some stuff", profiler::colors::Gold);
 #endif
-    fileContent.Load(path);
+    for (int i = 0; i < nbTest; i++)
+    {
+        fileContent.Load(path);
+        float isqrt = sqrt(i);
+    }
 #ifdef EASY_PROFILE_USE
     EASY_END_BLOCK;
 #endif
@@ -158,7 +166,7 @@ TEST(Resource, TestResourceBig)
     resourceManager.Destroy();
 #ifdef EASY_PROFILE_USE
     EASY_END_BLOCK;
-    profiler::dumpBlocksToFile("resourcebig_profile.prof");
+    //profiler::dumpBlocksToFile("resourcebig_profile.prof");
 #endif
 }
 

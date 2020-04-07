@@ -9,8 +9,11 @@
 #include "engine/resource.h"
 #include "utilities/file_utility.h"
 
-const int fromRange = 4;
-const int toRange = 512;
+const int smallFromRange = 4;
+const int smallToRange = 512;
+
+const int bigFromRange = 2;
+const int bigToRange = 64;
 
 
 static void BM_SmallResourceThread(benchmark::State& state)
@@ -30,7 +33,6 @@ static void BM_SmallResourceThread(benchmark::State& state)
     }
     for (auto _ : state)
     {
-        resources.clear();
         while (resources.size()<resourcesId.size()) {
             for (int n = 0; n < size; n++)
             {
@@ -45,6 +47,7 @@ static void BM_SmallResourceThread(benchmark::State& state)
                 }
             }
         }
+        resources.clear();
     }
     resourceManager.Destroy();
 }
@@ -66,7 +69,6 @@ static void BM_BigResourceThread(benchmark::State& state)
     }
     for (auto _ : state)
     {
-        resources.clear();
         while (resources.size() < resourcesId.size()) {
             for (int n = 0; n < size; n++)
             {
@@ -81,6 +83,8 @@ static void BM_BigResourceThread(benchmark::State& state)
                 }
             }
         }
+        resources.clear();
+
     }
     resourceManager.Destroy();
 }
@@ -127,8 +131,8 @@ static void BM_BigResourceNonThread(benchmark::State& state)
     }
 }
 
-BENCHMARK(BM_SmallResourceThread)->Range(fromRange, toRange)->UseRealTime();
-BENCHMARK(BM_BigResourceThread)->Range(fromRange, toRange)->UseRealTime();
+BENCHMARK(BM_SmallResourceThread)->Range(smallFromRange, smallToRange)->UseRealTime();
+BENCHMARK(BM_BigResourceThread)->Range(bigFromRange, bigToRange)->UseRealTime();
 
-BENCHMARK(BM_SmallResourceNonThread)->Range(fromRange, toRange)->UseRealTime();
-BENCHMARK(BM_BigResourceNonThread)->Range(fromRange, toRange)->UseRealTime();
+BENCHMARK(BM_SmallResourceNonThread)->Range(smallFromRange, smallToRange)->UseRealTime();
+BENCHMARK(BM_BigResourceNonThread)->Range(bigFromRange, bigToRange)->UseRealTime();
