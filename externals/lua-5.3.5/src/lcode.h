@@ -14,7 +14,7 @@
 
 
 /*
-** Marks the end of a patch list. It is an invalid value both as an absolute
+** Marks the End of a patch list. It is an invalid value both as an absolute
 ** address, and as a list link (would link an element to itself).
 */
 #define NO_JUMP (-1)

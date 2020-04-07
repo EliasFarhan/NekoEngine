@@ -347,7 +347,7 @@ class BenchmarkRunner {
   }
 };
 
-}  // end namespace
+}  // End namespace
 
 RunResults RunBenchmark(
     const benchmark::internal::BenchmarkInstance& b,
@@ -356,6 +356,6 @@ RunResults RunBenchmark(
   return r.get_results();
 }
 
-}  // end namespace internal
+}  // End namespace internal
 
-}  // end namespace benchmark
+}  // End namespace benchmark

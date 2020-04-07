@@ -87,30 +87,30 @@ public:
     NVec2<T, N> operator+(const Vec2<T>& rhs) const
     {
         NVec2<T, N> v = this;
-        std::for_each(v.xs.begin(), v.xs.end(), [rhs](T x) { return x + rhs.x; });
-        std::for_each(v.ys.begin(), v.ys.end(), [rhs](T y) { return y + rhs.y; });
+        std::for_each(v.xs.Begin(), v.xs.End(), [rhs](T x) { return x + rhs.x; });
+        std::for_each(v.ys.Begin(), v.ys.End(), [rhs](T y) { return y + rhs.y; });
         return v;
     }
 
     NVec2<T, N>& operator+=(const Vec2<T>& rhs)
     {
-        std::for_each(xs.begin(), xs.end(), [rhs](T x) { return x + rhs.x; });
-        std::for_each(ys.begin(), ys.end(), [rhs](T y) { return y + rhs.y; });
+        std::for_each(xs.Begin(), xs.End(), [rhs](T x) { return x + rhs.x; });
+        std::for_each(ys.Begin(), ys.End(), [rhs](T y) { return y + rhs.y; });
         return *this;
     }
 
     NVec2<T, N> operator-(const Vec2<T>& rhs) const
     {
         NVec2<T, N> v = this;
-        std::for_each(v.xs.begin(), v.xs.end(), [rhs](T x) { return x - rhs.x; });
-        std::for_each(v.ys.begin(), v.ys.end(), [rhs](T y) { return y - rhs.y; });
+        std::for_each(v.xs.Begin(), v.xs.End(), [rhs](T x) { return x - rhs.x; });
+        std::for_each(v.ys.Begin(), v.ys.End(), [rhs](T y) { return y - rhs.y; });
         return v;
     }
 
     NVec2<T, N>& operator-=(const Vec2<T>& rhs)
     {
-        std::for_each(xs.begin(), xs.end(), [rhs](T x) { return x - rhs.x; });
-        std::for_each(ys.begin(), ys.end(), [rhs](T y) { return y - rhs.y; });
+        std::for_each(xs.Begin(), xs.End(), [rhs](T x) { return x - rhs.x; });
+        std::for_each(ys.Begin(), ys.End(), [rhs](T y) { return y - rhs.y; });
         return *this;
     }
 
@@ -451,34 +451,34 @@ public:
     NVec3<T, N> operator+(const Vec3<T>& rhs) const
     {
         NVec3<T, N> v = this;
-        std::for_each(v.xs.begin(), v.xs.end(), [rhs](T x) { return x + rhs.x; });
-        std::for_each(v.ys.begin(), v.ys.end(), [rhs](T y) { return y + rhs.y; });
-        std::for_each(v.zs.begin(), v.zs.end(), [rhs](T z) { return z + rhs.z; });
+        std::for_each(v.xs.Begin(), v.xs.End(), [rhs](T x) { return x + rhs.x; });
+        std::for_each(v.ys.Begin(), v.ys.End(), [rhs](T y) { return y + rhs.y; });
+        std::for_each(v.zs.Begin(), v.zs.End(), [rhs](T z) { return z + rhs.z; });
         return v;
     }
 
     NVec3<T, N>& operator+=(const Vec3<T>& rhs)
     {
-        std::for_each(xs.begin(), xs.end(), [rhs](T x) { return x + rhs.x; });
-        std::for_each(ys.begin(), ys.end(), [rhs](T y) { return y + rhs.y; });
-        std::for_each(zs.begin(), zs.end(), [rhs](T z) { return z + rhs.z; });
+        std::for_each(xs.Begin(), xs.End(), [rhs](T x) { return x + rhs.x; });
+        std::for_each(ys.Begin(), ys.End(), [rhs](T y) { return y + rhs.y; });
+        std::for_each(zs.Begin(), zs.End(), [rhs](T z) { return z + rhs.z; });
         return *this;
     }
 
     NVec3<T, N> operator-(const Vec3<T>& rhs) const
     {
         NVec3<T, N> v = this;
-        std::for_each(v.xs.begin(), v.xs.end(), [rhs](T x) { return x - rhs.x; });
-        std::for_each(v.ys.begin(), v.ys.end(), [rhs](T y) { return y - rhs.y; });
-        std::for_each(v.zs.begin(), v.zs.end(), [rhs](T z) { return z - rhs.z; });
+        std::for_each(v.xs.Begin(), v.xs.End(), [rhs](T x) { return x - rhs.x; });
+        std::for_each(v.ys.Begin(), v.ys.End(), [rhs](T y) { return y - rhs.y; });
+        std::for_each(v.zs.Begin(), v.zs.End(), [rhs](T z) { return z - rhs.z; });
         return v;
     }
 
     NVec3<T, N>& operator-=(const Vec3<T>& rhs)
     {
-        std::for_each(xs.begin(), xs.end(), [rhs](T x) { return x - rhs.x; });
-        std::for_each(ys.begin(), ys.end(), [rhs](T y) { return y - rhs.y; });
-        std::for_each(zs.begin(), zs.end(), [rhs](T z) { return z - rhs.z; });
+        std::for_each(xs.Begin(), xs.End(), [rhs](T x) { return x - rhs.x; });
+        std::for_each(ys.Begin(), ys.End(), [rhs](T y) { return y - rhs.y; });
+        std::for_each(zs.Begin(), zs.End(), [rhs](T z) { return z - rhs.z; });
         return *this;
     }
 
@@ -922,38 +922,38 @@ public:
     NVec4<T, N> operator+(const Vec4<T>& rhs) const
     {
         NVec4<T, N> v = this;
-        std::for_each(v.xs.begin(), v.xs.end(), [rhs](T x) { return x + rhs.x; });
-        std::for_each(v.ys.begin(), v.ys.end(), [rhs](T y) { return y + rhs.y; });
-        std::for_each(v.zs.begin(), v.zs.end(), [rhs](T z) { return z + rhs.z; });
-        std::for_each(v.ws.begin(), v.ws.end(), [rhs](T w) { return w + rhs.w; });
+        std::for_each(v.xs.Begin(), v.xs.End(), [rhs](T x) { return x + rhs.x; });
+        std::for_each(v.ys.Begin(), v.ys.End(), [rhs](T y) { return y + rhs.y; });
+        std::for_each(v.zs.Begin(), v.zs.End(), [rhs](T z) { return z + rhs.z; });
+        std::for_each(v.ws.Begin(), v.ws.End(), [rhs](T w) { return w + rhs.w; });
         return v;
     }
 
     NVec4<T, N>& operator+=(const Vec4<T>& rhs)
     {
-        std::for_each(xs.begin(), xs.end(), [rhs](T x) { return x + rhs.x; });
-        std::for_each(ys.begin(), ys.end(), [rhs](T y) { return y + rhs.y; });
-        std::for_each(zs.begin(), zs.end(), [rhs](T z) { return z + rhs.z; });
-        std::for_each(ws.begin(), ws.end(), [rhs](T w) { return w + rhs.w; });
+        std::for_each(xs.Begin(), xs.End(), [rhs](T x) { return x + rhs.x; });
+        std::for_each(ys.Begin(), ys.End(), [rhs](T y) { return y + rhs.y; });
+        std::for_each(zs.Begin(), zs.End(), [rhs](T z) { return z + rhs.z; });
+        std::for_each(ws.Begin(), ws.End(), [rhs](T w) { return w + rhs.w; });
         return *this;
     }
 
     NVec4<T, N> operator-(const Vec4<T>& rhs) const
     {
         NVec4<T, N> v = this;
-        std::for_each(v.xs.begin(), v.xs.end(), [rhs](T x) { return x - rhs.x; });
-        std::for_each(v.ys.begin(), v.ys.end(), [rhs](T y) { return y - rhs.y; });
-        std::for_each(v.zs.begin(), v.zs.end(), [rhs](T z) { return z - rhs.z; });
-        std::for_each(v.ws.begin(), v.ws.end(), [rhs](T w) { return w - rhs.w; });
+        std::for_each(v.xs.Begin(), v.xs.End(), [rhs](T x) { return x - rhs.x; });
+        std::for_each(v.ys.Begin(), v.ys.End(), [rhs](T y) { return y - rhs.y; });
+        std::for_each(v.zs.Begin(), v.zs.End(), [rhs](T z) { return z - rhs.z; });
+        std::for_each(v.ws.Begin(), v.ws.End(), [rhs](T w) { return w - rhs.w; });
         return v;
     }
 
     NVec4<T, N>& operator-=(const Vec4<T>& rhs)
     {
-        std::for_each(xs.begin(), xs.end(), [rhs](T x) { return x - rhs.x; });
-        std::for_each(ys.begin(), ys.end(), [rhs](T y) { return y - rhs.y; });
-        std::for_each(zs.begin(), zs.end(), [rhs](T z) { return z - rhs.z; });
-        std::for_each(ws.begin(), ws.end(), [rhs](T w) { return w - rhs.w; });
+        std::for_each(xs.Begin(), xs.End(), [rhs](T x) { return x - rhs.x; });
+        std::for_each(ys.Begin(), ys.End(), [rhs](T y) { return y - rhs.y; });
+        std::for_each(zs.Begin(), zs.End(), [rhs](T z) { return z - rhs.z; });
+        std::for_each(ws.Begin(), ws.End(), [rhs](T w) { return w - rhs.w; });
         return *this;
     }
 

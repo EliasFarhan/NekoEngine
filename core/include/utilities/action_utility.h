@@ -44,7 +44,7 @@ public:
     /*
     void UnregisterCallback(const std::function<void(Ts ...)>& callback)
     {
-        callbacks_.erase(std::remove(callbacks_.begin(), callbacks_.end(), callback));
+        callbacks_.erase(std::remove(callbacks_.Begin(), callbacks_.End(), callback));
     }
     */
 

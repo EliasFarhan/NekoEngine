@@ -1112,7 +1112,7 @@ struct LHS_assign {
 
 /*
 ** check whether, in an assignment to an upvalue/local variable, the
-** upvalue/local variable is begin used in a previous assignment to a
+** upvalue/local variable is Begin used in a previous assignment to a
 ** table. If so, save original upvalue/local value in a safe place and
 ** use this safe copy in the previous assignment.
 */
@@ -1300,7 +1300,7 @@ static void forbody (LexState *ls, int base, int line, int nvars, int isnum) {
   adjustlocalvars(ls, nvars);
   luaK_reserveregs(fs, nvars);
   block(ls);
-  leaveblock(fs);  /* end of scope for declared variables */
+  leaveblock(fs);  /* End of scope for declared variables */
   luaK_patchtohere(fs, prep);
   if (isnum)  /* numeric for? */
     endfor = luaK_codeAsBx(fs, OP_FORLOOP, base, NO_JUMP);
@@ -1424,7 +1424,7 @@ static void ifstat (LexState *ls, int line) {
   if (testnext(ls, TK_ELSE))
     block(ls);  /* 'else' part */
   check_match(ls, TK_END, TK_IF, line);
-  luaK_patchtohere(fs, escapelist);  /* patch escape list to 'if' end */
+  luaK_patchtohere(fs, escapelist);  /* patch escape list to 'if' End */
 }
 
 

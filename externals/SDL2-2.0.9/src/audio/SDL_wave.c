@@ -717,7 +717,7 @@ MS_ADPCM_Decode(WaveFile *file, Uint8 **audio_buf, Uint32 *audio_len)
         /* Decode the block data. It stores the samples directly in the output. */
         result = MS_ADPCM_DecodeBlockData(&state);
         if (result == -1) {
-            /* Unexpected end. Stop decoding and return partial data if necessary. */
+            /* Unexpected End. Stop decoding and return partial data if necessary. */
             if (file->trunchint == TruncVeryStrict || file->trunchint == TruncStrict) {
                 SDL_free(state.output.data);
                 return SDL_SetError("Truncated data chunk");
@@ -1114,7 +1114,7 @@ IMA_ADPCM_Decode(WaveFile *file, Uint8 **audio_buf, Uint32 *audio_len)
         }
 
         if (result == -1) {
-            /* Unexpected end. Stop decoding and return partial data if necessary. */
+            /* Unexpected End. Stop decoding and return partial data if necessary. */
             if (file->trunchint == TruncVeryStrict || file->trunchint == TruncStrict) {
                 SDL_free(state.output.data);
                 SDL_free(cstate);
@@ -1386,7 +1386,7 @@ PCM_ConvertSint24ToSint32(WaveFile *file, Uint8 **audio_buf, Uint32 *audio_len)
     *audio_buf = ptr;
     *audio_len = (Uint32)expanded_len;
 
-    /* work from end to start, since we're expanding in-place. */
+    /* work from End to start, since we're expanding in-place. */
     for (i = sample_count; i > 0; i--) {
         const size_t o = i - 1;
         uint8_t b[4];
@@ -1879,7 +1879,7 @@ WaveLoad(SDL_RWops *src, WaveFile *file, SDL_AudioSpec *spec, Uint8 **audio_buf,
         if (result == -1) {
             /* Unexpected EOF. Corrupt file or I/O issues. */
             if (file->trunchint == TruncVeryStrict) {
-                return SDL_SetError("Unexpected end of WAVE file");
+                return SDL_SetError("Unexpected End of WAVE file");
             }
             /* Let the checks after this loop sort this issue out. */
             break;
@@ -2084,7 +2084,7 @@ WaveLoad(SDL_RWops *src, WaveFile *file, SDL_AudioSpec *spec, Uint8 **audio_buf,
 
     spec->silence = SDL_SilenceValueForFormat(spec->format);
 
-    /* Report the end position back to the cleanup code. */
+    /* Report the End position back to the cleanup code. */
     if (RIFFlengthknown) {
         chunk->position = RIFFend;
     } else {

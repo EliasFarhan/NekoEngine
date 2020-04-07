@@ -534,7 +534,7 @@ PSP_QueueCopy(SDL_Renderer * renderer, SDL_RenderCommand *cmd, SDL_Texture * tex
     }
     else
     {
-        float start, end;
+        float start, End;
         float curU = u0;
         float curX = x;
         const float endX = x + width;
@@ -554,12 +554,12 @@ PSP_QueueCopy(SDL_Renderer * renderer, SDL_RenderCommand *cmd, SDL_Texture * tex
         }
 
 
-        for(i = 0, start = 0, end = width; i < count; i++, start += slice)
+        for(i = 0, start = 0, End = width; i < count; i++, start += slice)
         {
             const float polyWidth = ((curX + slice) > endX) ? (endX - curX) : slice;
             const float sourceWidth = ((curU + ustep) > u1) ? (u1 - curU) : ustep;
 
-            SDL_assert(start < end);
+            SDL_assert(start < End);
 
             verts->u = curU;
             verts->v = v0;

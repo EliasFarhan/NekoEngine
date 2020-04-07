@@ -72,5 +72,5 @@ bool SameNames(UserCounters const& l, UserCounters const& r) {
   return true;
 }
 
-}  // end namespace internal
-}  // end namespace benchmark
+}  // End namespace internal
+}  // End namespace benchmark

@@ -297,7 +297,7 @@ typedef TValue *StkId;  /* index to stack elements */
 
 
 /*
-** Header for string value; string bytes follow the end of this structure
+** Header for string value; string bytes follow the End of this structure
 ** (aligned according to 'UTString'; see next).
 */
 typedef struct TString {
@@ -340,7 +340,7 @@ typedef union UTString {
 
 
 /*
-** Header for userdata; memory area follows the end of this structure
+** Header for userdata; memory area follows the End of this structure
 ** (aligned according to 'UUdata'; see next).
 */
 typedef struct Udata {

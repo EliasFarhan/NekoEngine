@@ -181,7 +181,7 @@ main(int argc, char *argv[])
 #endif
 
 
-/* keep this at the end of the file so it works with GCC builds that don't
+/* keep this at the End of the file so it works with GCC builds that don't
    support "#pragma GCC diagnostic push" ... we'll just leave the warning
    disabled after this. */
 /* this pragma arrived in GCC 4.2 and causes a warning on older GCCs! Sigh. */
@@ -296,7 +296,7 @@ SDL_GetErrorMsg(char *errstr, int maxlen)
             }
         }
 
-        /* slide back if we've overshot the end of our buffer. */
+        /* slide back if we've overshot the End of our buffer. */
         if (maxlen < 0) {
             msg -= (-maxlen) + 1;
         }

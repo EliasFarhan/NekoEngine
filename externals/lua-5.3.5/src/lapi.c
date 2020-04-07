@@ -207,11 +207,11 @@ static void reverse (lua_State *L, StkId from, StkId to) {
 LUA_API void lua_rotate (lua_State *L, int idx, int n) {
   StkId p, t, m;
   lua_lock(L);
-  t = L->top - 1;  /* end of stack segment being rotated */
+  t = L->top - 1;  /* End of stack segment being rotated */
   p = index2addr(L, idx);  /* start of segment */
   api_checkstackindex(L, idx, p);
   api_check(L, (n >= 0 ? n : -n) <= (t - p + 1), "invalid 'n'");
-  m = (n >= 0 ? t - n : p - n - 1);  /* end of prefix */
+  m = (n >= 0 ? t - n : p - n - 1);  /* End of prefix */
   reverse(L, p, m);  /* reverse the prefix with length 'n' */
   reverse(L, m + 1, t);  /* reverse the suffix */
   reverse(L, p, t);  /* reverse the entire segment */
@@ -1079,7 +1079,7 @@ LUA_API int lua_gc (lua_State *L, int what, int data) {
         luaC_checkGC(L);
       }
       g->gcrunning = oldrunning;  /* restore previous state */
-      if (debt > 0 && g->gcstate == GCSpause)  /* end of cycle? */
+      if (debt > 0 && g->gcstate == GCSpause)  /* End of cycle? */
         res = 1;  /* signal it */
       break;
     }

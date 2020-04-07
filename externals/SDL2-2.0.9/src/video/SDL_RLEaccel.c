@@ -57,7 +57,7 @@
  *   where they are 16 bit. This makes the pixel data aligned at all times.
  *   Segments never wrap around from one scan line to the next.
  *
- *   The end of the sequence is marked by a zero <skip>,<run> pair at the *
+ *   The End of the sequence is marked by a zero <skip>,<run> pair at the *
  *   beginning of a line.
  *
  * Encoding of surfaces with per-pixel alpha:
@@ -83,7 +83,7 @@
  *   for the translucent lines. Two padding bytes may be inserted
  *   before each translucent line to keep them 32-bit aligned.
  *
- *   The end of the sequence is marked by a zero <skip>,<run> pair at the
+ *   The End of the sequence is marked by a zero <skip>,<run> pair at the
  *   beginning of an opaque line.
  */
 
@@ -1122,7 +1122,7 @@ RLEAlphaSurface(SDL_Surface * surface)
         int h = surface->h, w = surface->w;
         SDL_PixelFormat *sf = surface->format;
         Uint32 *src = (Uint32 *) surface->pixels;
-        Uint8 *lastline = dst;  /* end of last non-blank line */
+        Uint8 *lastline = dst;  /* End of last non-blank line */
 
         /* opaque counts are 8 or 16 bits, depending on target depth */
 #define ADD_OPAQUE_COUNTS(n, m)         \

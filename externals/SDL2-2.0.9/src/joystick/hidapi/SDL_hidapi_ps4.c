@@ -300,7 +300,7 @@ HIDAPI_DriverPS4_RumbleJoystick(SDL_HIDAPI_Device *device, SDL_Joystick *joystic
     effects->ucLedBlue = 80;
 
     if (ctx->is_bluetooth) {
-        /* Bluetooth reports need a CRC at the end of the packet (at least on Linux) */
+        /* Bluetooth reports need a CRC at the End of the packet (at least on Linux) */
         Uint8 ubHdr = 0xA2; /* hidp header is part of the CRC calculation */
         Uint32 unCRC;
         unCRC = crc32(0, &ubHdr, 1);

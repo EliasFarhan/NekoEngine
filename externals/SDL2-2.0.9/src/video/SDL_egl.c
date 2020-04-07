@@ -208,7 +208,7 @@ static SDL_bool SDL_EGL_HasExtension(_THIS, SDL_EGL_ExtensionType type, const ch
                     return SDL_TRUE;
                 }
             }
-            /* If the search stopped in the middle of an extension, skip to the end of it */
+            /* If the search stopped in the middle of an extension, skip to the End of it */
             ext_start += ext_len;
             while (*ext_start != ' ' && *ext_start != 0) {
                 ext_start++;

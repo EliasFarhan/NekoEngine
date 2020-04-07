@@ -235,4 +235,4 @@ std::vector<BenchmarkReporter::Run> ComputeBigO(
   return results;
 }
 
-}  // end namespace benchmark
+}  // End namespace benchmark

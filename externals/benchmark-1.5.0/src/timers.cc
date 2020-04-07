@@ -104,7 +104,7 @@ BENCHMARK_NORETURN static void DiagnoseAndExit(const char* msg) {
   std::exit(EXIT_FAILURE);
 }
 
-}  // end namespace
+}  // End namespace
 
 double ProcessCPUUsage() {
 #if defined(BENCHMARK_OS_WINDOWS)
@@ -210,8 +210,8 @@ std::string DateTimeString(bool local) {
   return std::string(storage);
 }
 
-}  // end namespace
+}  // End namespace
 
 std::string LocalDateTimeString() { return DateTimeString(true); }
 
-}  // end namespace benchmark
+}  // End namespace benchmark

@@ -149,7 +149,7 @@ bool    ImGui_ImplOpenGL3_Init(const char* glsl_version)
     g_GlVersion = 2000; // GLES 2
 #endif
 
-    // Setup back-end capabilities flags
+    // Setup back-End capabilities flags
     ImGuiIO& io = ImGui::GetIO();
     io.BackendRendererName = "imgui_impl_opengl3";
 #if IMGUI_IMPL_OPENGL_MAY_HAVE_VTX_OFFSET

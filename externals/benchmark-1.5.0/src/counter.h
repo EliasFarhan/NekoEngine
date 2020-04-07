@@ -22,6 +22,6 @@ void Finish(UserCounters* l, IterationCount iterations, double time,
             double num_threads);
 void Increment(UserCounters* l, UserCounters const& r);
 bool SameNames(UserCounters const& l, UserCounters const& r);
-}  // end namespace internal
+}  // End namespace internal
 
-}  // end namespace benchmark
+}  // End namespace benchmark

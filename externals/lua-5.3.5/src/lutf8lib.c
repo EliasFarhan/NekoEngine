@@ -26,7 +26,7 @@
 
 
 /* from strlib */
-/* translate a relative string position: negative means back from end */
+/* translate a relative string position: negative means back from End */
 static lua_Integer u_posrelat (lua_Integer pos, size_t len) {
   if (pos >= 0) return pos;
   else if (0u - (size_t)pos > len) return 0;

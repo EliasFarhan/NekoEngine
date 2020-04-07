@@ -58,7 +58,7 @@ static const int kRangeMultiplier = 8;
 // The size of a benchmark family determines is the number of inputs to repeat
 // the benchmark on. If this is "large" then warn the user during configuration.
 static const size_t kMaxFamilySize = 100;
-}  // end namespace
+}  // End namespace
 
 namespace internal {
 
@@ -495,10 +495,10 @@ int Benchmark::ArgsCnt() const {
 
 void FunctionBenchmark::Run(State& st) { func_(st); }
 
-}  // end namespace internal
+}  // End namespace internal
 
 void ClearRegisteredBenchmarks() {
   internal::BenchmarkFamilies::GetInstance()->ClearBenchmarks();
 }
 
-}  // end namespace benchmark
+}  // End namespace benchmark

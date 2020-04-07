@@ -28,6 +28,6 @@ void ColorPrintf(std::ostream& out, LogColor color, const char* fmt, ...);
 // output, false otherwise.
 bool IsColorTerminal();
 
-}  // end namespace benchmark
+}  // End namespace benchmark
 
 #endif  // BENCHMARK_COLORPRINT_H_

@@ -71,7 +71,7 @@ typedef struct tColorY {
 
 This is a simple but effective workaround for observed issues.
 These rows allocate extra memory and are then hidden from the surface.
-Rows are added to the end of destination surfaces when they are allocated.
+Rows are added to the End of destination surfaces when they are allocated.
 This catches any potential overflows which seem to happen with
 just the right src image dimensions and scale/rotation and can lead
 to a situation where the program can segfault.

@@ -27,7 +27,7 @@ char (&ArraySizeHelper(const T (&array)[N]))[N];
 
 #define arraysize(array) (sizeof(::benchmark::internal::ArraySizeHelper(array)))
 
-}  // end namespace internal
-}  // end namespace benchmark
+}  // End namespace internal
+}  // End namespace benchmark
 
 #endif  // BENCHMARK_ARRAYSIZE_H_

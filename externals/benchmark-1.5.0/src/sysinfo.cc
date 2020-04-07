@@ -501,7 +501,7 @@ int GetNumCPUs() {
     return -1;
   }
   if (!f.eof()) {
-    std::cerr << "Failed to read to end of /proc/cpuinfo\n";
+    std::cerr << "Failed to read to End of /proc/cpuinfo\n";
     return -1;
   }
   f.close();
@@ -550,7 +550,7 @@ double GetCPUCyclesPerSecond() {
     auto Cmp = [&](char X, char Y) {
       return std::tolower(X) == std::tolower(Y);
     };
-    return std::equal(Key.begin(), Key.end(), Value.begin(), Cmp);
+    return std::equal(Key.Begin(), Key.End(), Value.Begin(), Cmp);
   };
 
   std::string ln;
@@ -579,7 +579,7 @@ double GetCPUCyclesPerSecond() {
     return error_value;
   }
   if (!f.eof()) {
-    std::cerr << "Failed to read to end of /proc/cpuinfo\n";
+    std::cerr << "Failed to read to End of /proc/cpuinfo\n";
     return error_value;
   }
   f.close();
@@ -675,7 +675,7 @@ std::vector<double> GetLoadAvg() {
 #endif
 }
 
-}  // end namespace
+}  // End namespace
 
 const CPUInfo& CPUInfo::Get() {
   static const CPUInfo* info = new CPUInfo();
@@ -696,4 +696,4 @@ const SystemInfo& SystemInfo::Get() {
 }
 
 SystemInfo::SystemInfo() : name(GetSystemName()) {}
-}  // end namespace benchmark
+}  // End namespace benchmark

@@ -33,8 +33,8 @@ template<typename T>
 class SmallVector
 {
 private:
-	size_t length_{};
-	T* data_{};
+	size_t size_ = 0;
+	T* data_ = nullptr;;
 
 public:
 	typedef T* iterator;
@@ -42,12 +42,12 @@ public:
 
 	SmallVector() = default;
 
-	SmallVector(size_t length) : length_{ length }
+	SmallVector(size_t size) : size_{ size }
 	{
-		neko_assert(length_ >= 0, "[Error] Small Vector initialized with negative size");
+		neko_assert(size_ <= 0, "[Error] Small Vector initialized with negative size");
 
-		if (length_ > 0)
-			data_ = new T[length] {};
+		if (size_ > 0)
+			data_ = new T[size] {};
 	}
 
 	~SmallVector()
@@ -57,110 +57,95 @@ public:
 
 	T& operator[](int index)
 	{
-		neko_assert(index >= 0 && index < length_, "[Error] Out of scope access");
+		neko_assert(index >= 0 && index < size_, "[Error] Out of scope access");
 		return data_[index];
 	}
 
-	int GetLength() const { return length_; }
+	int GetSize() const { return size_; }
 };
 
 template<typename T>
 class DynArray
 {
-	FreeListAllocator& allocator_; //Please don't use Linear or Stack Allocator
-	T* buffer_ = nullptr;
-
-	// capacity is the total storage capacity
-	size_t capacity = 0;
-
-	// size is the current number of elements 
-	size_t size = 0;
+private:
+	FreeListAllocator& allocator_ = FreeListAllocator();
+	size_t capacity_ = 0;
+	size_t size_ = 0;
+	T* data_ = nullptr;
 
 public:
     typedef T* iterator;
     typedef const T* const_iterator;
 
-	DynArray(FreeListAllocator& allocator) : allocator_(allocator)
-	{
-		capacity = 0;
-		size = 0;
+	DynArray(FreeListAllocator& allocator) : allocator_(allocator){
 	}
+	
 	~DynArray(){
-	    allocator_.Deallocate(buffer_);
+	    allocator_.Deallocate(data_);
 	}
 
-    iterator begin(){
-	    return (std::uint64_t)buffer_;
+    iterator Begin(){
+	    return (std::uint64_t)data_;
 	}
 
     iterator end(){
-        return buffer_ + static_cast<T*>(size);
+        return data_ + static_cast<T*>(size_);
     }
 
-	T& operator[](size_t index)
-	{
-		neko_assert(index >= 0 && index < size, "[Error] Out of scope access");
-		return buffer_[index];
+	T& operator[](size_t index){
+		neko_assert(index >= 0 && index < size_, "[Error] Out of scope access");
+		return data_[index];
 	}
-	void Push(T elem)
-	{
-	    if (buffer_ == nullptr){
-	        capacity = 2;
-	        buffer_ = static_cast<T*>(allocator_.Allocate(capacity, alignof(T)));
-	        buffer_[0] = elem;
-	        size++;
+	
+	void Push(T elem){
+	    if (data_ == nullptr){
+	        capacity_ = 2;
+	        data_ = (T*)(allocator_.Allocate(sizeof(T) * capacity_, alignof(T)));
+	        data_[0] = elem;
+	        size_++;
 	    }else{
-	        if (size + 1 > capacity){
-                T temp[size];
-                memcpy(temp, buffer_, size);
+			if (size_ + 1 > capacity_) {
+				SmallVector<T> temp(size_);
+				for (int i = 0; i < size_; ++i){
+					temp[i] = data_[i];
+				}
 
-                allocator_.Deallocate(buffer_);
-                capacity *= 2;
-                allocator_.Allocate(capacity, alignof(T));
-                for (int i = 0; i < size; ++i)
-                {
-					buffer_[i] = temp[i];
-                }
-                buffer_[size++] = elem;
-            }else{
-	            buffer_[size++] = elem;
+                allocator_.Deallocate(data_);
+                capacity_ *= 2;
+                data_ = (T*)allocator_.Allocate(sizeof(T)*capacity_, alignof(T));
+	        	
+				for (int i = 0; i < size_; ++i){
+					data_[i] = temp[i];
+				}
+	        	
+                data_[size_+1] = elem;
+				size_++;
+            }else{			
+	            data_[size_+1] = elem;
+				size_++;
 	        }
-
 	    }
-
-		if (size == capacity) {
-			T* temp = static_cast<T*>(allocator_.Allocate(2*capacity, alignof(T)));
-
-			for (size_t i = 0; i < size; i++) {
-				temp[i] = buffer_[i];
-			}
-			allocator_.Deallocate(buffer_);
-			capacity *= 2;
-			buffer_ = temp;
-		}
-
-		buffer_[size] = elem;
-		size++;
 	}
 
-	void Insert(T data, size_t index)
-	{
-		if (index == capacity)
+	void Insert(T data, size_t index){
+		if (index == capacity_)
 			Push(data);
-		else
-			buffer_[index] = data;
+		else{
+			for (int i = size_; i == index; i--){
+				data_[i] = data_[i - 1];
+			}
+			data_[index] = data;
+			size_++;
+		}
 	}
 
-	size_t Size() const
-	{
-		return size;
+	size_t Size() const{
+		return size_;
 	}
 
-	size_t Capacity() const
-	{
-		return capacity;
+	size_t Capacity() const{
+		return capacity_;
 	}
-
 };
 
 }

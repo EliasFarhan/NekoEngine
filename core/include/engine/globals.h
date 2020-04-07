@@ -36,4 +36,4 @@ namespace neko
 	const Index INVALID_INDEX = std::numeric_limits<uint32_t>::max();
 
 
-} // end namespace neko
+} // End namespace neko

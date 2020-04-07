@@ -219,4 +219,4 @@ bool IsTruthyFlagValue(const std::string& value) {
   return isalnum(ch) &&
          !(ch == '0' || ch == 'f' || ch == 'F' || ch == 'n' || ch == 'N');
 }
-}  // end namespace benchmark
+}  // End namespace benchmark

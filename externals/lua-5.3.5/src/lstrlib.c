@@ -59,7 +59,7 @@ static int str_len (lua_State *L) {
 }
 
 
-/* translate a relative string position: negative means back from end */
+/* translate a relative string position: negative means back from End */
 static lua_Integer posrelat (lua_Integer pos, size_t len) {
   if (pos >= 0) return pos;
   else if (0u - (size_t)pos > len) return 0;
@@ -213,8 +213,8 @@ static int str_dump (lua_State *L) {
 
 typedef struct MatchState {
   const char *src_init;  /* init of source string */
-  const char *src_end;  /* end ('\0') of source string */
-  const char *p_end;  /* end ('\0') of pattern */
+  const char *src_end;  /* End ('\0') of source string */
+  const char *p_end;  /* End ('\0') of pattern */
   lua_State *L;
   int matchdepth;  /* control for recursive depth (to avoid C stack overflow) */
   unsigned char level;  /* total number of captures (finished or unfinished) */
@@ -426,7 +426,7 @@ static const char *match (MatchState *ms, const char *s, const char *p) {
   if (ms->matchdepth-- == 0)
     luaL_error(ms->L, "pattern too complex");
   init: /* using goto's to optimize tail recursion */
-  if (p != ms->p_end) {  /* end of pattern? */
+  if (p != ms->p_end) {  /* End of pattern? */
     switch (*p) {
       case '(': {  /* start capture */
         if (*(p + 1) == ')')  /* position capture? */
@@ -435,14 +435,14 @@ static const char *match (MatchState *ms, const char *s, const char *p) {
           s = start_capture(ms, s, p + 1, CAP_UNFINISHED);
         break;
       }
-      case ')': {  /* end capture */
+      case ')': {  /* End capture */
         s = end_capture(ms, s, p + 1);
         break;
       }
       case '$': {
         if ((p + 1) != ms->p_end)  /* is the '$' the last char in pattern? */
           goto dflt;  /* no; go to default */
-        s = (s == ms->src_end) ? s : NULL;  /* check end of string */
+        s = (s == ms->src_end) ? s : NULL;  /* check End of string */
         break;
       }
       case L_ESC: {  /* escaped sequences not in the format class[*+?-]? */
@@ -610,7 +610,7 @@ static int str_find_aux (lua_State *L, int find) {
   const char *p = luaL_checklstring(L, 2, &lp);
   lua_Integer init = posrelat(luaL_optinteger(L, 3, 1), ls);
   if (init < 1) init = 1;
-  else if (init > (lua_Integer)ls + 1) {  /* start after string's end? */
+  else if (init > (lua_Integer)ls + 1) {  /* start after string's End? */
     lua_pushnil(L);  /* cannot find anything */
     return 1;
   }
@@ -638,7 +638,7 @@ static int str_find_aux (lua_State *L, int find) {
       if ((res=match(&ms, s1, p)) != NULL) {
         if (find) {
           lua_pushinteger(L, (s1 - s) + 1);  /* start */
-          lua_pushinteger(L, res - s);   /* end */
+          lua_pushinteger(L, res - s);   /* End */
           return push_captures(&ms, NULL, 0) + 2;
         }
         else
@@ -665,7 +665,7 @@ static int str_match (lua_State *L) {
 typedef struct GMatchState {
   const char *src;  /* current position */
   const char *p;  /* pattern */
-  const char *lastmatch;  /* end of last match */
+  const char *lastmatch;  /* End of last match */
   MatchState ms;  /* match state */
 } GMatchState;
 
@@ -763,7 +763,7 @@ static int str_gsub (lua_State *L) {
   size_t srcl, lp;
   const char *src = luaL_checklstring(L, 1, &srcl);  /* subject */
   const char *p = luaL_checklstring(L, 2, &lp);  /* pattern */
-  const char *lastmatch = NULL;  /* end of last match */
+  const char *lastmatch = NULL;  /* End of last match */
   int tr = lua_type(L, 3);  /* replacement type */
   lua_Integer max_s = luaL_optinteger(L, 4, srcl + 1);  /* max replacements */
   int anchor = (*p == '^');
@@ -788,7 +788,7 @@ static int str_gsub (lua_State *L) {
     }
     else if (src < ms.src_end)  /* otherwise, skip one character */
       luaL_addchar(&b, *src++);
-    else break;  /* end of subject */
+    else break;  /* End of subject */
     if (anchor) break;
   }
   luaL_addlstring(&b, src, ms.src_end-src);
@@ -1399,7 +1399,7 @@ static int str_pack (lua_State *L) {
         const char *s = luaL_checklstring(L, arg, &len);
         luaL_argcheck(L, strlen(s) == len, arg, "string contains zeros");
         luaL_addlstring(&b, s, len);
-        luaL_addchar(&b, '\0');  /* add zero at the end */
+        luaL_addchar(&b, '\0');  /* add zero at the End */
         totalsize += len + 1;
         break;
       }

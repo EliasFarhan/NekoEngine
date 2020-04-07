@@ -536,7 +536,7 @@ static lu_mem traversethread (global_State *g, lua_State *th) {
   for (; o < th->top; o++)  /* mark live elements in the stack */
     markvalue(g, o);
   if (g->gcstate == GCSinsideatomic) {  /* final traversal? */
-    StkId lim = th->stack + th->stacksize;  /* real end of stack */
+    StkId lim = th->stack + th->stacksize;  /* real End of stack */
     for (; o < lim; o++)  /* clear not-marked stack slice */
       setnilvalue(o);
     /* 'remarkupvals' may have removed thread from 'twups' list */
@@ -753,7 +753,7 @@ static GCObject **sweeplist (lua_State *L, GCObject **p, lu_mem count) {
 
 
 /*
-** sweep a list until a live object (or end of list)
+** sweep a list until a live object (or End of list)
 */
 static GCObject **sweeptolive (lua_State *L, GCObject **p) {
   GCObject **old = p;
@@ -864,7 +864,7 @@ static void callallpendingfinalizers (lua_State *L) {
 
 
 /*
-** find last 'next' field in list 'p' list (to add elements in its end)
+** find last 'next' field in list 'p' list (to add elements in its End)
 */
 static GCObject **findlast (GCObject **p) {
   while (*p != NULL)
@@ -887,7 +887,7 @@ static void separatetobefnz (global_State *g, int all) {
       p = &curr->next;  /* don't bother with it */
     else {
       *p = curr->next;  /* remove 'curr' from 'finobj' list */
-      curr->next = *lastnext;  /* link at the end of 'tobefnz' list */
+      curr->next = *lastnext;  /* link at the End of 'tobefnz' list */
       *lastnext = curr;
       lastnext = &curr->next;
     }

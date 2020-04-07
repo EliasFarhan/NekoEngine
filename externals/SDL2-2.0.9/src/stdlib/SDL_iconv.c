@@ -198,7 +198,7 @@ getlocale(char *buffer, size_t bufsize)
     SDL_strlcpy(buffer, lang, bufsize);
     ptr = SDL_strchr(buffer, '@');
     if (ptr != NULL) {
-        *ptr = '\0';            /* chop end of string. */
+        *ptr = '\0';            /* chop End of string. */
     }
 
     return buffer;

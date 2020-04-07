@@ -63,8 +63,8 @@ inline LogType& GetLogInstanceForLevel(int level) {
   return GetNullLogInstance();
 }
 
-}  // end namespace internal
-}  // end namespace benchmark
+}  // End namespace internal
+}  // End namespace benchmark
 
 // clang-format off
 #define VLOG(x)                                                               \

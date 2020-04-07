@@ -207,7 +207,7 @@ static void register_error(hid_device *device, const char *op)
 		return;
 	
 	/* Get rid of the CR and LF that FormatMessage() sticks at the
-	   end of the message. Thanks Microsoft! */
+	   End of the message. Thanks Microsoft! */
 	ptr = msg;
 	while (*ptr) {
 		if (*ptr == '\r') {

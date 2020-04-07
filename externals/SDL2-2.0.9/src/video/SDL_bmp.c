@@ -68,7 +68,7 @@ static int readRlePixels(SDL_Surface * surface, SDL_RWops * src, int isRle8)
     Uint8 ch;
     Uint8 needsPad;
 
-#define COPY_PIXEL(x)   spot = &bits[ofs++]; if(spot >= start && spot < end) *spot = (x)
+#define COPY_PIXEL(x)   spot = &bits[ofs++]; if(spot >= start && spot < End) *spot = (x)
 
     for (;;) {
         if (!SDL_RWread(src, &ch, 1, 1)) return 1;
@@ -95,17 +95,17 @@ static int readRlePixels(SDL_Surface * surface, SDL_RWops * src, int isRle8)
             }
         } else {
             /*
-            | A leading zero is an escape; it may signal the end of the bitmap,
+            | A leading zero is an escape; it may signal the End of the bitmap,
             | a cursor move, or some absolute data.
             | zero tag may be absolute mode or an escape
             */
             if (!SDL_RWread(src, &ch, 1, 1)) return 1;
             switch (ch) {
-            case 0:                         /* end of line */
+            case 0:                         /* End of line */
                 ofs = 0;
                 bits -= pitch;               /* go to previous */
                 break;
-            case 1:                         /* end of bitmap */
+            case 1:                         /* End of bitmap */
                 return 0;                    /* success! */
             case 2:                         /* delta */
                 if (!SDL_RWread(src, &ch, 1, 1)) return 1;

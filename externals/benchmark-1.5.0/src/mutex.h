@@ -150,6 +150,6 @@ class Barrier {
   }
 };
 
-}  // end namespace benchmark
+}  // End namespace benchmark
 
 #endif  // BENCHMARK_MUTEX_H_
