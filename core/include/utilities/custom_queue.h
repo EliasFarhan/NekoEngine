@@ -122,7 +122,7 @@ namespace neko
 		};
 		void Resize()
 		{
-			for (int i = 0; i++; i < Size())
+			for (int i = 0; i < Size(); i++)
 			{
 				queueVector[i] = queueVector[start_ + i];
 			}
@@ -157,17 +157,21 @@ namespace neko
 		};
 		T Pop()
 		{
-			T pop = queueVector[Size()];
-			queueVector.erase(Size());
+			T pop = queueVector[0];
+			for (int i = 0; i < Size(); i++)
+			{
+				queueVector[i] = queueVector[i+1];
+			}
+			
 			return pop;
 		};
 		T Begin()
 		{
-			return queueVector[Size()];
+			return queueVector[0];
 		};
 		T End()
 		{
-			return queueVector[0];
+			return queueVector[Size()];
 		};
 		int Size()
 		{
