@@ -1,19 +1,19 @@
 #include <AudioEngine.h>
 
-AudioEngine::AudioEngine()
+FmodAudioEngine::FmodAudioEngine()
 {
     FMOD::Studio::System::create(&fmodStudioSystem);
     fmodStudioSystem->initialize(MAX_CHANNELS, FMOD_STUDIO_INIT_LIVEUPDATE, FMOD_INIT_PROFILE_ENABLE, NULL);
     fmodStudioSystem->getCoreSystem(&fmodSystem);
 }
 
-AudioEngine::~AudioEngine()
+FmodAudioEngine::~FmodAudioEngine()
 {
     fmodStudioSystem->unloadAll();
     fmodStudioSystem->release();
 }
 
-void AudioEngine::Update()
+void FmodAudioEngine::Update()
 {
     std::vector<ChannelMap::iterator> stoppedChannels;
     //Erases stopped channelsMap
@@ -34,7 +34,7 @@ void AudioEngine::Update()
 }
 
 //Load Bank
-void AudioEngine::LoadBank(std::string& bankName, FMOD_STUDIO_LOAD_BANK_FLAGS flags)   //Banks stores all the soundsMap and information for each event
+void FmodAudioEngine::LoadBank(std::string_view& bankName, FMOD_STUDIO_LOAD_BANK_FLAGS flags)   //Banks stores all the soundsMap and information for each event
 {
     const auto it = bankMap.find(bankName);
     if (it != bankMap.end())
@@ -46,12 +46,12 @@ void AudioEngine::LoadBank(std::string& bankName, FMOD_STUDIO_LOAD_BANK_FLAGS fl
     }
 }
 
-void AudioEngine::LoadEvent(std::string& eventName) {
+void FmodAudioEngine::LoadEvent(std::string_view& eventName) {
     const auto it = eventMap.find(eventName);
     if (it != eventMap.end())
         return;
     FMOD::Studio::EventDescription* eventDescription = nullptr;
-    AudioEngine::fmodStudioSystem->getEvent(eventName.c_str(), &eventDescription);
+    FmodAudioEngine::fmodStudioSystem->getEvent(eventName.c_str(), &eventDescription);
     if (eventDescription) {
         FMOD::Studio::EventInstance* eventInstance = nullptr;
         eventDescription->createInstance(&eventInstance);
@@ -62,7 +62,7 @@ void AudioEngine::LoadEvent(std::string& eventName) {
 }
 
 //Loads a sound with name, if he's in 3 Dimensions, looping or streaming
-void AudioEngine::LoadSound(std::string &soundName, bool is3d, bool isLooping, bool isStream)
+void FmodAudioEngine::LoadSound(std::string_view& soundName, bool is3d, bool isLooping, bool isStream)
 {
     const auto it = soundMap.find(soundName);
     if (it != soundMap.end())
@@ -82,7 +82,7 @@ void AudioEngine::LoadSound(std::string &soundName, bool is3d, bool isLooping, b
 }
 
 //Unload soundsMap by name
-void AudioEngine::UnLoadSound(std::string &soundName)
+void FmodAudioEngine::UnLoadSound(std::string_view& soundName)
 {
     auto foundIt = soundMap.find(soundName);
     if (foundIt == soundMap.end())
@@ -93,7 +93,7 @@ void AudioEngine::UnLoadSound(std::string &soundName)
 }
 
 //Plays the selected sound
-void AudioEngine::PlaySound(std::string& soundName, const Vector3& v3Position, float volumeDb)
+void FmodAudioEngine::PlaySound(std::string_view& soundName, const Vector3& v3Position, float volumeDb)
 {
     const ChannelId channelId = nextChannelID++;  //Creates a new channel ID
     auto it = soundMap.find(soundName);  //Search Sound
@@ -122,7 +122,7 @@ void AudioEngine::PlaySound(std::string& soundName, const Vector3& v3Position, f
     }
 }
 
-void AudioEngine::PlayEvent(std::string& eventName) {
+void FmodAudioEngine::PlayEvent(std::string_view& eventName) {
     auto it = eventMap.find(eventName);
     if (it == eventMap.end()) {
         LoadEvent(eventName);
@@ -133,7 +133,7 @@ void AudioEngine::PlayEvent(std::string& eventName) {
     it->second->start();
 }
 
-void AudioEngine::StopChannel(int channelID)
+void FmodAudioEngine::StopChannel(int channelID)
 {
     const auto it = channelMap.find(channelID);
 	if (it == channelMap.end())
@@ -143,7 +143,7 @@ void AudioEngine::StopChannel(int channelID)
     it->second->stop();
 }
 
-void AudioEngine::StopEvent(std::string& eventName, bool isImmediate) {
+void FmodAudioEngine::StopEvent(std::string_view& eventName, bool isImmediate) {
     const auto it = eventMap.find(eventName);
     if (it == eventMap.end())
         return;
@@ -154,7 +154,7 @@ void AudioEngine::StopEvent(std::string& eventName, bool isImmediate) {
 }
 
 
-float AudioEngine::GetEventParameter(std::string& eventName, std::string& parameterName) {
+float FmodAudioEngine::GetEventParameter(std::string_view& eventName, std::string& parameterName) {
     const auto it = eventMap.find(eventName);
     if (it == eventMap.end())
         return;
@@ -165,7 +165,7 @@ float AudioEngine::GetEventParameter(std::string& eventName, std::string& parame
 	return value;
 }
 
-void AudioEngine::SetEventParameter(std::string& eventName, std::string& parameterName, float parameterValue) {
+void FmodAudioEngine::SetEventParameter(std::string_view& eventName, std::string_view& parameterName, float parameterValue) {
     const auto it = eventMap.find(eventName);
     if (it == eventMap.end())
         return;
@@ -173,7 +173,7 @@ void AudioEngine::SetEventParameter(std::string& eventName, std::string& paramet
     it->second->setParameterByName(parameterName.c_str(), parameterValue);
 }
 
-void AudioEngine::StopAllChannels()
+void FmodAudioEngine::StopAllChannels()
 {
 	for (const auto channel : channelMap)
 	{
@@ -182,7 +182,7 @@ void AudioEngine::StopAllChannels()
 }
 
 //Sets the channel position in 3D
-void AudioEngine::SetChannel3dPosition(unsigned int channelID, const Vector3& position)
+void FmodAudioEngine::SetChannel3dPosition(unsigned int channelID, const Vector3& position)
 {
     auto it = channelMap.find(channelID);
     if (it == channelMap.end())
@@ -193,7 +193,7 @@ void AudioEngine::SetChannel3dPosition(unsigned int channelID, const Vector3& po
 }
 
 //Sets the channel volume
-void AudioEngine::SetChannelVolume(unsigned int channelId, float volumeDB)
+void FmodAudioEngine::SetChannelVolume(unsigned int channelId, float volumeDB)
 {
     const auto it = channelMap.find(channelId);
     if (it == channelMap.end())
@@ -202,7 +202,7 @@ void AudioEngine::SetChannelVolume(unsigned int channelId, float volumeDB)
     it->second->setVolume(volumeDB);
 }
 
-bool AudioEngine::IsPlaying(unsigned int channelID)
+bool FmodAudioEngine::IsPlaying(unsigned int channelID)
 {
     const auto it = channelMap.find(channelID);
 	if (it == channelMap.end())
@@ -217,7 +217,7 @@ bool AudioEngine::IsPlaying(unsigned int channelID)
     return isPlaying;
 }
 
-bool AudioEngine::IsEventPlaying(std::string& eventName) {
+bool FmodAudioEngine::IsEventPlaying(std::string_view& eventName) {
     auto it = eventMap.find(eventName);
     if (it == eventMap.end())
         return false;
@@ -229,14 +229,14 @@ bool AudioEngine::IsEventPlaying(std::string& eventName) {
     return false;
 }
 
-void AudioEngine::SetListener(const Vector3& position, float volumeDB)
+void FmodAudioEngine::SetListener(const Vector3& position, float volumeDB)
 {
     FMOD_3D_ATTRIBUTES attributes;
     attributes.position = Vec3ToFmod(position);
     fmodStudioSystem->setListenerAttributes(0, &attributes);
 }
 
-FMOD_VECTOR AudioEngine::Vec3ToFmod(const Vector3& position)
+FMOD_VECTOR FmodAudioEngine::Vec3ToFmod(const Vector3& position)
 {
     FMOD_VECTOR fmodVector;
     fmodVector.x = position.x;
