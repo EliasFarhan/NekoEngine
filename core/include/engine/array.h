@@ -84,13 +84,14 @@ public:
 	    allocator_.Deallocate(data_);
 	}
 
-    iterator Begin(){
+    iterator begin(){
 	    return (std::uint64_t)data_;
 	}
-
+	
     iterator end(){
         return data_ + static_cast<T*>(size_);
     }
+	
 
 	T& operator[](size_t index){
 		neko_assert(index >= 0 && index < size_, "[Error] Out of scope access");

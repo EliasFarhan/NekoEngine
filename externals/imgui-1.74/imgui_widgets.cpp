@@ -821,7 +821,7 @@ bool ImGui::ScrollbarEx(const ImRect& bb_frame, ImGuiID id, ImGuiAxis axis, floa
     const float grab_h_pixels = ImClamp(scrollbar_size_v * (size_avail_v / win_size_v), style.GrabMinSize, scrollbar_size_v);
     const float grab_h_norm = grab_h_pixels / scrollbar_size_v;
 
-    // Handle input right away. None of the code of Begin() is relying on scrolling position before calling Scrollbar().
+    // Handle input right away. None of the code of begin() is relying on scrolling position before calling Scrollbar().
     bool held = false;
     bool hovered = false;
     ButtonBehavior(bb, id, &hovered, &held, ImGuiButtonFlags_NoNavFocus);
@@ -850,7 +850,7 @@ bool ImGui::ScrollbarEx(const ImRect& bb_frame, ImGuiID id, ImGuiAxis axis, floa
         }
 
         // Apply scroll
-        // It is ok to modify Scroll here because we are being called in Begin() after the calculation of ContentSize and before setting up our starting position
+        // It is ok to modify Scroll here because we are being called in begin() after the calculation of ContentSize and before setting up our starting position
         const float scroll_v_norm = ImSaturate((clicked_v_norm - g.ScrollbarClickDeltaToGrabCenter - grab_h_norm * 0.5f) / (1.0f - grab_h_norm));
         *p_scroll_v = IM_ROUND(scroll_v_norm * scroll_max);//(win_size_contents_v - win_size_v));
 
@@ -6134,7 +6134,7 @@ bool ImGui::BeginMenu(const char* label, bool enabled)
     if (menuset_is_open)
         g.NavWindow = window;  // Odd hack to allow hovering across menus of a same menu-set (otherwise we wouldn't be able to hover parent)
 
-    // The reference position stored in popup_pos will be used by Begin() to find a suitable position for the child menu,
+    // The reference position stored in popup_pos will be used by begin() to find a suitable position for the child menu,
     // However the final position is going to be different! It is choosen by FindBestWindowPosForPopup().
     // e.g. Menus tend to overlap each other horizontally to amplify relative Z-ordering.
     ImVec2 popup_pos, pos = window->DC.CursorPos;
@@ -6142,7 +6142,7 @@ bool ImGui::BeginMenu(const char* label, bool enabled)
     {
         // Menu inside an horizontal menu bar
         // Selectable extend their highlight by half ItemSpacing in each direction.
-        // For ChildMenu, the popup position will be overwritten by the call to FindBestWindowPosForPopup() in Begin()
+        // For ChildMenu, the popup position will be overwritten by the call to FindBestWindowPosForPopup() in begin()
         popup_pos = ImVec2(pos.x - 1.0f - IM_FLOOR(style.ItemSpacing.x * 0.5f), pos.y - style.FramePadding.y + window->MenuBarHeight());
         window->DC.CursorPos.x += IM_FLOOR(style.ItemSpacing.x * 0.5f);
         PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(style.ItemSpacing.x * 2.0f, style.ItemSpacing.y));

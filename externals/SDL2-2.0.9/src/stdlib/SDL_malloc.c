@@ -1655,7 +1655,7 @@ static MLOCK_T magic_init_mutex;
   chunks are free, and if so, unlink them from the lists that they
   are on and merge them with the current chunk.
 
-  Chunks always Begin on even word boundaries, so the mem portion
+  Chunks always begin on even word boundaries, so the mem portion
   (which is returned to the user) is also on an even word boundary, and
   thus at least double-word aligned.
 

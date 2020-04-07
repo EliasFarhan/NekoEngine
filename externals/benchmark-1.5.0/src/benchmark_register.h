@@ -31,7 +31,7 @@ AddPowers(std::vector<T>* dst, T lo, T hi, int mult) {
     if (i > kmax / mult) break;
   }
 
-  return dst->Begin() + start_offset;
+  return dst->begin() + start_offset;
 }
 
 template <typename T>

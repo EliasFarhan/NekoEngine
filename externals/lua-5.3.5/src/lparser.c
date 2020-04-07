@@ -1112,7 +1112,7 @@ struct LHS_assign {
 
 /*
 ** check whether, in an assignment to an upvalue/local variable, the
-** upvalue/local variable is Begin used in a previous assignment to a
+** upvalue/local variable is begin used in a previous assignment to a
 ** table. If so, save original upvalue/local value in a safe place and
 ** use this safe copy in the previous assignment.
 */
