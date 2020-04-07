@@ -33,6 +33,7 @@ namespace neko
 	class SmallVector
 	{
 	private:
+		size_t capacity_=0;
 		size_t size_ = 0;
 		T* data_ = nullptr;;
 
@@ -43,33 +44,40 @@ namespace neko
 
 		SmallVector() = default;
 
-		SmallVector(size_t size) : size_{ size }
-		{
-			neko_assert(size >= 0, "[Error] Small Vector initialized with negative size");
+		SmallVector(size_t capacity) : capacity_{ capacity }{
+			neko_assert(capacity >= 0, "[Error] Small Vector initialized with negative size");
 
-			if (size_ > 0)
-				data_ = new T[size]{};
+			if (capacity_ > 0)
+				data_ = new T[capacity_]{};
 		}
 
-		~SmallVector()
-		{
+		~SmallVector(){
 			delete[] data_;
 		}
 
-		T& operator[](int index)
-		{
+		T& operator[](int index){
 			neko_assert(index >= 0 && index < size_, "[Error] Out of scope access");
 			return data_[index];
 		}
 
-		int GetSize() const { return size_; }
+		void Push(T elem) {
+			if (size_ + 1 > capacity_) {
+				neko_assert(size_ + 1 <= capacity_, "[Error] Out of scope access");
+			}
+			else {
+				data_[size_] = elem;
+				size_++;
+			}	
+		}
+		
+		size_t GetSize() const { return size_; }
 	};
 
 	template<typename T>
 	class DynArray
 	{
 	private:
-		FreeListAllocator& allocator_ = FreeListAllocator();
+		FreeListAllocator& allocator_;
 		size_t capacity_ = 0;
 		size_t size_ = 0;
 		T* data_ = nullptr;
@@ -116,7 +124,7 @@ namespace neko
 			neko_assert(index >= 0 && index < size_, "[Error] Out of scope access");
 			return data_[index];
 		}
-
+		//Always use push to add new elements
 		void Push(T elem) {
 			if (data_ == nullptr) {
 				capacity_ = 2;
@@ -153,13 +161,64 @@ namespace neko
 			}
 		}
 
-		size_t Size() const {
-			return size_;
-		}
+		size_t GetSize() const {return size_;}
 
-		size_t Capacity() const {
-			return capacity_;
-		}
+		size_t GetCapacity() const {return capacity_;}
 	};
 
+	template<typename T>
+	class FixedVector
+	{
+	private:
+		size_t capacity_ = 0;
+		size_t size_ = 0;
+		FreeListAllocator& allocator_;
+		T* data_ = nullptr;;
+
+	public:
+
+		typedef T* iterator;
+		typedef const T* const_iterator;
+
+		FixedVector(size_t capacity, FreeListAllocator& allocator) : capacity_{ capacity }, allocator_ {allocator}
+		{
+			neko_assert(capacity_ >= 0, "[Error] Fixed Vector initialized with negative size");
+
+			if (capacity_ > 0)
+				data_ = new T[capacity_]{};
+		}
+
+		~FixedVector()
+		{
+			delete[] data_;
+		}
+
+		T& operator[](int index)
+		{
+			neko_assert(index >= 0 && index < size_, "[Error] Out of scope access");
+			return data_[index];
+		}
+
+		void Push(T elem) {
+			if (data_ == nullptr) {
+
+				data_ = (T*)(allocator_.Allocate(sizeof(T) * capacity_, alignof(T)));
+				data_[0] = elem;
+				size_++;
+			}
+			else {
+				if (size_ + 1 > capacity_) {
+					neko_assert(size_ + 1 <= capacity_, "[Error] Out of scope access");
+				}
+				else {
+					data_[size_] = elem;
+					size_++;
+				}
+			}
+		}
+		
+		size_t GetCapacity() const {return capacity_;}
+
+		size_t GetSize() const { return size_; }
+	};
 }
