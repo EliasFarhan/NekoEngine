@@ -550,7 +550,7 @@ double GetCPUCyclesPerSecond() {
     auto Cmp = [&](char X, char Y) {
       return std::tolower(X) == std::tolower(Y);
     };
-    return std::equal(Key.begin(), Key.End(), Value.begin(), Cmp);
+    return std::equal(Key.Begin(), Key.End(), Value.Begin(), Cmp);
   };
 
   std::string ln;

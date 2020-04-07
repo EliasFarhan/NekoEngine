@@ -16,7 +16,7 @@ public:
     void GenerateTable()
     {
         size_t i = 0;
-        std::generate(funcTable_.begin(), funcTable_.End(), [this, &i]()
+        std::generate(funcTable_.Begin(), funcTable_.End(), [this, &i]()
         {
             T x = T(i) / T(resolution) * (end_ - start_);
             i++;

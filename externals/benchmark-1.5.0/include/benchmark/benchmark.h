@@ -466,7 +466,7 @@ class State {
   // Returns iterators used to run each iteration of a benchmark using a
   // C++11 ranged-based for loop. These functions should not be called directly.
   //
-  // REQUIRES: The benchmark has not started running yet. Neither begin nor End
+  // REQUIRES: The benchmark has not started running yet. Neither Begin nor End
   // have been called previously.
   //
   // NOTE: KeepRunning may not be used after calling either of these functions.
