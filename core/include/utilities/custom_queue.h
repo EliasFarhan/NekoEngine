@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <array>
 #include "engine/assert.h"
 
 namespace neko
@@ -20,7 +21,7 @@ namespace neko
 
 		void Clear()
 		{
-			
+			start_ = 0;
 			end_ = 0;
 		}
 
@@ -68,11 +69,11 @@ namespace neko
 			};
 			return pop;
 		}
-		T Begin()
+		T Front()
 		{
 			return buffer_[start_];
 		}
-		T End()
+		T Back()
 		{
 			return buffer_[end_ - 1];
 		}
@@ -101,28 +102,18 @@ namespace neko
 	{
 
 	public:
-		DynamicQueue()
-		{
-			queueVector.resize(1);
-		}
+		DynamicQueue()= default;
+		
 		~DynamicQueue() = default;
+		
 		void PushBack(T element)
-		{
-			/*if (end_ >= queueVector.size())
+		{		
+			if (Size() >= queueVector.capacity())
 			{
-				queueVector.resize(queueVector.size()*2);
+				Rebase();
+				queueVector.resize(Size());
 			}
-
-			queueVector[end_] = element;
-			end_++;*/
-			if (start_ - end_ + 1 >= queueVector.size)
-			{
-				queueVector.resize(start_ - end_ + 1);
-			}
-			if (end_ - start_ + 1 >= queueVector.size)
-			{
-				queueVector.resize(end_ - start_ + 1);
-			}
+			
 			queueVector[end_] = element;
 			if (end_ + 1 != start_)
 			{
@@ -134,29 +125,45 @@ namespace neko
 		void Clear()
 		{
 			queueVector.clear();
+			start_ = 0;
+			end_ = 0;
 		}
 		T Pop()
 		{
 			T pop = queueVector[start_];
 			start_++;
-			if (start_ > queueVector.size)
+			if (start_ > queueVector.capacity())
 			{
 				start_ = 0;
 			}
 			return pop;
 		}
-		T Begin()
+		T Front()
 		{
 			return queueVector[start_];
 		}
-		T End()
+		T Back()
 		{
-			return queueVector[end_ - 1];
+			if (end_ != 0)
+			{
+				return queueVector[end_ - 1];
+			}
+			
+			return queueVector[end_];
+			
+			
 		}
 		int Size()
 		{
-			return end_ - start_ + 1;
+			if (end_ > start_)
+			{
+				return end_ - start_ + 1;
+			}
+			else {
+				return   start_ - end_ + 1;
+			}
 		}
+		
 		void Rebase()
 		{
 			for (int i = 0; i < Size(); i++)
@@ -180,12 +187,12 @@ namespace neko
 
 
 	template<typename T>
-	class DynamicQueue2
+	class DynamicQueueBasic
 	{
 
 	public:
-		DynamicQueue2() = default;
-		~DynamicQueue2() = default;
+		DynamicQueueBasic() = default;
+		~DynamicQueueBasic() = default;
 		void PushBack(T element)
 		{
 			queueVector.push_back(element);
@@ -204,17 +211,17 @@ namespace neko
 			
 			return pop;
 		};
-		T Begin()
+		T Front()
 		{
 			return queueVector[0];
 		};
-		T End()
+		T Back()
 		{
-			return queueVector[Size()];
+			return queueVector[Size()-1];
 		};
 		int Size()
 		{
-			return queueVector.size();
+			return queueVector.capacity();
 		};
 		T& operator[](size_t idx)
 		{
