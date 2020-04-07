@@ -46,6 +46,8 @@ void HelloTransformProgram::Render()
             break;
     }
 
+    glEnable(GL_DEPTH_TEST);
+
 }
 
 void HelloTransformProgram::Destroy()
@@ -78,6 +80,8 @@ void HelloTransformProgram::Update(seconds dt)
 
 void HelloTransformProgram::DrawImGui()
 {
+
+    ImGui::SetNextWindowPos(ImVec2(0, 400), ImGuiCond_FirstUseEver);
     ImGui::Begin("Transform Window");
     const char* items[static_cast<size_t>(ShapeType::LENGTH)] = {
             "Plane",

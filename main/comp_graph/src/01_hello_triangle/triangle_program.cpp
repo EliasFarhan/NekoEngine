@@ -51,10 +51,12 @@ void HelloTriangleProgram::Init()
 
     nekoShader_.LoadFromFile(
             config.dataRootPath+"data/shaders/01_hello_triangle/hello_neko_quad.vert",
-            config.dataRootPath+"/data/shaders/01_hello_triangle/hello_triangle.frag"
+            config.dataRootPath+"data/shaders/01_hello_triangle/hello_triangle.frag"
             );
     quad_.Init();
     circle_.Init();
+
+    glEnable(GL_DEPTH_TEST);
 }
 
 void HelloTriangleProgram::Update(seconds dt)
@@ -139,6 +141,8 @@ void HelloTriangleProgram::Destroy()
 
 void HelloTriangleProgram::DrawImGui()
 {
+
+    ImGui::SetNextWindowPos(ImVec2(0, 400), ImGuiCond_FirstUseEver);
     ImGui::Begin("Hello Triangle Program");
     const char* items[(size_t)RenderType::Length]= {
             "Simple Vao Program",

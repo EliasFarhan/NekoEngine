@@ -43,6 +43,7 @@ public:
     /**
      * \brief Called by a render thread to take ownership of the context, typically used in OpenGL
      */
+
     virtual void MakeCurrentContext() {};
     virtual void LeaveCurrentContext() {};
 };

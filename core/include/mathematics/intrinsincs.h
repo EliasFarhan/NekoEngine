@@ -16,8 +16,7 @@ static_assert(false, "AVX2 is not enabled");
 #endif
 #endif
 
-#if defined(__arm__)
-#include <arm_neon.h>
+#if defined(__arm__) || defined(__ANDROID__)
 typedef float v4f __attribute__ ((vector_size (16)));
 #endif
 

@@ -19,96 +19,93 @@ const float maxNmb = 100.0f;
 
 void RandomFill(std::vector<float>& numbers, float start = -maxNmb, float end = maxNmb)
 {
-    std::random_device rd;
-    std::mt19937 g(rd());
-    std::uniform_real_distribution<float> dist{start, end};
-    std::generate(numbers.begin(), numbers.end(), [&g, &dist](){return dist(g);});
+	std::random_device rd;
+	std::mt19937 g(rd());
+	std::uniform_real_distribution<float> dist{ start, end };
+	std::generate(numbers.begin(), numbers.end(), [&g, &dist]() {return dist(g); });
 }
 
-TEST(Engine, TestMathematics)
+TEST(Engine, TestSinTable)
 {
-    neko::FuncTable<float> sinFuncTable(0.0f, M_PI, [](float x){ return sinf(x);});
-    sinFuncTable.GenerateTable();
-    size_t sampleSize = 1024;
-    std::vector<float> localNumbers(sampleSize);
-    RandomFill(localNumbers, 0.0f, M_PI);
+	neko::FuncTable<float> sinFuncTable(0.0f, neko::PI, [](float x) { return neko::Sin(neko::radian_t(x)); });
+	sinFuncTable.GenerateTable();
+	const size_t sampleSize = 1024;
+	std::vector<float> localNumbers(sampleSize);
+	RandomFill(localNumbers, 0.0f, M_PI);
 
-    float error = 0.0f;
-    for(auto v : localNumbers)
-    {
-        error += sinFuncTable.GetValue(v) - sinf(v);
-    }
-    error /= float(sampleSize);
-    std::cout << "Error margin for sinFuncTable with resolution 512: "<<error<<"\n";
+	float error = 0.0f;
+	for (auto v : localNumbers)
+	{
+		error += std::abs(sinFuncTable.GetValue(v) - neko::Sin(neko::radian_t(v)));
+	}
+	error /= float(sampleSize);
+	EXPECT_LT(error, 0.01f);
 }
 
-TEST(Engine, TestQuaternion)
+TEST(Engine, Quaternion_Dot)
 {
-    //Variables
-    neko::Quaternion quaternionA = neko::Quaternion(0.71, 0, 0, 0.71);
-    neko::Quaternion quaternionB = neko::Quaternion(0, 0, 0, 1);
-    neko::Quaternion quaternionACopy;
-
-    //Display start variables
-    std::cout << "QuaternionA"<<quaternionA<<'\n';
-    std::cout << std::endl;
-    std::cout <<"QuaternionB"<< quaternionB<<'\n';
-    std::cout << std::endl << std::endl;
-
-    //Dot Product Test
-    std::cout << "Dot product: " << neko::Quaternion::Dot(quaternionA, quaternionB) << std::endl << std::endl;
-
-    //Normalize Test
-    std::cout << "Normalize: ";
-    std::cout << "NormalizedQuaternionA" << neko::Quaternion::Normalized(quaternionA) << '\n';
-    std::cout << std::endl << std::endl;
-
-    //Magnitude Test
-    std::cout << "Magnitude: " << neko::Quaternion::Magnitude(quaternionA) <<'\n'<<'\n';
-
-    //AngleAxis Test
-    std::cout << "AngleAxis: " << "Cannot be tested right now"<<'\n'<<'\n';
-
-    //Angle Test
-    std::cout << "Angle: " << neko::Quaternion::Angle(quaternionA, quaternionB) <<'\n'<<'\n';
-
-    //Conjugate Test
-    quaternionACopy = quaternionA;
-    std::cout << "Conjugate: ";
-    std::cout <<"QuaternionAConjugate"<< quaternionACopy.Conjugate()<<'\n';
-    std::cout <<'\n'<<'\n';
-
-    //Inverse Test
-    quaternionACopy = quaternionA;
-    std::cout << "Inverse: ";
-    std::cout <<"QuaternionAInverse"<< quaternionACopy.Inverse()<<'\n';
-    std::cout << std::endl << std::endl;
-
-    //FromEuler
-    std::cout << "Euler: " << "Cannot be tested right now" <<'\n'<<'\n';
+    neko::Quaternion q1 = neko::Quaternion(1,0,0,0);
+    neko::Quaternion q2 = neko::Quaternion(1,0,0,0);
+    float expectedDot = 1;
+    float dotQ1Q2 = neko::Quaternion::Dot(q1, q2);
+    EXPECT_TRUE(expectedDot - dotQ1Q2 < 0.001f);
 }
-TEST(Engine, TestMatrix4)
+
+TEST(Engine, Quaternion_Normalized)
 {
-    neko::Mat4f m1 (std::array<neko::Vec4f,4>
-            {
-                    neko::Vec4f{1,2,3,4},
-                    neko::Vec4f{-1,-2,-3,-4},
-                    neko::Vec4f{4,2,2,1},
-                    neko::Vec4f{-4,-3,-2,-1}
-            });
-
-    neko::Mat4f result = neko::Mat4f(std::array<neko::Vec4f, 4>{
-            neko::Vec4f(-5,5,6,-5 ),
-            neko::Vec4f(-8,8,5,-3 ),
-            neko::Vec4f(-5,5,8,-5 ),
-            neko::Vec4f(-5,5,9,-5 )
-    });
-    result = result.Transpose();
-    EXPECT_TRUE(neko::Mat4f::MatrixDifference(m1.MultiplyNaive(m1), result)< 0.01f);
-    EXPECT_TRUE(neko::Mat4f::MatrixDifference(m1.MultiplyIntrinsincs(m1), result)<0.01f);
-    EXPECT_TRUE(neko::Mat4f::MatrixDifference(m1.MultiplyNaive(m1), m1.MultiplyIntrinsincs(m1))<0.01f);
+    neko::Quaternion q = neko::Quaternion(3.33f, 0, 0, 0);
+    neko::Quaternion expectedNormalized = neko::Quaternion(1,0,0,0);
+    neko::Quaternion normalized = neko::Quaternion::Normalized(q);
+    EXPECT_EQ(expectedNormalized, normalized);
 }
 
+TEST(Engine, Quaternion_Magnitude)
+{
+    neko::Quaternion q = neko::Quaternion(1, 0, 0, 0);
+    float expectedMagnitude = 1;
+    float magnitude = neko::Quaternion::Magnitude(q);
+    EXPECT_TRUE(expectedMagnitude - magnitude < 0.001f);
+}
+
+TEST(Engine, Quaternion_AngleAxis)
+{
+    neko::Quaternion q = neko::Quaternion::Identity();
+    neko::radian_t rad(30);
+    neko::Vec3f axis(1, 1, 1);
+    neko::Quaternion expectedAngleAxisQuaternion = neko::Quaternion(0, 0, 0, 1);    //TODO: Calculate the expected value
+    q = q.AngleAxis(rad, axis);
+    //EXPECT_EQ(q, expectedAngleAxisQuaternion);
+}
+
+TEST(Engine, Quaternion_Angle)
+{
+    neko::Quaternion q1 = neko::Quaternion::Identity();
+    neko::Quaternion q2 = neko::Quaternion::Identity();
+    neko::degree_t expectedAngle(0);
+    neko::degree_t angle(neko::Quaternion::Angle(q1, q2));
+    EXPECT_EQ(expectedAngle, angle);
+}
+
+TEST(Engine, Quaternion_Conjugate)
+{
+    neko::Quaternion q = neko::Quaternion(8, 10, 888, 2);
+    neko::Quaternion expectedQuaternion = neko::Quaternion(-8, -10, -888, 2);
+    q = q.Conjugate();
+    EXPECT_EQ(q, expectedQuaternion);
+}
+
+TEST(Engine, Quaternion_Inverse)
+{
+    neko::Quaternion q = neko::Quaternion(1, 0.5, 0.5, 0);
+    neko::Quaternion expectedInverse = neko::Quaternion(-0.6666666f, -0.3333333f, -0.3333333f, 0);
+    q = q.Inverse();
+    EXPECT_TRUE(q.x - expectedInverse.x < 0.001f && q.y - expectedInverse.y < 0.001f && q.z - expectedInverse.z < 0.001f && q.w - expectedInverse.w < 0.001f);
+}
+
+TEST(Engine, Quaternion_FromEuler)
+{
+    //TODO
+}
 
 TEST(Engine, TestAabb)
 {
@@ -127,10 +124,10 @@ TEST(Engine, TestAabb)
 
     neko::radian_t angle = static_cast<neko::radian_t>(neko::PI / 4);
     neko::Obb2d obb1;
-    obb1.SetCenterExtendsRot(neko::Vec2f(0, 0), neko::Vec2f(0.5, 0.5), angle);
+    obb1.FromCenterExtendsRotation(neko::Vec2f(0, 0), neko::Vec2f(0.5, 0.5), angle);
     neko::Obb2d obb2;
-    obb2.SetCenterExtendsRot(neko::Vec2f(1, 1), neko::Vec2f(0.5, 0.5), angle);
-    std::cout << "OBB1 (" << obb1.lowerLeftBound << " , " << obb1.upperRightBound << " , " << obb1.rotation << "); OBB2 (" << obb2.lowerLeftBound << " , " << obb2.upperRightBound << " , " << obb2.rotation << ")  Intersect :" << obb1.IntersectObb(obb2) << "\n";
+    obb2.FromCenterExtendsRotation(neko::Vec2f(1, 1), neko::Vec2f(0.5, 0.5), angle);
+    std::cout << "OBB1 (" << obb1.localLowerLeftBound << " , " << obb1.localUpperRightBound << " , " << obb1.rotation << "); OBB2 (" << obb2.localLowerLeftBound << " , " << obb2.localUpperRightBound << " , " << obb2.rotation << ")  Intersect :" << obb1.IntersectObb(obb2) << "\n";
     EXPECT_FALSE(obb1.IntersectObb(obb2));
 
     aabb1.FromObb(obb1);
@@ -157,12 +154,12 @@ TEST(Engine, TestAabb)
     std::cout << "AABB1 (" << aabb3.lowerLeftBound << " , " << aabb3.upperRightBound << "); Plane (" << origin3 << " , " << normal3 << ")  Intersect :" << aabb3.IntersectPlane(normal3, origin3) << "\n";
     EXPECT_TRUE(aabb3.IntersectPlane(normal3, origin3));
 
-    neko::Obb2d obb3;
-    obb3.SetCenterExtendsRot(neko::Vec2f(0, 0), neko::Vec2f(0.5, 0.5), angle);
-    neko::Obb2d obb4;
-    obb4.SetCenterExtendsRot(neko::Vec2f(1, 1), neko::Vec2f(0.5, 0.5), angle);
-    std::cout << "OBB1 (" << obb3.lowerLeftBound << " , " << obb3.upperRightBound << "); OBB2 (" << obb4.lowerLeftBound << " , " << obb4.upperRightBound << ")  Intersect :" << obb3.IntersectObb(obb4) << "\n";
-    //EXPECT_FALSE(obb3.IntersectObb(obb4));
+    //neko::Obb2d obb3;
+    //obb3.FromCenterExtendsRotation(neko::Vec2f(0, 0), neko::Vec2f(0.5, 0.5), angle);
+    //neko::Obb2d obb4;
+    //obb4.FromCenterExtendsRotation(neko::Vec2f(1, 1), neko::Vec2f(0.5, 0.5), angle);
+    //std::cout << "OBB1 (" << obb3.localLowerLeftBound << " , " << obb3.localUpperRightBound << "); OBB2 (" << obb4.localLowerLeftBound << " , " << obb4.localUpperRightBound << ")  Intersect :" << obb3.IntersectObb(obb4) << "\n";
+    ////EXPECT_FALSE(obb3.IntersectObb(obb4));
 
     //aabb3.FromObb(obb3);
     //aabb4.FromObb(obb4);
@@ -170,3 +167,25 @@ TEST(Engine, TestAabb)
     //EXPECT_FALSE(aabb1.ContainsAabb(aabb2));
     //EXPECT_TRUE(aabb1.IntersectAabb(aabb2));
 }
+
+    TEST(Engine, TestMatrix4)
+    {
+        neko::Mat4f m1(std::array<neko::Vec4f, 4>
+        {
+            neko::Vec4f{ 1,2,3,4 },
+                neko::Vec4f{ -1,-2,-3,-4 },
+                neko::Vec4f{ 4,2,2,1 },
+                neko::Vec4f{ -4,-3,-2,-1 }
+        });
+
+        neko::Mat4f result = neko::Mat4f(std::array<neko::Vec4f, 4>{
+            neko::Vec4f(-5, 5, 6, -5),
+                neko::Vec4f(-8, 8, 5, -3),
+                neko::Vec4f(-5, 5, 8, -5),
+                neko::Vec4f(-5, 5, 9, -5)
+        });
+        result = result.Transpose();
+        EXPECT_LT(neko::Mat4f::MatrixDifference(m1.MultiplyNaive(m1), result), 0.01f);
+        EXPECT_LT(neko::Mat4f::MatrixDifference(m1.MultiplyIntrinsincs(m1), result), 0.01f);
+        EXPECT_LT(neko::Mat4f::MatrixDifference(m1.MultiplyNaive(m1), m1.MultiplyIntrinsincs(m1)), 0.01f);
+    }
