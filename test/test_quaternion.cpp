@@ -112,7 +112,7 @@ TEST(Engine, Quaternion_Square_Magnitude)
 {
     neko::Quaternion q = neko::Quaternion(2, 4, 2, 1);
     float expectedMagnitude = 25;
-    float magnitude = neko::Quaternion::Magnitude(q);
+    float magnitude = neko::Quaternion::SquareMagnitude(q);
     EXPECT_TRUE(expectedMagnitude - magnitude < 0.001f);
 }
 
@@ -140,11 +140,11 @@ TEST(Engine, Quaternion_Intrinsics_Square_Magnitude)
 TEST(Engine, Quaternion_AngleAxis)
 {
     neko::Quaternion q = neko::Quaternion::Identity();
-    neko::radian_t rad(30);
-    neko::Vec3f axis(1, 1, 1);
-    neko::Quaternion expectedAngleAxisQuaternion = neko::Quaternion(0, 0, 0, 1);    //TODO: Calculate the expected value
-    q = q.AngleAxis(rad, axis);
-    //EXPECT_EQ(q, expectedAngleAxisQuaternion);
+    neko::radian_t rad(0.5);
+    neko::Vec3f axis(50, 30, 20);
+    neko::Quaternion expectedAngleAxisQuaternion = neko::Quaternion(0.38887, 0.23332, 0.15554, 0.87758);    //TODO: Calculate the expected value
+	q = q.AngleAxis(rad, axis);
+    EXPECT_TRUE(q.x - expectedAngleAxisQuaternion.x < 0.001f && q.y - expectedAngleAxisQuaternion.y < 0.001f && q.z - expectedAngleAxisQuaternion.z < 0.001f && q.w - expectedAngleAxisQuaternion.w < 0.001f);
 }
 
 TEST(Engine, Quaternion_Intrinsics_AngleAxis)
@@ -194,25 +194,19 @@ TEST(Engine, Quaternion_Intrinsics_Inverse)
 
 TEST(Engine, Quaternion_FromEuler)
 {
-    //neko::EulerAngles angle;
-	
-    //TODO
+    neko::Vec3f vec = neko::Vec3f(3, 70, 90);
+    neko::EulerAngles angle = static_cast<neko::EulerAngles>(vec);
+    neko::Quaternion q = neko::Quaternion::Identity();
+    q = neko::Quaternion::FromEuler(angle);
+    neko::Quaternion expectedEuler = neko::Quaternion(0.58965, 0.56841, 0.42060, -0.39028);
+    EXPECT_TRUE(q.x - expectedEuler.x < 0.001f && q.y - expectedEuler.y < 0.001f && q.z - expectedEuler.z < 0.001f && q.w - expectedEuler.w < 0.001f);
+
 }
 
 TEST(Engine, Quaternion_Intrinsics_FromEuler)
 {
     //TODO
 }
-
-/*TEST(Engine, Quaternion_Identity)
-{
-    //TODO
-}
-
-TEST(Engine, Quaternion_Intrinsics_Identity)
-{
-    //TODO
-}*/
 
 TEST(Engine, Quaternion_Operations)
 {
@@ -227,8 +221,6 @@ TEST(Engine, Quaternion_Operations)
     EXPECT_EQ(q1 - q2, result);
     result = neko::Quaternion(24,28,16, 28);
     EXPECT_EQ(q2 * q1, result);
-    float b = 4;
-    //neko::radian_t a = static_cast<neko::radian_t>(b);
 }
 
 TEST(Engine, Quaternion_Intrinsics_Operations)
