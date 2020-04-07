@@ -37,6 +37,7 @@ namespace neko
 		T* data_ = nullptr;;
 
 	public:
+		
 		typedef T* iterator;
 		typedef const T* const_iterator;
 
@@ -74,8 +75,26 @@ namespace neko
 		T* data_ = nullptr;
 
 	public:
-		typedef T* iterator;
-		typedef const T* const_iterator;
+
+		class iterator
+		{
+		public:
+			typedef iterator self_type;
+			typedef T value_type;
+			typedef T& reference;
+			typedef T* pointer;
+			typedef std::forward_iterator_tag iterator_category;
+			typedef int difference_type;
+			iterator(pointer ptr) : ptr_(ptr) { }
+			self_type operator++() { self_type i = *this; ptr_++; return i; }
+			self_type operator++(int junk) { ptr_++; return *this; }
+			reference operator*() { return *ptr_; }
+			pointer operator->() { return ptr_; }
+			bool operator==(const self_type& rhs) { return ptr_ == rhs.ptr_; }
+			bool operator!=(const self_type& rhs) { return ptr_ != rhs.ptr_; }
+		private:
+			pointer ptr_;
+		};
 
 		DynArray(FreeListAllocator& allocator) : allocator_(allocator) {
 		}
@@ -85,11 +104,11 @@ namespace neko
 		}
 
 		iterator begin() {
-			return (std::uint64_t)data_;
+			return iterator(data_);
 		}
 
 		iterator end() {
-			return data_ + static_cast<T*>(size_);
+			return iterator(data_ + size_);
 		}
 
 
