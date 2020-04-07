@@ -11,12 +11,23 @@
 namespace neko
 {
 
-template<typename T>
-class Mat3
+class Mat3f
 {
-private:
-    std::array<Vec4 < T>, 4>
-    columns_; //row vector
+public :
+    Mat3f()
+    {
+        data = std::array<float, 9>();
+    }
+
+    Vec3f operator*(const Vec3f& rhs) const
+    {
+        Vec3f v;
+        v.x = data[0] * rhs.x + data[1] * rhs.y + data[2] * rhs.z;
+        v.y = data[3] * rhs.x + data[4] * rhs.y + data[5] * rhs.z;
+        v.z = data[6] * rhs.x + data[7] * rhs.y + data[8] * rhs.z;
+        return v;
+    }
+    std::array<float, 9> data; //row vector
 };
 
 template<typename T>
@@ -232,7 +243,7 @@ private:
     columns_; //row vector
 };
 
-using Mat3f = Mat3<float>;
+//using Mat3f = Mat3<float>;
 using Mat4f = Mat4<float>;
 
 #ifdef __SSE__

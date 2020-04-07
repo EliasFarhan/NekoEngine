@@ -26,12 +26,13 @@
 #include "mathematics/vector.h"
 #include "matrix.h"
 #include "const.h"
+#include "transform.h"
 
 namespace neko {
 struct Obb2d {
     /// Get the center of the OBB.
     Vec2f GetCenter() const {
-        return 0.5f * (localLowerLeftBound + localUpperRightBound);
+        return center;
     }
 
     /// Get the direction of the OBB rotated 90 degrees clockwise.
@@ -45,9 +46,10 @@ struct Obb2d {
     }
 
     /// Set the center, the extends and the rotation of the OBB.
-    void FromCenterExtendsRotation(Vec2f center, Vec2f localExtends, degree_t rot) {
-        localLowerLeftBound = center - localExtends;
-        localUpperRightBound = center + localExtends;
+    void FromCenterExtendsRotation(Vec2f newCenter, Vec2f localExtends, degree_t rot) {
+        center = newCenter;
+        localLowerLeftBound = localExtends * -1.0f;
+        localUpperRightBound = localExtends;
 		rotation = rot;
     }
 
@@ -98,13 +100,13 @@ struct Obb2d {
 
 		if((rotationToAxis >= 0 && rotationToAxis <= PI / 2) || (rotationToAxis >= -PI && rotationToAxis <= -PI / 2))
 		{
-			Vec2f lowerLeftToTopRight = lowerLeftBound - upperRightBound;
+			Vec2f lowerLeftToTopRight = localLowerLeftBound - localUpperRightBound;
 
             extend = (lowerLeftToTopRight.Magnitude() * Vec2f::AngleBetween(lowerLeftToTopRight, axis)).value();
 		}
 		else
 		{
-			Vec2f upperLeftBound = GetOppositeBound(upperRightBound, true);
+			Vec2f upperLeftBound = GetOppositeBound(localUpperRightBound, true);
 			Vec2 lowerRightToUpperLeft = (upperLeftBound - GetCenter()) * 2;
 
             extend = (lowerRightToUpperLeft.Magnitude() * Vec2f::AngleBetween(lowerRightToUpperLeft, axis)).value();
@@ -147,10 +149,10 @@ struct Obb2d {
         float min = std::numeric_limits<float>::infinity();
         float max = -std::numeric_limits<float>::infinity();
         std::array<Vec2f, 4> corners;
-        corners[0] = localLowerLeftBound.Rotate(rotation);
-        corners[1] = Vec2f(localUpperRightBound.x, localLowerLeftBound.y).Rotate(rotation);
-        corners[2] = Vec2f(localLowerLeftBound.x, localUpperRightBound.y).Rotate(rotation);
-        corners[3] = localUpperRightBound.Rotate(rotation);
+        corners[0] = localLowerLeftBound.Rotate(rotation) + GetCenter();
+        corners[1] = Vec2f(localUpperRightBound.x, localLowerLeftBound.y).Rotate(rotation) + GetCenter();
+        corners[2] = Vec2f(localLowerLeftBound.x, localUpperRightBound.y).Rotate(rotation) + GetCenter();
+        corners[3] = localUpperRightBound.Rotate(rotation) + GetCenter();
         for (auto& corner : corners) {
             float projection = Vec2f::Dot(corner, axis);
             if (projection < min) { min = projection; }
@@ -168,25 +170,17 @@ struct Obb2d {
 
     bool IsOverlapping(Obb2d& obb1)
     {
-        std::array<Vec2f, 4 > perpendicularAxis = { GetUp(), GetRight(), obb1.GetUp(), obb1.GetRight(), };
+        std::array<Vec2f, 4> perpendicularAxis = { GetUp(), GetRight(), obb1.GetUp(), obb1.GetRight()};
         // we need to find the minimal overlap and axis on which it happens
-        float minOverlap = std::numeric_limits<float>::infinity();
-
         for (auto& axis : perpendicularAxis) {
             Vec2f proj1 = ProjectOnAxis(axis);
             Vec2f proj2 = obb1.ProjectOnAxis(axis);
 
-            float overlap = std::min(proj1.y, proj2.y) - std::max(proj1.x, proj2.x);
-            if (overlap == 0.f) { // shapes are not overlapping
+            if (!(proj1.x <= proj2.y && proj1.y >= proj2.x) || !(proj2.x <= proj1.y && proj2.y >= proj1.x))
+            {
                 return false;
             }
-            else {
-                if (overlap < minOverlap) {
-                    minOverlap = overlap;
-                }
-            }
         }
-
         return true;
     }
 
@@ -200,60 +194,69 @@ struct Obb2d {
 
     Vec2f localLowerLeftBound;	///< the lower vertex
     Vec2f  localUpperRightBound;	///< the upper vertex
+    Vec2f center;
     radian_t rotation;       ///< the angle of rotation in rd
 };
 
 struct Obb3d {
-    Vec2f GetCenter() const {
-        return 0.5f * (localLowerLeftBound + localUpperRightBound);
+    Vec3f GetCenter() const {
+        return center;
     }
 
-    /// Get the direction of the OBB rotated 90 degrees clockwise.
-    Vec2f GetRight() {
-        return Vec2f(CalculateDirection().y, -CalculateDirection().x);
+    Vec3f GetRight()
+    {
+        return RotateAxis(Vec3f(1, 0, 0), rotation);
     }
 
-    /// Get the direction of the OBB rotated 90 degrees clockwise.
-    Vec2f GetUp() {
-        return Vec2f(CalculateDirection());
+    Vec3f GetUp()
+    {
+        return RotateAxis(Vec3f(0, 1, 0), rotation);
+    }
+
+    Vec3f GetForward()
+    {
+        return RotateAxis(Vec3f(0, 0, 1), rotation);
     }
 
     /// Set the center, the extends and the rotation of the OBB.
-    void FromCenterExtendsRotation(Vec2f center, Vec2f localExtends, degree_t rot) {
-        localLowerLeftBound = center - localExtends;
-        localUpperRightBound = center + localExtends;
-        rotation = rot;
+    void FromCenterExtendsRotation(Vec3f newCenter, Vec3f localExtends, RadianAngles rot) {
+        center = newCenter;
+        localLowerLeftBound = localExtends * -1.0f;
+        localUpperRightBound = localExtends;
+        rotation.x = rot.x;
+        rotation.y = rot.y;
+        rotation.z = rot.z;
     }
 
-    bool IntersectObb(Obb2d obb) {
-        Vec2f axis1 = CalculateDirection();
-        Vec2f axis2 = GetRight();
-        Vec2f axis3 = obb.CalculateDirection();
-        Vec2f axis4 = obb.GetRight();
+    //bool IntersectObb(Obb2d obb) {
+    //    Vec2f axis1 = GetUp();
+    //    Vec2f axis2 = GetRight();
+    //    Vec2f axis3 = obb.CalculateDirection();
+    //    Vec2f axis4 = obb.GetRight();
 
-        float centersDistance = (GetCenter() - obb.GetCenter()).Magnitude();
+    //    float centersDistance = (GetCenter() - obb.GetCenter()).Magnitude();
 
-        if (centersDistance <= GetExtendOnAxis(axis1) + obb.GetExtendOnAxis(axis1))
-        {
-            return true;
-        }
-        if (centersDistance <= GetExtendOnAxis(axis2) + obb.GetExtendOnAxis(axis2))
-        {
-            return true;
-        }
-        if (centersDistance <= GetExtendOnAxis(axis3) + obb.GetExtendOnAxis(axis3))
-        {
-            return true;
-        }
-        if (centersDistance <= GetExtendOnAxis(axis4) + obb.GetExtendOnAxis(axis4))
-        {
-            return true;
-        }
+    //    if (centersDistance <= GetExtendOnAxis(axis1) + obb.GetExtendOnAxis(axis1))
+    //    {
+    //        return true;
+    //    }
+    //    if (centersDistance <= GetExtendOnAxis(axis2) + obb.GetExtendOnAxis(axis2))
+    //    {
+    //        return true;
+    //    }
+    //    if (centersDistance <= GetExtendOnAxis(axis3) + obb.GetExtendOnAxis(axis3))
+    //    {
+    //        return true;
+    //    }
+    //    if (centersDistance <= GetExtendOnAxis(axis4) + obb.GetExtendOnAxis(axis4))
+    //    {
+    //        return true;
+    //    }
 
-        return false;
-    }
+    //    return false;
+    //}
 
-    float GetExtendOnAxis(Vec2f axis) {
+    float GetExtendOnAxis(Vec3f axis) {
         float extend;
 
         if (axis == GetUp()) {
@@ -266,38 +269,43 @@ struct Obb3d {
             return extend;
         }
 
-        float rotationToAxis = Vec2f::AngleBetween(axis, CalculateDirection()).
+        if (axis == GetUp()) {
+            extend = 0.5f * (localUpperRightBound.x - localLowerLeftBound.x);
+            return extend;
+        }
+
+        float rotationToAxis = Vec3f::AngleBetween(axis, GetUp()).
             value();
         rotationToAxis = std::fmod(rotationToAxis, PI);
 
         if ((rotationToAxis >= 0 && rotationToAxis <= PI / 2) || (rotationToAxis >= -PI && rotationToAxis <= -PI / 2))
         {
-            Vec2f lowerLeftToTopRight = lowerLeftBound - upperRightBound;
+            Vec3f lowerLeftToTopRight = localLowerLeftBound - localUpperRightBound;
 
-            extend = (lowerLeftToTopRight.Magnitude() * Vec2f::AngleBetween(lowerLeftToTopRight, axis)).value();
+            extend = (lowerLeftToTopRight.Magnitude() * Vec3f::AngleBetween(lowerLeftToTopRight, axis)).value();
         }
         else
         {
-            Vec2f upperLeftBound = GetOppositeBound(upperRightBound, true);
-            Vec2 lowerRightToUpperLeft = (upperLeftBound - GetCenter()) * 2;
+            Vec3f upperLeftBound = GetOppositeBound(localUpperRightBound, true);
+            Vec3f lowerRightToUpperLeft = (upperLeftBound - GetCenter()) * 2;
 
-            extend = (lowerRightToUpperLeft.Magnitude() * Vec2f::AngleBetween(lowerRightToUpperLeft, axis)).value();
+            extend = (lowerRightToUpperLeft.Magnitude() * Vec3f::AngleBetween(lowerRightToUpperLeft, axis)).value();
         }
 
         return extend;
     }
 
-    Vec2f GetOppositeBound(Vec2f bound, bool isUpper) {
-        Vec2f centerToProjectionOnDir;
-        Vec2f oppositeBound;
-        Vec2f boundToOppositeBound;
-        Vec2f centerToBound = bound - GetCenter();
+    Vec3f GetOppositeBound(Vec3f bound, bool isUpper) {
+        Vec3f centerToProjectionOnDir;
+        Vec3f oppositeBound;
+        Vec3f boundToOppositeBound;
+        Vec3f centerToBound = bound - GetCenter();
 
         if (isUpper)
         {
             centerToProjectionOnDir =
-                CalculateDirection() * (centerToBound).Magnitude() *
-                Cos(Vec2f::AngleBetween(centerToBound, CalculateDirection()));
+                GetUp() * (centerToBound).Magnitude() *
+                Cos(Vec3f::AngleBetween(centerToBound, GetUp()));
             boundToOppositeBound =
                 GetCenter() + centerToProjectionOnDir - bound;
             oppositeBound = localUpperRightBound + boundToOppositeBound +
@@ -306,8 +314,8 @@ struct Obb3d {
         else
         {
             centerToProjectionOnDir =
-                CalculateDirection() * (centerToBound).Magnitude() *
-                Cos(Vec2f::AngleBetween(centerToBound, CalculateDirection())) * -1;
+                GetUp() * (centerToBound).Magnitude() *
+                Cos(Vec3f::AngleBetween(centerToBound, GetUp())) * -1;
             boundToOppositeBound =
                 GetCenter() + centerToProjectionOnDir - bound;
             oppositeBound = localLowerLeftBound + boundToOppositeBound +
@@ -317,66 +325,84 @@ struct Obb3d {
         return oppositeBound;
     }
 
-    Vec2f ProjectOnAxis(const Vec2f& axis)
+    Vec2f ProjectOnAxis(const Vec3f& axis)
     {
         float min = std::numeric_limits<float>::infinity();
         float max = -std::numeric_limits<float>::infinity();
-        std::array<Vec2f, 4> corners;
-        corners[0] = localLowerLeftBound.Rotate(rotation);
-        corners[1] = Vec2f(localUpperRightBound.x, localLowerLeftBound.y).Rotate(rotation);
-        corners[2] = Vec2f(localLowerLeftBound.x, localUpperRightBound.y).Rotate(rotation);
-        corners[3] = localUpperRightBound.Rotate(rotation);
+        std::array<Vec3f, 8> corners;
+        corners[0] = RotateAxis(Vec3f(localLowerLeftBound.x, localLowerLeftBound.y, localLowerLeftBound.z), rotation) + GetCenter();
+        corners[1] = RotateAxis(Vec3f(-localLowerLeftBound.x, localLowerLeftBound.y, localLowerLeftBound.z), rotation) + GetCenter();
+        corners[2] = RotateAxis(Vec3f(localLowerLeftBound.x, localLowerLeftBound.y, -localLowerLeftBound.z), rotation) + GetCenter();
+        corners[3] = RotateAxis(Vec3f(-localLowerLeftBound.x, localLowerLeftBound.y, -localLowerLeftBound.z), rotation) + GetCenter();
+        corners[4] = RotateAxis(Vec3f(localLowerLeftBound.x, -localLowerLeftBound.y, localLowerLeftBound.z), rotation) + GetCenter();
+        corners[5] = RotateAxis(Vec3f(-localLowerLeftBound.x, -localLowerLeftBound.y, localLowerLeftBound.z), rotation) + GetCenter();
+        corners[6] = RotateAxis(Vec3f(localLowerLeftBound.x, -localLowerLeftBound.y, -localLowerLeftBound.z), rotation) + GetCenter();
+        corners[7] = RotateAxis(Vec3f(-localLowerLeftBound.x, -localLowerLeftBound.y, -localLowerLeftBound.z), rotation) + GetCenter();
         for (auto& corner : corners) {
-            float projection = Vec2f::Dot(corner, axis);
+            float projection = Vec3f::Dot(corner, axis);
             if (projection < min) { min = projection; }
             if (projection > max) { max = projection; }
         }
         return Vec2f(min, max);
     }
 
-    std::array<Vec2f, 4> GetPerpendicularAxes(const std::array<Vec2f, 4>& vertices1, const std::array<Vec2f, 4>& vertices2)
+    bool IsOverlapping(Obb3d& obb1)
     {
-        std::array<Vec2f, 4> axes;
-
-        return axes;
-    }
-
-    bool IsOverlapping(Obb2d& obb1)
-    {
-        std::array<Vec2f, 4 > perpendicularAxis = { GetUp(), GetRight(), obb1.GetUp(), obb1.GetRight(), };
+        std::array<Vec3f, 6> perpendicularAxis = { GetUp(), GetRight(), GetForward(), obb1.GetUp(), obb1.GetRight(), obb1.GetForward(), };
         // we need to find the minimal overlap and axis on which it happens
-        float minOverlap = std::numeric_limits<float>::infinity();
-
         for (auto& axis : perpendicularAxis) {
             Vec2f proj1 = ProjectOnAxis(axis);
             Vec2f proj2 = obb1.ProjectOnAxis(axis);
 
-            float overlap = std::min(proj1.y, proj2.y) - std::max(proj1.x, proj2.x);
-            if (overlap == 0.f) { // shapes are not overlapping
+            if (!(proj1.x <= proj2.y && proj1.y >= proj2.x) || !(proj2.x <= proj1.y && proj2.y >= proj1.x))
+            {
                 return false;
-            }
-            else {
-                if (overlap < minOverlap) {
-                    minOverlap = overlap;
-                }
             }
         }
 
         return true;
     }
 
-    Vec3f GetUp()	///< return the normal of the upper side
+    Vec3f RotateAxis(Vec3f axis, RadianAngles rotation)	///< return the normal of the upper side
     {
-        Vec3f direction(1.0f, 0.0f, 0.0f);
-        Vec3f point(1.0f, 0.0f, 0.0f);
-        Mat3f rotateXMatrix = { Vec3f{1, 0, 0}, 0, Cos(rotation.x), -Sin(rotation.x), 0, Sin(rotation.x), Cos(rotation.x) }
-        
-        return direction;
+        EulerAngles euler(rotation.x, rotation.y, rotation.z);
+        Quaternion q = Quaternion::FromEuler(euler);
+        Vec3f newAxis;
+        newAxis.x = axis.x * (q.x * q.x + q.w * q.w - q.y * q.y - q.z * q.z) + axis.y * (2 * q.x * q.y - 2 * q.w * q.z) + axis.z * (2 * q.x * q.z + 2 * q.w * q.y);
+        newAxis.y = axis.x * (2 * q.w * q.z + 2 * q.x * q.y) + axis.y * (q.w * q.w - q.x * q.x + q.y * q.y - q.z * q.z) + axis.z * (-2 * q.w * q.x + 2 * q.y * q.z);
+        newAxis.z = axis.x * (-2 * q.w * q.y + 2 * q.x * q.z) + axis.y * (2 * q.w * q.x + 2 * q.y * q.z) + axis.z * (q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z);
+        return newAxis;
     }
 
+
+    EulerAngles ToEulerAngles(Quaternion q) {
+        EulerAngles angles;
+
+        // roll (x-axis rotation)
+        double sinr_cosp = 2 * (q.w * q.x + q.y * q.z);
+        double cosr_cosp = 1 - 2 * (q.x * q.x + q.y * q.y);
+        angles.x = static_cast<neko::radian_t>(std::atan2(sinr_cosp, cosr_cosp));
+
+        // pitch (y-axis rotation)
+        double sinp = 2 * (q.w * q.y - q.z * q.x);
+        if (std::abs(sinp) >= 1)
+            angles.y = static_cast<neko::radian_t>(std::copysign(M_PI / 2, sinp)); // use 90 degrees if out of range
+        else
+            angles.y = static_cast<neko::radian_t>(std::asin(sinp));
+
+        // yaw (z-axis rotation)
+        double siny_cosp = 2 * (q.w * q.z + q.x * q.y);
+        double cosy_cosp = 1 - 2 * (q.y * q.y + q.z * q.z);
+        angles.z = static_cast<neko::radian_t>(std::atan2(siny_cosp, cosy_cosp));
+
+        return angles;
+    }
+
+
 	Vec3f localLowerLeftBound;	///< the lower vertex
-	Vec3f localUpperRightBound;	///< the upper vertex
-    EulerAngles rotation;
+    Vec3f localUpperRightBound;	///< the upper vertex
+    Vec3f center;	///< the upper vertex
+    RadianAngles rotation;
 };
 
 
@@ -421,10 +447,7 @@ struct Aabb2d {
 
     ///\brief Set the AABB from OBB.
     void FromObb(Obb2d obb) {
-        FromCenterExtendsRotation(
-            obb.GetCenter(),
-            Vec2f(obb.GetExtendOnAxis(obb.GetRight()), obb.GetExtendOnAxis(obb.CalculateDirection())),
-            static_cast<degree_t>(obb.rotation));
+        FromCenterExtendsRotation(obb.GetCenter(), Vec2f(obb.GetExtendOnAxis(obb.GetRight()), obb.GetExtendOnAxis(obb.GetUp())),obb.rotation);
     }
 
     bool ContainsPoint(const Vec2f point) const {
@@ -498,7 +521,7 @@ struct Aabb3d {
     void FromCenterExtendsRotation(
         const Vec3f center,
         const Vec3f extends,
-        const EulerAngles rotation) {
+        const RadianAngles rotation) {
         Vec3f relativeLowerLeftBound = extends * -1.0f;
         Vec3f relativeUpperRightBound = extends;
         Vec3<radian_t> newAngle = Vec3<radian_t>{
@@ -543,10 +566,10 @@ struct Aabb3d {
         upperRightBound = relativeUpperRightBound + center;
     }
 
-    ////\brief Set the AABB3d from OBB3d.
-    //void FromObb(Obb3d obb) {
-    //	FromCenterExtendsRotation(obb.GetCenter(), obb.GetExtends(), Vec3f::AngleBetween<>(Vec3f(0, 1)));
-    //}
+    //\brief Set the AABB3d from OBB3d.
+    void FromObb(Obb3d obb) {
+    	FromCenterExtendsRotation(obb.GetCenter(), Vec3f(obb.GetExtendOnAxis(obb.GetRight()), obb.GetExtendOnAxis(obb.GetUp()), obb.GetExtendOnAxis(obb.GetForward())), obb.rotation);
+    }
 
     bool ContainsPoint(const Vec3f point) const {
         bool contains = point.x <= upperRightBound.x && point.x >= lowerLeftBound.x;

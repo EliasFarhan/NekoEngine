@@ -127,8 +127,8 @@ TEST(Engine, TestAabb)
     obb1.FromCenterExtendsRotation(neko::Vec2f(0, 0), neko::Vec2f(0.5, 0.5), angle);
     neko::Obb2d obb2;
     obb2.FromCenterExtendsRotation(neko::Vec2f(1, 1), neko::Vec2f(0.5, 0.5), angle);
-    std::cout << "OBB1 (" << obb1.localLowerLeftBound << " , " << obb1.localUpperRightBound << " , " << obb1.rotation << "); OBB2 (" << obb2.localLowerLeftBound << " , " << obb2.localUpperRightBound << " , " << obb2.rotation << ")  Intersect :" << obb1.IntersectObb(obb2) << "\n";
-    EXPECT_FALSE(obb1.IntersectObb(obb2));
+    std::cout << "OBB1 (" << obb1.localLowerLeftBound << " , " << obb1.localUpperRightBound << " , " << obb1.rotation << "); OBB2 (" << obb2.localLowerLeftBound << " , " << obb2.localUpperRightBound << " , " << obb2.rotation << ")  Intersect :" << obb1.IsOverlapping(obb2) << "\n";
+    EXPECT_FALSE(obb1.IsOverlapping(obb2));
 
     aabb1.FromObb(obb1);
     aabb2.FromObb(obb2);
@@ -154,18 +154,19 @@ TEST(Engine, TestAabb)
     std::cout << "AABB1 (" << aabb3.lowerLeftBound << " , " << aabb3.upperRightBound << "); Plane (" << origin3 << " , " << normal3 << ")  Intersect :" << aabb3.IntersectPlane(normal3, origin3) << "\n";
     EXPECT_TRUE(aabb3.IntersectPlane(normal3, origin3));
 
-    //neko::Obb2d obb3;
-    //obb3.FromCenterExtendsRotation(neko::Vec2f(0, 0), neko::Vec2f(0.5, 0.5), angle);
-    //neko::Obb2d obb4;
-    //obb4.FromCenterExtendsRotation(neko::Vec2f(1, 1), neko::Vec2f(0.5, 0.5), angle);
-    //std::cout << "OBB1 (" << obb3.localLowerLeftBound << " , " << obb3.localUpperRightBound << "); OBB2 (" << obb4.localLowerLeftBound << " , " << obb4.localUpperRightBound << ")  Intersect :" << obb3.IntersectObb(obb4) << "\n";
-    ////EXPECT_FALSE(obb3.IntersectObb(obb4));
+    neko::RadianAngles angles = neko::RadianAngles(static_cast<neko::radian_t>(0), static_cast<neko::radian_t>(0), static_cast<neko::radian_t>(neko::PI / 4));
+    neko::Obb3d obb3;
+    obb3.FromCenterExtendsRotation(neko::Vec3f(0, 0, 0), neko::Vec3f(0.5, 0.5, 0.5), angles);
+    neko::Obb3d obb4;
+    obb4.FromCenterExtendsRotation(neko::Vec3f(1, 1, 1), neko::Vec3f(0.5, 0.5, 0.5), angles);
+    std::cout << "OBB1 (" << obb3.localLowerLeftBound << " , " << obb3.localUpperRightBound << "); OBB2 (" << obb4.localLowerLeftBound << " , " << obb4.localUpperRightBound << ")  Intersect :" << obb3.IsOverlapping(obb4) << "\n";
+    EXPECT_FALSE(obb3.IsOverlapping(obb4));
 
-    //aabb3.FromObb(obb3);
-    //aabb4.FromObb(obb4);
-    //std::cout << "AABB1 (" << aabb3.lowerLeftBound << " , " << aabb3.upperRightBound << "); AABB2 (" << aabb4.lowerLeftBound << " , " << aabb4.upperRightBound << ")  Contains :" << aabb3.ContainsAabb(aabb4) << "  Intersect :" << aabb3.IntersectAabb(aabb4) << "\n";
-    //EXPECT_FALSE(aabb1.ContainsAabb(aabb2));
-    //EXPECT_TRUE(aabb1.IntersectAabb(aabb2));
+    aabb3.FromObb(obb3);
+    aabb4.FromObb(obb4);
+    std::cout << "AABB1 (" << aabb3.lowerLeftBound << " , " << aabb3.upperRightBound << "); AABB2 (" << aabb4.lowerLeftBound << " , " << aabb4.upperRightBound << ")  Contains :" << aabb3.ContainsAabb(aabb4) << "  Intersect :" << aabb3.IntersectAabb(aabb4) << "\n";
+    EXPECT_FALSE(aabb1.ContainsAabb(aabb2));
+    EXPECT_TRUE(aabb1.IntersectAabb(aabb2));
 }
 
     TEST(Engine, TestMatrix4)

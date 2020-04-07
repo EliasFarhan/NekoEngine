@@ -527,6 +527,7 @@ public:
     }
 
     static neko::radian_t AngleBetween(const Vec3& v1, const Vec3& v2);
+
 };
 //-----------------------------------------------------------------------------
 // Vec3 Aliases
@@ -564,6 +565,12 @@ neko::radian_t Vec3<T>::AngleBetween(const Vec3& v1, const Vec3& v2)
     const float det = v1.x * v2.y - v1.y * v2.x;
     const neko::radian_t angle = Atan2(det, dot);
     return angle;
+}
+
+template<typename T>
+Vec3<T> operator*(T lhs, const Vec3<T>& rhs)
+{
+    return Vec3<T>(rhs.x * lhs, rhs.y * lhs, rhs.z * lhs);
 }
 
 //-----------------------------------------------------------------------------
