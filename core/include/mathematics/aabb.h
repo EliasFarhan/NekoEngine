@@ -269,8 +269,8 @@ struct Obb3d {
             return extend;
         }
 
-        if (axis == GetUp()) {
-            extend = 0.5f * (localUpperRightBound.x - localLowerLeftBound.x);
+        if (axis == GetForward()) {
+            extend = 0.5f * (localUpperRightBound.z - localLowerLeftBound.z);
             return extend;
         }
 
@@ -373,31 +373,6 @@ struct Obb3d {
         newAxis.z = axis.x * (-2 * q.w * q.y + 2 * q.x * q.z) + axis.y * (2 * q.w * q.x + 2 * q.y * q.z) + axis.z * (q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z);
         return newAxis;
     }
-
-
-    EulerAngles ToEulerAngles(Quaternion q) {
-        EulerAngles angles;
-
-        // roll (x-axis rotation)
-        double sinr_cosp = 2 * (q.w * q.x + q.y * q.z);
-        double cosr_cosp = 1 - 2 * (q.x * q.x + q.y * q.y);
-        angles.x = static_cast<neko::radian_t>(std::atan2(sinr_cosp, cosr_cosp));
-
-        // pitch (y-axis rotation)
-        double sinp = 2 * (q.w * q.y - q.z * q.x);
-        if (std::abs(sinp) >= 1)
-            angles.y = static_cast<neko::radian_t>(std::copysign(M_PI / 2, sinp)); // use 90 degrees if out of range
-        else
-            angles.y = static_cast<neko::radian_t>(std::asin(sinp));
-
-        // yaw (z-axis rotation)
-        double siny_cosp = 2 * (q.w * q.z + q.x * q.y);
-        double cosy_cosp = 1 - 2 * (q.y * q.y + q.z * q.z);
-        angles.z = static_cast<neko::radian_t>(std::atan2(siny_cosp, cosy_cosp));
-
-        return angles;
-    }
-
 
 	Vec3f localLowerLeftBound;	///< the lower vertex
     Vec3f localUpperRightBound;	///< the upper vertex
@@ -524,43 +499,22 @@ struct Aabb3d {
         const RadianAngles rotation) {
         Vec3f relativeLowerLeftBound = extends * -1.0f;
         Vec3f relativeUpperRightBound = extends;
-        Vec3<radian_t> newAngle = Vec3<radian_t>{
-        rotation.x, rotation.y, rotation.z
-        };
-        std::array<Vec3f, 6> corners;
-        corners[0] = relativeLowerLeftBound;
-        corners[1] = upperRightBound;
-        corners[2] = Vec3f(relativeLowerLeftBound.x, relativeUpperRightBound.y, relativeUpperRightBound.z);
-        corners[3] = Vec3f(relativeLowerLeftBound.x, relativeLowerLeftBound.y, relativeUpperRightBound.z);
-        corners[4] = Vec3f(relativeUpperRightBound.x, relativeLowerLeftBound.y, relativeLowerLeftBound.z);
-        corners[5] = Vec3f(relativeUpperRightBound.x, relativeUpperRightBound.y, relativeLowerLeftBound.z);
-        const float cosAngleX = Cos(newAngle.x);
-        const float sinAngleX = Sin(newAngle.x);
-        const float cosAngleY = Cos(newAngle.y);
-        const float sinAngleY = Sin(newAngle.y);
-        const float cosAngleZ = Cos(newAngle.z);
-        const float sinAngleZ = Sin(newAngle.z);
+        std::array<Vec3f, 8> corners;
+        corners[0] = RotateAxis(Vec3f(relativeLowerLeftBound.x, relativeLowerLeftBound.y, relativeLowerLeftBound.z), rotation);
+        corners[1] = RotateAxis(Vec3f(-relativeLowerLeftBound.x, relativeLowerLeftBound.y, relativeLowerLeftBound.z), rotation);
+        corners[2] = RotateAxis(Vec3f(relativeLowerLeftBound.x, relativeLowerLeftBound.y, -relativeLowerLeftBound.z), rotation);
+        corners[3] = RotateAxis(Vec3f(-relativeLowerLeftBound.x, relativeLowerLeftBound.y, -relativeLowerLeftBound.z), rotation);
+        corners[4] = RotateAxis(Vec3f(relativeLowerLeftBound.x, -relativeLowerLeftBound.y, relativeLowerLeftBound.z), rotation);
+        corners[5] = RotateAxis(Vec3f(-relativeLowerLeftBound.x, -relativeLowerLeftBound.y, relativeLowerLeftBound.z), rotation);
+        corners[6] = RotateAxis(Vec3f(relativeLowerLeftBound.x, -relativeLowerLeftBound.y, -relativeLowerLeftBound.z), rotation);
+        corners[7] = RotateAxis(Vec3f(-relativeLowerLeftBound.x, -relativeLowerLeftBound.y, -relativeLowerLeftBound.z), rotation);
         for (Vec3f corner : corners) {
-            //Rotate around X
-            float x = corner.x * cosAngleX - corner.y * sinAngleX;
-            float y = corner.x * sinAngleX + corner.y * cosAngleX;
-            float z = corner.z;
-            corner = Vec3f(x, y, z);
-            //Rotate around Y
-            x = corner.x * cosAngleY + corner.z * sinAngleY;
-            y = corner.y;
-            z = -corner.x * sinAngleY + corner.z * cosAngleY;
-            corner = Vec3f(x, y, z);
-            //Rotate around Z
-            x = corner.x;
-            y = corner.y * cosAngleZ - corner.z * sinAngleZ;
-            z = corner.y * sinAngleZ + corner.z * cosAngleZ;
-            if (x > relativeUpperRightBound.x) { relativeUpperRightBound.x = x; }
-            if (x < relativeLowerLeftBound.x) { relativeLowerLeftBound.x = x; }
-            if (y > relativeUpperRightBound.y) { relativeUpperRightBound.y = y; }
-            if (y < relativeLowerLeftBound.y) { relativeLowerLeftBound.y = y; }
-            if (z > relativeUpperRightBound.z) { relativeUpperRightBound.z = z; }
-            if (z < relativeLowerLeftBound.z) { relativeLowerLeftBound.z = z; }
+            if (corner.x > relativeUpperRightBound.x) { relativeUpperRightBound.x = corner.x; }
+            if (corner.x < relativeLowerLeftBound.x) { relativeLowerLeftBound.x = corner.x; }
+            if (corner.y > relativeUpperRightBound.y) { relativeUpperRightBound.y = corner.y; }
+            if (corner.y < relativeLowerLeftBound.y) { relativeLowerLeftBound.y = corner.y; }
+            if (corner.z > relativeUpperRightBound.z) { relativeUpperRightBound.z = corner.z; }
+            if (corner.z < relativeLowerLeftBound.z) { relativeLowerLeftBound.z = corner.z; }
         }
         lowerLeftBound = relativeLowerLeftBound + center;
         upperRightBound = relativeUpperRightBound + center;
@@ -632,6 +586,18 @@ struct Aabb3d {
         float d = Vec3f::Dot(normal, point);
         float s = Vec3f::Dot(normal, center)-d;
         return std::abs(s) <= r;
+    }
+
+
+    Vec3f RotateAxis(Vec3f axis, RadianAngles rotation)	///< return the normal of the upper side
+    {
+        EulerAngles euler(rotation.x, rotation.y, rotation.z);
+        Quaternion q = Quaternion::FromEuler(euler);
+        Vec3f newAxis;
+        newAxis.x = axis.x * (q.x * q.x + q.w * q.w - q.y * q.y - q.z * q.z) + axis.y * (2 * q.x * q.y - 2 * q.w * q.z) + axis.z * (2 * q.x * q.z + 2 * q.w * q.y);
+        newAxis.y = axis.x * (2 * q.w * q.z + 2 * q.x * q.y) + axis.y * (q.w * q.w - q.x * q.x + q.y * q.y - q.z * q.z) + axis.z * (-2 * q.w * q.x + 2 * q.y * q.z);
+        newAxis.z = axis.x * (-2 * q.w * q.y + 2 * q.x * q.z) + axis.y * (2 * q.w * q.x + 2 * q.y * q.z) + axis.z * (q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z);
+        return newAxis;
     }
 
     Vec3f lowerLeftBound = Vec3f::zero; // the lower vertex
