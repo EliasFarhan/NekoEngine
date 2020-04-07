@@ -31,7 +31,7 @@ namespace neko {
 struct Obb2d {
     /// Get the center of the OBB.
     Vec2f GetCenter() const {
-        return 0.5f * (lowerLeftBound + upperRightBound);
+        return 0.5f * (localLowerLeftBound + localUpperRightBound);
     }
 
     /// Get the direction of the OBB rotated 90 degrees clockwise.
@@ -39,13 +39,17 @@ struct Obb2d {
 		return Vec2f(CalculateDirection().y,-CalculateDirection().x);
     }
 
-    /// Set the center, the extends and the rotation of the OBB.
-    void SetCenterExtendsRot(Vec2f center, Vec2f extends, degree_t rot) {
-        lowerLeftBound = center - extends;
-        upperRightBound = center + extends;
-		rotation = rot;
+    /// Get the direction of the OBB rotated 90 degrees clockwise.
+    Vec2f GetUp() {
+        return Vec2f(CalculateDirection());
     }
 
+    /// Set the center, the extends and the rotation of the OBB.
+    void FromCenterExtendsRotation(Vec2f center, Vec2f localExtends, degree_t rot) {
+        localLowerLeftBound = center - localExtends;
+        localUpperRightBound = center + localExtends;
+		rotation = rot;
+    }
 
     bool IntersectObb(Obb2d obb) {
         Vec2f axis1 = CalculateDirection();
@@ -78,13 +82,13 @@ struct Obb2d {
     float GetExtendOnAxis(Vec2f axis) {
         float extend;
 
-        if (axis == CalculateDirection()) {
-            extend = 0.5f * (upperRightBound.y - lowerLeftBound.y);
+        if (axis == GetUp()) {
+            extend = 0.5f * (localUpperRightBound.y - localLowerLeftBound.y);
             return extend;
         }
 
         if (axis == GetRight()) {
-            extend = 0.5f * (upperRightBound.x - lowerLeftBound.x);
+            extend = 0.5f * (localUpperRightBound.x - localLowerLeftBound.x);
             return extend;
         }
 		
@@ -122,7 +126,7 @@ struct Obb2d {
                 Cos(Vec2f::AngleBetween(centerToBound, CalculateDirection()));
             boundToOppositeBound =
                 GetCenter() + centerToProjectionOnDir - bound;
-            oppositeBound = upperRightBound + boundToOppositeBound +
+            oppositeBound = localUpperRightBound + boundToOppositeBound +
                             boundToOppositeBound;
         } else 
 		{
@@ -131,11 +135,59 @@ struct Obb2d {
                 Cos(Vec2f::AngleBetween(centerToBound, CalculateDirection())) * -1;
             boundToOppositeBound =
                 GetCenter() + centerToProjectionOnDir - bound;
-            oppositeBound = upperRightBound + boundToOppositeBound +
+            oppositeBound = localLowerLeftBound + boundToOppositeBound +
                             boundToOppositeBound;
         }
 
         return oppositeBound;
+    }
+
+    Vec2f ProjectOnAxis(const Vec2f& axis)
+    {
+        float min = std::numeric_limits<float>::infinity();
+        float max = -std::numeric_limits<float>::infinity();
+        std::array<Vec2f, 4> corners;
+        corners[0] = localLowerLeftBound.Rotate(rotation);
+        corners[1] = Vec2f(localUpperRightBound.x, localLowerLeftBound.y).Rotate(rotation);
+        corners[2] = Vec2f(localLowerLeftBound.x, localUpperRightBound.y).Rotate(rotation);
+        corners[3] = localUpperRightBound.Rotate(rotation);
+        for (auto& corner : corners) {
+            float projection = Vec2f::Dot(corner, axis);
+            if (projection < min) { min = projection; }
+            if (projection > max) { max = projection; }
+        }
+        return Vec2f(min, max);
+    }
+
+    std::array<Vec2f, 4> GetPerpendicularAxes(const std::array<Vec2f, 4>& vertices1, const std::array<Vec2f, 4>& vertices2)
+    {
+        std::array<Vec2f, 4> axes;
+
+        return axes;
+    }
+
+    bool IsOverlapping(Obb2d& obb1)
+    {
+        std::array<Vec2f, 4 > perpendicularAxis = { GetUp(), GetRight(), obb1.GetUp(), obb1.GetRight(), };
+        // we need to find the minimal overlap and axis on which it happens
+        float minOverlap = std::numeric_limits<float>::infinity();
+
+        for (auto& axis : perpendicularAxis) {
+            Vec2f proj1 = ProjectOnAxis(axis);
+            Vec2f proj2 = obb1.ProjectOnAxis(axis);
+
+            float overlap = std::min(proj1.y, proj2.y) - std::max(proj1.x, proj2.x);
+            if (overlap == 0.f) { // shapes are not overlapping
+                return false;
+            }
+            else {
+                if (overlap < minOverlap) {
+                    minOverlap = overlap;
+                }
+            }
+        }
+
+        return true;
     }
 
 	Vec2f CalculateDirection()	///< return the normal of the upper side
@@ -146,59 +198,185 @@ struct Obb2d {
 		return direction;
 	}
 
-    Vec2f lowerLeftBound;	///< the lower vertex
-    Vec2f upperRightBound;	///< the upper vertex
+    Vec2f localLowerLeftBound;	///< the lower vertex
+    Vec2f  localUpperRightBound;	///< the upper vertex
     radian_t rotation;       ///< the angle of rotation in rd
 };
 
 struct Obb3d {
+    Vec2f GetCenter() const {
+        return 0.5f * (localLowerLeftBound + localUpperRightBound);
+    }
 
-	/// Set the center, the extend and the rotations of the OBB.
-	void SetCenterExtendsRotZRotX(Vec3f center, Vec3f extend, degree_t rotz, degree_t rotx) {
-		lowerLeftBound = center - extend;
-		upperRightBound = center + extend;
-		rotationZ = rotz;
-		rotationX = rotx;
-	}
+    /// Get the direction of the OBB rotated 90 degrees clockwise.
+    Vec2f GetRight() {
+        return Vec2f(CalculateDirection().y, -CalculateDirection().x);
+    }
 
-	Vec3f CalculateDirection(){
-		return Vec3f(Cos(rotationZ), Sin(rotationX) + Sin(rotationZ), Cos(rotationX)).Normalized();		// TODO normalize vec3f
-	}
+    /// Get the direction of the OBB rotated 90 degrees clockwise.
+    Vec2f GetUp() {
+        return Vec2f(CalculateDirection());
+    }
 
-	bool IntersectObb(Obb3d obb)
-	{
-		Vec3f axis1 = GetDirection();
-		Vec3f axis2 = GetRight();
-		Vec3f axis3 = GetUp();
-		Vec3f axis4 = obb.GetDirection();
-		Vec3f axis5 = obb.GetRight();
-		Vec3f axis6 = obb.GetUp();
+    /// Set the center, the extends and the rotation of the OBB.
+    void FromCenterExtendsRotation(Vec2f center, Vec2f localExtends, degree_t rot) {
+        localLowerLeftBound = center - localExtends;
+        localUpperRightBound = center + localExtends;
+        rotation = rot;
+    }
 
-		return false;
-	}
+    bool IntersectObb(Obb2d obb) {
+        Vec2f axis1 = CalculateDirection();
+        Vec2f axis2 = GetRight();
+        Vec2f axis3 = obb.CalculateDirection();
+        Vec2f axis4 = obb.GetRight();
 
-	Vec3f GetDirection()
-	{
-		float x = Cos(rotationZ);
-		float y = Sin(rotationZ)+Sin(rotationX);
-		float z = Cos(rotationX);
-		// return Vec3f(x, y, z).Normalized;
-	}
+        float centersDistance = (GetCenter() - obb.GetCenter()).Magnitude();
 
-	Vec3f GetRight()
-	{
+        if (centersDistance <= GetExtendOnAxis(axis1) + obb.GetExtendOnAxis(axis1))
+        {
+            return true;
+        }
+        if (centersDistance <= GetExtendOnAxis(axis2) + obb.GetExtendOnAxis(axis2))
+        {
+            return true;
+        }
+        if (centersDistance <= GetExtendOnAxis(axis3) + obb.GetExtendOnAxis(axis3))
+        {
+            return true;
+        }
+        if (centersDistance <= GetExtendOnAxis(axis4) + obb.GetExtendOnAxis(axis4))
+        {
+            return true;
+        }
 
-	}
+        return false;
+    }
 
-	Vec3f GetUp()
-	{
+    float GetExtendOnAxis(Vec2f axis) {
+        float extend;
 
-	}
+        if (axis == GetUp()) {
+            extend = 0.5f * (localUpperRightBound.y - localLowerLeftBound.y);
+            return extend;
+        }
 
-	Vec3f lowerLeftBound;	///< the lower vertex
-	Vec3f upperRightBound;	///< the upper vertex
-	degree_t rotationZ;       ///< the angle of rotation on the Z axis in rd
-	degree_t rotationX;       ///< the angle of rotation on the X axis in rd
+        if (axis == GetRight()) {
+            extend = 0.5f * (localUpperRightBound.x - localLowerLeftBound.x);
+            return extend;
+        }
+
+        float rotationToAxis = Vec2f::AngleBetween(axis, CalculateDirection()).
+            value();
+        rotationToAxis = std::fmod(rotationToAxis, PI);
+
+        if ((rotationToAxis >= 0 && rotationToAxis <= PI / 2) || (rotationToAxis >= -PI && rotationToAxis <= -PI / 2))
+        {
+            Vec2f lowerLeftToTopRight = lowerLeftBound - upperRightBound;
+
+            extend = (lowerLeftToTopRight.Magnitude() * Vec2f::AngleBetween(lowerLeftToTopRight, axis)).value();
+        }
+        else
+        {
+            Vec2f upperLeftBound = GetOppositeBound(upperRightBound, true);
+            Vec2 lowerRightToUpperLeft = (upperLeftBound - GetCenter()) * 2;
+
+            extend = (lowerRightToUpperLeft.Magnitude() * Vec2f::AngleBetween(lowerRightToUpperLeft, axis)).value();
+        }
+
+        return extend;
+    }
+
+    Vec2f GetOppositeBound(Vec2f bound, bool isUpper) {
+        Vec2f centerToProjectionOnDir;
+        Vec2f oppositeBound;
+        Vec2f boundToOppositeBound;
+        Vec2f centerToBound = bound - GetCenter();
+
+        if (isUpper)
+        {
+            centerToProjectionOnDir =
+                CalculateDirection() * (centerToBound).Magnitude() *
+                Cos(Vec2f::AngleBetween(centerToBound, CalculateDirection()));
+            boundToOppositeBound =
+                GetCenter() + centerToProjectionOnDir - bound;
+            oppositeBound = localUpperRightBound + boundToOppositeBound +
+                boundToOppositeBound;
+        }
+        else
+        {
+            centerToProjectionOnDir =
+                CalculateDirection() * (centerToBound).Magnitude() *
+                Cos(Vec2f::AngleBetween(centerToBound, CalculateDirection())) * -1;
+            boundToOppositeBound =
+                GetCenter() + centerToProjectionOnDir - bound;
+            oppositeBound = localLowerLeftBound + boundToOppositeBound +
+                boundToOppositeBound;
+        }
+
+        return oppositeBound;
+    }
+
+    Vec2f ProjectOnAxis(const Vec2f& axis)
+    {
+        float min = std::numeric_limits<float>::infinity();
+        float max = -std::numeric_limits<float>::infinity();
+        std::array<Vec2f, 4> corners;
+        corners[0] = localLowerLeftBound.Rotate(rotation);
+        corners[1] = Vec2f(localUpperRightBound.x, localLowerLeftBound.y).Rotate(rotation);
+        corners[2] = Vec2f(localLowerLeftBound.x, localUpperRightBound.y).Rotate(rotation);
+        corners[3] = localUpperRightBound.Rotate(rotation);
+        for (auto& corner : corners) {
+            float projection = Vec2f::Dot(corner, axis);
+            if (projection < min) { min = projection; }
+            if (projection > max) { max = projection; }
+        }
+        return Vec2f(min, max);
+    }
+
+    std::array<Vec2f, 4> GetPerpendicularAxes(const std::array<Vec2f, 4>& vertices1, const std::array<Vec2f, 4>& vertices2)
+    {
+        std::array<Vec2f, 4> axes;
+
+        return axes;
+    }
+
+    bool IsOverlapping(Obb2d& obb1)
+    {
+        std::array<Vec2f, 4 > perpendicularAxis = { GetUp(), GetRight(), obb1.GetUp(), obb1.GetRight(), };
+        // we need to find the minimal overlap and axis on which it happens
+        float minOverlap = std::numeric_limits<float>::infinity();
+
+        for (auto& axis : perpendicularAxis) {
+            Vec2f proj1 = ProjectOnAxis(axis);
+            Vec2f proj2 = obb1.ProjectOnAxis(axis);
+
+            float overlap = std::min(proj1.y, proj2.y) - std::max(proj1.x, proj2.x);
+            if (overlap == 0.f) { // shapes are not overlapping
+                return false;
+            }
+            else {
+                if (overlap < minOverlap) {
+                    minOverlap = overlap;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    Vec3f GetUp()	///< return the normal of the upper side
+    {
+        Vec3f direction(1.0f, 0.0f, 0.0f);
+        Vec3f point(1.0f, 0.0f, 0.0f);
+        Mat3f rotateXMatrix = { Vec3f{1, 0, 0}, 0, Cos(rotation.x), -Sin(rotation.x), 0, Sin(rotation.x), Cos(rotation.x) }
+        
+        return direction;
+    }
+
+	Vec3f localLowerLeftBound;	///< the lower vertex
+	Vec3f localUpperRightBound;	///< the upper vertex
+    EulerAngles rotation;
 };
 
 
