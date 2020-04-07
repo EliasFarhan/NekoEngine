@@ -139,11 +139,11 @@ namespace neko
 						data_[i] = temp[i];
 					}
 
-					data_[size_ + 1] = elem;
+					data_[size_] = elem;
 					size_++;
 				}
 				else {
-					data_[size_ + 1] = elem;
+					data_[size_] = elem;
 					size_++;
 				}
 			}

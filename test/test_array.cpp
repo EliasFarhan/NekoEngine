@@ -26,11 +26,12 @@ namespace neko {
 		FreeListAllocator allocator(SIZE + ALLOCATOR_HEADER_SIZE, start);
 		DynArray<double> doubleArray(allocator);
 
-		for (int i = 0; i < SIZE; ++i)
-		{
-			doubleArray.Push(0.1 + i);
-		}
-		EXPECT_EQ(doubleArray[62], 0.1 + 62);
+
+		doubleArray.Push(0.1 + 62);
+		doubleArray.Push(0.1 + 52);
+		doubleArray.Push(0.1 + 12);
+		
+		EXPECT_EQ(doubleArray[2], 0.1 + 12);
 	}
 
 }// !neko
