@@ -875,7 +875,7 @@ SDL_PrivateAddMappingForGUID(SDL_JoystickGUID jGUID, const char *mappingString, 
         pControllerMapping->priority = priority;
 
         if (s_pSupportedControllers) {
-            /* Add the mapping to the End of the list */
+            /* Add the mapping to the end of the list */
             ControllerMapping_t *pCurrMapping, *pPrevMapping;
 
             for ( pPrevMapping = s_pSupportedControllers, pCurrMapping = pPrevMapping->next;

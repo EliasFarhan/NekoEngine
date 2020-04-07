@@ -193,7 +193,7 @@ SDL_DrawLines(SDL_Surface * dst, const SDL_Point * points, int count,
             continue;
         }
 
-        /* Draw the End if it was clipped */
+        /* Draw the end if it was clipped */
         draw_end = (x2 != points[i].x || y2 != points[i].y);
 
         func(dst, x1, y1, x2, y2, color, draw_end);

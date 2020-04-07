@@ -1068,7 +1068,7 @@ void luaV_execute (lua_State *L) {
         int b = GETARG_B(i);
         int c = GETARG_C(i);
         StkId rb;
-        L->top = base + c + 1;  /* mark the End of concat operands */
+        L->top = base + c + 1;  /* mark the end of concat operands */
         Protect(luaV_concat(L, c - b + 1));
         ra = RA(i);  /* 'luaV_concat' may invoke TMs and move the stack */
         rb = base + b;

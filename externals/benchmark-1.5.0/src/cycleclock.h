@@ -171,7 +171,7 @@ inline BENCHMARK_ALWAYS_INLINE int64_t Now() {
 #error You need to define CycleTimer for your OS and CPU
 #endif
 }
-}  // End namespace cycleclock
-}  // End namespace benchmark
+}  // end namespace cycleclock
+}  // end namespace benchmark
 
 #endif  // BENCHMARK_CYCLECLOCK_H_

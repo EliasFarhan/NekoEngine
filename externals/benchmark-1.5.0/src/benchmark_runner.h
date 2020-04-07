@@ -46,6 +46,6 @@ RunResults RunBenchmark(
 
 }  // namespace internal
 
-}  // End namespace benchmark
+}  // end namespace benchmark
 
 #endif  // BENCHMARK_RUNNER_H_

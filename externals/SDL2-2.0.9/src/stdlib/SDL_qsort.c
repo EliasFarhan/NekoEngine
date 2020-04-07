@@ -242,11 +242,11 @@ typedef struct { char * first; char * last; } stack_entry;
  *    all the potential portability pitfalls and problems
  *    I know of:
  *      - In one place (the insertion sort) I construct
- *        a pointer that points just past the End of the
+ *        a pointer that points just past the end of the
  *        supplied array, and assume that (a) it won't
  *        compare equal to any pointer within the array,
  *        and (b) it will compare equal to a pointer
- *        obtained by stepping off the End of the array.
+ *        obtained by stepping off the end of the array.
  *        These might fail on some segmented architectures.
  *      - I assume that there are 8 bits in a |char| when
  *        computing the size of stack needed. This would

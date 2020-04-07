@@ -483,7 +483,7 @@ static int read_line (lua_State *L, FILE *f, int chop) {
   luaL_Buffer b;
   int c = '\0';
   luaL_buffinit(L, &b);
-  while (c != EOF && c != '\n') {  /* repeat until End of line */
+  while (c != EOF && c != '\n') {  /* repeat until end of line */
     char *buff = luaL_prepbuffer(&b);  /* preallocate buffer */
     int i = 0;
     l_lockfile(f);  /* no memory errors can happen inside the lock */
@@ -553,7 +553,7 @@ static int g_read (lua_State *L, FILE *f, int first) {
           case 'l':  /* line */
             success = read_line(L, f, 1);
             break;
-          case 'L':  /* line with End-of-line */
+          case 'L':  /* line with end-of-line */
             success = read_line(L, f, 0);
             break;
           case 'a':  /* file */
@@ -655,7 +655,7 @@ static int f_write (lua_State *L) {
 
 static int f_seek (lua_State *L) {
   static const int mode[] = {SEEK_SET, SEEK_CUR, SEEK_END};
-  static const char *const modenames[] = {"set", "cur", "End", NULL};
+  static const char *const modenames[] = {"set", "cur", "end", NULL};
   FILE *f = tofile(L);
   int op = luaL_checkoption(L, 2, "cur", modenames);
   lua_Integer p3 = luaL_optinteger(L, 3, 0);

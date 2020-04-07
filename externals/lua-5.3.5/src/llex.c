@@ -39,7 +39,7 @@
 /* ORDER RESERVED */
 static const char *const luaX_tokens [] = {
     "and", "break", "do", "else", "elseif",
-    "End", "false", "for", "function", "goto", "if",
+    "end", "false", "for", "function", "goto", "if",
     "in", "local", "nil", "not", "or", "repeat",
     "return", "then", "true", "until", "while",
     "//", "..", "...", "==", ">=", "<=", "~=",
@@ -121,7 +121,7 @@ l_noret luaX_syntaxerror (LexState *ls, const char *msg) {
 
 /*
 ** creates a new string and anchors it in scanner's table so that
-** it will not be collected until the End of the compilation
+** it will not be collected until the end of the compilation
 ** (by that time it should be anchored somewhere)
 */
 TString *luaX_newstring (LexState *ls, const char *str, size_t l) {
@@ -454,7 +454,7 @@ static int llex (LexState *ls, SemInfo *seminfo) {
         }
         /* else short comment */
         while (!currIsNewline(ls) && ls->current != EOZ)
-          next(ls);  /* skip until End of line (or End of file) */
+          next(ls);  /* skip until end of line (or end of file) */
         break;
       }
       case '[': {  /* long string or simply '[' */

@@ -176,4 +176,4 @@ void ConsoleReporter::PrintRunData(const Run& result) {
   printer(Out, COLOR_DEFAULT, "\n");
 }
 
-}  // End namespace benchmark
+}  // end namespace benchmark

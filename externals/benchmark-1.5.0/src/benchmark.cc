@@ -304,7 +304,7 @@ std::unique_ptr<BenchmarkReporter> CreateReporter(
   }
 }
 
-}  // End namespace
+}  // end namespace
 
 bool IsZero(double n) {
   return std::abs(n) < std::numeric_limits<double>::epsilon();
@@ -334,7 +334,7 @@ ConsoleReporter::OutputOptions GetOutputOptions(bool force_no_color) {
   return static_cast<ConsoleReporter::OutputOptions>(output_opts);
 }
 
-}  // End namespace internal
+}  // end namespace internal
 
 size_t RunSpecifiedBenchmarks() {
   return RunSpecifiedBenchmarks(nullptr, nullptr);
@@ -476,7 +476,7 @@ int InitializeStreams() {
   return 0;
 }
 
-}  // End namespace internal
+}  // end namespace internal
 
 void Initialize(int* argc, char** argv) {
   internal::ParseCommandLineFlags(argc, argv);
@@ -491,4 +491,4 @@ bool ReportUnrecognizedArguments(int argc, char** argv) {
   return argc > 1;
 }
 
-}  // End namespace benchmark
+}  // end namespace benchmark

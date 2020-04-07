@@ -97,7 +97,7 @@ char *SDL_strtokr(char *s1, const char *s2, char **ptr)
         ++(*ptr);
     }
 
-    /* parsed to End of string */
+    /* parsed to end of string */
     return s1;
 #endif
 }

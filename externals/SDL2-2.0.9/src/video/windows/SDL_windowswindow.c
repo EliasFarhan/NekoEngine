@@ -517,7 +517,7 @@ WIN_GetWindowBordersSize(_THIS, SDL_Window * window, int *top, int *left, int *b
     GetWindowRect(hwnd, &rcWindow);
 
     /* convert the top/left values to make them relative to
-     * the window; they will End up being slightly negative */
+     * the window; they will end up being slightly negative */
     ptDiff.y = rcWindow.top;
     ptDiff.x = rcWindow.left;
 

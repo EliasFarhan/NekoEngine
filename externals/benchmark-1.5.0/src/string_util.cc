@@ -106,7 +106,7 @@ std::string ToBinaryStringFullySpecified(double value, double threshold,
   return mantissa + ExponentToPrefix(exponent, false);
 }
 
-}  // End namespace
+}  // end namespace
 
 void AppendHumanReadable(int n, std::string* str) {
   std::stringstream ss;
@@ -249,4 +249,4 @@ double stod(const std::string& str, size_t* pos) {
 }
 #endif
 
-}  // End namespace benchmark
+}  // end namespace benchmark

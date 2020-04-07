@@ -1238,7 +1238,7 @@ SDL_ResampleAudioStream(SDL_AudioStream *stream, const void *_inbuf, const int i
     const int paddingsamples = stream->resampler_padding_samples;
     const int paddingbytes = paddingsamples * sizeof (float);
     float *lpadding = (float *) stream->resampler_state;
-    const float *rpadding = (const float *) inbufend; /* we set this up so there are valid padding samples at the End of the input buffer. */
+    const float *rpadding = (const float *) inbufend; /* we set this up so there are valid padding samples at the end of the input buffer. */
     const int cpy = SDL_min(inbuflen, paddingbytes);
     int retval;
 
@@ -1246,7 +1246,7 @@ SDL_ResampleAudioStream(SDL_AudioStream *stream, const void *_inbuf, const int i
 
     retval = SDL_ResampleAudio(chans, inrate, outrate, lpadding, rpadding, inbuf, inbuflen, outbuf, outbuflen);
 
-    /* update our left padding with End of current input, for next run. */
+    /* update our left padding with end of current input, for next run. */
     SDL_memcpy((lpadding + paddingsamples) - (cpy / sizeof (float)), inbufend - cpy, cpy);
     return retval;
 }
@@ -1391,7 +1391,7 @@ SDL_AudioStreamPutInternal(SDL_AudioStream *stream, const void *buf, int len, in
        !!! FIXME:  converters will iterate over the data backwards if
        !!! FIXME:  the output grows, and this means we won't align if buflen
        !!! FIXME:  isn't a multiple of 16. In these cases, we should chop off
-       !!! FIXME:  a few samples at the End and convert them separately. */
+       !!! FIXME:  a few samples at the end and convert them separately. */
 
     /* no padding prepended on first run. */
     neededpaddingbytes = stream->resampler_padding_samples * sizeof (float);
@@ -1449,7 +1449,7 @@ SDL_AudioStreamPutInternal(SDL_AudioStream *stream, const void *buf, int len, in
     }
 
     if (stream->dst_rate != stream->src_rate) {
-        /* save off some samples at the End; they are used for padding now so
+        /* save off some samples at the end; they are used for padding now so
            the resampler is coherent and then used at the start of the next
            put operation. Prepend last put operation's padding, too. */
 
@@ -1459,7 +1459,7 @@ SDL_AudioStreamPutInternal(SDL_AudioStream *stream, const void *buf, int len, in
             buflen += paddingbytes;
         }
 
-        /* save off the data at the End for the next run. */
+        /* save off the data at the end for the next run. */
         SDL_memcpy(stream->resampler_padding, workbuf + (buflen - neededpaddingbytes), neededpaddingbytes);
 
         resamplebuf = workbuf + buflen;  /* skip to second piece of workbuf. */
@@ -1512,7 +1512,7 @@ SDL_AudioStreamPut(SDL_AudioStream *stream, const void *buf, int len)
        !!! FIXME:  converters will iterate over the data backwards if
        !!! FIXME:  the output grows, and this means we won't align if buflen
        !!! FIXME:  isn't a multiple of 16. In these cases, we should chop off
-       !!! FIXME:  a few samples at the End and convert them separately. */
+       !!! FIXME:  a few samples at the end and convert them separately. */
 
     #if DEBUG_AUDIOSTREAM
     printf("AUDIOSTREAM: wants to put %d preconverted bytes\n", buflen);

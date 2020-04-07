@@ -190,4 +190,4 @@ std::vector<BenchmarkReporter::Run> ComputeStats(
   return results;
 }
 
-}  // End namespace benchmark
+}  // end namespace benchmark

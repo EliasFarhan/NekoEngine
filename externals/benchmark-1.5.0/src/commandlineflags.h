@@ -68,6 +68,6 @@ bool IsFlag(const char* str, const char* flag);
 // some non-alphanumeric character. As a special case, also returns true if
 // value is the empty string.
 bool IsTruthyFlagValue(const std::string& value);
-}  // End namespace benchmark
+}  // end namespace benchmark
 
 #endif  // BENCHMARK_COMMANDLINEFLAGS_H_

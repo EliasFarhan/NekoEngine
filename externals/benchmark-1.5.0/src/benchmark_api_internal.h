@@ -47,7 +47,7 @@ bool IsZero(double n);
 
 ConsoleReporter::OutputOptions GetOutputOptions(bool force_no_color = false);
 
-}  // End namespace internal
-}  // End namespace benchmark
+}  // end namespace internal
+}  // end namespace benchmark
 
 #endif  // BENCHMARK_API_INTERNAL_H

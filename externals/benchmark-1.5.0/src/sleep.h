@@ -10,6 +10,6 @@ const int kNumNanosPerSecond = kNumNanosPerMicro * kNumMicrosPerSecond;
 
 void SleepForMilliseconds(int milliseconds);
 void SleepForSeconds(double seconds);
-}  // End namespace benchmark
+}  // end namespace benchmark
 
 #endif  // BENCHMARK_SLEEP_H_

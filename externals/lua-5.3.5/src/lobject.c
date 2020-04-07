@@ -131,7 +131,7 @@ void luaO_arith (lua_State *L, int op, const TValue *p1, const TValue *p2,
         setivalue(res, intarith(L, op, i1, i2));
         return;
       }
-      else break;  /* go to the End */
+      else break;  /* go to the end */
     }
     case LUA_OPDIV: case LUA_OPPOW: {  /* operate only on floats */
       lua_Number n1; lua_Number n2;
@@ -139,7 +139,7 @@ void luaO_arith (lua_State *L, int op, const TValue *p1, const TValue *p2,
         setfltvalue(res, numarith(L, op, n1, n2));
         return;
       }
-      else break;  /* go to the End */
+      else break;  /* go to the end */
     }
     default: {  /* other operations */
       lua_Number n1; lua_Number n2;
@@ -151,7 +151,7 @@ void luaO_arith (lua_State *L, int op, const TValue *p1, const TValue *p2,
         setfltvalue(res, numarith(L, op, n1, n2));
         return;
       }
-      else break;  /* go to the End */
+      else break;  /* go to the end */
     }
   }
   /* could not perform raw operation; try metamethod */

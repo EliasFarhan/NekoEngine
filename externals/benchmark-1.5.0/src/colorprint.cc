@@ -80,7 +80,7 @@ PlatformColorCode GetPlatformColorCode(LogColor color) {
 #endif
 }
 
-}  // End namespace
+}  // end namespace
 
 std::string FormatString(const char* msg, va_list args) {
   // we might need a second shot at this, so pre-emptivly make a copy
@@ -185,4 +185,4 @@ bool IsColorTerminal() {
 #endif  // BENCHMARK_OS_WINDOWS
 }
 
-}  // End namespace benchmark
+}  // end namespace benchmark

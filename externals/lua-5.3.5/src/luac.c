@@ -76,15 +76,15 @@ static int doargs(int argc, char* argv[])
  if (argv[0]!=NULL && *argv[0]!=0) progname=argv[0];
  for (i=1; i<argc; i++)
  {
-  if (*argv[i]!='-')			/* End of options; keep it */
+  if (*argv[i]!='-')			/* end of options; keep it */
    break;
-  else if (IS("--"))			/* End of options; skip it */
+  else if (IS("--"))			/* end of options; skip it */
   {
    ++i;
    if (version) ++version;
    break;
   }
-  else if (IS("-"))			/* End of options; use stdin */
+  else if (IS("-"))			/* end of options; use stdin */
    break;
   else if (IS("-l"))			/* list */
    ++listing;
@@ -117,7 +117,7 @@ static int doargs(int argc, char* argv[])
  return i;
 }
 
-#define FUNCTION "(function()End)();"
+#define FUNCTION "(function()end)();"
 
 static const char* reader(lua_State *L, void *ud, size_t *size)
 {

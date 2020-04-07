@@ -466,7 +466,7 @@ class State {
   // Returns iterators used to run each iteration of a benchmark using a
   // C++11 ranged-based for loop. These functions should not be called directly.
   //
-  // REQUIRES: The benchmark has not started running yet. Neither Begin nor End
+  // REQUIRES: The benchmark has not started running yet. Neither begin nor end
   // have been called previously.
   //
   // NOTE: KeepRunning may not be used after calling either of these functions.
@@ -525,7 +525,7 @@ class State {
   // If the ranged-for style of benchmark loop is used, the user must explicitly
   // break from the loop, otherwise all future iterations will be run.
   // If the 'KeepRunning()' loop is used the current thread will automatically
-  // exit the loop at the End of the current iteration.
+  // exit the loop at the end of the current iteration.
   //
   // For threaded benchmarks only the current thread stops executing and future
   // calls to `KeepRunning()` will block until all threads have completed
@@ -548,7 +548,7 @@ class State {
   void SetIterationTime(double seconds);
 
   // Set the number of bytes processed by the current benchmark
-  // execution.  This routine is typically called once at the End of a
+  // execution.  This routine is typically called once at the end of a
   // throughput oriented benchmark.
   //
   // REQUIRES: a benchmark has exited its benchmarking loop.
@@ -578,7 +578,7 @@ class State {
 
   // If this routine is called with items > 0, then an items/s
   // label is printed on the benchmark report line for the currently
-  // executing benchmark. It is typically called at the End of a processing
+  // executing benchmark. It is typically called at the end of a processing
   // benchmark where a processing items/second output is desired.
   //
   // REQUIRES: a benchmark has exited its benchmarking loop.
@@ -596,7 +596,7 @@ class State {
   }
 
   // If this routine is called, the specified label is printed at the
-  // End of the benchmark report line for the currently executing
+  // end of the benchmark report line for the currently executing
   // benchmark.  Example:
   //  static void BM_Compress(benchmark::State& state) {
   //    ...

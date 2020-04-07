@@ -151,4 +151,4 @@ void CSVReporter::PrintRunData(const Run& run) {
   Out << '\n';
 }
 
-}  // End namespace benchmark
+}  // end namespace benchmark

@@ -48,4 +48,4 @@ void SleepForSeconds(double seconds) {
   SleepForMicroseconds(static_cast<int>(seconds * kNumMicrosPerSecond));
 }
 #endif  // BENCHMARK_OS_WINDOWS
-}  // End namespace benchmark
+}  // end namespace benchmark

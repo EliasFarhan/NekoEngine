@@ -102,4 +102,4 @@ double BenchmarkReporter::Run::GetAdjustedCPUTime() const {
   return new_time;
 }
 
-}  // End namespace benchmark
+}  // end namespace benchmark

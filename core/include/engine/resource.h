@@ -31,7 +31,7 @@ class ResourceManager
     const T* GetResource(ResourceId resourceId)
     {
         const auto resourcePair = resourceMap_.find(resourceId);
-        if (resourcePair != resourceMap_.End())
+        if (resourcePair != resourceMap_.end())
         {
             return resourcePair->second;
         }

@@ -791,7 +791,7 @@ ConvertAltivec32to32_noprefetch(SDL_BlitInfo * info)
 
         SDL_assert(width == 0);
 
-        /* cover pixels at the End of the row that didn't fit in 16 bytes. */
+        /* cover pixels at the end of the row that didn't fit in 16 bytes. */
         while (extrawidth) {
             bits = *(src++);    /* max 7 pixels, don't bother with prefetch. */
             RGBA_FROM_8888(bits, srcfmt, r, g, b, a);
@@ -886,7 +886,7 @@ ConvertAltivec32to32_prefetch(SDL_BlitInfo * info)
 
         SDL_assert(width == 0);
 
-        /* cover pixels at the End of the row that didn't fit in 16 bytes. */
+        /* cover pixels at the end of the row that didn't fit in 16 bytes. */
         while (extrawidth) {
             bits = *(src++);    /* max 7 pixels, don't bother with prefetch. */
             RGBA_FROM_8888(bits, srcfmt, r, g, b, a);

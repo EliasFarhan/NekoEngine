@@ -94,7 +94,7 @@ std::string FormatKV(std::string const& key, double value) {
 
 int64_t RoundDouble(double v) { return static_cast<int64_t>(v + 0.5); }
 
-}  // End namespace
+}  // end namespace
 
 bool JSONReporter::ReportContext(const Context& context) {
   std::ostream& out = GetOutputStream();
@@ -250,4 +250,4 @@ void JSONReporter::PrintRunData(Run const& run) {
   out << '\n';
 }
 
-}  // End namespace benchmark
+}  // end namespace benchmark

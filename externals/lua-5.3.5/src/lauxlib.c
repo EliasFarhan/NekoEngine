@@ -693,7 +693,7 @@ static int skipcomment (LoadF *lf, int *cp) {
     do {  /* skip first line */
       c = getc(lf->f);
     } while (c != EOF && c != '\n');
-    *cp = getc(lf->f);  /* skip End-of-line, if present */
+    *cp = getc(lf->f);  /* skip end-of-line, if present */
     return 1;  /* there was a comment */
   }
   else return 0;  /* no comment */

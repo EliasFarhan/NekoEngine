@@ -43,6 +43,6 @@ inline double ChronoClockNow() {
 
 std::string LocalDateTimeString();
 
-}  // End namespace benchmark
+}  // end namespace benchmark
 
 #endif  // BENCHMARK_TIMERS_H

@@ -302,13 +302,13 @@ public:
         {
             std::array<float,8> values;
 
-            std::generate(values.Begin(), values.End(),floatRand);
+            std::generate(values.begin(), values.end(),floatRand);
             transform.positionsX = _mm256_load_ps(&values[0]);
-            std::generate(values.Begin(), values.End(),floatRand);
+            std::generate(values.begin(), values.end(),floatRand);
             transform.positionsY = _mm256_load_ps(&values[0]);
-            std::generate(values.Begin(), values.End(),floatRand);
+            std::generate(values.begin(), values.end(),floatRand);
             transform.positionsZ = _mm256_load_ps(&values[0]);
-            std::generate(values.Begin(), values.End(),floatRand);
+            std::generate(values.begin(), values.end(),floatRand);
             transform.positionsW = _mm256_load_ps(&values[0]);
 
         }
@@ -355,13 +355,13 @@ public:
 		{
 			std::array<float, 8> values;
 
-			std::generate(values.Begin(), values.End(), floatRand);
+			std::generate(values.begin(), values.end(), floatRand);
 			transform.positionsX = _mm_load_ps(&values[0]);
-			std::generate(values.Begin(), values.End(), floatRand);
+			std::generate(values.begin(), values.end(), floatRand);
 			transform.positionsY = _mm_load_ps(&values[0]);
-			std::generate(values.Begin(), values.End(), floatRand);
+			std::generate(values.begin(), values.end(), floatRand);
 			transform.positionsZ = _mm_load_ps(&values[0]);
-			std::generate(values.Begin(), values.End(), floatRand);
+			std::generate(values.begin(), values.end(), floatRand);
 			transform.positionsW = _mm_load_ps(&values[0]);
 
 		}

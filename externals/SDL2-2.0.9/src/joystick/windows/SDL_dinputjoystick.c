@@ -383,7 +383,7 @@ SDL_IsXInputDevice(const GUID* pGuidProductFromDirectInput)
     }
 
     /* Go through RAWINPUT (WinXP and later) to find HID devices. */
-    /* Cache this if we End up using it. */
+    /* Cache this if we end up using it. */
     if (SDL_RawDevList == NULL) {
         if ((GetRawInputDeviceList(NULL, &SDL_RawDevListCount, sizeof(RAWINPUTDEVICELIST)) == -1) || (!SDL_RawDevListCount)) {
             return SDL_FALSE;  /* oh well. */

@@ -315,7 +315,7 @@ SDL_ReserveSpaceInDataQueue(SDL_DataQueue *queue, const size_t len)
     packet = queue->head;
     if (packet) {
         const size_t avail = queue->packet_size - packet->datalen;
-        if (len <= avail) {  /* we can use the space at End of this packet. */
+        if (len <= avail) {  /* we can use the space at end of this packet. */
             void *retval = packet->data + packet->datalen;
             packet->datalen += len;
             queue->queued_bytes += len;

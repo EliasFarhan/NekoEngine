@@ -32,6 +32,6 @@ double StatisticsMean(const std::vector<double>& v);
 double StatisticsMedian(const std::vector<double>& v);
 double StatisticsStdDev(const std::vector<double>& v);
 
-}  // End namespace benchmark
+}  // end namespace benchmark
 
 #endif  // STATISTICS_H_

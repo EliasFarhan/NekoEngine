@@ -54,6 +54,6 @@ using std::stoi;
 using std::stod;
 #endif
 
-}  // End namespace benchmark
+}  // end namespace benchmark
 
 #endif  // BENCHMARK_STRING_UTIL_H_

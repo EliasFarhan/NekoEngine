@@ -103,7 +103,7 @@ double atan(double x)
 		id = 3; x  = -1.0/x;
 	    }
 	}}
-    /* End of argument reduction */
+    /* end of argument reduction */
 	z = x*x;
 	w = z*z;
     /* break sum from i=0 to 10 aT[i]z**(i+1) into odd and even poly */

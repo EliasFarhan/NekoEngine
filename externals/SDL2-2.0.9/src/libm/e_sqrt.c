@@ -75,7 +75,7 @@
  *	sqrt(-ve) = NaN		... with invalid signal
  *	sqrt(NaN) = NaN		... with invalid signal for signaling NaN
  *
- * Other methods : see the appended file at the End of the program below.
+ * Other methods : see the appended file at the end of the program below.
  *---------------
  */
 

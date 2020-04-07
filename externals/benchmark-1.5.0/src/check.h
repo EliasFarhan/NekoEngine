@@ -48,8 +48,8 @@ class CheckHandler {
   LogType& log_;
 };
 
-}  // End namespace internal
-}  // End namespace benchmark
+}  // end namespace internal
+}  // end namespace benchmark
 
 // The CHECK macro returns a std::ostream object that can have extra information
 // written to it.

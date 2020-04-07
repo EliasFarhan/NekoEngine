@@ -153,6 +153,6 @@ inline bool Regex::Match(const std::string& str) {
 }
 #endif
 
-}  // End namespace benchmark
+}  // end namespace benchmark
 
 #endif  // BENCHMARK_RE_H_

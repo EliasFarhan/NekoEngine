@@ -32,7 +32,7 @@ class Window : public SystemInterface
 public:
     virtual void GenerateUiFrame() = 0;
     /**
-     * \brief Called at the End of a graphics frame to switch the double
+     * \brief Called at the end of a graphics frame to switch the double
      */
     virtual void SwapBuffer() = 0;
     /**

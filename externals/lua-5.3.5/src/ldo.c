@@ -674,7 +674,7 @@ LUA_API int lua_resume (lua_State *L, lua_State *from, int nargs) {
       seterrorobj(L, status, L->top);  /* push error message */
       L->ci->top = L->top;
     }
-    else lua_assert(status == L->status);  /* normal End or yield */
+    else lua_assert(status == L->status);  /* normal end or yield */
   }
   L->nny = oldnny;  /* restore 'nny' */
   L->nCcalls--;

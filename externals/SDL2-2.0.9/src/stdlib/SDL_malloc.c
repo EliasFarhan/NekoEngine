@@ -340,7 +340,7 @@ MORECORE                  default: sbrk
   though. Internally, we only call it with arguments less than half
   the max value of a size_t, which should work across all reasonable
   possibilities, although sometimes generating compiler warnings.  See
-  near the End of this file for guidelines for creating a custom
+  near the end of this file for guidelines for creating a custom
   version of MORECORE.
 
 MORECORE_CONTIGUOUS       default: 1 (true)
@@ -993,7 +993,7 @@ extern "C"
   malloc_trim(size_t pad);
 
   If possible, gives memory back to the system (via negative arguments
-  to sbrk) if there is unused memory at the `high' End of the malloc
+  to sbrk) if there is unused memory at the `high' end of the malloc
   pool or in unused MMAP segments. You can call this after freeing
   large blocks of memory to potentially reduce the system-level memory
   requirements of a program. However, it cannot guarantee to reduce
@@ -1185,7 +1185,7 @@ extern "C"
 #endif                          /* MSPACES */
 
 #ifdef __cplusplus
-};                              /* End of extern "C" */
+};                              /* end of extern "C" */
 #endif /* __cplusplus */
 
 /*
@@ -1589,7 +1589,7 @@ static MLOCK_T magic_init_mutex;
   originally described by Knuth.  (See the paper by Paul Wilson
   ftp://ftp.cs.utexas.edu/pub/garbage/allocsrv.ps for a survey of such
   techniques.)  Sizes of free chunks are stored both in the front of
-  each chunk and at the End.  This makes consolidating fragmented
+  each chunk and at the end.  This makes consolidating fragmented
   chunks into bigger chunks fast.  The head fields also hold bits
   representing whether chunks are free or in use.
 
@@ -1655,7 +1655,7 @@ static MLOCK_T magic_init_mutex;
   chunks are free, and if so, unlink them from the lists that they
   are on and merge them with the current chunk.
 
-  Chunks always Begin on even word boundaries, so the mem portion
+  Chunks always begin on even word boundaries, so the mem portion
   (which is returned to the user) is also on an even word boundary, and
   thus at least double-word aligned.
 
@@ -1691,7 +1691,7 @@ static MLOCK_T magic_init_mutex;
   The exceptions to all this are
 
      1. The special chunk `top' is the top-most available chunk (i.e.,
-        the one bordering the End of available memory). It is treated
+        the one bordering the end of available memory). It is treated
         specially.  Top is never included in any bin, is used only if
         no other chunk is available, and is released back to the
         system if it is very large (see M_TRIM_THRESHOLD).  In effect,
@@ -2215,7 +2215,7 @@ has_segment_link(mstate m, msegmentptr ss)
 #endif /* MORECORE_CANNOT_TRIM */
 
 /*
-  TOP_FOOT_SIZE is padding at the End of a segment, including space
+  TOP_FOOT_SIZE is padding at the end of a segment, including space
   that may be needed to place segment records and fenceposts when new
   noncontiguous segments are added.
 */
@@ -3545,7 +3545,7 @@ sys_alloc(mstate m, size_t nb)
                 asize =
                     granularity_align(nb + TOP_FOOT_SIZE + MALLOC_ALIGNMENT +
                                       SIZE_T_ONE);
-                /* Adjust to End on a page boundary */
+                /* Adjust to end on a page boundary */
                 if (!is_page_aligned(base))
                     asize += (page_align((size_t) base) - (size_t) base);
                 /* Can't call MORECORE if size is negative when treated as signed */
@@ -3770,7 +3770,7 @@ sys_trim(mstate m, size_t pad)
                         extra = (HALF_MAX_SIZE_T) + SIZE_T_ONE - unit;
                     ACQUIRE_MORECORE_LOCK();
                     {
-                        /* Make sure End of memory is where we last set it. */
+                        /* Make sure end of memory is where we last set it. */
                         char *old_br = (char *) (CALL_MORECORE(0));
                         if (old_br == sp->base + sp->size) {
                             char *rel_br = (char *) (CALL_MORECORE(-extra));
@@ -4053,7 +4053,7 @@ internal_memalign(mstate m, size_t alignment, size_t bytes)
                 p = newp;
             }
 
-            /* Give back spare room at the End */
+            /* Give back spare room at the end */
             if (!is_mmapped(p)) {
                 size_t size = chunksize(p);
                 if (size > nb + MIN_CHUNK_SIZE) {
@@ -5037,7 +5037,7 @@ mspace_mallopt(int param_number, int value)
   * MORECORE may allocate more memory than requested. (Or even less,
       but this will usually result in a malloc failure.)
   * MORECORE must not allocate memory when given argument zero, but
-      instead return one past the End address of memory from previous
+      instead return one past the end address of memory from previous
       nonzero call.
   * For best performance, consecutive calls to MORECORE with positive
       arguments should return increasing addresses, indicating that

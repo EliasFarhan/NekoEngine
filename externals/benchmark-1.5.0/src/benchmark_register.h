@@ -31,7 +31,7 @@ AddPowers(std::vector<T>* dst, T lo, T hi, int mult) {
     if (i > kmax / mult) break;
   }
 
-  return dst->Begin() + start_offset;
+  return dst->begin() + start_offset;
 }
 
 template <typename T>
@@ -50,8 +50,8 @@ void AddNegatedPowers(std::vector<T>* dst, T lo, T hi, int mult) {
 
   const auto it = AddPowers(dst, hi_complement, lo_complement, mult);
 
-  std::for_each(it, dst->End(), [](T& t) { t *= -1; });
-  std::reverse(it, dst->End());
+  std::for_each(it, dst->end(), [](T& t) { t *= -1; });
+  std::reverse(it, dst->end());
 }
 
 template <typename T>

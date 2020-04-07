@@ -50,6 +50,6 @@ struct LeastSq {
 // Function to return an string for the calculated complexity
 std::string GetBigOString(BigO complexity);
 
-}  // End namespace benchmark
+}  // end namespace benchmark
 
 #endif  // COMPLEXITY_H_

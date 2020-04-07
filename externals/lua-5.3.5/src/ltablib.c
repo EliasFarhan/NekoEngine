@@ -81,7 +81,7 @@ static int tinsert (lua_State *L) {
   lua_Integer pos;  /* where to insert new element */
   switch (lua_gettop(L)) {
     case 2: {  /* called with only 2 arguments */
-      pos = e;  /* insert new element at the End */
+      pos = e;  /* insert new element at the end */
       break;
     }
     case 3: {
