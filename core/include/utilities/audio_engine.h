@@ -1,5 +1,5 @@
-#ifndef _AUDIO_ENGINE_H_	//Prevents multiple definition of the objects
-#define _AUDIO_ENGINE_H_
+#pragma once
+
 
 #include <mathematics/vector.h>
 #include <string_view>
@@ -41,4 +41,3 @@ private:
     EventMap eventMap;
     BankMap bankMap;
 };
-#endif

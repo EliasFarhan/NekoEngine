@@ -116,7 +116,12 @@ if(Neko_Fmod)
 
 	set(Fmod_VERSION 2.00.08)
 	set(Fmod_DIR "${EXTERNAL_DIR}/Fmod-${Fmod_VERSION}")
-	add_subdirectory("${Fmod_DIR}")
+	if(UNIX)
+			include_directories("${EXTERNAL_DIR}/Fmod-${Fmod_VERSION}/linux/api/core/inc/" "${EXTERNAL_DIR}/Fmod-${Fmod_VERSION}/linux/api/studio/inc/")
+	else()
+			include_directories("${EXTERNAL_DIR}/Fmod-${Fmod_VERSION}/win/api/core/inc/" "${EXTERNAL_DIR}/Fmod-${Fmod_VERSION}/win/api/studio/inc/")
+	endif()
+    add_subdirectory("common/fmod_wrapper")
 
 endif()
 

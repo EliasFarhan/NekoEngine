@@ -1,0 +1,6 @@
+file(GLOB_RECURSE fmod_wrapper_src include/*.h src/*.cpp)
+add_library(fmod_wrapper STATIC ${fmod_wrapper_src})
+target_link_libraries(fmod_wrapper ${fmod_wrapper_libs} Neko_Core)
+target_include_directories(fmod_wrapper PUBLIC "include/")
+neko_lib_config(fmod_wrapper)
+set_target_properties (fmod_wrapper PROPERTIES FOLDER Neko)
