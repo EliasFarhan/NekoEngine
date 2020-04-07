@@ -31,7 +31,7 @@ namespace neko {
 		doubleArray.Push(0.1 + 52);
 		doubleArray.Push(0.1 + 12);
 		
-		EXPECT_EQ(doubleArray[2], 0.1 + 12);
+		EXPECT_EQ(doubleArray[1], 0.1 + 52);
 	}
 
 }// !neko

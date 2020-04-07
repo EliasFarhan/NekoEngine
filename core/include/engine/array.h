@@ -126,18 +126,10 @@ namespace neko
 			}
 			else {
 				if (size_ + 1 > capacity_) {
-					SmallVector<T> temp(size_);
-					for (int i = 0; i < size_; ++i) {
-						temp[i] = data_[i];
-					}
 
 					allocator_.Deallocate(data_);
 					capacity_ *= 2;
 					data_ = (T*)allocator_.Allocate(sizeof(T) * capacity_, alignof(T));
-
-					for (int i = 0; i < size_; ++i) {
-						data_[i] = temp[i];
-					}
 
 					data_[size_] = elem;
 					size_++;
