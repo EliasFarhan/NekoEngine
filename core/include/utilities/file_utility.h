@@ -41,7 +41,9 @@ namespace neko
 
         void Load(std::string_view path);
         void Destroy();
-		
+
+        bool operator==(const BufferFile& bufferFile) const;
+
 	};
 
 bool FileExists(const std::string_view filename);

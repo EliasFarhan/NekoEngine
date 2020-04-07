@@ -25,6 +25,10 @@
 #include <sstream>
 #include <functional>
 #include "engine/log.h"
+#ifdef EASY_PROFILE_USE
+#include "easy/profiler.h"
+#include <easy/arbitrary_value.h> // EASY_VALUE, EASY_ARRAY are defined here
+#endif
 
 #if defined(__ANDROID__)
 #include <android/asset_manager.h>
@@ -132,7 +136,16 @@ namespace neko
 {
 void BufferFile::Load(std::string_view path)
 {
+#ifdef EASY_PROFILE_USE
+	EASY_BLOCK("LoadFunction", profiler::colors::Blue600);
+#endif
+#ifdef EASY_PROFILE_USE
+	EASY_BLOCK("Ifstream", profiler::colors::Blue600);
+#endif
 	std::ifstream is(path.data(),std::ifstream::binary);
+#ifdef EASY_PROFILE_USE
+	EASY_END_BLOCK;
+#endif
 	if(!is)
 	{
 		std::ostringstream oss;
@@ -142,6 +155,9 @@ void BufferFile::Load(std::string_view path)
 	}
 	if(is)
 	{
+#ifdef EASY_PROFILE_USE
+		EASY_BLOCK("Read", profiler::colors::Blue600);
+#endif
 		is.seekg(0, is.end);
 		dataLength = is.tellg();
 		is.seekg(0, is.beg);
@@ -149,7 +165,13 @@ void BufferFile::Load(std::string_view path)
 		dataBuffer[dataLength] = 0;
 		is.read(dataBuffer, dataLength);
 		is.close();
+#ifdef EASY_PROFILE_USE
+		EASY_END_BLOCK;
+#endif
 	}
+#ifdef EASY_PROFILE_USE
+	EASY_END_BLOCK;
+#endif
 }
 
 void BufferFile::Destroy()
@@ -157,6 +179,11 @@ void BufferFile::Destroy()
 	delete[] dataBuffer;
 	dataBuffer = nullptr;
 	dataLength = 0;
+}
+
+bool BufferFile::operator==(const BufferFile& bufferFile) const
+{
+	return strcmp(dataBuffer, bufferFile.dataBuffer) == 0;
 }
 
 bool FileExists(const std::string_view filename)

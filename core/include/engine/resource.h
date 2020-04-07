@@ -30,16 +30,17 @@ public:
     ResourceManager();
     void Init();
     void Destroy();
-    bool IsResourceReady(ResourceId resourceId);
-    std::string GetResource(ResourceId resourceId);
-    ResourceId LoadResource(Path assetPath);
+    bool IsResourceReady(const ResourceId resourceId);
+    neko::BufferFile GetResource(const ResourceId resourceId);
+    ResourceId LoadResource(const Path assetPath);
+    void DeleteResource(const ResourceId resourceId);
 private:
     void LoadingLoop();
     enum ResourceManagerStatus : std::uint8_t
     {
         IS_RUNNING = 1, //To check if the ResourceManager is running
         IS_NOT_EMPTY = 10, //To check if the ResourceManager has tasks
-        IS_WAITING = 100, //To check if the ResourceManager is waiting for a task
+        IS_WAITING = 100, //To check if the ResourceManager has tasks
     };
     std::unordered_map<ResourceId, LoadPromise> resourcePromises_;
     std::vector<ResourceId> idQueue_;
