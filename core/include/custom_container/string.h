@@ -12,6 +12,7 @@ class String
     char* buffer_ = nullptr;
     size_t length_ = 0;
     Allocator& allocator_;
+    size_t addedSize_ = 0;
 
 public:
     //-----------------------------------------------------------------------------
@@ -19,10 +20,10 @@ public:
     //-----------------------------------------------------------------------------
 
     /// \brief Empty String Constructor
-    String(Allocator& allocator);
+    String(Allocator& allocator, size_t addedAllocateSize = 0);
 
     /// \brief char* String Constructor
-    String(Allocator& allocator, const std::string_view str);
+    String(Allocator& allocator, const std::string_view str, size_t addedAllocateSize = 0);
 
     /// \brief Default String Destructor
     ~String();

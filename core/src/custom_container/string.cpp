@@ -29,23 +29,23 @@ namespace neko
     //-----------------------------------------------------------------------------
     // Constructors
     //-----------------------------------------------------------------------------
-    String::String(Allocator& allocator): allocator_(allocator)
+    String::String(Allocator& allocator, size_t addedAllocateSize): allocator_(allocator)
     {
-        //std::cout << "String Created (empty)" << std::endl;
         length_ = 0;
+        addedSize_ = addedAllocateSize;
         buffer_ = static_cast<char*>(allocator_.Allocate(
             sizeof(char),
             alignof(char)));
     }
     
-    String::String(Allocator& allocator, std::string_view str): allocator_(allocator)
+    String::String(Allocator& allocator, std::string_view str, size_t addedAllocateSize): allocator_(allocator)
     {
         if (!str.empty())
         {
-            //std::cout << "String Created" << std::endl;
             buffer_ = static_cast<char*>(allocator_.Allocate(
-	            sizeof(char) * str.size()+1,
+	            sizeof(char) * str.size()+1 + addedAllocateSize,
 	            alignof(char)));
+            addedSize_ = addedAllocateSize;
             length_ = str.size()+1;
 
             for(int i = 0; i < length_-1; i++) {
@@ -61,7 +61,6 @@ namespace neko
     	{
             allocator_.Deallocate(buffer_);
             length_ = 0;
-            //std::cout << "String destroyed" << std::endl;
     	}
     }
 
@@ -117,39 +116,57 @@ namespace neko
     }
 
    String& String::operator=(const char rhs[]) {
-        allocator_.Deallocate(buffer_);
-        length_ = strlen(rhs)+1;
+       if (addedSize_ == 0) {
+           allocator_.Deallocate(buffer_);
+           length_ = strlen(rhs) + 1;
 
-        buffer_ = static_cast<char*>(allocator_.Allocate(
-            sizeof(char) * length_ + 1,
-            alignof(char)));
+           buffer_ = static_cast<char*>(allocator_.Allocate(
+               sizeof(char) * length_ + 1,
+               alignof(char)));
 
-        for(unsigned i = 0; i < length_;i++) {
-            buffer_[i] = rhs[i];
-        }
+           for (unsigned i = 0; i < length_; i++) {
+               buffer_[i] = rhs[i];
+           }
 
-        buffer_[length_ - 1] = 0;
-        return *this;
+           buffer_[length_ - 1] = 0;
+       }
+       else {
+           length_ = strlen(rhs) + 1;
+           for (unsigned i = 0; i < length_; i++) {
+               buffer_[i] = rhs[i];
+           }
+       }
+
+       return *this;
+
     }
 
     String& String::operator+= (const String& rhs)
     {
-        unsigned len = length_-1 + rhs.Length();
-        char* str = static_cast<char*>(allocator_.Allocate(
-            sizeof(char) * length_ + 1,
-            alignof(char)));
-        
-        for (unsigned i = 0; i < length_-1; i++) {
-            str[i] = buffer_[i];
+        unsigned len = length_ - 1 + rhs.Length();
+
+        if (addedSize_ == 0) {
+            char* str = static_cast<char*>(allocator_.Allocate(
+                sizeof(char) * length_ + 1,
+                alignof(char)));
+
+            for (unsigned i = 0; i < length_ - 1; i++) {
+                str[i] = buffer_[i];
+            }
+            for (unsigned j = 0; j < rhs.Length(); j++) {
+                str[length_ - 1 + j] = rhs[j];
+            }
+
+            allocator_.Deallocate(buffer_);
+            buffer_ = str;
+        }
+        else {
+            for (unsigned j = 0; j < rhs.Length(); j++) {
+                buffer_[length_ - 1 + j] = rhs[j];
+            }
         }
 
-        for (unsigned j = 0; j < rhs.Length(); j++) {
-            str[length_-1 + j] = rhs[j];
-        }
-
-        allocator_.Deallocate(buffer_);
         length_ = len;
-        buffer_ = str;
         return *this;
     }
 
