@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include "engine/assert.h"
 
 namespace neko
 {
@@ -13,43 +14,47 @@ namespace neko
 	{
 	public:
 
-		SmallQueue();
+		SmallQueue() = default;
 
-		~SmallQueue();
+		~SmallQueue() = default;
 
 		void Clear()
 		{
-			for (int i = 0; i <= capacity; i++)
-			{
-				buffer_[i] = nullptr;
-			}
+			
+			end_ = 0;
+		}
 
-		};
 		void PushBack(T element)
 		{
-			if (end_ <= capacity)
+			neko_assert(end_ <= capacity, "end_ index is not possible")
+			neko_assert(end_ >= 0, "")
+
+			buffer_[end_] = element;
+
+			if (end_ < capacity)
 			{
-
-				buffer_[end_] = element;
-
-				if (end_ < capacity)
+				if (end_ + 1 != start_)
 				{
 					end_++;
 				}
 				else
 				{
-					if (start_ != 0)
-					{
-						end_ = 0;
-					}
-					else
-					{
-						end_ = -1;
-					}
+					neko_assert(end_ + 1 != start_, "end_ idx cant be equale to start_ idx")
+				}
+			}
+			else
+			{
+				if (start_ != 0)
+				{
+					end_ = 0;
+				}
+				else
+				{
+					end_ = -1;
 				}
 			}
 
-		};
+		}
 		T Pop()
 		{
 			T pop = buffer_[start_];
@@ -59,30 +64,35 @@ namespace neko
 			}
 			else
 			{
-				if (end_ != start_)
-				{
-					start_ = 0;
-				}
-
+				start_ = 0;
 			};
 			return pop;
-		};
+		}
 		T Begin()
 		{
 			return buffer_[start_];
-		};
+		}
 		T End()
 		{
 			return buffer_[end_ - 1];
-		};
+		}
 		T& operator[](size_t idx)
 		{
-			return buffer_[idx];
-		};
+			idx += start_;
+			if (idx < capacity) 
+			{
+				return buffer_[idx];
+			}
+			else
+			{
+				 idx -= capacity;
+				 return buffer_[idx];
+			}
+		}
 
 	private:
 		size_t start_ = 0, end_ = 0;
-		std::array<T, capacity> buffer_;
+		std::array< T, capacity> buffer_;
 	};
 
 
@@ -91,48 +101,77 @@ namespace neko
 	{
 
 	public:
-		DynamicQueue();
+		DynamicQueue()
+		{
+			queueVector.resize(1);
+		}
 		~DynamicQueue() = default;
 		void PushBack(T element)
 		{
+			/*if (end_ >= queueVector.size())
+			{
+				queueVector.resize(queueVector.size()*2);
+			}
+
 			queueVector[end_] = element;
-			end_++;
-		};
+			end_++;*/
+			if (start_ - end_ + 1 >= queueVector.size)
+			{
+				queueVector.resize(start_ - end_ + 1);
+			}
+			if (end_ - start_ + 1 >= queueVector.size)
+			{
+				queueVector.resize(end_ - start_ + 1);
+			}
+			queueVector[end_] = element;
+			if (end_ + 1 != start_)
+			{
+				end_++;
+			}
+			
+			
+		}
 		void Clear()
 		{
-			queueVector.erase();
-		};
+			queueVector.clear();
+		}
 		T Pop()
 		{
 			T pop = queueVector[start_];
 			start_++;
+			if (start_ > queueVector.size)
+			{
+				start_ = 0;
+			}
 			return pop;
-		};
+		}
 		T Begin()
 		{
 			return queueVector[start_];
-		};
+		}
 		T End()
 		{
 			return queueVector[end_ - 1];
-		};
+		}
 		int Size()
 		{
 			return end_ - start_ + 1;
-		};
-		void Resize()
+		}
+		void Rebase()
 		{
 			for (int i = 0; i < Size(); i++)
 			{
 				queueVector[i] = queueVector[start_ + i];
 			}
 			end_ = Size();
+			queueVector.resize(end_);
 			start_ = 0;
-		};
+		}
 		T& operator[](size_t idx)
 		{
+			idx += start_;
 			return queueVector[idx];
-		};
+		}
 
 	private:
 		size_t start_ = 0, end_ = 0;
@@ -153,7 +192,7 @@ namespace neko
 		};
 		void Clear()
 		{
-			queueVector.erase();
+			queueVector.clear();
 		};
 		T Pop()
 		{
