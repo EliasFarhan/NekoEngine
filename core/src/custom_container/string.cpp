@@ -29,23 +29,21 @@ namespace neko
     //-----------------------------------------------------------------------------
     // Constructors
     //-----------------------------------------------------------------------------
-    String::String(Allocator& allocator, size_t addedAllocateSize): allocator_(allocator)
+    String::String(Allocator& allocator): allocator_(allocator)
     {
         length_ = 0;
-        addedSize_ = addedAllocateSize;
         buffer_ = static_cast<char*>(allocator_.Allocate(
-            sizeof(char),
+            sizeof(char) + baseAllocatedSize_,
             alignof(char)));
     }
     
-    String::String(Allocator& allocator, std::string_view str, size_t addedAllocateSize): allocator_(allocator)
+    String::String(Allocator& allocator, std::string_view str): allocator_(allocator)
     {
         if (!str.empty())
         {
             buffer_ = static_cast<char*>(allocator_.Allocate(
-	            sizeof(char) * str.size()+1 + addedAllocateSize,
+	            sizeof(char) * str.size()+1 + baseAllocatedSize_,
 	            alignof(char)));
-            addedSize_ = addedAllocateSize;
             length_ = str.size()+1;
 
             for(int i = 0; i < length_-1; i++) {
@@ -116,7 +114,7 @@ namespace neko
     }
 
    String& String::operator=(const char rhs[]) {
-       if (addedSize_ == 0) {
+       if (length_ + strlen(rhs) > baseAllocatedSize_) {
            allocator_.Deallocate(buffer_);
            length_ = strlen(rhs) + 1;
 
@@ -145,9 +143,9 @@ namespace neko
     {
         unsigned len = length_ - 1 + rhs.Length();
 
-        if (addedSize_ == 0) {
+        if (length_ + rhs.length_ > baseAllocatedSize_) {
             char* str = static_cast<char*>(allocator_.Allocate(
-                sizeof(char) * length_ + 1,
+                sizeof(char) * len,
                 alignof(char)));
 
             for (unsigned i = 0; i < length_ - 1; i++) {

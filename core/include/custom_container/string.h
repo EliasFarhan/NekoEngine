@@ -8,11 +8,10 @@ namespace neko
 {
 
 class String
-{
+{   
     char* buffer_ = nullptr;
     size_t length_ = 0;
     Allocator& allocator_;
-    size_t addedSize_ = 0;
 
 public:
     //-----------------------------------------------------------------------------
@@ -20,10 +19,10 @@ public:
     //-----------------------------------------------------------------------------
 
     /// \brief Empty String Constructor
-    String(Allocator& allocator, size_t addedAllocateSize = 0);
+    String(Allocator& allocator);
 
     /// \brief char* String Constructor
-    String(Allocator& allocator, const std::string_view str, size_t addedAllocateSize = 0);
+    String(Allocator& allocator, const std::string_view str);
 
     /// \brief Default String Destructor
     ~String();
@@ -53,7 +52,7 @@ public:
 
     //TODO UTF-8
 private :
-
+    const size_t baseAllocatedSize_ = 128;
 };
 
 }

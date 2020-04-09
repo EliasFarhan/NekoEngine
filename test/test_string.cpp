@@ -27,12 +27,12 @@ TEST(Engine, TestString)
         EXPECT_TRUE(str1 != str4);
 
         str1 += str2;
-        String str5 = String(allocator, "Q", sizeof(char));
+        String str5 = String(allocator, "Q");
         str5 += str3;
         str5 += str2;
 
         EXPECT_TRUE(str1 == "AB");
-        EXPECT_TRUE(str5 == "QB");
+        EXPECT_TRUE(str5 == "QAB");
     }
     free(data);
 }
