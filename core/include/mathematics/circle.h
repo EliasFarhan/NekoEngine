@@ -33,14 +33,11 @@ namespace neko
 
 struct Circle
 {
-	union 
-	{
+
 		float radius;
         Vec2f center;
-
-	};
 	
-    Circle() : center(Vec2f(0, 0)), radius(0.0f)
+    Circle() : radius(0.0f), center(Vec2f(0, 0))
     {
 
     }
@@ -59,7 +56,8 @@ struct Circle
 
         return distanceVector.Magnitude() <= radiusSum;
 
-    }bool IntersectsOther(Circle circle) const
+    }
+	bool IntersectsOther(Circle circle) const
     {
         Vec2f distanceVector = center - circle.center;
         float radiusSum = radius + circle.radius;
@@ -116,14 +114,11 @@ struct alignas(8 * sizeof(float)) Plan
     }
 };
 
-struct alignas(4 * sizeof(float)) Sphere
+struct Sphere
 {
-	union 
-	{
-		Vec3f center;
-		float radius;
-	};
-    
+    Vec3f center;
+    float radius;
+
 
     Sphere() : center(Vec3f(0, 0, 0)), radius(0.0f)
     {
@@ -168,7 +163,7 @@ struct alignas(4 * sizeof(float)) Sphere
     }
 };
 
-class FourCircle
+class alignas(16) FourCircle
 {
 public:
     alignas(4 * sizeof(float)) std::array<float, 4> centerXs;
@@ -193,7 +188,6 @@ public:
     }
 
     std::array<bool, 4> IntersectsIntrinsics(const FourCircle & circle) const;
-    std::array<bool, 4> IntersectsCircleIntrinsics(const Circle & circle, size_t n) const;
 };
 
 class FourPlan
@@ -225,17 +219,19 @@ public:
 
 };
 
-class alignas(4 * sizeof(float)) FourSphere
+struct alignas(4 * sizeof(float)) FourSphere
 {
-public:
-    std::array<float, 4> centerXs;
-    std::array<float, 4> centerYs;
-    std::array<float, 4> centerZs;
-    std::array<float, 4> radius;
+    alignas(4 * sizeof(float)) std::array<float, 4> centerXs;
+    alignas(4 * sizeof(float)) std::array<float, 4> centerYs;
+    alignas(4 * sizeof(float)) std::array<float, 4> centerZs;
+    alignas(4 * sizeof(float)) std::array<float, 4> radius;
 
-    FourSphere() = default;
+    FourSphere() noexcept : centerXs{}, centerYs{}, centerZs{}, radius{}
+    {
 
-    explicit FourSphere(std::array<Sphere, 4> & spheres) : centerXs(), centerYs(), centerZs(), radius()
+    }
+	~FourSphere() = default;
+    explicit FourSphere(std::array<Sphere, 4> spheres) : centerXs(), centerYs(), centerZs(), radius()
     {
         for (size_t i = 0; i < 4; i++)
         {
@@ -274,7 +270,6 @@ public:
     }
 
     std::array<bool, 4> IntersectIntrinsics(const FourSphere & spheres) const;
-    std::array<bool, 4> IntersectSphereIntrinsics(Sphere & sphere);
     std::array<bool, 4> IntersectSpherePlanIntrinsics(Plan & plan);
 };
 
@@ -282,9 +277,7 @@ public:
 
 inline std::array<bool, 4> FourCircle::IntersectsIntrinsics(const FourCircle& circle) const
 {
-    alignas(4 * sizeof(bool)) std::array<bool, 4> results = {};
-    alignas(4 * sizeof(float)) std::array<float, 4> magnitude = {};
-    alignas(4 * sizeof(float)) std::array<float, 4> radii = {};
+    alignas(16) std::array<bool, 4> results = {};
 
     __m128 x1;
     __m128 y1;
@@ -296,175 +289,87 @@ inline std::array<bool, 4> FourCircle::IntersectsIntrinsics(const FourCircle& ci
     __m128 disty;
     __m128 rad2;
 
-    for (size_t i = 0; i < 4; i++)
-    {
-        x1 = _mm_loadu_ps(centerXs.data() + i);
-        y1 = _mm_loadu_ps(centerYs.data() + i);
-        rad1 = _mm_loadu_ps(radius.data() + i);
+    x1 = _mm_load_ps(centerXs.data());
+    y1 = _mm_load_ps(centerYs.data());
+    rad1 = _mm_load_ps(radius.data());
 
-        x2 = _mm_loadu_ps(circle.centerXs.data() + i);
-        y2 = _mm_loadu_ps(circle.centerYs.data() + i);
-        rad2 = _mm_loadu_ps(circle.radius.data() + i);
-        x1 = _mm_sub_ps(x1, x2);
-        y1 = _mm_sub_ps(y1, y2);
+    x2 = _mm_load_ps(circle.centerXs.data());
+    y2 = _mm_load_ps(circle.centerYs.data());
+    rad2 = _mm_load_ps(circle.radius.data());
+    x1 = _mm_sub_ps(x1, x2);
+    y1 = _mm_sub_ps(y1, y2);
 
-        rad1 = _mm_add_ps(rad1, rad2);
+    rad1 = _mm_add_ps(rad1, rad2);
 
-        distx = _mm_mul_ps(x1, x1);
-        disty = _mm_mul_ps(y1, y1);
+    distx = _mm_mul_ps(x1, x1);
+    disty = _mm_mul_ps(y1, y1);
 
-        distx = _mm_add_ps(distx, disty);
+    distx = _mm_add_ps(distx, disty);
 
-        auto mag = _mm_rsqrt_ps(distx);
-    	
-        magnitude[i] = _mm_movemask_ps(mag);
-        radii[i] = _mm_movemask_ps(distx);
+    auto mag = _mm_rsqrt_ps(distx);
+    auto mask = _mm_cmple_ps(rad1, mag);
+    auto result = _mm_movemask_ps(mask);
 
-        results[i] = magnitude[i] <= radii[i];
-    }
-    return results;
-}
+    if (result & 1) { results[0] = true; }
+    if (result & 2) { results[1] = true; }
+    if (result & 4) { results[2] = true; }
+    if (result & 8) { results[3] = true; }
 
-inline std::array<bool, 4> FourCircle::IntersectsCircleIntrinsics(const Circle& circle, size_t n) const
-{
 
-    std::array<Circle, 4> circles;
-    circles.fill(circle);
-    FourCircle n_circle(circles);
-
-    alignas(4 * sizeof(bool)) std::array<bool, 4> results = {};
-    alignas(4 * sizeof(float)) std::array<float, 4> magnitude = {};
-    alignas(4 * sizeof(float)) std::array<float, 4> radii = {};
-
-    __m128 x1;
-    __m128 y1;
-    __m128 distx;
-    __m128 rad1;
-
-    __m128 x2;
-    __m128 y2;
-    __m128 disty;
-    __m128 rad2;
-
-    for (size_t i = 0; i < 4; i++)
-    {
-        x1 = _mm_loadu_ps(centerXs.data() + i);
-        y1 = _mm_loadu_ps(centerYs.data() + i);
-        rad1 = _mm_loadu_ps(radius.data() + i);
-
-        x2 = _mm_loadu_ps(n_circle.centerXs.data() + i);
-        y2 = _mm_loadu_ps(n_circle.centerYs.data() + i);
-        rad2 = _mm_loadu_ps(n_circle.radius.data() + i);
-        x1 = _mm_sub_ps(x1, x2);
-        y1 = _mm_sub_ps(y1, y2);
-
-        rad1 = _mm_add_ps(rad1, rad2);
-
-        distx = _mm_mul_ps(x1, x1);
-        disty = _mm_mul_ps(y1, y1);
-
-        distx = _mm_add_ps(distx, disty);
-
-        auto mag = _mm_rsqrt_ps(distx);
-
-        magnitude[i] = _mm_movemask_ps(mag);
-        radii[i] = _mm_movemask_ps(distx);
-
-        results[i] = magnitude[i] <= radii[i];
-    }
     return results;
 }
 
 inline std::array<bool, 4> FourSphere::IntersectIntrinsics(const FourSphere& spheres) const
 {
-    __m128 x1, x2, y1, y2, z1, z2, rad1, rad2;
-    int result = 0;
-    alignas(4 * sizeof(bool))	std::array<bool, 4> results = {};
-    alignas(4 * sizeof(float))	std::array<float, 4> magnitude = {};
-    alignas(4 * sizeof(float))	std::array<float, 4> radii = {};
+    alignas(16) std::array<bool, 4> results = {};
 
-        x1 = _mm_load_ps(centerXs.data());
-        x2 = _mm_load_ps(spheres.centerXs.data());
-        auto x3 = _mm_sub_ps(x1, x2); // center.x - sphere.center.x
-        x3 = _mm_sub_ps(x3, x3);
+    __m128 x1;
+    __m128 y1;
+    __m128 z1;
+    __m128 rad1;
 
-        y1 = _mm_load_ps(centerYs.data());
-        y2 = _mm_load_ps(spheres.centerYs.data());
-        auto y3 = _mm_sub_ps(y1, y2); //center.y - sphere.center.y
-        y3 = _mm_sub_ps(y3, y3);
+    __m128 x2;
+    __m128 y2;
+    __m128 z2;
+    __m128 rad2;
+	
+	__m128 distx;
+	__m128 disty;
+	__m128 distz;
 
-        z1 = _mm_load_ps(centerZs.data());
-        z2 = _mm_load_ps(spheres.centerZs.data());
-        auto z3 = _mm_sub_ps(z1, z2); //center.z - sphere.center.z
-        z3 = _mm_sub_ps(z3, z3);
+    x1 = _mm_load_ps(centerXs.data());
+    x2 = _mm_load_ps(spheres.centerXs.data());
 
-        rad1 = _mm_load_ps(radius.data());
-        rad2 = _mm_load_ps(spheres.radius.data());
-        auto rad3 = _mm_add_ps(rad1, rad2); // radius + sphere.radius
-    	
-        auto dist1 = _mm_add_ps(y3, z3);
-        auto dist2 = _mm_add_ps(x3, dist1);
-        dist2 = _mm_mul_ps(dist2, dist2);
+    y1 = _mm_load_ps(centerYs.data());
+    y2 = _mm_load_ps(spheres.centerYs.data());
 
-        auto mag = _mm_rsqrt_ps(dist2);
-        auto mask = _mm_cmple_ps(rad3, mag);
-        result = _mm_movemask_ps(mask);
-    	
+    z1 = _mm_load_ps(centerZs.data());
+    z2 = _mm_load_ps(spheres.centerZs.data());
+	
+    rad1 = _mm_load_ps(radius.data());
+    rad2 = _mm_load_ps(spheres.radius.data());
+
+	rad1 = _mm_add_ps(rad1, rad2); // radius + sphere.radius
+    auto x3 = _mm_sub_ps(x1, x2); // center.x - sphere.center.x
+    auto y3 = _mm_sub_ps(y1, y2); //center.y - sphere.center.y
+    auto z3 = _mm_sub_ps(z1, z2); //center.z - sphere.center.z
+
+    distx = _mm_mul_ps(x3, x3);
+    disty = _mm_mul_ps(y3, y3);
+    distz = _mm_mul_ps(z3, z3);
+
+    distx = _mm_add_ps(distx, _mm_add_ps(disty, distz));
+
+    auto mag = _mm_rsqrt_ps(distx);
+    auto mask = _mm_cmple_ps(rad1, mag);
+    auto result = _mm_movemask_ps(mask);
+
     if (result & 1) { results[0] = true; }
     if (result & 2) { results[1] = true; }
     if (result & 4) { results[2] = true; }
     if (result & 8) { results[3] = true; }
-    
-	
-    return results;
-}
 
-inline std::array<bool, 4> FourSphere::IntersectSphereIntrinsics(Sphere& sphere)
-{
-    std::array<Sphere, 4> spheres;
-    spheres.fill(sphere);
-    FourSphere n_sphere(spheres);
-    __m128 x1, x2, y1, y2, z1, z2, rad1, rad2;
-    int result = 0;
-    alignas(4 * sizeof(bool))	std::array<bool, 4> results = {};
-    alignas(4 * sizeof(float))	std::array<float, 4> magnitude = {};
-    alignas(4 * sizeof(float))	std::array<float, 4> radii = {};
 
-        x1 = _mm_load_ps(centerXs.data());
-        x2 = _mm_load_ps(n_sphere.centerXs.data());
-        auto x3 = _mm_sub_ps(x1, x2); // center.x - sphere.center.x
-        x3 = _mm_sub_ps(x3, x3);
-
-        y1 = _mm_load_ps(centerYs.data());
-        y2 = _mm_load_ps(n_sphere.centerYs.data());
-        auto y3 = _mm_sub_ps(y1, y2); //center.y - sphere.center.y
-        y3 = _mm_sub_ps(y3, y3);
-
-        z1 = _mm_load_ps(centerZs.data());
-        z2 = _mm_load_ps(n_sphere.centerZs.data());
-        auto z3 = _mm_sub_ps(z1, z2); //center.z - sphere.center.z
-        z3 = _mm_sub_ps(z3, z3);
-
-        rad1 = _mm_load_ps(radius.data());
-        rad2 = _mm_load_ps(n_sphere.radius.data());
-        auto rad3 = _mm_add_ps(rad1, rad2); // radius + sphere.radius
-
-        auto dist1 = _mm_add_ps(y3, z3);
-        auto dist2 = _mm_add_ps(x3, dist1);
-        dist2 = _mm_mul_ps(dist2, dist2);
-
-        auto mag = _mm_rsqrt_ps(dist2);
-        auto mask = _mm_cmple_ps(rad3, mag);
-        result = _mm_movemask_ps(mask);
-
-    
-    // One or more of the distances were less-than-or-equal-to the maximum,
-    // so we have something to draw.
-    if (result & 1) { results[0] = true; }
-    if (result & 2) { results[1] = true; }
-    if (result & 4) { results[2] = true; }
-    if (result & 8) { results[3] = true; }
-	
     return results;
 }
 
@@ -483,7 +388,7 @@ inline std::array<bool, 4> FourSphere::IntersectSpherePlanIntrinsics(Plan& plan)
     array.fill(plan);
     FourPlan n_plan(array);
 
-    alignas(4 * sizeof(bool)) std::array<bool, 4> results = {};
+    alignas(16) std::array<bool, 4> results = {};
 
     auto normX = _mm_load_ps(n_plan.normalXs.data());
     auto normY = _mm_load_ps(n_plan.normalYs.data());
