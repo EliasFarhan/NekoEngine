@@ -34,8 +34,8 @@ namespace neko
 struct Circle
 {
 
-		float radius;
-        Vec2f center;
+	float radius;
+    Vec2f center;
 	
     Circle() : radius(0.0f), center(Vec2f(0, 0))
     {
@@ -44,23 +44,23 @@ struct Circle
 
     ~Circle() = default;
 
-    explicit Circle(Vec2f Center, float Radius) : center(Center), radius(Radius)
+    explicit Circle(Vec2f Center, float Radius) : radius(Radius), center(Center)
     {
 
     }
 
     bool Intersects(Circle circle) const
     {
-        Vec2f distanceVector = center - circle.center;
-        float radiusSum = radius + circle.radius;
+	    const Vec2f distanceVector = center - circle.center;
+	    const float radiusSum = radius + circle.radius;
 
         return distanceVector.Magnitude() <= radiusSum;
 
     }
 	bool IntersectsOther(Circle circle) const
     {
-        Vec2f distanceVector = center - circle.center;
-        float radiusSum = radius + circle.radius;
+	    const Vec2f distanceVector = center - circle.center;
+        const float radiusSum = radius + circle.radius;
 
 
         float distance = Sqrt(distanceVector.x * distanceVector.x + distanceVector.y * distanceVector.y);
@@ -86,23 +86,15 @@ struct Circle
         return false;
     }
 
-    static float Sqrt(float x)
-    {
-        auto i = *reinterpret_cast<int*>(&x);
-        i = 0x5f3759df - (i >> 1);
-        auto r = *reinterpret_cast<float*>(&i);
-        r = r * (1.5f - 0.5f * x * r * r);
-        return r * x;
-    }
+    
 
 };
 struct alignas(8 * sizeof(float)) Plan
 {
-	union 
-	{
-		Vec3f pos;
-		Vec3f normal;
-	};
+	
+	Vec3f pos;
+	Vec3f normal;
+	
 
     Plan() : pos(Vec3f(0, 0, 0)), normal(Vec3f(0, 0, 0))
     {
@@ -130,7 +122,7 @@ struct Sphere
 
     }
 
-    bool Intersects(const Sphere & sphere) const
+    bool Intersects(const Sphere sphere) const
     {
         const Vec3f distanceVec = center - sphere.center;
 
@@ -145,9 +137,9 @@ struct Sphere
 
         const float radiusSum = sphere.radius + radius;
 
-        float distance = Circle::Sqrt(distanceVec.x * distanceVec.x +
-            distanceVec.y * distanceVec.y +
-            distanceVec.z * distanceVec.z);
+        float distance = Sqrt(distanceVec.x * distanceVec.x +
+					            distanceVec.y * distanceVec.y +
+					            distanceVec.z * distanceVec.z);
 
         return distance <= radiusSum;
     }
@@ -163,7 +155,7 @@ struct Sphere
     }
 };
 
-class alignas(16) FourCircle
+class alignas(4 * sizeof(float)) FourCircle
 {
 public:
     alignas(4 * sizeof(float)) std::array<float, 4> centerXs;
@@ -190,7 +182,7 @@ public:
     std::array<bool, 4> IntersectsIntrinsics(const FourCircle & circle) const;
 };
 
-class FourPlan
+class alignas(4 * sizeof(float)) FourPlan
 {
 public:
     std::array<float, 4> posXs;
@@ -201,9 +193,14 @@ public:
     std::array<float, 4> normalYs;
     std::array<float, 4> normalZs;
 
-    FourPlan() = default;
+    FourPlan() noexcept : posXs{}, posYs{}, posZs{}, normalXs{}, normalYs{}, normalZs{}
+    {
 
-    explicit FourPlan(std::array<Plan, 4> plans) noexcept : posXs{}, posYs{}, posZs{}, normalXs{}, normalYs{}, normalZs{}
+    }
+
+	~FourPlan() = default;
+	
+    explicit FourPlan(std::array<Plan, 4> plans) : posXs{}, posYs{}, posZs{}, normalXs{}, normalYs{}, normalZs{}
     {
         for (size_t i = 0; i < 4; i++)
         {
@@ -252,7 +249,6 @@ struct alignas(4 * sizeof(float)) FourSphere
         std::array<float, 4> mag = {};
         std::array<bool, 4> results = {};
 
-
         for (size_t i = 0; i < 4; i++)
         {
             distanceX[i] = centerXs[i] - sphere.centerXs[i];
@@ -261,7 +257,8 @@ struct alignas(4 * sizeof(float)) FourSphere
 
             radSum[i] = radius[i] + sphere.radius[i];
             radSub[i] = radius[i] - sphere.radius[i];
-            mag[i] = Circle::Sqrt(distanceX[i] * distanceX[i] + distanceY[i] * distanceY[i] + distanceZ[i] * distanceZ[i]);
+        	
+            mag[i] = Sqrt(distanceX[i] * distanceX[i] + distanceY[i] * distanceY[i] + distanceZ[i] * distanceZ[i]);
 
             results[i] = radSub[i] <= mag[i] <= radSum[i];
         }
@@ -270,11 +267,13 @@ struct alignas(4 * sizeof(float)) FourSphere
     }
 
     std::array<bool, 4> IntersectIntrinsics(const FourSphere & spheres) const;
-    std::array<bool, 4> IntersectSpherePlanIntrinsics(Plan & plan);
+    std::array<bool, 4> IntersectSpherePlanIntrinsics(const Plan & plan) const;
 };
 
 #ifdef __SSE__
-
+/**
+* \brief Test the intersection between four circle in a list.
+*/
 inline std::array<bool, 4> FourCircle::IntersectsIntrinsics(const FourCircle& circle) const
 {
     alignas(16) std::array<bool, 4> results = {};
@@ -299,7 +298,8 @@ inline std::array<bool, 4> FourCircle::IntersectsIntrinsics(const FourCircle& ci
     x1 = _mm_sub_ps(x1, x2);
     y1 = _mm_sub_ps(y1, y2);
 
-    rad1 = _mm_add_ps(rad1, rad2);
+    auto radSum = _mm_add_ps(rad1, rad2);
+	auto radSub = _mm_sub_ps(rad2, rad1);
 
     distx = _mm_mul_ps(x1, x1);
     disty = _mm_mul_ps(y1, y1);
@@ -307,18 +307,19 @@ inline std::array<bool, 4> FourCircle::IntersectsIntrinsics(const FourCircle& ci
     distx = _mm_add_ps(distx, disty);
 
     auto mag = _mm_rsqrt_ps(distx);
-    auto mask = _mm_cmple_ps(rad1, mag);
-    auto result = _mm_movemask_ps(mask);
+    auto mask = _mm_cmpneq_ps(_mm_cmple_ps(radSum, mag), _mm_cmple_ps(radSub, mag));
 
-    if (result & 1) { results[0] = true; }
-    if (result & 2) { results[1] = true; }
-    if (result & 4) { results[2] = true; }
-    if (result & 8) { results[3] = true; }
-
-
+	auto result = _mm_movemask_ps(mask);
+    for (int i = 0; i < 4; i++) {
+        if (result != 0) {
+            results[i] = 1;
+        }
+    }
     return results;
 }
-
+/**
+* \brief Test the intersection between four sphere in a list.
+*/
 inline std::array<bool, 4> FourSphere::IntersectIntrinsics(const FourSphere& spheres) const
 {
     alignas(16) std::array<bool, 4> results = {};
@@ -349,7 +350,8 @@ inline std::array<bool, 4> FourSphere::IntersectIntrinsics(const FourSphere& sph
     rad1 = _mm_load_ps(radius.data());
     rad2 = _mm_load_ps(spheres.radius.data());
 
-	rad1 = _mm_add_ps(rad1, rad2); // radius + sphere.radius
+	auto radSum = _mm_add_ps(rad1, rad2); // radius + sphere.radius
+	auto radSub = _mm_sub_ps(rad1, rad2); // radius - sphere.radius
     auto x3 = _mm_sub_ps(x1, x2); // center.x - sphere.center.x
     auto y3 = _mm_sub_ps(y1, y2); //center.y - sphere.center.y
     auto z3 = _mm_sub_ps(z1, z2); //center.z - sphere.center.z
@@ -358,23 +360,23 @@ inline std::array<bool, 4> FourSphere::IntersectIntrinsics(const FourSphere& sph
     disty = _mm_mul_ps(y3, y3);
     distz = _mm_mul_ps(z3, z3);
 
-    distx = _mm_add_ps(distx, _mm_add_ps(disty, distz));
+    auto dist = _mm_add_ps(distx, _mm_add_ps(disty, distz));
 
-    auto mag = _mm_rsqrt_ps(distx);
-    auto mask = _mm_cmple_ps(rad1, mag);
-    auto result = _mm_movemask_ps(mask);
+    auto mag = _mm_rsqrt_ps(dist);
+    auto mask = _mm_cmpneq_ps(_mm_cmple_ps(radSum, mag), _mm_cmple_ps(radSub, mag));
 
-    if (result & 1) { results[0] = true; }
-    if (result & 2) { results[1] = true; }
-    if (result & 4) { results[2] = true; }
-    if (result & 8) { results[3] = true; }
-
+	auto result = _mm_movemask_ps(mask);
+    for (int i = 0; i < 4; i++) {
+        if (result != 0) {
+            results[i] = 1;
+        }
+    }
 
     return results;
 }
 
-
-inline std::array<bool, 4> FourSphere::IntersectSpherePlanIntrinsics(Plan& plan)
+/*
+inline std::array<bool, 4> FourSphere::IntersectSpherePlanIntrinsics(const Plan& plan) const
 {
     /*
         const float normMagnitude = plan.normal.Magnitude();
@@ -383,7 +385,7 @@ inline std::array<bool, 4> FourSphere::IntersectSpherePlanIntrinsics(Plan& plan)
         const float p = dot / normMagnitude;
 
         return p < radius && p > -radius;
-    */
+    #1#
     std::array<Plan, 4> array;
     array.fill(plan);
     FourPlan n_plan(array);
@@ -420,14 +422,14 @@ inline std::array<bool, 4> FourSphere::IntersectSpherePlanIntrinsics(Plan& plan)
     __m128 mask = _mm_cmple_ps(posX, rad);
 
     int result = _mm_movemask_ps(mask);
-
-    if (result & 1) { results[0] = true; }
-    if (result & 2) { results[1] = true; }
-    if (result & 4) { results[2] = true; }
-    if (result & 8) { results[3] = true; }
-
+    for (int i = 0; i < 4; i++) {
+        if (result != 0) {
+            results[i] = 1;
+        }
+    }
     return results;
 }
+*/
 #endif
 
 }
