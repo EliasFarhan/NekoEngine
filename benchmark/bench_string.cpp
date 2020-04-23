@@ -20,8 +20,8 @@ static void BM_StringWithAddedAllocator(benchmark::State& state)
     void* data = malloc(memorySize);
     neko::FreeListAllocator allocator = neko::FreeListAllocator(memorySize, data);
 
-    neko::String s1 = neko::String(allocator, "AA");
-    neko::String s2 = neko::String(allocator, "BB");
+    neko::NekoString s1 = neko::NekoString(allocator, "AA");
+    neko::NekoString s2 = neko::NekoString(allocator, "BB");
 
 
     for (auto _ : state)

@@ -16,10 +16,10 @@ TEST(Engine, TestString)
     void* data = malloc(memorySize);
     FreeListAllocator allocator = FreeListAllocator(memorySize, data);
     {
-        String str1 = String(allocator, "A");
-        String str2 = String(allocator, "B");
-        String str3 = String(allocator, "A");
-        String str4 = String(allocator, "D");
+        NekoString str1 = NekoString(allocator, "A");
+        NekoString str2 = NekoString(allocator, "B");
+        NekoString str3 = NekoString(allocator, "A");
+        NekoString str4 = NekoString(allocator, "D");
 
         EXPECT_TRUE(str1 == "A");
         EXPECT_TRUE(str1 != "Z");
@@ -27,7 +27,7 @@ TEST(Engine, TestString)
         EXPECT_TRUE(str1 != str4);
 
         str1 += str2;
-        String str5 = String(allocator, "Q");
+        NekoString str5 = NekoString(allocator, "Q");
         str5 += str3;
         str5 += str2;
 

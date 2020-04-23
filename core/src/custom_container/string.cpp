@@ -29,7 +29,7 @@ namespace neko
     //-----------------------------------------------------------------------------
     // Constructors
     //-----------------------------------------------------------------------------
-    String::String(Allocator& allocator): allocator_(allocator)
+    NekoString::NekoString(Allocator& allocator): allocator_(allocator)
     {
         length_ = 0;
         buffer_ = static_cast<char*>(allocator_.Allocate(
@@ -37,7 +37,7 @@ namespace neko
             alignof(char)));
     }
     
-    String::String(Allocator& allocator, std::string_view str): allocator_(allocator)
+    NekoString::NekoString(Allocator& allocator, std::string_view str): allocator_(allocator)
     {
         if (!str.empty())
         {
@@ -53,7 +53,7 @@ namespace neko
         }
     }
 
-    String::~String()
+    NekoString::~NekoString()
     {
     	if(buffer_ != nullptr)
     	{
@@ -62,7 +62,7 @@ namespace neko
     	}
     }
 
-    size_t String::Length() const
+    size_t NekoString::Length() const
     {
         return length_;
     }
@@ -72,7 +72,7 @@ namespace neko
     // Operators
     //-----------------------------------------------------------------------------
     
-    std::ostream& operator<< (std::ostream& os, const String& s)
+    std::ostream& operator<< (std::ostream& os, const NekoString& s)
     {
         if (s.Length() > 0)
         {
@@ -85,19 +85,19 @@ namespace neko
         return os;
     }
 
-    char String::operator[] (unsigned rhs) const
+    char NekoString::operator[] (unsigned rhs) const
     {
         if (rhs >= length_) throw 1;
         return buffer_[rhs];
     }
 
-    char& String::operator[] (unsigned rhs)
+    char& NekoString::operator[] (unsigned rhs)
     {
         if (rhs >= length_) throw 1;
         return buffer_[rhs];
     }
 
-    String& String::operator= (const String& rhs)
+    NekoString& NekoString::operator= (const NekoString& rhs)
     {
         if (this == &rhs) { return *this;}
         allocator_.Deallocate(buffer_);
@@ -113,7 +113,7 @@ namespace neko
         return *this;
     }
 
-   String& String::operator=(const char rhs[]) {
+    NekoString& NekoString::operator=(const char rhs[]) {
        if (length_ + strlen(rhs) > baseAllocatedSize_) {
            allocator_.Deallocate(buffer_);
            length_ = strlen(rhs) + 1;
@@ -139,7 +139,7 @@ namespace neko
 
     }
 
-    String& String::operator+= (const String& rhs)
+    NekoString& NekoString::operator+= (const NekoString& rhs)
     {
         unsigned len = length_ - 1 + rhs.Length();
 
@@ -168,19 +168,19 @@ namespace neko
         return *this;
     }
 
-    bool operator==(const String& lhs, const String& rhs) {
+    bool operator==(const NekoString& lhs, const NekoString& rhs) {
         return strcmp(lhs.buffer_, rhs.buffer_) == 0;
     }
 
-    bool operator==(const String& lhs, const char rhs[]) {
+    bool operator==(const NekoString& lhs, const char rhs[]) {
         return strcmp(lhs.buffer_, rhs) == 0;
     }
 
-    bool operator!=(const String& lhs, const String& rhs) {
+    bool operator!=(const NekoString& lhs, const NekoString& rhs) {
         return !(lhs == rhs);
     }
 
-    bool operator!=(const String& lhs, const char rhs[]) {
+    bool operator!=(const NekoString& lhs, const char rhs[]) {
         return !(lhs == rhs);
     }
 }

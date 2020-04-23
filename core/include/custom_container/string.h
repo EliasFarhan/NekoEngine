@@ -7,7 +7,7 @@
 namespace neko
 {
 
-class String
+class NekoString
 {   
     char* buffer_ = nullptr;
     size_t length_ = 0;
@@ -19,13 +19,13 @@ public:
     //-----------------------------------------------------------------------------
 
     /// \brief Empty String Constructor
-    String(Allocator& allocator);
+    NekoString(Allocator& allocator);
 
     /// \brief char* String Constructor
-    String(Allocator& allocator, const std::string_view str);
+    NekoString(Allocator& allocator, const std::string_view str);
 
     /// \brief Default String Destructor
-    ~String();
+    ~NekoString();
 
     /// \brief String length
     size_t Length() const;
@@ -34,21 +34,21 @@ public:
     // Operators
     //-----------------------------------------------------------------------------
 
-    friend std::ostream& operator<< (std::ostream& os, const String& s);
+    friend std::ostream& operator<< (std::ostream& os, const NekoString& s);
 
     char  operator[] (unsigned rhs) const;
     char& operator[] (unsigned rhs);
 
-    String& operator= (const String& rhs);
-    String& operator= (const char rhs[]);
+    NekoString& operator= (const NekoString& rhs);
+    NekoString& operator= (const char rhs[]);
 
-    String& operator+= (const String& rhs);
+    NekoString& operator+= (const NekoString& rhs);
 
-    friend bool operator== (const String& lhs, const String& rhs);
-    friend bool operator== (const String& lhs, const char rhs[]);
+    friend bool operator== (const NekoString& lhs, const NekoString& rhs);
+    friend bool operator== (const NekoString& lhs, const char rhs[]);
 
-    friend bool operator!= (const String& lhs, const String& rhs);
-    friend bool operator!= (const String& lhs, const char rhs[]);
+    friend bool operator!= (const NekoString& lhs, const NekoString& rhs);
+    friend bool operator!= (const NekoString& lhs, const char rhs[]);
 
     //TODO UTF-8
 private :
