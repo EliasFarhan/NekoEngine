@@ -1,4 +1,6 @@
 function(neko_bin_config binary)
+
+    set_target_properties(${library} PROPERTIES UNITY_BUILD ON)
     if(Emscripten)
         if("${CMAKE_BUILD_TYPE}" MATCHES "Debug")
             set_target_properties(${binary} PROPERTIES  COMPILE_FLAGS
@@ -32,6 +34,7 @@ function(neko_lib_config library)
             -Wall -Wextra>
             $<$<CXX_COMPILER_ID:MSVC>:
             /W4>)
+    set_target_properties(${library} PROPERTIES UNITY_BUILD ON)
     if(Emscripten)
         if("${CMAKE_BUILD_TYPE}" MATCHES "Debug")
             set_target_properties(${library} PROPERTIES  COMPILE_FLAGS

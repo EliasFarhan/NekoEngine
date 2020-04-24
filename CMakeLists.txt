@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.16)
 project(Neko)
 
 set (CMAKE_CXX_STANDARD 17)
@@ -68,6 +68,7 @@ set(IMGUI_VERSION "1.74" CACHE INTERNAL "")
 set(IMGUI_ROOT "${EXTERNAL_DIR}/imgui-${IMGUI_VERSION}" CACHE STRING "")
 include_directories("${IMGUI_ROOT}")
 add_subdirectory("${IMGUI_ROOT}")
+set_target_properties(imgui PROPERTIES UNITY_BUILD ON)
 
 if(Neko_Lua)
     set(LUA_VERSION "5.3.5")
