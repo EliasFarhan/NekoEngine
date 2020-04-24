@@ -39,9 +39,10 @@ public:
     JobSystem();
     ~JobSystem();
     void KickJob(const std::function<void()>& func);
-    void Work();
+
 
 private:
+	void Work();
     const static std::uint8_t OCCUPIED_THREADS = 3; // Define number of threads used by engine.
     std::uint8_t numberOfWorkers;
     std::queue<std::function<void()>> tasks_; // Managed via mutex. // TODO: replace with custom queue when those are implemented.
