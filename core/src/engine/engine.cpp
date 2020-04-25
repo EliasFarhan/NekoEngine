@@ -70,6 +70,7 @@ void BasicEngine::Init()
 #endif
 	instance_ = this;
 	logDebug("Current path: " + GetCurrentPath());
+	jobSystem_.Init();
 }
 
 void BasicEngine::Update(seconds dt)
@@ -95,6 +96,7 @@ void BasicEngine::Update(seconds dt)
 void BasicEngine::Destroy()
 {
     renderer_->Destroy();
+	jobSystem_.Destroy();
 	instance_ = nullptr;
 }
 

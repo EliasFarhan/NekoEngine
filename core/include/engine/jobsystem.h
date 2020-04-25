@@ -25,6 +25,7 @@
 #include <queue>
 #include <atomic>
 #include <future>
+#include "engine/system.h"
 
 namespace neko
 {
@@ -72,12 +73,8 @@ private:
     std::atomic<std::uint8_t> status_;
 };
 
-class JobWorker
+struct JobQueue
 {
-public:
-private:
-    void Work();
-
     std::mutex mutex_;
     std::condition_variable cv_;
     std::queue<Job*> jobs_;
@@ -93,7 +90,7 @@ class JobSystem : SystemInterface
 public:
     JobSystem();
     ~JobSystem() override;
-    void ScheduleJob(Job* func);
+    void ScheduleJob(Job* func, JobThreadType threadType);
     void Init() override;
 
     void Update(seconds dt) override{}
@@ -101,18 +98,17 @@ public:
     void Destroy() override;
 
 private:
-	void Work(std::queue<Job*>& jobs);
+	void Work(JobQueue& jobQueue);
 
 
 
     const static std::uint8_t OCCUPIED_THREADS = 3; // Define number of threads used by engine.
     std::uint8_t numberOfWorkers;
-    std::queue<Job*> jobs_; // Managed via mutex. // TODO: replace with custom queue when those are implemented.
-    std::queue<Job*> renderJobs_; // Managed via mutex. // TODO: replace with custom queue when those are implemented.
-    std::queue<Job*> resourceJobs_; // Managed via mutex. // TODO: replace with custom queue when those are implemented.
+    JobQueue jobs_; // Managed via mutex. // TODO: replace with custom queue when those are implemented.
+    JobQueue renderJobs_; // Managed via mutex. // TODO: replace with custom queue when those are implemented.
+    JobQueue resourceJobs_; // Managed via mutex. // TODO: replace with custom queue when those are implemented.
     std::vector<std::thread> workers_; // TODO: replace with fixed vector when those are implemented.
-    std::mutex mutex_;
-    std::condition_variable cv_;
+    
     std::atomic<std::uint8_t> status_ = RUNNING;
     std::atomic<std::uint8_t> initializedWorkers_ = 0;
 };

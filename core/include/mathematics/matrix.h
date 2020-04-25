@@ -1,12 +1,12 @@
 #pragma once
 
+#include "engine/assert.h"
 #include "mathematics/vector.h"
 #include "mathematics/angle.h"
 #include "mathematics/quaternion.h"
 #include "mathematics/intrinsincs.h"
-#include "trigo.h"
+#include "mathematics/trigo.h"
 
-#include <cassert>
 
 namespace neko
 {
@@ -398,7 +398,7 @@ const inline Mat4f Mat4f::Zero = Mat4f(
 template <>
 inline Mat4f Mat4f::Perspective(radian_t fovy, float aspect, float near, float far)
 {
-    assert(fabsf(aspect - std::numeric_limits<float>::epsilon()) > 0.0f);
+    neko_assert(fabsf(aspect - std::numeric_limits<float>::epsilon()) > 0.0f, "Aspect should not be zero");
 
     const float tanHalfFovy = Tan(fovy / 2.0f);
     Mat4f perspective{Mat4f::Zero};

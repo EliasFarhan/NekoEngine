@@ -15,16 +15,39 @@ JobSystem::~JobSystem()
 
 }
 
-void JobSystem::ScheduleJob(Job* func)
+void JobSystem::ScheduleJob(Job* func, JobThreadType threadType)
 {
-    {// CRITICAL
-        std::unique_lock<std::mutex> lock(mutex_);
-        jobs_.push(func);
-    }// !CRITICAL
-    cv_.notify_one();
+    auto scheduleJobFunc = [this, &func](JobQueue& jobQueue)
+    {
+        std::unique_lock<std::mutex> lock(jobQueue.mutex_);
+        jobQueue.jobs_.push(func);
+        jobQueue.cv_.notify_one();
+    };
+	switch (threadType)
+	{
+    case JobThreadType::MAIN_THREAD: {
+        break;
+    }
+    case JobThreadType::RENDER_THREAD:
+	{
+        scheduleJobFunc(renderJobs_);
+        break;
+    }
+    case JobThreadType::RESOURCE_THREAD:
+	{
+        scheduleJobFunc(resourceJobs_);
+    	break;
+    }
+    case JobThreadType::OTHER_THREAD:
+	{
+        scheduleJobFunc(jobs_);
+        break;
+    }
+	default: ;
+	}
 }
 
-void JobSystem::Work(std::queue<Job*>& jobs)
+void JobSystem::Work(JobQueue& jobQueue)
 {
     initializedWorkers_++; // Atomic increment.
 
@@ -32,17 +55,17 @@ void JobSystem::Work(std::queue<Job*>& jobs)
     {
         Job* job;
         {// CRITICAL
-            std::unique_lock<std::mutex> lock(mutex_);
-            if (!jobs.empty())
+            std::unique_lock<std::mutex> lock(jobQueue.mutex_);
+            if (!jobQueue.jobs_.empty())
             {
-                job = jobs.front();
-                jobs.pop();
+                job = jobQueue.jobs_.front();
+                jobQueue.jobs_.pop();
             }
             else
             {
                 if (status_ & Status::RUNNING) // Atomic check.
                 {
-                    cv_.wait(lock); // !CRITICAL
+                    jobQueue.cv_.wait(lock); // !CRITICAL
                 }
                 continue;
             }
@@ -85,11 +108,16 @@ void JobSystem::Init()
 void JobSystem::Destroy()
 {
 // Spin-lock waiting for all threads to become ready for shutdown.
-    while (initializedWorkers_ != numberOfWorkers || !jobs_.empty())
+    while (initializedWorkers_ != numberOfWorkers ||
+        !jobs_.jobs_.empty() ||
+        !renderJobs_.jobs_.empty() ||
+        !resourceJobs_.jobs_.empty())
     {} // WARNING: Not locking mutex for task_ access here!
 
     status_ = 0u; // Atomic assign.
-    cv_.notify_all(); // Wake all workers.
+    renderJobs_.cv_.notify_all();
+    resourceJobs_.cv_.notify_all();
+	jobs_.cv_.notify_all(); // Wake all workers.
     const size_t len = numberOfWorkers;
     for (size_t i = 0; i < len; ++i)
     {

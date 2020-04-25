@@ -32,6 +32,8 @@
 #include <mathematics/vector.h>
 #include <atomic>
 
+#include "jobsystem.h"
+
 
 namespace neko
 {
@@ -95,6 +97,7 @@ protected:
     static BasicEngine* instance_;
     Renderer* renderer_ = nullptr;
     Window* window_ = nullptr;
+    JobSystem jobSystem_;
 	bool isRunning_;
     std::atomic<float> dt_;
     Action<> initAction_;

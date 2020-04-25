@@ -35,7 +35,7 @@ TEST(Engine, TestJobSystem)
 		    jobSystem.Init();
 		    for (size_t i = 0; i < TASKS_COUNT; ++i)
 		    {
-                jobSystem.ScheduleJob(jobs[i].get());
+                jobSystem.ScheduleJob(jobs[i].get(),JobThreadType::OTHER_THREAD);
 		    }
 		    jobSystem.Destroy();
 #ifdef USING_EASY_PROFILER

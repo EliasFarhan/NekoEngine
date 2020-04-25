@@ -28,7 +28,7 @@
 #include "mathematics/const.h"
 #include <mathematics/intrinsincs.h>
 #include "mathematics/angle.h"
-#include "trigo.h"
+#include "mathematics/trigo.h"
 
 namespace neko
 {

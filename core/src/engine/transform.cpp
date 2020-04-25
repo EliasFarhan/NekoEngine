@@ -21,8 +21,9 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-#include <mathematics/transform.h>
+
 #include <engine/transform.h>
+#include <mathematics/transform.h>
 #include "engine/globals.h"
 
 
