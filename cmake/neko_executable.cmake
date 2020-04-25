@@ -1,6 +1,6 @@
 function(neko_bin_config binary)
 
-    set_target_properties(${library} PROPERTIES UNITY_BUILD ON)
+    set_target_properties(${binary} PROPERTIES UNITY_BUILD ON)
     if(Emscripten)
         if("${CMAKE_BUILD_TYPE}" MATCHES "Debug")
             set_target_properties(${binary} PROPERTIES  COMPILE_FLAGS
