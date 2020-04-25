@@ -7,9 +7,8 @@ namespace neko::gl
 
 class Gles3Renderer : public Renderer
 {
-protected:
+public:
     void ClearScreen() override;
-    void Update() override;
 
     void BeforeRenderLoop() override;
 

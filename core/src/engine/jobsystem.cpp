@@ -25,7 +25,9 @@ void JobSystem::ScheduleJob(Job* func, JobThreadType threadType)
     };
 	switch (threadType)
 	{
-    case JobThreadType::MAIN_THREAD: {
+    case JobThreadType::MAIN_THREAD:
+    {
+        func->Execute();
         break;
     }
     case JobThreadType::RENDER_THREAD:
@@ -136,7 +138,8 @@ Job::Job(std::function<void()> task) :
 
 void Job::Join() const
 {
-    taskDoneFuture_.get();
+    if(!(status_ & DONE))
+        taskDoneFuture_.get();
 }
 
 void Job::Execute()
@@ -151,6 +154,7 @@ void Job::Execute()
     status_ |= STARTED;
     task_();
     status_ |= DONE;
+    promise_.set_value();
 }
 
 bool Job::IsDone() const

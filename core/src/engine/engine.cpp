@@ -32,6 +32,7 @@
 #include <engine/log.h>
 #include <utilities/file_utility.h>
 #include "graphics/graphics.h"
+#include <engine/window.h>
 #include "imgui.h"
 #ifdef EASY_PROFILE_USE
 #include <easy/profiler.h>
@@ -79,18 +80,34 @@ void BasicEngine::Update(seconds dt)
 #ifdef EASY_PROFILE_USE
 	EASY_BLOCK("Basic Engine Update");
 #endif
-	{
-#ifdef EASY_PROFILE_USE
-		EASY_BLOCK("Application Update");
-#endif
+    Job eventJob([this]{ManageEvent();});
+    Job updateJob([this, &dt]{updateAction_.Execute(dt);});
+    updateJob.AddDependency(&eventJob);
 
-		updateAction_.Execute(dt);
-	}
-#if defined(NEKO_SAMETHREAD)
-	renderer_->Update();
-#endif
+    Job rendererSyncJob([this]{renderer_->Sync();});
+    updateJob.AddDependency(&rendererSyncJob);
 
-	renderer_->Sync();
+    Job renderJob([this]{
+        renderer_->ClearScreen();
+        GenerateUiFrame();
+        renderer_->RenderAll();
+        window_->RenderUi();
+    });
+    renderJob.AddDependency(&eventJob);
+
+    Job swapBufferJob([this]{
+       window_->SwapBuffer();
+    });
+    swapBufferJob.AddDependency(&renderJob);
+    swapBufferJob.AddDependency(&updateJob);
+
+    jobSystem_.ScheduleJob(&rendererSyncJob, JobThreadType::RENDER_THREAD);
+    jobSystem_.ScheduleJob(&renderJob, JobThreadType::RENDER_THREAD);
+    jobSystem_.ScheduleJob(&swapBufferJob, JobThreadType::RENDER_THREAD);
+    jobSystem_.ScheduleJob(&eventJob, JobThreadType::MAIN_THREAD);
+    jobSystem_.ScheduleJob(&updateJob, JobThreadType::MAIN_THREAD);
+
+    swapBufferJob.Join();
 }
 
 void BasicEngine::Destroy()
@@ -115,8 +132,9 @@ void EmLoop(void* arg)
 void BasicEngine::EngineLoop()
 {
 	isRunning_ = true;
-
-	renderer_->RenderLoop();
+    window_->LeaveCurrentContext();
+	Job initRenderJob([this]{window_->MakeCurrentContext();});
+	jobSystem_.ScheduleJob(&initRenderJob, JobThreadType::RENDER_THREAD);
 	clock = std::chrono::system_clock::now();
 #ifdef EMSCRIPTEN
 	// void emscripten_set_main_loop(em_callback_func func, int fps, int simulate_infinite_loop);
@@ -150,9 +168,6 @@ void BasicEngine::GenerateUiFrame()
 
 	std::ostringstream oss;
 	oss << "App FPS: " << 1.0f / GetDeltaTime() << '\n'
-#if !defined(NEKO_SAME_THREAD)
-		<< "Render FPS: " << 1.0f / renderer_->GetDeltaTime()
-#endif
 		<< '\n';
 	ImGui::Text("%s", oss.str().c_str());
 	ImGui::End();

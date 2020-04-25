@@ -99,31 +99,21 @@ public:
      */
     void Sync();
 
-    virtual void Update();
-    void RenderLoop();
+    virtual void RenderAll();
 
     void Destroy();
 
     void SetFlag(RendererFlag flag);
     void SetWindow(Window* window);
-    float GetDeltaTime() const { return dt_; }
-protected:
-    virtual void ClearScreen() = 0;
 
-    virtual void RenderAll();
+    virtual void ClearScreen() = 0;
+protected:
+
 
     virtual void BeforeRenderLoop();
     virtual void AfterRenderLoop();
 
     Window* window_ = nullptr;
-    std::thread renderThread_;
-
-    //Used to synchronize the EngineLoop with the RenderLoop
-#ifndef EMSCRIPTEN
-    std::mutex renderMutex_;
-
-    std::condition_variable cv_;
-#endif
 
     std::atomic<std::uint8_t> flags_{IS_RENDERING_UI};
     std::atomic<float> dt_{0.0f};

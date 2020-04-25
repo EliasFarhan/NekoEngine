@@ -61,56 +61,13 @@ void Renderer::RenderAll()
 
 void Renderer::Sync()
 {
-#if !defined(NEKO_SAMETHREAD)
 #ifdef EASY_PROFILE_USE
-	EASY_BLOCK("EngineRenderSync");
-	EASY_BLOCK("EngineAppWaiting");
-	EASY_BLOCK("AcquireRenderLock");
-#endif
-	std::unique_lock lock(renderMutex_);
-#ifdef EASY_PROFILE_USE
-	EASY_END_BLOCK;
-#endif
-	flags_ |= IS_APP_WAITING;
-#ifdef EASY_PROFILE_USE
-	EASY_BLOCK("WaitForRenderSignal");
-#endif
-	cv_.wait(lock);
-#ifdef EASY_PROFILE_USE
-	EASY_END_BLOCK;
-	EASY_END_BLOCK;
 	EASY_BLOCK("SwapRenderCommand");
-#endif
 #endif
 	std::swap(currentCommandBuffer_, nextCommandBuffer_);
 	nextCommandBuffer_.clear();
 	//TODO copy all the new transform3d?
-	auto* engine = BasicEngine::GetInstance();
-	engine->ManageEvent();
-	flags_ &= ~IS_APP_WAITING;
-}
 
-void Renderer::RenderLoop()
-{
-#if !defined(NEKO_SAMETHREAD)
-	flags_ |= IS_RUNNING;
-	window_->LeaveCurrentContext();
-	renderThread_ = std::thread([this] {
-		BeforeRenderLoop();
-
-		std::chrono::time_point<std::chrono::system_clock> clock = std::chrono::system_clock::now();
-		while (flags_ & IS_RUNNING)
-		{
-			const auto start = std::chrono::system_clock::now();
-			const auto dt = std::chrono::duration_cast<seconds>(start - clock);
-			dt_ = dt.count();
-			clock = start;
-
-			Update();
-		}
-		AfterRenderLoop();
-		});
-#endif
 }
 
 void Renderer::Destroy()
@@ -119,9 +76,6 @@ void Renderer::Destroy()
 	EASY_BLOCK("ClosingFromEngine");
 #endif
 	flags_ &= ~IS_RUNNING;
-#if !defined(NEKO_SAMETHREAD)
-	renderThread_.join();
-#endif
 }
 
 void Renderer::SetFlag(Renderer::RendererFlag flag)
@@ -134,55 +88,6 @@ void Renderer::SetWindow(Window* window)
 	window_ = window;
 }
 
-void Renderer::Update()
-{
-#ifdef EASY_PROFILE_USE
-	EASY_BLOCK("RenderFullUpdateCPU");
-#endif
-
-
-	auto* engine = BasicEngine::GetInstance();
-	{
-#if !defined(NEKO_SAMETHREAD)
-		std::unique_lock<std::mutex> lock(renderMutex_);
-#endif
-#ifdef EASY_PROFILE_USE
-		EASY_BLOCK("RenderUpdateCPU");
-#endif
-		ClearScreen();
-		engine->GenerateUiFrame();
-		RenderAll();
-#if !defined(NEKO_SAMETHREAD)
-		lock.unlock();
-#endif
-		window_->RenderUi();
-	}
-	{
-#if !defined(NEKO_SAMETHREAD)
-		std::unique_lock<std::mutex> lock(renderMutex_);
-#endif
-#ifdef EASY_PROFILE_USE
-		EASY_BLOCK("RenderSwapBufferCPU");
-#endif
-		window_->SwapBuffer();
-	}
-	{
-#ifdef EASY_PROFILE_USE
-		EASY_BLOCK("WaitForAppCPU");
-#endif
-#if !defined(NEKO_SAMETHREAD)
-		while (!(flags_ & IS_APP_WAITING) && (flags_ & IS_RUNNING))
-		{
-			cv_.notify_one();
-		}
-
-		{
-			cv_.notify_one();
-		}
-#endif
-
-	}
-}
 void Renderer::BeforeRenderLoop()
 {
 #if !defined(NEKO_SAMETHREAD)
