@@ -145,7 +145,7 @@ namespace neko
 		
 		void PushBack(T element)
 		{		
-			if (Size() >= queueVector.capacity())
+			if (Size() >=queueVector.size())
 			{
 				Rebase();
 				queueVector.resize(Size());
@@ -155,6 +155,13 @@ namespace neko
 			if (end_ + 1 != start_)
 			{
 				end_++;
+				if (end_ > queueVector.size())
+				{
+					if (start_ != 0)
+					{
+						end_ = 0;
+					}
+				}
 			}
 					
 		}
@@ -189,20 +196,29 @@ namespace neko
 			
 			
 		}
-		int Size()
+		size_t Size()
 		{
-			if (end_ > start_)
+			if (start_ == 0 && end_ == 0)
 			{
-				return end_ - start_ + 1;
+				return 1;
 			}
-			else {
-				return   start_ - end_ + 1;
+			else 
+			{  
+				if (end_ > start_)
+				{
+					return end_ - start_ + 1;
+				}
+			
+				else 
+				{
+					return   start_ - end_ + 1;
+				}
 			}
 		}
 		
 		void Rebase()
 		{
-			for (int i = 0; i < Size(); i++)
+			for (size_t i = 0; i < Size(); i++)
 			{
 				queueVector[i] = queueVector[start_ + i];
 			}
@@ -240,7 +256,7 @@ namespace neko
 		T Pop()
 		{
 			T pop = queueVector[0];
-			for (int i = 0; i < Size(); i++)
+			for (size_t i = 0; i < Size(); i++)
 			{
 				queueVector[i] = queueVector[i+1];
 			}
@@ -255,7 +271,7 @@ namespace neko
 		{
 			return queueVector[Size()-1];
 		};
-		int Size()
+		size_t Size()
 		{
 			return queueVector.capacity();
 		};
