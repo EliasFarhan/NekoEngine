@@ -10,13 +10,41 @@ namespace neko
 	{
 	public:
 		FixedQueue();
+		
 		~FixedQueue() = default;
-		void Push(T element); //need
-		void Clear(); //need
-		T Pop(); //need
-		T Front(); //need
-		T Back(); //need
-		int Size(); //useful ?
+
+		void Push(T element)
+		{
+			allocator.push_back(element);
+		}
+
+		void Clear()
+		{
+			allocator._Destroy();
+		}
+
+		T Pop()
+		{
+			T returnValue = queueVector[0];
+			allocator.erase(0);
+			return returnValue;
+		}
+
+		T Front()
+		{
+			return allocator.begin();
+		}
+
+		T Back()
+		{
+			return allocator.end();
+		}
+
+		int Size()
+		{
+			return allocator.size();
+		}
+
 	private:
 		std::allocator<int> allocator;
 	};
@@ -128,8 +156,7 @@ namespace neko
 			{
 				end_++;
 			}
-			
-			
+					
 		}
 		void Clear()
 		{
@@ -179,7 +206,7 @@ namespace neko
 			{
 				queueVector[i] = queueVector[start_ + i];
 			}
-			end_ = Size();
+			end_ = Size()-1;
 			queueVector.resize(end_);
 			start_ = 0;
 		}
