@@ -26,6 +26,7 @@
 #include "mathematics/vector.h"
 #include "matrix.h"
 #include "const.h"
+#include "engine/assert.h"
 #include "transform.h"
 
 namespace neko {
@@ -51,34 +52,6 @@ struct Obb2d {
         localLowerLeftBound = localExtends * -1.0f;
         localUpperRightBound = localExtends;
 		rotation = rot;
-    }
-
-    bool IntersectObb(Obb2d obb) {
-        Vec2f axis1 = CalculateDirection();
-        Vec2f axis2 = GetRight();
-        Vec2f axis3 = obb.CalculateDirection();
-        Vec2f axis4 = obb.GetRight();
-
-		float centersDistance = (GetCenter() - obb.GetCenter()).Magnitude();
-
-		if(centersDistance <= GetExtendOnAxis(axis1) + obb.GetExtendOnAxis(axis1))
-		{
-			return true;
-		}
-		if (centersDistance <= GetExtendOnAxis(axis2) + obb.GetExtendOnAxis(axis2))
-		{
-			return true;
-		}
-		if (centersDistance <= GetExtendOnAxis(axis3) + obb.GetExtendOnAxis(axis3))
-		{
-			return true;
-		}
-		if (centersDistance <= GetExtendOnAxis(axis4) + obb.GetExtendOnAxis(axis4))
-		{
-			return true;
-		}
-
-        return false;
     }
 
     float GetExtendOnAxis(Vec2f axis) {
@@ -168,7 +141,7 @@ struct Obb2d {
         return axes;
     }
 
-    bool IsOverlapping(Obb2d& obb1)
+    bool IntersectObb(Obb2d& obb1)
     {
         std::array<Vec2f, 4> perpendicularAxis = { GetUp(), GetRight(), obb1.GetUp(), obb1.GetRight()};
         // we need to find the minimal overlap and axis on which it happens
@@ -346,9 +319,9 @@ struct Obb3d {
         return Vec2f(min, max);
     }
 
-    bool IsOverlapping(Obb3d& obb1)
+    bool IntersectObb(Obb3d& obb1)
     {
-        std::array<Vec3f, 6> perpendicularAxis = { GetUp(), GetRight(), GetForward(), obb1.GetUp(), obb1.GetRight(), obb1.GetForward(), };
+        std::array<Vec3f, 6> perpendicularAxis = { GetUp(), GetRight(), GetForward(), obb1.GetUp(), obb1.GetRight(), obb1.GetForward()};
         // we need to find the minimal overlap and axis on which it happens
         for (auto& axis : perpendicularAxis) {
             Vec2f proj1 = ProjectOnAxis(axis);
@@ -390,7 +363,9 @@ struct Aabb2d {
     Vec2f CalculateExtends() const { return 0.5f * (upperRightBound - lowerLeftBound); }
 
     ///\brief Set the AABB from the center, extends.
-    void FromCenterExtends(const Vec2f center, const Vec2f extends) {
+    void FromCenterExtends(const Vec2f center, Vec2f extends) {
+        extends.x = abs(extends.x);
+        extends.y = abs(extends.y);
         lowerLeftBound = center - extends;
         upperRightBound = center + extends;
     }
@@ -398,8 +373,10 @@ struct Aabb2d {
     ///\brief Enlarge AABB after a rotation
     void FromCenterExtendsRotation(
         const Vec2f center,
-        const Vec2f extends,
+        Vec2f extends,
         const degree_t rotation) {
+        extends.x = abs(extends.x);
+        extends.y = abs(extends.y);
         Vec2f relativeLowerLeftBound = extends *-1.0f;
         Vec2f relativeUpperRightBound = extends;
         radian_t newAngle = rotation;
@@ -438,12 +415,15 @@ struct Aabb2d {
     }
 
     bool IntersectAabb(const Aabb2d& aabb) const {
-        return (ContainsPoint(aabb.upperRightBound) || ContainsPoint(aabb.lowerLeftBound)
-        );
+        bool x = abs(aabb.CalculateCenter().x - CalculateCenter().x) <= (aabb.CalculateExtends().x + CalculateExtends().x);
+        bool y = abs(aabb.CalculateCenter().y - CalculateCenter().y) <= (aabb.CalculateExtends().y + CalculateExtends().y);
+
+        return x && y;
     }
 
 
     bool IntersectRay(const Vec2f& dirRay, const Vec2f& origin) const {
+        neko_assert(Vec2f(0, 0) != dirRay, "Null Ray Direction");
         if (ContainsPoint(origin))
         {
             return true;
@@ -486,8 +466,11 @@ struct Aabb3d {
     ///\brief Set the AABB from the center, extends.
     void FromCenterExtends(
         const Vec3f center,
-        const Vec3f extends,
+        Vec3f extends,
         const Vec3f rotation = Vec3f::zero) {
+        extends.x = abs(extends.x);
+        extends.y = abs(extends.y);
+        extends.z = abs(extends.z);
         lowerLeftBound = center - extends;
         upperRightBound = center + extends;
     }
@@ -495,8 +478,11 @@ struct Aabb3d {
     ///\brief Enlarge AABB after a rotation
     void FromCenterExtendsRotation(
         const Vec3f center,
-        const Vec3f extends,
+        Vec3f extends,
         const RadianAngles rotation) {
+        extends.x = abs(extends.x);
+        extends.y = abs(extends.y);
+        extends.z = abs(extends.z);
         Vec3f relativeLowerLeftBound = extends * -1.0f;
         Vec3f relativeUpperRightBound = extends;
         std::array<Vec3f, 8> corners;
@@ -540,11 +526,16 @@ struct Aabb3d {
     }
 
     bool IntersectAabb(const Aabb3d& aabb) const {
-        return (ContainsPoint(aabb.upperRightBound) ||
-                ContainsPoint(aabb.lowerLeftBound));
+        bool x = abs(aabb.CalculateCenter().x - CalculateCenter().x) <= (aabb.CalculateExtends().x + CalculateExtends().x);
+        bool y = abs(aabb.CalculateCenter().y - CalculateCenter().y) <= (aabb.CalculateExtends().y + CalculateExtends().y);
+        bool z = abs(aabb.CalculateCenter().z - CalculateCenter().z) <= (aabb.CalculateExtends().z + CalculateExtends().z);
+
+        return x && y && z;
     }
 
     bool IntersectRay(const Vec3f& dirRay, const Vec3f& origin) const {
+
+        neko_assert(Vec3f(0, 0, 0) != dirRay, "Null Ray Direction");
         if (ContainsPoint(origin))
         {
             return true;
