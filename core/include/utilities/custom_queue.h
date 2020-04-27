@@ -144,25 +144,31 @@ namespace neko
 		~DynamicQueue() = default;
 		
 		void PushBack(T element)
-		{		
-			if (Size() >=queueVector.size())
+		{
+			
+			if (Size()-1 >= queueVector.size())
 			{
-				Rebase();
-				queueVector.resize(Size());
+				if (!queueVector.empty())
+					Rebase();
+				queueVector.resize(Size()+1);
+				
 			}
 			
 			queueVector[end_] = element;
 			if (end_ + 1 != start_)
 			{
 				end_++;
-				if (end_ > queueVector.size())
-				{
-					if (start_ != 0)
-					{
-						end_ = 0;
-					}
-				}
 			}
+			else 
+			{
+				Rebase();
+				end_++;
+			}
+			if (end_ >= queueVector.size()&& start_ != 0)
+			{
+				end_ = 0;				
+			}
+			
 					
 		}
 		void Clear()
@@ -171,11 +177,11 @@ namespace neko
 			start_ = 0;
 			end_ = 0;
 		}
-		T Pop()
+		T PopFront()
 		{
 			T pop = queueVector[start_];
 			start_++;
-			if (start_ > queueVector.capacity())
+			if (start_> queueVector.size()-1)
 			{
 				start_ = 0;
 			}
@@ -191,39 +197,35 @@ namespace neko
 			{
 				return queueVector[end_ - 1];
 			}
-			
-			return queueVector[end_];
-			
-			
+		
 		}
 		size_t Size()
 		{
 			if (start_ == 0 && end_ == 0)
 			{
-				return 1;
+				return 0;
 			}
 			else 
 			{  
 				if (end_ > start_)
 				{
-					return end_ - start_ + 1;
+					return end_ - start_ +1;
 				}
 			
 				else 
 				{
-					return   start_ - end_ + 1;
+					return   start_ - end_+1;
 				}
 			}
 		}
 		
 		void Rebase()
 		{
-			for (size_t i = 0; i < Size(); i++)
+			for (size_t i = 0; i < Size()-1; i++)
 			{
 				queueVector[i] = queueVector[start_ + i];
 			}
 			end_ = Size()-1;
-			queueVector.resize(end_);
 			start_ = 0;
 		}
 		T& operator[](size_t idx)
@@ -253,10 +255,11 @@ namespace neko
 		{
 			queueVector.clear();
 		};
-		T Pop()
+		T PopFront()
 		{
 			T pop = queueVector[0];
-			for (size_t i = 0; i < Size(); i++)
+			
+			for (size_t i = 0; i < Size()-1; i++)
 			{
 				queueVector[i] = queueVector[i+1];
 			}
@@ -273,7 +276,7 @@ namespace neko
 		};
 		size_t Size()
 		{
-			return queueVector.capacity();
+			return queueVector.size();
 		};
 		T& operator[](size_t idx)
 		{
