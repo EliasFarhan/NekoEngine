@@ -9,14 +9,6 @@ namespace neko {
 		// std::find_if(arra.begin(), arra.end(). []{})
 	}
 
-	TEST(Array, SmallVectorOperator) {
-		SmallVector<double> intVec(5);
-		intVec[4] = 18.58484845;
-		EXPECT_EQ(intVec[4], 18.58484845);
-
-	}
-
-
 	TEST(Array, DynArrays) {
 
 		const size_t ALLOCATOR_HEADER_SIZE = 16;
@@ -33,5 +25,14 @@ namespace neko {
 		
 		EXPECT_EQ(doubleArray[1], 0.1 + 52);
 	}
+
+	/*
+	TEST(Array, SmallVectorOperator) {
+		SmallVector<double> intVec(5);
+		intVec[4] = 18.58484845;
+		EXPECT_EQ(intVec[4], 18.58484845);
+
+	}
+	*/
 
 }// !neko

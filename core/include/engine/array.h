@@ -129,13 +129,16 @@ namespace neko
 			}
 			else {
 				if (size_ + 1 > capacity_) {
-
-					allocator_.Deallocate(data_);
 					capacity_ *= 2;
-					data_ = (T*)allocator_.Allocate(sizeof(T) * capacity_, alignof(T));
-
-					data_[size_] = elem;
+					T* data = (T*)allocator_.Allocate(sizeof(T) * capacity_, alignof(T));
+					for(int i=0; i<size_;i++){
+						data[i] = data_[i];
+					}
+					data[size_] = elem;
 					size_++;
+					allocator_.Deallocate(data_);
+					
+					data_ = data;
 				}
 				else {
 					data_[size_] = elem;
