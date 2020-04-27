@@ -55,26 +55,15 @@ TEST(Engine, TestFourCircle)
 	
 	const auto results = neko::FourCircle::IntersectsIntrinsicsCircle(n_circle, n_circle2);
 
-	EXPECT_FALSE(results[0] == array[0].Intersects(array2[0]));
-	EXPECT_FALSE(results[0] == array[0].Intersects(array2[1]));
-	EXPECT_FALSE(results[0] == array[0].Intersects(array2[2]));
-	EXPECT_TRUE(results[0] == array[0].Intersects(array2[3]));
+	EXPECT_TRUE(results & array[0].Intersects(array2[3]) << 0u);
 
-	EXPECT_FALSE(results[1] == array[1].Intersects(array2[0]));
-	EXPECT_TRUE(results[1] == array[1].Intersects(array2[1]) );
-	EXPECT_FALSE(results[1] == array[1].Intersects(array2[2]));
-	EXPECT_TRUE(results[1] == array[1].Intersects(array2[3]) );
+	EXPECT_TRUE(results &  array[1].Intersects(array2[1]) << 1u);
+	EXPECT_TRUE(results &  array[1].Intersects(array2[3]) << 1u);
 	
-	EXPECT_FALSE(results[2] == array[2].Intersects(array2[0]));
-	EXPECT_FALSE(results[2] == array[2].Intersects(array2[1]));
-	EXPECT_FALSE(results[2] == array[2].Intersects(array2[2]));
-	EXPECT_TRUE(results[2] == array[2].Intersects(array2[3]));
-
-	
-	EXPECT_FALSE(results[3] == array[3].Intersects(array2[0]));
-	EXPECT_FALSE(results[3] == array[3].Intersects(array2[1]));
-	EXPECT_TRUE(results[3] == array[3].Intersects(array2[2]));
-	EXPECT_TRUE(results[3] == array[3].Intersects(array2[3]));
+	EXPECT_TRUE(results & array[2].Intersects(array2[3]) << 2u);
+						  
+	EXPECT_TRUE(results & array[3].Intersects(array2[2]) << 3u);
+	EXPECT_TRUE(results & array[3].Intersects(array2[3]) << 3u);
 }
 
 
@@ -86,6 +75,7 @@ TEST(Engine, TestFourSphere)
 		neko::Sphere(neko::Vec3f(2, 0, 0), 1),
 		neko::Sphere(neko::Vec3f(5, 0, 0), 2)
 	};
+	
 	std::array<neko::Sphere, 4> array2 = {
 		neko::Sphere(neko::Vec3f(-3, 5, 0), 2),
 		neko::Sphere(neko::Vec3f(0, 8, 0), 3),
@@ -97,25 +87,14 @@ TEST(Engine, TestFourSphere)
 
 	const auto results = neko::FourSphere::IntersectIntrinsicsSphere(n_sphere, n_sphere2);
 
-	EXPECT_FALSE(results[0] == array[0].Intersects(array2[0]));
-	EXPECT_FALSE(results[0] == array[0].Intersects(array2[1]));
-	EXPECT_FALSE(results[0] == array[0].Intersects(array2[2]));
-	EXPECT_TRUE(results[0] == array[0].Intersects(array2[3]));
+	EXPECT_TRUE(results & array[0].Intersects(array2[3]) << 0u);
 
-	EXPECT_FALSE(results[0] == array[1].Intersects(array2[0]));
-	EXPECT_TRUE(results[0] == array[1].Intersects(array2[1]));
-	EXPECT_FALSE(results[0] == array[1].Intersects(array2[2]));
-	EXPECT_TRUE(results[0] == array[1].Intersects(array2[3]));
+	EXPECT_TRUE(results & array[1].Intersects(array2[1]) << 1u);
+	EXPECT_TRUE(results & array[1].Intersects(array2[3]) << 1u);
 
-	EXPECT_FALSE(results[0] == array[2].Intersects(array2[0]));
-	EXPECT_FALSE(results[0] == array[2].Intersects(array2[1]));
-	EXPECT_FALSE(results[0] == array[2].Intersects(array2[2]));
-	EXPECT_TRUE(results[0] == array[2].Intersects(array2[3]));
+	EXPECT_TRUE(results & array[2].Intersects(array2[3]) << 2u);
 
-
-	EXPECT_FALSE(results[0] == array[3].Intersects(array2[0]));
-	EXPECT_FALSE(results[0] == array[3].Intersects(array2[1]));
-	EXPECT_TRUE(results[0] == array[3].Intersects(array2[2]));
-	EXPECT_TRUE(results[0] == array[3].Intersects(array2[3]));
+	EXPECT_TRUE(results & array[3].Intersects(array2[2]) << 3u);
+	EXPECT_TRUE(results & array[3].Intersects(array2[3]) << 3u);
 }
 

@@ -261,7 +261,7 @@ public:
 
         return results;
     }
-    static std::array<bool, 4> IntersectsIntrinsicsCircle(const FourCircle& circlesA, const FourCircle& circlesB);
+    static uint8_t IntersectsIntrinsicsCircle(const FourCircle& circlesA, const FourCircle& circlesB);
 };
 
 struct alignas(4 * sizeof(float)) FourSphere
@@ -316,112 +316,74 @@ struct alignas(4 * sizeof(float)) FourSphere
 
         return results;
     }
-
-    static std::array<bool, 4> IntersectIntrinsicsSphere(const FourSphere & spheresA, const FourSphere& spheresB);
+    static uint8_t IntersectIntrinsicsSphere(const FourSphere & spheresA, const FourSphere& spheresB);
 };
 
 #ifdef __SSE__
 /**
 * \brief Test the intersection between four circle in a list.
 */
-inline std::array<bool, 4> FourCircle::IntersectsIntrinsicsCircle(const FourCircle& circlesA, const FourCircle& circlesB)
+inline uint8_t FourCircle::IntersectsIntrinsicsCircle(const FourCircle& circlesA, const FourCircle& circlesB)
 {
-    std::array<bool, 4> results = {};
+    __m128 x1 = _mm_load_ps(circlesA.centerXs.data());
+    __m128 y1 = _mm_load_ps(circlesA.centerYs.data());
+    __m128 rad1 = _mm_load_ps(circlesA.radius.data());
 
-    __m128 x1;
-    __m128 y1;
-    __m128 distx;
-    __m128 rad1;
-
-    __m128 x2;
-    __m128 y2;
-    __m128 disty;
-    __m128 rad2;
-
-    x1 = _mm_load_ps(circlesA.centerXs.data());
-    y1 = _mm_load_ps(circlesA.centerYs.data());
-    rad1 = _mm_load_ps(circlesA.radius.data());
-
-    x2 = _mm_load_ps(circlesB.centerXs.data());
-    y2 = _mm_load_ps(circlesB.centerYs.data());
-    rad2 = _mm_load_ps(circlesB.radius.data());
+    __m128 x2 = _mm_load_ps(circlesB.centerXs.data());
+    __m128 y2 = _mm_load_ps(circlesB.centerYs.data());
+    __m128 rad2 = _mm_load_ps(circlesB.radius.data());
     x1 = _mm_sub_ps(x1, x2);
     y1 = _mm_sub_ps(y1, y2);
 
     __m128 radSum = _mm_add_ps(rad1, rad2);
     __m128 radSub = _mm_sub_ps(rad2, rad1);
 
-    distx = _mm_mul_ps(x1, x1);
-    disty = _mm_mul_ps(y1, y1);
+    __m128 distx = _mm_mul_ps(x1, x1);
+    __m128 disty = _mm_mul_ps(y1, y1);
 
     distx = _mm_add_ps(distx, disty);
 
     __m128 mag = _mm_rsqrt_ps(distx);
     __m128 mask = _mm_cmpneq_ps(_mm_cmple_ps(radSum, mag), _mm_cmple_ps(radSub, mag));
 
-    int result = _mm_movemask_ps(mask);
-    for (int i = 0; i < 4; i++) {
-        if (result != 0) {
-            results[i] = 1;
-        }
-    }
+    uint8_t results = _mm_movemask_ps(mask);
+    
     return results;
 }
+	
 /**
 * \brief Test the intersection between four sphere in a list.
 */
 
-inline std::array<bool, 4> FourSphere::IntersectIntrinsicsSphere(const FourSphere& spheresA, const FourSphere& spheresB)
+inline uint8_t FourSphere::IntersectIntrinsicsSphere(const FourSphere& spheresA, const FourSphere& spheresB)
 {
-    alignas(16) std::array<bool, 4> results = {};
+    __m128 x1 = _mm_load_ps(spheresA.centerXs.data());
+    __m128 x2 = _mm_load_ps(spheresB.centerXs.data());
 
-    __m128 x1;
-    __m128 y1;
-    __m128 z1;
-    __m128 rad1;
+    __m128 y1 = _mm_load_ps(spheresA.centerYs.data());
+    __m128 y2 = _mm_load_ps(spheresB.centerYs.data());
 
-    __m128 x2;
-    __m128 y2;
-    __m128 z2;
-    __m128 rad2;
+    __m128 z1 = _mm_load_ps(spheresA.centerZs.data());
+    __m128 z2 = _mm_load_ps(spheresB.centerZs.data());
 
-    __m128 distx;
-    __m128 disty;
-    __m128 distz;
+    __m128 rad1 = _mm_load_ps(spheresA.radius.data());
+    __m128 rad2 = _mm_load_ps(spheresB.radius.data());
 
-    x1 = _mm_load_ps(spheresA.centerXs.data());
-    x2 = _mm_load_ps(spheresB.centerXs.data());
+    __m128 radSum = _mm_add_ps(rad1, rad2); // radius + sphere.radius
+    __m128 radSub = _mm_sub_ps(rad2, rad1); // radius - sphere.radius
+    __m128 x3 = _mm_sub_ps(x1, x2); // center.x - sphere.center.x
+    __m128 y3 = _mm_sub_ps(y1, y2); //center.y - sphere.center.y
+    __m128 z3 = _mm_sub_ps(z1, z2); //center.z - sphere.center.z
 
-    y1 = _mm_load_ps(spheresA.centerYs.data());
-    y2 = _mm_load_ps(spheresB.centerYs.data());
-
-    z1 = _mm_load_ps(spheresA.centerZs.data());
-    z2 = _mm_load_ps(spheresB.centerZs.data());
-
-    rad1 = _mm_load_ps(spheresA.radius.data());
-    rad2 = _mm_load_ps(spheresB.radius.data());
-
-    auto radSum = _mm_add_ps(rad1, rad2); // radius + sphere.radius
-    auto radSub = _mm_sub_ps(rad2, rad1); // radius - sphere.radius
-    auto x3 = _mm_sub_ps(x1, x2); // center.x - sphere.center.x
-    auto y3 = _mm_sub_ps(y1, y2); //center.y - sphere.center.y
-    auto z3 = _mm_sub_ps(z1, z2); //center.z - sphere.center.z
-
-    distx = _mm_mul_ps(x3, x3);
-    disty = _mm_mul_ps(y3, y3);
-    distz = _mm_mul_ps(z3, z3);
+    __m128 distx = _mm_mul_ps(x3, x3);
+    __m128 disty = _mm_mul_ps(y3, y3);
+    __m128 distz = _mm_mul_ps(z3, z3);
 
     auto dist = _mm_add_ps(distx, _mm_add_ps(disty, distz));
 
     auto mag = _mm_rsqrt_ps(dist);
     auto mask = _mm_cmpneq_ps(_mm_cmple_ps(radSum, mag), _mm_cmple_ps(radSub, mag));
-    auto result = _mm_movemask_ps(mask);
-
-    for (int i = 0; i < 4; i++) {
-        if (result != 0) {
-            results[i] = 1;
-        }
-    }
+    uint8_t results = _mm_movemask_ps(mask);
 
     return results;
 }
