@@ -46,44 +46,59 @@ TEST(Engine, TestFourCircle)
 	neko::Vec2f pos(2.0f, 2.0f);
 	neko::Vec2f pos2(0.0f, 0.0f);	
 	
-	std::array<neko::Circle, 4> array = {
+	std::array<neko::Circle, 4> array1 = {
 		neko::Circle(neko::Vec2f(2, 2), 2),
 		neko::Circle(neko::Vec2f(3, 3), 3),
 		neko::Circle(neko::Vec2f(3, 3), 1),
 		neko::Circle(neko::Vec2f(-2, 2), 2)
 	};
-	const neko::FourCircle n_circle(array);
+	std::array<neko::Circle, 4> array2 = {
+	neko::Circle(neko::Vec2f(3, 3), 1),
+	neko::Circle(neko::Vec2f(-2, 2), 2),
+	neko::Circle(neko::Vec2f(2, 2), 2),
+	neko::Circle(neko::Vec2f(3, 3), 3),
+	};
+	const neko::FourCircle n_circle1(array1);
+	const neko::FourCircle n_circle2(array2);
 	
-	const auto results = n_circle.IntersectsIntrinsics(n_circle);
+	const auto results = n_circle1.IntersectsIntrinsics(n_circle2);
 	std::cout << "---------TEST INTERSECT INTRINSICS---------\n";
 
-	EXPECT_TRUE(results[0] == array[0].Intersects(array[1]));
-	EXPECT_TRUE(results[1] == array[1].Intersects(array[2]));
-	EXPECT_TRUE(results[2] == array[0].Intersects(array[3]));
-	EXPECT_FALSE(results[3] == array[2].Intersects(array[3]));
+	EXPECT_TRUE(results[0] == array1[0].Intersects(array2[0]));
+	EXPECT_TRUE(results[1] == array1[1].Intersects(array2[1]));
+	EXPECT_TRUE(results[2] == array1[2].Intersects(array2[2]));
+	EXPECT_TRUE(results[3] == array1[3].Intersects(array2[3]));
 
+	
 }
 
 
 TEST(Engine, TestFourSphere)
 {
-	std::array<neko::Sphere, 4> array = {
+	std::array<neko::Sphere, 4> array1 = {
 		neko::Sphere(neko::Vec3f(2, 2, 2), 2),
 		neko::Sphere(neko::Vec3f(3, 3, 3), 3),
 		neko::Sphere(neko::Vec3f(3, 3, 3), 1),
 		neko::Sphere(neko::Vec3f(2, 2, -2), 2)
 	};
+	std::array<neko::Sphere, 4> array2 = {
+	neko::Sphere(neko::Vec3f(2, 2, -2), 2),
+	neko::Sphere(neko::Vec3f(2, 2, 2), 2),
+	neko::Sphere(neko::Vec3f(3, 3, 3), 1),
+	neko::Sphere(neko::Vec3f(3, 3, 3), 3),
+	};
 
-	const neko::FourSphere n_sphere(array);
+	const neko::FourSphere n_sphere(array1);
+	const neko::FourSphere n_sphere2(array2);
 	
 	auto result = n_sphere.IntersectIntrinsics(n_sphere);
 	
 	std::cout << "---------TEST INTERSECT INTRINSICS---------\n";
 	
-	EXPECT_TRUE(result[0] == array[0].Intersects(array[1]));
-	EXPECT_TRUE(result[1] == array[1].Intersects(array[2]));
-	EXPECT_TRUE(result[2] == array[0].Intersects(array[3]));
-	EXPECT_FALSE(result[3] == array[2].Intersects(array[3]));
+	EXPECT_TRUE(result[0] == array1[0].Intersects(array2[0]));
+	EXPECT_TRUE(result[1] == array1[1].Intersects(array2[1]));
+	EXPECT_TRUE(result[2] == array1[2].Intersects(array2[2]));
+	EXPECT_TRUE(result[3] == array1[3].Intersects(array2[3]));
 	
 }
 
