@@ -33,69 +33,89 @@ namespace neko
 
 struct Circle
 {
-
-	float radius;
+    float radius;
     Vec2f center;
-	
-    Circle() : radius(0.0f), center(Vec2f(0, 0))
-    {
 
+Circle() : radius(0.0f), center(Vec2f(0, 0))
+{
+
+}
+
+~Circle() = default;
+
+explicit Circle(Vec2f Center, float Radius) : radius(Radius), center(Center)
+{
+
+}
+
+bool Intersects(Circle circle) const
+{
+    const Vec2f distanceVector = center - circle.center;
+    const float radiusSum = radius + circle.radius;
+
+    return distanceVector.Magnitude() <= radiusSum;
+}
+bool IntersectsOther(Circle circle) const
+{
+    const Vec2f distanceVector = center - circle.center;
+    const float radiusSum = radius + circle.radius;
+
+    const float distance = RSqrt(distanceVector.x * distanceVector.x + 
+								   distanceVector.y * distanceVector.y);
+    return distance <= radiusSum;
+
+}
+
+bool RectCircleIntersects(Rect2f rect) const
+{
+    const Vec2f distanceVector = rect.center - center;
+    const float magnitude = distanceVector.Magnitude();
+
+    if (magnitude <= rect.halfSize.x + radius)
+    {
+        return true;
     }
 
-    ~Circle() = default;
-
-    explicit Circle(Vec2f Center, float Radius) : radius(Radius), center(Center)
+    if (magnitude <= rect.halfSize.y + radius)
     {
-
+        return true;
     }
 
-    bool Intersects(Circle circle) const
+    return false;
+}
+bool IntersectsRay(Vec2f pos,float direction) const
+{
+	const auto a = Vec2f::Dot(pos, pos);
+    const auto b = Vec2f::Dot(center,pos);
+    const auto c = Vec2f::Dot(center, center) - radius * radius;
+
+    float discriminant = b * b - 4 * a * c;
+    if (discriminant < 0) {  }
+    else
     {
-	    const Vec2f distanceVector = center - circle.center;
-	    const float radiusSum = radius + circle.radius;
+        discriminant = sqrt(discriminant);
 
-        return distanceVector.Magnitude() <= radiusSum;
+        float t1 = (-b - discriminant) / (2 * a);
+        float t2 = (-b + discriminant) / (2 * a);
 
-    }
-	bool IntersectsOther(Circle circle) const
-    {
-	    const Vec2f distanceVector = center - circle.center;
-        const float radiusSum = radius + circle.radius;
-
-
-        float distance = Sqrt(distanceVector.x * distanceVector.x + distanceVector.y * distanceVector.y);
-        return distance <= radiusSum;
-
-    }
-
-    bool RectCircleIntersects(Rect2f rect) const
-    {
-        const Vec2f distanceVector = rect.center - center;
-        const float magnitude = distanceVector.Magnitude();
-
-        if (magnitude <= rect.halfSize.x + radius)
+        if (t1 >= 0 && t1 <= 1)
         {
             return true;
         }
-
-        if (magnitude <= rect.halfSize.y + radius)
+        if (t2 >= 0 && t2 <= 1)
         {
             return true;
         }
-
         return false;
     }
-
-    
-
-};
-struct alignas(8 * sizeof(float)) Plan
-{
+}
 	
+};
+struct Plan
+{
 	Vec3f pos;
 	Vec3f normal;
 	
-
     Plan() : pos(Vec3f(0, 0, 0)), normal(Vec3f(0, 0, 0))
     {
 
@@ -110,7 +130,6 @@ struct Sphere
 {
     Vec3f center;
     float radius;
-
 
     Sphere() : center(Vec3f(0, 0, 0)), radius(0.0f)
     {
@@ -131,15 +150,15 @@ struct Sphere
         return distanceVec.Magnitude() <= radiusSum;
     }
 
-    bool IntersectsOther(const Sphere & sphere) const
+    bool IntersectsOther(const Sphere sphere) const
     {
         const Vec3f distanceVec = center - sphere.center;
 
         const float radiusSum = sphere.radius + radius;
 
-        float distance = Sqrt(distanceVec.x * distanceVec.x +
-					            distanceVec.y * distanceVec.y +
-					            distanceVec.z * distanceVec.z);
+        const float distance = RSqrt(distanceVec.x * distanceVec.x +
+					                   distanceVec.y * distanceVec.y +
+					                   distanceVec.z * distanceVec.z);
 
         return distance <= radiusSum;
     }
@@ -153,14 +172,46 @@ struct Sphere
 
         return p < radius&& p > -radius;
     }
+	
+    bool IntersectsRay(Vec3f start, Vec3f end) const
+    {
+	    const Vec3f d = end - start;
+	    const Vec3f f = center - start;
+
+	    const float a = Vec3f::Dot(d,d);
+	    const float b = 2 * Vec3f::Dot(f,d);
+	    const float c = Vec3f::Dot(f,f) - radius * radius;
+
+        float discriminant = b * b - 4 * a * c;
+        if (discriminant < 0){}
+        else
+        {
+            discriminant = sqrt(discriminant);
+            float t1 = (-b - discriminant) / (2 * a);
+            float t2 = (-b + discriminant) / (2 * a);
+
+            if (t1 >= 0 && t1 <= 1)
+            {
+                return true;
+            }
+            if (t2 >= 0 && t2 <= 1)
+            {
+                // ExitWound
+                return true;
+            }
+
+            return false;
+        }
+	    return false;
+    }
 };
 
 class alignas(4 * sizeof(float)) FourCircle
 {
 public:
-    alignas(4 * sizeof(float)) std::array<float, 4> centerXs;
-    alignas(4 * sizeof(float)) std::array<float, 4> centerYs;
-    alignas(4 * sizeof(float)) std::array<float, 4> radius;
+    std::array<float, 4> centerXs;
+    std::array<float, 4> centerYs;
+    std::array<float, 4> radius;
 
     FourCircle() noexcept : centerXs{}, centerYs{}, radius{}
     {
@@ -178,56 +229,47 @@ public:
             radius[i] = circles[i].radius;
         }
     }
-
-    std::array<bool, 4> IntersectsIntrinsics(const FourCircle & circle) const;
-};
-
-class alignas(4 * sizeof(float)) FourPlan
-{
-public:
-    std::array<float, 4> posXs;
-    std::array<float, 4> posYs;
-    std::array<float, 4> posZs;
-
-    std::array<float, 4> normalXs;
-    std::array<float, 4> normalYs;
-    std::array<float, 4> normalZs;
-
-    FourPlan() noexcept : posXs{}, posYs{}, posZs{}, normalXs{}, normalYs{}, normalZs{}
+    std::array<bool, 4> Intersects(const FourCircle& sphere)
     {
+        std::array<float, 4> distanceX = {};
+        std::array<float, 4> distanceY = {};
+        std::array<float, 4> radSum = {};
+        std::array<float, 4> radSub = {};
+        std::array<float, 4> mag = {};
+        std::array<bool, 4> results = {};
 
-    }
-
-	~FourPlan() = default;
-	
-    explicit FourPlan(std::array<Plan, 4> plans) : posXs{}, posYs{}, posZs{}, normalXs{}, normalYs{}, normalZs{}
-    {
         for (size_t i = 0; i < 4; i++)
         {
-            posXs[i] = plans[i].pos.x;
-            posYs[i] = plans[i].pos.y;
-            posZs[i] = plans[i].pos.z;
+            distanceX[i] = centerXs[i] - sphere.centerXs[i];
+            distanceY[i] = centerYs[i] - sphere.centerYs[i];
 
-            normalXs[i] = plans[i].normal.x;
-            normalYs[i] = plans[i].normal.y;
-            normalZs[i] = plans[i].normal.z;
+            radSum[i] = radius[i] + sphere.radius[i];
+            radSub[i] = radius[i] - sphere.radius[i];
+
+            mag[i] = RSqrt(distanceX[i] * distanceX[i] + distanceY[i] * distanceY[i]);
+
+            results[i] = radSub[i] <= mag[i] <= radSum[i];
         }
-    }
 
+        return results;
+    }
+    static std::array<bool, 4> IntersectsIntrinsicsCircle(const FourCircle& circlesA, const FourCircle& circlesB);
 };
 
 struct alignas(4 * sizeof(float)) FourSphere
 {
-    alignas(4 * sizeof(float)) std::array<float, 4> centerXs;
-    alignas(4 * sizeof(float)) std::array<float, 4> centerYs;
-    alignas(4 * sizeof(float)) std::array<float, 4> centerZs;
-    alignas(4 * sizeof(float)) std::array<float, 4> radius;
+    std::array<float, 4> centerXs;
+    std::array<float, 4> centerYs;
+    std::array<float, 4> centerZs;
+    std::array<float, 4> radius;
 
     FourSphere() noexcept : centerXs{}, centerYs{}, centerZs{}, radius{}
     {
 
     }
+	
 	~FourSphere() = default;
+	
     explicit FourSphere(std::array<Sphere, 4> spheres) : centerXs(), centerYs(), centerZs(), radius()
     {
         for (size_t i = 0; i < 4; i++)
@@ -239,7 +281,7 @@ struct alignas(4 * sizeof(float)) FourSphere
         }
     }
 
-    std::array<bool, 4> Intersects(const FourSphere & sphere)
+    std::array<bool, 4> Intersects(const FourSphere& sphere)
     {
         std::array<float, 4> distanceX = {};
         std::array<float, 4> distanceY = {};
@@ -257,8 +299,8 @@ struct alignas(4 * sizeof(float)) FourSphere
 
             radSum[i] = radius[i] + sphere.radius[i];
             radSub[i] = radius[i] - sphere.radius[i];
-        	
-            mag[i] = Sqrt(distanceX[i] * distanceX[i] + distanceY[i] * distanceY[i] + distanceZ[i] * distanceZ[i]);
+
+            mag[i] = RSqrt(distanceX[i] * distanceX[i] + distanceY[i] * distanceY[i] + distanceZ[i] * distanceZ[i]);
 
             results[i] = radSub[i] <= mag[i] <= radSum[i];
         }
@@ -266,15 +308,14 @@ struct alignas(4 * sizeof(float)) FourSphere
         return results;
     }
 
-    std::array<bool, 4> IntersectIntrinsics(const FourSphere & spheres) const;
-    std::array<bool, 4> IntersectSpherePlanIntrinsics(const Plan & plan) const;
+    static std::array<bool, 4> IntersectIntrinsicsSphere(const FourSphere & spheresA, const FourSphere& spheresB);
 };
 
 #ifdef __SSE__
 /**
 * \brief Test the intersection between four circle in a list.
 */
-inline std::array<bool, 4> FourCircle::IntersectsIntrinsics(const FourCircle& circle) const
+inline std::array<bool, 4> FourCircle::IntersectsIntrinsicsCircle(const FourCircle& circlesA, const FourCircle& circlesB)
 {
     alignas(16) std::array<bool, 4> results = {};
 
@@ -288,28 +329,28 @@ inline std::array<bool, 4> FourCircle::IntersectsIntrinsics(const FourCircle& ci
     __m128 disty;
     __m128 rad2;
 
-    x1 = _mm_load_ps(centerXs.data());
-    y1 = _mm_load_ps(centerYs.data());
-    rad1 = _mm_load_ps(radius.data());
+    x1 = _mm_load_ps(circlesA.centerXs.data());
+    y1 = _mm_load_ps(circlesA.centerYs.data());
+    rad1 = _mm_load_ps(circlesA.radius.data());
 
-    x2 = _mm_load_ps(circle.centerXs.data());
-    y2 = _mm_load_ps(circle.centerYs.data());
-    rad2 = _mm_load_ps(circle.radius.data());
+    x2 = _mm_load_ps(circlesB.centerXs.data());
+    y2 = _mm_load_ps(circlesB.centerYs.data());
+    rad2 = _mm_load_ps(circlesB.radius.data());
     x1 = _mm_sub_ps(x1, x2);
     y1 = _mm_sub_ps(y1, y2);
 
-    auto radSum = _mm_add_ps(rad1, rad2);
-	auto radSub = _mm_sub_ps(rad2, rad1);
+    __m128 radSum = _mm_add_ps(rad1, rad2);
+    __m128 radSub = _mm_sub_ps(rad2, rad1);
 
     distx = _mm_mul_ps(x1, x1);
     disty = _mm_mul_ps(y1, y1);
 
     distx = _mm_add_ps(distx, disty);
 
-    auto mag = _mm_rsqrt_ps(distx);
-    auto mask = _mm_cmpneq_ps(_mm_cmple_ps(radSum, mag), _mm_cmple_ps(radSub, mag));
+    __m128 mag = _mm_rsqrt_ps(distx);
+    __m128 mask = _mm_cmpneq_ps(_mm_cmple_ps(radSum, mag), _mm_cmple_ps(radSub, mag));
 
-	auto result = _mm_movemask_ps(mask);
+    int result = _mm_movemask_ps(mask);
     for (int i = 0; i < 4; i++) {
         if (result != 0) {
             results[i] = 1;
@@ -320,7 +361,8 @@ inline std::array<bool, 4> FourCircle::IntersectsIntrinsics(const FourCircle& ci
 /**
 * \brief Test the intersection between four sphere in a list.
 */
-inline std::array<bool, 4> FourSphere::IntersectIntrinsics(const FourSphere& spheres) const
+
+inline std::array<bool, 4> FourSphere::IntersectIntrinsicsSphere(const FourSphere& spheresA, const FourSphere& spheresB)
 {
     alignas(16) std::array<bool, 4> results = {};
 
@@ -333,25 +375,25 @@ inline std::array<bool, 4> FourSphere::IntersectIntrinsics(const FourSphere& sph
     __m128 y2;
     __m128 z2;
     __m128 rad2;
-	
-	__m128 distx;
-	__m128 disty;
-	__m128 distz;
 
-    x1 = _mm_load_ps(centerXs.data());
-    x2 = _mm_load_ps(spheres.centerXs.data());
+    __m128 distx;
+    __m128 disty;
+    __m128 distz;
 
-    y1 = _mm_load_ps(centerYs.data());
-    y2 = _mm_load_ps(spheres.centerYs.data());
+    x1 = _mm_load_ps(spheresA.centerXs.data());
+    x2 = _mm_load_ps(spheresB.centerXs.data());
 
-    z1 = _mm_load_ps(centerZs.data());
-    z2 = _mm_load_ps(spheres.centerZs.data());
-	
-    rad1 = _mm_load_ps(radius.data());
-    rad2 = _mm_load_ps(spheres.radius.data());
+    y1 = _mm_load_ps(spheresA.centerYs.data());
+    y2 = _mm_load_ps(spheresB.centerYs.data());
 
-	auto radSum = _mm_add_ps(rad1, rad2); // radius + sphere.radius
-	auto radSub = _mm_sub_ps(rad1, rad2); // radius - sphere.radius
+    z1 = _mm_load_ps(spheresA.centerZs.data());
+    z2 = _mm_load_ps(spheresB.centerZs.data());
+
+    rad1 = _mm_load_ps(spheresA.radius.data());
+    rad2 = _mm_load_ps(spheresB.radius.data());
+
+    auto radSum = _mm_add_ps(rad1, rad2); // radius + sphere.radius
+    auto radSub = _mm_sub_ps(rad2, rad1); // radius - sphere.radius
     auto x3 = _mm_sub_ps(x1, x2); // center.x - sphere.center.x
     auto y3 = _mm_sub_ps(y1, y2); //center.y - sphere.center.y
     auto z3 = _mm_sub_ps(z1, z2); //center.z - sphere.center.z
@@ -364,8 +406,8 @@ inline std::array<bool, 4> FourSphere::IntersectIntrinsics(const FourSphere& sph
 
     auto mag = _mm_rsqrt_ps(dist);
     auto mask = _mm_cmpneq_ps(_mm_cmple_ps(radSum, mag), _mm_cmple_ps(radSub, mag));
+    auto result = _mm_movemask_ps(mask);
 
-	auto result = _mm_movemask_ps(mask);
     for (int i = 0; i < 4; i++) {
         if (result != 0) {
             results[i] = 1;
@@ -375,61 +417,5 @@ inline std::array<bool, 4> FourSphere::IntersectIntrinsics(const FourSphere& sph
     return results;
 }
 
-/*
-inline std::array<bool, 4> FourSphere::IntersectSpherePlanIntrinsics(const Plan& plan) const
-{
-    /*
-        const float normMagnitude = plan.normal.Magnitude();
-        const float dot = Vec3f::Dot(center - plan.pos, plan.normal);
-
-        const float p = dot / normMagnitude;
-
-        return p < radius && p > -radius;
-    #1#
-    std::array<Plan, 4> array;
-    array.fill(plan);
-    FourPlan n_plan(array);
-
-    alignas(16) std::array<bool, 4> results = {};
-
-    auto normX = _mm_load_ps(n_plan.normalXs.data());
-    auto normY = _mm_load_ps(n_plan.normalYs.data());
-    auto normZ = _mm_load_ps(n_plan.normalZs.data());
-
-    auto posX = _mm_load_ps(n_plan.posXs.data());
-    auto posY = _mm_load_ps(n_plan.posYs.data());
-    auto posZ = _mm_load_ps(n_plan.posZs.data());
-
-    auto centerX = _mm_load_ps(centerXs.data());
-    auto centerY = _mm_load_ps(centerYs.data());
-    auto centerZ = _mm_load_ps(centerZs.data());
-
-    auto rad = _mm_load_ps(radius.data());
-
-    posX = _mm_sub_ps(posX, centerX); //center - plan.pos = pos
-    posY = _mm_sub_ps(posY, centerY);
-    posZ = _mm_sub_ps(posZ, centerZ);
-
-    normX = _mm_mul_ps(normX, posX); //dot pos, plan.norm = norm
-    normY = _mm_mul_ps(normY, posY);
-    normZ = _mm_mul_ps(normZ, posZ);
-
-    normY = _mm_sub_ps(normY, normZ);
-    normX = _mm_sub_ps(normX, normY);//norm - norm - norm
-
-    posX = _mm_div_ps(posX, normX);
-
-    __m128 mask = _mm_cmple_ps(posX, rad);
-
-    int result = _mm_movemask_ps(mask);
-    for (int i = 0; i < 4; i++) {
-        if (result != 0) {
-            results[i] = 1;
-        }
-    }
-    return results;
-}
-*/
 #endif
-
 }

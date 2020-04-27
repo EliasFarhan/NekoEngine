@@ -12,8 +12,8 @@ TEST(Engine, TestCircle)
 	const neko::Sphere sphere1(neko::Vec3f(2, 2, 2), 2);
 	const neko::Sphere sphere2(neko::Vec3f(3, 3, 2), 2);
 
-	std::cout << neko::Sqrt(2.0f) << '\n';
-	std::cout << neko::Sqrt(4.0f) << '\n';
+	std::cout << neko::RSqrt(2.0f) << '\n';
+	std::cout << neko::RSqrt(4.0f) << '\n';
 	
 	EXPECT_TRUE(circleA.Intersects(circleB));
 	EXPECT_TRUE(circleB.Intersects(circleC));
@@ -24,16 +24,16 @@ TEST(Engine, TestCircle)
 TEST(Engine, TestSphere)
 {
 	const neko::Sphere sphereA(neko::Vec3f(2, 2, 2), 2);
-	const neko::Sphere sphereB(neko::Vec3f(3, 3, 0), 3);
-	const neko::Sphere sphereC(neko::Vec3f(3, 3, 3), 1);
-	const neko::Sphere sphereD(neko::Vec3f(-2, -2, -2), 2);
+	const neko::Sphere sphereB(neko::Vec3f(2, 2, -2), 2);
+	const neko::Sphere sphereC(neko::Vec3f(2, 0, 0), 1);
+	const neko::Sphere sphereD(neko::Vec3f(0, 3, 0), 2);
 
 	const neko::Rect rect(neko::Vec2f(1, 1), neko::Vec2f(2, 2));
 	const neko::Plan plan(neko::Vec3f(0, 2, 0), neko::Vec3f(0, 1, 0));
 	
 
-	std::cout << neko::Sqrt(2.0f) << '\n';
-	std::cout << neko::Sqrt(4.0f) << '\n';
+	std::cout << neko::RSqrt(2.0f) << '\n';
+	std::cout << neko::RSqrt(4.0f) << '\n';
 	EXPECT_TRUE(sphereA.Intersects(sphereB));
 	EXPECT_TRUE(sphereB.Intersects(sphereC));
 	EXPECT_TRUE(sphereA.Intersects(sphereD));
@@ -47,43 +47,87 @@ TEST(Engine, TestFourCircle)
 	neko::Vec2f pos2(0.0f, 0.0f);	
 	
 	std::array<neko::Circle, 4> array = {
-		neko::Circle(neko::Vec2f(2, 2), 2),
+		neko::Circle(neko::Vec2f(-3, 0), 2),
 		neko::Circle(neko::Vec2f(3, 3), 3),
-		neko::Circle(neko::Vec2f(3, 3), 1),
-		neko::Circle(neko::Vec2f(-2, 2), 2)
+		neko::Circle(neko::Vec2f(2, 0), 1),
+		neko::Circle(neko::Vec2f(5, 0), 2)
+	};
+	std::array<neko::Circle, 4> array2 = {
+		neko::Circle(neko::Vec2f(-3, 5), 2),
+		neko::Circle(neko::Vec2f(0, 8), 3),
+		neko::Circle(neko::Vec2f(7, 2), 1),
+		neko::Circle(neko::Vec2f(1,0), 2)
 	};
 	const neko::FourCircle n_circle(array);
+	const neko::FourCircle n_circle2(array2);
 	
-	const auto results = n_circle.IntersectsIntrinsics(n_circle);
-	std::cout << "---------TEST INTERSECT INTRINSICS---------\n";
+	const auto results = neko::FourCircle::IntersectsIntrinsicsCircle(n_circle, n_circle2);
 
-	EXPECT_TRUE(results[0] == array[0].Intersects(array[1]));
-	EXPECT_TRUE(results[1] == array[1].Intersects(array[2]));
-	EXPECT_TRUE(results[2] == array[0].Intersects(array[3]));
-	EXPECT_FALSE(results[3] == array[2].Intersects(array[3]));
+	EXPECT_FALSE(results[0] == array[0].Intersects(array2[0]));
+	EXPECT_FALSE(results[0] == array[0].Intersects(array2[1]));
+	EXPECT_FALSE(results[0] == array[0].Intersects(array2[2]));
+	EXPECT_TRUE(results[0] == array[0].Intersects(array2[3]));
 
+	EXPECT_FALSE(results[0] == array[1].Intersects(array2[0]));
+	EXPECT_TRUE(results[0] == array[1].Intersects(array2[1]) );
+	EXPECT_FALSE(results[0] == array[1].Intersects(array2[2]));
+	EXPECT_TRUE(results[0] == array[1].Intersects(array2[3]) );
+	
+	EXPECT_FALSE(results[0] == array[2].Intersects(array2[0]));
+	EXPECT_FALSE(results[0] == array[2].Intersects(array2[1]));
+	EXPECT_FALSE(results[0] == array[2].Intersects(array2[2]));
+	EXPECT_TRUE(results[0] == array[2].Intersects(array2[3]));
+
+	
+	EXPECT_FALSE(results[0] == array[3].Intersects(array2[0]));
+	EXPECT_FALSE(results[0] == array[3].Intersects(array2[1]));
+	EXPECT_TRUE(results[0] == array[3].Intersects(array2[2]));
+	EXPECT_TRUE(results[0] == array[3].Intersects(array2[3]));
 }
 
 
 TEST(Engine, TestFourSphere)
 {
-	std::array<neko::Sphere, 4> array = {
-		neko::Sphere(neko::Vec3f(2, 2, 2), 2),
-		neko::Sphere(neko::Vec3f(3, 3, 3), 3),
-		neko::Sphere(neko::Vec3f(3, 3, 3), 1),
-		neko::Sphere(neko::Vec3f(2, 2, -2), 2)
-	};
 
+	neko::Vec2f pos(2.0f, 2.0f);
+	neko::Vec2f pos2(0.0f, 0.0f);
+
+	std::array<neko::Sphere, 4> array = {
+		neko::Sphere(neko::Vec3f(-3, 0, 0), 2),
+		neko::Sphere(neko::Vec3f(3, 3, 0), 3),
+		neko::Sphere(neko::Vec3f(2, 0, 0), 1),
+		neko::Sphere(neko::Vec3f(5, 0, 0), 2)
+	};
+	std::array<neko::Sphere, 4> array2 = {
+		neko::Sphere(neko::Vec3f(-3, 5, 0), 2),
+		neko::Sphere(neko::Vec3f(0, 8, 0), 3),
+		neko::Sphere(neko::Vec3f(7, 2, 0), 1),
+		neko::Sphere(neko::Vec3f(1,0, 0), 2)
+	};
 	const neko::FourSphere n_sphere(array);
-	
-	auto result = n_sphere.IntersectIntrinsics(n_sphere);
-	
-	std::cout << "---------TEST INTERSECT INTRINSICS---------\n";
-	
-	EXPECT_TRUE(result[0] == array[0].Intersects(array[1]));
-	EXPECT_TRUE(result[1] == array[1].Intersects(array[2]));
-	EXPECT_TRUE(result[2] == array[0].Intersects(array[3]));
-	EXPECT_FALSE(result[3] == array[2].Intersects(array[3]));
-	
+	const neko::FourSphere n_sphere2(array2);
+
+	const auto results = neko::FourSphere::IntersectIntrinsicsSphere(n_sphere, n_sphere2);
+
+	EXPECT_FALSE(results[0] == array[0].Intersects(array2[0]));
+	EXPECT_FALSE(results[0] == array[0].Intersects(array2[1]));
+	EXPECT_FALSE(results[0] == array[0].Intersects(array2[2]));
+	EXPECT_TRUE(results[0] == array[0].Intersects(array2[3]));
+
+	EXPECT_FALSE(results[0] == array[1].Intersects(array2[0]));
+	EXPECT_TRUE(results[0] == array[1].Intersects(array2[1]));
+	EXPECT_FALSE(results[0] == array[1].Intersects(array2[2]));
+	EXPECT_TRUE(results[0] == array[1].Intersects(array2[3]));
+
+	EXPECT_FALSE(results[0] == array[2].Intersects(array2[0]));
+	EXPECT_FALSE(results[0] == array[2].Intersects(array2[1]));
+	EXPECT_FALSE(results[0] == array[2].Intersects(array2[2]));
+	EXPECT_TRUE(results[0] == array[2].Intersects(array2[3]));
+
+
+	EXPECT_FALSE(results[0] == array[3].Intersects(array2[0]));
+	EXPECT_FALSE(results[0] == array[3].Intersects(array2[1]));
+	EXPECT_TRUE(results[0] == array[3].Intersects(array2[2]));
+	EXPECT_TRUE(results[0] == array[3].Intersects(array2[3]));
 }
 

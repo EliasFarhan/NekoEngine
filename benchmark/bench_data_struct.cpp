@@ -5,7 +5,6 @@
 const unsigned long fromRange = 8;
 const unsigned long toRange = 1 << 20;
 
-
 static void BM_Vector(benchmark::State& state)
 {
 	const auto length = state.range(0);

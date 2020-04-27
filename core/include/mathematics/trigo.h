@@ -5,7 +5,10 @@
 
 namespace neko
 {
-inline float Sqrt(float x)
+/**
+ * \brief return an approximation of the sqrt
+ */
+inline float RSqrt(float x)
 {
     auto i = *reinterpret_cast<int*>(&x);
     i = 0x5f3759df - (i >> 1);
