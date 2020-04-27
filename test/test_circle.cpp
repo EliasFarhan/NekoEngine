@@ -20,6 +20,24 @@ TEST(Engine, TestCircle)
 	EXPECT_TRUE(circleA.Intersects(circleD));
 	EXPECT_FALSE(circleC.Intersects(circleD));
 }
+TEST(Engine, TestCircleRSqrt)
+{
+	const neko::Circle circleA(neko::Vec2f(2, 2), 2);
+	const neko::Circle circleB(neko::Vec2f(3, 3), 3);
+	const neko::Circle circleC(neko::Vec2f(3, 3), 1);
+	const neko::Circle circleD(neko::Vec2f(-2, 2), 2);
+
+	const neko::Sphere sphere1(neko::Vec3f(2, 2, 2), 2);
+	const neko::Sphere sphere2(neko::Vec3f(3, 3, 2), 2);
+
+	std::cout << neko::RSqrt(2.0f) << '\n';
+	std::cout << neko::RSqrt(4.0f) << '\n';
+	
+	EXPECT_TRUE(circleA.IntersectsOther(circleB));
+	EXPECT_TRUE(circleB.IntersectsOther(circleC));
+	EXPECT_TRUE(circleA.IntersectsOther(circleD));
+	EXPECT_FALSE(circleC.IntersectsOther(circleD));
+}
 
 TEST(Engine, TestSphere)
 {
