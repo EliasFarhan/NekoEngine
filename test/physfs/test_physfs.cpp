@@ -36,8 +36,9 @@ TEST(PhysFS, TestOpenFile)
     physfs::InitPhysFs();
 
     const Configuration config;
-	
-    const char* output = physfs::ReadFile(config.dataRootPath + "data/test.txt");
+    
+    EXPECT_TRUE(physfs::OpenArchive(config.dataRootPath + "data/data2.zip"));
+    const char* output = physfs::ReadFile("test.txt");
     EXPECT_NE(output, nullptr);
 	if (output != nullptr) std::cout << output << '\n';
 }

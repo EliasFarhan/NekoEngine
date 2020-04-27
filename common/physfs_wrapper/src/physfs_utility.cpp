@@ -12,12 +12,12 @@ bool InitPhysFs()
 
 bool FileExists(std::string_view filename)
 {
-	if (PHYSFS_exists(filename.data())) 
+	if (PHYSFS_exists(filename.data()))
 	{
 		LogDebug(LogCategory::IO, "Found '" + std::string(filename) + "'.");
 		return true;
 	}
-	
+
 	LogError(LogCategory::IO, "Could not find '" + std::string(filename) + "'!");
 	return false;
 
@@ -49,7 +49,6 @@ const char* ReadFile(const std::string& path)
 	PHYSFS_seek(file, 0);
 	void* buffer = new void*[len + 1];
 	PHYSFS_readBytes(file, buffer, len);
-	const char* result = static_cast<const char*>(buffer);
-	return result;
+	return static_cast<const char*>(buffer);
 }
 }
