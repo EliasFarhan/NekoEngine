@@ -47,10 +47,10 @@ TEST(Engine, TestFourCircle)
 	neko::Vec2f pos2(0.0f, 0.0f);	
 	
 	std::array<neko::Circle, 4> array1 = {
-		neko::Circle(neko::Vec2f(2, 2), 2),
-		neko::Circle(neko::Vec2f(3, 3), 3),
-		neko::Circle(neko::Vec2f(3, 3), 1),
-		neko::Circle(neko::Vec2f(-2, 2), 2)
+	neko::Circle(neko::Vec2f(2, 2), 2),
+	neko::Circle(neko::Vec2f(3, 3), 3),
+	neko::Circle(neko::Vec2f(3, 3), 1),
+	neko::Circle(neko::Vec2f(-2, 2), 2)
 	};
 	std::array<neko::Circle, 4> array2 = {
 	neko::Circle(neko::Vec2f(3, 3), 1),
@@ -76,10 +76,10 @@ TEST(Engine, TestFourCircle)
 TEST(Engine, TestFourSphere)
 {
 	std::array<neko::Sphere, 4> array1 = {
-		neko::Sphere(neko::Vec3f(2, 2, 2), 2),
-		neko::Sphere(neko::Vec3f(3, 3, 3), 3),
-		neko::Sphere(neko::Vec3f(3, 3, 3), 1),
-		neko::Sphere(neko::Vec3f(2, 2, -2), 2)
+	neko::Sphere(neko::Vec3f(2, 2, 2), 2),
+	neko::Sphere(neko::Vec3f(3, 3, 3), 3),
+	neko::Sphere(neko::Vec3f(3, 3, 3), 1),
+	neko::Sphere(neko::Vec3f(2, 2, -2), 2)
 	};
 	std::array<neko::Sphere, 4> array2 = {
 	neko::Sphere(neko::Vec3f(2, 2, -2), 2),
@@ -88,10 +88,10 @@ TEST(Engine, TestFourSphere)
 	neko::Sphere(neko::Vec3f(3, 3, 3), 3),
 	};
 
-	const neko::FourSphere n_sphere(array1);
+	const neko::FourSphere n_sphere1(array1);
 	const neko::FourSphere n_sphere2(array2);
 	
-	auto result = n_sphere.IntersectIntrinsics(n_sphere);
+	auto result = n_sphere1.IntersectIntrinsics(n_sphere2);
 	
 	std::cout << "---------TEST INTERSECT INTRINSICS---------\n";
 	
