@@ -83,6 +83,9 @@ bool RectCircleIntersects(Rect2f rect) const
 
     return false;
 }
+
+/*
+ *TODO : Circle ray intersection
 bool IntersectsRay(Vec2f pos,float direction) const
 {
 	const auto a = Vec2f::Dot(pos, pos);
@@ -109,8 +112,9 @@ bool IntersectsRay(Vec2f pos,float direction) const
         return false;
     }
 }
-	
+*/	
 };
+	
 struct Plan
 {
 	Vec3f pos;
@@ -173,6 +177,8 @@ struct Sphere
         return p < radius&& p > -radius;
     }
 	
+    /*
+     *TODO : Sphere ray intersection
     bool IntersectsRay(Vec3f start, Vec3f end) const
     {
 	    const Vec3f d = end - start;
@@ -204,6 +210,7 @@ struct Sphere
         }
 	    return false;
     }
+    */
 };
 
 class alignas(4 * sizeof(float)) FourCircle
@@ -220,7 +227,7 @@ public:
 
     ~FourCircle() = default;
 
-    explicit FourCircle(std::array<Circle, 4> circles) : centerXs(), centerYs(), radius()
+    explicit FourCircle(std::array<Circle, 4>& circles) : centerXs(), centerYs(), radius()
     {
         for (size_t i = 0; i < 4; i++)
         {
@@ -231,6 +238,7 @@ public:
     }
     std::array<bool, 4> Intersects(const FourCircle& sphere)
     {
+        alignas(4 * sizeof(float))
         std::array<float, 4> distanceX = {};
         std::array<float, 4> distanceY = {};
         std::array<float, 4> radSum = {};
@@ -270,7 +278,7 @@ struct alignas(4 * sizeof(float)) FourSphere
 	
 	~FourSphere() = default;
 	
-    explicit FourSphere(std::array<Sphere, 4> spheres) : centerXs(), centerYs(), centerZs(), radius()
+    explicit FourSphere(std::array<Sphere, 4>& spheres) : centerXs(), centerYs(), centerZs(), radius()
     {
         for (size_t i = 0; i < 4; i++)
         {
@@ -283,6 +291,7 @@ struct alignas(4 * sizeof(float)) FourSphere
 
     std::array<bool, 4> Intersects(const FourSphere& sphere)
     {
+        alignas(4 * sizeof(float))
         std::array<float, 4> distanceX = {};
         std::array<float, 4> distanceY = {};
         std::array<float, 4> distanceZ = {};
@@ -317,7 +326,7 @@ struct alignas(4 * sizeof(float)) FourSphere
 */
 inline std::array<bool, 4> FourCircle::IntersectsIntrinsicsCircle(const FourCircle& circlesA, const FourCircle& circlesB)
 {
-    alignas(16) std::array<bool, 4> results = {};
+    std::array<bool, 4> results = {};
 
     __m128 x1;
     __m128 y1;
