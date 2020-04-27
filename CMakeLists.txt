@@ -62,6 +62,18 @@ if(Neko_Profile)
     add_subdirectory(${EASY_PROFILE_DIR})
 endif()
 
+if(Neko_PhysFS)
+    #physfs
+    add_compile_definitions("NEKO_PHYSFS=1")
+    set(PHYSFS_VERSION "3.0.2" CACHE INTERNAL "")
+    set(PHYSFS_ROOT "${EXTERNAL_DIR}/physfs-${PHYSFS_VERSION}" CACHE INTERNAL "")
+    add_subdirectory("${PHYSFS_ROOT}")
+    include_directories(${PHYSFS_ROOT}/src)
+
+    add_subdirectory("common/physfs_wrapper")
+
+endif()
+
 include("cmake/data.cmake")
 set(NEKO_CORE_DIR "${CMAKE_SOURCE_DIR}/core/" CACHE INTERNAL "")
 add_subdirectory(${NEKO_CORE_DIR})
@@ -129,16 +141,6 @@ if(Neko_Benchmark AND NOT Emscripten)
 
 endif()
 
-if(Neko_PhysFS)
-    #physfs
-    set(PHYSFS_VERSION "3.0.2" CACHE INTERNAL "")
-    set(PHYSFS_ROOT "${EXTERNAL_DIR}/physfs-${PHYSFS_VERSION}" CACHE INTERNAL "")
-    add_subdirectory("${PHYSFS_ROOT}")
-    include_directories(${PHYSFS_ROOT}/src)
-
-    add_subdirectory("common/physfs_wrapper")
-
-endif()
 
 set(main_project_dir "main/")
 file(GLOB main_projects "${main_project_dir}/*")

@@ -5,7 +5,9 @@
 #include "easy/profiler.h"
 #include <easy/arbitrary_value.h> // EASY_VALUE, EASY_ARRAY are defined here
 #endif
+#ifdef NEKO_PHYSFS
 #include "../../../common/physfs_wrapper/include/physfs_utility.h"
+#endif
 #include "engine/assert.h"
 #include "utilities/file_utility.h"
 #include "utilities/json_utility.h"
@@ -17,7 +19,9 @@ neko::ResourceManager::ResourceManager()
 
 void neko::ResourceManager::Init()
 {
+#ifdef NEKO_PHYSFS
     physfs::InitPhysFs();
+#endif
     status_ = IS_RUNNING;
     loadingThread_ = std::thread([this]()
     {
@@ -72,7 +76,9 @@ void neko::ResourceManager::LoadingLoop()
                 resource.resource.Load(resource.relativePath);
             } else
             {
+#ifdef NEKO_PHYSFS
                 resource.resource.LoadFromArchived(resource.archivedPath, resource.relativePath);
+#endif
             }
 #ifdef EASY_PROFILE_USE
             EASY_END_BLOCK;
@@ -193,6 +199,7 @@ neko::ResourceId neko::ResourceManager::LoadResource(const Path assetPath)
 #endif
 }
 
+#ifdef NEKO_PHYSFS
 neko::ResourceId neko::ResourceManager::LoadArchivedResource(const Path archivedPath, const Path relativePath)
 {
 #ifdef EASY_PROFILE_USE
@@ -223,6 +230,7 @@ neko::ResourceId neko::ResourceManager::LoadArchivedResource(const Path archived
     EASY_END_BLOCK;
 #endif
 }
+#endif
 
 void neko::ResourceManager::DeleteResource(const ResourceId resourceId)
 {

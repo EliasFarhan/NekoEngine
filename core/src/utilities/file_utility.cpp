@@ -159,6 +159,7 @@ void BufferFile::Load(std::string_view path)
 	}
 }
 
+#ifdef NEKO_PHYSFS
 void BufferFile::LoadFromArchived(std::string_view archivedPath, std::string_view path)
 {
 	physfs::OpenArchive(archivedPath.data());
@@ -170,6 +171,7 @@ void BufferFile::LoadFromArchived(std::string_view archivedPath, std::string_vie
 	dataBuffer[dataLength] = 0;
 	strcpy(dataBuffer, str.c_str());
 }
+#endif
 
 void BufferFile::Destroy()
 {

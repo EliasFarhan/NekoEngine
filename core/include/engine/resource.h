@@ -35,7 +35,9 @@ public:
     bool IsResourceReady(const ResourceId resourceId);
     neko::BufferFile GetResource(const ResourceId resourceId);
     ResourceId LoadResource(const Path assetPath);
+#ifdef NEKO_PHYSFS
     ResourceId LoadArchivedResource(const Path archivedPath, const Path relativePath);
+#endif
     void DeleteResource(const ResourceId resourceId);
 
 private:

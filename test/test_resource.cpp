@@ -195,6 +195,7 @@ TEST(Resource, TestSoleUUID)
 }
 
 
+#ifdef NEKO_PHYSFS
 TEST(Resource, PhysFSLoad)
 {
     const sole::uuid test = sole::uuid4();
@@ -216,3 +217,4 @@ TEST(Resource, PhysFSLoad)
     EXPECT_FALSE(resourceManager.IsResourceReady(randomUuid));
     resourceManager.Destroy();
 }
+#endif

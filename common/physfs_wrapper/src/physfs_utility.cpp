@@ -45,10 +45,11 @@ const char* ReadFile(const std::string& path)
 		return nullptr;
 	}
 
-	const PHYSFS_sint64 len = PHYSFS_fileLength(file);
+	const PHYSFS_uint64 len = PHYSFS_fileLength(file);
 	PHYSFS_seek(file, 0);
-	char* buffer = new char[len];
+	char* buffer = new char[len+1];
+	buffer[len] = 0;
 	PHYSFS_readBytes(file, buffer, len);
-	return static_cast<const char*>(buffer);
+	return buffer;
 }
 }
