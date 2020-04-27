@@ -155,20 +155,20 @@ BENCHMARK(BM_MagnitudeIntrinsicsFourVec)->Range(fromRange, toRange);
 
 static void BM_DotSimple(benchmark::State& state)
 {
-    std::array<neko::Vec3f, 4> array1;
-    for (auto& arr : array1)
-    {
-        arr = neko::Vec3f(std::rand(), std::rand(), std::rand());
-    }
-
-    std::array<neko::Vec3f, 4> array2;
-    for (auto& arr : array2)
-    {
-        arr = neko::Vec3f(std::rand(), std::rand(), std::rand());
-    }
-
     for (auto _ : state)
     {
+        std::array<neko::Vec3f, 4> array1;
+        for (auto& arr : array1)
+        {
+            arr = neko::Vec3f(std::rand(), std::rand(), std::rand());
+        }
+
+        std::array<neko::Vec3f, 4> array2;
+        for (auto& arr : array2)
+        {
+            arr = neko::Vec3f(std::rand(), std::rand(), std::rand());
+        }
+
         for (size_t i = 0; i < state.range(0); i++)
         {
             for (size_t j = 0; j < 4; ++j)
@@ -183,22 +183,22 @@ BENCHMARK(BM_DotSimple)->Range(fromRange, toRange);
 
 static void BM_Dot(benchmark::State& state)
 {
-    std::array<neko::Vec3f, 4> array1;
-    for (auto& arr : array1)
-    {
-        arr = neko::Vec3f(std::rand(), std::rand(), std::rand());
-    }
-    const neko::FourVec3f fourVec31(array1);
-
-    std::array<neko::Vec3f, 4> array2;
-    for (auto& arr : array2)
-    {
-        arr = neko::Vec3f(std::rand(), std::rand(), std::rand());
-    }
-    const neko::FourVec3f fourVec32(array2);
-
     for (auto _ : state)
     {
+        std::array<neko::Vec3f, 4> array1;
+        for (auto& arr : array1)
+        {
+            arr = neko::Vec3f(std::rand(), std::rand(), std::rand());
+        }
+        const neko::FourVec3f fourVec31(array1);
+
+        std::array<neko::Vec3f, 4> array2;
+        for (auto& arr : array2)
+        {
+            arr = neko::Vec3f(std::rand(), std::rand(), std::rand());
+        }
+        const neko::FourVec3f fourVec32(array2);
+
         for (size_t i = 0; i < state.range(0); i++)
         {
             benchmark::DoNotOptimize(neko::FourVec3f::Dot(fourVec31, fourVec32));
@@ -210,22 +210,22 @@ BENCHMARK(BM_Dot)->Range(fromRange, toRange);
 
 static void BM_DotIntrinsics(benchmark::State& state)
 {
-    std::array<neko::Vec3f, 4> array1;
-    for (auto& arr : array1)
-    {
-        arr = neko::Vec3f(std::rand(), std::rand(), std::rand());
-    }
-    const neko::FourVec3f fourVec31(array1);
-
-    std::array<neko::Vec3f, 4> array2;
-    for (auto& arr : array2)
-    {
-        arr = neko::Vec3f(std::rand(), std::rand(), std::rand());
-    }
-    const neko::FourVec3f fourVec32(array2);
-
     for (auto _ : state)
     {
+        std::array<neko::Vec3f, 4> array1;
+        for (auto& arr : array1)
+        {
+            arr = neko::Vec3f(std::rand(), std::rand(), std::rand());
+        }
+        const neko::FourVec3f fourVec31(array1);
+
+        std::array<neko::Vec3f, 4> array2;
+        for (auto& arr : array2)
+        {
+            arr = neko::Vec3f(std::rand(), std::rand(), std::rand());
+        }
+        const neko::FourVec3f fourVec32(array2);
+
         for (size_t i = 0; i < state.range(0); i++)
         {
             benchmark::DoNotOptimize(neko::FourVec3f::DotIntrinsics(fourVec31, fourVec32));
@@ -237,22 +237,22 @@ BENCHMARK(BM_DotIntrinsics)->Range(fromRange, toRange);
 
 static void BM_DotIntrinsicsEightVec(benchmark::State& state)
 {
-    std::array<neko::Vec3f, 8> array1;
-    for (auto& arr : array1)
-    {
-        arr = neko::Vec3f(std::rand(), std::rand(), std::rand());
-    }
-    const neko::EightVec3f eightVec31(array1);
-
-    std::array<neko::Vec3f, 8> array2;
-    for (auto& arr : array2)
-    {
-        arr = neko::Vec3f(std::rand(), std::rand(), std::rand());
-    }
-    const neko::EightVec3f eightVec32(array2);
-
     for (auto _ : state)
     {
+        std::array<neko::Vec3f, 8> array1;
+        for (auto& arr : array1)
+        {
+            arr = neko::Vec3f(std::rand(), std::rand(), std::rand());
+        }
+        const neko::EightVec3f eightVec31(array1);
+
+        std::array<neko::Vec3f, 8> array2;
+        for (auto& arr : array2)
+        {
+            arr = neko::Vec3f(std::rand(), std::rand(), std::rand());
+        }
+        const neko::EightVec3f eightVec32(array2);
+
         for (size_t i = 0; i < state.range(0); i++)
         {
             benchmark::DoNotOptimize(neko::EightVec3f::DotIntrinsics(eightVec31, eightVec32));
@@ -264,109 +264,113 @@ BENCHMARK(BM_DotIntrinsicsEightVec)->Range(fromRange, toRange);
 
 static void BM_ReflectSimple(benchmark::State& state)
 {
-    std::array<neko::Vec3f, 4> array1;
-    for (auto& arr : array1)
-    {
-        arr = neko::Vec3f(std::rand(), std::rand(), std::rand());
-    }
+	for (auto _ : state)
+	{
+		std::array<neko::Vec3f, 4> array1;
+		for (auto& arr : array1)
+		{
+			arr = neko::Vec3f(std::rand(), std::rand(), std::rand());
+		}
 
-    std::array<neko::Vec3f, 4> array2;
-    for (auto& arr : array2)
-    {
-        arr = neko::Vec3f(std::rand(), std::rand(), std::rand());
-    }
+		std::array<neko::Vec3f, 4> array2;
+		for (auto& arr : array2)
+		{
+			arr = neko::Vec3f(std::rand(), std::rand(), std::rand());
+		}
 
-    for (auto _ : state)
-    {
-        for (size_t i = 0; i < state.range(0); i++)
-        {
-            for (size_t j = 0; j < 4; ++j)
-            {
-                benchmark::DoNotOptimize(neko::Vec3f::Reflect(array1[j], array2[j]));
-            }
-        }
-    }
+		for (size_t i = 0; i < state.range(0); i++)
+		{
+			for (size_t j = 0; j < 4; ++j)
+			{
+				benchmark::DoNotOptimize(
+					neko::Vec3f::Reflect(array1[j], array2[j]));
+			}
+		}
+	}
 }
 
 BENCHMARK(BM_ReflectSimple)->Range(fromRange, toRange);
 
-static void BM_Reflect(benchmark::State& state)
+static void BM_ReflectFourVec(benchmark::State& state)
 {
-    std::array<neko::Vec3f, 4> array1;
-    for (auto& arr : array1)
-    {
-        arr = neko::Vec3f(std::rand(), std::rand(), std::rand());
-    }
-    const neko::FourVec3f fourVec31(array1);
+	for (auto _ : state)
+	{
+		std::array<neko::Vec3f, 4> array1;
+		for (auto& arr : array1)
+		{
+			arr = neko::Vec3f(std::rand(), std::rand(), std::rand());
+		}
+		const neko::FourVec3f fourVec31(array1);
 
-    std::array<neko::Vec3f, 4> array2;
-    for (auto& arr : array2)
-    {
-        arr = neko::Vec3f(std::rand(), std::rand(), std::rand());
-    }
-    const neko::FourVec3f fourVec32(array2);
+		std::array<neko::Vec3f, 4> array2;
+		for (auto& arr : array2)
+		{
+			arr = neko::Vec3f(std::rand(), std::rand(), std::rand());
+		}
+		const neko::FourVec3f fourVec32(array2);
 
-    for (auto _ : state)
-    {
-        for (size_t i = 0; i < state.range(0); i++)
-        {
-			benchmark::DoNotOptimize(neko::FourVec3f::Reflect(fourVec31, fourVec32));
-        }
-    }
+		for (size_t i = 0; i < state.range(0); i++)
+		{
+			benchmark::DoNotOptimize(
+				neko::FourVec3f::Reflect(fourVec31, fourVec32));
+		}
+	}
 }
 
-BENCHMARK(BM_Reflect)->Range(fromRange, toRange);
+BENCHMARK(BM_ReflectFourVec)->Range(fromRange, toRange);
 
-static void BM_ReflectIntrinsics(benchmark::State& state)
+static void BM_ReflectIntrinsicsFourVec(benchmark::State& state)
 {
-    std::array<neko::Vec3f, 4> array1;
-    for (auto& arr : array1)
-    {
-        arr = neko::Vec3f(std::rand(), std::rand(), std::rand());
-    }
-    const neko::FourVec3f fourVec31(array1);
+	for (auto _ : state)
+	{
+		std::array<neko::Vec3f, 4> array1;
+		for (auto& arr : array1)
+		{
+			arr = neko::Vec3f(std::rand(), std::rand(), std::rand());
+		}
+		const neko::FourVec3f fourVec31(array1);
 
-    std::array<neko::Vec3f, 4> array2;
-    for (auto& arr : array2)
-    {
-        arr = neko::Vec3f(std::rand(), std::rand(), std::rand());
-    }
-    const neko::FourVec3f fourVec32(array2);
+		std::array<neko::Vec3f, 4> array2;
+		for (auto& arr : array2)
+		{
+			arr = neko::Vec3f(std::rand(), std::rand(), std::rand());
+		}
+		neko::FourVec3f fourVec32(array2);
 
-    for (auto _ : state)
-    {
-        for (size_t i = 0; i < state.range(0); i++)
-        {
-            benchmark::DoNotOptimize(neko::FourVec3f::ReflectIntrinsics(fourVec31, fourVec32));
-        }
-    }
+		for (size_t i = 0; i < state.range(0); i++)
+		{
+			benchmark::DoNotOptimize(
+				neko::FourVec3f::ReflectIntrinsics(fourVec31, fourVec32));
+		}
+	}
 }
 
-BENCHMARK(BM_ReflectIntrinsics)->Range(fromRange, toRange);
+BENCHMARK(BM_ReflectIntrinsicsFourVec)->Range(fromRange, toRange);
 
 static void BM_ReflectIntrinsicsEightVec(benchmark::State& state)
 {
-    std::array<neko::Vec3f, 8> array1;
-    for (auto& arr : array1)
-    {
-        arr = neko::Vec3f(std::rand(), std::rand(), std::rand());
-    }
-    const neko::EightVec3f eightVec31(array1);
+	for (auto _ : state)
+	{
+		std::array<neko::Vec3f, 8> array1;
+		for (auto& arr : array1)
+		{
+			arr = neko::Vec3f(std::rand(), std::rand(), std::rand());
+		}
+		const neko::EightVec3f eightVec31(array1);
 
-    std::array<neko::Vec3f, 8> array2;
-    for (auto& arr : array2)
-    {
-        arr = neko::Vec3f(std::rand(), std::rand(), std::rand());
-    }
-    const neko::EightVec3f eightVec32(array2);
+		std::array<neko::Vec3f, 8> array2;
+		for (auto& arr : array2)
+		{
+			arr = neko::Vec3f(std::rand(), std::rand(), std::rand());
+		}
+		neko::EightVec3f eightVec32(array2);
 
-    for (auto _ : state)
-    {
-        for (size_t i = 0; i < state.range(0); i++)
-        {
-            benchmark::DoNotOptimize(neko::EightVec3f::ReflectIntrinsics(eightVec31, eightVec32));
-        }
-    }
+		for (size_t i = 0; i < state.range(0); i++)
+		{
+			benchmark::DoNotOptimize(
+				neko::EightVec3f::ReflectIntrinsics(eightVec31, eightVec32));
+		}
+	}
 }
 
 BENCHMARK(BM_ReflectIntrinsicsEightVec)->Range(fromRange, toRange);

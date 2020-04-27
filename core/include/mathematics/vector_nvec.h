@@ -30,7 +30,7 @@ namespace neko
 //-----------------------------------------------------------------------------
 // NVec2
 //-----------------------------------------------------------------------------
-template<typename T, int N>
+template<typename T, size_t N>
 class alignas(N * sizeof(T)) NVec2
 {
 public:
@@ -117,7 +117,7 @@ public:
     //-----------------------------------------------------------------------------
     // Formulas
     //-----------------------------------------------------------------------------
-    static std::array<T, N> Dot(NVec2<T, N> v1, NVec2<T, N> v2)
+    static std::array<T, N> Dot(const NVec2<T, N>& v1, const NVec2<T, N>& v2)
     {
         std::array<T, N> result;
         for (int i = 0; i < N; i++)
@@ -185,7 +185,7 @@ public:
         return result;
     }
 
-    NVec2<T, N> Rotate(std::array<T, N> angles) const
+    NVec2<T, N> Rotate(const std::array<T, N>& angles) const
     {
         NVec2<T, N> result;
         for (int i = 0; i < N; i++)
@@ -197,8 +197,8 @@ public:
         return result;
     }
 
-    static std::array<T, N> DotIntrinsics(NVec2<T, N> v1, NVec2<T, N> v2);
-    static std::array<T, N> DotIntrinsics(NVec2<T, N> v1, Vec2<T> v2);
+    static std::array<T, N> DotIntrinsics(const NVec2<T, N>& v1, const NVec2<T, N>& v2);
+    static std::array<T, N> DotIntrinsics(const NVec2<T, N>& v1, const Vec2<T>& v2);
     std::array<T, N> SquareMagnitudeIntrinsics() const;
     std::array<T, N> MagnitudeIntrinsics() const;
     NVec2<T, N> NormalizedIntrinsics();
@@ -215,7 +215,7 @@ using EightVec2f = NVec2<float, 8>;
 //-----------------------------------------------------------------------------
 #ifdef __SSE__
 template <>
-inline std::array<float, 4> FourVec2f::DotIntrinsics(FourVec2f v1, FourVec2f v2)
+inline std::array<float, 4> FourVec2f::DotIntrinsics(const FourVec2f& v1, const FourVec2f& v2)
 {
     alignas(4 * sizeof(float))
     std::array<float, 4> result;
@@ -233,7 +233,7 @@ inline std::array<float, 4> FourVec2f::DotIntrinsics(FourVec2f v1, FourVec2f v2)
     return result;
 }
 template <>
-inline std::array<float, 4> FourVec2f::DotIntrinsics(FourVec2f v1, Vec2f v2)
+inline std::array<float, 4> FourVec2f::DotIntrinsics(const FourVec2f& v1, const Vec2f& v2)
 {
     alignas(4 * sizeof(float))
     std::array<float, 4> result;
@@ -302,7 +302,7 @@ inline FourVec2f FourVec2f::NormalizedIntrinsics()
 
 #ifdef __AVX2__
 template <>
-inline std::array<float, 8> EightVec2f::DotIntrinsics(EightVec2f v1, EightVec2f v2)
+inline std::array<float, 8> EightVec2f::DotIntrinsics(const EightVec2f& v1, const EightVec2f& v2)
 {
     alignas(8 * sizeof(float))
     std::array<float, 8> result;
@@ -320,7 +320,7 @@ inline std::array<float, 8> EightVec2f::DotIntrinsics(EightVec2f v1, EightVec2f 
     return result;
 }
 template <>
-inline std::array<float, 8> EightVec2f::DotIntrinsics(EightVec2f v1, Vec2f v2)
+inline std::array<float, 8> EightVec2f::DotIntrinsics(const EightVec2f& v1, const Vec2f& v2)
 {
     alignas(8 * sizeof(float))
     std::array<float, 8> result;
@@ -389,7 +389,7 @@ inline EightVec2f EightVec2f::NormalizedIntrinsics()
 //-----------------------------------------------------------------------------
 // NVec3
 //-----------------------------------------------------------------------------
-template<typename T, int N>
+template<typename T, size_t N>
 class alignas(N * sizeof(T)) NVec3
 {
 public:
@@ -485,7 +485,7 @@ public:
     //-----------------------------------------------------------------------------
     // Formulas
     //-----------------------------------------------------------------------------
-    static std::array<T, N> Dot(NVec3<T, N> v1, NVec3<T, N> v2)
+    static std::array<T, N> Dot(const NVec3<T, N>& v1, const NVec3<T, N>& v2)
     {
         std::array<T, N> result;
         for (int i = 0; i < N; i++)
@@ -557,12 +557,12 @@ public:
         return result;
     }
 
-    static std::array<T, N> DotIntrinsics(NVec3<T, N> v1, NVec3<T, N> v2);
-    static std::array<T, N> DotIntrinsics(NVec3<T, N> v1, Vec3<T> v2);
+    static std::array<T, N> DotIntrinsics(const NVec3<T, N>& v1, const NVec3<T, N>& v2);
+    static std::array<T, N> DotIntrinsics(const NVec3<T, N>& v1, const Vec3<T>& v2);
     std::array<T, N> SquareMagnitudeIntrinsics() const;
     std::array<T, N> MagnitudeIntrinsics() const;
     NVec3<T, N> NormalizedIntrinsics();
-    static NVec3<T, N> ReflectIntrinsics(NVec3<T, N> inVec, NVec3<T, N> normal);
+    static NVec3<T, N> ReflectIntrinsics(const NVec3<T, N>& inVec, NVec3<T, N>& normal);
 };
 
 //-----------------------------------------------------------------------------
@@ -576,7 +576,7 @@ using EightVec3f = NVec3<float, 8>;
 //-----------------------------------------------------------------------------
 #ifdef __SSE__
 template <>
-inline std::array<float, 4> FourVec3f::DotIntrinsics(FourVec3f v1, FourVec3f v2)
+inline std::array<float, 4> FourVec3f::DotIntrinsics(const FourVec3f& v1, const FourVec3f& v2)
 {
     alignas(4 * sizeof(float))
     std::array<float, 4> result;
@@ -598,7 +598,7 @@ inline std::array<float, 4> FourVec3f::DotIntrinsics(FourVec3f v1, FourVec3f v2)
     return result;
 }
 template <>
-inline std::array<float, 4> FourVec3f::DotIntrinsics(FourVec3f v1, Vec3f v2)
+inline std::array<float, 4> FourVec3f::DotIntrinsics(const FourVec3f& v1, const Vec3f& v2)
 {
     alignas(4 * sizeof(float))
     std::array<float, 4> result;
@@ -669,7 +669,7 @@ inline FourVec3f FourVec3f::NormalizedIntrinsics()
     return result;
 }
 template<>
-inline FourVec3f FourVec3f::ReflectIntrinsics(FourVec3f inVec, FourVec3f normal)
+inline FourVec3f FourVec3f::ReflectIntrinsics(const FourVec3f& inVec, FourVec3f& normal)
 {
     FourVec3f result;
     normal = normal.NormalizedIntrinsics();
@@ -707,7 +707,7 @@ inline FourVec3f FourVec3f::ReflectIntrinsics(FourVec3f inVec, FourVec3f normal)
 
 #ifdef __AVX2__
 template <>
-inline std::array<float, 8> EightVec3f::DotIntrinsics(EightVec3f v1, EightVec3f v2)
+inline std::array<float, 8> EightVec3f::DotIntrinsics(const EightVec3f& v1, const EightVec3f& v2)
 {
     alignas(8 * sizeof(float))
     std::array<float, 8> result;
@@ -729,7 +729,7 @@ inline std::array<float, 8> EightVec3f::DotIntrinsics(EightVec3f v1, EightVec3f 
     return result;
 }
 template <>
-inline std::array<float, 8> EightVec3f::DotIntrinsics(EightVec3f v1, Vec3f v2)
+inline std::array<float, 8> EightVec3f::DotIntrinsics(const EightVec3f& v1, const Vec3f& v2)
 {
     alignas(8 * sizeof(float))
     std::array<float, 8> result;
@@ -800,7 +800,7 @@ inline EightVec3f EightVec3f::NormalizedIntrinsics()
     return result;
 }
 template<>
-inline EightVec3f EightVec3f::ReflectIntrinsics(EightVec3f inVec, EightVec3f normal)
+inline EightVec3f EightVec3f::ReflectIntrinsics(const EightVec3f& inVec, EightVec3f& normal)
 {
     EightVec3f result;
     normal = normal.NormalizedIntrinsics();
@@ -839,7 +839,7 @@ inline EightVec3f EightVec3f::ReflectIntrinsics(EightVec3f inVec, EightVec3f nor
 //-----------------------------------------------------------------------------
 // NVec4
 //-----------------------------------------------------------------------------
-template<typename T, int N>
+template<typename T, size_t N>
 class alignas(N * sizeof(T)) NVec4
 {
 public:
@@ -944,7 +944,7 @@ public:
     //-----------------------------------------------------------------------------
     // Formulas
     //-----------------------------------------------------------------------------
-    static std::array<T, N> Dot(NVec4<T, N> v1, NVec4<T, N> v2)
+    static std::array<T, N> Dot(const NVec4<T, N>& v1, const NVec4<T, N>& v2)
     {
         std::array<T, N> result;
         for (int i = 0; i < N; i++)
@@ -957,7 +957,7 @@ public:
         return result;
     }
 
-    static std::array<T, N> Dot3(NVec4<T, N> v1, NVec4<T, N> v2)
+    static std::array<T, N> Dot3(const NVec4<T, N>& v1, const NVec4<T, N>& v2)
     {
         std::array<T, N> result;
         for (int i = 0; i < N; i++)
@@ -1004,7 +1004,7 @@ public:
         return result;
     }
 
-    static NVec4<T, N> Lerp(NVec4<T, N> v1, NVec4<T, N> v2, T t)
+    static NVec4<T, N> Lerp(const NVec4<T, N>& v1, const NVec4<T, N>& v2, T t)
     {
         NVec4<T, N> result;
         for (int i = 0; i < N; i++)
@@ -1017,8 +1017,8 @@ public:
         return result;
     }
 
-    static std::array<T, N> DotIntrinsics(NVec4<T, N> v1, NVec4<T, N> v2);
-    static std::array<T, N> DotIntrinsics(NVec4<T, N> v1, Vec4<T> v2);
+    static std::array<T, N> DotIntrinsics(const NVec4<T, N>& v1, const NVec4<T, N>& v2);
+    static std::array<T, N> DotIntrinsics(const NVec4<T, N>& v1, const Vec4<T>& v2);
     std::array<T, N> SquareMagnitudeIntrinsics() const;
     std::array<T, N> MagnitudeIntrinsics() const;
     NVec4<T, N> NormalizedIntrinsics();
@@ -1035,7 +1035,7 @@ using EightVec4f = NVec4<float, 8>;
 //-----------------------------------------------------------------------------
 #ifdef __SSE__
 template <>
-inline std::array<float, 4> FourVec4f::DotIntrinsics(FourVec4f v1, FourVec4f v2)
+inline std::array<float, 4> FourVec4f::DotIntrinsics(const FourVec4f& v1, const FourVec4f& v2)
 {
     alignas(4 * sizeof(float))
     std::array<float, 4> result;
@@ -1061,7 +1061,7 @@ inline std::array<float, 4> FourVec4f::DotIntrinsics(FourVec4f v1, FourVec4f v2)
     return result;
 }
 template <>
-inline std::array<float, 4> FourVec4f::DotIntrinsics(FourVec4f v1, Vec4f v2)
+inline std::array<float, 4> FourVec4f::DotIntrinsics(const FourVec4f& v1, const Vec4f& v2)
 {
     alignas(4 * sizeof(float))
     std::array<float, 4> result;
@@ -1142,7 +1142,7 @@ inline FourVec4f FourVec4f::NormalizedIntrinsics()
 
 #ifdef __AVX2__
 template <>
-inline std::array<float, 8> EightVec4f::DotIntrinsics(EightVec4f v1, EightVec4f v2)
+inline std::array<float, 8> EightVec4f::DotIntrinsics(const EightVec4f& v1, const EightVec4f& v2)
 {
     alignas(8 * sizeof(float))
     std::array<float, 8> result;
@@ -1168,7 +1168,7 @@ inline std::array<float, 8> EightVec4f::DotIntrinsics(EightVec4f v1, EightVec4f 
     return result;
 }
 template <>
-inline std::array<float, 8> EightVec4f::DotIntrinsics(EightVec4f v1, Vec4f v2)
+inline std::array<float, 8> EightVec4f::DotIntrinsics(const EightVec4f& v1, const Vec4f& v2)
 {
     alignas(8 * sizeof(float))
     std::array<float, 8> result;
