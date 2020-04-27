@@ -40,6 +40,7 @@ namespace neko
         size_t dataLength = 0;
 
         void Load(std::string_view path);
+        void LoadFromArchived(std::string_view archivedPath, std::string_view path);
         void Destroy();
 
         bool operator==(const BufferFile& bufferFile) const;

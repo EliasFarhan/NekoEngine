@@ -16,12 +16,14 @@ const ResourceId INVALID_RESOURCE_ID = sole::uuid();
 /**
  * \brief Custom promise waiting for a resource
  */
-struct LoadPromise {
+struct Resource {
     BufferFile resource;
-    Path path = "";
+    Path relativePath = "";
+    Path archivedPath = "";
     bool ready = false;
-    LoadPromise(Path newPath) : path(newPath) {}
-    LoadPromise() {}
+    Resource(Path newAssetPath) : relativePath(newAssetPath) {}
+    Resource(Path newArchivedPath, Path newAssetPath) : relativePath(newAssetPath), archivedPath(newArchivedPath) {}
+    Resource() {}
 };
 
 class ResourceManager
@@ -33,6 +35,7 @@ public:
     bool IsResourceReady(const ResourceId resourceId);
     neko::BufferFile GetResource(const ResourceId resourceId);
     ResourceId LoadResource(const Path assetPath);
+    ResourceId LoadArchivedResource(const Path archivedPath, const Path relativePath);
     void DeleteResource(const ResourceId resourceId);
 
 private:
@@ -43,7 +46,7 @@ private:
         IS_RUNNING = 1 << 1, //To check if the ResourceManager is running
         IS_NOT_EMPTY = 1 << 2, //To check if the ResourceManager has no tasks
     };
-    std::unordered_map<ResourceId, LoadPromise> resourcePromises_;
+    std::unordered_map<ResourceId, Resource> resourcePromises_;
     std::vector<ResourceId> idQueue_;
     std::atomic<std::uint8_t> status_;
     std::thread loadingThread_;

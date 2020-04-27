@@ -5,6 +5,7 @@
 #include "easy/profiler.h"
 #include <easy/arbitrary_value.h> // EASY_VALUE, EASY_ARRAY are defined here
 #endif
+#include "../../../common/physfs_wrapper/include/physfs_utility.h"
 #include "engine/assert.h"
 #include "utilities/file_utility.h"
 #include "utilities/json_utility.h"
@@ -16,6 +17,7 @@ neko::ResourceManager::ResourceManager()
 
 void neko::ResourceManager::Init()
 {
+    physfs::InitPhysFs();
     status_ = IS_RUNNING;
     loadingThread_ = std::thread([this]()
     {
@@ -50,14 +52,14 @@ void neko::ResourceManager::LoadingLoop()
             EASY_BLOCK("Load", profiler::colors::Blue);
 #endif
             ResourceId resourceToLoad;
-            LoadPromise promise;
+            Resource resource;
             {
 #ifdef EASY_PROFILE_USE
                 EASY_BLOCK("Get Queue and Promise", profiler::colors::Red);
 #endif
                 std::lock_guard<std::mutex> lockGuard(loadingMutex_);
                 resourceToLoad = idQueue_[0];
-                promise = resourcePromises_[resourceToLoad];
+                resource = resourcePromises_[resourceToLoad];
 #ifdef EASY_PROFILE_USE
                 EASY_END_BLOCK;
 #endif
@@ -65,11 +67,17 @@ void neko::ResourceManager::LoadingLoop()
 #ifdef EASY_PROFILE_USE
             EASY_BLOCK("File Loading", profiler::colors::Blue600);
 #endif
-            promise.resource.Load(promise.path);
+            if (resource.archivedPath.empty())
+            {
+                resource.resource.Load(resource.relativePath);
+            } else
+            {
+                resource.resource.LoadFromArchived(resource.archivedPath, resource.relativePath);
+            }
 #ifdef EASY_PROFILE_USE
             EASY_END_BLOCK;
 #endif
-            promise.ready = true;
+            resource.ready = true;
 
             {
 #ifdef EASY_PROFILE_USE
@@ -79,7 +87,7 @@ void neko::ResourceManager::LoadingLoop()
 #ifdef EASY_PROFILE_USE
                 EASY_BLOCK("Set Promise", profiler::colors::Red200);
 #endif
-                resourcePromises_[resourceToLoad] = promise;
+                resourcePromises_[resourceToLoad] = resource;
 #ifdef EASY_PROFILE_USE
                 EASY_END_BLOCK;
 #endif
@@ -141,7 +149,6 @@ bool neko::ResourceManager::IsResourceReady(const ResourceId resourceId)
 #endif
 }
 
-
 neko::BufferFile neko::ResourceManager::GetResource(const ResourceId resourceId)
 {
 #ifdef EASY_PROFILE_USE
@@ -173,7 +180,7 @@ neko::ResourceId neko::ResourceManager::LoadResource(const Path assetPath)
     {
         const std::lock_guard<std::mutex> lockGuard(loadingMutex_);
         idQueue_.push_back(resourceId);
-        resourcePromises_[resourceId] = LoadPromise(assetPath);
+        resourcePromises_[resourceId] = Resource(assetPath);
     }
 #ifdef EASY_PROFILE_USE
     EASY_END_BLOCK;
@@ -186,6 +193,36 @@ neko::ResourceId neko::ResourceManager::LoadResource(const Path assetPath)
 #endif
 }
 
+neko::ResourceId neko::ResourceManager::LoadArchivedResource(const Path archivedPath, const Path relativePath)
+{
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("LoadResource", profiler::colors::Blue);
+#endif
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("Generate UUID", profiler::colors::Purple);
+#endif
+    const ResourceId resourceId = sole::uuid4();
+#ifdef EASY_PROFILE_USE
+    EASY_END_BLOCK;
+#endif
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("Add to queue", profiler::colors::Red);
+#endif
+    {
+        const std::lock_guard<std::mutex> lockGuard(loadingMutex_);
+        idQueue_.push_back(resourceId);
+        resourcePromises_[resourceId] = Resource(archivedPath, relativePath);
+    }
+#ifdef EASY_PROFILE_USE
+    EASY_END_BLOCK;
+#endif
+    status_ |= IS_NOT_EMPTY;
+    cv_.notify_all();
+    return resourceId;
+#ifdef EASY_PROFILE_USE
+    EASY_END_BLOCK;
+#endif
+}
 
 void neko::ResourceManager::DeleteResource(const ResourceId resourceId)
 {

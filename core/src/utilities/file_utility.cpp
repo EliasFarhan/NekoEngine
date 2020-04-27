@@ -24,6 +24,9 @@
 #include <utilities/file_utility.h>
 #include <sstream>
 #include <functional>
+
+#include "../../../common/physfs_wrapper/include/physfs_utility.h"
+#include "engine/assert.h"
 #include "engine/log.h"
 #ifdef EASY_PROFILE_USE
 #include "easy/profiler.h"
@@ -154,6 +157,18 @@ void BufferFile::Load(std::string_view path)
 		is.read(dataBuffer, dataLength);
 		is.close();
 	}
+}
+
+void BufferFile::LoadFromArchived(std::string_view archivedPath, std::string_view path)
+{
+	physfs::OpenArchive(archivedPath.data());
+	std::string strPath = path.data();
+	neko_assert(physfs::FileExists(strPath), "Archived file not found");
+	std::string str = physfs::ReadFile(strPath);
+	dataLength = str.length();
+	dataBuffer = new char[dataLength + 1];
+	dataBuffer[dataLength] = 0;
+	strcpy(dataBuffer, str.c_str());
 }
 
 void BufferFile::Destroy()
