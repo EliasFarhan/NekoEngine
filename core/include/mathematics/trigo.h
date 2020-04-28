@@ -5,6 +5,17 @@
 
 namespace neko
 {
+/**
+ * \brief return an approximation of the sqrt
+ */
+inline float RSqrt(float x)
+{
+    auto i = *reinterpret_cast<int*>(&x);
+    i = 0x5f3759df - (i >> 1);
+    auto r = *reinterpret_cast<float*>(&i);
+    r = r * (1.5f - 0.5f * x * r * r);
+    return r * x;
+}
 inline float Sin(radian_t angle)
 {
     return std::sin(angle.value());
