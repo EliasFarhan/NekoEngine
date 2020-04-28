@@ -94,9 +94,8 @@ namespace neko
 			}
 
 		}
-		T Pop()
+		void Pop()
 		{
-			T pop = buffer_[start_];
 			if (start_ < capacity)
 			{
 				start_++;
@@ -105,7 +104,6 @@ namespace neko
 			{
 				start_ = 0;
 			};
-			return pop;
 		}
 		T Front()
 		{
@@ -148,7 +146,7 @@ namespace neko
 			if (Size() >= queueVector.size())
 			{
 				if (!queueVector.empty()) Rebase();
-				queueVector.resize(Size() + 1);
+				queueVector.resize(Size()+1+Size());
 			}
 
 			queueVector[end_] = element;
@@ -173,15 +171,13 @@ namespace neko
 			start_ = 0;
 			end_ = 0;
 		}
-		T PopFront()
+		void PopFront()
 		{
-			T pop = queueVector[start_];
 			start_++;
 			if (start_> queueVector.size()-1)
 			{
 				start_ = 0;
 			}
-			return pop;
 		}
 		T Front()
 		{
@@ -255,16 +251,14 @@ namespace neko
 		{
 			queueVector.clear();
 		};
-		T PopFront()
+		void PopFront()
 		{
-			T pop = queueVector[0];
 			
 			for (size_t i = 0; i < Size()-1; i++)
 			{
 				queueVector[i] = queueVector[i+1];
 			}
-			queueVector.resize(Size());
-			return pop;
+			queueVector.pop_back();
 		};
 		T Front()
 		{
