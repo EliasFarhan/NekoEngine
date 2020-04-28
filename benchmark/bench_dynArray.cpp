@@ -1,3 +1,4 @@
+#include <iostream>
 #include <benchmark/benchmark.h>
 #include <random>
 #include <algorithm>
@@ -6,14 +7,13 @@
 #include "engine/array.h"
 #include <mathematics/vector.h>
 
-const long fromRange = 8;
-const long toRange = 1 << 15;
-const float start = -100.0f;
-const float end = 100.0f;
+const int fromRange = 2;
+const int toRange = 64;
 
 static void BM_Push(benchmark::State& state){
+	
 	const size_t ALLOCATOR_HEADER_SIZE = 16;
-	const size_t SIZE = 131072;
+	const size_t SIZE = 1024;
 	void* start = malloc(SIZE + ALLOCATOR_HEADER_SIZE);
 
 	neko::FreeListAllocator allocator(SIZE + ALLOCATOR_HEADER_SIZE, start);
