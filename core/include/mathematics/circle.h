@@ -236,31 +236,31 @@ public:
             radius[i] = circles[i].radius;
         }
     }
-    uint8_t Intersects(const FourCircle& sphere)
+	
+    uint8_t Intersects(const FourCircle& circle) const
     {
         alignas(4 * sizeof(float))
         std::array<float, 4> distanceX = {};
         std::array<float, 4> distanceY = {};
         std::array<float, 4> radSum = {};
-        std::array<float, 4> radSub = {};
         std::array<float, 4> mag = {};
         uint8_t results = {};
 
         for (size_t i = 0; i < 4; i++)
         {
-            distanceX[i] = centerXs[i] - sphere.centerXs[i];
-            distanceY[i] = centerYs[i] - sphere.centerYs[i];
+            distanceX[i] = centerXs[i] - circle.centerXs[i];
+            distanceY[i] = centerYs[i] - circle.centerYs[i];
 
-            radSum[i] = radius[i] + sphere.radius[i];
-            radSub[i] = radius[i] - sphere.radius[i];
+            radSum[i] = radius[i] + circle.radius[i];
 
             mag[i] = RSqrt(distanceX[i] * distanceX[i] + distanceY[i] * distanceY[i]);
 
-            results = radSub[i] <= mag[i] <= radSum[i];
+            results = mag[i] <= radSum[i];
         }
 
         return results;
     }
+	
     static uint8_t IntersectsIntrinsicsCircle(const FourCircle& circlesA, const FourCircle& circlesB);
 };
 
@@ -289,14 +289,13 @@ struct alignas(4 * sizeof(float)) FourSphere
         }
     }
 
-    uint8_t Intersects(const FourSphere& sphere)
+    uint8_t Intersects(const FourSphere& sphere) const
     {
         alignas(4 * sizeof(float))
         std::array<float, 4> distanceX = {};
         std::array<float, 4> distanceY = {};
         std::array<float, 4> distanceZ = {};
         std::array<float, 4> radSum = {};
-        std::array<float, 4> radSub = {};
         std::array<float, 4> mag = {};
         uint8_t results = {};
 
@@ -307,21 +306,21 @@ struct alignas(4 * sizeof(float)) FourSphere
             distanceZ[i] = centerZs[i] - sphere.centerZs[i];
 
             radSum[i] = radius[i] + sphere.radius[i];
-            radSub[i] = radius[i] - sphere.radius[i];
 
             mag[i] = RSqrt(distanceX[i] * distanceX[i] + distanceY[i] * distanceY[i] + distanceZ[i] * distanceZ[i]);
 
-            results = radSub[i] <= mag[i] <= radSum[i];
+            results = mag[i] <= radSum[i];
         }
 
         return results;
     }
+	
     static uint8_t IntersectIntrinsicsSphere(const FourSphere & spheresA, const FourSphere& spheresB);
 };
 
 #ifdef __SSE__
 /**
-* \brief Test the intersection between four circle in a list.
+* \brief Test the intersection between two array of four Circle.
 */
 inline uint8_t FourCircle::IntersectsIntrinsicsCircle(const FourCircle& circlesA, const FourCircle& circlesB)
 {
@@ -352,9 +351,8 @@ inline uint8_t FourCircle::IntersectsIntrinsicsCircle(const FourCircle& circlesA
 }
 	
 /**
-* \brief Test the intersection between four sphere in a list.
+* \brief Test the intersection between two array of four Sphere.
 */
-
 inline uint8_t FourSphere::IntersectIntrinsicsSphere(const FourSphere& spheresA, const FourSphere& spheresB)
 {
     __m128 x1 = _mm_load_ps(spheresA.centerXs.data());
