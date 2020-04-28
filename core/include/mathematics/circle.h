@@ -154,7 +154,7 @@ struct Sphere
         return distanceVec.Magnitude() <= radiusSum;
     }
 
-    bool IntersectsOther(const Sphere sphere) const
+    bool IntersectsRSqrt(const Sphere sphere) const
     {
         const Vec3f distanceVec = center - sphere.center;
 
@@ -236,7 +236,7 @@ public:
             radius[i] = circles[i].radius;
         }
     }
-    std::array<bool, 4> Intersects(const FourCircle& sphere)
+    uint8_t Intersects(const FourCircle& sphere)
     {
         alignas(4 * sizeof(float))
         std::array<float, 4> distanceX = {};
@@ -244,7 +244,7 @@ public:
         std::array<float, 4> radSum = {};
         std::array<float, 4> radSub = {};
         std::array<float, 4> mag = {};
-        std::array<bool, 4> results = {};
+        uint8_t results = {};
 
         for (size_t i = 0; i < 4; i++)
         {
@@ -256,7 +256,7 @@ public:
 
             mag[i] = RSqrt(distanceX[i] * distanceX[i] + distanceY[i] * distanceY[i]);
 
-            results[i] = radSub[i] <= mag[i] <= radSum[i];
+            results = radSub[i] <= mag[i] <= radSum[i];
         }
 
         return results;
@@ -289,7 +289,7 @@ struct alignas(4 * sizeof(float)) FourSphere
         }
     }
 
-    std::array<bool, 4> Intersects(const FourSphere& sphere)
+    uint8_t Intersects(const FourSphere& sphere)
     {
         alignas(4 * sizeof(float))
         std::array<float, 4> distanceX = {};
@@ -298,7 +298,7 @@ struct alignas(4 * sizeof(float)) FourSphere
         std::array<float, 4> radSum = {};
         std::array<float, 4> radSub = {};
         std::array<float, 4> mag = {};
-        std::array<bool, 4> results = {};
+        uint8_t results = {};
 
         for (size_t i = 0; i < 4; i++)
         {
@@ -311,7 +311,7 @@ struct alignas(4 * sizeof(float)) FourSphere
 
             mag[i] = RSqrt(distanceX[i] * distanceX[i] + distanceY[i] * distanceY[i] + distanceZ[i] * distanceZ[i]);
 
-            results[i] = radSub[i] <= mag[i] <= radSum[i];
+            results = radSub[i] <= mag[i] <= radSum[i];
         }
 
         return results;
@@ -332,19 +332,19 @@ inline uint8_t FourCircle::IntersectsIntrinsicsCircle(const FourCircle& circlesA
     __m128 x2 = _mm_load_ps(circlesB.centerXs.data());
     __m128 y2 = _mm_load_ps(circlesB.centerYs.data());
     __m128 rad2 = _mm_load_ps(circlesB.radius.data());
+	
     x1 = _mm_sub_ps(x1, x2);
     y1 = _mm_sub_ps(y1, y2);
 
     __m128 radSum = _mm_add_ps(rad1, rad2);
-    __m128 radSub = _mm_sub_ps(rad2, rad1);
 
     __m128 distx = _mm_mul_ps(x1, x1);
     __m128 disty = _mm_mul_ps(y1, y1);
 
-    distx = _mm_add_ps(distx, disty);
+    __m128 dist = _mm_add_ps(distx, disty);
 
-    __m128 mag = _mm_rsqrt_ps(distx);
-    __m128 mask = _mm_cmpneq_ps(_mm_cmple_ps(radSum, mag), _mm_cmple_ps(radSub, mag));
+    __m128 mag = _mm_rsqrt_ps(dist);
+    __m128 mask = _mm_cmple_ps(radSum, mag);
 
     uint8_t results = _mm_movemask_ps(mask);
     
@@ -370,19 +370,19 @@ inline uint8_t FourSphere::IntersectIntrinsicsSphere(const FourSphere& spheresA,
     __m128 rad2 = _mm_load_ps(spheresB.radius.data());
 
     __m128 radSum = _mm_add_ps(rad1, rad2); // radius + sphere.radius
-    __m128 radSub = _mm_sub_ps(rad2, rad1); // radius - sphere.radius
-    __m128 x3 = _mm_sub_ps(x1, x2); // center.x - sphere.center.x
-    __m128 y3 = _mm_sub_ps(y1, y2); //center.y - sphere.center.y
-    __m128 z3 = _mm_sub_ps(z1, z2); //center.z - sphere.center.z
+	
+    x1 = _mm_sub_ps(x1, x2); // center.x - sphere.center.x
+    y1 = _mm_sub_ps(y1, y2); //center.y - sphere.center.y
+    z1 = _mm_sub_ps(z1, z2); //center.z - sphere.center.z
 
-    __m128 distx = _mm_mul_ps(x3, x3);
-    __m128 disty = _mm_mul_ps(y3, y3);
-    __m128 distz = _mm_mul_ps(z3, z3);
+    __m128 distx = _mm_mul_ps(x1, x1);
+    __m128 disty = _mm_mul_ps(y1, y1);
+    __m128 distz = _mm_mul_ps(z1, z1);
 
-    auto dist = _mm_add_ps(distx, _mm_add_ps(disty, distz));
+    __m128 dist = _mm_add_ps(distx, _mm_add_ps(disty, distz));
 
-    auto mag = _mm_rsqrt_ps(dist);
-    auto mask = _mm_cmpneq_ps(_mm_cmple_ps(radSum, mag), _mm_cmple_ps(radSub, mag));
+    __m128 mag = _mm_rsqrt_ps(dist);
+    __m128 mask = _mm_cmple_ps(radSum, mag);
     uint8_t results = _mm_movemask_ps(mask);
 
     return results;

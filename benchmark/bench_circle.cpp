@@ -9,7 +9,7 @@
 #endif
 
 const long fromRange = 8;
-const long toRange = 1 << 16;
+const long toRange = 1 << 18;
 const float maxNmb = 50.0f;
 
 float RandomFloat()
@@ -38,7 +38,7 @@ static void BM_CircleIntersects(benchmark::State& state)
 }
 BENCHMARK(BM_CircleIntersects)->Range(fromRange, toRange);
 
-static void BM_CircleIntersectsOther(benchmark::State& state)
+static void BM_CircleIntersectsRSqrt(benchmark::State& state)
 {
 	for (auto _ : state)
     {
@@ -54,8 +54,9 @@ static void BM_CircleIntersectsOther(benchmark::State& state)
         }
     }
 }
-BENCHMARK(BM_CircleIntersectsOther)->Range(fromRange, toRange);
+BENCHMARK(BM_CircleIntersectsRSqrt)->Range(fromRange, toRange);
 
+/*
 static void BM_CircleIntersectsIntrinsics(benchmark::State& state)
 {
 
@@ -84,6 +85,7 @@ static void BM_CircleIntersectsIntrinsics(benchmark::State& state)
     }
 }
 BENCHMARK(BM_CircleIntersectsIntrinsics)->Range(fromRange, toRange);
+*/
 
 static void BM_SphereIntersects(benchmark::State& state)
 {
@@ -102,7 +104,7 @@ static void BM_SphereIntersects(benchmark::State& state)
 }
 BENCHMARK(BM_SphereIntersects)->Range(fromRange, toRange);
 
-static void BM_SphereIntersectsOther(benchmark::State& state)
+static void BM_SphereIntersectsRSqrt(benchmark::State& state)
 {
 	for (auto _ : state)
     {
@@ -113,12 +115,13 @@ static void BM_SphereIntersectsOther(benchmark::State& state)
     
         for (size_t i = 0; i < n; i++)
         {
-            benchmark::DoNotOptimize(sphere.IntersectsOther(sphere2));
+            benchmark::DoNotOptimize(sphere.IntersectsRSqrt(sphere2));
         }
     }
 }
-BENCHMARK(BM_SphereIntersectsOther)->Range(fromRange, toRange);
+BENCHMARK(BM_SphereIntersectsRSqrt)->Range(fromRange, toRange);
 
+/*
 static void BM_SphereIntersectsIntrinsics(benchmark::State& state)
 {
     for (auto _ : state)
@@ -144,4 +147,5 @@ static void BM_SphereIntersectsIntrinsics(benchmark::State& state)
     }
 }
 BENCHMARK(BM_SphereIntersectsIntrinsics)->Range(fromRange, toRange);
+*/
 
