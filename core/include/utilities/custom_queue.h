@@ -142,34 +142,30 @@ namespace neko
 		DynamicQueue()= default;
 		
 		~DynamicQueue() = default;
-		
+
 		void PushBack(T element)
 		{
-			
-			if (Size()-1 >= queueVector.size())
+			if (Size() >= queueVector.size())
 			{
-				if (!queueVector.empty())
-					Rebase();
-				queueVector.resize(Size()+1);
-				
+				if (!queueVector.empty()) Rebase();
+				queueVector.resize(Size() + 1);
 			}
-			
+
 			queueVector[end_] = element;
+			
 			if (end_ + 1 != start_)
 			{
 				end_++;
 			}
-			else 
+			else
 			{
 				Rebase();
 				end_++;
 			}
-			if (end_ >= queueVector.size()&& start_ != 0)
+			if (end_ > queueVector.size() && start_ != 0)
 			{
-				end_ = 0;				
+				end_ = 0;
 			}
-			
-					
 		}
 		void Clear()
 		{
@@ -197,6 +193,10 @@ namespace neko
 			{
 				return queueVector[end_ - 1];
 			}
+			else
+			{
+				return queueVector[queueVector.size() - start_];
+			}
 		
 		}
 		size_t Size()
@@ -209,12 +209,12 @@ namespace neko
 			{  
 				if (end_ > start_)
 				{
-					return end_ - start_ +1;
+					return end_ - start_ ;
 				}
 			
 				else 
 				{
-					return   start_ - end_+1;
+					return  queueVector.size() - start_ + end_ ;
 				}
 			}
 		}
@@ -225,7 +225,7 @@ namespace neko
 			{
 				queueVector[i] = queueVector[start_ + i];
 			}
-			end_ = Size()-1;
+			end_ = Size();
 			start_ = 0;
 		}
 		T& operator[](size_t idx)
@@ -263,7 +263,7 @@ namespace neko
 			{
 				queueVector[i] = queueVector[i+1];
 			}
-			
+			queueVector.resize(Size());
 			return pop;
 		};
 		T Front()
