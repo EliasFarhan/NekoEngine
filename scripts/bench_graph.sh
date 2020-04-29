@@ -16,4 +16,4 @@ else
 fi
 
 
-python3 "$(dirname "$0")/bench_graph.py" "$json_filename"
+python "$(dirname "$0")/bench_graph.py" "$json_filename"
