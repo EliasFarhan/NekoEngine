@@ -123,7 +123,7 @@ namespace neko
 		void Push(T elem) {
 			if (data_ == nullptr) {
 				capacity_ = 2;
-				data_ = (T*)(allocator_.Allocate(sizeof(T) * capacity_, alignof(T)));
+				data_ = (T*)allocator_.Allocate(sizeof(T) * capacity_, alignof(T));
 				data_[0] = elem;
 				size_++;
 			}
