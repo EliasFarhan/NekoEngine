@@ -53,4 +53,7 @@ target_include_directories(Neko_Core PUBLIC "${IMGUI_ROOT}")
 target_include_directories(Neko_Core PUBLIC include/)
 target_include_directories(Neko_Core PUBLIC ${UTILITIES_DIR})
 neko_lib_config(Neko_Core)
-
+if(${CMAKE_VERSION} VERSION_LESS "3.16.0")
+else()
+    target_precompile_headers(Neko_Core PRIVATE "include/core_pch.h")
+endif()

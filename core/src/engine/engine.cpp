@@ -112,6 +112,10 @@ void BasicEngine::Update(seconds dt)
 
 void BasicEngine::Destroy()
 {
+    Job leaveContext([this] {window_->LeaveCurrentContext(); });
+    jobSystem_.ScheduleJob(&leaveContext, JobThreadType::RENDER_THREAD);
+    leaveContext.Join();
+    window_->MakeCurrentContext();
     renderer_->Destroy();
 	jobSystem_.Destroy();
 	instance_ = nullptr;
