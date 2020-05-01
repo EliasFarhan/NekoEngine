@@ -31,4 +31,3 @@ if(Emscripten)
 endif()
 set_target_properties (sdl_engine PROPERTIES FOLDER Neko)
 
-target_precompile_headers(sdl_engine PRIVATE "include/sdl_wrapper_pch.h")

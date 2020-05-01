@@ -101,7 +101,8 @@ if(Neko_SDL2)
     include_directories(${SDL_DIR}/include ${SDL_DIR}/src)
 
     add_subdirectory("common/sdl_engine")
-
+    
+    target_precompile_headers(sdl_engine PRIVATE "common/sdl_engine/include/sdl_wrapper_pch.h")
 endif()
 
 if(Neko_Test)
