@@ -62,6 +62,7 @@ endif()
 include("cmake/data.cmake")
 set(NEKO_CORE_DIR "${CMAKE_SOURCE_DIR}/core/" CACHE INTERNAL "")
 add_subdirectory(${NEKO_CORE_DIR})
+target_precompile_headers(Neko_Core PRIVATE "${NEKO_CORE_DIR}/include/core_pch.h")
 
 #imgui
 set(IMGUI_VERSION "1.74" CACHE INTERNAL "")

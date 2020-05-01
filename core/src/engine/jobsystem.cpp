@@ -2,6 +2,10 @@
 
 #include <utility>
 
+#ifdef EASY_PROFILE_USE
+#include <easy/profiler.h>
+#endif
+
 namespace neko
 {
 
@@ -51,17 +55,29 @@ void JobSystem::ScheduleJob(Job* func, JobThreadType threadType)
 
 void JobSystem::Work(JobQueue& jobQueue)
 {
-    initializedWorkers_++; // Atomic increment.
+    ++initializedWorkers_; // Atomic increment.
 
     while (status_ & Status::RUNNING) // Atomic check.
     {
-        Job* job;
+        Job* job = nullptr;
         {// CRITICAL
             std::unique_lock<std::mutex> lock(jobQueue.mutex_);
             if (!jobQueue.jobs_.empty())
             {
                 job = jobQueue.jobs_.front();
                 jobQueue.jobs_.pop();
+                if (!job->CheckDependenciesStarted())
+                {
+                	if(jobQueue.jobs_.empty())
+                	{
+#ifdef EASY_PROFILE_USE
+                        EASY_BLOCK("Wait for Dependencies");
+#endif
+                        jobQueue.cv_.wait_for(lock, std::chrono::microseconds(100));
+                	}
+                    jobQueue.jobs_.push(job);
+                    continue;
+                }
             }
             else
             {
@@ -157,21 +173,35 @@ void Job::Execute()
     promise_.set_value();
 }
 
+bool Job::CheckDependenciesStarted()
+{
+	for(auto& dep : dependencies_)
+	{
+		if(!(dep->status_ & STARTED))
+            return false;
+	}
+    return true;
+}
+
 bool Job::IsDone() const
 {
     return status_ & DONE;
 }
 
-void Job::AddDependency(const Job* dep)
+void Job::AddDependency(const Job* dependentJob)
 {
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("Jobsystem Add Dependency");
+#endif
     //Be sure to not create a cycle of dependencies which would deadlock the thread
-    std::function<bool(std::vector<const Job*>, const Job*)> checkDependencies =
-            [&checkDependencies](std::vector<const Job*> dependencies, const Job* job) {
+	//Also check if the dependencies is not already in the dependency tree
+    std::function<bool(const std::vector<const Job*>&, const Job*)> checkDependencies =
+            [&checkDependencies, dependentJob](const std::vector<const Job*>& dependencies, const Job* job) {
                 for(auto& dep : dependencies)
                 {
-                    if(dep == job)
+                    if(dep == job || dep == dependentJob)
                         return false;
-                    bool recursiveDep = checkDependencies(dep->dependencies_, job);
+                    const bool recursiveDep = checkDependencies(dep->dependencies_, job);
                     if(!recursiveDep)
                         return false;
                 }
@@ -179,7 +209,7 @@ void Job::AddDependency(const Job* dep)
             };
     if(checkDependencies(dependencies_, this))
     {
-        dependencies_.push_back(dep);
+        dependencies_.push_back(dependentJob);
     }
 }
 

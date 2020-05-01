@@ -80,7 +80,17 @@ void BasicEngine::Update(seconds dt)
 #ifdef EASY_PROFILE_USE
 	EASY_BLOCK("Basic Engine Update");
 #endif
-    Job eventJob([this]{ManageEvent();});
+	
+    Job eventJob([this]
+    {
+#if defined(__ANDROID__)
+        window_->MakeCurrentContext();
+#endif
+	    ManageEvent();
+#if defined(__ANDROID__)
+        window_->LeaveCurrentContext();
+#endif
+    });
     Job updateJob([this, &dt]{updateAction_.Execute(dt);});
     updateJob.AddDependency(&eventJob);
 
@@ -88,6 +98,12 @@ void BasicEngine::Update(seconds dt)
     updateJob.AddDependency(&rendererSyncJob);
 
     Job renderJob([this]{
+#ifdef EASY_PROFILE_USE
+        EASY_BLOCK("Render Update");
+#endif
+#if defined(__ANDROID__)
+        window_->MakeCurrentContext();
+#endif
         renderer_->ClearScreen();
         GenerateUiFrame();
         renderer_->RenderAll();
@@ -97,6 +113,9 @@ void BasicEngine::Update(seconds dt)
 
     Job swapBufferJob([this]{
        window_->SwapBuffer();
+#if defined(__ANDROID__)
+       window_->LeaveCurrentContext();
+#endif
     });
     swapBufferJob.AddDependency(&renderJob);
     swapBufferJob.AddDependency(&updateJob);
@@ -167,6 +186,9 @@ void BasicEngine::SetWindowAndRenderer(Window* window, Renderer* renderer)
 
 void BasicEngine::GenerateUiFrame()
 {
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("Generate ImGui Frame");
+#endif
 	ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_FirstUseEver);
 	ImGui::Begin("Neko Window");
 

@@ -63,6 +63,11 @@ public:
      * \brief Execute is called by the JobSystem
      */
     void Execute();
+	/**
+	 *  \brief Check if all dependencies started
+	 *  used when we want to start the job to know if we should join or wait for other dependencies
+	 */
+    bool CheckDependenciesStarted();
     bool IsDone() const;
     void AddDependency(const Job* dep);
 private:
