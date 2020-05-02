@@ -9,6 +9,7 @@
 #include "02_hello_texture/texture_program.h"
 #include "03_hello_transform/transform_program.h"
 #include "04_hello_coords/coords_program.h"
+#include "05_hello_camera/camera_program.h"
 
 namespace neko
 {
@@ -20,7 +21,8 @@ void SampleBrowser::Init()
     RegisterRenderProgram("02 Hello Texture", std::make_unique<HelloTextureProgram>());
     RegisterRenderProgram("03 Hello Transform", std::make_unique<HelloTransformProgram>());
     RegisterRenderProgram("04 Hello Coords", std::make_unique<HelloCoordsProgram>());
-    programs_[currentProgramIndex_]->Init();
+    RegisterRenderProgram("05 Hello Camera", std::make_unique<HelloCameraProgram>());
+	programs_[currentProgramIndex_]->Init();
 }
 
 void SampleBrowser::Update(seconds dt)

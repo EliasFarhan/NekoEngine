@@ -108,7 +108,7 @@ public:
                 v[column] += columns_[column][row] * rhs[row];
             }
         }
-        return Mat4<T>(v);
+        return Vec4<T>(v);
     }
 
     Mat4<T> operator*(const Mat4<T>& rhs) const noexcept

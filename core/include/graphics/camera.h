@@ -1,22 +1,61 @@
 #pragma once
 
 #include <mathematics/vector.h>
+#include <mathematics/matrix.h>
 
 namespace neko
 {
 
 struct Camera
 {
-    Vec4f position;
-    Vec4f direction;
-    Vec4f up;
-};
+    Vec3f position;
+    Vec3f reverseDirection;
 
+	Vec3f GetRight() const
+	{
+		return Vec3f::Cross(Vec3f::up, reverseDirection).Normalized();
+	}
 
-class CameraManager
-{
-public:
+	Vec3f GetUp() const
+	{
+		const Vec3f right = GetRight();
+		return Vec3f::Cross(reverseDirection, right);
+	}
+	Mat4f GenerateViewMatrix() const
+	{
+		const Vec3f right = GetRight();
+		const Vec3f up = GetUp();
+		const Mat4f rotation(std::array<Vec4f, 4>{
+			Vec4f(right.x, up.x, reverseDirection.x, 0.0f),
+				Vec4f(right.y, up.y, reverseDirection.y, 0.0f),
+				Vec4f(right.z, up.z, reverseDirection.z, 0.0f),
+				Vec4f(0.0f, 0.0f, 0.0f, 1.0f)
+		});
+		const Mat4f translation(std::array<Vec4f, 4>{
+			Vec4f(1,0,0,0),
+			Vec4f(0,1,0,0),
+			Vec4f(0,0,1,0),
+			Vec4f(-position.x,-position.y,-position.z,1),
+		});
+		return rotation * translation;
+	}
 
+	void SetDirectionFromEuler(const EulerAngles& angles)
+	{
+		const Quaternion q = Quaternion::FromEuler(angles);
+		reverseDirection = Vec3f(Mat4f::RotationMatrixFrom(q)*Vec4f(0,0,1,0));
+	}
+	void Rotate(const EulerAngles& angles)
+	{
+		const auto pitch = Quaternion::AngleAxis(angles.x, GetRight());
+		reverseDirection = Vec3f(Mat4f::RotationMatrixFrom(pitch)* Vec4f(reverseDirection));
+
+		const auto yaw = Quaternion::AngleAxis(angles.y, GetUp());
+		reverseDirection = Vec3f(Mat4f::RotationMatrixFrom(yaw) * Vec4f(reverseDirection));
+
+		const auto roll = Quaternion::AngleAxis(angles.z, reverseDirection);
+		reverseDirection = Vec3f(Mat4f::RotationMatrixFrom(roll) * Vec4f(reverseDirection));
+	}
 };
 
 }
