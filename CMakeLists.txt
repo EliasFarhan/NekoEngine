@@ -124,8 +124,8 @@ if(Neko_Assimp)
     SET (ASSIMP_BUILD_BLEND_IMPORTER ON CACHE BOOL "" FORCE)
     SET (ASSIMP_BUILD_GLTF_IMPORTER ON CACHE BOOL "" FORCE)
 
-    add_subdirectory(${ASSIMP_DIR})
-    set_target_properties (assimp IrrXML zlib zlibstatic PROPERTIES
+    add_subdirectory("${ASSIMP_DIR}")
+    set_target_properties (assimp IrrXML PROPERTIES
             FOLDER Externals)
     add_subdirectory("common/assimp_wrapper")
 endif()
