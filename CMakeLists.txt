@@ -78,6 +78,8 @@ if(Neko_Lua)
     add_subdirectory(${LUA_DIR})
     set(LUA_WRAPPER_DIR "${CMAKE_SOURCE_DIR}/common/lua_wrapper" CACHE INTERNAL "")
     add_subdirectory(${LUA_WRAPPER_DIR})
+    set_target_properties (lua PROPERTIES
+            FOLDER Externals)
 endif()
 
 if(Neko_GLES3)
@@ -123,6 +125,8 @@ if(Neko_Assimp)
     SET (ASSIMP_BUILD_GLTF_IMPORTER ON CACHE BOOL "" FORCE)
 
     add_subdirectory(${ASSIMP_DIR})
+        set_target_properties (assimp IrrXML zlib zlibstatic PROPERTIES
+            FOLDER Externals)
 endif()
 
 if(Neko_Test)
