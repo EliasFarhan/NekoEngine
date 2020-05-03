@@ -4,7 +4,7 @@
 #include "gl/shape.h"
 #include "gl/shader.h"
 #include <gl/texture.h>
-#include "mathematics/transform.h"
+#include "mathematics/matrix.h"
 
 namespace neko
 {

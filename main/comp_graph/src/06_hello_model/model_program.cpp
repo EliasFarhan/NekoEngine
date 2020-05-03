@@ -25,7 +25,7 @@ void HelloModelProgram::Update(seconds dt)
 	camera_.Update(dt);
 	const auto& config = BasicEngine::GetInstance()->config;
 
-	projection_ = Mat4f::Perspective(
+	projection_ = Transform3d::Perspective(
 		degree_t(45.0f),
 		static_cast<float>(config.windowSize.x) / config.windowSize.y,
 		0.1f,
@@ -44,6 +44,8 @@ void HelloModelProgram::DrawImGui()
 
 void HelloModelProgram::Render()
 {
+	if (shader_.GetProgram() == 0)
+		return;
 	std::lock_guard<std::mutex> lock(updateMutex_);
 	shader_.Bind();
 	shader_.SetMat4("view", camera_.GenerateViewMatrix());

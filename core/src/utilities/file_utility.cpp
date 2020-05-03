@@ -27,6 +27,7 @@
 #include "engine/log.h"
 
 #if defined(__ANDROID__)
+#include <jni.h>
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>
 

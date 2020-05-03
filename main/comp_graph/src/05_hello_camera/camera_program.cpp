@@ -26,7 +26,7 @@ void HelloCameraProgram::Update(seconds dt)
 	std::lock_guard<std::mutex> lock(updateMutex_);
 	
 	const auto& config = BasicEngine::GetInstance()->config;
-	projection_ = Mat4f::Perspective(
+	projection_ = Transform3d::Perspective(
 		degree_t(45.0f),
 		static_cast<float>(config.windowSize.x) / config.windowSize.y,
 		0.1f,
@@ -151,13 +151,13 @@ void HelloCameraProgram::Render()
 	{
 		Mat4f model = Mat4f::Identity; //model transform matrix
 		Vec3f cubePosition(cubeDistance_ * i, 0, cubeDistance_*i);
-		model = Mat4f::Translate(model, cubePosition);
+		model = Transform3d::Translate(model, cubePosition);
 		shader_.SetMat4("model", model);
 		cube_.Draw();
 
 		model = Mat4f::Identity;
 		cubePosition = Vec3f(cubeDistance_ * i, 0, -cubeDistance_ * i);
-		model = Mat4f::Translate(model, cubePosition);
+		model = Transform3d::Translate(model, cubePosition);
 		shader_.SetMat4("model", model);
 		cube_.Draw();
 	}

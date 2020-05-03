@@ -168,47 +168,7 @@ public:
         return result;
     };
 
-    static Mat4<float> Translate(const Mat4<float>& transform, const Vec3f pos);
 
-    static Mat4<float> Scale(const Mat4<float>& transform, const Vec3f scale);
-
-    static Mat4<float> Rotate(const Mat4<float>& transform, const degree_t angle, const Vec3f axis);
-
-    static Mat4<float> Rotate(const Mat4<float>& transform, const radian_t angle, const Vec3f axis);
-
-    static Mat4<float> Rotate(const Mat4<float>& transform, const Quaternion& quaternion);
-
-    static Mat4<float> Rotate(const Mat4<float>& transform, const EulerAngles eulerAngles);
-
-    static Mat4<float> const TranslationMatrixFrom(const Vec3f translation);
-
-    static Mat4<float> const ScalingMatrixFrom(const Vec3f& scale);
-
-    static Mat4<float> const RotationMatrixFrom(const degree_t angle, const Vec3f axis);
-
-    static Mat4<float> const RotationMatrixFrom(const radian_t angle, const Vec3f axis);
-
-    static Mat4<float> const RotationMatrixFrom(const EulerAngles cardinalRotation);
-
-    static Mat4<float> const RotationMatrixFrom(const RadianAngles cardinalRotation);
-
-    static Mat4<float> const RotationMatrixFrom(const Quaternion& quaternion);
-
-    static EulerAngles const Rotation(const Mat4<float>& transform);
-
-    static float Pitch(const Mat4<float>& transform);
-
-    static float RotationOnX(const Mat4<float>& transform);
-
-    static float Yaw(const Mat4<float>& transform);
-
-    static float RotationOnY(const Mat4<float>& transform);
-
-    static float Roll(const Mat4<float>& transform);
-
-    static float RotationOnZ(const Mat4<float>& transform);
-
-    static Mat4<T> Perspective(radian_t fovy, float aspect, float near, float far);
 
     friend std::ostream& operator<<(std::ostream& os, const Mat4<T>& m)
     {
@@ -395,19 +355,4 @@ const inline Mat4f Mat4f::Zero = Mat4f(
             Vec4f::zero
         });
 
-template <>
-inline Mat4f Mat4f::Perspective(radian_t fovy, float aspect, float near, float far)
-{
-    neko_assert(fabsf(aspect - std::numeric_limits<float>::epsilon()) > 0.0f, "Aspect should not be zero");
-
-    const float tanHalfFovy = Tan(fovy / 2.0f);
-    Mat4f perspective{Mat4f::Zero};
-
-    perspective[0][0] = 1.0f/ (aspect * tanHalfFovy);
-    perspective[1][1] = 1.0f / (tanHalfFovy);
-    perspective[2][2] = - (far + near) / (far - near);
-    perspective[2][3] = - 1.0f;
-    perspective[3][2] = - (2.0f * far * near) / (far - near);
-    return perspective;
-}
 }

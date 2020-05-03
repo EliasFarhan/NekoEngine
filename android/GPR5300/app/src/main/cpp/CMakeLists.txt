@@ -3,7 +3,7 @@
 
 # Sets the minimum version of CMake required to build the native library.
 
-cmake_minimum_required(VERSION 3.4.1)
+cmake_minimum_required(VERSION 3.10)
 
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -34,7 +34,6 @@ set(NEKO_SRC_DIR ${CMAKE_SOURCE_DIR}/../../../../../../)
 
 add_definitions(-DXXH_FORCE_MEMORY_ACCESS=0)
 add_definitions(-DNEKO_GLES3=1)
-add_definitions(-DNEKO_SAMETHREAD=1)
 
 set(ASSIMP_NO_EXPORT ON CACHE INTERNAL "")
 set(ASSIMP_BUILD_ALL_EXPORTERS_BY_DEFAULT OFF CACHE INTERNAL "")
@@ -42,7 +41,6 @@ set(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT OFF CACHE INTERNAL "")
 set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE INTERNAL "")
 set(ASSIMP_BUILD_TESTS OFF CACHE INTERNAL "")
 set(ASSIMP_INSTALL OFF CACHE INTERNAL "")
-set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
 
 SET (ASSIMP_BUILD_FBX_IMPORTER ON CACHE BOOL "" FORCE)
 SET (ASSIMP_BUILD_OBJ_IMPORTER ON CACHE BOOL "" FORCE)
@@ -70,6 +68,7 @@ add_subdirectory(${NEKO_SRC_DIR}/core ${CMAKE_CURRENT_BINARY_DIR}/core)
 add_subdirectory(${NEKO_SRC_DIR}/common/sdl_engine ${CMAKE_CURRENT_BINARY_DIR}/sdl_engine)
 add_subdirectory(${NEKO_SRC_DIR}/common/gles3_wrapper ${CMAKE_CURRENT_BINARY_DIR}/gles3_wrapper)
 add_subdirectory(${NEKO_SRC_DIR}/common/assimp_wrapper ${CMAKE_CURRENT_BINARY_DIR}/assimp_wrapper)
+
 #comp_graph
 set(COMP_GRAPH_DIR ${NEKO_SRC_DIR}/main/comp_graph)
 include_directories( ${COMP_GRAPH_DIR}/include)
@@ -89,4 +88,4 @@ target_link_libraries( # Specifies the target library.
 
                        # Links the target library to the log library
                        # included in the NDK.
-                       ${log-lib} ${opengl-lib} SDL2 assimp Neko_Core sdl_engine glad gles3_wrapper imgui assimp_wrapper)
+                       ${log-lib} ${opengl-lib} Neko_Core sdl_engine glad gles3_wrapper imgui assimp_wrapper)

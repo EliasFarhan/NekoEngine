@@ -2,6 +2,7 @@
 
 #include <mathematics/vector.h>
 #include <mathematics/matrix.h>
+#include "mathematics/transform.h"
 
 namespace neko
 {
@@ -43,18 +44,18 @@ struct Camera
 	void SetDirectionFromEuler(const EulerAngles& angles)
 	{
 		const Quaternion q = Quaternion::FromEuler(angles);
-		reverseDirection = Vec3f(Mat4f::RotationMatrixFrom(q)*Vec4f(0,0,1,0));
+		reverseDirection = Vec3f(Transform3d::RotationMatrixFrom(q)*Vec4f(0,0,1,0));
 	}
 	void Rotate(const EulerAngles& angles)
 	{
 		const auto pitch = Quaternion::AngleAxis(angles.x, GetRight());
-		reverseDirection = Vec3f(Mat4f::RotationMatrixFrom(pitch)* Vec4f(reverseDirection));
+		reverseDirection = Vec3f(Transform3d::RotationMatrixFrom(pitch)* Vec4f(reverseDirection));
 
 		const auto yaw = Quaternion::AngleAxis(angles.y, GetUp());
-		reverseDirection = Vec3f(Mat4f::RotationMatrixFrom(yaw) * Vec4f(reverseDirection));
+		reverseDirection = Vec3f(Transform3d::RotationMatrixFrom(yaw) * Vec4f(reverseDirection));
 
 		const auto roll = Quaternion::AngleAxis(angles.z, reverseDirection);
-		reverseDirection = Vec3f(Mat4f::RotationMatrixFrom(roll) * Vec4f(reverseDirection));
+		reverseDirection = Vec3f(Transform3d::RotationMatrixFrom(roll) * Vec4f(reverseDirection));
 	}
 };
 

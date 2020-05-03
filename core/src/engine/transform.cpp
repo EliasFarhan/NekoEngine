@@ -23,8 +23,8 @@
  */
 
 #include <engine/transform.h>
-#include <mathematics/transform.h>
 #include "engine/globals.h"
+#include "mathematics/transform.h"
 
 
 namespace neko
@@ -39,9 +39,9 @@ Index Scale2dManager::AddComponent(Entity entity)
 void Transform3dManager::UpdateTransform(Entity entity)
 {
     Mat4f transform = Mat4f::Identity;
-    transform = Mat4f::Translate(transform, position3DManager_.GetComponent(entity));
-    transform = Mat4f::Scale(transform, scale3DManager_.GetComponent(entity));
-    transform = Mat4f::Rotate(transform, rotation3DManager_.GetComponent(entity));
+    transform = Transform3d::Translate(transform, position3DManager_.GetComponent(entity));
+    transform = Transform3d::Scale(transform, scale3DManager_.GetComponent(entity));
+    transform = Transform3d::Rotate(transform, rotation3DManager_.GetComponent(entity));
 
 }
 }
