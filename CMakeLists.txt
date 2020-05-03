@@ -18,6 +18,7 @@ set(Neko_Test ON CACHE BOOL "Activate Test")
 set(Neko_Assert ON CACHE BOOL "Activate Neko Assertion")
 set(Neko_Benchmark ON CACHE BOOL "Activate Benchmark")
 set(Neko_Lua ON CACHE BOOL "Activate Lua Wrapper")
+set(Neko_Assimp ON CACHE BOOL "Activate Assimp Wrapper")
 
 MESSAGE("CMAKE SYSTEM NAME: ${CMAKE_SYSTEM_NAME}")
 
@@ -103,6 +104,25 @@ if(Neko_SDL2)
     add_subdirectory("common/sdl_engine")
     
     target_precompile_headers(sdl_engine PRIVATE "common/sdl_engine/include/sdl_wrapper_pch.h")
+endif()
+
+if(Neko_Assimp)
+    set(ASSIMP_VERSION 5.0.1)
+    set(ASSIMP_DIR "${EXTERNAL_DIR}/assimp-${ASSIMP_VERSION}")
+    set(ASSIMP_NO_EXPORT ON CACHE INTERNAL "")
+    set(ASSIMP_BUILD_ALL_EXPORTERS_BY_DEFAULT OFF CACHE INTERNAL "")
+    set(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT OFF CACHE INTERNAL "")
+    set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE INTERNAL "")
+    set(ASSIMP_BUILD_TESTS OFF CACHE INTERNAL "")
+    set(ASSIMP_INSTALL OFF CACHE INTERNAL "")
+    set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
+
+    SET (ASSIMP_BUILD_FBX_IMPORTER ON CACHE BOOL "" FORCE)
+    SET (ASSIMP_BUILD_OBJ_IMPORTER ON CACHE BOOL "" FORCE)
+    SET (ASSIMP_BUILD_BLEND_IMPORTER ON CACHE BOOL "" FORCE)
+    SET (ASSIMP_BUILD_GLTF_IMPORTER ON CACHE BOOL "" FORCE)
+
+    add_subdirectory(${ASSIMP_DIR})
 endif()
 
 if(Neko_Test)
