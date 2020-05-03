@@ -26,7 +26,7 @@ void HelloCameraProgram::Update(seconds dt)
 	std::lock_guard<std::mutex> lock(updateMutex_);
 	
 	const auto& config = BasicEngine::GetInstance()->config;
-	projection = Mat4f::Perspective(
+	projection_ = Mat4f::Perspective(
 		degree_t(45.0f),
 		static_cast<float>(config.windowSize.x) / config.windowSize.y,
 		0.1f,
@@ -144,7 +144,7 @@ void HelloCameraProgram::Render()
 	shader_.Bind();
 	glBindTexture(GL_TEXTURE_2D, textureWall_);
 	shader_.SetMat4("view", camera_.GenerateViewMatrix());
-	shader_.SetMat4("projection", projection);
+	shader_.SetMat4("projection", projection_);
 
 	
 	for(int i = -cubeNumbers_/2; i <= cubeNumbers_/2; i++)

@@ -21,7 +21,7 @@ private:
 	gl::Shader shader_;
 	gl::TextureId  textureWall_;
 	Camera camera_;
-	Mat4f projection{ Mat4f::Identity };
+	Mat4f projection_{ Mat4f::Identity };
 	EulerAngles cameraAngles{ degree_t(0.0f), degree_t(0.0f), degree_t(0.0f) };
 
 	Vec2f mouseMotion_ = Vec2f::zero;

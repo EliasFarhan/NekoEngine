@@ -29,5 +29,5 @@ neko_lib_config(sdl_engine)
 if(Emscripten)
     set_property(TARGET sdl_engine APPEND_STRING PROPERTY LINK_FLAGS " -s USE_SDL=2 -s USE_WEBGL2=1 ")
 endif()
-set_target_properties (sdl_engine PROPERTIES FOLDER Neko)
+set_target_properties (sdl_engine PROPERTIES FOLDER Neko\\Common)
 

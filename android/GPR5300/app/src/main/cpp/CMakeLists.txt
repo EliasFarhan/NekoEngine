@@ -5,6 +5,9 @@
 
 cmake_minimum_required(VERSION 3.4.1)
 
+set (CMAKE_CXX_STANDARD 17)
+set (CMAKE_CXX_STANDARD_REQUIRED ON)
+
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
 # You can define multiple libraries, and CMake builds them for you.
@@ -32,6 +35,20 @@ set(NEKO_SRC_DIR ${CMAKE_SOURCE_DIR}/../../../../../../)
 add_definitions(-DXXH_FORCE_MEMORY_ACCESS=0)
 add_definitions(-DNEKO_GLES3=1)
 add_definitions(-DNEKO_SAMETHREAD=1)
+
+set(ASSIMP_NO_EXPORT ON CACHE INTERNAL "")
+set(ASSIMP_BUILD_ALL_EXPORTERS_BY_DEFAULT OFF CACHE INTERNAL "")
+set(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT OFF CACHE INTERNAL "")
+set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE INTERNAL "")
+set(ASSIMP_BUILD_TESTS OFF CACHE INTERNAL "")
+set(ASSIMP_INSTALL OFF CACHE INTERNAL "")
+set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
+
+SET (ASSIMP_BUILD_FBX_IMPORTER ON CACHE BOOL "" FORCE)
+SET (ASSIMP_BUILD_OBJ_IMPORTER ON CACHE BOOL "" FORCE)
+SET (ASSIMP_BUILD_BLEND_IMPORTER ON CACHE BOOL "" FORCE)
+SET (ASSIMP_BUILD_GLTF_IMPORTER ON CACHE BOOL "" FORCE)
+
 include_directories(${NEKO_SRC_DIR}/externals/utilities)
 include_directories(${NEKO_SRC_DIR}/externals/imgui-1.74)
 #SDL_ENGINE
@@ -46,12 +63,13 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/")
 add_subdirectory(${NEKO_SRC_DIR}/externals/glad ${CMAKE_CURRENT_BINARY_DIR}/glad)
 add_subdirectory(${NEKO_SRC_DIR}/externals/imgui-1.74 ${CMAKE_CURRENT_BINARY_DIR}/imgui-1.74)
 add_subdirectory(${NEKO_SRC_DIR}/externals/SDL2-2.0.9 ${CMAKE_CURRENT_BINARY_DIR}/SDL2-2.0.9)
+add_subdirectory(${NEKO_SRC_DIR}/externals/assimp-5.0.1 ${CMAKE_CURRENT_BINARY_DIR}/assimp-5.0.1)
 include(${NEKO_SRC_DIR}/cmake/data.cmake)
 include(${NEKO_SRC_DIR}/cmake/neko_executable.cmake)
 add_subdirectory(${NEKO_SRC_DIR}/core ${CMAKE_CURRENT_BINARY_DIR}/core)
 add_subdirectory(${NEKO_SRC_DIR}/common/sdl_engine ${CMAKE_CURRENT_BINARY_DIR}/sdl_engine)
 add_subdirectory(${NEKO_SRC_DIR}/common/gles3_wrapper ${CMAKE_CURRENT_BINARY_DIR}/gles3_wrapper)
-
+add_subdirectory(${NEKO_SRC_DIR}/common/assimp_wrapper ${CMAKE_CURRENT_BINARY_DIR}/assimp_wrapper)
 #comp_graph
 set(COMP_GRAPH_DIR ${NEKO_SRC_DIR}/main/comp_graph)
 include_directories( ${COMP_GRAPH_DIR}/include)
@@ -71,4 +89,4 @@ target_link_libraries( # Specifies the target library.
 
                        # Links the target library to the log library
                        # included in the NDK.
-                       ${log-lib} ${opengl-lib} SDL2 Neko_Core sdl_engine glad gles3_wrapper imgui)
+                       ${log-lib} ${opengl-lib} SDL2 assimp Neko_Core sdl_engine glad gles3_wrapper imgui assimp_wrapper)

@@ -1,0 +1,10 @@
+
+LIST(APPEND ASSIMP_WRAPPER_LIBS Neko_Core assimp gles3_wrapper)
+file(GLOB_RECURSE assimp_wrapper_src include/*.h src/*.cpp)
+
+add_library(assimp_wrapper STATIC ${assimp_wrapper_src})
+target_link_libraries(assimp_wrapper PUBLIC ${ASSIMP_WRAPPER_LIBS})
+
+target_include_directories(assimp_wrapper PUBLIC "include/")
+neko_lib_config(assimp_wrapper)
+set_target_properties (assimp_wrapper PROPERTIES FOLDER Neko\\Common)

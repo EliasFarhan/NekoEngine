@@ -2,8 +2,8 @@
 
 #include "mathematics/vector.h"
 #include "mathematics/matrix.h"
-#include "const.h"
-#include "angle.h"
+#include "mathematics/const.h"
+#include "mathematics/angle.h"
 #include "mathematics/quaternion.h"
 
 namespace neko
@@ -24,7 +24,7 @@ inline Mat4f const Transform3d::TranslationMatrixFrom(const Vec3f translation)
 }
 
 template<>
-inline Mat4f const Transform3d::ScalingMatrixFrom(const Vec3f scale)
+inline Mat4f const Transform3d::ScalingMatrixFrom(const Vec3f& scale)
 {
     return Mat4f(
             std::array<Vec4f, 4>
@@ -34,7 +34,6 @@ inline Mat4f const Transform3d::ScalingMatrixFrom(const Vec3f scale)
                             Vec4f(0, 0, scale[2], 0),
                             Vec4f(0, 0, 0, 1)});
 }
-
 template<>
 inline Mat4f const Transform3d::RotationMatrixFrom(const degree_t angle, const Vec3f axis)
 {
@@ -138,9 +137,8 @@ inline Mat4<float> const Transform3d::RotationMatrixFrom(const RadianAngles card
 {
     return RotationMatrixFrom(cardinalRotation);
 }
-
 template<>
-inline Mat4f const Transform3d::RotationMatrixFrom(const Quaternion& quaternion)
+Mat4f const Transform3d::RotationMatrixFrom(const Quaternion& quaternion)
 {
     const float x = quaternion.x;
     const float y = quaternion.y;

@@ -182,7 +182,7 @@ public:
 
     static Mat4<float> const TranslationMatrixFrom(const Vec3f translation);
 
-    static Mat4<float> const ScalingMatrixFrom(const Vec3f scale);
+    static Mat4<float> const ScalingMatrixFrom(const Vec3f& scale);
 
     static Mat4<float> const RotationMatrixFrom(const degree_t angle, const Vec3f axis);
 

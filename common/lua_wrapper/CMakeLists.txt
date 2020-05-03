@@ -8,3 +8,4 @@ file(GLOB_RECURSE lua_wrapper_src ${LUA_WRAPPER_DIR}/include/*.h ${LUA_WRAPPER_D
 add_library(lua_wrapper STATIC ${lua_wrapper_src})
 target_include_directories(lua_wrapper PUBLIC ${LUA_WRAPPER_DIR}/include)
 target_link_libraries(lua_wrapper lua)
+set_target_properties (lua_wrapper PROPERTIES FOLDER Neko\\Common)
