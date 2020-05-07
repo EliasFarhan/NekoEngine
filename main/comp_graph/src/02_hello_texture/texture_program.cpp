@@ -41,7 +41,7 @@ void HelloTextureProgram::Render()
     if(shader_.GetProgram() == 0)
         return;
     shader_.Bind();
-    shader_.SetInt("outTexture", 0);
+    shader_.SetInt("ourTexture", 0);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, textureId_);
     quad_.Draw();

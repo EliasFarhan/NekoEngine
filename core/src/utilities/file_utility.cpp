@@ -36,8 +36,8 @@ static AAssetManager* assetManager = nullptr;
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_swiss_sae_gpr5300_MainActivity_load(JNIEnv * env, jclass clazz, jobject mgr) {
-	// TODO: implement load()
+Java_swiss_sae_gpr5300_MainActivity_load(JNIEnv *env, jclass clazz, jobject mgr)
+{
 	assetManager = AAssetManager_fromJava(env, mgr);
 	logDebug("Asset Manager from JNI loaded!");
 }

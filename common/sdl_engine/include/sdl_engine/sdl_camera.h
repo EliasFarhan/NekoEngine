@@ -35,7 +35,7 @@ struct Camera : neko::Camera, SdlEventSystemInterface, SystemInterface
 		degree_t(45.0f), degree_t(0.0f), degree_t(0.0f));
 	Vec2f mouseMotion_ = Vec2f::zero;
 
-	const float mouseMotionRatio_ = 50.0f;
+	const float mouseMotionRatio_ = 25.0f;
 };
 	
 }

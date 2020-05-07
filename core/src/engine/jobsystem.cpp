@@ -85,7 +85,7 @@ void JobSystem::Work(JobQueue& jobQueue)
                 {
                     jobQueue.cv_.wait(lock); // !CRITICAL
                 }
-                continue;
+            	continue; //Refetch a new job
             }
         }// !CRITICAL
         job->Execute();
