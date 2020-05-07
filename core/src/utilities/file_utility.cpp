@@ -131,6 +131,14 @@ namespace fs = std::filesystem;
 
 namespace neko
 {
+ResourceJob::ResourceJob() : Job([this]{bufferFile_.Load(filePath_);})
+{
+}
+
+void ResourceJob::SetFilePath(std::string_view path)
+{
+    filePath_ = path;
+}
 void BufferFile::Load(std::string_view path)
 {
 	std::ifstream is(path.data(),std::ifstream::binary);
@@ -327,6 +335,8 @@ const std::string LoadFile(const std::string& path)
 		std::istreambuf_iterator<char>());
 	return str;
 }
+
+
 }
 #endif
 

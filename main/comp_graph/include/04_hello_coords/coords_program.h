@@ -40,7 +40,7 @@ private:
         Vec3f(-1.3f, 1.0f, -1.5f)
     };
     gl::Shader shader_;
-    gl::TextureId  textureWall_;
+    TextureId  textureWall_;
 
     Mat4f view{Mat4f::Identity};
     Mat4f projection{Mat4f::Identity};

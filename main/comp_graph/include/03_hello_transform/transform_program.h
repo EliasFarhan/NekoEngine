@@ -38,6 +38,6 @@ private:
     degree_t angle_{0.0f};
     EulerAngles eulerAngle_{Vec3f::zero};
     gl::Shader shaderProgram_;
-    gl::TextureId textureWall_;
+    TextureId textureWall_;
 };
 }
