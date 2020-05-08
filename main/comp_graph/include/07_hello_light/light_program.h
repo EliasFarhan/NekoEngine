@@ -2,6 +2,7 @@
 #include "comp_graph/sample_program.h"
 #include "gl/shader.h"
 #include "gl/shape.h"
+#include "graphics/color.h"
 #include "sdl_engine/sdl_camera.h"
 
 
@@ -17,10 +18,7 @@ public:
 	void Render() override;
 	void OnEvent(const SDL_Event& event) override;
 private:
-	Color lightColor_{ 1,1,1,1 };
-	Color objectColor_{ 1.0f,0.23f, 0.1f,1.0f };
-
-	gl::RenderCuboid cube_;
+	gl::RenderCuboid cube_{ Vec3f::zero, Vec3f::one };
 	sdl::Camera camera_;
 
 	Mat4f projection_{ Mat4f::Identity };
@@ -28,7 +26,16 @@ private:
 	gl::Shader lightShader_;
 	gl::Shader phongShader_;
 
+	Vec3f lightPos_;
+
 	float time_ = 0.0f;
+	const float lightDist_ = 3.5f;
+	Color3 lightColor_{ 1,1,1 };
+	Color3 objectColor_{ 1.0f,0.23f, 0.1f };
+	float ambientStrength_ = 0.1f;
+	float diffuseStrength_ = 0.4f;
+	float specularStrength_ = 0.4f;
+	int specularPow_ = 32;
 	
 };
 }

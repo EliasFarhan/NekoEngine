@@ -1,5 +1,6 @@
 #version 300 es
-layout(location = 0) out vec4 FragColor;
+precision mediump float;
+out vec4 FragColor;
 
 uniform vec3 objectColor;
 uniform vec3 lightColor;
@@ -24,7 +25,7 @@ void main()
 
 	vec3 viewDir = normalize(viewPos - FragPos);
 	vec3 reflectDir = reflect(-lightDir, norm);
-	float spec = pow(max(diff*dot(viewDir, reflectDir), 0.0), specularPow);
+	float spec = pow(max(diff*dot(viewDir, reflectDir), 0.0), float(specularPow));
 	vec3 specular = specularStrength * spec * lightColor;
 
 	vec3 result = (ambient + diffuse + specular) * objectColor;

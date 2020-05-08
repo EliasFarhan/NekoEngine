@@ -51,7 +51,7 @@ void HelloCoordsProgram::Render()
     shader_.SetMat4("view", view);
     shader_.SetMat4("projection", projection);
 
-    for (auto cubePosition : cubePositions)
+    for (const auto cubePosition : cubePositions)
     {
         Mat4f model = Mat4f::Identity; //model transform matrix
         model = Transform3d::Rotate(model, degree_t(timeSinceInit_.count()*45.0f), Vec3f(1.0f, 0.0f, 0.0f));

@@ -4,7 +4,6 @@
 namespace neko
 {
 
-using Color = Vec4f;
-
-
+using Color3 = Vec3f;
+using Color4 = Vec4f;
 }
