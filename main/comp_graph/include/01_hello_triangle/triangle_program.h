@@ -71,24 +71,25 @@ private:
 	TriangleProgram triangleProgram_;
 	struct VaoProgram
 	{
-		float vertices[18] = {
-				0.5f, 0.5f, 0.0f,  // top right
-				0.5f, -0.5f, 0.0f,  // bottom right
-				-0.5f, 0.5f, 0.0f,   // top left
-				0.5f, -0.5f, 0.0f,  // bottom right
-				-0.5f, -0.5f, 0.0f,  // bottom left
-				-0.5f, 0.5f, 0.0f   // top left
-		};
-		float colors[18] = {
-				1.0f, 0.0f, 1.0f,// top right
-				0.0f, 1.0f, 0.0f, // bottom right
-				0.5f, 0.0f, 0.5f,// top left
-				0.0f, 1.0f, 0.0f, // bottom right
-				0.0f, 0.0f, 1.0f,// bottom left
-				0.5f, 0.0f, 0.5f,// top left
+		float vertexData[36] =
+		{
+			//vertex position
+			0.5f, 0.5f, 0.0f,    
+			0.5f, -0.5f, 0.0f,	 
+			-0.5f, 0.5f, 0.0f,	 
+			0.5f, -0.5f, 0.0f,	 
+			-0.5f, -0.5f, 0.0f,	 
+			-0.5f, 0.5f, 0.0f,
+			//colors
+			1.0f, 0.0f, 1.0f,
+			0.0f, 1.0f, 0.0f,
+			0.5f, 0.0f, 0.5f,
+			0.0f, 1.0f, 0.0f,
+			0.0f, 0.0f, 1.0f,
+			0.5f, 0.0f, 0.5f
 		};
 
-		unsigned int VBO[2] = {}; //Vertex Buffer Object
+		unsigned int VBO = 0; //Vertex Buffer Object
 		unsigned int VAO = 0; //Vertex Array Object
 	};
 	VaoProgram vaoProgam_;

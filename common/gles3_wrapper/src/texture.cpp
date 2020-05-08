@@ -26,7 +26,7 @@ unsigned stbCreateTexture(const std::string_view filename, TextureFlags flags)
         reqComponents = 3;
     else if (extension == ".png")
         reqComponents = 4;
-
+    stbi_set_flip_vertically_on_load(true);
     BufferFile textureFile;
     textureFile.Load(filename);
     void *data = nullptr;

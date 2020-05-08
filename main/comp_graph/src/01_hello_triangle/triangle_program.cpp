@@ -33,19 +33,17 @@ void HelloTriangleProgram::Init()
                          config.dataRootPath+"data/shaders/01_hello_triangle/hello_triangle.frag");
 
     //Initialize the VAO program
-    glGenBuffers(2, &vaoProgam_.VBO[0]);
+    glGenBuffers(1, &vaoProgam_.VBO);
     glGenVertexArrays(1, &vaoProgam_.VAO);
     // 1. bind Vertex Array Object
     glBindVertexArray(vaoProgam_.VAO);
     // 2. copy our vertices array in a buffer for OpenGL to use
-    glBindBuffer(GL_ARRAY_BUFFER, vaoProgam_.VBO[0]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vaoProgam_.vertices), vaoProgam_.vertices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, vaoProgam_.VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vaoProgam_.vertexData), vaoProgam_.vertexData, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
     // 2. copy our colors array in a buffer for OpenGL to use
-    glBindBuffer(GL_ARRAY_BUFFER, vaoProgam_.VBO[1]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vaoProgam_.colors), vaoProgam_.colors, GL_STATIC_DRAW);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(18 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
 
@@ -156,7 +154,7 @@ void HelloTriangleProgram::Destroy()
     glDeleteBuffers(2, &eboProgram_.EBO);
 
     glDeleteVertexArrays(1, &vaoProgam_.VAO);
-    glDeleteBuffers(2, &vaoProgam_.VBO[0]);
+    glDeleteBuffers(1, &vaoProgam_.VBO);
 
     quad_.Destroy();
     circle_.Destroy();
