@@ -15,7 +15,7 @@ namespace neko::assimp
 	};
 	struct Texture
 	{
-		gl::TextureId id;
+		TextureId id;
 		enum class TextureType : std::uint8_t
 		{
 			DIFFUSE,

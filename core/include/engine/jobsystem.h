@@ -70,7 +70,8 @@ public:
     bool CheckDependenciesStarted();
     bool IsDone() const;
     void AddDependency(const Job* dep);
-private:
+
+protected:
     std::vector<const Job*> dependencies_;
     std::function<void()> task_;
     std::promise<void> promise_;
@@ -98,7 +99,7 @@ public:
     void ScheduleJob(Job* func, JobThreadType threadType);
     void Init() override;
 
-    void Update(seconds dt) override{}
+    void Update([[maybe_unused]]seconds dt) override{}
 
     void Destroy() override;
 

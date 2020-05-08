@@ -21,7 +21,7 @@ JobSystem::~JobSystem()
 
 void JobSystem::ScheduleJob(Job* func, JobThreadType threadType)
 {
-    auto scheduleJobFunc = [this, &func](JobQueue& jobQueue)
+    auto scheduleJobFunc = [&func](JobQueue& jobQueue)
     {
         std::unique_lock<std::mutex> lock(jobQueue.mutex_);
         jobQueue.jobs_.push(func);

@@ -30,19 +30,31 @@
 #include <string_view>
 #include <fstream>
 
+#include "engine/jobsystem.h"
+
 
 namespace neko
 {
 
-	struct BufferFile
-	{
-        char* dataBuffer = nullptr;
-        size_t dataLength = 0;
+struct BufferFile
+{
+    char* dataBuffer = nullptr;
+    size_t dataLength = 0;
 
-        void Load(std::string_view path);
-        void Destroy();
-		
-	};
+    void Load(std::string_view path);
+    void Destroy();
+
+};
+class ResourceJob : public Job
+{
+public:
+    ResourceJob();
+    void SetFilePath(std::string_view path);
+    BufferFile GetBufferFile(){return bufferFile_;}
+private:
+    std::string filePath_;
+    BufferFile bufferFile_;
+};
 
 bool FileExists(const std::string_view filename);
 

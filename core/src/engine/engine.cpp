@@ -212,5 +212,10 @@ void BasicEngine::RegisterOnDrawUi(DrawImGuiInterface& drawUi)
     drawImGuiAction_.RegisterCallback([&drawUi]{ drawUi.DrawImGui();});
 }
 
+void BasicEngine::ScheduleJob(Job* job, JobThreadType threadType)
+{
+    jobSystem_.ScheduleJob(job, threadType);
+}
+
 
 }

@@ -28,6 +28,7 @@ private:
 	gl::Shader lightShader_;
 	gl::Shader phongShader_;
 
+	float time_ = 0.0f;
 	
 };
 }
