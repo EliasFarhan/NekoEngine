@@ -348,6 +348,10 @@ public:
     {
 
     }
+	explicit Vec3(const T* ptr) : x(ptr[0]), y(ptr[1]), z(ptr[2])
+    {
+	    
+    }
 
     template<typename U>
     explicit Vec3(const Vec2<U>& vec2)

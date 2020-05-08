@@ -80,7 +80,6 @@ void SdlEngine::ManageEvent()
             isRunning_ = false;
         }
 
-        auto& config = BasicEngine::GetInstance()->config;
         if (event.type == SDL_WINDOWEVENT)
         {
             if (event.window.event == SDL_WINDOWEVENT_RESIZED)

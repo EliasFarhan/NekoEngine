@@ -84,6 +84,8 @@ void HelloLightProgram::Render()
 	phongShader_.SetFloat("diffuseStrength", diffuseStrength_);
 	phongShader_.SetFloat("specularStrength", specularStrength_);
 	phongShader_.SetInt("specularPow", specularPow_);
+	const auto inverseTransposeModel = model.Inverse().Transpose();
+	phongShader_.SetMat4("inverseTransposeModel", inverseTransposeModel);
 	cube_.Draw();
 	
 }

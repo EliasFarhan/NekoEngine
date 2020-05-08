@@ -33,8 +33,8 @@ private:
 	Color3 lightColor_{ 1,1,1 };
 	Color3 objectColor_{ 1.0f,0.23f, 0.1f };
 	float ambientStrength_ = 0.1f;
-	float diffuseStrength_ = 0.4f;
-	float specularStrength_ = 0.4f;
+	float diffuseStrength_ = 1.0f;
+	float specularStrength_ = 0.5f;
 	int specularPow_ = 32;
 	
 };
