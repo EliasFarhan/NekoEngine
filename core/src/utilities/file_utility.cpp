@@ -24,7 +24,14 @@
 #include <utilities/file_utility.h>
 #include <sstream>
 #include <functional>
+
+#include "../../../common/physfs_wrapper/include/physfs_utility.h"
+#include "engine/assert.h"
 #include "engine/log.h"
+#ifdef EASY_PROFILE_USE
+#include "easy/profiler.h"
+#include <easy/arbitrary_value.h> // EASY_VALUE, EASY_ARRAY are defined here
+#endif
 
 #if defined(__ANDROID__)
 #include <android/asset_manager.h>
@@ -137,7 +144,7 @@ void BufferFile::Load(std::string_view path)
 	{
 		std::ostringstream oss;
 		oss << "[Error] Could not open file: " << path << " for BufferFile";
-		logDebug(oss.str());
+		LogDebug(oss.str());
 		return;
 	}
 	if(is)
@@ -152,11 +159,30 @@ void BufferFile::Load(std::string_view path)
 	}
 }
 
+#ifdef NEKO_PHYSFS
+void BufferFile::LoadFromArchived(std::string_view archivedPath, std::string_view path)
+{
+	physfs::OpenArchive(archivedPath.data());
+	std::string strPath = path.data();
+	neko_assert(physfs::FileExists(strPath), "Archived file not found");
+	std::string str = physfs::ReadFile(strPath);
+	dataLength = str.length();
+	dataBuffer = new char[dataLength + 1];
+	dataBuffer[dataLength] = 0;
+	strcpy(dataBuffer, str.c_str());
+}
+#endif
+
 void BufferFile::Destroy()
 {
 	delete[] dataBuffer;
 	dataBuffer = nullptr;
 	dataLength = 0;
+}
+
+bool BufferFile::operator==(const BufferFile& bufferFile) const
+{
+	return strcmp(dataBuffer, bufferFile.dataBuffer) == 0;
 }
 
 bool FileExists(const std::string_view filename)
@@ -319,7 +345,7 @@ std::string GetCurrentPath()
 	return fs::current_path().string();
 }
 
-const std::string LoadFile(const std::string& path)
+std::string LoadFile(const std::string_view& path)
 {
 	std::ifstream t(path);
 	std::string str((std::istreambuf_iterator<char>(t)),

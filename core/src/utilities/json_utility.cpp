@@ -95,7 +95,7 @@ json LoadJson(const std::string_view jsonPath)
     json jsonContent;
     if (!neko::FileExists(jsonPath))
     {
-        logDebug("[Error] File does not exist: " + std::string(jsonPath));
+        LogDebug("[Error] File does not exist: " + std::string(jsonPath));
         return jsonContent;
     }
 

@@ -32,7 +32,7 @@
 #include <engine/log.h>
 #include <utilities/file_utility.h>
 #include "graphics/graphics.h"
-#include "imgui.h"
+#include <imgui.h>
 #ifdef EASY_PROFILE_USE
 #include <easy/profiler.h>
 #endif
@@ -55,7 +55,7 @@ BasicEngine::BasicEngine(Configuration* config)
 
 BasicEngine::~BasicEngine()
 {
-	logDebug("Destroy Basic Engine");
+	LogDebug("Destroy Basic Engine");
 
 #ifdef EASY_PROFILE_USE
 	profiler::dumpBlocksToFile("Neko_Profile.prof");
@@ -69,7 +69,7 @@ void BasicEngine::Init()
 	EASY_FUNCTION(profiler::colors::Magenta);
 #endif
 	instance_ = this;
-	logDebug("Current path: " + GetCurrentPath());
+	LogDebug("Current path: " + GetCurrentPath());
 }
 
 void BasicEngine::Update(seconds dt)
