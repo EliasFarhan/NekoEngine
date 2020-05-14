@@ -12,6 +12,7 @@
 #include "05_hello_camera/camera_program.h"
 #include "06_hello_model/model_program.h"
 #include "07_hello_light/light_program.h"
+#include "08_hello_lightmaps/lightmaps_program.h"
 namespace neko
 {
 
@@ -25,6 +26,7 @@ void SampleBrowser::Init()
     RegisterRenderProgram("05 Hello Camera", std::make_unique<HelloCameraProgram>());
     RegisterRenderProgram("06 Hello Model", std::make_unique<HelloModelProgram>());
     RegisterRenderProgram("07 Hello Light", std::make_unique<HelloLightProgram>());
+    RegisterRenderProgram("08 Hello Lightmaps", std::make_unique<HelloLightMapsProgram>());
 	programs_[currentProgramIndex_]->Init();
 }
 

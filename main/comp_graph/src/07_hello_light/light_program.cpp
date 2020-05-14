@@ -25,11 +25,7 @@ void HelloLightProgram::Update(seconds dt)
 		0.0f,
 		Sin(radian_t(time_)))* lightDist_;
 	const auto& config = BasicEngine::GetInstance()->config;
-	projection_ = Transform3d::Perspective(
-		degree_t(45.0f),
-		static_cast<float>(config.windowSize.x) / config.windowSize.y,
-		0.1f,
-		100.0f);
+	camera_.SetAspect(config.windowSize.x, config.windowSize.y);;
 	camera_.Update(dt);
 }
 
@@ -56,7 +52,7 @@ void HelloLightProgram::Render()
 {
 	std::lock_guard<std::mutex> lock(updateMutex_);
 	const Mat4f view = camera_.GenerateViewMatrix();
-
+	const Mat4f projection = camera_.GenerateProjectionMatrix();
     //Render cube light
     lightShader_.Bind();
 	Mat4f model = Mat4f::Identity;
@@ -64,7 +60,7 @@ void HelloLightProgram::Render()
 	model = Transform3d::Translate(model, lightPos_);
 	lightShader_.SetMat4("model", model);
 	lightShader_.SetMat4("view", view);
-	lightShader_.SetMat4("projection", projection_);
+	lightShader_.SetMat4("projection", projection);
    
 	lightShader_.SetVec3("lightColor", Vec3f(1,1,1));
 	cube_.Draw();
@@ -74,7 +70,7 @@ void HelloLightProgram::Render()
 	model = Mat4f::Identity;
 	phongShader_.SetMat4("model", model);
 	phongShader_.SetMat4("view", view);
-	phongShader_.SetMat4("projection", projection_);
+	phongShader_.SetMat4("projection", projection);
 	phongShader_.SetVec3("lightColor", Vec3f(1, 1, 1));
 	phongShader_.SetVec3("lightPos", lightPos_);
 	phongShader_.SetVec3("viewPos", camera_.position);
@@ -84,6 +80,7 @@ void HelloLightProgram::Render()
 	phongShader_.SetFloat("diffuseStrength", diffuseStrength_);
 	phongShader_.SetFloat("specularStrength", specularStrength_);
 	phongShader_.SetInt("specularPow", specularPow_);
+	
 	const auto inverseTransposeModel = model.Inverse().Transpose();
 	phongShader_.SetMat4("inverseTransposeModel", inverseTransposeModel);
 	cube_.Draw();

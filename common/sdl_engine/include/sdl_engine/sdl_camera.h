@@ -6,7 +6,7 @@
 namespace neko::sdl
 {
 
-struct Camera : neko::Camera, SdlEventSystemInterface, SystemInterface
+struct Camera3D : neko::Camera3D, SdlEventSystemInterface, SystemInterface
 {
 	void OnEvent(const SDL_Event& event) override;
 

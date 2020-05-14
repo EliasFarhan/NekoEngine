@@ -59,4 +59,24 @@ struct Camera
 	}
 };
 
+struct Camera3D : Camera
+{
+	float aspect = 1.0f;
+	degree_t fovy = degree_t(45.0f);
+	float nearPlane = 0.1f;
+	float farPlane = 100.0f;
+	Mat4f GenerateProjectionMatrix()
+	{
+		return Transform3d::Perspective(
+			fovy,
+			aspect,
+			nearPlane,
+			farPlane);
+	};
+
+	void SetAspect(int width, int height)
+	{
+		aspect = static_cast<float>(width) / height;
+	}
+};
 }

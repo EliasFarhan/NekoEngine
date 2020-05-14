@@ -2,7 +2,7 @@
 
 namespace neko::sdl
 {
-	void Camera::OnEvent(const SDL_Event& event)
+	void Camera3D::OnEvent(const SDL_Event& event)
 	{
 		switch (event.type)
 		{
@@ -23,13 +23,13 @@ namespace neko::sdl
 		}
 	}
 
-	void Camera::Init()
+	void Camera3D::Init()
 	{
 		position = cameraOriginPos;
 		SetDirectionFromEuler(cameraOriginAngles);
 	}
 
-	void Camera::Update(seconds dt)
+	void Camera3D::Update(seconds dt)
 	{
 		const auto mouseState = SDL_GetMouseState(nullptr, nullptr);
 		cameraMovement_ = mouseState & SDL_BUTTON(3) ?
@@ -89,7 +89,7 @@ namespace neko::sdl
 			(cameraMovement_ & ACCELERATE ? cameraFast_ : cameraSpeed_);
 	}
 
-	void Camera::Destroy()
+	void Camera3D::Destroy()
 	{
 	}
 }
