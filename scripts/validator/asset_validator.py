@@ -50,6 +50,10 @@ def define_asset_type(filename) -> AssetType:
 
 def validate_asset(data_src):
     asset_type = define_asset_type(data_src)
+    if asset_type != AssetType.UNKNOWN:
+        #TODO check if .meta file exists
+        pass
+
     if asset_type == AssetType.VERT_SHADER or asset_type == AssetType.FRAG_SHADER:
         shader_validator.validate_shader(data_src)
 

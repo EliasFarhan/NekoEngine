@@ -1,7 +1,9 @@
 import platform
 import subprocess
+import os
 if platform.system() == 'Windows':
-    program = '%VULKAN_SDK%/Bin/glslangValidator.exe'
+    vulkan_path = os.getenv("VULKAN_SDK")
+    program = '{}\\Bin\\glslangValidator.exe'.format(vulkan_path)
 else:
     program = 'glslangValidator'
 
