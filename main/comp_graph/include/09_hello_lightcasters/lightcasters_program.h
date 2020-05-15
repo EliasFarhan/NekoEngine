@@ -48,10 +48,10 @@ private:
 	degree_t lightCutOffAngle_{ 30.0f };
 
 	const static size_t cubeNumbers_ = 10;
-	Vec3f cubePositions[cubeNumbers_] =
+	Vec3f cubePositions_[cubeNumbers_] =
 	{
 		Vec3f(0.0f, 0.0f, 0.0f),
-		Vec3f(2.0f, 5.0f, -15.0f),
+		Vec3f(2.0f,  5.0f, -15.0f),
 		Vec3f(-1.5f, -2.2f, -2.5f),
 		Vec3f(-3.8f, -2.0f, -12.3f),
 		Vec3f(2.4f, -0.4f, -3.5f),
@@ -61,6 +61,6 @@ private:
 		Vec3f(1.5f, 0.2f, -1.5f),
 		Vec3f(-1.3f, 1.0f, -1.5f)
 	};
-	EulerAngles cubeAngles[cubeNumbers_];
+	EulerAngles cubeAngles_[cubeNumbers_]{};
 };
 }

@@ -200,7 +200,8 @@ Mat4f Rotate(const Mat4f& transform, const Quaternion& quaternion)
 
 Mat4f Rotate(const Mat4f& transform, const EulerAngles eulerAngles)
 {
-    return RotationMatrixFrom(eulerAngles) * transform;
+    const Quaternion quaternion = Quaternion::FromEuler(eulerAngles);
+    return RotationMatrixFrom(quaternion) * transform;
 }
 
 

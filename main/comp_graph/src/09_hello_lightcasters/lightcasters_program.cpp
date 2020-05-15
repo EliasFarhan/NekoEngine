@@ -6,7 +6,7 @@ namespace neko
 {
 void HelloLightCastersProgram::Init()
 {
-	for (auto& cubeAngle : cubeAngles)
+	for (auto& cubeAngle : cubeAngles_)
 	{
 		cubeAngle = EulerAngles(
 			degree_t(RandomRange(0.0f, 180.0f)),
@@ -37,6 +37,8 @@ void HelloLightCastersProgram::Init()
 	);
 	cube_.Init();
 	camera_.Init();
+	camera_.position = Vec3f(15.0f, 12.0f, -14.0f);
+	camera_.reverseDirection = Vec3f(7, 5, -2).Normalized();
 }
 
 void HelloLightCastersProgram::Update(seconds dt)
@@ -61,7 +63,11 @@ void HelloLightCastersProgram::Destroy()
 
 void HelloLightCastersProgram::DrawImGui()
 {
-	ImGui::Begin("Lightmaps Program");
+	ImGui::Begin("Light Casters Program");
+	ImGui::Text("Camera Position: %f, %f, %f", 
+		camera_.position.x, camera_.position.y, camera_.position.z);
+	ImGui::Text("Camera Direction: %f, %f, %f", 
+		-camera_.reverseDirection.x, -camera_.reverseDirection.y, -camera_.reverseDirection.z);
 	ImGui::InputFloat("ambientStrength", &ambientStrength_);
 	ImGui::InputFloat("diffuseStrength", &diffuseStrength_);
 	ImGui::InputFloat("specularStrength", &specularStrength_);
@@ -70,7 +76,10 @@ void HelloLightCastersProgram::DrawImGui()
 	{
 	case LightCasterType::DIRECTIONAL:
 	{
-		ImGui::InputFloat3("Light Direction", &lightDirection_[0]);
+		if(ImGui::InputFloat3("Light Direction", &lightDirection_[0]))
+		{
+			lightDirection_ = lightDirection_.Normalized();
+		}
 		break;
 	}
 	case LightCasterType::POINT: break;
@@ -85,6 +94,21 @@ void HelloLightCastersProgram::DrawImGui()
 	}
 	case LightCasterType::SPOT: break;
 	default: ;
+	}
+	//Select the Light Caster Type
+	const char* casterTypeNames[] = {
+		"Directional",
+		"Point",
+		"Flash",
+		"Spot"
+	};
+	int casterTypeIndex = static_cast<int>(casterType_);
+	if(ImGui::Combo("Light Caster Type", 
+		&casterTypeIndex, 
+		casterTypeNames, 
+		static_cast<int>(LightCasterType::LENGTH)))
+	{
+		casterType_ = static_cast<LightCasterType>(casterTypeIndex);
 	}
 	ImGui::End();
 }
@@ -109,10 +133,8 @@ void HelloLightCastersProgram::Render()
 		cube_.Draw();
 	}
 	//Render container cube
-	Mat4f model = Mat4f::Identity;
-	gl::Shader& containerShader = containerShaders_[(int)casterType_];
+	gl::Shader& containerShader = containerShaders_[static_cast<int>(casterType_)];
 	containerShader.Bind();
-	containerShader.SetMat4("model", model);
 	containerShader.SetMat4("view", view);
 	containerShader.SetMat4("projection", projection);
 	switch (casterType_)
@@ -134,7 +156,7 @@ void HelloLightCastersProgram::Render()
 		containerShader.SetVec3("light.position", camera_.position);
 		containerShader.SetVec3("light.direction", Vec3f::zero - camera_.reverseDirection);
 		containerShader.SetFloat("light.cutOff", Cos(lightCutOffAngle_));
-			break;
+		break;
 	}
 	case LightCasterType::SPOT:
 	{
@@ -160,11 +182,21 @@ void HelloLightCastersProgram::Render()
 	containerShader.SetFloat("ambientStrength", ambientStrength_);
 	containerShader.SetFloat("diffuseStrength", diffuseStrength_);
 	containerShader.SetFloat("specularStrength", specularStrength_);
+	for (size_t i = 0; i < cubeNumbers_; i++)
+	{
 
-	const auto inverseTransposeModel = model.Inverse().Transpose();
-	containerShader.SetMat4("inverseTransposeModel", inverseTransposeModel);
+		Mat4f model = Mat4f::Identity;
+		model = Transform3d::Rotate(model, cubeAngles_[i].x, Vec3f::left);
+		model = Transform3d::Rotate(model, cubeAngles_[i].y, Vec3f::up);
+		model = Transform3d::Rotate(model, cubeAngles_[i].z, Vec3f::forward);
+		model = Transform3d::Translate(model, cubePositions_[i]);
+		containerShader.SetMat4("model", model);
 
-	cube_.Draw();
+		const auto inverseTransposeModel = model.Inverse().Transpose();
+		containerShader.SetMat4("inverseTransposeModel", inverseTransposeModel);
+
+		cube_.Draw();
+	}
 }
 
 void HelloLightCastersProgram::OnEvent(const SDL_Event& event)

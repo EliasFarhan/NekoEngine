@@ -49,13 +49,11 @@ struct Camera
 	void Rotate(const EulerAngles& angles)
 	{
 		const auto pitch = Quaternion::AngleAxis(angles.x, GetRight());
-		reverseDirection = Vec3f(Transform3d::RotationMatrixFrom(pitch)* Vec4f(reverseDirection));
 
 		const auto yaw = Quaternion::AngleAxis(angles.y, GetUp());
-		reverseDirection = Vec3f(Transform3d::RotationMatrixFrom(yaw) * Vec4f(reverseDirection));
 
 		const auto roll = Quaternion::AngleAxis(angles.z, reverseDirection);
-		reverseDirection = Vec3f(Transform3d::RotationMatrixFrom(roll) * Vec4f(reverseDirection));
+		reverseDirection = Vec3f(Transform3d::RotationMatrixFrom(pitch*yaw*roll) * Vec4f(reverseDirection));
 	}
 };
 
@@ -76,7 +74,7 @@ struct Camera3D : Camera
 
 	void SetAspect(int width, int height)
 	{
-		aspect = static_cast<float>(width) / height;
+		aspect = static_cast<float>(width) / static_cast<float>(height);
 	}
 };
 }

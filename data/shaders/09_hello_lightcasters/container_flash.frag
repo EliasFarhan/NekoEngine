@@ -30,14 +30,15 @@ in vec2 TexCoords;
 in vec3 Normal;
 
 void main()
-{
+{        
+    vec3 lightDir = normalize(light.position - FragPos);
     vec3 ambient = texture(objectMaterial.diffuse, TexCoords).rgb * light.color * ambientStrength;
     float theta = dot(lightDir, normalize(-light.direction));
 
     if(theta > light.cutOff)
     {
         vec3 norm = normalize(Normal);
-        vec3 lightDir = normalize(light.position - FragPos);
+
         float diff = max(dot(norm, lightDir), 0.0);
         vec3 diffuse = light.color * diff * texture(objectMaterial.diffuse, TexCoords).rgb * diffuseStrength;
 
