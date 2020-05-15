@@ -7,8 +7,8 @@ namespace neko
 void HelloLightMapsProgram::Init()
 {
 	const auto& config = BasicEngine::GetInstance()->config;
-	containerDiffuse_ = gl::stbCreateTexture(config.dataRootPath + "/data/material/container2.png");
-	containerSpecular_ = gl::stbCreateTexture(config.dataRootPath + "/data/material/container2_specular.png");
+	containerDiffuse_ = gl::stbCreateTexture(config.dataRootPath + "data/material/container2.png");
+	containerSpecular_ = gl::stbCreateTexture(config.dataRootPath + "data/material/container2_specular.png");
 	containerShader_.LoadFromFile(
 		config.dataRootPath + "data/shaders/08_hello_lightmaps/container.vert",
 		config.dataRootPath + "data/shaders/08_hello_lightmaps/container.frag");

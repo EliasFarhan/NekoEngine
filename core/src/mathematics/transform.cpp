@@ -40,9 +40,9 @@ Mat4f const RotationMatrixFrom(const degree_t angle, const Vec3f axis)
 {
     const Vec3f normalizedAxis = axis.Normalized();
 
-    const float x = axis[0];
-    const float y = axis[1];
-    const float z = axis[2];
+    const float x = normalizedAxis[0];
+    const float y = normalizedAxis[1];
+    const float z = normalizedAxis[2];
     const float c = Cos(angle);
     const float s = Sin(angle);
     const float t = 1.0f - c;
@@ -70,9 +70,9 @@ Mat4f const RotationMatrixFrom(const radian_t angle, const Vec3f axis)
 {
     const Vec3f normalizedAxis = axis.Normalized();
 
-    const float x = axis[0];
-    const float y = axis[1];
-    const float z = axis[2];
+    const float x = normalizedAxis[0];
+    const float y = normalizedAxis[1];
+    const float z = normalizedAxis[2];
     const float c = Cos(angle);
     const float s = Sin(angle);
     const float t = 1.0f - c;
@@ -134,10 +134,6 @@ Mat4<float> const RotationMatrixFrom(const EulerAngles cardinalRotation)
 }
 
 
-Mat4<float> const RotationMatrixFrom(const RadianAngles cardinalRotation)
-{
-    return RotationMatrixFrom(cardinalRotation);
-}
 
 Mat4f const RotationMatrixFrom(const Quaternion& quaternion)
 {
@@ -205,46 +201,6 @@ Mat4f Rotate(const Mat4f& transform, const EulerAngles eulerAngles)
 }
 
 
-EulerAngles const Rotation(const Mat4<float>& transform)
-{
-    return EulerAngles();
-}
-
-
-float Pitch(const Mat4<float>& transform)
-{
-    return 0.0f;
-}
-
-
-float RotationOnX(const Mat4<float>& transform)
-{
-    return Pitch(transform);
-}
-
-
-float Yaw(const Mat4<float>& transform)
-{
-    return 0.0f;
-}
-
-
-float RotationOnY(const Mat4<float>& transform)
-{
-    return Yaw(transform);
-}
-
-
-float Roll(const Mat4<float>& transform)
-{
-    return 0.0f;
-}
-
-
-float RotationOnZ(const Mat4<float>& transform)
-{
-    return Roll(transform);
-}
 
 Mat4f Perspective(radian_t fovy, float aspect, float near, float far)
 {

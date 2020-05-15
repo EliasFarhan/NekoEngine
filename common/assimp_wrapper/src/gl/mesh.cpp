@@ -39,7 +39,7 @@ void Mesh::Draw(const gl::Shader& shader)
     		break;
         default: ;
         }
-        shader.SetFloat(("material." + name + number).c_str(), i);
+        shader.SetInt("material." + name + number, i);
         glBindTexture(GL_TEXTURE_2D, textures_[i].id);
     }
     glActiveTexture(GL_TEXTURE0);

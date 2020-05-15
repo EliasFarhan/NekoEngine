@@ -31,6 +31,8 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ApplicationInfo;
 
+import swiss.sae.gpr5300.BuildConfig;
+
 /**
     SDL Activity
 */
@@ -112,6 +114,7 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
         String library;
         String[] libraries = SDLActivity.mSingleton.getLibraries();
         if (libraries.length > 0) {
+            Log.v(TAG, "Libraries: "+libraries[libraries.length-1]);
             library = "lib" + libraries[libraries.length - 1] + ".so";
         } else {
             library = "libmain.so";
@@ -136,20 +139,33 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
      * @return names of shared libraries to be loaded (e.g. "SDL2", "main").
      */
     protected String[] getLibraries() {
-        return new String[] {
-            "hidapi",
-            "SDL2",
-            // "SDL2_image",
-            // "SDL2_mixer",
-            // "SDL2_net",
-            // "SDL2_ttf",
-            "main"
-        };
+        if (BuildConfig.DEBUG) {
+            return new String[]{
+                    "hidapid",
+                    // "SDL2_image",
+                    // "SDL2_mixer",
+                    // "SDL2_net",
+                    // "SDL2_ttf",
+                    "maind"
+            };
+        }
+        else {
+            return new String[]{
+                    "hidapi",
+                    //"SDL2",
+                    // "SDL2_image",
+                    // "SDL2_mixer",
+                    // "SDL2_net",
+                    // "SDL2_ttf",
+                    "main"
+            };
+        }
     }
 
     // Load the .so
     public void loadLibraries() {
        for (String lib : getLibraries()) {
+           Log.v(TAG, "Load Library: " + lib);
           SDL.loadLibrary(lib);
        }
     }

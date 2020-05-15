@@ -5,6 +5,7 @@
 #include "graphics/texture.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+#include "engine/engine.h"
 
 namespace neko
 {
@@ -24,6 +25,7 @@ Texture::Texture() : convertImage_([this]{image_ = StbImageConvert(diskLoadJob_.
 {
     convertImage_.AddDependency(&diskLoadJob_);
 }
+
 void Texture::LoadFromDisk()
 {
     BasicEngine::GetInstance()->ScheduleJob(&diskLoadJob_, JobThreadType::RESOURCE_THREAD);

@@ -35,14 +35,23 @@
 static AAssetManager* assetManager = nullptr;
 
 extern "C"
-JNIEXPORT void JNICALL
-Java_swiss_sae_gpr5300_MainActivity_load(JNIEnv *env, jclass clazz, jobject mgr)
 {
+JNIEXPORT void JNICALL
+Java_swiss_sae_gpr5300_MainActivity_load(JNIEnv *env, [[maybe_unused]] jclass clazz, jobject mgr) {
 	assetManager = AAssetManager_fromJava(env, mgr);
 	logDebug("Asset Manager from JNI loaded!");
 }
+}
 namespace neko
 {
+ResourceJob::ResourceJob() : Job([this]{bufferFile_.Load(filePath_);})
+{
+}
+void ResourceJob::SetFilePath(std::string_view path)
+{
+    filePath_ = path;
+}
+
 bool FileExists(const std::string_view path)
 {
 	{

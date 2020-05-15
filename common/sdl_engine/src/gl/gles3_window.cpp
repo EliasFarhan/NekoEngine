@@ -154,7 +154,7 @@ void Gles3Window::MakeCurrentContext()
 	{
 		oss << "\nSDL Error: " << SDL_GetError();
 	}
-	logDebug(oss.str());
+	//logDebug(oss.str());
 #endif
 }
 
@@ -170,7 +170,7 @@ void Gles3Window::LeaveCurrentContext()
 	{
 		oss << "[Error] After Leave Current Context, context: " << currentContext;
 	}
-	logDebug(oss.str());
+	//logDebug(oss.str());
 #endif
 }
 }

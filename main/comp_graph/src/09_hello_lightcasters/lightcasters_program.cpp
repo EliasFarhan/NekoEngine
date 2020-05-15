@@ -16,8 +16,8 @@ void HelloLightCastersProgram::Init()
 	}
 
 	const auto& config = BasicEngine::GetInstance()->config;
-	containerDiffuse_ = gl::stbCreateTexture(config.dataRootPath + "/data/material/container2.png");
-	containerSpecular_ = gl::stbCreateTexture(config.dataRootPath + "/data/material/container2_specular.png");
+	containerDiffuse_ = gl::stbCreateTexture(config.dataRootPath + "data/material/container2.png");
+	containerSpecular_ = gl::stbCreateTexture(config.dataRootPath + "data/material/container2_specular.png");
 	containerShaders_[0].LoadFromFile(
 		config.dataRootPath + "data/shaders/09_hello_lightcasters/container.vert",
 		config.dataRootPath + "data/shaders/09_hello_lightcasters/container_directional.frag");
@@ -45,6 +45,11 @@ void HelloLightCastersProgram::Update(seconds dt)
 {
 
 	std::lock_guard<std::mutex> lock(updateMutex_);
+	time_ += dt.count();
+	lightPointPos_ = Vec3f(
+		Cos(radian_t(time_)),
+		0.0f,
+		Sin(radian_t(time_))) * lightDist_;
 	const auto& config = BasicEngine::GetInstance()->config;
 	camera_.SetAspect(config.windowSize.x, config.windowSize.y);;
 	camera_.Update(dt);
@@ -92,7 +97,20 @@ void HelloLightCastersProgram::DrawImGui()
 		}
 		break;
 	}
-	case LightCasterType::SPOT: break;
+	case LightCasterType::SPOT:
+	{
+		float angle = lightCutOffAngle_.value();
+		if (ImGui::InputFloat("Light CutOff", &angle))
+		{
+			lightCutOffAngle_ = degree_t(angle);
+		}
+		angle = lightOuterCutOffAngle_.value();
+		if (ImGui::InputFloat("Light Outer CutOff", &angle))
+		{
+			lightOuterCutOffAngle_ = degree_t(angle);
+		}
+		break;
+	}
 	default: ;
 	}
 	//Select the Light Caster Type
@@ -149,6 +167,9 @@ void HelloLightCastersProgram::Render()
 	{
 		containerShader.SetVec3("light.color", Vec3f(1, 1, 1));
 		containerShader.SetVec3("light.position", lightPointPos_);
+		containerShader.SetFloat("light.constant", 1.0f);
+		containerShader.SetFloat("light.linear", 0.09f);
+		containerShader.SetFloat("light.quadratic", 0.032f);
 		break;
 	}
 	case LightCasterType::FLASH: {
@@ -163,6 +184,8 @@ void HelloLightCastersProgram::Render()
 		containerShader.SetVec3("light.color", Vec3f(1, 1, 1));
 		containerShader.SetVec3("light.position", camera_.position);
 		containerShader.SetVec3("light.direction", Vec3f::zero - camera_.reverseDirection);
+		containerShader.SetFloat("light.cutOff", Cos(lightCutOffAngle_));
+		containerShader.SetFloat("light.outerCutOff", Cos(lightOuterCutOffAngle_));
 		break;
 	}
 	default: break;;

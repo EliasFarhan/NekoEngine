@@ -5,6 +5,9 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include <engine/log.h>
+
+#include "io_system.h"
 
 namespace neko::assimp
 {
@@ -23,12 +26,21 @@ namespace neko::assimp
 	void Model::LoadModel(std::string_view path)
 	{
 		Assimp::Importer import;
-		const aiScene* scene = import.ReadFile(path.data(), aiProcess_Triangulate | aiProcess_FlipUVs);
-
+		NekoIOSystem ioSystem;
+		import.SetIOHandler(&ioSystem);
+		BufferFile sceneFile;
+		sceneFile.Load(path);
+		const auto extension = GetFilenameExtension(path);
+		
+		const aiScene* scene = import.ReadFileFromMemory(sceneFile.dataBuffer, sceneFile.dataLength,
+		        aiProcess_Triangulate | aiProcess_FlipUVs, extension.c_str());
+		
+        sceneFile.Destroy();
 		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 		{
 			std::ostringstream oss;
-			oss << "ERROR::ASSIMP::" << import.GetErrorString();
+			oss << "[ERROR] ASSIMP " << import.GetErrorString();
+			logDebug(oss.str());
 			return;
 		}
 		directory = path.substr(0, path.find_last_of('/'));
@@ -94,6 +106,7 @@ namespace neko::assimp
 		if (mesh->mMaterialIndex >= 0)
 		{
 			aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+			
 			std::vector<Texture> diffuseMaps = LoadMaterialTextures(material,
 			                                                        aiTextureType_DIFFUSE, Texture::TextureType::DIFFUSE);
 			textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
@@ -107,7 +120,7 @@ namespace neko::assimp
 
 	std::vector<Texture> Model::LoadMaterialTextures(aiMaterial* mat, aiTextureType type, Texture::TextureType typeName) const
 	{
-		std::vector<Texture> textures;
+	    std::vector<Texture> textures;
 		for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
 		{
 			aiString str;

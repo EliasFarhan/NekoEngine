@@ -45,7 +45,8 @@ private:
 	float ambientStrength_ = 0.1f;
 	float diffuseStrength_ = 1.0f;
 	float specularStrength_ = 0.5f;
-	degree_t lightCutOffAngle_{ 30.0f };
+	degree_t lightCutOffAngle_{ 10.0f };
+	degree_t lightOuterCutOffAngle_{15.0f};
 
 	const static size_t cubeNumbers_ = 10;
 	Vec3f cubePositions_[cubeNumbers_] =

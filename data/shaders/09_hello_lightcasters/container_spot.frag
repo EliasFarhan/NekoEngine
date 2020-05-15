@@ -15,6 +15,9 @@ struct Light
 {
     vec3 color;
     vec3 position;
+    vec3 direction;
+    float cutOff;
+    float outerCutOff;
 };
 uniform Light light;
 uniform vec3 viewPos;
@@ -29,18 +32,31 @@ in vec3 Normal;
 
 void main()
 {
-    vec3 ambient = texture(objectMaterial.diffuse, TexCoords).rgb * light.color * ambientStrength;
-
-    vec3 norm = normalize(Normal);
     vec3 lightDir = normalize(light.position - FragPos);
-    float diff = max(dot(norm, lightDir), 0.0);
-    vec3 diffuse = light.color * diff * texture(objectMaterial.diffuse, TexCoords).rgb * diffuseStrength;
+    vec3 ambient = texture(objectMaterial.diffuse, TexCoords).rgb * light.color * ambientStrength;
+    float theta     = dot(lightDir, normalize(-light.direction));
+    float epsilon   = light.cutOff - light.outerCutOff;
+    float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
 
-    vec3 viewDir = normalize(viewPos - FragPos);
-    vec3 reflectDir = reflect(-lightDir, norm);
-    float spec = pow(max(diff*dot(viewDir, reflectDir), 0.0), float(objectMaterial.shininess));
-    vec3 specular = light.color * spec * texture(objectMaterial.specular, TexCoords).rgb * specularStrength;
+    if(theta > light.outerCutOff)
+    {
+        vec3 norm = normalize(Normal);
 
-    vec3 result = ambient + diffuse + specular;
-    FragColor = vec4(result, 1.0);
+        float diff = max(dot(norm, lightDir), 0.0);
+        vec3 diffuse = light.color * diff *
+            texture(objectMaterial.diffuse, TexCoords).rgb * diffuseStrength * intensity;
+
+        vec3 viewDir = normalize(viewPos - FragPos);
+        vec3 reflectDir = reflect(-lightDir, norm);
+        float spec = pow(max(diff*dot(viewDir, reflectDir), 0.0), float(objectMaterial.shininess));
+        vec3 specular = light.color * spec *
+            texture(objectMaterial.specular, TexCoords).rgb * specularStrength * intensity;
+
+        vec3 result = ambient + diffuse + specular;
+        FragColor = vec4(result, 1.0);
+    }
+    else
+    {
+        FragColor = vec4(ambient, 1.0);
+    }
 }
