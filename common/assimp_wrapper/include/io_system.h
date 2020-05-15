@@ -10,7 +10,25 @@ namespace neko
 
 class NekoIOStream : public Assimp::IOStream
 {
-	
+public:
+
+    size_t Read(void* pvBuffer, size_t pSize, size_t pCount) override;
+
+    size_t Write(const void* pvBuffer, size_t pSize, size_t pCount) override;
+
+    aiReturn Seek(size_t pOffset, aiOrigin pOrigin) override;
+
+    size_t Tell() const override;
+
+    size_t FileSize() const override;
+
+    void Flush() override;
+
+    void LoadFromFile(std::string_view path);
+    void Destroy();
+private:
+    BufferFile bufferFile_;
+    size_t cursorIndex_ = 0;
 };
 
 class NekoIOSystem : public Assimp::IOSystem

@@ -26,16 +26,13 @@ namespace neko::assimp
 	void Model::LoadModel(std::string_view path)
 	{
 		Assimp::Importer import;
-		NekoIOSystem ioSystem;
-		import.SetIOHandler(&ioSystem);
-		BufferFile sceneFile;
-		sceneFile.Load(path);
-		const auto extension = GetFilenameExtension(path);
+		NekoIOSystem* ioSystem = new NekoIOSystem();
+		import.SetIOHandler(ioSystem);
 		
-		const aiScene* scene = import.ReadFileFromMemory(sceneFile.dataBuffer, sceneFile.dataLength,
-		        aiProcess_Triangulate | aiProcess_FlipUVs, extension.c_str());
+		const aiScene* scene = import.ReadFile(path.data(),
+		        aiProcess_Triangulate | aiProcess_FlipUVs);
 		
-        sceneFile.Destroy();
+
 		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 		{
 			std::ostringstream oss;
