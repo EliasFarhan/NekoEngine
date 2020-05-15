@@ -63,8 +63,9 @@ endif()
 include("cmake/data.cmake")
 set(NEKO_CORE_DIR "${CMAKE_SOURCE_DIR}/core/" CACHE INTERNAL "")
 add_subdirectory(${NEKO_CORE_DIR})
+if(NOT Emscripten)
 target_precompile_headers(Neko_Core PRIVATE "${NEKO_CORE_DIR}/include/core_pch.h")
-
+endif()
 #imgui
 set(IMGUI_VERSION "1.74" CACHE INTERNAL "")
 set(IMGUI_ROOT "${EXTERNAL_DIR}/imgui-${IMGUI_VERSION}" CACHE STRING "")
@@ -104,8 +105,9 @@ if(Neko_SDL2)
     include_directories(${SDL_DIR}/include ${SDL_DIR}/src)
 
     add_subdirectory("common/sdl_engine")
-    
+    if(NOT Emscripten)
     target_precompile_headers(sdl_engine PRIVATE "common/sdl_engine/include/sdl_wrapper_pch.h")
+        endif()
 endif()
 
 if(Neko_Assimp)
