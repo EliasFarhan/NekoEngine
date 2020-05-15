@@ -12,6 +12,7 @@ if(EMSCRIPTEN)
             "${bin_link_flags} -s USE_SDL=2 -s USE_WEBGL2=1 ")
 endif()
 set_target_properties(comp_graph PROPERTIES UNITY_BUILD ON)
+if(NOT Emscripten)
 target_precompile_headers(comp_graph PRIVATE "include/comp_graph/comp_graph_pch.h")
-
+endif()
 set_target_properties (comp_graph PROPERTIES FOLDER Neko\\Main)
