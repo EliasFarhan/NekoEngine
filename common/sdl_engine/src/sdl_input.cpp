@@ -35,6 +35,57 @@ namespace neko::sdl
         }
     }
 
+    void InputManager::OnPreUserInput()
+    {
+
+#ifndef NN_NINTENDO_SDK
+        for (size_t i = 0; i < static_cast<int>(KeyCode::KEYBOARD_SIZE); i++) {
+            if (keyPressedState_[i] == ButtonState::UP
+                ) {
+                keyPressedState_[i] = ButtonState::NONE;
+            }
+            else if (
+                keyPressedState_[i] == ButtonState::DOWN) {
+                keyPressedState_[i] = ButtonState::HELD;
+            }
+        }
+
+        for (size_t i = 0; i < static_cast<int>(MouseButtonCode::MOUSE_MAX); i++) {
+            if (buttonState_[i] == ButtonState::UP) { buttonState_[i] = ButtonState::NONE; }
+            else if (
+                buttonState_[i] == ButtonState::DOWN) {
+                buttonState_[i] = ButtonState::HELD;
+            }
+        }
+
+        for (size_t i = 0; i < static_cast<int>(ControllerInputs::LENGTH); i++) {
+            if (controllerButtonState_[i] == ButtonState::UP) {
+                controllerButtonState_[i] = ButtonState::NONE;
+            }
+            else if (controllerButtonState_[i] == ButtonState::DOWN) {
+                controllerButtonState_[i] = ButtonState::HELD;
+            }
+        }
+#else
+        for (size_t i = 0; i < static_cast<int>(SwitchInputs::LENGTH); i++) {
+            if (switchButtonState_[i] == ButtonState::UP)
+            {
+                switchButtonState_[i] = ButtonState::NONE;
+            }
+            else if (switchButtonState_[i] == ButtonState::DOWN) {
+                switchButtonState_[i] = ButtonState::HELD;
+            }
+        }
+#endif
+
+        /*LogDebug(
+            std::to_string(joyAxisLX) + " ; " +
+            std::to_string(joyAxisLY) + " ; " +
+            std::to_string(joyAxisRX) + " ; " +
+            std::to_string(joyAxisRY), LogType::PHYSICS_LOG);*/
+
+    }
+
     void InputManager::ProccesInputs(SDL_Event event)
     {
         switch (event.type) {

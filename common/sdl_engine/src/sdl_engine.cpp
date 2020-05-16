@@ -55,6 +55,7 @@ void SdlEngine::Init()
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK);
     window_->Init();
     initAction_.Execute();
+    InputLocator::provide(&inputManager_);
     inputManager_.Init();
 }
 
@@ -70,7 +71,8 @@ void SdlEngine::Destroy()
 
 void SdlEngine::ManageEvent()
 {
-    
+
+    inputManager_.OnPreUserInput();
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("Manage Event");
 #endif
@@ -90,9 +92,9 @@ void SdlEngine::ManageEvent()
             {
                 config.windowSize = Vec2u(event.window.data1, event.window.data2);
                 window_->OnResize(config.windowSize);
-                inputManager_.ProccesInputs(event);
             }
         }
+        inputManager_.ProccesInputs(event);
     }
     onEventAction_.Execute(event);
 }

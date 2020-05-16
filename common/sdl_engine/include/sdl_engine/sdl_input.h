@@ -7,6 +7,7 @@
 
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
+#include "utilities/service_locator.h"
 
 #define PC_INPUT
 #define SWITCH_INPUT
@@ -14,11 +15,11 @@
 
 namespace neko::sdl
 {
-class SdlEngine;
+	class SdlEngine;
 
-/**
-	 * \brief enum all the key on an US keyboard
-	 */
+	/**
+		 * \brief enum all the key on an US keyboard
+		 */
 
 	enum class KeyCode : uint16_t {
 		UNKNOWN = SDL_SCANCODE_UNKNOWN,
@@ -369,6 +370,8 @@ class SdlEngine;
 
 		//virtual void BindFromJson() = 0;
 
+		virtual void OnPreUserInput() = 0;
+
 		virtual void ProccesInputs(SDL_Event event) = 0;
 
 		/**
@@ -483,6 +486,8 @@ class SdlEngine;
 
 		 //void BindFromJson() override;
 
+		 void OnPreUserInput() override;
+
 		 void ProccesInputs(SDL_Event event) override;
 
 		 bool IsKeyDown(KeyCode key) const override;
@@ -558,4 +563,154 @@ class SdlEngine;
 
 		 SdlEngine& engine_;
 	 };
+
+	 class NullInputManager final : public IInputManager
+	 {
+	 public:
+		 NullInputManager() = default;
+		 ~NullInputManager() = default;
+
+		 void Init() override {}
+
+		 void OnPreUserInput() {};
+
+		 void ProccesInputs(SDL_Event event) override {}
+
+		 bool IsKeyDown(KeyCode key) const override
+		 {
+			 key;
+			 return false;
+		 }
+
+		 bool IsKeyUp(KeyCode key) const override
+		 {
+			 key;
+			 return false;
+		 }
+
+		 bool IsKeyHeld(KeyCode key) const override
+		 {
+			 key;
+			 return false;
+		 }
+
+		 Vec2f GetMousePosition() const override { return Vec2f(0, 0); }
+
+		 bool IsMouseButtonDown(MouseButtonCode button) const override
+		 {
+			 button;
+			 return false;
+		 }
+
+		 bool IsMouseButtonUp(MouseButtonCode button) const override
+		 {
+			 button;
+			 return false;
+		 }
+
+		 bool IsMouseButtonHeld(MouseButtonCode button) const override
+		 {
+			 button;
+			 return false;
+		 }
+
+		 bool IsSwitchButtonDown(SwitchInputs key) const override
+		 {
+			 key;
+			 return false;
+		 }
+
+		 bool IsSwitchButtonUp(SwitchInputs key) const override
+		 {
+			 key;
+			 return false;
+		 }
+
+		 bool IsSwitchButtonHeld(SwitchInputs key) const override
+		 {
+			 key;
+			 return false;
+		 }
+
+		 bool IsControllerDown(ControllerInputs key) const override
+		 {
+			 key;
+			 return false;
+		 }
+
+		 bool IsControllerUp(ControllerInputs key) const override
+		 {
+			 key;
+			 return false;
+		 }
+
+		 bool IsControllerHeld(ControllerInputs key) const override
+		 {
+			 key;
+			 return false;
+		 }
+
+		 bool IsActionDown(InputAction button) const override
+		 {
+			 button;
+			 return false;
+		 }
+
+		 bool IsActionUp(InputAction button) const override
+		 {
+			 button;
+			 return false;
+		 }
+
+		 bool IsActionHeld(InputAction button) const override
+		 {
+			 button;
+			 return false;
+		 }
+
+		 void PrintJoystick(const int device) const override
+		 {
+			 device;
+		 }
+		 /**
+		 * \brief translate ActionCurrent enum to string
+		 */
+		 std::string ActionEnumToString(InputAction action) override
+		 {
+			 action;
+			 return "";
+		 }
+		 /**
+		 * \brief translate KeyCode enum to string
+		 */
+		 std::string PcInputsEnumToString(KeyCode keyCode) override
+		 {
+			 keyCode;
+			 return "";
+		 }
+		 std::string PcInputsEnumToString(MouseButtonCode mouseButton) override
+		 {
+			 mouseButton;
+			 return "";
+		 }
+		 /**
+		 * \brief translate SwitchInputs enum to string
+		 */
+		 std::string SwitchInputsEnumToString(SwitchInputs switchInputs) override
+		 {
+			 switchInputs;
+			 return "";
+		 }
+		 /**
+		 * \brief translate ControllerInputs enum to string
+		 */
+		 std::string ControllerInputsEnumToString(ControllerInputs controller) override
+		 {
+			 controller;
+			 return "";
+		 }
+
+	 };
+
+	 using InputLocator = Locator<IInputManager, NullInputManager>;
 }

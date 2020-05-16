@@ -28,7 +28,29 @@ void SampleBrowser::Update(seconds dt)
 {
     programs_[currentProgramIndex_]->Update(dt);
     RendererLocator::get().Render(programs_[currentProgramIndex_].get());
-    if ()
+
+    for (unsigned int keyIndex = 0;
+        keyIndex != static_cast<unsigned>( sdl::KeyCode::KEYBOARD_SIZE);
+        keyIndex++) {
+        if (sdl::InputLocator::get().IsKeyDown(static_cast<sdl::KeyCode>(keyIndex)))
+        {
+            std::cout << sdl::InputLocator::get().PcInputsEnumToString(static_cast<sdl::KeyCode>(keyIndex)) + " ";
+            std::cout << "IsKeyDown : " << sdl::InputLocator::get().IsKeyDown(static_cast<sdl::KeyCode>(keyIndex)) + " ";
+            std::cout << '\n';
+        }
+        if (sdl::InputLocator::get().IsKeyHeld(static_cast<sdl::KeyCode>(keyIndex)))
+        {
+            std::cout << sdl::InputLocator::get().PcInputsEnumToString(static_cast<sdl::KeyCode>(keyIndex)) + " ";
+            std::cout << "IsKeyHeld : " << sdl::InputLocator::get().IsKeyHeld(static_cast<sdl::KeyCode>(keyIndex)) + " ";
+            std::cout << '\n';
+        }
+        if (sdl::InputLocator::get().IsKeyUp(static_cast<sdl::KeyCode>(keyIndex)))
+        {
+            std::cout << sdl::InputLocator::get().PcInputsEnumToString(static_cast<sdl::KeyCode>(keyIndex)) + " ";
+            std::cout << "IsKeyUp : " << sdl::InputLocator::get().IsKeyUp(static_cast<sdl::KeyCode>(keyIndex)) + " ";
+            std::cout << '\n';
+        }
+    }
 }
 
 void SampleBrowser::Destroy()
