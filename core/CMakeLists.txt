@@ -29,6 +29,7 @@ set(TASKFLOW_DIR ${EXTERNAL_DIR}/taskflow-2.2)
 include_directories(${TASKFLOW_DIR})
 
 add_library(Neko_Core STATIC ${Neko_SRC})
+target_link_libraries(Neko_Core PUBLIC imgui)
 if (APPLE)
     target_link_libraries(Neko_Core PUBLIC ${Boost_LIBRARIES})
 endif(APPLE)
