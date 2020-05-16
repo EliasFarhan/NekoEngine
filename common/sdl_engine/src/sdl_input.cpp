@@ -15,6 +15,29 @@ namespace neko::sdl
     {
     }
 
+    void InputManager::BindFromJson()
+    {
+        bindingPcInput_[static_cast<unsigned>(InputAction::UP)] = static_cast<unsigned>(KeyCode::W);
+        bindingPcInput_[static_cast<unsigned>(InputAction::DOWN)] = static_cast<unsigned>(KeyCode::S);
+        bindingPcInput_[static_cast<unsigned>(InputAction::RIGHT)] = static_cast<unsigned>(KeyCode::D);
+        bindingPcInput_[static_cast<unsigned>(InputAction::LEFT)] = static_cast<unsigned>(KeyCode::A);
+        bindingPcInput_[static_cast<unsigned>(InputAction::DASH)] = static_cast<unsigned>(KeyCode::Q);
+        bindingPcInput_[static_cast<unsigned>(InputAction::ABILITIES)] = static_cast<unsigned>(KeyCode::X);
+        bindingPcInput_[static_cast<unsigned>(InputAction::MAIN_SHOOT)] = static_cast<unsigned>(KeyCode::E);
+        bindingPcInput_[static_cast<unsigned>(InputAction::SECONDARY_CANCEL)] = static_cast<unsigned>(KeyCode::R);
+        bindingPcInput_[static_cast<unsigned>(InputAction::SECONDARY_SHOOT)] = static_cast<unsigned>(KeyCode::F);
+        bindingPcInput_[static_cast<unsigned>(InputAction::SECONDARY_TARGET)] = static_cast<unsigned>(KeyCode::SPACE);
+        /*json tmpJson = PokFileSystem::ReadJsonFile("input_json", FileType::BINDING, FolderType::ROM);
+        for (int i = 0; i < static_cast<int>(InputAction::LENGTH); i++) {
+            if (tmpJson[i] != nullptr) {
+                bindingPcInput_[i] = tmpJson[i]["PcInput"];
+                bindingSwitchInput_[i] = tmpJson[i]["SwitchInput"];
+                bindingControllerInput_[i] = tmpJson[i]["ControllerInput"];
+            }
+        }*/
+    }
+
+
     void InputManager::Init()
     {
         imGuiContext_ = ImGui::GetCurrentContext();
@@ -33,6 +56,9 @@ namespace neko::sdl
                         joystick_)) == joystick_);
             }
         }
+        controllerAxis_[static_cast<unsigned>(ControllerAxis::LEFT_BUMPER)] = -1.0f;
+        controllerAxis_[static_cast<unsigned>(ControllerAxis::RIGHT_BUMPER)] = -1.0f;
+        BindFromJson();
     }
 
     void InputManager::OnPreUserInput()
@@ -50,7 +76,7 @@ namespace neko::sdl
             }
         }
 
-        for (size_t i = 0; i < static_cast<int>(MouseButtonCode::MOUSE_MAX); i++) {
+        for (size_t i = 0; i < static_cast<int>(MouseButtonCode::LENGTH); i++) {
             if (buttonState_[i] == ButtonState::UP) { buttonState_[i] = ButtonState::NONE; }
             else if (
                 buttonState_[i] == ButtonState::DOWN) {
@@ -77,13 +103,7 @@ namespace neko::sdl
             }
         }
 #endif
-
-        /*LogDebug(
-            std::to_string(joyAxisLX) + " ; " +
-            std::to_string(joyAxisLY) + " ; " +
-            std::to_string(joyAxisRX) + " ; " +
-            std::to_string(joyAxisRY), LogType::PHYSICS_LOG);*/
-
+        mouseScroll_ = Vec2f::zero;
     }
 
     void InputManager::ProccesInputs(SDL_Event event)
@@ -95,8 +115,6 @@ namespace neko::sdl
 
 #pragma region keyboard
         case SDL_TEXTINPUT: {
-            //TODO(@Nico) ajouter le text input
-            //usingController = false;
             break;
         }
 
@@ -105,7 +123,6 @@ namespace neko::sdl
 
             const int index = event.key.keysym.scancode;
             keyPressedState_[index] = ButtonState::DOWN;
-            //usingController = false;
             break;
         }
         case SDL_KEYUP: {
@@ -113,7 +130,6 @@ namespace neko::sdl
 
             const int index = event.key.keysym.scancode;
             keyPressedState_[index] = ButtonState::UP;
-            //usingController = false;
             break;
         }
 #pragma endregion
@@ -136,7 +152,6 @@ namespace neko::sdl
             else if (event.button.button == SDL_BUTTON_MIDDLE)
                 buttonState_[static_cast<int>(MouseButtonCode::MIDDLE)] = ButtonState::DOWN;
 
-            //usingController = false;
             break;
         }
         case SDL_MOUSEBUTTONUP: {
@@ -151,16 +166,12 @@ namespace neko::sdl
             else if (event.button.button == SDL_BUTTON_MIDDLE)
                 buttonState_[static_cast<int>(MouseButtonCode::MIDDLE)] = ButtonState::UP;
 
-            //usingController = false;
             break;
         }
-        case SDL_MOUSEWHEEL: {/*
-            scrollX = event.wheel.y;
-            scrollY = event.wheel.y;
+        case SDL_MOUSEWHEEL: {
+            mouseScroll_.x = event.wheel.x;
+            mouseScroll_.y = event.wheel.y;
 
-            scrollUpdate = true;
-
-            usingController = false;*/
             break;
         }
 #pragma endregion
@@ -175,7 +186,6 @@ namespace neko::sdl
 
             std::cout << "No more joystick\n" << '\n';
 
-            //usingController = false;
             break;
         }
         case SDL_JOYDEVICEADDED: {
@@ -194,6 +204,7 @@ namespace neko::sdl
                 std::to_string(event.jball.yrel) + ")" << '\n';
             break;
         }
+
         case SDL_JOYBUTTONDOWN: {
             std::cout <<
                 "Joystick " << std::to_string(event.jbutton.which) << " button " + std::to_string(
@@ -204,72 +215,8 @@ namespace neko::sdl
 #else
             switchButtonState_[event.jbutton.button] = ButtonState::DOWN;
 #endif
-
-            //usingController = true;
             break;
         }
-        case SDL_JOYAXISMOTION: {
-            //LogDebug("Joystick Motion !");
-            //LogDebug(
-            //	"Joystick" + std::to_string(event.jaxis.which) + "axis" + std::to_string(
-            //		event.jaxis.axis) + "value:" + std::to_string(event.jaxis.value), LogType::INPUT_LOG);
-
-            // Considering 32540 is the max value, we take a 10% deadZone
-            const int deadZone = 3200;
-            float value = 0;
-            if (event.jaxis.value < -deadZone || event.jaxis.value > deadZone) {
-                value = event.jaxis.value / kMaxJoyValue_;
-                //usingController = true;
-            }
-
-            //switch (event.jaxis.axis) {
-
-            //case 0:
-            //    joyAxisLX = value;
-            //    break;
-            //case 1:
-            //    joyAxisLY = value;
-            //    break;
-            //case 2:
-            //    joyAxisRX = value;
-            //    break;
-            //case 3:
-            //    joyAxisRY = value;
-            //    break;
-            //}
-            //joyAxisUpdate = true;
-        }
-                              break;
-        case SDL_JOYHATMOTION: {
-            std::string s = "Joystick " + std::to_string(event.jhat.which) +
-                " hat " + std::to_string(event.jhat.hat) +
-                " value:";/*
-            if (event.jhat.value == SDL_HAT_CENTERED) {
-                joyAxisLX = 0.0f;
-                joyAxisLY = 0.0f;
-                s += " centered";
-            }
-            if (event.jhat.value & SDL_HAT_UP) {
-                joyAxisLY = -1.0f;
-                s += " up";
-            }
-            if (event.jhat.value & SDL_HAT_RIGHT) {
-                joyAxisLX = 1.0f;
-                s += " right";
-            }
-            if (event.jhat.value & SDL_HAT_DOWN) {
-                joyAxisLY = 1.0f;
-                s += " down";
-            }
-            if (event.jhat.value & SDL_HAT_LEFT) {
-                joyAxisLX = -1.0f;
-                s += " left";
-            }
-
-            usingController = true;
-            LogDebug(s, LogType::INPUT_LOG);*/
-        }
-                             break;
 
         case SDL_JOYBUTTONUP: {
             std::cout << "Joystick " + std::to_string(event.jbutton.which) + " button " + std::
@@ -279,9 +226,48 @@ namespace neko::sdl
 #else
             switchButtonState_[event.jbutton.button] = ButtonState::UP;
 #endif
-            //usingController = true;
             break;
         }
+
+        case SDL_JOYAXISMOTION: {
+            const int deadZone = 3200;
+            float value = 0;
+            if (event.jaxis.value < -deadZone || event.jaxis.value > deadZone) {
+                value = event.jaxis.value / kMaxJoyValue_;
+            }
+
+            controllerAxis_[event.jaxis.axis] = value;
+        }
+                              break;
+        case SDL_JOYHATMOTION: {
+            std::string s = "Joystick " + std::to_string(event.jhat.which) +
+                " hat " + std::to_string(event.jhat.hat) +
+                " value:";
+            if (event.jhat.value == SDL_HAT_CENTERED) {
+                controllerAxis_[static_cast<unsigned>(ControllerAxis::PAD_VERTICAL)] = 0;
+                controllerAxis_[static_cast<unsigned>(ControllerAxis::PAD_HORIZONTAL)] = 0;
+                s += " centered";
+            }
+            if (event.jhat.value & SDL_HAT_UP) {
+                controllerAxis_[static_cast<unsigned>(ControllerAxis::PAD_VERTICAL)] = 1.0f;
+                s += " up";
+            }
+            if (event.jhat.value & SDL_HAT_RIGHT) {
+                controllerAxis_[static_cast<unsigned>(ControllerAxis::PAD_HORIZONTAL)] = 1.0f;
+                s += " right";
+            }
+            if (event.jhat.value & SDL_HAT_DOWN) {
+                controllerAxis_[static_cast<unsigned>(ControllerAxis::PAD_VERTICAL)] = -1.0f;
+                s += " down";
+            }
+            if (event.jhat.value & SDL_HAT_LEFT) {
+                controllerAxis_[static_cast<unsigned>(ControllerAxis::PAD_HORIZONTAL)] = -1.0f;
+                s += " left";
+            }
+            std::cout << s << '\n';
+        }
+                             break;
+
                             /* Fall through to signal quit */
         case SDL_FINGERDOWN: {
 
@@ -302,7 +288,6 @@ namespace neko::sdl
         case SDL_CONTROLLERAXISMOTION: {
             std::cout << "Controller" + std::to_string(event.caxis.which) + "axis" + std::to_string(
                     event.caxis.axis) + "value:" + std::to_string(event.caxis.value) << '\n';
-            //usingController = true;
             break;
         }
         case SDL_CONTROLLERBUTTONDOWN: {
@@ -310,7 +295,6 @@ namespace neko::sdl
                     event.cbutton.button) + " up" << '\n';
             controllerButtonState_[event.cbutton.button] = ButtonState::DOWN;
 
-            //usingController = true;
             break;
         }
         case SDL_CONTROLLERBUTTONUP: {
@@ -343,16 +327,6 @@ namespace neko::sdl
         }
     }
 
-    //void InputManager::BindFromJson()
-    //{
-    //    json inputBindingFile = LoadJson("./../../data/input_binding.json");
-    //    for (int i = 0; i < static_cast<size_t>(InputAction::LENGTH); ++i)
-    //    {
-    //        bindingPcInput_[inputBindingFile[i]["Actions"]] = static_cast<KeyCode>(inputBindingFile[i]["PcInput"]);
-    //        bindingControllerInput_[inputBindingFile[i]["Actions"]] = static_cast<C>(inputBindingFile[i]["ControllerInput"]);
-    //    }
-    //}
-
     bool InputManager::IsKeyDown(KeyCode key) const
     {
         return keyPressedState_[static_cast<int>(key)] == ButtonState::DOWN;
@@ -375,35 +349,48 @@ namespace neko::sdl
 
     bool InputManager::IsSwitchButtonDown(SwitchInputs key) const
     {
-        return switchButtonState_[static_cast<int>(key)] == ButtonState::DOWN;
+        return switchButtonState_[static_cast<unsigned>(key)] == ButtonState::DOWN;
     }
 
     bool InputManager::IsSwitchButtonUp(SwitchInputs key) const
     {
-        return switchButtonState_[static_cast<int>(key)] == ButtonState::UP;
+        return switchButtonState_[static_cast<unsigned>(key)] == ButtonState::UP;
     }
 
     bool InputManager::IsSwitchButtonHeld(SwitchInputs key) const
     {
-        return switchButtonState_[static_cast<int>(key)] == ButtonState::HELD;
+        return switchButtonState_[static_cast<unsigned>(key)] == ButtonState::HELD;
     }
 
     bool InputManager::IsControllerDown(ControllerInputs key) const
     {
-        return controllerButtonState_[static_cast<int>(key)] == ButtonState::DOWN;
+        return controllerButtonState_[static_cast<unsigned>(key)] == ButtonState::DOWN;
     }
 
     bool InputManager::IsControllerUp(ControllerInputs key) const
     {
-        return controllerButtonState_[static_cast<int>(key)] == ButtonState::UP;
+        return controllerButtonState_[static_cast<unsigned>(key)] == ButtonState::UP;
     }
 
     bool InputManager::IsControllerHeld(ControllerInputs key) const
     {
-        return controllerButtonState_[static_cast<int>(key)] == ButtonState::HELD;
+        return controllerButtonState_[static_cast<unsigned>(key)] == ButtonState::HELD;
     }
 
-    Vec2f InputManager::GetMousePosition() const { return mousePos_; }
+    Vec2f InputManager::GetMousePosition() const
+    {
+        return mousePos_;
+    }
+
+    Vec2f InputManager::GetMouseScroll() const
+    {
+        return mouseScroll_;
+    }
+
+    float InputManager::GetJoystickAxis(ControllerAxis axis) const
+    {
+        return controllerAxis_[static_cast<unsigned>(axis)];
+    }
 
     bool InputManager::IsMouseButtonDown(MouseButtonCode button) const
     {
@@ -554,15 +541,14 @@ namespace neko::sdl
                 type = "Unknown";
                 break;
             }
-            // TODO (@Nico) Ain't compile on Switch|Release. Must be a problem about string calculation.
-            //LogDebug("       type: " + *type, LogType::INPUT_LOG);
-            //LogDebug("       axes: " + SDL_JoystickNumAxes(joystick), LogType::INPUT_LOG);
-            //LogDebug("      balls: " + SDL_JoystickNumBalls(joystick), LogType::INPUT_LOG);
-            //LogDebug("       hats: " + SDL_JoystickNumHats(joystick), LogType::INPUT_LOG);
-            //LogDebug("    buttons: " + SDL_JoystickNumButtons(joystick), LogType::INPUT_LOG);
-            //LogDebug("instance id: " + SDL_JoystickInstanceID(joystick), LogType::INPUT_LOG);
-            //LogDebug("       guid: " + *guid, LogType::INPUT_LOG);
-            //LogDebug("    VID/PID: " + std::to_string(static_cast<int>(SDL_JoystickGetVendor(joystick))) + ":" + std::to_string(static_cast<int>(SDL_JoystickGetProduct(joystick))), LogType::INPUT_LOG);
+            //std::cout <<"       type: " + *type << '\n';
+            //std::cout <<"       axes: " + SDL_JoystickNumAxes(joystick) << '\n';
+            //std::cout <<"      balls: " + SDL_JoystickNumBalls(joystick) << '\n';
+            //std::cout <<"       hats: " + SDL_JoystickNumHats(joystick) << '\n';
+            //std::cout <<"    buttons: " + SDL_JoystickNumButtons(joystick) << '\n';
+            //std::cout <<"instance id: " + SDL_JoystickInstanceID(joystick) << '\n';
+            //std::cout <<"       guid: " + *guid << '\n';
+            //std::cout <<"    VID/PID: " + std::to_string(static_cast<int>(SDL_JoystickGetVendor(joystick))) + ":" + std::to_string(static_cast<int>(SDL_JoystickGetProduct(joystick))) << '\n';
 
             SDL_JoystickClose(joystick);
         }
@@ -631,7 +617,6 @@ namespace neko::sdl
         case MouseButtonCode::LEFT: return "LeftMouse";
         case MouseButtonCode::RIGHT: return "RightMouse";
         case MouseButtonCode::MIDDLE: return "MiddleMouse";
-        case MouseButtonCode::MOUSE_MAX: return "MouseMax";
         default:
             return "";
         }
@@ -671,28 +656,34 @@ namespace neko::sdl
     std::string InputManager::ControllerInputsEnumToString(const ControllerInputs controller)
     {
         switch (controller) {
-        case ControllerInputs::VERTICAL_LEFT_AXIS: return "Vertical_Left_Stick";
-        case ControllerInputs::HORIZONTAL_LEFT_AXIS: return "Horizontal_Left_Stick";
         case ControllerInputs::PRESS_LEFT_STICK: return "Press_Left_Stick";
-        case ControllerInputs::LEFT_BUMPER: return "Left_Bumper";
         case ControllerInputs::LEFT_TRIGGER: return "Left_Trigger";
-        case ControllerInputs::VERTICAL_RIGHT_AXIS: return "Vertical_Right_stick";
-        case ControllerInputs::HORIZONTAL_RIGHT_AXIS: return "Horizontal_Right_Stick";
         case ControllerInputs::PRESS_RIGHT_STICK: return "Press_Right_Click";
-        case ControllerInputs::RIGHT_BUMPER: return "Right_Bumper";
         case ControllerInputs::RIGHT_TRIGGER: return "Right_Trigger";
         case ControllerInputs::BUTTON_A: return "Button_A";
         case ControllerInputs::BUTTON_B: return "Button_B";
         case ControllerInputs::BUTTON_X: return "Button_X";
         case ControllerInputs::BUTTON_Y: return "Button_Y";
-        case ControllerInputs::PAD_HORIZONTAL: return "Pad_Horizontal";
-        case ControllerInputs::PAD_VERTICAL: return "Pad_Vertical";
         case ControllerInputs::BUTTON_START: return "Button_Start";
         case ControllerInputs::BUTTON_SELECT: return "Button_Select";
         default: return "";
         }
     }
 
+    std::string InputManager::ControllerAxisEnumToString(const ControllerAxis controller)
+    {
+        switch (controller) {
+        case ControllerAxis::VERTICAL_LEFT_AXIS: return "Vertical_Left_Stick";
+        case ControllerAxis::HORIZONTAL_LEFT_AXIS: return "Horizontal_Left_Stick";
+        case ControllerAxis::LEFT_BUMPER: return "Left_Bumper";
+        case ControllerAxis::VERTICAL_RIGHT_AXIS: return "Vertical_Right_stick";
+        case ControllerAxis::HORIZONTAL_RIGHT_AXIS: return "Horizontal_Right_Stick";
+        case ControllerAxis::RIGHT_BUMPER: return "Right_Bumper";
+        case ControllerAxis::PAD_HORIZONTAL: return "Pad_Horizontal";
+        case ControllerAxis::PAD_VERTICAL: return "Pad_Vertical";
+        default: return "";
+        }
+    }
 
 
 

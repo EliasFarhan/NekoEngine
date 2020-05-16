@@ -274,7 +274,6 @@ namespace neko::sdl
 		LEFT,
 		RIGHT,
 		MIDDLE,
-		MOUSE_MAX,
 		LENGTH
 	};
 
@@ -288,22 +287,31 @@ namespace neko::sdl
 		BUTTON_B = 1,
 		BUTTON_X = 2,
 		BUTTON_Y = 3,
-		LEFT_BUMPER = 4,
-		RIGHT_BUMPER = 5,
+		LEFT_TRIGGER = 4,
+		RIGHT_TRIGGER = 5,
 		BUTTON_SELECT = 6,
 		BUTTON_START = 7,
 		PRESS_LEFT_STICK = 8,
 		PRESS_RIGHT_STICK = 9,
-		HORIZONTAL_LEFT_AXIS = 10,//X AXIS
-		VERTICAL_LEFT_AXIS = 11,//Y AXIS
-		VERTICAL_RIGHT_AXIS = 12,//4th axis
-		HORIZONTAL_RIGHT_AXIS = 13,//5th axis
-		PAD_HORIZONTAL = 14,//6th axis
-		PAD_VERTICAL = 15,//7th axis
-		LEFT_TRIGGER = 16,//9th axis	
-		RIGHT_TRIGGER = 17,//10th axis
 		LENGTH
 	};
+
+	/*
+	 * \b enum of the controller axis
+	 */
+	enum class ControllerAxis : uint8_t
+	{
+		HORIZONTAL_LEFT_AXIS = 0,
+		VERTICAL_LEFT_AXIS = 1,
+		LEFT_BUMPER = 2,
+		HORIZONTAL_RIGHT_AXIS = 3,
+		VERTICAL_RIGHT_AXIS = 4,
+		RIGHT_BUMPER = 5,
+		PAD_HORIZONTAL = 6,
+		PAD_VERTICAL = 7,
+		LENGTH
+	};
+
 	/*
 	 * \b enum all the button on a switch controller
 	 */
@@ -368,11 +376,17 @@ namespace neko::sdl
 
 		virtual void Init() = 0;
 
-		//virtual void BindFromJson() = 0;
+		virtual void BindFromJson() = 0;
 
 		virtual void OnPreUserInput() = 0;
 
 		virtual void ProccesInputs(SDL_Event event) = 0;
+
+		virtual Vec2f GetMousePosition() const = 0;
+
+		virtual Vec2f GetMouseScroll() const = 0;
+
+		virtual float GetJoystickAxis(ControllerAxis axis) const = 0;
 
 		/**
 		 * \brief Check if a key input is pressed down
@@ -388,8 +402,6 @@ namespace neko::sdl
 		 * \brief Check if a key input is held
 		 */
 		virtual bool IsKeyHeld(KeyCode key) const = 0;
-
-		virtual Vec2f GetMousePosition() const = 0;
 
 		/**
 		 * \brief Check if a mouse button is pressed down
@@ -471,6 +483,8 @@ namespace neko::sdl
 		*/
 		virtual std::string ControllerInputsEnumToString(ControllerInputs controller) = 0;
 
+		virtual std::string ControllerAxisEnumToString(const ControllerAxis controller) = 0;
+
 
 	};
 	/**
@@ -484,11 +498,17 @@ namespace neko::sdl
 
 		 void Init() override;
 
-		 //void BindFromJson() override;
+		 void BindFromJson() override;
 
 		 void OnPreUserInput() override;
 
 		 void ProccesInputs(SDL_Event event) override;
+
+		 Vec2f GetMousePosition() const override;
+
+		 Vec2f GetMouseScroll() const override;
+
+		 float GetJoystickAxis(ControllerAxis axis) const override;
 
 		 bool IsKeyDown(KeyCode key) const override;
 
@@ -507,8 +527,6 @@ namespace neko::sdl
 		 bool IsControllerUp(ControllerInputs key) const override;
 
 		 bool IsControllerHeld(ControllerInputs key) const override;
-
-		 Vec2f GetMousePosition() const override;
 
 		 bool IsMouseButtonDown(MouseButtonCode button) const override;
 
@@ -532,6 +550,7 @@ namespace neko::sdl
 		 std::string SwitchInputsEnumToString(SwitchInputs switchInputs) override;
 
 		 std::string ControllerInputsEnumToString(ControllerInputs controller) override;
+		 std::string ControllerAxisEnumToString(const ControllerAxis controller) override;
 
 	 protected:
 		 std::vector<int> bindingPcInput_ =
@@ -544,15 +563,18 @@ namespace neko::sdl
 		 std::vector<ButtonState> keyPressedState_ =
 			 std::vector<ButtonState>(static_cast<int>(KeyCode::KEYBOARD_SIZE));
 		 std::vector<ButtonState> buttonState_ =
-			 std::vector<ButtonState>(static_cast<int>(MouseButtonCode::MOUSE_MAX));
+			 std::vector<ButtonState>(static_cast<int>(MouseButtonCode::LENGTH));
 		 std::vector<ButtonState> switchButtonState_ =
 			 std::vector<ButtonState>(static_cast<int>(SwitchInputs::LENGTH));
 		 std::vector<ButtonState> controllerButtonState_ =
 			 std::vector<ButtonState>(static_cast<int>(ControllerInputs::LENGTH));
+		 std::vector<float> controllerAxis_ =
+			 std::vector<float>(static_cast<int>(ControllerAxis::LENGTH));
 
 		 const uint8_t* keyboard_;
 		 uint32_t mouse_;
-		 Vec2f mousePos_;
+		 Vec2f mousePos_ = Vec2f::zero;
+		 Vec2f mouseScroll_ = Vec2f::zero;
 
 		 SDL_Joystick* joystick_{};
 		 SDL_GameController* controller_{};
@@ -572,9 +594,17 @@ namespace neko::sdl
 
 		 void Init() override {}
 
+		 void BindFromJson() override {}
+
 		 void OnPreUserInput() {};
 
 		 void ProccesInputs(SDL_Event event) override {}
+
+		 Vec2f GetMousePosition() const override { return Vec2f(0.0f, 0.0f); }
+
+		 Vec2f GetMouseScroll() const override { return Vec2f(0.0f, 0.0f); }
+
+		 float GetJoystickAxis(ControllerAxis axis) const override { return 0.0f; }
 
 		 bool IsKeyDown(KeyCode key) const override
 		 {
@@ -594,7 +624,6 @@ namespace neko::sdl
 			 return false;
 		 }
 
-		 Vec2f GetMousePosition() const override { return Vec2f(0, 0); }
 
 		 bool IsMouseButtonDown(MouseButtonCode button) const override
 		 {
@@ -710,6 +739,14 @@ namespace neko::sdl
 			 return "";
 		 }
 
+		 /**
+		 * \brief translate ControllerInputs enum to string
+		 */
+		 std::string ControllerAxisEnumToString(const ControllerAxis controller) override
+		 {
+			 controller;
+			 return "";
+		 }
 	 };
 
 	 using InputLocator = Locator<IInputManager, NullInputManager>;
