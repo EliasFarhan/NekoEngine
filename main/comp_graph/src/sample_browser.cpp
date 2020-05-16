@@ -28,7 +28,7 @@ void SampleBrowser::Update(seconds dt)
 {
     programs_[currentProgramIndex_]->Update(dt);
     RendererLocator::get().Render(programs_[currentProgramIndex_].get());
-    
+    if ()
 }
 
 void SampleBrowser::Destroy()

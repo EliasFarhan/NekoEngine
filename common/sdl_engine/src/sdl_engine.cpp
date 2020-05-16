@@ -41,7 +41,7 @@
 
 namespace neko::sdl
 {
-SdlEngine::SdlEngine(Configuration* config) : BasicEngine(config)
+SdlEngine::SdlEngine(Configuration* config) : BasicEngine(config), inputManager_(*this)
 {
 }
 
@@ -90,6 +90,7 @@ void SdlEngine::ManageEvent()
             {
                 config.windowSize = Vec2u(event.window.data1, event.window.data2);
                 window_->OnResize(config.windowSize);
+                inputManager_.ProccesInputs(event);
             }
         }
     }
