@@ -54,9 +54,9 @@ struct Configuration
 #if defined(EMSCRIPTEN)
     std::string dataRootPath = "./";
 #elif defined(__ANDROID__)
-    std::string dataRootPath = "";
+    std::string dataRootPath = "data/";
 #else
-    std::string dataRootPath = "../../";
+    std::string dataRootPath = "../../data/";
 #endif
 };
 

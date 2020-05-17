@@ -16,24 +16,24 @@ void HelloLightCastersProgram::Init()
 	}
 
 	const auto& config = BasicEngine::GetInstance()->config;
-	containerDiffuse_ = gl::stbCreateTexture(config.dataRootPath + "data/material/container2.png");
-	containerSpecular_ = gl::stbCreateTexture(config.dataRootPath + "data/material/container2_specular.png");
+	containerDiffuse_ = gl::stbCreateTexture(config.dataRootPath + "material/container2.png");
+	containerSpecular_ = gl::stbCreateTexture(config.dataRootPath + "material/container2_specular.png");
 	containerShaders_[0].LoadFromFile(
-		config.dataRootPath + "data/shaders/09_hello_lightcasters/container.vert",
-		config.dataRootPath + "data/shaders/09_hello_lightcasters/container_directional.frag");
+		config.dataRootPath + "shaders/09_hello_lightcasters/container.vert",
+		config.dataRootPath + "shaders/09_hello_lightcasters/container_directional.frag");
 	containerShaders_[1].LoadFromFile(
-		config.dataRootPath + "data/shaders/09_hello_lightcasters/container.vert",
-		config.dataRootPath + "data/shaders/09_hello_lightcasters/container_point.frag");
+		config.dataRootPath + "shaders/09_hello_lightcasters/container.vert",
+		config.dataRootPath + "shaders/09_hello_lightcasters/container_point.frag");
 	containerShaders_[2].LoadFromFile(
-		config.dataRootPath + "data/shaders/09_hello_lightcasters/container.vert",
-		config.dataRootPath + "data/shaders/09_hello_lightcasters/container_flash.frag");
+		config.dataRootPath + "shaders/09_hello_lightcasters/container.vert",
+		config.dataRootPath + "shaders/09_hello_lightcasters/container_flash.frag");
 	containerShaders_[3].LoadFromFile(
-		config.dataRootPath + "data/shaders/09_hello_lightcasters/container.vert",
-		config.dataRootPath + "data/shaders/09_hello_lightcasters/container_spot.frag");
+		config.dataRootPath + "shaders/09_hello_lightcasters/container.vert",
+		config.dataRootPath + "shaders/09_hello_lightcasters/container_spot.frag");
 
 	lampShader_.LoadFromFile(
-		config.dataRootPath + "data/shaders/07_hello_light/lamp.vert",
-		config.dataRootPath + "data/shaders/07_hello_light/lamp.frag"
+		config.dataRootPath + "shaders/07_hello_light/lamp.vert",
+		config.dataRootPath + "shaders/07_hello_light/lamp.frag"
 	);
 	cube_.Init();
 	camera_.Init();

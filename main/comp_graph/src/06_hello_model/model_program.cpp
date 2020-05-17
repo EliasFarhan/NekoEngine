@@ -9,12 +9,12 @@ void HelloModelProgram::Init()
 {
 	const auto& config = BasicEngine::GetInstance()->config;
 
-	const std::string path = config.dataRootPath + "data/model/nanosuit2/nanosuit.obj";
+	const std::string path = config.dataRootPath + "model/nanosuit2/nanosuit.obj";
 	model_.LoadModel(path);
 	camera_.Init();
 	shader_.LoadFromFile(
-		config.dataRootPath + "data/shaders/06_hello_model/model.vert",
-		config.dataRootPath + "data/shaders/06_hello_model/model.frag");
+		config.dataRootPath + "shaders/06_hello_model/model.vert",
+		config.dataRootPath + "shaders/06_hello_model/model.frag");
 
 
 

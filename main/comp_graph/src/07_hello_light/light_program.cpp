@@ -9,11 +9,11 @@ void HelloLightProgram::Init()
 	cube_.Init();
 	const auto config =  BasicEngine::GetInstance()->config;
 	lightShader_.LoadFromFile(
-		config.dataRootPath + "data/shaders/07_hello_light/lamp.vert", 
-		config.dataRootPath + "data/shaders/07_hello_light/lamp.frag");
+		config.dataRootPath + "shaders/07_hello_light/lamp.vert",
+		config.dataRootPath + "shaders/07_hello_light/lamp.frag");
 	phongShader_.LoadFromFile(
-		config.dataRootPath + "data/shaders/07_hello_light/light.vert",
-		config.dataRootPath + "data/shaders/07_hello_light/light.frag");
+		config.dataRootPath + "shaders/07_hello_light/light.vert",
+		config.dataRootPath + "shaders/07_hello_light/light.frag");
 }
 
 void HelloLightProgram::Update(seconds dt)

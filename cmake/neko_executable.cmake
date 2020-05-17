@@ -10,7 +10,7 @@ function(neko_bin_config binary)
                 " -s USE_PTHREADS=1 -O3 -fno-rtti -fno-exceptions -s ASSERTIONS=1 ")
         endif()
         set_target_properties(${binary} PROPERTIES  LINK_FLAGS
-                " -s PTHREAD_POOL_SIZE=4 -Wl,--shared-memory,--no-check-features -s ASSERTIONS=1 -s EXPORT_ALL=1 -s TOTAL_MEMORY=128MB --preload-file ${CMAKE_BINARY_DIR}/data@data/ ")
+                " -s PTHREAD_POOL_SIZE=4 --emrun --shared-memory --no-check-features -Wl,--shared-memory,--no-check-features -s ASSERTIONS=1 -s EXPORT_ALL=1 -s TOTAL_MEMORY=128MB --preload-file ${CMAKE_BINARY_DIR}/data/ ")
         set_target_properties(${binary} PROPERTIES SUFFIX ".html")
     elseif(MSVC)
             set_target_properties(${binary} PROPERTIES COMPILE_FLAGS " /arch:AVX2 /Oi ")
@@ -44,7 +44,7 @@ function(neko_lib_config library)
                 " -s USE_PTHREADS=1 -O3 -fno-rtti -fno-exceptions -s ASSERTIONS=1 ")
         endif()
         set_property(TARGET ${library} APPEND_STRING PROPERTY LINK_FLAGS
-                " -s PTHREAD_POOL_SIZE=4  -s EXPORT_ALL=1 -s TOTAL_MEMORY=128MB -s ASSERTIONS=1 ")
+                " --shared-memory --no-check-features -s PTHREAD_POOL_SIZE=4  -s EXPORT_ALL=1 -s TOTAL_MEMORY=256MB -s ASSERTIONS=1 --emrun ")
         #-Wl,--shared-memory,--no-check-features
     elseif(MSVC)
         set_target_properties(${library} PROPERTIES COMPILE_FLAGS " /arch:AVX2 /Oi ")

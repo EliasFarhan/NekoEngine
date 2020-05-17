@@ -11,8 +11,8 @@ void HelloTriangleProgram::Init()
     const auto& config = BasicEngine::GetInstance()->config;
 
     //Initiliaze Triangle
-    triangleProgram_.shader.LoadFromFile(config.dataRootPath + "data/shaders/01_hello_triangle/hello_pos.vert",
-        config.dataRootPath + "data/shaders/01_hello_triangle/hello_color.frag");
+    triangleProgram_.shader.LoadFromFile(config.dataRootPath + "shaders/01_hello_triangle/hello_pos.vert",
+        config.dataRootPath + "shaders/01_hello_triangle/hello_color.frag");
 
 	glGenVertexArrays(1, &triangleProgram_.VAO);
     // ..:: Initialization code (done once (unless your object frequently changes)) :: ..
@@ -29,8 +29,8 @@ void HelloTriangleProgram::Init()
 
 	
     //Initiliaze VAO shader
-	shader_.LoadFromFile(config.dataRootPath+"data/shaders/01_hello_triangle/hello_triangle.vert",
-                         config.dataRootPath+"data/shaders/01_hello_triangle/hello_triangle.frag");
+	shader_.LoadFromFile(config.dataRootPath+"shaders/01_hello_triangle/hello_triangle.vert",
+                         config.dataRootPath+"shaders/01_hello_triangle/hello_triangle.frag");
 
     //Initialize the VAO program
     glGenBuffers(1, &vaoProgam_.VBO);
@@ -67,8 +67,8 @@ void HelloTriangleProgram::Init()
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(eboProgram_.indices), eboProgram_.indices, GL_STATIC_DRAW);
 
     nekoShader_.LoadFromFile(
-            config.dataRootPath+"data/shaders/01_hello_triangle/hello_neko_quad.vert",
-            config.dataRootPath+"data/shaders/01_hello_triangle/hello_triangle.frag"
+            config.dataRootPath+"shaders/01_hello_triangle/hello_neko_quad.vert",
+            config.dataRootPath+"shaders/01_hello_triangle/hello_triangle.frag"
             );
     quad_.Init();
     circle_.Init();

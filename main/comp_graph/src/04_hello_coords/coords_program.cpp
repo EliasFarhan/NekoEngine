@@ -11,9 +11,9 @@ void HelloCoordsProgram::Init()
 {
     const auto& config = BasicEngine::GetInstance()->config;
     shader_.LoadFromFile(
-            config.dataRootPath+"data/shaders/04_hello_coords/coords.vert",
-            config.dataRootPath+"data/shaders/04_hello_coords/coords.frag");
-    textureWall_ = gl::stbCreateTexture(config.dataRootPath+"data/sprites/wall.jpg");
+            config.dataRootPath+"shaders/04_hello_coords/coords.vert",
+            config.dataRootPath+"shaders/04_hello_coords/coords.frag");
+    textureWall_ = gl::stbCreateTexture(config.dataRootPath+"sprites/wall.jpg");
     cube_.Init();
 
     // note that we're translating the scene in the reverse direction of where we want to move
