@@ -33,10 +33,12 @@
 
 #include "engine/system.h"
 #include "engine/log.h"
+#include "engine/jobsystem.h"
 
 namespace neko
 {
-class Window;
+	class Job;
+	class Window;
 const size_t MAX_COMMAND_NMB = 8'192;
 
 
@@ -64,6 +66,7 @@ class RendererInterface
 {
 public:
     virtual void Render(RenderCommandInterface* command) = 0;
+    virtual void AddPreRenderJob(Job* job) = 0;
 };
 
 class NullRenderer final : public RendererInterface
@@ -71,6 +74,7 @@ class NullRenderer final : public RendererInterface
 public:
     void Render([[maybe_unused]]RenderCommandInterface* command) override
     {};
+	void AddPreRenderJob([[maybe_unused]] Job* job) override {}
 };
 
 class Renderer : public RendererInterface
@@ -94,22 +98,39 @@ public:
      */
     void Render(RenderCommandInterface* command) override;
 
-    /**
-     * \brief Called from Engine Loop to sync with the Render Loop
-     */
-    void Sync();
 
-    virtual void RenderAll();
 
     void Destroy();
 
     void SetFlag(RendererFlag flag);
     void SetWindow(Window* window);
 
+	void AddPreRenderJob(Job* job) override;
+
     virtual void ClearScreen() = 0;
+
+
+    void ResetJobs();
+    Job* GetSyncJob() { return &syncJob_; }
+    Job* GetRenderAllJob() { return &renderAllJob_; }
+    void ScheduleJobs();
 protected:
+    /**
+	 * \brief Called from Engine Loop to sync with the Render Loop
+	 */
+    void Sync();
+	/**
+	 * \brief Run the first job in the queue
+	 */
+    void PreRender();
+    virtual void RenderAll();
+	
+    Job renderAllJob_;
+    Job syncJob_{ [this] {Sync(); } };
 
-
+    std::mutex preRenderJobsMutex_;
+    std::vector<Job*> preRenderJobs_;
+	
     virtual void BeforeRenderLoop();
     virtual void AfterRenderLoop();
 

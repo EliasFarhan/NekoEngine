@@ -36,7 +36,20 @@
 
 namespace neko
 {
-Renderer::Renderer()
+Renderer::Renderer() :
+	renderAllJob_( [this]
+	{
+#if defined(__ANDROID__)
+		window_->MakeCurrentContext();
+#endif
+		auto* engine = BasicEngine::GetInstance();
+		PreRender();
+		ClearScreen();
+		engine->GenerateUiFrame();
+		RenderAll();
+		window_->RenderUi();
+	} ),
+	syncJob_([this] {Sync(); })
 {
 	currentCommandBuffer_.reserve(MAX_COMMAND_NMB);
 	nextCommandBuffer_.reserve(MAX_COMMAND_NMB);
@@ -59,6 +72,13 @@ void Renderer::RenderAll()
 	}
 }
 
+void Renderer::ScheduleJobs()
+{
+	auto* engine = BasicEngine::GetInstance();
+	engine->ScheduleJob(&syncJob_, JobThreadType::RENDER_THREAD);
+	engine->ScheduleJob(&renderAllJob_, JobThreadType::RENDER_THREAD);
+}
+
 void Renderer::Sync()
 {
 #ifdef EASY_PROFILE_USE
@@ -68,6 +88,24 @@ void Renderer::Sync()
 	nextCommandBuffer_.clear();
 	//TODO copy all the new transform3d?
 
+}
+
+void Renderer::PreRender()
+{
+	Job* job = nullptr;
+	{
+		std::lock_guard<std::mutex> lock(preRenderJobsMutex_);
+		if (!preRenderJobs_.empty())
+		{
+			job = preRenderJobs_.front();
+			preRenderJobs_.erase(preRenderJobs_.begin());
+		}
+	}
+
+	if(job != nullptr && job->CheckDependenciesStarted())
+	{
+		job->Execute();
+	}
 }
 
 void Renderer::Destroy()
@@ -86,6 +124,18 @@ void Renderer::SetFlag(Renderer::RendererFlag flag)
 void Renderer::SetWindow(Window* window)
 {
 	window_ = window;
+}
+
+void Renderer::AddPreRenderJob(Job* job)
+{
+	std::lock_guard<std::mutex> lock(preRenderJobsMutex_);
+	preRenderJobs_.push_back(job);
+}
+
+void Renderer::ResetJobs()
+{
+	syncJob_.Reset();
+	renderAllJob_.Reset();
 }
 
 void Renderer::BeforeRenderLoop()

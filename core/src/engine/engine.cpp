@@ -80,6 +80,9 @@ void BasicEngine::Update(seconds dt)
 #ifdef EASY_PROFILE_USE
 	EASY_BLOCK("Basic Engine Update");
 #endif
+
+    renderer_->ResetJobs();
+    window_->ResetJobs();
 	
     Job eventJob([this]
     {
@@ -94,39 +97,22 @@ void BasicEngine::Update(seconds dt)
     Job updateJob([this, &dt]{updateAction_.Execute(dt);});
     updateJob.AddDependency(&eventJob);
 
-    Job rendererSyncJob([this]{renderer_->Sync();});
-    updateJob.AddDependency(&rendererSyncJob);
+    Job* rendererSyncJob = renderer_->GetSyncJob();
+    updateJob.AddDependency(rendererSyncJob);
 
-    Job renderJob([this]{
-#ifdef EASY_PROFILE_USE
-        EASY_BLOCK("Render Update");
-#endif
-#if defined(__ANDROID__)
-        window_->MakeCurrentContext();
-#endif
-        renderer_->ClearScreen();
-        GenerateUiFrame();
-        renderer_->RenderAll();
-        window_->RenderUi();
-    });
-    renderJob.AddDependency(&eventJob);
+    Job* renderJob = renderer_->GetRenderAllJob();
+    renderJob->AddDependency(&eventJob);
 
-    Job swapBufferJob([this]{
-       window_->SwapBuffer();
-#if defined(__ANDROID__)
-       window_->LeaveCurrentContext();
-#endif
-    });
-    swapBufferJob.AddDependency(&renderJob);
-    swapBufferJob.AddDependency(&updateJob);
+    Job* swapBufferJob = window_->GetSwapBufferJob();
+    swapBufferJob->AddDependency(renderJob);
+    swapBufferJob->AddDependency(&updateJob);
 
-    jobSystem_.ScheduleJob(&rendererSyncJob, JobThreadType::RENDER_THREAD);
-    jobSystem_.ScheduleJob(&renderJob, JobThreadType::RENDER_THREAD);
-    jobSystem_.ScheduleJob(&swapBufferJob, JobThreadType::RENDER_THREAD);
+    renderer_->ScheduleJobs();
+    jobSystem_.ScheduleJob(swapBufferJob, JobThreadType::RENDER_THREAD);
     jobSystem_.ScheduleJob(&eventJob, JobThreadType::MAIN_THREAD);
     jobSystem_.ScheduleJob(&updateJob, JobThreadType::MAIN_THREAD);
 
-    swapBufferJob.Join();
+    swapBufferJob->Join();
 }
 
 void BasicEngine::Destroy()

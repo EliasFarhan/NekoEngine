@@ -2,10 +2,15 @@
 // Created by efarhan on 07.05.20.
 //
 
+#include "graphics/graphics.h"
 #include "graphics/texture.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include "engine/engine.h"
+
+#ifdef EASY_PROFILE_USE
+#include "easy/profiler.h"
+#endif
 
 namespace neko
 {
@@ -13,17 +18,30 @@ namespace neko
 
 Image StbImageConvert(BufferFile imageFile)
 {
-
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("Convert Image");
+#endif
     Image image;
     image.data = stbi_load_from_memory((unsigned char*) (imageFile.dataBuffer),
                                        imageFile.dataLength, &image.width, &image.height, &image.nbChannels, 0);
     return image;
-
-
 }
-Texture::Texture() : convertImage_([this]{image_ = StbImageConvert(diskLoadJob_.GetBufferFile());})
+Texture::Texture() :
+	convertImage_([this]
+	{
+		image_ = StbImageConvert(diskLoadJob_.GetBufferFile());
+		diskLoadJob_.GetBufferFile().Destroy();
+        RendererLocator::get().AddPreRenderJob(&uploadToGpuJob_);
+	}),
+    uploadToGpuJob_([this]
+    {
+#ifdef EASY_PROFILE_USE
+            EASY_BLOCK("Create GPU Texture");
+#endif
+	    CreateTexture();
+    })
 {
-    convertImage_.AddDependency(&diskLoadJob_);
+	convertImage_.AddDependency(&diskLoadJob_);
 }
 
 void Texture::LoadFromDisk()
@@ -32,12 +50,11 @@ void Texture::LoadFromDisk()
     BasicEngine::GetInstance()->ScheduleJob(&convertImage_, JobThreadType::RESOURCE_THREAD);
 }
 
-
-
-bool Texture::IsLoaded()
+bool Texture::IsLoaded() const
 {
-    return convertImage_.IsDone();
+    return uploadToGpuJob_.IsDone();
 }
+
 
 void Texture::SetPath(std::string_view path)
 {
@@ -46,11 +63,24 @@ void Texture::SetPath(std::string_view path)
 
 void Texture::FreeImage()
 {
-    stbi_image_free(image_.data);
+    image_.Destroy();
+}
+
+TextureManager::TextureManager()
+{
+}
+
+void TextureManager::Destroy()
+{
+    textureIndexMap_.clear();
+    currentIndex_ = 0;
 }
 
 void Image::Destroy()
 {
     stbi_image_free(data);
+    data = nullptr;
+    height = -1;
+    width = -1;
 }
 }

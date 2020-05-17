@@ -18,7 +18,10 @@ void HelloTextureProgram::Init()
     quad_.Init();
 
     const auto texturePath = config.dataRootPath + "sprites/wall.jpg";
-    textureId_ = neko::gl::stbCreateTexture(texturePath);
+    textureId_ = INVALID_TEXTURE_ID;
+    auto& textureManager = TextureManagerLocator::get();
+    textureIndex_ = textureManager.LoadTexture(texturePath);
+	//textureId_ = neko::gl::stbCreateTexture(texturePath);
 
     glEnable(GL_DEPTH_TEST);
 }
@@ -40,6 +43,15 @@ void HelloTextureProgram::Render()
 {
     if(shader_.GetProgram() == 0)
         return;
+	if(textureId_ == INVALID_TEXTURE_ID)
+	{
+        auto& textureManager = TextureManagerLocator::get();
+        textureId_ = textureManager.GetTextureId(textureIndex_);
+	}
+	if(textureId_ == INVALID_TEXTURE_ID)
+	{
+        return;
+	}
     shader_.Bind();
     shader_.SetInt("ourTexture", 0);
     glActiveTexture(GL_TEXTURE0);

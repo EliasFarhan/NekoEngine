@@ -71,6 +71,9 @@ public:
     bool IsDone() const;
     void AddDependency(const Job* dep);
 
+    std::function<void()> GetTask() const { return task_; }
+    void Reset();
+
 protected:
     std::vector<const Job*> dependencies_;
     std::function<void()> task_;

@@ -11,7 +11,7 @@
 namespace neko::gl
 {
 
-unsigned stbCreateTexture(const std::string_view filename, TextureFlags flags)
+TextureId stbCreateTexture(const std::string_view filename, Texture::TextureFlags flags)
 {
     const std::string extension = GetFilenameExtension(filename);
     if (!FileExists(filename))
@@ -49,17 +49,17 @@ unsigned stbCreateTexture(const std::string_view filename, TextureFlags flags)
     glGenTextures(1, &texture);
 
     glBindTexture(GL_TEXTURE_2D, texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, flags & CLAMP_WRAP ? GL_CLAMP_TO_EDGE : GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, flags & CLAMP_WRAP ? GL_CLAMP_TO_EDGE : GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, flags & SMOOTH_TEXTURE ? GL_LINEAR : GL_NEAREST);
-    if (flags & MIPMAPS_TEXTURE)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, flags & Texture::CLAMP_WRAP ? GL_CLAMP_TO_EDGE : GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, flags & Texture::CLAMP_WRAP ? GL_CLAMP_TO_EDGE : GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, flags & Texture::SMOOTH_TEXTURE ? GL_LINEAR : GL_NEAREST);
+    if (flags & Texture::MIPMAPS_TEXTURE)
     {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-                        flags & SMOOTH_TEXTURE ? GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_LINEAR);
+                        flags & Texture::SMOOTH_TEXTURE ? GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_LINEAR);
     }
     else
     {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, flags & SMOOTH_TEXTURE ? GL_LINEAR : GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, flags & Texture::SMOOTH_TEXTURE ? GL_LINEAR : GL_NEAREST);
     }
     if (extension == ".jpg" || extension == ".tga")
     {
@@ -73,7 +73,7 @@ unsigned stbCreateTexture(const std::string_view filename, TextureFlags flags)
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, image.width, image.height, 0, GL_RGB, GL_FLOAT, image.data);
     }
-    if (flags & MIPMAPS_TEXTURE)
+    if (flags & Texture::MIPMAPS_TEXTURE)
     {
         glGenerateMipmap(GL_TEXTURE_2D);
     }
@@ -86,44 +86,43 @@ void DestroyTexture(TextureId textureId)
     glDeleteTextures(1, &textureId);
 }
 
-TextureId CreateTexture(Image image, TextureFlags flags)
+void Texture::CreateTexture()
 {
-    unsigned int texture;
-    glGenTextures(1, &texture);
+    glGenTextures(1, &textureId_);
 
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, flags & CLAMP_WRAP ? GL_CLAMP_TO_EDGE : GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, flags & CLAMP_WRAP ? GL_CLAMP_TO_EDGE : GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, flags & SMOOTH_TEXTURE ? GL_LINEAR : GL_NEAREST);
-    if (flags & MIPMAPS_TEXTURE)
+    glBindTexture(GL_TEXTURE_2D, textureId_);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, flags_ & CLAMP_WRAP ? GL_CLAMP_TO_EDGE : GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, flags_ & CLAMP_WRAP ? GL_CLAMP_TO_EDGE : GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, flags_ & SMOOTH_TEXTURE ? GL_LINEAR : GL_NEAREST);
+    if (flags_ & MIPMAPS_TEXTURE)
     {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-                        flags & SMOOTH_TEXTURE ? GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_LINEAR);
+                        flags_ & SMOOTH_TEXTURE ? GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_LINEAR);
     }
     else
     {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, flags & SMOOTH_TEXTURE ? GL_LINEAR : GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, flags_ & SMOOTH_TEXTURE ? GL_LINEAR : GL_NEAREST);
     }
-    switch (image.nbChannels)
+    switch (image_.nbChannels)
     {
         case 1:
         {
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, image.width, image.height, 0, GL_R8, GL_UNSIGNED_BYTE, image.data);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, image_.width, image_.height, 0, GL_R8, GL_UNSIGNED_BYTE, image_.data);
             break;
         }
         case 2:
         {
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RG, image.width, image.height, 0, GL_RG, GL_UNSIGNED_BYTE, image.data);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RG, image_.width, image_.height, 0, GL_RG, GL_UNSIGNED_BYTE, image_.data);
             break;
         }
         case 3:
         {
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image.width, image.height, 0, GL_RGB, GL_UNSIGNED_BYTE, image.data);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image_.width, image_.height, 0, GL_RGB, GL_UNSIGNED_BYTE, image_.data);
             break;
         }
         case 4:
         {
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.width, image.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.data);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_.width, image_.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_.data);
             break;
         }
         default:
@@ -134,21 +133,65 @@ TextureId CreateTexture(Image image, TextureFlags flags)
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, data);
     }*/
-    if (flags & MIPMAPS_TEXTURE)
+    if (flags_ & MIPMAPS_TEXTURE)
     {
         glGenerateMipmap(GL_TEXTURE_2D);
     }
-    return texture;
-}
-
-void Texture::LoadTextureToGpu()
-{
-    textureId_ = CreateTexture(image_, flags_);
+    
 }
 
 void Texture::Destroy()
 {
     DestroyTexture(textureId_);
+}
+
+
+TextureManager::TextureManager()
+{
+}
+
+TextureIndex TextureManager::LoadTexture(std::string_view path)
+{
+    const auto it = textureIndexMap_.find(path.data());
+    if (it != textureIndexMap_.end())
+    {
+        return it->second;
+    }
+
+    if (!FileExists(path))
+    {
+        return INVALID_TEXTURE_INDEX;
+    }
+    const auto textureIndex = static_cast<TextureIndex>(textures_.size());
+	textures_.emplace_back(std::make_unique<Texture>());
+    auto* texture = textures_.back().get();
+    texture->SetPath(path);
+    texture->LoadFromDisk();
+    return textureIndex;
+	
+}
+
+void TextureManager::Update(seconds dt)
+{
+	
+}
+
+void TextureManager::Destroy()
+{
+	for(auto& texture : textures_)
+	{
+        texture->Destroy();
+	}
+    neko::TextureManager::Destroy();
+    textures_.clear();
+}
+
+TextureId TextureManager::GetTextureId(TextureIndex index)
+{
+    if (index == INVALID_TEXTURE_INDEX)
+        return INVALID_TEXTURE_ID;
+    auto* texture = textures_[index].get();
+    return texture->GetTextureId();
 }
 }
 

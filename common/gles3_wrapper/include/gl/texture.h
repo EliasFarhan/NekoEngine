@@ -6,32 +6,44 @@
 
 namespace neko::gl
 {
-
-
-enum TextureFlags : unsigned
-{
-    SMOOTH_TEXTURE = 1u << 0u,
-    MIPMAPS_TEXTURE = 1u << 1u,
-    CLAMP_WRAP = 1u << 2u,
-    REPEAT_WRAP = 1u << 3u,
-    MIRROR_REPEAT_WRAP = 1u << 4u,
-
-    DEFAULT = SMOOTH_TEXTURE | MIPMAPS_TEXTURE,
-};
-
 class Texture : public neko::Texture
 {
 public:
+    Texture() : neko::Texture(){}
+    Texture(const Texture&) = delete;
+    enum TextureFlags : unsigned
+    {
+        SMOOTH_TEXTURE = 1u << 0u,
+        MIPMAPS_TEXTURE = 1u << 1u,
+        CLAMP_WRAP = 1u << 2u,
+        REPEAT_WRAP = 1u << 3u,
+        MIRROR_REPEAT_WRAP = 1u << 4u,
+
+        DEFAULT = SMOOTH_TEXTURE | MIPMAPS_TEXTURE,
+    };
     void SetTextureFlags(TextureFlags textureFlags){flags_ = textureFlags;}
-    void LoadTextureToGpu() override;
-
     void Destroy() override;
+protected:
+    void CreateTexture() override;
 
-private:
-    TextureFlags flags_;
+    TextureFlags flags_ = DEFAULT;
 };
 
-TextureId stbCreateTexture(const std::string_view filename, TextureFlags flags = DEFAULT);
+class TextureManager : public neko::TextureManager
+{
+public:
+    TextureManager();
+	TextureIndex LoadTexture(std::string_view path) override;
+
+	void Update(seconds dt) override;
+	void Destroy() override;
+
+	TextureId GetTextureId(TextureIndex index) override;
+protected:
+    std::vector<std::unique_ptr<Texture>> textures_;
+};
+
+TextureId stbCreateTexture(const std::string_view filename, Texture::TextureFlags flags = Texture::DEFAULT);
 
 void DestroyTexture(TextureId);
 

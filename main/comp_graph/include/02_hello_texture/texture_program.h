@@ -28,5 +28,6 @@ private:
     gl::Shader shader_;
 
     TextureId textureId_ = 0u;
+    TextureIndex textureIndex_ = INVALID_TEXTURE_INDEX;
 };
 }

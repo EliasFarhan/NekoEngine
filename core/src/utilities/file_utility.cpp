@@ -140,7 +140,13 @@ namespace fs = std::filesystem;
 
 namespace neko
 {
-ResourceJob::ResourceJob() : Job([this]{bufferFile_.Load(filePath_);})
+ResourceJob::ResourceJob() : Job([this]
+{
+#ifdef EASY_PROFILE_USE
+		EASY_BLOCK("Load Resource");
+#endif
+	bufferFile_.Load(filePath_);
+})
 {
 }
 

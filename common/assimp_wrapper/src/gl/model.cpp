@@ -26,6 +26,7 @@ namespace neko::assimp
 	void Model::LoadModel(std::string_view path)
 	{
 		Assimp::Importer import;
+		//assimp delete automatically the IO System
 		NekoIOSystem* ioSystem = new NekoIOSystem();
 		import.SetIOHandler(ioSystem);
 		

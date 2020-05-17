@@ -1,16 +1,22 @@
 #pragma once
 
 #include <engine/resource.h>
+#include <xxhash.hpp>
+#include <utilities/service_locator.h>
 
 namespace neko
 {
 
 using TextureId = std::uint32_t;
+const TextureId INVALID_TEXTURE_ID = 0;
+using TextureIndex = std::uint32_t;
+const TextureIndex INVALID_TEXTURE_INDEX = std::numeric_limits<TextureIndex>::max();
+using TexturePathHash = xxh::hash32_t;
 struct Image
 {
-    unsigned char* data;
-    int width, height;
-    int nbChannels;
+    unsigned char* data = nullptr;
+    int width = -1, height = -1;
+    int nbChannels = 0;
     void Destroy();
 };
 
@@ -29,24 +35,54 @@ public:
      * \brief This function schedules the resource load from disk and the image conversion
      */
     void LoadFromDisk();
-    bool IsLoaded();
-    /**
-     * \brief This function needs to be called on the Render Thread
-     */
-    virtual void LoadTextureToGpu() = 0;
+	/**
+	 * \brief This function is called if the file was loaded
+	 */
+    bool IsLoaded() const;
 
     void FreeImage();
 
-    TextureId GetTextureId(){return textureId_;};
+    TextureId GetTextureId() const { return textureId_;};
 protected:
+    virtual void CreateTexture() = 0;
+    Job uploadToGpuJob_;
     Job convertImage_;
     ResourceJob diskLoadJob_;
     Image image_;
     TextureId textureId_ = 0;
 };
-template <class T>
-class TextureManager : public ResourceManager<T>
-{
 
+class TextureManagerInterface
+{
+public:
+    virtual TextureIndex LoadTexture(std::string_view path) = 0;
+    virtual TextureId GetTextureId(TextureIndex index) = 0;
 };
+
+class NullTextureManager : public TextureManagerInterface
+{
+public:
+    TextureIndex LoadTexture([[maybe_unused]] std::string_view path) override
+    {
+	    return INVALID_TEXTURE_INDEX;
+    }
+    TextureId GetTextureId([[maybe_unused]] TextureIndex index) override
+    {
+	    return INVALID_TEXTURE_ID;
+    }
+};
+	
+class TextureManager : public SystemInterface, public TextureManagerInterface
+{
+public:
+    TextureManager();
+	void Init() override {}
+    void Destroy() override;
+protected:
+    TextureIndex currentIndex_ = 0;
+    std::unordered_map<std::string, TextureIndex> textureIndexMap_;
+};
+
+using TextureManagerLocator = Locator<TextureManagerInterface, NullTextureManager>;
+
 }

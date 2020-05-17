@@ -14,3 +14,7 @@
 
 #include <cmath>
 #include <imgui.h>
+
+#ifdef EASY_PROFILE_USE
+#include "easy/profiler.h"
+#endif

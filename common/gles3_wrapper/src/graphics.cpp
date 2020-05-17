@@ -1,11 +1,16 @@
 #include "gl/graphics.h"
-
+#include "graphics/texture.h"
 #include "gl/gles3_include.h"
+
 #ifdef EASY_PROFILE_USE
 #include "easy/profiler.h"
 #endif
 namespace neko::gl
 {
+Gles3Renderer::Gles3Renderer() : Renderer(), textureManager_()
+{
+    TextureManagerLocator::provide(&textureManager_);
+}
 
 void Gles3Renderer::ClearScreen()
 {

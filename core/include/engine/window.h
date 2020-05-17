@@ -24,12 +24,23 @@
  */
 #include "engine/system.h"
 #include "mathematics/vector.h"
+#include "engine/jobsystem.h"
 
 namespace neko
 {
 class Window : public SystemInterface
 {
 public:
+    Window() : swapBufferJob_([this]
+    {
+        SwapBuffer();
+#if defined(__ANDROID__)
+        window_->LeaveCurrentContext();
+#endif
+    })
+    {
+	    
+    }
     virtual void GenerateUiFrame() = 0;
     /**
      * \brief Called at the end of a graphics frame to switch the double
@@ -40,11 +51,17 @@ public:
      */
     virtual void RenderUi() = 0;
     virtual void OnResize(Vec2u newWindowSize) = 0;
+
+    Job* GetSwapBufferJob() { return &swapBufferJob_; }
     /**
      * \brief Called by a render thread to take ownership of the context, typically used in OpenGL
      */
-
-    virtual void MakeCurrentContext() {};
+    virtual void MakeCurrentContext() {}
+    void ResetJobs() { swapBufferJob_.Reset(); }
     virtual void LeaveCurrentContext() {};
+protected:
+    Job swapBufferJob_;
 };
+
+
 }
