@@ -17,8 +17,6 @@ public:
 
     void AfterRenderLoop() override;
 
-protected:
-    TextureManager textureManager_;
 };
 
 }

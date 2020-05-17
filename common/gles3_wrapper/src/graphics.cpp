@@ -7,9 +7,8 @@
 #endif
 namespace neko::gl
 {
-Gles3Renderer::Gles3Renderer() : Renderer(), textureManager_()
+Gles3Renderer::Gles3Renderer() : Renderer()
 {
-    TextureManagerLocator::provide(&textureManager_);
 }
 
 void Gles3Renderer::ClearScreen()

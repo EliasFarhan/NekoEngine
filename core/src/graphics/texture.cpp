@@ -46,8 +46,11 @@ Texture::Texture() :
 
 void Texture::LoadFromDisk()
 {
-    BasicEngine::GetInstance()->ScheduleJob(&diskLoadJob_, JobThreadType::RESOURCE_THREAD);
-    BasicEngine::GetInstance()->ScheduleJob(&convertImage_, JobThreadType::RESOURCE_THREAD);
+    if (textureId_ == INVALID_TEXTURE_ID)
+    {
+        BasicEngine::GetInstance()->ScheduleJob(&diskLoadJob_, JobThreadType::RESOURCE_THREAD);
+        BasicEngine::GetInstance()->ScheduleJob(&convertImage_, JobThreadType::OTHER_THREAD);
+    }
 }
 
 bool Texture::IsLoaded() const

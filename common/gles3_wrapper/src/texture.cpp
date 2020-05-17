@@ -84,6 +84,7 @@ TextureId stbCreateTexture(const std::string_view filename, Texture::TextureFlag
 void DestroyTexture(TextureId textureId)
 {
     glDeleteTextures(1, &textureId);
+    textureId = INVALID_TEXTURE_ID;
 }
 
 void Texture::CreateTexture()
@@ -143,6 +144,7 @@ void Texture::CreateTexture()
 void Texture::Destroy()
 {
     DestroyTexture(textureId_);
+    textureId_ = INVALID_TEXTURE_ID;
 }
 
 
