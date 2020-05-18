@@ -9,6 +9,9 @@
 
 #include "io_system.h"
 
+#ifdef EASY_PROFILE_USE
+#include "easy/profiler.h"
+#endif
 namespace neko::assimp
 {
 	void Model::Draw(const gl::Shader& shader)
@@ -25,6 +28,9 @@ namespace neko::assimp
 
 	void Model::LoadModel(std::string_view path)
 	{
+#ifdef EASY_PROFILE_USE
+		EASY_BLOCK("Load 3d Model");
+#endif
 		Assimp::Importer import;
 		//assimp delete automatically the IO System
 		NekoIOSystem* ioSystem = new NekoIOSystem();
@@ -63,6 +69,9 @@ namespace neko::assimp
 
 	Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene) const
 	{
+#ifdef EASY_PROFILE_USE
+		EASY_BLOCK("Process Mesh");
+#endif
 		std::vector<Vertex> vertices;
 		std::vector<unsigned int> indices;
 		std::vector<Texture> textures;

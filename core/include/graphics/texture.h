@@ -51,7 +51,7 @@ protected:
     Job convertImage_;
     ResourceJob diskLoadJob_;
     Image image_;
-    TextureId textureId_ = 0;
+    TextureId textureId_ = INVALID_TEXTURE_ID;
 };
 
 class TextureManagerInterface

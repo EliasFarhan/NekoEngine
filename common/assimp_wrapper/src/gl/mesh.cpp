@@ -3,7 +3,9 @@
 #include "gl/gles3_include.h"
 
 #include <utility>
-
+#ifdef EASY_PROFILE_USE
+#include "easy/profiler.h"
+#endif
 namespace neko::assimp
 {
 Mesh::Mesh(std::vector<Vertex> vertices, const std::vector<unsigned>& indices,
@@ -59,6 +61,9 @@ void Mesh::Destroy()
 
 void Mesh::SetupMesh()
 {
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("Process Mesh");
+#endif
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);

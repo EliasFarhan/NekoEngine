@@ -7,12 +7,18 @@
 #include <graphics/texture.h>
 #include <engine/engine.h>
 
-
+#ifdef EASY_PROFILE_USE
+#include "easy/profiler.h"
+#endif
 namespace neko::gl
 {
 
 TextureId stbCreateTexture(const std::string_view filename, Texture::TextureFlags flags)
 {
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("Create Texture");
+    EASY_BLOCK("Load From File");
+#endif
     const std::string extension = GetFilenameExtension(filename);
     if (!FileExists(filename))
     {
@@ -29,6 +35,9 @@ TextureId stbCreateTexture(const std::string_view filename, Texture::TextureFlag
         reqComponents = 4;
     BufferFile textureFile;
     textureFile.Load(filename);
+#ifdef EASY_PROFILE_USE
+    EASY_END_BLOCK;
+#endif
     Image image = StbImageConvert(textureFile);
     /*if (extension == ".hdr")
     {
@@ -43,9 +52,12 @@ TextureId stbCreateTexture(const std::string_view filename, Texture::TextureFlag
         std::ostringstream oss;
         oss << "[Error] Texture: cannot load " << filename << "\n";
         logDebug(oss.str());
-        return 0;
+        return INVALID_TEXTURE_ID;
     }
-    unsigned int texture;
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("Push Texture To GPU");
+#endif
+    TextureId texture;
     glGenTextures(1, &texture);
 
     glBindTexture(GL_TEXTURE_2D, texture);

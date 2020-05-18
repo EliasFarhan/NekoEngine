@@ -44,7 +44,9 @@ Java_swiss_sae_gpr5300_MainActivity_load(JNIEnv *env, [[maybe_unused]] jclass cl
 
 namespace neko
 {
-
+/**
+ * \brief Non RAII structure, please Destroy it
+ */
 struct BufferFile
 {
     char* dataBuffer = nullptr;
