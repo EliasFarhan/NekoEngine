@@ -27,21 +27,21 @@ Image StbImageConvert(BufferFile imageFile)
     return image;
 }
 Texture::Texture() :
-	convertImage_([this]
+	uploadToGpuJob_([this]
 	{
-		image_ = StbImageConvert(diskLoadJob_.GetBufferFile());
-		diskLoadJob_.GetBufferFile().Destroy();
-        RendererLocator::get().AddPreRenderJob(&uploadToGpuJob_);
-	}),
-    uploadToGpuJob_([this]
-    {
 #ifdef EASY_PROFILE_USE
             EASY_BLOCK("Create GPU Texture");
 #endif
-	    CreateTexture();
+		CreateTexture();
+	}),
+    convertImage_([this]
+    {
+	    image_ = StbImageConvert(diskLoadJob_.GetBufferFile());
+	    diskLoadJob_.GetBufferFile().Destroy();
+	    RendererLocator::get().AddPreRenderJob(&uploadToGpuJob_);
     })
 {
-	convertImage_.AddDependency(&diskLoadJob_);
+
 }
 
 void Texture::LoadFromDisk()
@@ -49,6 +49,7 @@ void Texture::LoadFromDisk()
     if (textureId_ == INVALID_TEXTURE_ID)
     {
         BasicEngine::GetInstance()->ScheduleJob(&diskLoadJob_, JobThreadType::RESOURCE_THREAD);
+        convertImage_.AddDependency(&diskLoadJob_);
         BasicEngine::GetInstance()->ScheduleJob(&convertImage_, JobThreadType::OTHER_THREAD);
     }
 }
@@ -67,6 +68,13 @@ void Texture::SetPath(std::string_view path)
 void Texture::FreeImage()
 {
     image_.Destroy();
+}
+
+void Texture::Reset()
+{
+    diskLoadJob_.Reset();
+    convertImage_.Reset();
+    uploadToGpuJob_.Reset();
 }
 
 TextureManager::TextureManager()

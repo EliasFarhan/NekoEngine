@@ -217,7 +217,7 @@ void Job::Reset()
 {
     promise_ = std::promise<void>();
     taskDoneFuture_ = promise_.get_future();
-    dependencies_.clear();
     status_ = 0;
+    dependencies_.clear();
 }
 }

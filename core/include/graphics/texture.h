@@ -30,6 +30,7 @@ class Texture
 public:
     Texture();
     virtual void Destroy() = 0;
+	
     void SetPath(std::string_view path);
     /**
      * \brief This function schedules the resource load from disk and the image conversion
@@ -44,6 +45,7 @@ public:
 
     TextureId GetTextureId() const { return textureId_;};
 protected:
+    void Reset();
     virtual void CreateTexture() = 0;
     Job uploadToGpuJob_;
     Job convertImage_;
