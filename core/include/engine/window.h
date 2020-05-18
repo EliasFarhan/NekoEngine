@@ -35,7 +35,7 @@ public:
     {
         SwapBuffer();
 #if defined(__ANDROID__)
-        window_->LeaveCurrentContext();
+        LeaveCurrentContext();
 #endif
     })
     {
