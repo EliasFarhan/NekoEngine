@@ -1,14 +1,12 @@
 #pragma once
 
-#include <comp_graph/sample_program.h>
-#include "gl/shape.h"
-#include "gl/shader.h"
-#include "gl/texture.h"
+#include <input/sample_program.h>
+#include <sdl_engine/sdl_input.h>
 
 namespace neko
 {
 
-class TextureProgram : public SampleProgram
+class InputProgram : public SampleProgram
 {
 public:
     void Init() override;
@@ -24,8 +22,10 @@ public:
     void OnEvent(const SDL_Event& event) override;
 
 private:
-    gl::RenderQuad quad_{Vec3f::zero, Vec2f::one};
-    gl::Shader shader_;
-    gl::TextureId textureId_ = 0u;
+
+    Uint8 key[static_cast<int>(KeyCode::LENGTH)] = { static_cast<int>(InputAction::NONE) };
+    InputManager inputManager_ = InputManager();
+
+    
 };
-}
+};

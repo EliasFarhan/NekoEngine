@@ -24,39 +24,37 @@
  */
 
 #include "engine/engine.h"
-#include "sdl_engine/sdl_window.h"
-#include "graphics/graphics.h"
+#include <sdl_engine/sdl_input.h>
 #include <SDL.h>
-#include <SDL_main.h>
 
 namespace neko::sdl
 {
 
-class SdlEventSystemInterface
-{
-public:
-    virtual void OnEvent(const SDL_Event& event) = 0;
-};
+    class SdlEventSystemInterface
+    {
+    public:
+        virtual void OnEvent(const SDL_Event& event) = 0;
+    };
 
-class SdlEngine : public BasicEngine
-{
-public:
-	explicit SdlEngine(Configuration* config = nullptr);
-	SdlEngine() = delete;
-	void Init() override;
-	void Destroy() override;
+    class SdlEngine : public BasicEngine
+    {
+    public:
+        explicit SdlEngine(Configuration* config = nullptr);
+        SdlEngine() = delete;
+        void Init() override;
+        void Destroy() override;
 
-	void RegisterOnEvent(SdlEventSystemInterface& eventInterface);
+        void RegisterOnEvent(SdlEventSystemInterface& eventInterface);
 
-    void ManageEvent() override;
+        void ManageEvent() override;
 
-    void GenerateUiFrame() override;
+        void GenerateUiFrame() override;
 
-protected:
-    Action<const SDL_Event&> onEventAction_;
+    protected:
+        Action<const SDL_Event&> onEventAction_;
+        InputManager inputManager_;
 
-
-};
+    };
 
 }
 

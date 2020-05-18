@@ -33,13 +33,15 @@
 #include "gl/gles3_window.h"
 #endif
 
+/*
 #ifdef EASY_PROFILE_USE
 #include "easy/profiler.h"
 #endif
+*/
 
 namespace neko::sdl
 {
-SdlEngine::SdlEngine(Configuration* config) : BasicEngine(config)
+SdlEngine::SdlEngine(Configuration* config) : BasicEngine(config), inputManager_(*this)
 {
 }
 
@@ -50,9 +52,11 @@ void SdlEngine::Init()
     EASY_BLOCK("InitSdl");
 #endif
     assert(window_ != nullptr);
-    SDL_Init(SDL_INIT_VIDEO);
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK);
     window_->Init();
     initAction_.Execute();
+    InputLocator::provide(&inputManager_);
+    inputManager_.Init();
 }
 
 void SdlEngine::Destroy()
@@ -67,7 +71,8 @@ void SdlEngine::Destroy()
 
 void SdlEngine::ManageEvent()
 {
-    
+
+    inputManager_.OnPreUserInput();
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("Manage Event");
 #endif
@@ -89,6 +94,7 @@ void SdlEngine::ManageEvent()
                 window_->OnResize(config.windowSize);
             }
         }
+        inputManager_.ProccesInputs(event);
     }
     onEventAction_.Execute(event);
 }
