@@ -62,7 +62,7 @@ void HelloLightProgram::Render()
 	lightShader_.SetMat4("view", view);
 	lightShader_.SetMat4("projection", projection);
    
-	lightShader_.SetVec3("lightColor", Vec3f(1,1,1));
+	lightShader_.SetVec3("lightColor", lightColor_);
 	cube_.Draw();
 	
 	//Render center cube
@@ -71,7 +71,6 @@ void HelloLightProgram::Render()
 	phongShader_.SetMat4("model", model);
 	phongShader_.SetMat4("view", view);
 	phongShader_.SetMat4("projection", projection);
-	phongShader_.SetVec3("lightColor", Vec3f(1, 1, 1));
 	phongShader_.SetVec3("lightPos", lightPos_);
 	phongShader_.SetVec3("viewPos", camera_.position);
 	phongShader_.SetVec3("objectColor", objectColor_);

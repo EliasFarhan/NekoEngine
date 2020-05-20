@@ -26,6 +26,10 @@
 #include <functional>
 #include "engine/log.h"
 
+#ifdef EASY_PROFILE_USE
+#include "easy/profiler.h"
+#endif
+
 #if defined(__ANDROID__)
 #include <jni.h>
 #include <android/asset_manager.h>
@@ -154,6 +158,12 @@ void ResourceJob::SetFilePath(std::string_view path)
 {
     filePath_ = path;
 }
+
+std::string ResourceJob::GetFilePath() const
+{
+	return filePath_;
+}
+
 void BufferFile::Load(std::string_view path)
 {
 	std::ifstream is(path.data(),std::ifstream::binary);

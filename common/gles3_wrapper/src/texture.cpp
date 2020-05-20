@@ -102,8 +102,13 @@ void DestroyTexture(TextureId textureId)
 
 void Texture::CreateTexture()
 {
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("Generate Texture");
+#endif
     glGenTextures(1, &textureId_);
-
+#ifdef EASY_PROFILE_USE
+    EASY_END_BLOCK;
+#endif
     glBindTexture(GL_TEXTURE_2D, textureId_);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, flags_ & CLAMP_WRAP ? GL_CLAMP_TO_EDGE : GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, flags_ & CLAMP_WRAP ? GL_CLAMP_TO_EDGE : GL_REPEAT);
@@ -117,6 +122,9 @@ void Texture::CreateTexture()
     {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, flags_ & SMOOTH_TEXTURE ? GL_LINEAR : GL_NEAREST);
     }
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("Copy Buffer");
+#endif
     switch (image_.nbChannels)
     {
         case 1:
@@ -142,6 +150,9 @@ void Texture::CreateTexture()
         default:
             break;
     }
+#ifdef EASY_PROFILE_USE
+    EASY_END_BLOCK;
+#endif
     //TODO import hdr textures
     /*else if(extension == ".hdr")
     {
@@ -149,6 +160,9 @@ void Texture::CreateTexture()
     }*/
     if (flags_ & MIPMAPS_TEXTURE)
     {
+#ifdef EASY_PROFILE_USE
+        EASY_BLOCK("Generate Mipmaps");
+#endif
         glGenerateMipmap(GL_TEXTURE_2D);
     }
     

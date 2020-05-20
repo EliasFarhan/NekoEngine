@@ -1,8 +1,13 @@
 #pragma once
 #include <vector>
+
+#include "assimp/material.h"
 #include "mathematics/vector.h"
 #include "gl/shader.h"
 #include "gl/texture.h"
+
+struct aiMesh;
+struct aiScene;
 
 namespace neko::assimp
 {
@@ -15,30 +20,40 @@ namespace neko::assimp
 	};
 	struct Texture
 	{
-		TextureId id;
+		Texture() = default;
+		gl::Texture texture;
 		enum class TextureType : std::uint8_t
 		{
 			DIFFUSE,
 			SPECULAR
 		};
-		TextureType type;
+		TextureType type = TextureType::DIFFUSE;
 	};
 	class Mesh
 	{
 	public:
-		std::vector<Vertex> vertices_;
-		std::vector<unsigned int> indices_;
-		std::vector<Texture> textures_;
-		Mesh() = default;
-		Mesh(std::vector<Vertex> vertices, const std::vector<unsigned int>& indices,
-		     std::vector<Texture> textures);
+		Mesh();
 		void Init();
 		void Draw(const gl::Shader& shader);
 
 		void Destroy();
+
+		void ProcessMesh(const aiMesh* mesh, const aiScene* scene,
+			const std::string_view directory);
+		bool IsLoaded() const;
 	protected:
+
+		void LoadMaterialTextures(aiMaterial* material, aiTextureType aiTexture, Texture::TextureType texture,
+			const std::string_view directory);
+		std::vector<Vertex> vertices_;
+		std::vector<unsigned int> indices_;
+		std::vector<Texture> textures_;
+		Job loadMeshToGpu;
 		//  render data
-		unsigned int VAO, VBO, EBO;
+		unsigned int VAO = 0, VBO = 0, EBO = 0;
+		/**
+		 * \brief This function is called on the render thread as a pre-render job
+		 */
 		void SetupMesh();
 	};
 }

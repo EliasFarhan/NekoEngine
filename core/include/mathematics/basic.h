@@ -8,7 +8,7 @@ inline float Abs(float v)
 {
 	return std::abs(v);
 }
-inline bool Equal(float a, float b, float epsilon = 0.00001f)
+inline bool Equal(float a, float b, float epsilon = 0.0000001f)
 {
 	return Abs(a - b) < epsilon;
 }

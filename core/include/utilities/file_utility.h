@@ -61,6 +61,7 @@ class ResourceJob : public Job
 public:
     ResourceJob();
     void SetFilePath(std::string_view path);
+    std::string GetFilePath() const;
     BufferFile GetBufferFile() const {return bufferFile_;}
 private:
     std::string filePath_;

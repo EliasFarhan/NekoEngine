@@ -160,6 +160,7 @@ void Job::Join() const
 
 void Job::Execute()
 {
+
     for (auto& dep : dependencies_)
     {
         if (!dep->IsDone())
@@ -167,6 +168,7 @@ void Job::Execute()
             dep->Join();
         }
     }
+
     status_ |= STARTED;
     task_();
     status_ |= DONE;

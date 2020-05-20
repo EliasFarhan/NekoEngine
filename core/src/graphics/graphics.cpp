@@ -82,7 +82,7 @@ void Renderer::ScheduleJobs()
 void Renderer::Sync()
 {
 #ifdef EASY_PROFILE_USE
-	EASY_BLOCK("SwapRenderCommand");
+	EASY_BLOCK("Swapping Render Command");
 #endif
 	std::swap(currentCommandBuffer_, nextCommandBuffer_);
 	nextCommandBuffer_.clear();
@@ -92,19 +92,36 @@ void Renderer::Sync()
 
 void Renderer::PreRender()
 {
-	Job* job = nullptr;
+	using namespace std::chrono_literals;
+	std::chrono::microseconds availableLoadingTime(4000);
+	while (availableLoadingTime > 0us)
 	{
-		std::lock_guard<std::mutex> lock(preRenderJobsMutex_);
-		if (!preRenderJobs_.empty())
-		{
-			job = preRenderJobs_.front();
-			preRenderJobs_.erase(preRenderJobs_.begin());
-		}
-	}
+		std::chrono::time_point<std::chrono::system_clock> start = 
+			std::chrono::system_clock::now();
 
-	if(job != nullptr && job->CheckDependenciesStarted())
-	{
-		job->Execute();
+
+		Job* job = nullptr;
+		{
+			std::lock_guard<std::mutex> lock(preRenderJobsMutex_);
+			if (!preRenderJobs_.empty())
+			{
+				job = preRenderJobs_.front();
+				preRenderJobs_.erase(preRenderJobs_.begin());
+			}
+		}
+
+		if (job != nullptr && job->CheckDependenciesStarted())
+		{
+			job->Execute();
+		}
+		else
+		{
+			break;
+		}
+
+		std::chrono::time_point<std::chrono::system_clock> end = std::chrono::system_clock::now();
+		const auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+		availableLoadingTime -= duration;
 	}
 }
 

@@ -49,9 +49,9 @@ void HelloTextureProgram::Render()
         return;
 	}
     shader_.Bind();
-    shader_.SetInt("ourTexture", 0);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture_.GetTextureId());
+    shader_.SetInt("ourTexture", 0);//set the texture slot
+    glActiveTexture(GL_TEXTURE0);//activate the texture slot
+    glBindTexture(GL_TEXTURE_2D, texture_.GetTextureId());//bind texture id to texture slot
     quad_.Draw();
 }
 

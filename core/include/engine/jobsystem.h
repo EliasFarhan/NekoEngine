@@ -53,6 +53,26 @@ public:
         DONE = 1u << 1u
     };
     explicit Job(std::function<void()> task);
+    virtual ~Job() = default;
+    Job(const Job&) = delete;
+    Job& operator=(const Job&) = delete;
+    Job(Job&& job) noexcept
+    {
+        promise_ = std::move(job.promise_);
+        dependencies_ = std::move(job.dependencies_);
+        task_ = std::move(job.task_);
+        taskDoneFuture_ = std::move(job.taskDoneFuture_);
+        status_ = job.status_.load();
+    };
+    Job& operator=(Job&& job) noexcept
+    {
+        promise_ = std::move(job.promise_);
+        dependencies_ = std::move(job.dependencies_);
+        task_ = std::move(job.task_);
+        taskDoneFuture_ = std::move(job.taskDoneFuture_);
+        status_ = job.status_.load();
+        return *this;
+    }
     /**
      * \brief Wait for the Job to be done,
      * used when dependencies are not done

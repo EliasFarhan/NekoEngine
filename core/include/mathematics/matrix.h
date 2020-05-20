@@ -72,7 +72,7 @@ public:
 		return Mat3<T>(v);
 	}
 
-	float Determinant() const
+	[[nodiscard]] float Determinant() const
 	{
 		return
 			columns_[0][0] * columns_[1][1] * columns_[2][2] +
@@ -133,7 +133,7 @@ public:
 		return columns_[column];
 	}
 
-	inline Mat4<T> Transpose() const
+	[[nodiscard]] Mat4<T> Transpose() const
 	{
 		std::array<Vec4<T>, 4> v;
 		for (int column = 0; column < 4; column++)
@@ -264,7 +264,7 @@ public:
 		return os;
 	}
 
-	float Determinant() const
+	[[nodiscard]] float Determinant() const
 	{
 		float result = 0.0f;
 		for (int i = 0; i < 4; i++)
@@ -272,17 +272,31 @@ public:
 			const Mat3<T> m = Mat3<T>(std::array<Vec3<T>, 3>
 			{
 				Vec3<T>(&columns_[(i + 1) % 4][1]),
-					Vec3<T>(&columns_[(i + 2) % 4][1]),
-					Vec3<T>(&columns_[(i + 3) % 4][1])
+				Vec3<T>(&columns_[(i + 2) % 4][1]),
+				Vec3<T>(&columns_[(i + 3) % 4][1])
 			});
 			result += (i % 2 == 1 ? -1.0f : 1.0f) * columns_[i][0] * m.Determinant();
 		}
 		return result;
 	}
-	inline Mat4 Inverse() const
+	[[nodiscard]] Mat4 Inverse() const
 	{
 		Mat4 inverse = Zero;
-		const float determinant = Determinant();
+		float determinant = Determinant();
+		/*
+		for (int i = 0; i < 4; i++)
+		{
+			const Mat3<T> sub = Mat3<T>(std::array<Vec3<T>, 3>
+			{
+				Vec3<T>(&columns_[(i + 1) % 4][1]),
+				Vec3<T>(&columns_[(i + 2) % 4][1]),
+				Vec3<T>(&columns_[(i + 3) % 4][1])
+			});
+			const float d = sub.Determinant();
+			inverse[i][0] = (i % 2 == 1 ? -1.0f : 1.0f) * d;
+			determinant += columns_[i][0] * d;
+		}
+		*/
 		if (Equal(determinant, 0.0f))
 			return Zero;
 		//Calculate the cofactor matrix

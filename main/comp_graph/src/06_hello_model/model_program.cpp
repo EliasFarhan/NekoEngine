@@ -47,6 +47,8 @@ void HelloModelProgram::Render()
 	if (shader_.GetProgram() == 0)
 		return;
 	std::lock_guard<std::mutex> lock(updateMutex_);
+	if(!model_.IsLoaded())
+		return;
 	shader_.Bind();
 	shader_.SetMat4("view", camera_.GenerateViewMatrix());
 	shader_.SetMat4("projection", projection_);

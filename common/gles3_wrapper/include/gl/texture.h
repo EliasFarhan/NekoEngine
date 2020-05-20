@@ -10,7 +10,8 @@ class Texture : public neko::Texture
 {
 public:
     Texture() : neko::Texture(){}
-    Texture(const Texture&) = delete;
+
+    Texture(Texture&& tex) = default;
     enum TextureFlags : unsigned
     {
         SMOOTH_TEXTURE = 1u << 0u,

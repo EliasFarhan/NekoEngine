@@ -28,7 +28,9 @@ Image StbImageConvert(BufferFile imageFile);
 class Texture
 {
 public:
-    Texture();
+	virtual ~Texture() = default;
+	Texture();
+    Texture(Texture&& texture) = default;
     virtual void Destroy() = 0;
 	
     void SetPath(std::string_view path);
