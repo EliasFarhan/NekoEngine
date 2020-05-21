@@ -93,7 +93,7 @@ void Renderer::Sync()
 void Renderer::PreRender()
 {
 	using namespace std::chrono_literals;
-	std::chrono::microseconds availableLoadingTime(4000);
+	std::chrono::microseconds availableLoadingTime(8000);
 	while (availableLoadingTime > 0us)
 	{
 		std::chrono::time_point<std::chrono::system_clock> start = 

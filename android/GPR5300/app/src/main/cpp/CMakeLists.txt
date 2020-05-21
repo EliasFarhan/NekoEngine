@@ -30,7 +30,8 @@ find_library( # Sets the name of the path variable.
 find_library(opengl-lib
         GLESv3)
 
-set(NEKO_SRC_DIR ${CMAKE_SOURCE_DIR}/../../../../../../)
+set(NEKO_SRC_DIR "${CMAKE_SOURCE_DIR}/../../../../../../")
+set(EXTERNAL_DIR "${NEKO_SRC_DIR}/externals/")
 
 add_definitions(-DXXH_FORCE_MEMORY_ACCESS=0)
 add_definitions(-DNEKO_GLES3=1)
@@ -50,6 +51,13 @@ SET (ASSIMP_BUILD_GLTF_IMPORTER ON CACHE BOOL "" FORCE)
 include_directories(${NEKO_SRC_DIR}/externals/utilities)
 include_directories(${NEKO_SRC_DIR}/externals/imgui-1.74)
 #SDL_ENGINE
+set(Neko_Profile ON CACHE BOOL "Activate easy profiler")
+if(Neko_Profile)
+    set(EASY_PROFILE_DIR "${EXTERNAL_DIR}/easy_profiler-2.1.0")
+    set(EASY_OPTION_LOG ON CACHE BOOL "Print errors to stderr" FORCE)
+    add_definitions(-DEASY_PROFILE_USE=1)
+    add_subdirectory(${EASY_PROFILE_DIR} ${CMAKE_CURRENT_BINARY_DIR}/easy_profiler)
+endif()
 set(Neko_GLES3 ON CACHE BOOL "Activate OpenGL ES 3.0")
 set(Neko_SDL2 ON CACHE BOOL "Activate SDL2")
 set(Neko_Android ON CACHE BOOL "Android port")

@@ -73,9 +73,9 @@
 # include <mach/clock.h>
 # include <mach/mach.h>
 #endif
-
-#if EASY_OPTION_LOG_ENABLED != 0
 # include <iostream>
+#if EASY_OPTION_LOG_ENABLED != 0
+
 
 # ifndef EASY_ERRORLOG
 #  define EASY_ERRORLOG std::cerr
@@ -1154,6 +1154,7 @@ uint32_t ProfileManager::dumpBlocksToStream(std::ostream& _outputStream, bool _l
 
 uint32_t ProfileManager::dumpBlocksToFile(const char* _filename)
 {
+    std::cout << "DumpBlocks To File: "<<_filename<<'\n';
     EASY_LOGMSG("dumpBlocksToFile(\"" << _filename << "\")...\n");
 
     std::ofstream outputFile(_filename, std::fstream::binary);
