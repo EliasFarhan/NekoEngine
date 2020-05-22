@@ -4,6 +4,7 @@
 #include "engine/transform.h"
 #include "gl/shape.h"
 #include "gl/shader.h"
+#include "sdl_engine/sdl_camera.h"
 
 namespace neko
 {

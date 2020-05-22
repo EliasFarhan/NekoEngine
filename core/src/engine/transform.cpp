@@ -28,6 +28,9 @@
 #include "imgui.h"
 #include "graphics/graphics.h"
 
+#ifdef EASY_PROFILE_USE
+#include "easy/profiler.h"
+#endif
 namespace neko
 {
 
@@ -152,6 +155,9 @@ void Transform3dManager::UpdateDirtyComponent(Entity entity)
 
 void Transform3dManager::Update()
 {
+#ifdef EASY_PROFILE_USE
+	EASY_BLOCK("Update Transform");
+#endif
 	dirtyManager_.UpdateDirtyEntities();
 }
 

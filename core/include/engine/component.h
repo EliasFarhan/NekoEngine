@@ -143,12 +143,12 @@ class DoubleBufferComponentManager :
     public SyncBuffersInterface
 {
 public:
-	explicit DoubleBufferComponentManager(EntityManager& entityManager) :
-		ComponentManager(entityManager)
+	explicit DoubleBufferComponentManager(EntityManager& entityManager):
+		ComponentManager<T, componentType>(entityManager)
 	{
-		
 	}
-    [[nodiscard]] const T& GetCurrentComponent(Entity entity) const
+
+	[[nodiscard]] const T& GetCurrentComponent(Entity entity) const
     {
         return currentComponents_[entity];
     }

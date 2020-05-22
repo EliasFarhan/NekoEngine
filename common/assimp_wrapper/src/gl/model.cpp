@@ -92,7 +92,6 @@ namespace neko::assimp
 #ifdef EASY_PROFILE_USE
 		EASY_BLOCK("Count Meshes");
 #endif
-		size_t meshNmb = 0;
 		std::function<size_t(aiNode*)> countChildren = [&countChildren](aiNode* node)
 		{
 			size_t count = node->mNumMeshes;

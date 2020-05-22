@@ -29,6 +29,7 @@
 #include <engine/window.h>
 #include <engine/engine.h>
 #include "engine/log.h"
+#include "engine/component.h"
 
 #ifdef EASY_PROFILE_USE
 #include "easy/profiler.h"

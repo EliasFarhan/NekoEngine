@@ -24,7 +24,7 @@
  SOFTWARE.
  */
 
-#include <set>
+#include <unordered_map>
 #include <vector>
 #include <engine/globals.h>
 #include <xxhash.hpp>
