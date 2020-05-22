@@ -28,6 +28,7 @@
 #include <engine/entity.h>
 #include <mathematics/matrix.h>
 #include "engine/component.h"
+#include "graphics/graphics.h"
 #include "mathematics/vector.h"
 #include "mathematics/quaternion.h"
 
@@ -37,6 +38,7 @@ namespace neko
 
 class Position2dManager : public ComponentManager<Vec2f, ComponentType::POSITION2D>
 {
+    using ComponentManager::ComponentManager;
 };
 
 class Scale2dManager : public ComponentManager<Vec2f, ComponentType::SCALE2D>
@@ -49,19 +51,19 @@ public:
 
 class Rotation2dManager : public ComponentManager<float, ComponentType::ROTATION2D>
 {
-
+    using ComponentManager::ComponentManager;
 };
 
 
 class Position3dManager : public ComponentManager<Vec3f, ComponentType::POSITION3D>
 {
-
+    using ComponentManager::ComponentManager;
 };
 
 
-class Rotation3dManager : public ComponentManager<Quaternion, ComponentType::ROTATION3D>
+class Rotation3dManager : public ComponentManager<EulerAngles, ComponentType::ROTATION3D>
 {
-
+    using ComponentManager::ComponentManager;
 };
 
 class Scale3dManager : public ComponentManager<Vec3f, ComponentType::SCALE3D>
@@ -79,16 +81,46 @@ protected:
 
 };
 
-class Transform3dManager : public ComponentManager<Mat4f, ComponentType::TRANSFORM3D>
+class Transform3dManager : public DoubleBufferComponentManager<Mat4f, ComponentType::TRANSFORM3D>,
+public OnChangeParentInterface
 {
 public:
-	using ComponentManager::ComponentManager;
-	void UpdateTransform(Entity entity);
+    Transform3dManager(EntityManager& entityManager);
+    void Init();
+    void SetPosition(Entity entity, Vec3f position);
+    void SetScale(Entity entity, Vec3f scale);
+    void SetRotation(Entity entity, EulerAngles angles);
+    [[nodiscard]]Vec3f GetPosition(Entity entity) const;
+    [[nodiscard]] Vec3f GetScale(Entity entity) const;
+    [[nodiscard]] EulerAngles GetAngles(Entity entity) const;
+    void OnChangeParent(Entity entity, Entity newParent, Entity oldParent) override;
+	/**
+	 * \brief This function is called by the Dirty Manager
+	 */
+    void UpdateDirtyComponent(Entity entity) override;
+    void Update();
+	Index AddComponent(Entity entity) override;
 protected:
+
+    void UpdateTransform(Entity entity);
     Position3dManager position3DManager_;
     Scale3dManager scale3DManager_;
     Rotation3dManager rotation3DManager_;
+    DirtyManager dirtyManager_;
 };
+
+class Transform3dViewer : public DrawImGuiInterface
+{
+public:
+    explicit Transform3dViewer(EntityManager& entityManager, Transform3dManager& transform3dManager);
+	void DrawImGui() override;
+    void SetSelectedEntity(Entity selectedEntity) { selectedEntity_ = selectedEntity; };
+protected:
+    Entity selectedEntity_ = INVALID_ENTITY;
+    EntityManager& entityManager_;
+    Transform3dManager& transform3dManager_;
+};
+
 
 
 

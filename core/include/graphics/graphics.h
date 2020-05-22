@@ -34,10 +34,12 @@
 #include "engine/system.h"
 #include "engine/log.h"
 #include "engine/jobsystem.h"
+#include "utilities/action_utility.h"
 
 namespace neko
 {
-	class Job;
+class SyncBuffersInterface;
+class Job;
 	class Window;
 const size_t MAX_COMMAND_NMB = 8'192;
 
@@ -62,11 +64,13 @@ class RenderProgram : public RenderCommandInterface, public SystemInterface
 {
 };
 
+
 class RendererInterface
 {
 public:
     virtual void Render(RenderCommandInterface* command) = 0;
     virtual void AddPreRenderJob(Job* job) = 0;
+    virtual void RegisterSyncBuffersFunction(SyncBuffersInterface* syncBuffersInterface) = 0;
 };
 
 class NullRenderer final : public RendererInterface
@@ -75,6 +79,8 @@ public:
     void Render([[maybe_unused]]RenderCommandInterface* command) override
     {};
 	void AddPreRenderJob([[maybe_unused]] Job* job) override {}
+    void RegisterSyncBuffersFunction([[maybe_unused]] SyncBuffersInterface* syncBuffersInterface) override {}
+
 };
 
 class Renderer : public RendererInterface
@@ -114,25 +120,28 @@ public:
     Job* GetSyncJob() { return &syncJob_; }
     Job* GetRenderAllJob() { return &renderAllJob_; }
     void ScheduleJobs();
+    void RegisterSyncBuffersFunction([[maybe_unused]] SyncBuffersInterface* syncBuffersInterface) override;
 protected:
     /**
 	 * \brief Called from Engine Loop to sync with the Render Loop
 	 */
-    void Sync();
+    void SyncBuffers();
 	/**
 	 * \brief Run the first job in the queue
 	 */
     void PreRender();
     virtual void RenderAll();
+    virtual void BeforeRenderLoop();
+    virtual void AfterRenderLoop();
+
+    Action<> syncBuffersAction_;
 	
     Job renderAllJob_;
-    Job syncJob_{ [this] {Sync(); } };
+    Job syncJob_{ [this] {SyncBuffers(); } };
 
     std::mutex preRenderJobsMutex_;
     std::vector<Job*> preRenderJobs_;
-	
-    virtual void BeforeRenderLoop();
-    virtual void AfterRenderLoop();
+
 
     Window* window_ = nullptr;
 

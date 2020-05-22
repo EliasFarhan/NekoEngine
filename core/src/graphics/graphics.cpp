@@ -49,7 +49,7 @@ Renderer::Renderer() :
 		RenderAll();
 		window_->RenderUi();
 	} ),
-	syncJob_([this] {Sync(); })
+	syncJob_([this] {SyncBuffers(); })
 {
 	currentCommandBuffer_.reserve(MAX_COMMAND_NMB);
 	nextCommandBuffer_.reserve(MAX_COMMAND_NMB);
@@ -79,21 +79,29 @@ void Renderer::ScheduleJobs()
 	engine->ScheduleJob(&renderAllJob_, JobThreadType::RENDER_THREAD);
 }
 
-void Renderer::Sync()
+void Renderer::RegisterSyncBuffersFunction(SyncBuffersInterface* syncBuffersInterface)
+{
+	syncBuffersAction_.RegisterCallback([syncBuffersInterface]
+	{
+		syncBuffersInterface->SyncBuffers();
+	});
+}
+
+void Renderer::SyncBuffers()
 {
 #ifdef EASY_PROFILE_USE
 	EASY_BLOCK("Swapping Render Command");
 #endif
 	std::swap(currentCommandBuffer_, nextCommandBuffer_);
 	nextCommandBuffer_.clear();
-	//TODO copy all the new transform3d?
+	syncBuffersAction_.Execute();
 
 }
 
 void Renderer::PreRender()
 {
 	using namespace std::chrono_literals;
-	std::chrono::microseconds availableLoadingTime(4000);
+	microseconds availableLoadingTime(8000);
 	while (availableLoadingTime > 0us)
 	{
 		std::chrono::time_point<std::chrono::system_clock> start = 
@@ -120,7 +128,7 @@ void Renderer::PreRender()
 		}
 
 		std::chrono::time_point<std::chrono::system_clock> end = std::chrono::system_clock::now();
-		const auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+		const auto duration = std::chrono::duration_cast<microseconds>(end - start);
 		availableLoadingTime -= duration;
 	}
 }

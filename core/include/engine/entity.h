@@ -24,13 +24,16 @@
  SOFTWARE.
  */
 
+#include <set>
 #include <vector>
 #include <engine/globals.h>
 #include <xxhash.hpp>
 #include "utilities/action_utility.h"
+#include "engine/system.h"
 
 namespace neko
 {
+class OnChangeParentInterface;
 /**
  * \brief Entity start at 0 and goes to N
  */
@@ -54,7 +57,7 @@ class ComponentManager;
 /**
  * \brief Used in an Entity-Component-System to store all entities and what components they have
  */
-class EntityManager
+class EntityManager 
 {
 public:
     explicit EntityManager();
@@ -67,17 +70,17 @@ public:
 
     void DestroyEntity(Entity entity);
 
-    bool HasComponent(Entity entity, EntityMask componentType) const;
+    [[nodiscard]] bool HasComponent(Entity entity, EntityMask componentType) const;
 
-    bool IsPrefab(Entity entity) const;
+    [[nodiscard]] bool IsPrefab(Entity entity) const;
 
-    bool EntityExists(Entity entity);
+    [[nodiscard]] bool EntityExists(Entity entity);
 
-    size_t GetEntitiesNmb(EntityMask filterComponents = INVALID_ENTITY_MASK);
+    [[nodiscard]] size_t GetEntitiesNmb(EntityMask filterComponents = INVALID_ENTITY_MASK);
 
-    size_t GetEntitiesSize() const;
+    [[nodiscard]] size_t GetEntitiesSize() const;
 
-    std::vector<Entity> FilterEntities(EntityMask filterComponents = INVALID_ENTITY_MASK) const;
+    [[nodiscard]] std::vector<Entity> FilterEntities(EntityMask filterComponents = INVALID_ENTITY_MASK) const;
 
     void AddComponentType(Entity entity, EntityMask componentType);
 
@@ -87,36 +90,95 @@ public:
 
     void SetEntityNameHash(Entity entity, EntityHash entityHash);
 
-    EntityHash GetEntityNameHash(Entity entity);
+    [[nodiscard]] EntityHash GetEntityNameHash(Entity entity);
 
-    Entity FindEntityByHash(EntityHash entityHash);
+    [[nodiscard]] Entity FindEntityByHash(EntityHash entityHash);
 
-    Entity FindEntityByName(const std::string& entityName);
+    [[nodiscard]] Entity FindEntityByName(const std::string& entityName);
 
     template<typename T, ComponentType componentType>
     void RegisterComponentManager(ComponentManager<T, componentType>& componentManager)
     {
-        updateDirtyEntity.RegisterCallback(
-                [&componentManager](Entity entity) { componentManager.UpdateComponent(entity); });
         onDestroyEntity.RegisterCallback(
                 [&componentManager](Entity entity) { componentManager.DestroyComponent(entity); });
     }
 
-    void AddDirtyEntity(Entity entity);
-
-    void UpdateDirtyEntities();
+    void RegisterOnChangeParent(OnChangeParentInterface* onChangeInterface);
 
     Entity GetEntityParent(Entity entity);
+
+	/**
+	 * \brief Set the entity parent and check if child is not recursive parent.
+	 */
+    bool SetEntityParent(Entity child, Entity parent);
 
     static EntityHash HashEntityName(const std::string& entityName);
 
 private:
     Action<Entity> onDestroyEntity;
-    Action<Entity> updateDirtyEntity;
-    std::vector<Entity> dirtyEntities_;
+    Action<Entity, Entity, Entity> onChangeParent;
     std::vector<Entity> parentEntities_;
     std::vector<EntityMask> entityMaskArray_;
     std::vector<EntityHash> entityHashArray_;
+};
+
+class DirtyManager
+{
+public:
+    explicit DirtyManager(EntityManager& entityManager);
+    void SetDirty(Entity entity);
+
+    void UpdateDirtyEntities();
+	
+    template<typename T, ComponentType componentType>
+    void RegisterComponentManager(ComponentManager<T, componentType>* componentManager)
+    {
+        updateDirtyEntity.RegisterCallback(
+            [componentManager](Entity entity) { componentManager->UpdateDirtyComponent(entity); });
+    }
+	
+private:
+	
+    EntityManager& entityManager_;
+    Action<Entity> updateDirtyEntity;
+    std::vector<Entity> dirtyEntities_;
+};
+
+class OnChangeParentInterface
+{
+public:
+	virtual ~OnChangeParentInterface() = default;
+	virtual void OnChangeParent(Entity entity, Entity newParent, Entity oldParent) = 0;
+};
+
+class EntityHierarchy : public OnChangeParentInterface
+{
+public:
+    explicit EntityHierarchy(EntityManager& entityManager);
+    void OnChangeParent(Entity entity, Entity newParent, Entity oldParent) override;
+    const std::vector<Entity>& GetChildren(Entity entity);
+    [[nodiscard]] bool HasChildren(Entity entity);
+private:
+    EntityManager& entityManager_;
+    std::unordered_map<Entity, std::vector<Entity>> entityHierarchyMap_;
+};
+
+/**
+ * ImGui class that allows to show the active entities and select them
+ */
+class EntityViewer : public DrawImGuiInterface
+{
+public:
+    explicit EntityViewer(EntityManager& entityManager, EntityHierarchy& entityHierarchy);
+    [[nodiscard]] Entity GetSelectedEntity() const { return selectedEntity_; }
+	void DrawImGui() override;
+protected:
+    void DrawEntityHierarchy(neko::Entity entity,
+                             bool draw,
+                             bool destroy);
+    EntityHierarchy& entityHierarchy_;
+    EntityManager& entityManager_;
+    Entity selectedEntity_ = INVALID_ENTITY;
 };
 
 }

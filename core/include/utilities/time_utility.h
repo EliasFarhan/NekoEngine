@@ -31,6 +31,7 @@ namespace neko
 {
     using seconds = std::chrono::duration<float, std::ratio<1,1>>;
     using milliseconds = std::chrono::duration<std::uint32_t, std::ratio<1,1000>>;
+	using microseconds = std::chrono::duration<std::uint32_t, std::ratio<1, 1'000'000>>;
 
 /**
  * \brief simple timer class in second, that needs to be updated with the current delta time of the frame

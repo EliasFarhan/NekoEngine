@@ -47,7 +47,8 @@ public:
 class DrawImGuiInterface
 {
 public:
-    virtual void DrawImGui() = 0;
+	virtual ~DrawImGuiInterface() = default;
+	virtual void DrawImGui() = 0;
 };
 
 }

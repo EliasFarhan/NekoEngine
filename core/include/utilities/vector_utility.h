@@ -15,7 +15,7 @@ void ResizeIfNecessary(std::vector<T>& vector, size_t index, T default_value)
 		}
 		while (futureSize <= index)
 		{
-			futureSize *= 2;
+			futureSize += futureSize/2;
 		}
 		vector.resize(futureSize, default_value);
 	}

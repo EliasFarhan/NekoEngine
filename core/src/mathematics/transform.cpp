@@ -135,30 +135,22 @@ Mat4<float> const RotationMatrixFrom(const EulerAngles cardinalRotation)
 
 
 
-Mat4f const RotationMatrixFrom(const Quaternion& quaternion)
+Mat4f const RotationMatrixFrom(const Quaternion& q)
 {
-    const float x = quaternion.x;
-    const float y = quaternion.y;
-    const float z = quaternion.z;
-    const float w = quaternion.w;
-    const float xx = 2.0f * x * x;
-    const float yy = 2.0f * y * y;
-    const float zz = 2.0f * z * z;
-    const float xy = 2.0f * z * y;
-    const float xz = 2.0f * x * z;
-    const float yz = 2.0f * y * z;
-    const float zw = 2.0f * z * w;
-    const float yw = 2.0f * y * w;
-    const float xw = 2.0f * x * w;
+    const Mat4f left = Mat4f(std::array<Vec4f, 4>{
+        Vec4f(q.w,-q.z,q.y,-q.x),
+    	Vec4f(q.z,q.w,-q.x,-q.y),
+    	Vec4f(-q.y,q.x,q.w,-q.z),
+    	Vec4f(q.x,q.y,q.z,q.w)
+    });
+    const Mat4f right = Mat4f(std::array<Vec4f, 4>{
+        Vec4f(q.w,-q.z,q.y,q.x),
+    	Vec4f(q.z,q.w,-q.x,q.y),
+    	Vec4f(-q.y,q.x,q.w,q.z),
+    	Vec4f(-q.x,-q.y,-q.z,q.w)
+    });
 
-    return Mat4f(
-            std::array<Vec4f, 4>
-                    {
-                            Vec4f(1.0f - yy - zz, xy + zw, xz - yw, 0),
-                            Vec4f(xy - zw, 1.0f - xx - zz, yz + xw, 0),
-                            Vec4f(xz + yw, yz - xw, 1.0f - xx - yy, 0),
-                            Vec4f(0, 0, 0, 1)
-                    });
+    return left*right;
 }
 
 

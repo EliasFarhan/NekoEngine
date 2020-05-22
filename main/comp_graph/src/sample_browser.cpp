@@ -15,6 +15,8 @@
 #include "08_hello_lightmaps/lightmaps_program.h"
 #include "09_hello_lightcasters/lightcasters_program.h"
 
+#include "99_hello_scene/scene_program.h"
+
 namespace neko
 {
 
@@ -29,6 +31,8 @@ void SampleBrowser::Init()
     RegisterRenderProgram("07 Hello Light", std::make_unique<HelloLightProgram>());
     RegisterRenderProgram("08 Hello Lightmaps", std::make_unique<HelloLightMapsProgram>());
     RegisterRenderProgram("09 Hello Light Casters", std::make_unique<HelloLightCastersProgram>());
+	
+    RegisterRenderProgram("99 Hello Scene", std::make_unique<HelloSceneProgram>());
 	programs_[currentProgramIndex_]->Init();
 }
 
