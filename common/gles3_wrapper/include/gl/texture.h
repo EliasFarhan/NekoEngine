@@ -11,7 +11,16 @@ class Texture : public neko::Texture
 public:
     Texture() : neko::Texture(){}
 
-    Texture(Texture&& tex) = default;
+    Texture(Texture&& tex) noexcept :
+		neko::Texture(std::move(tex)),
+		flags_(tex.flags_)
+    {
+        if (!tex.IsLoaded())
+        {
+            //If you are crashing here, it means you are moving the Texture before it is fully loaded!!!
+            std::abort();
+        }
+    }
     enum TextureFlags : unsigned
     {
         SMOOTH_TEXTURE = 1u << 0u,

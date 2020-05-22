@@ -30,7 +30,19 @@ class Texture
 public:
 	virtual ~Texture() = default;
 	Texture();
-    Texture(Texture&& texture) = default;
+    Texture(Texture&& texture) noexcept :
+        uploadToGpuJob_ (std::move(texture.uploadToGpuJob_)),
+        convertImageJob_(std::move(texture.convertImageJob_)),
+		diskLoadJob_ (std::move(texture.diskLoadJob_)),
+		image_(texture.image_),
+		textureId_ (texture.textureId_)
+    {
+    	if(!texture.IsLoaded())
+    	{
+    		//If you are crashing here, it means you are moving the Texture before it is fully loaded!!!
+            std::abort();
+    	}
+    }
     virtual void Destroy() = 0;
 	
     void SetPath(std::string_view path);
@@ -50,7 +62,7 @@ protected:
     void Reset();
     virtual void CreateTexture() = 0;
     Job uploadToGpuJob_;
-    Job convertImage_;
+    Job convertImageJob_;
     ResourceJob diskLoadJob_;
     Image image_;
     TextureId textureId_ = INVALID_TEXTURE_ID;

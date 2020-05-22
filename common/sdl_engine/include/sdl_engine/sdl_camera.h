@@ -32,7 +32,7 @@ struct Camera3D : neko::Camera3D, SdlEventSystemInterface, SystemInterface
 	std::uint8_t cameraMovement_ = NONE;
 	const Vec3f cameraOriginPos = Vec3f(0.0f, 3.0f, -3.0f);
 	const EulerAngles cameraOriginAngles = EulerAngles(
-		degree_t(45.0f), degree_t(0.0f), degree_t(0.0f));
+		degree_t(-45.0f), degree_t(0.0f), degree_t(0.0f));
 	Vec2f mouseMotion_ = Vec2f::zero;
 
 	const float mouseMotionRatio_ = 25.0f;

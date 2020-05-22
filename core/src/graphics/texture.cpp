@@ -34,7 +34,7 @@ Texture::Texture() :
 #endif
 		CreateTexture();
 	}),
-    convertImage_([this]
+    convertImageJob_([this]
     {
 	    image_ = StbImageConvert(diskLoadJob_.GetBufferFile());
 	    diskLoadJob_.GetBufferFile().Destroy();
@@ -49,8 +49,8 @@ void Texture::LoadFromDisk()
     if (textureId_ == INVALID_TEXTURE_ID)
     {
         BasicEngine::GetInstance()->ScheduleJob(&diskLoadJob_, JobThreadType::RESOURCE_THREAD);
-        convertImage_.AddDependency(&diskLoadJob_);
-        BasicEngine::GetInstance()->ScheduleJob(&convertImage_, JobThreadType::OTHER_THREAD);
+        convertImageJob_.AddDependency(&diskLoadJob_);
+        BasicEngine::GetInstance()->ScheduleJob(&convertImageJob_, JobThreadType::OTHER_THREAD);
     }
 }
 
@@ -73,7 +73,7 @@ void Texture::FreeImage()
 void Texture::Reset()
 {
     diskLoadJob_.Reset();
-    convertImage_.Reset();
+    convertImageJob_.Reset();
     uploadToGpuJob_.Reset();
 }
 
