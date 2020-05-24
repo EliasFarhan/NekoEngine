@@ -13,6 +13,14 @@ public:
     bool IsLoaded() const;
     void Draw(const gl::Shader& shader);
     void Destroy();
+    [[nodiscard]] size_t GetMeshCount() const
+    {
+	    return meshes_.size();
+    };
+    [[nodiscard]] const Mesh& GetMesh(size_t index) const
+    {
+	    return meshes_[index];
+    };
 private:
     // model data
     std::vector<Mesh> meshes_;

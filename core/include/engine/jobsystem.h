@@ -92,6 +92,7 @@ public:
     void AddDependency(const Job* dep);
 
     std::function<void()> GetTask() const { return task_; }
+    void SetTask(std::function<void()> task) { task_ = task; }
     void Reset();
 
 protected:

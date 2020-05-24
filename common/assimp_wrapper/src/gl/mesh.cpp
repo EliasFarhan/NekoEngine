@@ -72,6 +72,16 @@ void Mesh::Destroy()
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &EBO);
+
+	for(auto& texture : textures_)
+	{
+        gl::DestroyTexture(texture.texture.GetTextureId());
+	}
+    textures_.clear();
+    vertices_.clear();
+    indices_.clear();
+
+    loadMeshToGpu.Reset();
 }
 
 

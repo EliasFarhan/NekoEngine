@@ -348,6 +348,16 @@ public:
     {
 
     }
+
+	explicit Vec3(Vec2<T> v) : x(v.x), y(v.y),z(0)
+    {
+	    
+    }
+	explicit Vec3(Vec4<T> v) : x(v.x), y(v.y), z(v.z)
+    {
+	    
+    }
+
 	explicit Vec3(const T* ptr) : x(ptr[0]), y(ptr[1]), z(ptr[2])
     {
 	    

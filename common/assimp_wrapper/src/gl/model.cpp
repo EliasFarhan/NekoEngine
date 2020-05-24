@@ -25,6 +25,8 @@ namespace neko::assimp
 	{
 		for (auto& mesh : meshes_)
 			mesh.Destroy();
+		meshes_.clear();
+		processModelJob_.Reset();
 	}
 
 	Model::Model() : processModelJob_([this]
@@ -104,6 +106,7 @@ namespace neko::assimp
 #ifdef EASY_PROFILE_USE
 		EASY_END_BLOCK;
 #endif
+		
 		meshes_.reserve(countChildren(scene->mRootNode));
 #ifdef EASY_PROFILE_USE
 		EASY_BLOCK("Process Nodes");

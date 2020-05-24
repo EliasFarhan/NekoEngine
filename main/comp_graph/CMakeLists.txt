@@ -2,7 +2,11 @@ include_directories("include/")
 
 file(GLOB_RECURSE comp_graph_src include/*.h src/*.cpp)
 
-add_executable(comp_graph ${comp_graph_src})
+file(GLOB_RECURSE shaders_src ${CMAKE_SOURCE_DIR}/data/shaders/*.vert ${CMAKE_SOURCE_DIR}/data/shaders/*.frag)
+
+source_group("Shaders"	FILES ${shaders_src})
+
+add_executable(comp_graph ${comp_graph_src} ${shaders_src})
 target_link_libraries(comp_graph PUBLIC Neko_Core sdl_engine gles3_wrapper assimp_wrapper)
 neko_bin_config(comp_graph)
 
