@@ -60,10 +60,16 @@ void HelloInstancingProgram::Init()
 		config.dataRootPath + "shaders/10_hello_instancing/asteroid.frag");
 	vertexInstancingDrawShader_.LoadFromFile(config.dataRootPath + "shaders/10_hello_instancing/asteroid_vertex_instancing.vert",
 		config.dataRootPath + "shaders/10_hello_instancing/asteroid.frag");
+	camera_.position = Vec3f(0.0f, 400.0f, 400.0f);
+	camera_.reverseDirection = Vec3f(0.0f, -1.0f, -1.0f).Normalized();
 }
 
 void HelloInstancingProgram::Update(seconds dt)
 {
+	if (!model_.IsLoaded())
+	{
+		return;
+	}
 	std::lock_guard<std::mutex> lock(updateMutex_);
 
 	auto* engine = BasicEngine::GetInstance();
@@ -72,10 +78,12 @@ void HelloInstancingProgram::Update(seconds dt)
 	{
 		engine->ScheduleJob(&planetMotionUpdate_[i], JobThreadType::OTHER_THREAD);
 	}
+	camera_.Update(dt);
 }
 
 void HelloInstancingProgram::Destroy()
 {
+	model_.Destroy();
 }
 
 void HelloInstancingProgram::DrawImGui()
@@ -86,15 +94,20 @@ void HelloInstancingProgram::DrawImGui()
 
 void HelloInstancingProgram::Render()
 {
-	std::lock_guard<std::mutex> lock(updateMutex_);
+	if (!model_.IsLoaded())
+	{
+		return;
+	}
 	for (auto& job : planetMotionUpdate_)
 	{
 		job.Join();
 	}
+	std::lock_guard<std::mutex> lock(updateMutex_);
 	for (auto& job : planetMotionUpdate_)
 	{
 		job.Reset();
 	}
+
 
 }
 

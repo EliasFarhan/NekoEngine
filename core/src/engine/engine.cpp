@@ -68,20 +68,18 @@ BasicEngine::~BasicEngine()
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_swiss_sae_gpr5300_MainActivity_destroy([[maybe_unused]]JNIEnv *env, [[maybe_unused]]jclass clazz, [[maybe_unused]]jstring directory)
+Java_swiss_sae_gpr5300_MainActivity_finalize([[maybe_unused]]JNIEnv *env, [[maybe_unused]]jclass clazz, [[maybe_unused]]jstring directory)
 {
 
 #ifdef EASY_PROFILE_USE
+    if(env == nullptr)
+    {
+        logDebug("[Error] Android environment is null");
+        return;
+    }
+
     std::string path = env->GetStringUTFChars(directory, nullptr);
 
-    struct stat sb;
-    int32_t res = stat(path.c_str(), &sb);
-    if (0 == res && sb.st_mode && S_IFDIR){
-        logDebug(path+" dir already in app's internal data storage.");
-    }
-    else if (ENOENT == errno){
-        res = mkdir(path.c_str(), 0770);
-    }
 	path += "/Neko_Profile.prof";
 	logDebug("Android data profile data path: "+path);
     auto blockNumber = profiler::dumpBlocksToFile(path.c_str());
@@ -91,7 +89,7 @@ Java_swiss_sae_gpr5300_MainActivity_destroy([[maybe_unused]]JNIEnv *env, [[maybe
     }
     else
     {
-        logDebug("Easy Profile with several blocks.");
+        logDebug("Easy Profile with several blocks: "+std::to_string(blockNumber));
     }
 #endif
 }
