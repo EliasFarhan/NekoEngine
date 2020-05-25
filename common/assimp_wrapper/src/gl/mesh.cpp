@@ -33,7 +33,7 @@ void Mesh::Init()
 void Mesh::Draw(const gl::Shader& shader)
 {
 #ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Draw Mesh");
+    //EASY_BLOCK("Draw Mesh");
 #endif
     unsigned int diffuseNr = 1;
     unsigned int specularNr = 1;

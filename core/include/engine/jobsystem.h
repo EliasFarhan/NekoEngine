@@ -52,6 +52,7 @@ public:
         STARTED = 1u << 0u,
         DONE = 1u << 1u
     };
+    Job():Job([]{}){};
     explicit Job(std::function<void()> task);
     virtual ~Job() = default;
     Job(const Job&) = delete;

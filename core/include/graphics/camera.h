@@ -12,6 +12,13 @@ struct Camera
     Vec3f position;
     Vec3f reverseDirection;
 
+	void LookAt(Vec3f target)
+	{
+		const Vec3f direction = position - target;
+		reverseDirection = direction.Normalized();
+		
+	}
+	
 	Vec3f GetRight() const
 	{
 		return Vec3f::Cross(Vec3f::up, reverseDirection).Normalized();
@@ -76,5 +83,7 @@ struct Camera3D : Camera
 	{
 		aspect = static_cast<float>(width) / static_cast<float>(height);
 	}
+
+	
 };
 }

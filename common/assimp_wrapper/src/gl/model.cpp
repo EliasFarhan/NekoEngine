@@ -40,6 +40,7 @@ namespace neko::assimp
 	{
 		path_ = path;
 		directory_ = path.substr(0, path.find_last_of('/'));
+		logDebug("ASSIMP: Loading model: " + path_);
 		BasicEngine::GetInstance()->ScheduleJob(&processModelJob_, JobThreadType::OTHER_THREAD);
 	}
 
