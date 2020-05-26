@@ -35,6 +35,8 @@ private:
 
 	const size_t maxAsteroidNmb_ = 100'000;
 	const size_t minAsteroidNmb_ = 1'000;
+	const size_t uniformChunkSize_ = 100;
+	size_t instanceChunkSize_ = 1'000;
 	size_t asteroidNmb_ = 1000;
 
 	gl::Shader singleDrawShader_;
@@ -45,7 +47,7 @@ private:
 	std::vector<Vec3f> asteroidVelocities_;
 	std::vector<Vec3f> asteroidForces_;
 	std::vector<Mat4f> asteroidModels_;
-	int instanceVBO_ = 0;
+	unsigned int instanceVBO_ = 0;
 
 	const float gravityConst = 1000.0f;
 	const float centerMass = 1000.0f;

@@ -30,37 +30,13 @@ void Mesh::Init()
 }
 
 
-void Mesh::Draw(const gl::Shader& shader)
+void Mesh::Draw(const gl::Shader& shader) const
 {
 #ifdef EASY_PROFILE_USE
     //EASY_BLOCK("Draw Mesh");
 #endif
-    unsigned int diffuseNr = 1;
-    unsigned int specularNr = 1;
-    for (unsigned int i = 0; i < textures_.size(); i++)
-    {
-    	// activate proper texture unit before binding
-        glActiveTexture(GL_TEXTURE0 + i);
-        // retrieve texture number (the N in diffuse_textureN)
-        std::string number;
-        std::string name;
-    	switch(textures_[i].type)
-    	{
-        case Texture::TextureType::DIFFUSE:
-            name = "texture_diffuse";
-            number = std::to_string(diffuseNr++);
-    		break;
-        case Texture::TextureType::SPECULAR:
-            name = "texture_specular";
-            number = std::to_string(specularNr++);
-    		break;
-        default: ;
-        }
-        shader.SetInt("material." + name + number, i);
-        glBindTexture(GL_TEXTURE_2D, textures_[i].texture.GetTextureId());
-    }
-    glActiveTexture(GL_TEXTURE0);
 
+    BindTexture(shader);
     // draw mesh
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, indices_.size(), GL_UNSIGNED_INT, 0);
@@ -226,5 +202,34 @@ void Mesh::LoadMaterialTextures(
     	path += str.C_Str();
         glTexture.SetPath(path);
     }
+}
+
+void Mesh::BindTexture(const gl::Shader& shader) const
+{
+    unsigned int diffuseNr = 1;
+    unsigned int specularNr = 1;
+    for (unsigned int i = 0; i < textures_.size(); i++)
+    {
+        // activate proper texture unit before binding
+        glActiveTexture(GL_TEXTURE0 + i);
+        // retrieve texture number (the N in diffuse_textureN)
+        std::string number;
+        std::string name;
+        switch(textures_[i].type)
+        {
+            case Texture::TextureType::DIFFUSE:
+                name = "texture_diffuse";
+                number = std::to_string(diffuseNr++);
+                break;
+            case Texture::TextureType::SPECULAR:
+                name = "texture_specular";
+                number = std::to_string(specularNr++);
+                break;
+            default: ;
+        }
+        shader.SetInt("material." + name + number, i);
+        glBindTexture(GL_TEXTURE_2D, textures_[i].texture.GetTextureId());
+    }
+    glActiveTexture(GL_TEXTURE0);
 }
 }

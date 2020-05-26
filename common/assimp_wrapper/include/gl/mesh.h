@@ -34,13 +34,17 @@ namespace neko::assimp
 	public:
 		Mesh();
 		void Init();
-		void Draw(const gl::Shader& shader);
-
+		void Draw(const gl::Shader& shader) const;
+        void BindTexture(const gl::Shader& shader) const;
 		void Destroy();
 
 		void ProcessMesh(const aiMesh* mesh, const aiScene* scene,
 			const std::string_view directory);
 		bool IsLoaded() const;
+
+
+		[[nodiscard]] unsigned int GetVao() const {return VAO;}
+		[[nodiscard]] size_t GetElementsCount() const {return indices_.size();}
 	protected:
 
 		void LoadMaterialTextures(aiMaterial* material, aiTextureType aiTexture, Texture::TextureType texture,
