@@ -54,7 +54,6 @@
 #include "event_trace_win.h"
 #include "current_time.h"
 
-#include <iostream>
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -196,7 +195,6 @@ PROFILER_API void beginNonScopedBlock(const profiler::BaseBlockDescriptor* _desc
 }
 PROFILER_API uint32_t dumpBlocksToFile(const char* filename)
 {
-    std::cout << "DumpBlocks To File: "<<filename<<'\n';
     return ProfileManager::instance().dumpBlocksToFile(filename);
 }
 

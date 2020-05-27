@@ -58,6 +58,14 @@ if(Neko_Profile)
     set(EASY_PROFILE_DIR "${EXTERNAL_DIR}/easy_profiler-2.1.0")
     add_compile_definitions("EASY_PROFILE_USE=1")
     add_subdirectory(${EASY_PROFILE_DIR})
+    
+    set_target_properties (easy_profiler PROPERTIES FOLDER Externals)
+    set_target_properties (profiler_converter PROPERTIES FOLDER Externals)
+    set_target_properties (profiler_sample PROPERTIES FOLDER Externals)
+    set_target_properties (profiler_reader PROPERTIES FOLDER Externals)
+    set_target_properties (profiler_sample_disabled_profiler PROPERTIES FOLDER Externals)
+    
+
 endif()
 
 include("cmake/data.cmake")
@@ -106,8 +114,8 @@ if(Neko_SDL2)
 
     add_subdirectory("common/sdl_engine")
     if(NOT Emscripten)
-    target_precompile_headers(sdl_engine PRIVATE "common/sdl_engine/include/sdl_wrapper_pch.h")
-        endif()
+        target_precompile_headers(sdl_engine PRIVATE "common/sdl_engine/include/sdl_wrapper_pch.h")
+    endif()
 endif()
 
 if(Neko_Assimp)
@@ -130,6 +138,10 @@ if(Neko_Assimp)
     set_target_properties (assimp IrrXML PROPERTIES
             FOLDER Externals)
     add_subdirectory("common/assimp_wrapper")
+    
+    set_target_properties (zlib PROPERTIES FOLDER Externals)
+    
+    set_target_properties (zlibstatic PROPERTIES FOLDER Externals)
 endif()
 
 if(Neko_Test)
@@ -139,10 +151,9 @@ if(Neko_Test)
     set(INSTALL_GTEST OFF CACHE INTERNAL "")
     add_subdirectory(${GOOGLE_TEST_DIR})
     include_directories(${GOOGLE_TEST_DIR}/include)
-
-    set_target_properties (gtest gtest_main PROPERTIES
-            FOLDER Externals\\GTest)
     add_subdirectory("test/")
+    set_target_properties (gtest PROPERTIES FOLDER Externals/GTest)
+    set_target_properties(gtest_main PROPERTIES FOLDER Externals/GTest)
 endif()
 
 if(Neko_Benchmark)
@@ -150,10 +161,9 @@ if(Neko_Benchmark)
     set(GOOGLE_BENCH_DIR "${EXTERNAL_DIR}/benchmark-1.5.0" CACHE STRING "")
 
     add_subdirectory(${GOOGLE_BENCH_DIR})
-    set_target_properties (benchmark PROPERTIES FOLDER Externals)
-    set_target_properties (benchmark_main PROPERTIES FOLDER Externals)
     add_subdirectory("benchmark/")
-
+    set_target_properties (benchmark PROPERTIES FOLDER Externals/GTest)
+    set_target_properties(benchmark_main PROPERTIES FOLDER Externals/GTest)
 endif()
 
 set(main_project_dir "main/")

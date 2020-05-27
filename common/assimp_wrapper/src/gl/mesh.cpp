@@ -32,10 +32,6 @@ void Mesh::Init()
 
 void Mesh::Draw(const gl::Shader& shader) const
 {
-#ifdef EASY_PROFILE_USE
-    //EASY_BLOCK("Draw Mesh");
-#endif
-
     BindTexture(shader);
     // draw mesh
     glBindVertexArray(VAO);

@@ -70,7 +70,7 @@ add_custom_target(
         DataTarget
         DEPENDS ${DATA_BINARY_FILES} ${DATA_FILES})
 
-set_target_properties (DataTarget PROPERTIES FOLDER Neko)
+set_target_properties (DataTarget PROPERTIES FOLDER Neko/Core)
 
 if(MSVC)
     if (${CMAKE_HOST_SYSTEM_PROCESSOR} STREQUAL "AMD64")

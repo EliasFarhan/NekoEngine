@@ -92,23 +92,7 @@ namespace neko::assimp
 			logDebug(oss.str());
 			return;
 		}
-#ifdef EASY_PROFILE_USE
-		EASY_BLOCK("Count Meshes");
-#endif
-		std::function<size_t(aiNode*)> countChildren = [&countChildren](aiNode* node)
-		{
-			size_t count = node->mNumMeshes;
-			for(size_t i = 0; i < node->mNumChildren; i++)
-			{
-				count += countChildren(node->mChildren[i]);
-			}
-			return count;
-		};
-#ifdef EASY_PROFILE_USE
-		EASY_END_BLOCK;
-#endif
-		
-		meshes_.reserve(countChildren(scene->mRootNode));
+		meshes_.reserve(scene->mNumMeshes);
 #ifdef EASY_PROFILE_USE
 		EASY_BLOCK("Process Nodes");
 #endif
