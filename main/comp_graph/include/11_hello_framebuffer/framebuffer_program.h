@@ -15,7 +15,7 @@ public:
         GRAYSCALE,
         BLUR,
         EDGE_DETECTION,
-
+        LENGTH
     };
 
     HelloFramebufferProgram();

@@ -67,7 +67,8 @@ void HelloFramebufferProgram::Init()
 
     modelShader_.LoadFromFile(config.dataRootPath+"shaders/11_hello_framebuffer/model.vert",
             config.dataRootPath+"shaders/11_hello_framebuffer/model.frag");
-    camera_.Init();
+    camera_.position = Vec3f(0.0f,-5.0f,-5.0f);
+    camera_.LookAt(Vec3f::zero);
 }
 
 void HelloFramebufferProgram::Update(seconds dt)
@@ -99,7 +100,21 @@ void HelloFramebufferProgram::Destroy()
 
 void HelloFramebufferProgram::DrawImGui()
 {
-
+    ImGui::Begin("Post Processing");
+    const char* postProcessingNames[(int)PostProcessingType::LENGTH] =
+    {
+        "No Processing",
+        "Inverse",
+        "Grayscale",
+        "Blur",
+        "Edge Detection"
+    };
+    int currentIndex = (int)postProcessingType_;
+    if(ImGui::Combo("Post Processing Type", &currentIndex, postProcessingNames, (int)PostProcessingType::LENGTH))
+    {
+        postProcessingType_ = (PostProcessingType)currentIndex;
+    }
+    ImGui::End();
 }
 
 void HelloFramebufferProgram::Render()
@@ -113,11 +128,12 @@ void HelloFramebufferProgram::Render()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
     //Draw scene
+    modelShader_.Bind();
     modelShader_.SetMat4("model", Mat4f::Identity);
     modelShader_.SetMat4("view", camera_.GenerateViewMatrix());
     modelShader_.SetMat4("projection", camera_.GenerateProjectionMatrix());
 
-    modelShader_.SetInt("texture_diffuse1", 1);
+    modelShader_.SetInt("texture_diffuse1", 0);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, containerTexture_.GetTextureId());
     cube_.Draw();
@@ -141,6 +157,8 @@ void HelloFramebufferProgram::Render()
         case PostProcessingType::EDGE_DETECTION:
             currentShader = &screenEdgeDetectionShader_;
             break;
+        default:
+            break;
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     currentShader->Bind();
@@ -148,7 +166,7 @@ void HelloFramebufferProgram::Render()
     currentShader->SetInt("screenTexture", 0);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, fboTexture_);
-    cube_.Draw();
+    screenFrame_.Draw();
 
 
 }
