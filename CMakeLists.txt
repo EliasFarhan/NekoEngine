@@ -138,10 +138,10 @@ if(Neko_Assimp)
     set_target_properties (assimp IrrXML PROPERTIES
             FOLDER Externals)
     add_subdirectory("common/assimp_wrapper")
-    
-    set_target_properties (zlib PROPERTIES FOLDER Externals)
-    
-    set_target_properties (zlibstatic PROPERTIES FOLDER Externals)
+    if(ASSIMP_BUILD_ZLIB)
+        set_target_properties (zlib PROPERTIES FOLDER Externals)
+        set_target_properties (zlibstatic PROPERTIES FOLDER Externals)
+    endif()
 endif()
 
 if(Neko_Test)
