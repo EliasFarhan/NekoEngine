@@ -11,6 +11,8 @@
 #include "gl/shape.h"
 #include "gl/shader.h"
 #include "gl/texture.h"
+#include "sdl_engine/sdl_camera.h"
+
 #ifdef EASY_PROFILE_USE
 #include "easy/profiler.h"
 #endif
