@@ -1,6 +1,10 @@
 #pragma once
 
 #include "comp_graph/sample_program.h"
+#include "sdl_engine/sdl_camera.h"
+#include "gl/shader.h"
+#include "gl/texture.h"
+#include "gl/shape.h"
 
 namespace neko
 {

@@ -1,0 +1,38 @@
+#pragma once
+#include "comp_graph/sample_program.h"
+#include "gl/shape.h"
+#include "gl/shader.h"
+#include "gl/texture.h"
+#include "sdl_engine/sdl_camera.h"
+
+namespace neko
+{
+
+class HelloStencilProgam : public SampleProgram
+{
+public:
+
+	void Init() override;
+	void Update(seconds dt) override;
+	void Destroy() override;
+	void DrawImGui() override;
+	void Render() override;
+	void OnEvent(const SDL_Event& event) override;
+private:
+	enum StencilModeType : std::uint8_t
+	{
+		NONE = 0u,
+		USE_STENCIL = 1u<<0u,
+		REMOVE_ONLY_DEPTH = 1u<<2u
+	};
+	gl::RenderCuboid cube_{Vec3f::zero, Vec3f::one*2.0f};
+	gl::RenderQuad plane_{ Vec3f::zero, Vec2f::one * 4.0f };
+	gl::Shader cubeShader_;
+	gl::Shader floorShader_;
+	gl::Texture cubeTexture_;
+
+	sdl::Camera3D camera_;
+	std::uint8_t flags_ = NONE;
+};
+
+}

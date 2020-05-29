@@ -3,6 +3,7 @@
 //
 #include "gl/shape.h"
 #include "11_hello_framebuffer/framebuffer_program.h"
+#include "imgui.h"
 
 namespace neko
 {
@@ -24,7 +25,7 @@ void HelloFramebufferProgram::Init()
 
     glGenTextures(1, &fboTexture_);
     glBindTexture(GL_TEXTURE_2D, fboTexture_);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, config.windowSize.x, config.windowSize.y, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, config.windowSize.x, config.windowSize.y, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glBindTexture(GL_TEXTURE_2D, 0);

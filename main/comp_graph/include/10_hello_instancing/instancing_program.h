@@ -26,7 +26,7 @@ public:
 private:
 	void CalculateForce(size_t begin, size_t end);
 	void CalculateVelocity(size_t begin, size_t end);
-	void CalculateTransforms(size_t begin, size_t end);
+	void CalculatePositions(size_t begin, size_t end);
 
 	InstancingType instancingType_ = InstancingType::NO_INSTANCING;
 	
@@ -35,7 +35,7 @@ private:
 
 	const size_t maxAsteroidNmb_ = 100'000;
 	const size_t minAsteroidNmb_ = 1'000;
-	const size_t uniformChunkSize_ = 100;
+	const size_t uniformChunkSize_ = 254;
 	size_t instanceChunkSize_ = 1'000;
 	size_t asteroidNmb_ = 1000;
 
@@ -46,7 +46,6 @@ private:
 	std::vector<Vec3f> asteroidPositions_;
 	std::vector<Vec3f> asteroidVelocities_;
 	std::vector<Vec3f> asteroidForces_;
-	std::vector<Mat4f> asteroidModels_;
 	unsigned int instanceVBO_ = 0;
 
 	const float gravityConst = 1000.0f;

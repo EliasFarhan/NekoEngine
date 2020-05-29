@@ -34,7 +34,8 @@ void main()
     }
     vec3 col = vec3(0.0);
     for(int i = 0; i < 9; i++)
-    col += sampleTex[i] * kernel[i];
-
+    {
+        col += sampleTex[i] * kernel[i];
+    }
     FragColor = vec4(col, 1.0);
 }

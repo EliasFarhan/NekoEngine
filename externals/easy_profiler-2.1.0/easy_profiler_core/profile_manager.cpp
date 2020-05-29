@@ -75,6 +75,7 @@
 #endif
 #if EASY_OPTION_LOG_ENABLED != 0
 
+#include <iostream>
 
 # ifndef EASY_ERRORLOG
 #  define EASY_ERRORLOG std::cerr

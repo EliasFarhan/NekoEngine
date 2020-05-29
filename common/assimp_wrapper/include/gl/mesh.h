@@ -35,7 +35,7 @@ namespace neko::assimp
 		Mesh();
 		void Init();
 		void Draw(const gl::Shader& shader) const;
-        void BindTexture(const gl::Shader& shader) const;
+        void BindTextures(const gl::Shader& shader) const;
 		void Destroy();
 
 		void ProcessMesh(const aiMesh* mesh, const aiScene* scene,

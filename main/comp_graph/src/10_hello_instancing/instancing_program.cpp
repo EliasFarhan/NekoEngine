@@ -11,7 +11,6 @@ namespace neko
 void HelloInstancingProgram::Init()
 {
     asteroidPositions_.resize(maxAsteroidNmb_);
-    asteroidModels_.resize(maxAsteroidNmb_);
     asteroidForces_.resize(maxAsteroidNmb_);
     asteroidVelocities_.resize(maxAsteroidNmb_);
 #ifdef EASY_PROFILE_USE
@@ -26,10 +25,6 @@ void HelloInstancingProgram::Init()
         position = Vec3f(Transform3d::RotationMatrixFrom(angle, Vec3f::up) * Vec4f(position));
         position *= radius;
         asteroidPositions_[i] = position;
-
-        Mat4f model = Mat4f::Identity;
-        model = Transform3d::Translate(model, position);
-        asteroidModels_[i] = model;
     }
 #ifdef EASY_PROFILE_USE
     EASY_END_BLOCK;
@@ -69,7 +64,7 @@ void HelloInstancingProgram::Update(seconds dt)
 #endif
     CalculateForce(0, asteroidNmb_);
     CalculateVelocity(0, asteroidNmb_);
-    CalculateTransforms(0, asteroidNmb_);
+    CalculatePositions(0, asteroidNmb_);
 #ifdef EASY_PROFILE_USE
     EASY_END_BLOCK;
 #endif
@@ -127,21 +122,10 @@ void HelloInstancingProgram::Render()
         glGenBuffers(1, &instanceVBO_);
 
         glBindBuffer(GL_ARRAY_BUFFER, instanceVBO_);
-        //OpenGL requires that Mat4f be given as 4 Vec4f O_ô
         glEnableVertexAttribArray(5);
-        glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(Mat4f), (void*)0);
-        glEnableVertexAttribArray(6);
-        glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(Mat4f), (void*)sizeof(Vec4f));
-        glEnableVertexAttribArray(7);
-        glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, sizeof(Mat4f), (void*)(2*sizeof(Vec4f)));
-        glEnableVertexAttribArray(8);
-        glVertexAttribPointer(8, 4, GL_FLOAT, GL_FALSE, sizeof(Mat4f), (void*)(3*sizeof(Vec4f)));
+        glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, sizeof(Vec3f), (void*)0);
         glVertexAttribDivisor(5, 1);
-        glVertexAttribDivisor(6, 1);
-        glVertexAttribDivisor(7, 1);
-        glVertexAttribDivisor(8, 1);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
-
         glBindVertexArray(0);
 
     }
@@ -159,7 +143,7 @@ void HelloInstancingProgram::Render()
 
             for (size_t i = 0; i < asteroidNmb_; i++)
             {
-                singleDrawShader_.SetMat4("model", asteroidModels_[i]);
+                singleDrawShader_.SetVec3("position", asteroidPositions_[i]);
                 model_.Draw(singleDrawShader_);
             }
             break;
@@ -171,7 +155,7 @@ void HelloInstancingProgram::Render()
 #endif
             uniformInstancingShader_.Bind();
             const auto& asteroidMesh = model_.GetMesh(0);
-            asteroidMesh.BindTexture(uniformInstancingShader_);
+            asteroidMesh.BindTextures(uniformInstancingShader_);
             uniformInstancingShader_.SetMat4("view", camera_.GenerateViewMatrix());
             uniformInstancingShader_.SetMat4("projection", camera_.GenerateProjectionMatrix());
 
@@ -179,11 +163,19 @@ void HelloInstancingProgram::Render()
             {
                 const size_t chunkBeginIndex = chunk * uniformChunkSize_;
                 const size_t chunkEndIndex = std::min(asteroidNmb_, (chunk + 1) * uniformChunkSize_);
-                for (size_t index = chunkBeginIndex; index < chunkEndIndex; index++)
+#ifdef EASY_PROFILE_USE
+                EASY_BLOCK("Set Uniform Model Matrices");
+#endif
+            	for (size_t index = chunkBeginIndex; index < chunkEndIndex; index++)
                 {
-                    const std::string uniformName = "model[" + std::to_string(index - chunkBeginIndex) + "]";
-                    uniformInstancingShader_.SetMat4(uniformName, asteroidModels_[index]);
+                    const std::string uniformName = "position[" + std::to_string(index - chunkBeginIndex) + "]";
+                    uniformInstancingShader_.SetVec3(uniformName, asteroidPositions_[index]);
                 }
+#ifdef EASY_PROFILE_USE
+                EASY_END_BLOCK
+                EASY_BLOCK("Draw Mesh");
+
+#endif
                 if (chunkEndIndex > chunkBeginIndex)
                 {
                     glBindVertexArray(asteroidMesh.GetVao());
@@ -201,7 +193,7 @@ void HelloInstancingProgram::Render()
 #endif
             vertexInstancingDrawShader_.Bind();
             const auto& asteroidMesh = model_.GetMesh(0);
-            asteroidMesh.BindTexture(vertexInstancingDrawShader_);
+            asteroidMesh.BindTextures(vertexInstancingDrawShader_);
             vertexInstancingDrawShader_.SetMat4("view", camera_.GenerateViewMatrix());
             vertexInstancingDrawShader_.SetMat4("projection", camera_.GenerateProjectionMatrix());
 
@@ -212,11 +204,17 @@ void HelloInstancingProgram::Render()
                 if (chunkEndIndex > chunkBeginIndex)
                 {
                     const size_t chunkSize = chunkEndIndex-chunkBeginIndex;
-
+#ifdef EASY_PROFILE_USE
+                    EASY_BLOCK("Set VBO Model Matrices");
+#endif
                     glBindBuffer(GL_ARRAY_BUFFER, instanceVBO_);
-                    glBufferData(GL_ARRAY_BUFFER, sizeof(Mat4f) * chunkSize, &asteroidModels_[chunkBeginIndex], GL_DYNAMIC_DRAW);
+                    glBufferData(GL_ARRAY_BUFFER, sizeof(Vec3f) * chunkSize, &asteroidPositions_[chunkBeginIndex], GL_DYNAMIC_DRAW);
                     glBindBuffer(GL_ARRAY_BUFFER, 0);
+#ifdef EASY_PROFILE_USE
+                    EASY_END_BLOCK
+                    EASY_BLOCK("Draw Mesh");
 
+#endif
                     glBindVertexArray(asteroidMesh.GetVao());
                     glDrawElementsInstanced(GL_TRIANGLES, asteroidMesh.GetElementsCount(), GL_UNSIGNED_INT, 0,
                                             chunkSize);
@@ -269,14 +267,12 @@ void HelloInstancingProgram::CalculateVelocity(size_t begin, size_t end)
     }
 }
 
-void HelloInstancingProgram::CalculateTransforms(size_t begin, size_t end)
+void HelloInstancingProgram::CalculatePositions(size_t begin, size_t end)
 {
     const size_t endCount = std::min(end, asteroidNmb_);
     for (auto i = begin; i < endCount; i++)
     {
         asteroidPositions_[i] += asteroidVelocities_[i] * dt_;
-        const Mat4f model = Transform3d::Translate(Mat4f::Identity, asteroidPositions_[i]);
-        asteroidModels_[i] = model;
     }
 }
 }

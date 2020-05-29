@@ -15,6 +15,8 @@
 #include "08_hello_lightmaps/lightmaps_program.h"
 #include "09_hello_lightcasters/lightcasters_program.h"
 #include "10_hello_instancing/instancing_program.h"
+#include "11_hello_framebuffer/framebuffer_program.h"
+#include "12_hello_stencil/stencil_program.h"
 
 #include "99_hello_scene/scene_program.h"
 
@@ -34,6 +36,7 @@ void SampleBrowser::Init()
     RegisterRenderProgram("09 Hello Light Casters", std::make_unique<HelloLightCastersProgram>());
     RegisterRenderProgram("10 Hello Instancing", std::make_unique<HelloInstancingProgram>());
 	RegisterRenderProgram("11 Hello Framebuffer", std::make_unique<HelloFramebufferProgram>());
+    RegisterRenderProgram("12 Hello Stencil", std::make_unique<HelloStencilProgam>());
 
     RegisterRenderProgram("99 Hello Scene", std::make_unique<HelloSceneProgram>());
 	programs_[currentProgramIndex_]->Init();

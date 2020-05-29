@@ -32,7 +32,7 @@ void Mesh::Init()
 
 void Mesh::Draw(const gl::Shader& shader) const
 {
-    BindTexture(shader);
+    BindTextures(shader);
     // draw mesh
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, indices_.size(), GL_UNSIGNED_INT, 0);
@@ -200,7 +200,7 @@ void Mesh::LoadMaterialTextures(
     }
 }
 
-void Mesh::BindTexture(const gl::Shader& shader) const
+void Mesh::BindTextures(const gl::Shader& shader) const
 {
     unsigned int diffuseNr = 1;
     unsigned int specularNr = 1;
