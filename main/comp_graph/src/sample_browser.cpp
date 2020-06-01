@@ -18,6 +18,7 @@
 #include "11_hello_framebuffer/framebuffer_program.h"
 #include "12_hello_stencil/stencil_program.h"
 #include "13_hello_depth/depth_program.h"
+#include "14_hello_outline/outline_program.h"
 
 #include "99_hello_scene/scene_program.h"
 
@@ -39,7 +40,10 @@ void SampleBrowser::Init()
 	RegisterRenderProgram("11 Hello Framebuffer", std::make_unique<HelloFramebufferProgram>());
     RegisterRenderProgram("12 Hello Stencil", std::make_unique<HelloStencilProgam>());
     RegisterRenderProgram("13 Hello Depth", std::make_unique<HelloDepthProgram>());
+    RegisterRenderProgram("14 Hello Outline", std::make_unique<HelloOutlineProgram>());
+	
     RegisterRenderProgram("99 Hello Scene", std::make_unique<HelloSceneProgram>());
+	
 	programs_[currentProgramIndex_]->Init();
 }
 

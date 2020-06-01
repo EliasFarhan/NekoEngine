@@ -19,17 +19,17 @@ struct Camera
 		
 	}
 	
-	Vec3f GetRight() const
+	[[nodiscard]] Vec3f GetRight() const
 	{
 		return Vec3f::Cross(Vec3f::up, reverseDirection).Normalized();
 	}
 
-	Vec3f GetUp() const
+	[[nodiscard]] Vec3f GetUp() const
 	{
 		const Vec3f right = GetRight();
-		return Vec3f::Cross(reverseDirection, right);
+		return Vec3f::Cross(reverseDirection, right).Normalized();
 	}
-	Mat4f GenerateViewMatrix() const
+	[[nodiscard]] Mat4f GenerateViewMatrix() const
 	{
 		const Vec3f right = GetRight();
 		const Vec3f up = GetUp();
@@ -70,7 +70,7 @@ struct Camera3D : Camera
 	degree_t fovy = degree_t(45.0f);
 	float nearPlane = 0.1f;
 	float farPlane = 100.0f;
-	Mat4f GenerateProjectionMatrix()
+	[[nodiscard]] Mat4f GenerateProjectionMatrix() const
 	{
 		return Transform3d::Perspective(
 			fovy,

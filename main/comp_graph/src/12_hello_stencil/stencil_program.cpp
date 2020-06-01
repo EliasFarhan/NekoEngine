@@ -80,18 +80,18 @@ void HelloStencilProgam::Render()
 	cube_.Draw();
 	if(flags_ & USE_STENCIL)
 	{
+		// Draw floor
 		glEnable(GL_STENCIL_TEST);
 
-		// Draw floor
 		glStencilFunc(GL_ALWAYS, 1, 0xFF); // Set any stencil to 1
-		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE); //only put stencil value if depth pass
 		glStencilMask(0xFF); // Write to stencil buffer
 
 		glClear(GL_STENCIL_BUFFER_BIT); // Clear stencil buffer (0 by default)
 	}
 	if(flags_ & REMOVE_ONLY_DEPTH)
 	{
-		glDepthMask(GL_FALSE); // Don't write to depth buffer
+		glDepthMask(GL_FALSE); // Don't write to depth buffer, but still checking depth
 	}
 	floorShader_.Bind();
 	floorShader_.SetMat4("view", view);
@@ -113,6 +113,7 @@ void HelloStencilProgam::Render()
 	}
 	cubeShader_.Bind();
 	model = Mat4f::Identity;
+	model = Transform3d::Scale(model, Vec3f(1, -1, 1));
 	model = Transform3d::Translate(model, Vec3f(0, -1, 0));
 	cubeShader_.SetMat4("model", model);
 	cubeShader_.SetVec3("overrideColor", Vec3f::one * 0.3f);
