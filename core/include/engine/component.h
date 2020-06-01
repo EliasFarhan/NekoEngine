@@ -167,7 +167,6 @@ public:
 
 	void SyncBuffers() override
 	{
-        const auto oldSize = currentComponents_.size();
         const auto newSize = this->components_.size();
         ResizeIfNecessary(currentComponents_, newSize - 1, {});
 		for(size_t i = 0; i < newSize; i++)

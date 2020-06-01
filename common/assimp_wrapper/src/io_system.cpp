@@ -3,8 +3,13 @@
 namespace neko
 {
 
-Assimp::IOStream* NekoIOSystem::Open(const char* pFile, const char* pMode)
+Assimp::IOStream* NekoIOSystem::Open(const char* pFile, [[maybe_unused]] const char* pMode)
 {
+    const std::string mode = pMode;
+    if(mode == "r+" or mode == "w" or mode == "w+" or mode == "a" or mode == "a+")
+    {
+        return nullptr;
+    }
     auto* ioStream = new NekoIOStream();
     ioStream->LoadFromFile(pFile);
 	return ioStream;

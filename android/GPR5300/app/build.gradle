@@ -4,7 +4,7 @@ apply plugin: 'com.android.application'
 android {
     signingConfigs {
         release {
-            storeFile file('C:\\Users\\unite\\comp_graph.jks')
+            storeFile file('comp_graph.jks')
             storePassword '12345678'
             keyAlias = 'comp_graph_key'
             keyPassword '12345678'

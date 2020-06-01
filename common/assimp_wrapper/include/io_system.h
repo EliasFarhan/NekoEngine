@@ -7,7 +7,9 @@
 
 namespace neko
 {
-
+/**
+ * \brief Read-only IO Stream use by Assimp that use Neko BufferFile
+ */
 class NekoIOStream : public Assimp::IOStream
 {
 public:
@@ -30,6 +32,7 @@ private:
     BufferFile bufferFile_;
     size_t cursorIndex_ = 0;
 };
+
 
 class NekoIOSystem : public Assimp::IOSystem
 {
