@@ -57,6 +57,8 @@ void HelloStencilProgam::DrawImGui()
 
 void HelloStencilProgam::Render()
 {
+	if (!cubeTexture_.IsLoaded())
+		return;
 	std::lock_guard<std::mutex> lock(updateMutex_);
 	//Draw upper cube
 	glEnable(GL_DEPTH_TEST);
