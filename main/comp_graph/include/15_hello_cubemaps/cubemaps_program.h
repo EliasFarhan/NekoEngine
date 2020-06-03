@@ -20,15 +20,25 @@ public:
 	void Render() override;
 	void OnEvent(const SDL_Event& event) override;
 private:
+	enum class ModelRenderMode
+	{
+		NONE,
+		REFLECTION,
+		REFRACTION,
+		LENGTH
+	};
 	gl::RenderCuboid cube_{ Vec3f::zero, Vec3f::one*2.0f };
 	gl::Shader skyboxShader_;
 	gl::Shader modelShader_;
+	gl::Shader modelReflectionShader_;
+	gl::Shader modelRefractionShader_;
 	TextureId skyboxTexture_ = 0;
 	assimp::Model model_;
 	sdl::Camera3D camera_;
-
-
-
+	ModelRenderMode currentRenderMode_ = ModelRenderMode::NONE;
+	float reflectionValue_ = 1.0f;
+	float refractionValue_ = 1.0f;
+	float refractiveIndex_ = 1.52f;
 
 	
 	
