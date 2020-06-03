@@ -35,6 +35,8 @@ public:
 		columns_ = m.columns_;
 	}
 
+	
+
 	explicit Mat3(const std::array<Vec3 < T>, 3>& v)
 	{
 		columns_ = v;
@@ -111,6 +113,23 @@ public:
 	explicit Mat4(const std::array<Vec4 < T>, 4> & v)
 	{
 		columns_ = v;
+	}
+	explicit Mat4(const Mat3<T>& m) noexcept
+	{
+		for (int col = 0; col < 4; col++)
+		{
+			for (int row = 0; row < 4; row++)
+			{
+				if(col == 3 or row == 3)
+				{
+					columns_[col][row] = 0;
+				}
+				else
+				{
+					columns_[col][row] = m[col][row];
+				}
+			}
+		}
 	}
 
 	const T& operator()(size_t row, size_t column) const
@@ -322,6 +341,19 @@ public:
 		inverse = inverse.Transpose();
 		inverse = inverse * (1.0f / determinant);
 		return inverse;
+	}
+
+	[[nodiscard]] Mat3<T> ToMat3() const
+	{
+		std::array<Vec3<T>, 3> column;
+		for(int col = 0; col < 3; col++)
+		{
+			for(int row = 0; row < 3; row++)
+			{
+				column[col][row] = columns_[col][row];
+			}
+		}
+		return Mat3<T>(column);
 	}
 	const static Mat4<T> Identity;
 	const static Mat4<T> Zero;

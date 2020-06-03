@@ -66,10 +66,10 @@ void HelloOutlineProgram::Render()
 	if(flags_ & USE_STENCIL)
 	{
 		glEnable(GL_STENCIL_TEST);
-		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE); //write only when depth pass
 		glStencilFunc(GL_ALWAYS, 1, 0xFF); // all fragments should pass the stencil test
 		glStencilMask(0xFF); // enable writing to the stencil buffer
-		glClear(GL_STENCIL_BUFFER_BIT);
+		glClear(GL_STENCIL_BUFFER_BIT); //set stencil buffer values to 0
 	}
 	modelShader_.Bind();
 	modelShader_.SetMat4("view", view);
@@ -84,7 +84,7 @@ void HelloOutlineProgram::Render()
 
 	if(flags_ & USE_STENCIL)
 	{
-		glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+		glStencilFunc(GL_NOTEQUAL, 1, 0xFF); //only draw if stencil value is not one
 		glStencilMask(0x00); // disable writing to the stencil buffer
 	}
 	if(flags_ & DRAW_OUTLINE)
