@@ -88,8 +88,8 @@ void SdlEngine::ManageEvent()
                 window_->OnResize(config.windowSize);
             }
         }
+        onEventAction_.Execute(event);
     }
-    onEventAction_.Execute(event);
 }
 
 void SdlEngine::GenerateUiFrame()

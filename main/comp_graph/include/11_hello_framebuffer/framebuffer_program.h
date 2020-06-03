@@ -54,6 +54,7 @@ private:
     unsigned int fbo_;
     unsigned int rbo_;
     unsigned int fboTexture_;
+    bool hasScreenResize_ = false;
 };
 
 
