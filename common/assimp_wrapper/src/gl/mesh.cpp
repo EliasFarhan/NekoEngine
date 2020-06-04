@@ -66,6 +66,9 @@ void Mesh::ProcessMesh(
     EASY_BLOCK("Process Assimp Mesh");
 #endif
 
+    min_ = Vec3f(mesh->mAABB.mMin);
+    max_ = Vec3f(mesh->mAABB.mMax);
+	
     for (unsigned int i = 0; i < mesh->mNumVertices; i++)
     {
         Vertex vertex;
@@ -176,6 +179,14 @@ void Mesh::SetupMesh()
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
 
     glBindVertexArray(0);
+}
+
+Sphere Mesh::GenerateBoundingSphere() const
+{
+    Sphere s;
+    s.radius_ = std::max(std::max(max_.x - min_.x, max_.y - min_.y), max_.z - min_.z);
+    s.center_ = min_ + (max_ - min_) / 2.0f;
+    return s;
 }
 
 void Mesh::LoadMaterialTextures(

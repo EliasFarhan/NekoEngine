@@ -357,6 +357,14 @@ public:
     {
 	    
     }
+    /**
+     * \brief Adding explicit constructor for vector-like type
+     */
+	template<class U>
+	explicit Vec3(U u) : x(u.x), y(u.y), z(u.z)
+    {
+	    
+    }
 
 	explicit Vec3(const T* ptr) : x(ptr[0]), y(ptr[1]), z(ptr[2])
     {
@@ -420,6 +428,11 @@ public:
     Vec3<T> operator-(const Vec3<T>& rhs) const
     {
         return Vec3<T>(x - rhs.x, y - rhs.y, z - rhs.z);
+    }
+
+	Vec3<T> operator-() const
+    {
+	    return Vec3<T>(-x, -y , -z );
     }
 
     Vec3<T>& operator-=(const Vec3<T>& rhs)

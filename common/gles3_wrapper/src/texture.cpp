@@ -93,17 +93,17 @@ TextureId stbCreateTexture(const std::string_view filename, Texture::TextureFlag
     return texture;
 }
 
-TextureId LoadCubemap(std::vector<std::string> faces)
+TextureId LoadCubemap(std::vector<std::string> facesFilename)
 {
     TextureId textureID;
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
 
 
-    for (unsigned int i = 0; i < faces.size(); i++)
+    for (unsigned int i = 0; i < facesFilename.size(); i++)
     {
         BufferFile textureFile;
-        textureFile.Load(faces[i]);
+        textureFile.Load(facesFilename[i]);
         Image image = StbImageConvert(textureFile);
         textureFile.Destroy();
         if (image.data != nullptr)
@@ -114,7 +114,7 @@ TextureId LoadCubemap(std::vector<std::string> faces)
         }
         else
         {
-            logDebug("[Error] Cubemap tex failed to load at path: "+ faces[i]);
+            logDebug("[Error] Cubemap tex failed to load at path: "+ facesFilename[i]);
         }
         image.Destroy();
     }

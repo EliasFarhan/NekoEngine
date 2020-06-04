@@ -19,10 +19,10 @@ uniform float refractiveIndex;//= 1.52
 void main()
 {    
 	float ratio = 1.00 / refractiveIndex;
-    vec3 I = normalize(Position - cameraPos);
-    vec3 R = refract(I, normalize(Normal), ratio);
+    vec3 viewDir = normalize(Position - cameraPos);
+    vec3 refractDir = refract(viewDir, normalize(Normal), ratio);
 
-	vec3 reflColor = texture(skybox, R).rgb;
+	vec3 refrColor = texture(skybox, refractDir).rgb;
 	vec3 diffuseColor = texture(texture_diffuse1, TexCoords).rgb; 
-    FragColor = vec4(mix(diffuseColor, reflColor, refractionValue),1.0);
+    FragColor = vec4(mix(diffuseColor, refrColor, refractionValue),1.0);
 }

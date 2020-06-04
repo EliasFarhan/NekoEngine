@@ -5,6 +5,7 @@
 #include "mathematics/vector.h"
 #include "gl/shader.h"
 #include "gl/texture.h"
+#include "mathematics/circle.h"
 
 struct aiMesh;
 struct aiScene;
@@ -45,6 +46,8 @@ namespace neko::assimp
 
 		[[nodiscard]] unsigned int GetVao() const {return VAO;}
 		[[nodiscard]] size_t GetElementsCount() const {return indices_.size();}
+
+		[[nodiscard]] Sphere GenerateBoundingSphere() const;
 	protected:
 
 		void LoadMaterialTextures(aiMaterial* material, aiTextureType aiTexture, Texture::TextureType texture,
@@ -52,6 +55,7 @@ namespace neko::assimp
 		std::vector<Vertex> vertices_;
 		std::vector<unsigned int> indices_;
 		std::vector<Texture> textures_;
+		Vec3f min_, max_;
 		Job loadMeshToGpu;
 		//  render data
 		unsigned int VAO = 0, VBO = 0, EBO = 0;

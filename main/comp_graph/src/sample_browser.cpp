@@ -20,6 +20,8 @@
 #include "13_hello_depth/depth_program.h"
 #include "14_hello_outline/outline_program.h"
 #include "15_hello_cubemaps/cubemaps_program.h"
+#include "16_hello_culling/culling_program.h"
+#include "17_hello_frustum/frustum_program.h"
 
 #include "99_hello_scene/scene_program.h"
 #include <16_hello_culling\culling_program.h>
@@ -45,6 +47,8 @@ void SampleBrowser::Init()
     RegisterRenderProgram("14 Hello Outline", std::make_unique<HelloOutlineProgram>());
     RegisterRenderProgram("15 Hello Cubemaps", std::make_unique<HelloCubemapsProgram>());
     RegisterRenderProgram("16 Hello Culling", std::make_unique<HelloCullingProgram>());
+    RegisterRenderProgram("17 Hello Frustum Culling", std::make_unique<HelloFrustumProgram>());
+	
     RegisterRenderProgram("99 Hello Scene", std::make_unique<HelloSceneProgram>());
 	
 	programs_[currentProgramIndex_]->Init();
@@ -63,9 +67,9 @@ void SampleBrowser::Destroy()
 
 void SampleBrowser::SwitchToProgram(size_t index)
 {
-    const auto previousindex = currentProgramIndex_;
+    const auto previousIndex = currentProgramIndex_;
     currentProgramIndex_ = index;
-    programs_[previousindex]->Destroy();
+    programs_[previousIndex]->Destroy();
     programs_[currentProgramIndex_]->Init();
 }
 

@@ -16,10 +16,10 @@ uniform sampler2D texture_specular1;
 
 void main()
 {    
-	vec3 I = normalize(Position - cameraPos);
-    vec3 R = reflect(I, normalize(Normal));
+	vec3 viewDir = normalize(Position - cameraPos);
+    vec3 reflectDir = reflect(viewDir, normalize(Normal));
 
-	vec3 reflColor = texture(skybox, R).rgb;
+	vec3 reflColor = texture(skybox, reflectDir).rgb;
 	vec3 diffuseColor = texture(texture_diffuse1, TexCoords).rgb; 
     FragColor = vec4(mix(diffuseColor, reflColor, reflectionValue),1.0);
 }

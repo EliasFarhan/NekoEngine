@@ -86,11 +86,11 @@ void RenderCuboid::Init()
     float vertices[] = {
     	//Right face 
          0.5f * size_.x + offset_.x,  0.5f * size_.y + offset_.y,  0.5f * size_.z + offset_.z,  1.0f, 0.0f,  1.0f, 0.0f, 0.0f,
+         0.5f * size_.x + offset_.x, -0.5f * size_.y + offset_.y, -0.5f * size_.z + offset_.z,  0.0f, 1.0f,  1.0f, 0.0f, 0.0f,
          0.5f * size_.x + offset_.x,  0.5f * size_.y + offset_.y, -0.5f * size_.z + offset_.z,  1.0f, 1.0f,  1.0f, 0.0f, 0.0f,
          0.5f * size_.x + offset_.x, -0.5f * size_.y + offset_.y, -0.5f * size_.z + offset_.z,  0.0f, 1.0f,  1.0f, 0.0f, 0.0f,
-         0.5f * size_.x + offset_.x, -0.5f * size_.y + offset_.y, -0.5f * size_.z + offset_.z,  0.0f, 1.0f,  1.0f, 0.0f, 0.0f,
-         0.5f * size_.x + offset_.x, -0.5f * size_.y + offset_.y,  0.5f * size_.z + offset_.z,  0.0f, 0.0f,  1.0f, 0.0f, 0.0f,
          0.5f * size_.x + offset_.x,  0.5f * size_.y + offset_.y,  0.5f * size_.z + offset_.z,  1.0f, 0.0f,  1.0f, 0.0f, 0.0f,
+         0.5f * size_.x + offset_.x, -0.5f * size_.y + offset_.y,  0.5f * size_.z + offset_.z,  0.0f, 0.0f,  1.0f, 0.0f, 0.0f,
          //Left face  
          -0.5f * size_.x + offset_.x,  0.5f * size_.y + offset_.y,  0.5f * size_.z + offset_.z,  1.0f, 0.0f,  -1.0f, 0.0f, 0.0f,
          -0.5f * size_.x + offset_.x,  0.5f * size_.y + offset_.y, -0.5f * size_.z + offset_.z,  1.0f, 1.0f,  -1.0f, 0.0f, 0.0f,
@@ -100,11 +100,11 @@ void RenderCuboid::Init()
          -0.5f * size_.x + offset_.x,  0.5f * size_.y + offset_.y,  0.5f * size_.z + offset_.z,  1.0f, 0.0f,  -1.0f, 0.0f, 0.0f,
          //Top face   
          -0.5f * size_.x + offset_.x,  0.5f * size_.y + offset_.y, -0.5f * size_.z + offset_.z,  0.0f, 1.0f,  0.0f, 1.0f, 0.0f,
+          0.5f * size_.x + offset_.x,  0.5f * size_.y + offset_.y,  0.5f * size_.z + offset_.z,  1.0f, 0.0f,  0.0f, 1.0f, 0.0f,
           0.5f * size_.x + offset_.x,  0.5f * size_.y + offset_.y, -0.5f * size_.z + offset_.z,  1.0f, 1.0f,  0.0f, 1.0f, 0.0f,
           0.5f * size_.x + offset_.x,  0.5f * size_.y + offset_.y,  0.5f * size_.z + offset_.z,  1.0f, 0.0f,  0.0f, 1.0f, 0.0f,
-          0.5f * size_.x + offset_.x,  0.5f * size_.y + offset_.y,  0.5f * size_.z + offset_.z,  1.0f, 0.0f,  0.0f, 1.0f, 0.0f,
-         -0.5f * size_.x + offset_.x,  0.5f * size_.y + offset_.y,  0.5f * size_.z + offset_.z,  0.0f, 0.0f,  0.0f, 1.0f, 0.0f,
          -0.5f * size_.x + offset_.x,  0.5f * size_.y + offset_.y, -0.5f * size_.z + offset_.z,  0.0f, 1.0f,  0.0f, 1.0f, 0.0f,
+         -0.5f * size_.x + offset_.x,  0.5f * size_.y + offset_.y,  0.5f * size_.z + offset_.z,  0.0f, 0.0f,  0.0f, 1.0f, 0.0f,
          //Bottom face              
          -0.5f * size_.x + offset_.x, -0.5f * size_.y + offset_.y, -0.5f * size_.z + offset_.z,  0.0f, 1.0f,  0.0f, -1.0f, 0.0f,
           0.5f * size_.x + offset_.x, -0.5f * size_.y + offset_.y, -0.5f * size_.z + offset_.z,  1.0f, 1.0f,  0.0f, -1.0f, 0.0f,
@@ -112,20 +112,20 @@ void RenderCuboid::Init()
           0.5f * size_.x + offset_.x, -0.5f * size_.y + offset_.y,  0.5f * size_.z + offset_.z,  1.0f, 0.0f,  0.0f, -1.0f, 0.0f,
          -0.5f * size_.x + offset_.x, -0.5f * size_.y + offset_.y,  0.5f * size_.z + offset_.z,  0.0f, 0.0f,  0.0f, -1.0f, 0.0f,
          -0.5f * size_.x + offset_.x, -0.5f * size_.y + offset_.y, -0.5f * size_.z + offset_.z,  0.0f, 1.0f,  0.0f, -1.0f, 0.0f,
-         //Back face  
+         //Front face  
          -0.5f * size_.x + offset_.x, -0.5f * size_.y + offset_.y,  0.5f * size_.z + offset_.z,  0.0f, 0.0f,  0.0f, 0.0f, 1.0f,
           0.5f * size_.x + offset_.x, -0.5f * size_.y + offset_.y,  0.5f * size_.z + offset_.z,  1.0f, 0.0f,  0.0f, 0.0f, 1.0f,
           0.5f * size_.x + offset_.x,  0.5f * size_.y + offset_.y,  0.5f * size_.z + offset_.z,  1.0f, 1.0f,  0.0f, 0.0f, 1.0f,
           0.5f * size_.x + offset_.x,  0.5f * size_.y + offset_.y,  0.5f * size_.z + offset_.z,  1.0f, 1.0f,  0.0f, 0.0f, 1.0f,
          -0.5f * size_.x + offset_.x,  0.5f * size_.y + offset_.y,  0.5f * size_.z + offset_.z,  0.0f, 1.0f,  0.0f, 0.0f, 1.0f,
          -0.5f * size_.x + offset_.x, -0.5f * size_.y + offset_.y,  0.5f * size_.z + offset_.z,  0.0f, 0.0f,  0.0f, 0.0f, 1.0f,
-    	//Front face
+    	//Back face
         -0.5f*size_.x+offset_.x, -0.5f*size_.y+offset_.y, -0.5f*size_.z+offset_.z,  0.0f, 0.0f,  0.0f, 0.0f, -1.0f,
+         0.5f * size_.x + offset_.x,  0.5f * size_.y + offset_.y, -0.5f * size_.z + offset_.z,  1.0f, 1.0f,  0.0f, 0.0f, -1.0f,
          0.5f*size_.x+offset_.x, -0.5f*size_.y+offset_.y, -0.5f*size_.z+offset_.z,  1.0f, 0.0f,  0.0f, 0.0f, -1.0f,
          0.5f*size_.x+offset_.x,  0.5f*size_.y+offset_.y, -0.5f*size_.z+offset_.z,  1.0f, 1.0f,  0.0f, 0.0f, -1.0f,
-         0.5f*size_.x+offset_.x,  0.5f*size_.y+offset_.y, -0.5f*size_.z+offset_.z,  1.0f, 1.0f,  0.0f, 0.0f, -1.0f,
+        -0.5f * size_.x + offset_.x, -0.5f * size_.y + offset_.y, -0.5f * size_.z + offset_.z,  0.0f, 0.0f,  0.0f, 0.0f, -1.0f,
         -0.5f*size_.x+offset_.x,  0.5f*size_.y+offset_.y, -0.5f*size_.z+offset_.z,  0.0f, 1.0f,  0.0f, 0.0f, -1.0f,
-        -0.5f*size_.x+offset_.x, -0.5f*size_.y+offset_.y, -0.5f*size_.z+offset_.z,  0.0f, 0.0f,  0.0f, 0.0f, -1.0f,
         
         
         

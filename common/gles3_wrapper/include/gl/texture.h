@@ -56,7 +56,7 @@ protected:
 };
 
 TextureId stbCreateTexture(const std::string_view filename, Texture::TextureFlags flags = Texture::DEFAULT);
-TextureId LoadCubemap(std::vector<std::string> faces);
+TextureId LoadCubemap(std::vector<std::string> facesFilename);
 void DestroyTexture(TextureId);
 
 
