@@ -27,14 +27,19 @@ private:
 		REFRACTION,
 		LENGTH
 	};
-	gl::RenderCuboid cube_{ Vec3f::zero, Vec3f::one*2.0f };
+	gl::RenderCuboid skyboxCube_{ Vec3f::zero, Vec3f::one*2.0f };
 	gl::Shader skyboxShader_;
+	
+	TextureId skyboxTexture_ = 0;
+
 	gl::Shader modelShader_;
 	gl::Shader modelReflectionShader_;
 	gl::Shader modelRefractionShader_;
-	TextureId skyboxTexture_ = 0;
 	assimp::Model model_;
+	gl::RenderCuboid cube_{Vec3f::zero, Vec3f::one};
+	gl::Texture cubeTexture_;
 	sdl::Camera3D camera_;
+	
 	ModelRenderMode currentRenderMode_ = ModelRenderMode::NONE;
 	float reflectionValue_ = 1.0f;
 	float refractionValue_ = 1.0f;

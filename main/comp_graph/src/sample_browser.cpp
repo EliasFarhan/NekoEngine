@@ -22,6 +22,7 @@
 #include "15_hello_cubemaps/cubemaps_program.h"
 
 #include "99_hello_scene/scene_program.h"
+#include <16_hello_culling\culling_program.h>
 
 namespace neko
 {
@@ -43,7 +44,7 @@ void SampleBrowser::Init()
     RegisterRenderProgram("13 Hello Depth", std::make_unique<HelloDepthProgram>());
     RegisterRenderProgram("14 Hello Outline", std::make_unique<HelloOutlineProgram>());
     RegisterRenderProgram("15 Hello Cubemaps", std::make_unique<HelloCubemapsProgram>());
-	
+    RegisterRenderProgram("16 Hello Culling", std::make_unique<HelloCullingProgram>());
     RegisterRenderProgram("99 Hello Scene", std::make_unique<HelloSceneProgram>());
 	
 	programs_[currentProgramIndex_]->Init();

@@ -6,7 +6,7 @@ namespace neko
 void HelloCubemapsProgram::Init()
 {
 	const auto& config = BasicEngine::GetInstance()->config;
-	cube_.Init();
+	skyboxCube_.Init();
 	skyboxTexture_ = gl::LoadCubemap({
         config.dataRootPath+"sprites/skybox/right.jpg",
 		config.dataRootPath+"sprites/skybox/left.jpg",
@@ -28,6 +28,9 @@ void HelloCubemapsProgram::Init()
 		config.dataRootPath + "shaders/15_hello_cubemaps/model_refraction.frag");
 	camera_.position = Vec3f(0, 3, 3);
 	camera_.LookAt(Vec3f::zero);
+	cube_.Init();
+	cubeTexture_.SetPath(config.dataRootPath + "sprites/container.jpg");
+	cubeTexture_.LoadFromDisk();
 }
 
 void HelloCubemapsProgram::Update(seconds dt)
@@ -41,13 +44,13 @@ void HelloCubemapsProgram::Update(seconds dt)
 void HelloCubemapsProgram::Destroy()
 {
 	glDeleteTextures(1, &skyboxTexture_);
-	cube_.Destroy();
+	skyboxCube_.Destroy();
 	skyboxShader_.Destroy();
 
 	modelShader_.Destroy();
 	modelReflectionShader_.Destroy();
 	modelRefractionShader_.Destroy();
-
+	cube_.Destroy();
 	model_.Destroy();
 }
 
@@ -86,6 +89,10 @@ void HelloCubemapsProgram::Render()
 	{
 		return;
 	}
+	if(!cubeTexture_.IsLoaded())
+	{
+		return;
+	}
 	std::lock_guard<std::mutex> lock(updateMutex_);
 
 	const auto view = camera_.GenerateViewMatrix();
@@ -99,10 +106,16 @@ void HelloCubemapsProgram::Render()
 		modelShader_.SetMat4("view", view);
 		modelShader_.SetMat4("projection", projection);
 		auto model = Mat4f::Identity;
-		model = Transform3d::Scale(model, Vec3f(0.2f, 0.2f, 0.2f));
+		model = Transform3d::Scale(model, Vec3f(0.1f, 0.1f, 0.1f));
 		modelShader_.SetMat4("model", model);
 		modelShader_.SetMat4("transposeInverseModel", model.Inverse().Transpose());
 		model_.Draw(modelShader_);
+		model = Mat4f::Identity;
+		model = Transform3d::Translate(model, Vec3f::left * 2.0f);
+		modelShader_.SetMat4("model", model);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, cubeTexture_.GetTextureId());
+		cube_.Draw();
 		break;
 	}
 	case ModelRenderMode::REFLECTION:
@@ -111,7 +124,7 @@ void HelloCubemapsProgram::Render()
 		modelReflectionShader_.SetMat4("view", view);
 		modelReflectionShader_.SetMat4("projection", projection);
 		auto model = Mat4f::Identity;
-		model = Transform3d::Scale(model, Vec3f(0.2f, 0.2f, 0.2f));
+		model = Transform3d::Scale(model, Vec3f(0.1f, 0.1f, 0.1f));
 		modelReflectionShader_.SetMat4("model", model);
 		modelReflectionShader_.SetMat4("transposeInverseModel", model.Inverse().Transpose());
 		modelReflectionShader_.SetInt("skybox", 2);
@@ -120,6 +133,12 @@ void HelloCubemapsProgram::Render()
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture_);
 		model_.Draw(modelReflectionShader_);
+		model = Mat4f::Identity;
+		model = Transform3d::Translate(model, Vec3f::left * 2.0f);
+		modelReflectionShader_.SetMat4("model", model);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, cubeTexture_.GetTextureId());
+		cube_.Draw();
 		break;
 	}
 	case ModelRenderMode::REFRACTION:
@@ -128,7 +147,7 @@ void HelloCubemapsProgram::Render()
 		modelRefractionShader_.SetMat4("view", view);
 		modelRefractionShader_.SetMat4("projection", projection);
 		auto model = Mat4f::Identity;
-		model = Transform3d::Scale(model, Vec3f(0.2f, 0.2f, 0.2f));
+		model = Transform3d::Scale(model, Vec3f(0.1f, 0.1f, 0.1f));
 		modelRefractionShader_.SetMat4("model", model);
 		modelRefractionShader_.SetMat4("transposeInverseModel", model.Inverse().Transpose());
 
@@ -139,6 +158,12 @@ void HelloCubemapsProgram::Render()
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture_);
 		model_.Draw(modelRefractionShader_);
+		model = Mat4f::Identity;
+		model = Transform3d::Translate(model, Vec3f::left * 2.0f);
+		modelRefractionShader_.SetMat4("model", model);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, cubeTexture_.GetTextureId());
+		cube_.Draw();
 		break;
 	}
 	default: ;
@@ -152,7 +177,7 @@ void HelloCubemapsProgram::Render()
 	skyboxShader_.SetInt("skybox", 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture_);
-	cube_.Draw();
+	skyboxCube_.Draw();
 	glDepthFunc(GL_LESS);
 }
 
