@@ -14,12 +14,14 @@ typedef float v4f __attribute__ ((vector_size (16)));
 #else
 static_assert(false, "AVX2 is not enabled");
 #endif
+#else
+#if defined(__amd64__) || defined(__i386__)
+#include <x86intrin.h>
+#endif
 #endif
 
 #if defined(__arm__) || defined(__ANDROID__)
 typedef float v4f __attribute__ ((vector_size (16)));
 #endif
 
-#if defined(__amd64__) || defined(__i386__)
-#include <x86intrin.h>
-#endif
+

@@ -26,7 +26,12 @@
 #include <functional>
 #include "engine/log.h"
 
+#ifdef EASY_PROFILE_USE
+#include "easy/profiler.h"
+#endif
+
 #if defined(__ANDROID__)
+#include <jni.h>
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>
 
@@ -34,14 +39,23 @@
 static AAssetManager* assetManager = nullptr;
 
 extern "C"
+{
 JNIEXPORT void JNICALL
-Java_swiss_sae_gpr5300_MainActivity_load(JNIEnv * env, jclass clazz, jobject mgr) {
-	// TODO: implement load()
+Java_swiss_sae_gpr5300_MainActivity_load(JNIEnv *env, [[maybe_unused]] jclass clazz, jobject mgr) {
 	assetManager = AAssetManager_fromJava(env, mgr);
 	logDebug("Asset Manager from JNI loaded!");
 }
+}
 namespace neko
 {
+ResourceJob::ResourceJob() : Job([this]{bufferFile_.Load(filePath_);})
+{
+}
+void ResourceJob::SetFilePath(std::string_view path)
+{
+    filePath_ = path;
+}
+
 bool FileExists(const std::string_view path)
 {
 	{
@@ -130,6 +144,26 @@ namespace fs = std::filesystem;
 
 namespace neko
 {
+ResourceJob::ResourceJob() : Job([this]
+{
+#ifdef EASY_PROFILE_USE
+		EASY_BLOCK("Load Resource");
+#endif
+	bufferFile_.Load(filePath_);
+})
+{
+}
+
+void ResourceJob::SetFilePath(std::string_view path)
+{
+    filePath_ = path;
+}
+
+std::string ResourceJob::GetFilePath() const
+{
+	return filePath_;
+}
+
 void BufferFile::Load(std::string_view path)
 {
 	std::ifstream is(path.data(),std::ifstream::binary);
@@ -326,6 +360,8 @@ const std::string LoadFile(const std::string& path)
 		std::istreambuf_iterator<char>());
 	return str;
 }
+
+
 }
 #endif
 

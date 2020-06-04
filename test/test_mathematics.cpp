@@ -656,24 +656,85 @@ TEST(Aabb, TestAabb)
     EXPECT_TRUE(aabb3.IntersectAabb(aabb4));
 }
 
-    TEST(Engine, TestMatrix4)
-    {
-        neko::Mat4f m1(std::array<neko::Vec4f, 4>
-        {
-            neko::Vec4f{ 1,2,3,4 },
-                neko::Vec4f{ -1,-2,-3,-4 },
-                neko::Vec4f{ 4,2,2,1 },
-                neko::Vec4f{ -4,-3,-2,-1 }
-        });
+TEST(Engine, Matrix3Det)
+{
+	const neko::Mat3f m1 = neko::Mat3f(std::array<neko::Vec3f, 3>
+	{
+		neko::Vec3f(6,10,14),
+		neko::Vec3f(7,11,15),
+		neko::Vec3f(8,12,16)
+	});
+	const float det1 = 0.0f;
+	EXPECT_TRUE(neko::Equal(m1.Determinant(), det1));
+	const neko::Mat3f m2 = neko::Mat3f(std::array<neko::Vec3f, 3>
+	{
+		neko::Vec3f(7,11,15),
+		neko::Vec3f(8,12,16),
+		neko::Vec3f(5,9,13)
+	});
+	const float det2 = 0.0f;
+	EXPECT_TRUE(neko::Equal(m2.Determinant(), det1));
+	const neko::Mat3f m3 = neko::Mat3f(std::array<neko::Vec3f, 3>
+	{
+		neko::Vec3f(8,12,16),
+			neko::Vec3f(5,9,13),
+			neko::Vec3f(6,10,14)
+	});
+	const float det3 = 0.0f;
+	EXPECT_TRUE(neko::Equal(m3.Determinant(), det1));
+	const neko::Mat3f m4 = neko::Mat3f(std::array<neko::Vec3f, 3>
+	{
+		neko::Vec3f(5, 9, 13),
+		neko::Vec3f(6, 10, 14),
+		neko::Vec3f(7, 11, 15)
+	});
+	const float det4 = 0.0f;
+	EXPECT_TRUE(neko::Equal(m4.Determinant(), det1));
+}
 
-        neko::Mat4f result = neko::Mat4f(std::array<neko::Vec4f, 4>{
-            neko::Vec4f(-5, 5, 6, -5),
-                neko::Vec4f(-8, 8, 5, -3),
-                neko::Vec4f(-5, 5, 8, -5),
-                neko::Vec4f(-5, 5, 9, -5)
-        });
-        result = result.Transpose();
-        EXPECT_LT(neko::Mat4f::MatrixDifference(m1.MultiplyNaive(m1), result), 0.01f);
-        EXPECT_LT(neko::Mat4f::MatrixDifference(m1.MultiplyIntrinsincs(m1), result), 0.01f);
-        EXPECT_LT(neko::Mat4f::MatrixDifference(m1.MultiplyNaive(m1), m1.MultiplyIntrinsincs(m1)), 0.01f);
-    }
+TEST(Engine, TestMatrix4)
+{
+	neko::Mat4f m1(std::array<neko::Vec4f, 4>
+	{
+		neko::Vec4f{ 1,2,3,4 },
+		neko::Vec4f{ -1,-2,-3,-4 },
+		neko::Vec4f{ 4,2,2,1 },
+		neko::Vec4f{ -4,-3,-2,-1 }
+	});
+
+	neko::Mat4f result = neko::Mat4f(std::array<neko::Vec4f, 4>{
+		neko::Vec4f(-5, 5, 6, -5),
+		neko::Vec4f(-8, 8, 5, -3),
+		neko::Vec4f(-5, 5, 8, -5),
+		neko::Vec4f(-5, 5, 9, -5)
+	});
+	result = result.Transpose();
+	EXPECT_LT(neko::Mat4f::MatrixDifference(m1.MultiplyNaive(m1), result), 0.01f);
+	EXPECT_LT(neko::Mat4f::MatrixDifference(m1.MultiplyIntrinsincs(m1), result), 0.01f);
+	EXPECT_LT(neko::Mat4f::MatrixDifference(m1.MultiplyNaive(m1), m1.MultiplyIntrinsincs(m1)), 0.01f);
+
+	EXPECT_LT(neko::Mat4f::MatrixDifference(neko::Mat4f::Identity, neko::Mat4f::Identity.Inverse()), 0.01f);
+	EXPECT_LT(neko::Mat4f::MatrixDifference(neko::Mat4f::Zero, neko::Mat4f::Zero.Inverse()), 0.01f);
+	
+	const neko::Mat4f m = neko::Mat4f(std::array<neko::Vec4f, 4>
+	{
+		neko::Vec4f(1.0f,5.0f,9.0f,13.0f),
+		neko::Vec4f(2.0f,6.0f,-10.0f,14.0f),
+		neko::Vec4f(3.0f,-7.0f,11.0f,15.0f),
+		neko::Vec4f(4.0f,8.0f,12.0f,16.0f)
+	});
+
+	const auto mInvCalculus = m.Inverse();
+
+	const neko::Mat4f mInv = neko::Mat4f(std::array<neko::Vec4f, 4>
+	{
+		neko::Vec4f(-198.0f,7.0f,20.0f,136.0f),
+		neko::Vec4f(10.0f,0.0f,-30.0f,20.0f),
+		neko::Vec4f(14.0f,-21.0f,0.0f,7.0f),
+		neko::Vec4f(34.0f,14.0f,10.0f,-23.0f)
+	})*(1.0f/420.0f);
+	
+	
+	EXPECT_LT(neko::Mat4f::MatrixDifference(mInvCalculus, mInv), 0.01f);
+	EXPECT_GT(neko::Mat4f::MatrixDifference(mInvCalculus, neko::Mat4f::Identity), 0.01f);
+}

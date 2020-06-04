@@ -21,7 +21,7 @@ foreach(bench_file ${BENCH_FILES} )
         set_property(TARGET ${bench_name} APPEND_STRING PROPERTY COMPILE_FLAGS " -fno-omit-frame-pointer -save-temps ")
     ENDIF(MSVC)
     set_target_properties (${bench_name} PROPERTIES
-            FOLDER Benchmark)
+            FOLDER Neko/Benchmark)
     IF(APPLE)
         set_target_properties(${bench_name} PROPERTIES
                 RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}

@@ -26,6 +26,13 @@ void RenderQuad::Init()
             0.0f, 1.0f,   // bottom left
     };
 
+    Vec3f normals[4] = {
+        Vec3f::back,
+        Vec3f::back,
+        Vec3f::back,
+        Vec3f::back
+    };
+
     unsigned int indices[6] = {
             // note that we start from 0!
             0, 1, 3,   // first triangle
@@ -33,7 +40,7 @@ void RenderQuad::Init()
     };
 
     //Initialize the EBO program
-    glGenBuffers(2, &VBO[0]);
+    glGenBuffers(3, &VBO[0]);
     glGenBuffers(1, &EBO);
     glGenVertexArrays(1, &VAO);
     // 1. bind Vertex Array Object
@@ -48,6 +55,12 @@ void RenderQuad::Init()
     glBufferData(GL_ARRAY_BUFFER, sizeof(texCoords), texCoords, GL_STATIC_DRAW);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*) 0);
     glEnableVertexAttribArray(1);
+    // bind normals data
+    glBindBuffer(GL_ARRAY_BUFFER, VBO[2]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(normals), normals, GL_STATIC_DRAW);
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vec2f), (void*)0);
+    glEnableVertexAttribArray(0);
+	//bind EBO
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
@@ -62,117 +75,93 @@ void RenderQuad::Draw() const
 void RenderQuad::Destroy()
 {
     glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(2, &VBO[0]);
-    glDeleteBuffers(2, &EBO);
+    glDeleteBuffers(3, &VBO[0]);
+    glDeleteBuffers(1, &EBO);
 
 }
 
 void RenderCuboid::Init()
 {
-
-    Vec3f vertices[8] =
-    {
-        Vec3f(-0.5f, -0.5f, -0.5f) * size_ + offset_,//0
-        Vec3f(0.5f, -0.5f, -0.5f) * size_ + offset_,//1
-        Vec3f(0.5f, 0.5f, -0.5f) * size_ + offset_,//2
-        //2 Vec3f( 0.5f,  0.5f, -0.5f)
-        Vec3f(-0.5f, 0.5f, -0.5f) * size_ + offset_,//3
-        //0 Vec3f(-0.5f, -0.5f, -0.5f),
-
-        Vec3f(-0.5f, -0.5f, 0.5f) * size_ + offset_,//4
-        Vec3f(0.5f, -0.5f, 0.5f) * size_ + offset_,//5
-        Vec3f(0.5f, 0.5f, 0.5f) * size_ + offset_,//6
-        //7 Vec3f( 0.5f,  0.5f,  0.5f),
-        Vec3f(-0.5f, 0.5f, 0.5f) * size_ + offset_,//7
-        //5 Vec3f(-0.5f, -0.5f,  0.5f),//9
-
-        //8 Vec3f(-0.5f,  0.5f,  0.5f),
-        //3 Vec3f(-0.5f,  0.5f, -0.5f),
-        //0 Vec3f(-0.5f, -0.5f, -0.5f),
-        //0 Vec3f(-0.5f, -0.5f, -0.5f),
-        //5 Vec3f(-0.5f, -0.5f,  0.5f),
-        //8 Vec3f(-0.5f,  0.5f,  0.5f),
-
-        //7 Vec3f( 0.5f,  0.5f,  0.5f),
-        //2 Vec3f( 0.5f,  0.5f, -0.5f),
-        //1 Vec3f( 0.5f, -0.5f, -0.5f),
-        //1 Vec3f( 0.5f, -0.5f, -0.5f),
-        //6 Vec3f( 0.5f, -0.5f,  0.5f),
-        //7 Vec3f( 0.5f,  0.5f,  0.5f),
-
-        //0 Vec3f(-0.5f, -0.5f, -0.5f),
-        //1 Vec3f( 0.5f, -0.5f, -0.5f),
-        //6 Vec3f( 0.5f, -0.5f,  0.5f),
-        //6 Vec3f( 0.5f, -0.5f,  0.5f),
-        //5 Vec3f(-0.5f, -0.5f,  0.5f),
-        //0 Vec3f(-0.5f, -0.5f, -0.5f),
-
-        //3 Vec3f(-0.5f,  0.5f, -0.5f),
-        //2 Vec3f( 0.5f,  0.5f, -0.5f),
-        //7 Vec3f( 0.5f,  0.5f,  0.5f),
-        //7 Vec3f( 0.5f,  0.5f,  0.5f),
-        //8 Vec3f(-0.5f,  0.5f,  0.5f),
-        //3 Vec3f(-0.5f,  0.5f, -0.5f)
+    //Position 3 floats, texCoords 2 floats, Normal 3 floats 
+    float vertices[] = {
+    	//Right face 
+         0.5f * size_.x + offset_.x,  0.5f * size_.y + offset_.y,  0.5f * size_.z + offset_.z,  1.0f, 0.0f,  1.0f, 0.0f, 0.0f,
+         0.5f * size_.x + offset_.x,  0.5f * size_.y + offset_.y, -0.5f * size_.z + offset_.z,  1.0f, 1.0f,  1.0f, 0.0f, 0.0f,
+         0.5f * size_.x + offset_.x, -0.5f * size_.y + offset_.y, -0.5f * size_.z + offset_.z,  0.0f, 1.0f,  1.0f, 0.0f, 0.0f,
+         0.5f * size_.x + offset_.x, -0.5f * size_.y + offset_.y, -0.5f * size_.z + offset_.z,  0.0f, 1.0f,  1.0f, 0.0f, 0.0f,
+         0.5f * size_.x + offset_.x, -0.5f * size_.y + offset_.y,  0.5f * size_.z + offset_.z,  0.0f, 0.0f,  1.0f, 0.0f, 0.0f,
+         0.5f * size_.x + offset_.x,  0.5f * size_.y + offset_.y,  0.5f * size_.z + offset_.z,  1.0f, 0.0f,  1.0f, 0.0f, 0.0f,
+         //Left face  
+         -0.5f * size_.x + offset_.x,  0.5f * size_.y + offset_.y,  0.5f * size_.z + offset_.z,  1.0f, 0.0f,  -1.0f, 0.0f, 0.0f,
+         -0.5f * size_.x + offset_.x,  0.5f * size_.y + offset_.y, -0.5f * size_.z + offset_.z,  1.0f, 1.0f,  -1.0f, 0.0f, 0.0f,
+         -0.5f * size_.x + offset_.x, -0.5f * size_.y + offset_.y, -0.5f * size_.z + offset_.z,  0.0f, 1.0f,  -1.0f, 0.0f, 0.0f,
+         -0.5f * size_.x + offset_.x, -0.5f * size_.y + offset_.y, -0.5f * size_.z + offset_.z,  0.0f, 1.0f,  -1.0f, 0.0f, 0.0f,
+         -0.5f * size_.x + offset_.x, -0.5f * size_.y + offset_.y,  0.5f * size_.z + offset_.z,  0.0f, 0.0f,  -1.0f, 0.0f, 0.0f,
+         -0.5f * size_.x + offset_.x,  0.5f * size_.y + offset_.y,  0.5f * size_.z + offset_.z,  1.0f, 0.0f,  -1.0f, 0.0f, 0.0f,
+         //Top face   
+         -0.5f * size_.x + offset_.x,  0.5f * size_.y + offset_.y, -0.5f * size_.z + offset_.z,  0.0f, 1.0f,  0.0f, 1.0f, 0.0f,
+          0.5f * size_.x + offset_.x,  0.5f * size_.y + offset_.y, -0.5f * size_.z + offset_.z,  1.0f, 1.0f,  0.0f, 1.0f, 0.0f,
+          0.5f * size_.x + offset_.x,  0.5f * size_.y + offset_.y,  0.5f * size_.z + offset_.z,  1.0f, 0.0f,  0.0f, 1.0f, 0.0f,
+          0.5f * size_.x + offset_.x,  0.5f * size_.y + offset_.y,  0.5f * size_.z + offset_.z,  1.0f, 0.0f,  0.0f, 1.0f, 0.0f,
+         -0.5f * size_.x + offset_.x,  0.5f * size_.y + offset_.y,  0.5f * size_.z + offset_.z,  0.0f, 0.0f,  0.0f, 1.0f, 0.0f,
+         -0.5f * size_.x + offset_.x,  0.5f * size_.y + offset_.y, -0.5f * size_.z + offset_.z,  0.0f, 1.0f,  0.0f, 1.0f, 0.0f,
+         //Bottom face              
+         -0.5f * size_.x + offset_.x, -0.5f * size_.y + offset_.y, -0.5f * size_.z + offset_.z,  0.0f, 1.0f,  0.0f, -1.0f, 0.0f,
+          0.5f * size_.x + offset_.x, -0.5f * size_.y + offset_.y, -0.5f * size_.z + offset_.z,  1.0f, 1.0f,  0.0f, -1.0f, 0.0f,
+          0.5f * size_.x + offset_.x, -0.5f * size_.y + offset_.y,  0.5f * size_.z + offset_.z,  1.0f, 0.0f,  0.0f, -1.0f, 0.0f,
+          0.5f * size_.x + offset_.x, -0.5f * size_.y + offset_.y,  0.5f * size_.z + offset_.z,  1.0f, 0.0f,  0.0f, -1.0f, 0.0f,
+         -0.5f * size_.x + offset_.x, -0.5f * size_.y + offset_.y,  0.5f * size_.z + offset_.z,  0.0f, 0.0f,  0.0f, -1.0f, 0.0f,
+         -0.5f * size_.x + offset_.x, -0.5f * size_.y + offset_.y, -0.5f * size_.z + offset_.z,  0.0f, 1.0f,  0.0f, -1.0f, 0.0f,
+         //Back face  
+         -0.5f * size_.x + offset_.x, -0.5f * size_.y + offset_.y,  0.5f * size_.z + offset_.z,  0.0f, 0.0f,  0.0f, 0.0f, 1.0f,
+          0.5f * size_.x + offset_.x, -0.5f * size_.y + offset_.y,  0.5f * size_.z + offset_.z,  1.0f, 0.0f,  0.0f, 0.0f, 1.0f,
+          0.5f * size_.x + offset_.x,  0.5f * size_.y + offset_.y,  0.5f * size_.z + offset_.z,  1.0f, 1.0f,  0.0f, 0.0f, 1.0f,
+          0.5f * size_.x + offset_.x,  0.5f * size_.y + offset_.y,  0.5f * size_.z + offset_.z,  1.0f, 1.0f,  0.0f, 0.0f, 1.0f,
+         -0.5f * size_.x + offset_.x,  0.5f * size_.y + offset_.y,  0.5f * size_.z + offset_.z,  0.0f, 1.0f,  0.0f, 0.0f, 1.0f,
+         -0.5f * size_.x + offset_.x, -0.5f * size_.y + offset_.y,  0.5f * size_.z + offset_.z,  0.0f, 0.0f,  0.0f, 0.0f, 1.0f,
+    	//Front face
+        -0.5f*size_.x+offset_.x, -0.5f*size_.y+offset_.y, -0.5f*size_.z+offset_.z,  0.0f, 0.0f,  0.0f, 0.0f, -1.0f,
+         0.5f*size_.x+offset_.x, -0.5f*size_.y+offset_.y, -0.5f*size_.z+offset_.z,  1.0f, 0.0f,  0.0f, 0.0f, -1.0f,
+         0.5f*size_.x+offset_.x,  0.5f*size_.y+offset_.y, -0.5f*size_.z+offset_.z,  1.0f, 1.0f,  0.0f, 0.0f, -1.0f,
+         0.5f*size_.x+offset_.x,  0.5f*size_.y+offset_.y, -0.5f*size_.z+offset_.z,  1.0f, 1.0f,  0.0f, 0.0f, -1.0f,
+        -0.5f*size_.x+offset_.x,  0.5f*size_.y+offset_.y, -0.5f*size_.z+offset_.z,  0.0f, 1.0f,  0.0f, 0.0f, -1.0f,
+        -0.5f*size_.x+offset_.x, -0.5f*size_.y+offset_.y, -0.5f*size_.z+offset_.z,  0.0f, 0.0f,  0.0f, 0.0f, -1.0f,
+        
+        
+        
+         
+        
     };
-
-    float texCoords[16] =
-    {
-        0.0f, 0.0f,
-        1.0f, 0.0f,
-        1.0f, 1.0f,
-        0.0f, 1.0f,
-
-        1.0f, 1.0f,
-        0.0f, 1.0f,
-        0.0f, 0.0f,
-        1.0f, 0.0f
-    };
-    unsigned int indices[36] =
-    {
-        0, 1, 2,
-        2, 3, 0,
-        4, 6, 5,
-        4, 7, 6,
-        7, 0, 3,
-        0, 7, 4,
-        6, 2, 1,
-        1, 5, 6,
-        0, 1, 5,
-        5, 4, 0,
-        3, 6, 2,
-        6, 3, 7
-    };
-    //Initialize the EBO program
-    glGenBuffers(2, &VBO[0]);
-    glGenBuffers(1, &EBO);
     glGenVertexArrays(1, &VAO);
-    // 1. bind Vertex Array Object
+    glGenBuffers(1, &VBO[0]);
+
     glBindVertexArray(VAO);
-    // 2. copy our vertices array in a buffer for OpenGL to use
+
     glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vec3f), (void*) nullptr);
+
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-    //bind texture coords data
-    glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(texCoords), texCoords, GL_STATIC_DRAW);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*) nullptr);
+    // texture coord attribute
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    // normal attribute
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 }
 
 void RenderCuboid::Draw() const
 {
     glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 
 void RenderCuboid::Destroy()
 {
     glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(2, &VBO[0]);
-    glDeleteBuffers(2, &EBO);
+    glDeleteBuffers(1, &VBO[0]);
+    //glDeleteBuffers(2, &EBO);
 }
 
 void RenderCircle::Init()

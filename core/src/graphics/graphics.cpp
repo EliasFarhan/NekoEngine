@@ -29,6 +29,7 @@
 #include <engine/window.h>
 #include <engine/engine.h>
 #include "engine/log.h"
+#include "engine/component.h"
 
 #ifdef EASY_PROFILE_USE
 #include "easy/profiler.h"
@@ -36,7 +37,20 @@
 
 namespace neko
 {
-Renderer::Renderer()
+Renderer::Renderer() :
+	renderAllJob_( [this]
+	{
+#if defined(__ANDROID__)
+		window_->MakeCurrentContext();
+#endif
+		auto* engine = BasicEngine::GetInstance();
+		PreRender();
+		ClearScreen();
+		engine->GenerateUiFrame();
+		RenderAll();
+		window_->RenderUi();
+	} ),
+	syncJob_([this] {SyncBuffers(); })
 {
 	currentCommandBuffer_.reserve(MAX_COMMAND_NMB);
 	nextCommandBuffer_.reserve(MAX_COMMAND_NMB);
@@ -59,58 +73,65 @@ void Renderer::RenderAll()
 	}
 }
 
-void Renderer::Sync()
+void Renderer::ScheduleJobs()
 {
-#if !defined(NEKO_SAMETHREAD)
+	auto* engine = BasicEngine::GetInstance();
+	engine->ScheduleJob(&syncJob_, JobThreadType::RENDER_THREAD);
+	engine->ScheduleJob(&renderAllJob_, JobThreadType::RENDER_THREAD);
+}
+
+void Renderer::RegisterSyncBuffersFunction(SyncBuffersInterface* syncBuffersInterface)
+{
+	syncBuffersAction_.RegisterCallback([syncBuffersInterface]
+	{
+		syncBuffersInterface->SyncBuffers();
+	});
+}
+
+void Renderer::SyncBuffers()
+{
 #ifdef EASY_PROFILE_USE
-	EASY_BLOCK("EngineRenderSync");
-	EASY_BLOCK("EngineAppWaiting");
-	EASY_BLOCK("AcquireRenderLock");
-#endif
-	std::unique_lock lock(renderMutex_);
-#ifdef EASY_PROFILE_USE
-	EASY_END_BLOCK;
-#endif
-	flags_ |= IS_APP_WAITING;
-#ifdef EASY_PROFILE_USE
-	EASY_BLOCK("WaitForRenderSignal");
-#endif
-	cv_.wait(lock);
-#ifdef EASY_PROFILE_USE
-	EASY_END_BLOCK;
-	EASY_END_BLOCK;
-	EASY_BLOCK("SwapRenderCommand");
-#endif
+	EASY_BLOCK("Swapping Render Command");
 #endif
 	std::swap(currentCommandBuffer_, nextCommandBuffer_);
 	nextCommandBuffer_.clear();
-	//TODO copy all the new transform3d?
-	auto* engine = BasicEngine::GetInstance();
-	engine->ManageEvent();
-	flags_ &= ~IS_APP_WAITING;
+	syncBuffersAction_.Execute();
+
 }
 
-void Renderer::RenderLoop()
+void Renderer::PreRender()
 {
-#if !defined(NEKO_SAMETHREAD)
-	flags_ |= IS_RUNNING;
-	window_->LeaveCurrentContext();
-	renderThread_ = std::thread([this] {
-		BeforeRenderLoop();
+	using namespace std::chrono_literals;
+	microseconds availableLoadingTime(8000);
+	while (availableLoadingTime < 8001us)
+	{
+		std::chrono::time_point<std::chrono::system_clock> start = 
+			std::chrono::system_clock::now();
 
-		std::chrono::time_point<std::chrono::system_clock> clock = std::chrono::system_clock::now();
-		while (flags_ & IS_RUNNING)
+
+		Job* job = nullptr;
 		{
-			const auto start = std::chrono::system_clock::now();
-			const auto dt = std::chrono::duration_cast<seconds>(start - clock);
-			dt_ = dt.count();
-			clock = start;
-
-			Update();
+			std::lock_guard<std::mutex> lock(preRenderJobsMutex_);
+			if (!preRenderJobs_.empty())
+			{
+				job = preRenderJobs_.front();
+				preRenderJobs_.erase(preRenderJobs_.begin());
+			}
 		}
-		AfterRenderLoop();
-		});
-#endif
+
+		if (job != nullptr && job->CheckDependenciesStarted())
+		{
+			job->Execute();
+		}
+		else
+		{
+			break;
+		}
+
+		std::chrono::time_point<std::chrono::system_clock> end = std::chrono::system_clock::now();
+		const auto duration = std::chrono::duration_cast<microseconds>(end - start);
+		availableLoadingTime -= duration;
+	}
 }
 
 void Renderer::Destroy()
@@ -119,9 +140,6 @@ void Renderer::Destroy()
 	EASY_BLOCK("ClosingFromEngine");
 #endif
 	flags_ &= ~IS_RUNNING;
-#if !defined(NEKO_SAMETHREAD)
-	renderThread_.join();
-#endif
 }
 
 void Renderer::SetFlag(Renderer::RendererFlag flag)
@@ -134,55 +152,18 @@ void Renderer::SetWindow(Window* window)
 	window_ = window;
 }
 
-void Renderer::Update()
+void Renderer::AddPreRenderJob(Job* job)
 {
-#ifdef EASY_PROFILE_USE
-	EASY_BLOCK("RenderFullUpdateCPU");
-#endif
-
-
-	auto* engine = BasicEngine::GetInstance();
-	{
-#if !defined(NEKO_SAMETHREAD)
-		std::unique_lock<std::mutex> lock(renderMutex_);
-#endif
-#ifdef EASY_PROFILE_USE
-		EASY_BLOCK("RenderUpdateCPU");
-#endif
-		ClearScreen();
-		engine->GenerateUiFrame();
-		RenderAll();
-#if !defined(NEKO_SAMETHREAD)
-		lock.unlock();
-#endif
-		window_->RenderUi();
-	}
-	{
-#if !defined(NEKO_SAMETHREAD)
-		std::unique_lock<std::mutex> lock(renderMutex_);
-#endif
-#ifdef EASY_PROFILE_USE
-		EASY_BLOCK("RenderSwapBufferCPU");
-#endif
-		window_->SwapBuffer();
-	}
-	{
-#ifdef EASY_PROFILE_USE
-		EASY_BLOCK("WaitForAppCPU");
-#endif
-#if !defined(NEKO_SAMETHREAD)
-		while (!(flags_ & IS_APP_WAITING) && (flags_ & IS_RUNNING))
-		{
-			cv_.notify_one();
-		}
-
-		{
-			cv_.notify_one();
-		}
-#endif
-
-	}
+	std::lock_guard<std::mutex> lock(preRenderJobsMutex_);
+	preRenderJobs_.push_back(job);
 }
+
+void Renderer::ResetJobs()
+{
+	syncJob_.Reset();
+	renderAllJob_.Reset();
+}
+
 void Renderer::BeforeRenderLoop()
 {
 #if !defined(NEKO_SAMETHREAD)

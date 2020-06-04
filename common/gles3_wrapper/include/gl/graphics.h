@@ -1,15 +1,17 @@
 #pragma once
 
 #include <thread>
+
+#include "texture.h"
 #include "graphics/graphics.h"
 namespace neko::gl
 {
 
 class Gles3Renderer : public Renderer
 {
-protected:
+public:
+    Gles3Renderer();
     void ClearScreen() override;
-    void Update() override;
 
     void BeforeRenderLoop() override;
 

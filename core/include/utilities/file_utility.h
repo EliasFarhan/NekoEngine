@@ -30,19 +30,43 @@
 #include <string_view>
 #include <fstream>
 
+#include "engine/jobsystem.h"
+
+
+#if defined(__ANDROID__)
+#include <jni.h>
+extern "C"
+{
+JNIEXPORT void JNICALL
+Java_swiss_sae_gpr5300_MainActivity_load(JNIEnv *env, [[maybe_unused]] jclass clazz, jobject mgr);
+}
+#endif
 
 namespace neko
 {
+/**
+ * \brief Non RAII structure, please Destroy it
+ */
+struct BufferFile
+{
+    char* dataBuffer = nullptr;
+    size_t dataLength = 0;
 
-	struct BufferFile
-	{
-        char* dataBuffer = nullptr;
-        size_t dataLength = 0;
+    void Load(std::string_view path);
+    void Destroy();
 
-        void Load(std::string_view path);
-        void Destroy();
-		
-	};
+};
+class ResourceJob : public Job
+{
+public:
+    ResourceJob();
+    void SetFilePath(std::string_view path);
+    std::string GetFilePath() const;
+    BufferFile GetBufferFile() const {return bufferFile_;}
+private:
+    std::string filePath_;
+    BufferFile bufferFile_;
+};
 
 bool FileExists(const std::string_view filename);
 

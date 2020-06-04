@@ -4,7 +4,7 @@
 #include "gl/shape.h"
 #include "gl/shader.h"
 #include <gl/texture.h>
-#include "mathematics/transform.h"
+#include "mathematics/matrix.h"
 
 namespace neko
 {
@@ -38,6 +38,6 @@ private:
     degree_t angle_{0.0f};
     EulerAngles eulerAngle_{Vec3f::zero};
     gl::Shader shaderProgram_;
-    gl::TextureId textureWall_;
+    TextureId textureWall_;
 };
 }

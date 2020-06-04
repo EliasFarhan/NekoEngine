@@ -18,20 +18,26 @@ void Task(std::atomic<unsigned int>& currentDoneTasks)
 
 TEST(Engine, TestJobSystem)
 {
-    const unsigned int TASKS_COUNT = 16;
+    const size_t TASKS_COUNT = 16;
     std::atomic<unsigned int> doneTasks = 0;
+    std::vector<std::unique_ptr<Job>> jobs(TASKS_COUNT);
+    std::generate(jobs.begin(), jobs.end(),
+            [&doneTasks]{ return std::make_unique<Job>([&doneTasks] { Task(doneTasks); });
+    });
 
+    JobSystem jobSystem;
     {// JobSystem
 #ifdef USING_EASY_PROFILER
         EASY_PROFILER_ENABLE;
         EASY_BLOCK("JOBSYSTEM_MAIN_THREAD")
     	{
 #endif
-		    JobSystem jobSystem;
+		    jobSystem.Init();
 		    for (size_t i = 0; i < TASKS_COUNT; ++i)
 		    {
-		        jobSystem.KickJob(std::function<void()>{[&doneTasks] { Task(doneTasks); }});
+                jobSystem.ScheduleJob(jobs[i].get(),JobThreadType::OTHER_THREAD);
 		    }
+		    jobSystem.Destroy();
 #ifdef USING_EASY_PROFILER
         }
     	EASY_END_BLOCK;

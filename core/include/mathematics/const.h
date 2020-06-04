@@ -8,5 +8,7 @@
 #include <cmath>
 namespace neko
 {
-const float PI = M_PI;
+const float PI = static_cast<float>(M_PI);
+
+
 }

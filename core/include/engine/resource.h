@@ -40,7 +40,7 @@ class ResourceManager
 
     ResourceId LoadResource(const std::string_view assetPath)
     {
-        const std::string resourceMetaPath = assetPath + resourceMetafile_;
+        const std::string resourceMetaPath = std::string(assetPath.data()) + resourceMetafile_.data();
         const json resourceMetaJson = LoadJson(assetPath);
         const auto resourceId = LoadResource(resourceMetaJson);
         return resourceId;

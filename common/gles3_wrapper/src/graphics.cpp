@@ -1,19 +1,25 @@
 #include "gl/graphics.h"
+#include "graphics/texture.h"
 #include "gl/gles3_include.h"
 
+#ifdef EASY_PROFILE_USE
+#include "easy/profiler.h"
+#endif
 namespace neko::gl
 {
+Gles3Renderer::Gles3Renderer() : Renderer()
+{
+}
 
 void Gles3Renderer::ClearScreen()
 {
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("Clear Screen");
+#endif
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void Gles3Renderer::Update()
-{
-    Renderer::Update();
-}
 
 void Gles3Renderer::BeforeRenderLoop()
 {

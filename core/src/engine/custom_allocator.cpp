@@ -62,8 +62,8 @@ void* StackAllocator::Allocate(size_t allocatedSize, size_t alignment)
 
 	void* alignedAddress = (void*)((std::uint64_t) currentPos_ + adjustment);
 
-	auto* header = (AllocationHeader*)((std::uint64_t) alignedAddress - sizeof(AllocationHeader));
-	header->adjustment = adjustment;
+	auto* header = reinterpret_cast<AllocationHeader*>(std::uint64_t(alignedAddress) - sizeof(AllocationHeader));
+	header->adjustment = static_cast<std::uint8_t>(adjustment);
 #if defined(NEKO_ASSERT)
 	header->prevPos = prevPos_;
 	prevPos_ = alignedAddress;

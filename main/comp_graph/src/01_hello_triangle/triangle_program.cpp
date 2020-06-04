@@ -10,23 +10,40 @@ void HelloTriangleProgram::Init()
 {
     const auto& config = BasicEngine::GetInstance()->config;
 
-    shader_.LoadFromFile(config.dataRootPath+"data/shaders/01_hello_triangle/hello_triangle.vert",
-                         config.dataRootPath+"data/shaders/01_hello_triangle/hello_triangle.frag");
+    //Initiliaze Triangle
+    triangleProgram_.shader.LoadFromFile(config.dataRootPath + "shaders/01_hello_triangle/hello_pos.vert",
+        config.dataRootPath + "shaders/01_hello_triangle/hello_color.frag");
+
+	glGenVertexArrays(1, &triangleProgram_.VAO);
+    // ..:: Initialization code (done once (unless your object frequently changes)) :: ..
+	// 1. bind Vertex Array Object
+    glBindVertexArray(triangleProgram_.VAO);
+    // 2. copy our vertices array in a buffer for OpenGL to use
+	glGenBuffers(1, &triangleProgram_.VBO); 
+    glBindBuffer(GL_ARRAY_BUFFER, triangleProgram_.VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(triangleProgram_.vertices), &triangleProgram_.vertices, GL_STATIC_DRAW);
+    // 3. then set our vertex attributes pointers
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+
+	
+    //Initiliaze VAO shader
+	shader_.LoadFromFile(config.dataRootPath+"shaders/01_hello_triangle/hello_triangle.vert",
+                         config.dataRootPath+"shaders/01_hello_triangle/hello_triangle.frag");
 
     //Initialize the VAO program
-    glGenBuffers(2, &vaoProgam_.VBO[0]);
+    glGenBuffers(1, &vaoProgam_.VBO);
     glGenVertexArrays(1, &vaoProgam_.VAO);
     // 1. bind Vertex Array Object
     glBindVertexArray(vaoProgam_.VAO);
     // 2. copy our vertices array in a buffer for OpenGL to use
-    glBindBuffer(GL_ARRAY_BUFFER, vaoProgam_.VBO[0]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vaoProgam_.vertices), vaoProgam_.vertices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, vaoProgam_.VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vaoProgam_.vertexData), vaoProgam_.vertexData, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
     // 2. copy our colors array in a buffer for OpenGL to use
-    glBindBuffer(GL_ARRAY_BUFFER, vaoProgam_.VBO[1]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vaoProgam_.colors), vaoProgam_.colors, GL_STATIC_DRAW);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(18 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
 
@@ -50,8 +67,8 @@ void HelloTriangleProgram::Init()
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(eboProgram_.indices), eboProgram_.indices, GL_STATIC_DRAW);
 
     nekoShader_.LoadFromFile(
-            config.dataRootPath+"data/shaders/01_hello_triangle/hello_neko_quad.vert",
-            config.dataRootPath+"data/shaders/01_hello_triangle/hello_triangle.frag"
+            config.dataRootPath+"shaders/01_hello_triangle/hello_neko_quad.vert",
+            config.dataRootPath+"shaders/01_hello_triangle/hello_triangle.frag"
             );
     quad_.Init();
     circle_.Init();
@@ -72,7 +89,13 @@ void HelloTriangleProgram::Render()
     std::lock_guard<std::mutex> lock(updateMutex_);
     switch (renderType_)
     {
-
+    case RenderType::Triangle:
+	    {
+	        triangleProgram_.shader.Bind();
+	        glBindVertexArray(triangleProgram_.VAO);
+	        glDrawArrays(GL_TRIANGLES, 0, 3);
+	        break;
+	    }
         case RenderType::VaoProgram:
         {
             shader_.Bind();
@@ -122,13 +145,16 @@ void HelloTriangleProgram::Render()
 
 void HelloTriangleProgram::Destroy()
 {
-
+    glDeleteVertexArrays(1, &triangleProgram_.VAO);
+    glDeleteBuffers(1, &triangleProgram_.VBO);
+    triangleProgram_.shader.Destroy();
+	
     glDeleteVertexArrays(1, &eboProgram_.VAO);
     glDeleteBuffers(2, &eboProgram_.VBO[0]);
     glDeleteBuffers(2, &eboProgram_.EBO);
 
     glDeleteVertexArrays(1, &vaoProgam_.VAO);
-    glDeleteBuffers(2, &vaoProgam_.VBO[0]);
+    glDeleteBuffers(1, &vaoProgam_.VBO);
 
     quad_.Destroy();
     circle_.Destroy();
@@ -145,6 +171,7 @@ void HelloTriangleProgram::DrawImGui()
     ImGui::SetNextWindowPos(ImVec2(0, 400), ImGuiCond_FirstUseEver);
     ImGui::Begin("Hello Triangle Program");
     const char* items[(size_t)RenderType::Length]= {
+    		"Triangle Program",
             "Simple Vao Program",
             "Simple Vbo Program",
             "Neko Quad",

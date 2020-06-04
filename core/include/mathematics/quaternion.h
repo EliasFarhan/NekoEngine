@@ -115,7 +115,7 @@ struct Quaternion
 	x degrees around the x axis, and y degrees around the y axis; 
 	applied in that order
 	*/
-	static Quaternion FromEuler(EulerAngles angle)
+	static Quaternion FromEuler(const EulerAngles& angle)
 	{
 		const auto cy = Cos(angle.x * 0.5f);
 		const auto sy = Sin(angle.x * 0.5f);

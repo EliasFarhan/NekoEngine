@@ -13,12 +13,15 @@ void HelloTextureProgram::Init()
 {
     const auto& config = BasicEngine::GetInstance()->config;
     shader_.LoadFromFile(
-            config.dataRootPath + "data/shaders/02_hello_texture/texture.vert",
-            config.dataRootPath + "data/shaders/02_hello_texture/texture.frag");
+            config.dataRootPath + "shaders/02_hello_texture/texture.vert",
+            config.dataRootPath + "shaders/02_hello_texture/texture.frag");
     quad_.Init();
 
-    const auto texturePath = config.dataRootPath + "data/sprites/wall.jpg";
-    textureId_ = neko::gl::stbCreateTexture(texturePath);
+    const auto texturePath = config.dataRootPath + "sprites/wall.jpg";
+    texture_.SetPath(texturePath);
+    texture_.LoadFromDisk();
+    auto& textureManager = TextureManagerLocator::get();
+	//textureId_ = neko::gl::stbCreateTexture(texturePath);
 
     glEnable(GL_DEPTH_TEST);
 }
@@ -32,18 +35,23 @@ void HelloTextureProgram::Destroy()
 {
     quad_.Destroy();
     shader_.Destroy();
-    gl::DestroyTexture(textureId_);
-    textureId_ = 0;
+    texture_.Destroy();
 }
 
 void HelloTextureProgram::Render()
 {
-    if(shader_.GetProgram() == 0)
+    if (shader_.GetProgram() == 0)
+    {
         return;
+    }
+	if (texture_.GetTextureId() == INVALID_TEXTURE_ID)
+	{
+        return;
+	}
     shader_.Bind();
-    shader_.SetInt("outTexture", 0);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, textureId_);
+    shader_.SetInt("ourTexture", 0);//set the texture slot
+    glActiveTexture(GL_TEXTURE0);//activate the texture slot
+    glBindTexture(GL_TEXTURE_2D, texture_.GetTextureId());//bind texture id to texture slot
     quad_.Draw();
 }
 

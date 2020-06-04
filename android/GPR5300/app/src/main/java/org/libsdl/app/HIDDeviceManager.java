@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import swiss.sae.gpr5300.BuildConfig;
+
 public class HIDDeviceManager {
     private static final String TAG = "hidapi";
     private static final String ACTION_USB_PERMISSION = "org.libsdl.app.USB_PERMISSION";
@@ -106,7 +108,13 @@ public class HIDDeviceManager {
 
         // Make sure we have the HIDAPI library loaded with the native functions
         try {
-            SDL.loadLibrary("hidapi");
+            if(BuildConfig.DEBUG)
+            {
+                SDL.loadLibrary("hidapid");
+            }
+            else {
+                SDL.loadLibrary("hidapi");
+            }
         } catch (Throwable e) {
             Log.w(TAG, "Couldn't load hidapi: " + e.toString());
 

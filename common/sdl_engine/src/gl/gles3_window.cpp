@@ -38,7 +38,7 @@ void Gles3Window::Init()
 #ifdef WIN32
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 #else
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
@@ -154,7 +154,7 @@ void Gles3Window::MakeCurrentContext()
 	{
 		oss << "\nSDL Error: " << SDL_GetError();
 	}
-	logDebug(oss.str());
+	//logDebug(oss.str());
 #endif
 }
 
@@ -170,7 +170,7 @@ void Gles3Window::LeaveCurrentContext()
 	{
 		oss << "[Error] After Leave Current Context, context: " << currentContext;
 	}
-	logDebug(oss.str());
+	//logDebug(oss.str());
 #endif
 }
 }

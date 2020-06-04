@@ -11,14 +11,29 @@ namespace neko
 class SampleBrowser : public SystemInterface, public DrawImGuiInterface, public sdl::SdlEventSystemInterface
 {
 public:
+	/**
+	 * \brief Executed on the render thread
+	 */
     void Init() override;
-
+    /**
+     * \brief Executed on the main thread
+     */
     void Update(seconds dt) override;
+    /**
+     * \brief Executed on the render thread
+     */
     void DrawImGui() override;
-
+    /**
+     * \brief Executed on the render thread
+     */
     void Destroy() override;
-
+    /**
+     * \brief Executed on the render thread
+	 */
     void SwitchToProgram(size_t index);
+    /**
+     * \brief Executed on the main thread
+     */
     void OnEvent(const SDL_Event& event) override;
 protected:
 

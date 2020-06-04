@@ -1,9 +1,9 @@
 #include <engine/engine.h>
 #include "04_hello_coords/coords_program.h"
 #include "imgui.h"
+
 #include "mathematics/matrix.h"
 #include "mathematics/transform.h"
-
 namespace neko
 {
 
@@ -11,14 +11,14 @@ void HelloCoordsProgram::Init()
 {
     const auto& config = BasicEngine::GetInstance()->config;
     shader_.LoadFromFile(
-            config.dataRootPath+"data/shaders/04_hello_coords/coords.vert",
-            config.dataRootPath+"data/shaders/04_hello_coords/coords.frag");
-    textureWall_ = gl::stbCreateTexture(config.dataRootPath+"data/sprites/wall.jpg");
+            config.dataRootPath+"shaders/04_hello_coords/coords.vert",
+            config.dataRootPath+"shaders/04_hello_coords/coords.frag");
+    textureWall_ = gl::stbCreateTexture(config.dataRootPath+"sprites/wall.jpg");
     cube_.Init();
 
     // note that we're translating the scene in the reverse direction of where we want to move
     view = Mat4f::Identity;
-    view = Mat4f::Translate(view, Vec3f(0.0f, 0.0f, -3.0f));
+    view = Transform3d::Translate(view, Vec3f(0.0f, 0.0f, -3.0f));
 
 
     glEnable(GL_DEPTH_TEST);
@@ -33,7 +33,7 @@ void HelloCoordsProgram::Update(seconds dt)
     timeSinceInit_ += dt;
 
     const auto& config = BasicEngine::GetInstance()->config;
-    projection = Mat4f::Perspective(
+    projection = Transform3d::Perspective(
         degree_t(45.0f), 
         static_cast<float>(config.windowSize.x) / config.windowSize.y, 
         0.1f, 
@@ -51,13 +51,13 @@ void HelloCoordsProgram::Render()
     shader_.SetMat4("view", view);
     shader_.SetMat4("projection", projection);
 
-    for (auto cubePosition : cubePositions)
+    for (const auto cubePosition : cubePositions)
     {
         Mat4f model = Mat4f::Identity; //model transform matrix
-        model = Mat4f::Rotate(model, degree_t(timeSinceInit_.count()*45.0f), Vec3f(1.0f, 0.0f, 0.0f));
-        model = Mat4f::Rotate(model, degree_t(timeSinceInit_.count()*45.0f), Vec3f(0.0f, 1.0f, 0.0f));
+        model = Transform3d::Rotate(model, degree_t(timeSinceInit_.count()*45.0f), Vec3f(1.0f, 0.0f, 0.0f));
+        model = Transform3d::Rotate(model, degree_t(timeSinceInit_.count()*45.0f), Vec3f(0.0f, 1.0f, 0.0f));
 
-        model = Mat4f::Translate(model, cubePosition);
+        model = Transform3d::Translate(model, cubePosition);
         shader_.SetMat4("model", model);
         cube_.Draw();
     }
