@@ -10,6 +10,10 @@ class Locator
     static_assert(std::is_base_of<T, TNull>::value, "TNull has to be a subtype of T");
 public:
 
+    static void initialize() {
+        service_ = &nullService_;
+    }
+
     static T& get()
     { return *service_; }
 
