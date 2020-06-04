@@ -24,7 +24,6 @@
 #include "17_hello_frustum/frustum_program.h"
 
 #include "99_hello_scene/scene_program.h"
-#include <16_hello_culling\culling_program.h>
 
 namespace neko
 {
