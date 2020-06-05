@@ -147,7 +147,7 @@ protected:
 
     std::atomic<std::uint8_t> flags_{IS_RENDERING_UI};
     std::atomic<float> dt_{0.0f};
-
+	
     std::vector<RenderCommandInterface*> currentCommandBuffer_ = {};
     std::vector<RenderCommandInterface*> nextCommandBuffer_ = {};
 };

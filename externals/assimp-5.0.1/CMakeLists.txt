@@ -450,6 +450,7 @@ ELSE(HUNTER_ENABLED)
 
     # compile from sources
     ADD_SUBDIRECTORY(contrib/zlib)
+    SET(ZLIB_BUILD_ASSIMP ON CACHE BOOL "")
     SET(ZLIB_FOUND 1)
     SET(ZLIB_LIBRARIES zlibstatic)
     SET(ZLIB_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/contrib/zlib ${CMAKE_CURRENT_BINARY_DIR}/contrib/zlib)
