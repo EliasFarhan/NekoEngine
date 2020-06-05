@@ -56,6 +56,9 @@ public:
 	{
 		
 	}
+	/**
+	 * \brief DrawLine in Normal Device Coordinate [-1,1]
+	 */
 	void DrawLine(const Line& line)
 	{
 		currentBuffer_.positions_.push_back(line.origin_);
