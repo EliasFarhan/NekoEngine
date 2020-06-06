@@ -19,11 +19,11 @@ void RenderQuad::Init()
             Vec2f(-0.5f, 0.5f) * size_ + Vec2f(offset_)   // top left
     };
 
-    float texCoords[8] = {
-            1.0f, 1.0f,      // top right
-            1.0f, 0.0f,   // bottom right
-            0.0f, 0.0f,   // bottom left
-            0.0f, 1.0f,   // bottom left
+    Vec2f texCoords[4] = {
+            Vec2f(1.0f, 1.0f),      // top right
+            Vec2f(1.0f, 0.0f),   // bottom right
+            Vec2f(0.0f, 0.0f),   // bottom left
+            Vec2f(0.0f, 1.0f),   // bottom left
     };
 
     Vec3f normals[4] = {
@@ -33,6 +33,20 @@ void RenderQuad::Init()
         Vec3f::back
     };
 
+    Vec3f tangent[4]{};
+    for(int i = 0; i < 4; i++)
+    {
+        Vec3f edge1 = Vec3f(vertices[(i+1)%4]-vertices[i]);
+        Vec3f edge2 = Vec3f(vertices[(i+2)%4]-vertices[i]);
+        Vec2f deltaUV1 = texCoords[(i+1)%4]-texCoords[i];
+        Vec2f deltaUV2 = texCoords[(i+2)%4]-texCoords[i];
+
+        float f = 1.0f/(deltaUV1.x*deltaUV2.y-deltaUV2.x*deltaUV1.y);
+        tangent[i].x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+        tangent[i].y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+        tangent[i].z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+    }
+
     unsigned int indices[6] = {
             // note that we start from 0!
             0, 1, 3,   // first triangle
@@ -40,7 +54,7 @@ void RenderQuad::Init()
     };
 
     //Initialize the EBO program
-    glGenBuffers(3, &VBO[0]);
+    glGenBuffers(4, &VBO[0]);
     glGenBuffers(1, &EBO);
     glGenVertexArrays(1, &VAO);
     // 1. bind Vertex Array Object
@@ -58,8 +72,13 @@ void RenderQuad::Init()
     // bind normals data
     glBindBuffer(GL_ARRAY_BUFFER, VBO[2]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(normals), normals, GL_STATIC_DRAW);
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vec2f), (void*)0);
-    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vec3f), (void*)0);
+    glEnableVertexAttribArray(2);
+    // bind tangent data
+    glBindBuffer(GL_ARRAY_BUFFER, VBO[3]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(tangent), tangent, GL_STATIC_DRAW);
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vec3f), (void*)0);
+    glEnableVertexAttribArray(3);
 	//bind EBO
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
@@ -75,7 +94,7 @@ void RenderQuad::Draw() const
 void RenderQuad::Destroy()
 {
     glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(3, &VBO[0]);
+    glDeleteBuffers(4, &VBO[0]);
     glDeleteBuffers(1, &EBO);
 
 }

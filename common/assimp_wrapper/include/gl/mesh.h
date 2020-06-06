@@ -18,7 +18,9 @@ namespace neko::assimp
 		Vec3f position;
 		Vec3f normal;
 		Vec2f texCoords;
-	};
+        Vec3f tangent;
+        Vec3f bitangent;
+    };
 	struct Texture
 	{
 		Texture() = default;
@@ -26,7 +28,8 @@ namespace neko::assimp
 		enum class TextureType : std::uint8_t
 		{
 			DIFFUSE,
-			SPECULAR
+			SPECULAR,
+			NORMALS
 		};
 		TextureType type = TextureType::DIFFUSE;
 	};

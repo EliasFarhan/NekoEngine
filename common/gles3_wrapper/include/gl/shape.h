@@ -9,7 +9,7 @@ struct VertexArrayObject
 {
     unsigned int VAO = 0;
     unsigned int EBO = 0;
-    unsigned int VBO[3]{};
+    unsigned int VBO[4]{};
 };
 
 class RenderCircle : public neko::RenderCircle, public VertexArrayObject

@@ -30,6 +30,8 @@ private:
     gl::Texture normalTex_;
     gl::RenderQuad plane_{Vec3f::zero, Vec2f::one};
 
-    sdl::Camera3D camera3D_;
+    assimp::Model model_;
+
+    sdl::Camera3D camera_;
 };
 }

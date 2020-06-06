@@ -83,6 +83,12 @@ void Mesh::ProcessMesh(
         vector.y = mesh->mNormals[i].y;
         vector.z = mesh->mNormals[i].z;
         vertex.normal = vector;
+
+        vector.x = mesh->mTangents[i].x;
+        vector.y = mesh->mTangents[i].y;
+        vector.z = mesh->mTangents[i].z;
+        vertex.tangent = vector;
+
         if (mesh->mTextureCoords[0]) // does the mesh contain texture coordinates?
         {
             Vec2f vec;
@@ -109,12 +115,14 @@ void Mesh::ProcessMesh(
         aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
         textures_.reserve(material->GetTextureCount(aiTextureType_SPECULAR) +
-	        material->GetTextureCount(aiTextureType_DIFFUSE));
+	        material->GetTextureCount(aiTextureType_DIFFUSE) + material->GetTextureCount(aiTextureType_NORMALS));
     	
         LoadMaterialTextures(material,
             aiTextureType_DIFFUSE, Texture::TextureType::DIFFUSE, directory);
         LoadMaterialTextures(material,
             aiTextureType_SPECULAR, Texture::TextureType::SPECULAR, directory);
+        LoadMaterialTextures(material,
+            aiTextureType_NORMALS, Texture::TextureType::NORMALS, directory);
     }
 }
 
@@ -170,13 +178,16 @@ void Mesh::SetupMesh()
 
     // vertex positions
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
-    // vertex normals
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)nullptr);
     // vertex texture coords
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
+    // vertex normals
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+    // vertex tangent
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tangent));
 
     glBindVertexArray(0);
 }
@@ -215,6 +226,7 @@ void Mesh::BindTextures(const gl::Shader& shader) const
 {
     unsigned int diffuseNr = 1;
     unsigned int specularNr = 1;
+    unsigned int normalNr = 1;
     for (unsigned int i = 0; i < textures_.size(); i++)
     {
         // activate proper texture unit before binding
@@ -231,6 +243,10 @@ void Mesh::BindTextures(const gl::Shader& shader) const
             case Texture::TextureType::SPECULAR:
                 name = "texture_specular";
                 number = std::to_string(specularNr++);
+                break;
+            case Texture::TextureType::NORMALS:
+                name = "texture_normal";
+                number = std::to_string(normalNr++);
                 break;
             default: ;
         }
