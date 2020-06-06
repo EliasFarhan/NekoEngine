@@ -128,7 +128,7 @@ void HelloFramebufferProgram::Render()
     std::lock_guard<std::mutex> lock(updateMutex_);
     if(hasScreenResize_)
     {
-        //When the screen resize, we need to
+        //When the screen resize, we need to resize
         glDeleteFramebuffers(1, &fbo_);
         glDeleteTextures(1, &fboColorBufferTexture_);
         glDeleteRenderbuffers(1, &rbo_);

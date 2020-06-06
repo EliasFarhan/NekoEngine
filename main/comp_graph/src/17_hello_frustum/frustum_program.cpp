@@ -134,7 +134,7 @@ void HelloFrustumProgram::DrawImGui()
     const size_t minChunkSize = 100;
     const size_t maxChunkSize = 10'000;
     ImGui::SliderScalar("Instance Chunk Size", ImGuiDataType_U64, &instanceChunkSize_, &minChunkSize, &maxChunkSize);
-    ImGui::LabelText("Asteroid Actual Nmb", "%llu", asteroidCulledPositions_.size());
+    ImGui::LabelText("Asteroid Actual Nmb", "%zu", asteroidCulledPositions_.size());
     ImGui::End();
 }
 
@@ -217,10 +217,11 @@ void HelloFrustumProgram::Render()
 	//Draw the mini view on top left
     glDisable(GL_DEPTH_TEST);
     screenShader_.Bind();
-    screenShader_.SetInt("screenTexture", 0);
     const float miniMapSize = 0.2f;
     screenShader_.SetVec2("offset", Vec2f((1.0f - miniMapSize/camera_.aspect) , 1.0f - miniMapSize));
     screenShader_.SetVec2("scale", Vec2f( miniMapSize/camera_.aspect, miniMapSize));
+
+    screenShader_.SetInt("screenTexture", 0);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, overViewTexture_);
     mainPlane_.Draw();
