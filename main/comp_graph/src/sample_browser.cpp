@@ -26,6 +26,7 @@
 #include "19_hello_hdr/hdr_program.h"
 #include "20_hello_bloom/bloom_program.h"
 #include "21_hello_shadow/shadow_program.h"
+#include "22_hello_blinn/blinn_program.h"
 
 #include "98_hello_line/line_program.h"
 #include "99_hello_scene/scene_program.h"
@@ -56,6 +57,7 @@ void SampleBrowser::Init()
     RegisterRenderProgram("19 Hello Hdr", std::make_unique<HelloHdrProgram>());
     RegisterRenderProgram("20 Hello Bloom", std::make_unique<HelloBloomProgram>());
     RegisterRenderProgram("21 Hello Shadow", std::make_unique<HelloShadowProgram>());
+    RegisterRenderProgram("22 Hello Blinn", std::make_unique<HelloBlinnProgram>());
 
     RegisterRenderProgram("98 Hello Line", std::make_unique<HelloLineProgram>());
     RegisterRenderProgram("99 Hello Scene", std::make_unique<HelloSceneProgram>());
