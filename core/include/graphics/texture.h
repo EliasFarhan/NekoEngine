@@ -20,7 +20,7 @@ struct Image
     void Destroy();
 };
 
-Image StbImageConvert(BufferFile imageFile);
+Image StbImageConvert(BufferFile imageFile, int requireComponents=3);
 
 /**
  * \brief Neko Texture contains an Image loaded async from disk, converted by stb_image

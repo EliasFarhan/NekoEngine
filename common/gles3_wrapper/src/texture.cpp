@@ -38,7 +38,7 @@ TextureId stbCreateTexture(const std::string_view filename, Texture::TextureFlag
 #ifdef EASY_PROFILE_USE
     EASY_END_BLOCK;
 #endif
-    Image image = StbImageConvert(textureFile);
+    Image image = StbImageConvert(textureFile,reqComponents);
     /*if (extension == ".hdr")
     {
         //data = stbi_loadf(filename.data(), &width, &height, &reqComponents, 0);
@@ -104,7 +104,13 @@ TextureId LoadCubemap(std::vector<std::string> facesFilename)
     {
         BufferFile textureFile;
         textureFile.Load(facesFilename[i]);
-        Image image = StbImageConvert(textureFile);
+        const auto extension = GetFilenameExtension(facesFilename[i]);
+        int reqComponents = 0;
+        if (extension == ".jpg" || extension == ".tga" || extension == ".hdr")
+            reqComponents = 3;
+        else if (extension == ".png")
+            reqComponents = 4;
+        Image image = StbImageConvert(textureFile,reqComponents);
         textureFile.Destroy();
         if (image.data != nullptr)
         {

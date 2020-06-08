@@ -114,15 +114,17 @@ void Mesh::ProcessMesh(
     {
         aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
-        textures_.reserve(material->GetTextureCount(aiTextureType_SPECULAR) +
-	        material->GetTextureCount(aiTextureType_DIFFUSE) + material->GetTextureCount(aiTextureType_NORMALS));
+        textures_.reserve(
+        material->GetTextureCount(aiTextureType_SPECULAR) +
+	        material->GetTextureCount(aiTextureType_DIFFUSE) + 
+            material->GetTextureCount(aiTextureType_HEIGHT));
     	
         LoadMaterialTextures(material,
             aiTextureType_DIFFUSE, Texture::TextureType::DIFFUSE, directory);
         LoadMaterialTextures(material,
             aiTextureType_SPECULAR, Texture::TextureType::SPECULAR, directory);
         LoadMaterialTextures(material,
-            aiTextureType_NORMALS, Texture::TextureType::NORMALS, directory);
+            aiTextureType_HEIGHT, Texture::TextureType::HEIGHT, directory);
     }
 }
 
@@ -227,7 +229,7 @@ void Mesh::BindTextures(const gl::Shader& shader) const
     unsigned int diffuseNr = 1;
     unsigned int specularNr = 1;
     unsigned int normalNr = 1;
-    for (unsigned int i = 0; i < textures_.size(); i++)
+    for (size_t i = 0; i < textures_.size(); i++)
     {
         // activate proper texture unit before binding
         glActiveTexture(GL_TEXTURE0 + i);
@@ -244,7 +246,7 @@ void Mesh::BindTextures(const gl::Shader& shader) const
                 name = "texture_specular";
                 number = std::to_string(specularNr++);
                 break;
-            case Texture::TextureType::NORMALS:
+            case Texture::TextureType::HEIGHT:
                 name = "texture_normal";
                 number = std::to_string(normalNr++);
                 break;
@@ -253,6 +255,8 @@ void Mesh::BindTextures(const gl::Shader& shader) const
         shader.SetInt("material." + name + number, i);
         glBindTexture(GL_TEXTURE_2D, textures_[i].texture.GetTextureId());
     }
+
+    shader.SetBool("enableNormalMap", normalNr > 1);
     glActiveTexture(GL_TEXTURE0);
 }
 }

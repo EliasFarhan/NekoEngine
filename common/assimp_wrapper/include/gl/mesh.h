@@ -29,7 +29,7 @@ namespace neko::assimp
 		{
 			DIFFUSE,
 			SPECULAR,
-			NORMALS
+			HEIGHT
 		};
 		TextureType type = TextureType::DIFFUSE;
 	};
