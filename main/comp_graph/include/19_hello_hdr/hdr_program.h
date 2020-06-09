@@ -4,6 +4,7 @@
 #include "gl/shader.h"
 #include "gl/shape.h"
 #include "gl/texture.h"
+#include "sdl_engine/sdl_camera.h"
 
 namespace neko
 {
@@ -46,7 +47,7 @@ private:
             {Vec3f( 0.8f, -1.7f, 6.0f), Color3(0.0f, 0.1f, 0.0f)}
     }};
 
-    gl::RenderCuboid cube_{Vec3f::zero, Vec3f(1.0f,1.0f,10.0f)};
+    gl::RenderCuboid cube_{Vec3f::forward*10.0f, Vec3f(5.0f,5.0f,50.0f)};
     gl::Texture cubeTexture_;
     gl::Shader cubeShader_;
 

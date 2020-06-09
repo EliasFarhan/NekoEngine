@@ -37,6 +37,11 @@ void HelloHdrProgram::Init()
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     hdrPlane_.Init();
+    hdrShader_.LoadFromFile(
+        config.dataRootPath + "shaders/19_hello_hdr/hdr_screen.vert",
+        config.dataRootPath + "shaders/19_hello_hdr/hdr_screen.frag");
+    camera_.position = Vec3f::forward*5.0f;
+    camera_.LookAt(camera_.position+Vec3f::forward);
 
 }
 
@@ -67,7 +72,7 @@ void HelloHdrProgram::DrawImGui()
     {
         flags_ = enableHdr ? flags_ | ENABLE_HDR : flags_ & ~ENABLE_HDR;
     }
-    ImGui::SliderFloat("Exposure", &exposure_, 0.0f, 3.0f);
+    ImGui::SliderFloat("Exposure", &exposure_, 0.1f, 6.0f);
     ImGui::End();
 }
 
