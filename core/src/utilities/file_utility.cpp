@@ -159,10 +159,6 @@ void ResourceJob::SetFilePath(std::string_view path)
     filePath_ = path;
 }
 
-std::string ResourceJob::GetFilePath() const
-{
-	return filePath_;
-}
 
 void BufferFile::Load(std::string_view path)
 {

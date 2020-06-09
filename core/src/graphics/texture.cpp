@@ -7,6 +7,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include "engine/engine.h"
+#include "utilities/file_utility.h"
 
 #ifdef EASY_PROFILE_USE
 #include "easy/profiler.h"
