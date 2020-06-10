@@ -29,6 +29,8 @@ struct Light
 };
 uniform Light light;
 
+uniform bool onlySpecular;
+
 void main() 
 {
     float distance    = length(light.position - FragPos);
@@ -48,12 +50,12 @@ void main()
     viewDir = normalize(viewPos - FragPos);
     
     float diff = max(dot(lightDir, normal), 0.0);
-    vec3 diffuse = diff * color * attenuation;
+    vec3 diffuse = diff * color * attenuation * (onlySpecular?0.0:1.0);
     // specular
     vec3 reflectDir = reflect(-lightDir, normal);
     float spec = pow(max(dot(reflectDir, viewDir), 0.0),  material.shininess);
 
-    vec3 specular = vec3(0.2) * spec * attenuation;
+    vec3 specular = vec3(onlySpecular?1.0:0.2) * spec * attenuation;
     FragColor = vec4(ambient + diffuse + specular, 1.0);
     
 }

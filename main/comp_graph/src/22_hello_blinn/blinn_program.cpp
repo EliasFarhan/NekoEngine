@@ -49,6 +49,11 @@ void HelloBlinnProgram::DrawImGui()
 	}
 	ImGui::SliderFloat("Floor Texture Resolution", &floorResolution_, 0.5f, 12.0f);
 	ImGui::SliderInt("Specular Pow", &specularPow_, 1, 256);
+	bool onlySpecular = flags_ & ONLY_SPECULAR;
+	if(ImGui::Checkbox("Only Specular", &onlySpecular))
+	{
+		flags_ = onlySpecular ? flags_ | ONLY_SPECULAR : flags_ & ~ONLY_SPECULAR;
+	}
 	ImGui::End();
 }
 
@@ -75,6 +80,7 @@ void HelloBlinnProgram::Render()
 	shader.SetVec3("viewPos", camera_.position);
 	shader.SetFloat("material.resolution", 1.0f);
 	shader.SetFloat("material.shininess", 32.0f);
+	shader.SetBool("onlySpecular", flags_ & ONLY_SPECULAR);
 	model_.Draw(shader);
 
 	model = Mat4f::Identity;

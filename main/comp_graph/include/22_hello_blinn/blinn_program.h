@@ -29,7 +29,8 @@ private:
 	enum BlinnFlags : std::uint8_t
 	{
 		NONE = 0u,
-		ENABLE_BLINN = 1u <<0u		
+		ENABLE_BLINN = 1u << 0u,
+		ONLY_SPECULAR = 1u << 1u
 	};
 	sdl::Camera3D camera_;
 	Vec3f lightPos_;

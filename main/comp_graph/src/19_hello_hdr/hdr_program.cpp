@@ -12,7 +12,7 @@ void HelloHdrProgram::Init()
     cubeShader_.LoadFromFile(
             config.dataRootPath + "shaders/19_hello_hdr/tunnel.vert",
             config.dataRootPath + "shaders/19_hello_hdr/tunnel.frag");
-    cubeTexture_.SetTextureFlags(gl::Texture::TextureFlags(gl::Texture::MIRROR_REPEAT_WRAP | gl::Texture::DEFAULT));
+    cubeTexture_.SetTextureFlags(gl::Texture::TextureFlags(gl::Texture::MIRROR_REPEAT_WRAP | gl::Texture::GAMMA_CORRECTION | gl::Texture::DEFAULT));
     cubeTexture_.SetPath(config.dataRootPath+"sprites/brickwall/brickwall.jpg");
     cubeTexture_.LoadFromDisk();
 
