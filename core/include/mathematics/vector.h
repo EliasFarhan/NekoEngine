@@ -58,6 +58,12 @@ struct Vec2
             T y; ///< Y coordinate of the vector
 
         };
+        struct
+        {
+            T u; ///< X coordinate of the vector
+            T v; ///< Y coordinate of the vector
+
+        };
         T coord[2];
     };
 

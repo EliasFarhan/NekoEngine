@@ -30,13 +30,16 @@ private:
 	{
 		NONE = 0u,
 		ENABLE_NORMAL_MAP = 1u<<0u,
-		ENABLE_MODEL = 1u<<1u
+		ENABLE_PLANE = 1u<<1u,
+		ENABLE_CUBE = 1u << 2u,
+		ENABLE_MODEL = 1u<<3u
 	};
     gl::Shader normalShader_;
     gl::Shader diffuseShader_;
     gl::Texture diffuseTex_;
     gl::Texture normalTex_;
     gl::RenderQuad plane_{Vec3f::zero, Vec2f::one};
+    gl::RenderCuboid cube_{ Vec3f::zero, Vec3f::one };
 
     assimp::Model model_;
 

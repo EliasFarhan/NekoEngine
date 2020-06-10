@@ -294,8 +294,10 @@ void HelloFrustumProgram::Culling(size_t begin, size_t end)
     const auto topNormal = Vec3f(Transform3d::RotationMatrixFrom(topQuaternion) * Vec4f(-cameraUp));
     const auto bottomQuaternion = Quaternion::AngleAxis(-camera_.fovY / 2.0f, cameraRight);
     const auto bottomNormal = Vec3f(Transform3d::RotationMatrixFrom(bottomQuaternion) * Vec4f(cameraUp));
+    
     for (size_t i = begin; i < end; i++)
     {
+
         const auto asteroidPos = asteroidPositions_[i];
         //Near
         {
@@ -313,10 +315,9 @@ void HelloFrustumProgram::Culling(size_t begin, size_t end)
             if (v < -asteroidRadius)
                 continue;
         }
-
+        const auto asterPos = asteroidPos - camera_.position;
     	//Right
         {
-            const auto asterPos = asteroidPos - camera_.position;
             const auto v = Vec3f::Dot(rightNormal, asterPos);
         	if(v < -asteroidRadius)
         	{
@@ -325,7 +326,6 @@ void HelloFrustumProgram::Culling(size_t begin, size_t end)
         }
     	//Left
         {
-            const auto asterPos = asteroidPos - camera_.position;
             const auto v = Vec3f::Dot(leftNormal, asterPos);
             if (v < -asteroidRadius)
             {
@@ -335,7 +335,7 @@ void HelloFrustumProgram::Culling(size_t begin, size_t end)
     	//Top
         {
 
-            const auto asterPos = asteroidPos - camera_.position;
+            
             const auto v = Vec3f::Dot(topNormal, asterPos);
             if (v < -asteroidRadius)
             {
@@ -344,8 +344,6 @@ void HelloFrustumProgram::Culling(size_t begin, size_t end)
         }
         //Bottom
         {
-            
-            const auto asterPos = asteroidPos - camera_.position;
             const auto v = Vec3f::Dot(bottomNormal, asterPos);
             if (v < -asteroidRadius)
             {
