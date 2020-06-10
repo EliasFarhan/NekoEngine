@@ -11,7 +11,8 @@ struct Camera
 {
     Vec3f position;
     Vec3f reverseDirection;
-
+	float nearPlane = 0.1f;
+	float farPlane = 100.0f;
 	void LookAt(Vec3f target)
 	{
 		const Vec3f direction = position - target;
@@ -62,15 +63,39 @@ struct Camera
 		const auto roll = Quaternion::AngleAxis(angles.z, reverseDirection);
 		reverseDirection = Vec3f(Transform3d::RotationMatrixFrom(pitch*yaw*roll) * Vec4f(reverseDirection));
 	}
+
+	[[nodiscard]] virtual Mat4f GenerateProjectionMatrix() const = 0;
+};
+
+struct Camera2D : Camera
+{
+	float right = 0.0f, left = 0.0f, top = 0.0f, bottom =0.0f;
+	[[nodiscard]] Mat4f GenerateProjectionMatrix() const override
+	{
+		return Mat4f(std::array<Vec4f, 4>{
+			Vec4f(2.0f / (right - left), 0, 0, 0),
+			Vec4f(0, 2.0f / (top - bottom), 0, 0),
+			Vec4f(0, 0, 2.0f / (farPlane - nearPlane), 0),
+			Vec4f(-(right + left) / (right - left), 
+					-(top + bottom) / (top - bottom), 
+					-(farPlane + nearPlane) / (farPlane - nearPlane), 1.0f)
+		});
+	}
+	void SetSize(Vec2f size)
+	{
+		left = -size.x;
+		right = size.x;
+		top = size.y;
+		bottom = size.y;
+	}
 };
 
 struct Camera3D : Camera
 {
 	float aspect = 1.0f;
 	degree_t fovY = degree_t(45.0f);
-	float nearPlane = 0.1f;
-	float farPlane = 100.0f;
-	[[nodiscard]] Mat4f GenerateProjectionMatrix() const
+
+	[[nodiscard]] Mat4f GenerateProjectionMatrix() const override
 	{
 		return Transform3d::Perspective(
 			fovY,

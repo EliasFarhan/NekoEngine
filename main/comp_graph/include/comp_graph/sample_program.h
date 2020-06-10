@@ -8,6 +8,8 @@ namespace neko
 
 class SampleProgram : public RenderProgram, public sdl::SdlEventSystemInterface, public DrawImGuiInterface
 {
+public:
+    virtual ~SampleProgram() = default;
 protected:
     std::mutex updateMutex_;
 };

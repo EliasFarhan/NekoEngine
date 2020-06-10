@@ -11,6 +11,7 @@ namespace neko
 class HelloBlinnProgram : public SampleProgram
 {
 public:
+    virtual ~HelloBlinnProgram()= default;
 	void Init() override;
 	void Update(seconds dt) override;
 	void Destroy() override;
