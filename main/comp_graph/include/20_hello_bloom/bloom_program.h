@@ -27,7 +27,8 @@ private:
 	enum BloomFlags : std::uint8_t
 	{
 		NONE = 0u,
-		ENABLE_BLOOM = 1u
+		ENABLE_BLOOM = 1u,
+		RESIZE_FRAMEBUFFER = 1u << 1u
 	};
 	struct Light
 	{
@@ -41,6 +42,9 @@ private:
 		radian_t angle = radian_t(0.0f);
 		Vec3f axis = Vec3f::up;
 	};
+
+	void CreateFramebuffer();
+	
 	gl::Shader cubeShader_;
 	gl::Shader lightShader_;
 	gl::Shader blurShader_;
