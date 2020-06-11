@@ -168,11 +168,13 @@ void HelloShadowProgram::RenderScene(const gl::Shader& shader)
 	model = Transform3d::Translate(model, Vec3f::forward * 5.0f);
 	model = Transform3d::Scale(model, Vec3f(0.1f));
 	shader.SetMat4("model", model);
+	shader.SetMat4("transposeInverseModel", model.Inverse().Transpose());
 	model_.Draw(shader);
 	//Render floor
 	model = Mat4f::Identity;
 	model = Transform3d::Rotate(model, degree_t(-90.0f), Vec3f::right);
 	shader.SetMat4("model", model);
+	shader.SetMat4("transposeInverseModel", model.Inverse().Transpose());
 	shader.SetTexture("material.texture_diffuse1", floorTexture_, 0);
 	floor_.Draw();
 	//Render cubes
@@ -183,6 +185,7 @@ void HelloShadowProgram::RenderScene(const gl::Shader& shader)
 		model = Transform3d::Rotate(model, transform.angle, transform.axis);
 		model = Transform3d::Scale(model, transform.scale);
 		shader.SetMat4("model", model);
+		shader.SetMat4("transposeInverseModel", model.Inverse().Transpose());
 		cube_.Draw();
 	}
 }
