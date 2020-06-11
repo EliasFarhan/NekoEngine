@@ -1,9 +1,11 @@
 #pragma once
 #include <string>
 #include <graphics/shader.h>
+#include "graphics/texture.h"
 #include "gl/gles3_include.h"
 #include "mathematics/vector.h"
 #include "mathematics/matrix.h"
+
 namespace neko::gl
 {
 class Shader : neko::Shader
@@ -47,7 +49,8 @@ public:
 */
     void SetMat4(const std::string& name, const Mat4f& mat) const;
 
-
+    void SetTexture(const std::string& name, const neko::Texture& texture, unsigned int slot = 0) const ;
+    void SetTexture(const std::string& name, TextureId texture, unsigned int slot = 0) const;
 private:
     GLuint shaderProgram_ = 0;
 };

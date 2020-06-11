@@ -20,7 +20,7 @@ private:
 	gl::RenderCuboid cube_{ Vec3f::zero, Vec3f::one };
 	gl::Shader shader_;
 	TextureId  textureWall_;
-	Camera camera_;
+	Camera3D camera_;
 	Mat4f projection_{ Mat4f::Identity };
 	EulerAngles cameraAngles{ degree_t(0.0f), degree_t(0.0f), degree_t(0.0f) };
 

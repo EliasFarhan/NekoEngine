@@ -185,4 +185,17 @@ void Shader::SetMat4(const std::string& name, const Mat4f& mat) const
     glUniformMatrix4fv(glGetUniformLocation(shaderProgram_, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
 
+void Shader::SetTexture(const std::string& name, const neko::Texture& texture, unsigned slot) const
+{
+    glUniform1i(glGetUniformLocation(shaderProgram_, name.c_str()), slot);
+    glActiveTexture(GL_TEXTURE0 + slot);
+    glBindTexture(GL_TEXTURE_2D, texture.GetTextureId());
+}
+
+void Shader::SetTexture(const std::string& name, TextureId texture, unsigned slot) const
+{
+    glUniform1i(glGetUniformLocation(shaderProgram_, name.c_str()), slot);
+    glActiveTexture(GL_TEXTURE0 + slot);
+    glBindTexture(GL_TEXTURE_2D, texture);
+}
 }

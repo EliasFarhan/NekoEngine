@@ -24,10 +24,27 @@ public:
 
     void Render() override;
 private:
+	enum ShadowFlags : std::uint8_t
+	{
+		NONE = 0u,
+		ENABLE_SHADOW = 1u,
+		ENABLE_BIAS = 1u << 1u,
+		ENABLE_PETER_PANNING = 1u << 2u,
+		ENABLE_OVER_SAMPLING = 1u << 3u,
+		ENABLE_PCF = 1u << 4u
+	};
     struct DirectionalLight
     {
-        Vec3f lightPos_ = Vec3f(1,0,1)*10.0f;
-        Vec3f lightDir_ = Vec3f(-1,0,-1).Normalized();
+        Vec3f lightPos = Vec3f::one*10.0f;
+        Vec3f lightDir = (-Vec3f::one).Normalized();
+    };
+
+    struct Transform
+    {
+        Vec3f position = Vec3f::zero;
+        Vec3f scale = Vec3f::one;
+        radian_t angle = radian_t(0.0f);
+        Vec3f axis = Vec3f::up;
     };
     void RenderScene(const gl::Shader& shader);
 	
@@ -35,7 +52,14 @@ private:
     gl::Texture floorTexture_;
 
     gl::RenderCuboid cube_{Vec3f::zero, Vec3f::one};
-	
+    std::array<Transform, 4> cubeTransforms_ = {
+        {
+	        {Vec3f(0.0f, 3.0f, 0.0f), Vec3f(0.5f)},
+        	{Vec3f(2.0f, 1.5f, 1.0f), Vec3f(0.5f)},
+        	{Vec3f(4.0f, 0.25f, 4.0f), Vec3f(0.5f)},
+        	{Vec3f(-1.0f, 1.5f, 2.0f), Vec3f(0.25f), degree_t(60.0f), Vec3f(1,0,1).Normalized()}
+        }
+    };
     assimp::Model model_;
 
     gl::Shader simpleDepthShader_;
@@ -48,5 +72,8 @@ private:
     unsigned int depthMap_ = 0;
     const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
     DirectionalLight light_;
+
+    float shadowBias_ = 0.0005f;
+    std::uint8_t flags_ = NONE;
 };
 }
