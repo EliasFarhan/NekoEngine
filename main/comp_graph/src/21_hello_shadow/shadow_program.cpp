@@ -18,8 +18,8 @@ void HelloShadowProgram::Init()
 	glGenFramebuffers(1, &depthMapFbo_);
 	glGenTextures(1, &depthMap_);
 	glBindTexture(GL_TEXTURE_2D, depthMap_);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
-		SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16,
+		SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -27,9 +27,11 @@ void HelloShadowProgram::Init()
 	
 	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFbo_);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap_, 0);
-	glDrawBuffers(0, GL_NONE);
+    GLenum drawBuffers[] = {GL_NONE };
+    glDrawBuffers(1, drawBuffers);
 	glReadBuffer(GL_NONE);
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 	{
 		logDebug("[Error] Shadow depth map framebuffer is incomplete");
 	}
