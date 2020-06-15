@@ -33,6 +33,8 @@ file(GLOB_RECURSE IMG_FILES
         "${PROJECT_SOURCE_DIR}/data/*.psd"
         "${PROJECT_SOURCE_DIR}/data/*.hdr"
         "${PROJECT_SOURCE_DIR}/data/*.pic"
+        "${PROJECT_SOURCE_DIR}/data/*.dds"
+        "${PROJECT_SOURCE_DIR}/data/*.ktx"
         )
 file(GLOB_RECURSE SND_FILES
         "${PROJECT_SOURCE_DIR}/data/*.wav"

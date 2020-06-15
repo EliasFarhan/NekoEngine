@@ -1,5 +1,7 @@
 #include "gl/texture.h"
 #include "gl/gles3_include.h"
+#include "gli/gli.hpp"
+
 #include "utilities/file_utility.h"
 
 #include <sstream>
@@ -13,6 +15,41 @@
 #endif
 namespace neko::gl
 {
+TextureId gliCreateTexture(const std::string_view filename, Texture::TextureFlags flags)
+{
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("Create GLI Texture");
+#endif
+    gli::texture texture = gli::load(filename.data());
+    if (texture.empty())
+        return 0;
+
+    gli::gl GL(gli::gl::PROFILE_ES30);
+    const gli::gl::format  format = GL.translate(texture.format(), texture.swizzles());
+    GLenum target = GL.translate(texture.target());
+    assert(gli::is_compressed(texture.format()) && target == gli::TARGET_2D);
+
+    GLuint textureId = 0;
+    glGenTextures(1, &textureId);
+    glBindTexture(target, textureId);
+    glTexParameteri(target, GL_TEXTURE_BASE_LEVEL, 0);
+    glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(texture.levels() - 1));
+    glTexParameteri(target, GL_TEXTURE_SWIZZLE_R, format.Swizzles[0]);
+    glTexParameteri(target, GL_TEXTURE_SWIZZLE_G, format.Swizzles[1]);
+    glTexParameteri(target, GL_TEXTURE_SWIZZLE_B, format.Swizzles[2]);
+    glTexParameteri(target, GL_TEXTURE_SWIZZLE_A, format.Swizzles[3]);
+    const Vec3<GLsizei>  extent(texture.extent());
+    glTexStorage2D(target, static_cast<GLint>(texture.levels()), format.Internal, extent.x, extent.y);
+    for (std::size_t level = 0; level < texture.levels(); ++level)
+    {
+        const Vec3<GLsizei> extent(texture.extent(level));
+        glCompressedTexSubImage2D(
+            target, static_cast<GLint>(level), 0, 0, extent.x, extent.y,
+            format.Internal, static_cast<GLsizei>(texture.size(level)), texture.data(0, 0, level));
+    }
+
+    return textureId;
+}
 
 TextureId stbCreateTexture(const std::string_view filename, Texture::TextureFlags flags)
 {
@@ -177,13 +214,13 @@ void Texture::CreateTexture()
         }
         case 3:
         {
-            internalFormat = flags_ & GAMMA_CORRECTION ? GL_SRGB : GL_RGB;
+            internalFormat = flags_ & GAMMA_CORRECTION ? GL_SRGB8 : GL_RGB;
             dataFormat = GL_RGB;
         	break;
         }
         case 4:
         {
-            internalFormat = flags_ & GAMMA_CORRECTION ? GL_SRGB : GL_RGBA;
+            internalFormat = flags_ & GAMMA_CORRECTION ? GL_SRGB8_ALPHA8 : GL_RGBA;
             dataFormat = GL_RGBA;
             break;
         }

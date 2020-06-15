@@ -28,5 +28,17 @@ private:
     gl::Shader shader_;
 
     gl::Texture texture_;
+
+    TextureId ddsTexture_ = 0;
+    TextureId ktxTexture_ = 0;
+
+	enum class TextureType
+	{
+		STB_TEXTURE,
+		DDS_TEXTURE,
+		KTX_TEXTURE,
+		LENGTH
+	};
+    TextureType textureType_ = TextureType::STB_TEXTURE;
 };
 }
