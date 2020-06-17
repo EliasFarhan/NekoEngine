@@ -18,23 +18,22 @@ void HelloLightCastersProgram::Init()
 	const auto& config = BasicEngine::GetInstance()->config;
 	containerDiffuse_ = gl::stbCreateTexture(config.dataRootPath + "material/container2.png");
 	containerSpecular_ = gl::stbCreateTexture(config.dataRootPath + "material/container2_specular.png");
-	containerShaders_[0].LoadFromFile(
-		config.dataRootPath + "shaders/09_hello_lightcasters/container.vert",
-		config.dataRootPath + "shaders/09_hello_lightcasters/container_directional.frag");
-	containerShaders_[1].LoadFromFile(
-		config.dataRootPath + "shaders/09_hello_lightcasters/container.vert",
-		config.dataRootPath + "shaders/09_hello_lightcasters/container_point.frag");
-	containerShaders_[2].LoadFromFile(
-		config.dataRootPath + "shaders/09_hello_lightcasters/container.vert",
-		config.dataRootPath + "shaders/09_hello_lightcasters/container_flash.frag");
-	containerShaders_[3].LoadFromFile(
-		config.dataRootPath + "shaders/09_hello_lightcasters/container.vert",
-		config.dataRootPath + "shaders/09_hello_lightcasters/container_spot.frag");
+    containerShaders_[0].LoadFromFile(
+            config.dataRootPath + "shaders/09_hello_lightcasters/container.vert",
+            config.dataRootPath + "shaders/09_hello_lightcasters/container_directional.frag");
+    containerShaders_[1].LoadFromFile(
+            config.dataRootPath + "shaders/09_hello_lightcasters/container.vert",
+            config.dataRootPath + "shaders/09_hello_lightcasters/container_point.frag");
+    containerShaders_[2].LoadFromFile(
+            config.dataRootPath + "shaders/09_hello_lightcasters/container.vert",
+            config.dataRootPath + "shaders/09_hello_lightcasters/container_flash.frag");
+    containerShaders_[3].LoadFromFile(
+            config.dataRootPath + "shaders/09_hello_lightcasters/container.vert",
+            config.dataRootPath + "shaders/09_hello_lightcasters/container_spot.frag");
 
-	lampShader_.LoadFromFile(
-		config.dataRootPath + "shaders/07_hello_light/lamp.vert",
-		config.dataRootPath + "shaders/07_hello_light/lamp.frag"
-	);
+    lampShader_.LoadFromFile(
+            config.dataRootPath + "shaders/07_hello_light/lamp.vert",
+            config.dataRootPath + "shaders/07_hello_light/lamp.frag");
 	cube_.Init();
 	camera_.Init();
 	camera_.position = Vec3f(15.0f, 12.0f, -14.0f);

@@ -74,7 +74,6 @@ void Shader::LoadFromFile(const std::string_view vertexShaderPath, const std::st
         logDebug(oss.str());
         return;
     }
-
     shaderProgram_ = glCreateProgram();
     glAttachShader(shaderProgram_, vertexShader);
     glAttachShader(shaderProgram_, fragmentShader);

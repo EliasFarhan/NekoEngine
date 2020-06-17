@@ -32,8 +32,8 @@ void HelloSceneProgram::Init()
 		));
 	}
 	const auto& config = BasicEngine::GetInstance()->config;
-	shader_.LoadFromFile(config.dataRootPath + "shaders/99_hello_scene/cube.vert",
-		config.dataRootPath + "shaders/99_hello_scene/cube.frag");
+    shader_.LoadFromFile(config.dataRootPath + "shaders/99_hello_scene/shadow.vert",
+                         config.dataRootPath + "shaders/99_hello_scene/cube.frag");
 	cube_.Init();
 }
 

@@ -8,20 +8,18 @@ namespace neko
 void HelloBloomProgram::Init()
 {
 	const auto& config = BasicEngine::GetInstance()->config;
-	cubeShader_.LoadFromFile(
-		config.dataRootPath + "shaders/20_hello_bloom/cube.vert",
-		config.dataRootPath + "shaders/20_hello_bloom/cube.frag"
-		);
-	lightShader_.LoadFromFile(
-		config.dataRootPath + "shaders/20_hello_bloom/cube.vert",
-		config.dataRootPath + "shaders/20_hello_bloom/light_cube.frag"
-	);
-	blurShader_.LoadFromFile(
-		config.dataRootPath + "shaders/20_hello_bloom/blur.vert",
-		config.dataRootPath + "shaders/20_hello_bloom/blur.frag");
-	bloomShader_.LoadFromFile(
-		config.dataRootPath + "shaders/20_hello_bloom/bloom.vert",
-		config.dataRootPath + "shaders/20_hello_bloom/bloom.frag");
+    cubeShader_.LoadFromFile(
+            config.dataRootPath + "shaders/20_hello_bloom/shadow.vert",
+            config.dataRootPath + "shaders/20_hello_bloom/cube.frag");
+    lightShader_.LoadFromFile(
+            config.dataRootPath + "shaders/20_hello_bloom/shadow.vert",
+            config.dataRootPath + "shaders/20_hello_bloom/light_cube.frag");
+    blurShader_.LoadFromFile(
+            config.dataRootPath + "shaders/20_hello_bloom/blur.vert",
+            config.dataRootPath + "shaders/20_hello_bloom/blur.frag");
+    bloomShader_.LoadFromFile(
+            config.dataRootPath + "shaders/20_hello_bloom/bloom.vert",
+            config.dataRootPath + "shaders/20_hello_bloom/bloom.frag");
 
 	cube_.Init();
     cubeTexture_.SetTextureFlags(gl::Texture::TextureFlags(gl::Texture::DEFAULT | gl::Texture::GAMMA_CORRECTION));

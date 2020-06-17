@@ -8,9 +8,9 @@ void HelloCullingProgram::Init()
 	const auto& config = BasicEngine::GetInstance()->config;
 
 	model_.LoadModel(config.dataRootPath + "model/nanosuit2/nanosuit.obj");
-	modelShader_.LoadFromFile(
-		config.dataRootPath + "shaders/16_hello_culling/model.vert",
-		config.dataRootPath + "shaders/16_hello_culling/model.frag");
+    modelShader_.LoadFromFile(
+            config.dataRootPath + "shaders/16_hello_culling/model.vert",
+            config.dataRootPath + "shaders/16_hello_culling/model.frag");
 	camera_.position = Vec3f(0, 3, 3);
 	camera_.LookAt(Vec3f::zero);
 	cube_.Init();

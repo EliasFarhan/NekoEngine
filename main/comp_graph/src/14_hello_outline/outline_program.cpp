@@ -10,10 +10,10 @@ void HelloOutlineProgram::Init()
 	cubeTexture_.SetPath(config.dataRootPath + "sprites/container.jpg");
 	cubeTexture_.LoadFromDisk();
 
-	modelShader_.LoadFromFile(config.dataRootPath + "shaders/14_hello_outline/model.vert",
-		config.dataRootPath + "shaders/14_hello_outline/model.frag");
-	outlineShader_.LoadFromFile(config.dataRootPath + "shaders/14_hello_outline/outline.vert", 
-		config.dataRootPath + "shaders/14_hello_outline/outline.frag");
+    modelShader_.LoadFromFile(config.dataRootPath + "shaders/14_hello_outline/model.vert",
+                              config.dataRootPath + "shaders/14_hello_outline/model.frag");
+    outlineShader_.LoadFromFile(config.dataRootPath + "shaders/14_hello_outline/outline.vert",
+                                config.dataRootPath + "shaders/14_hello_outline/outline.frag");
 	camera_.position = Vec3f(0.0f, 3.0f, 3.0f);
 	camera_.LookAt(Vec3f::zero);
 }

@@ -43,10 +43,10 @@ void HelloShadowProgram::Init()
 	camera_.position = Vec3f(0, 3, 3);
 	camera_.LookAt(Vec3f::zero);
 
-	simpleDepthShader_.LoadFromFile(config.dataRootPath + "shaders/21_hello_shadow/simple_depth.vert",
-		config.dataRootPath + "shaders/21_hello_shadow/simple_depth.frag");
-	modelShader_.LoadFromFile(config.dataRootPath + "shaders/21_hello_shadow/shadow.vert",
-		config.dataRootPath + "shaders/21_hello_shadow/shadow.frag");
+    simpleDepthShader_.LoadFromFile(config.dataRootPath + "shaders/21_hello_shadow/simple_depth.vert",
+                                    config.dataRootPath + "shaders/21_hello_shadow/simple_depth.frag");
+    modelShader_.LoadFromFile(config.dataRootPath + "shaders/21_hello_shadow/shadow.vert",
+                              config.dataRootPath + "shaders/21_hello_shadow/shadow.frag");
 }
 
 void HelloShadowProgram::Update(seconds dt)

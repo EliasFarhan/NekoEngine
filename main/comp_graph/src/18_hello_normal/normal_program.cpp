@@ -12,13 +12,12 @@ void HelloNormalProgram::Init()
 	normalTex_.SetPath(config.dataRootPath + "sprites/brickwall/brickwall_normal.jpg");
 	normalTex_.LoadFromDisk();
 
-	normalShader_.LoadFromFile(
-		config.dataRootPath + "shaders/18_hello_normal/normal.vert",
-		config.dataRootPath + "shaders/18_hello_normal/normal.frag");
-	diffuseShader_.LoadFromFile(
-		config.dataRootPath + "shaders/18_hello_normal/model.vert",
-		config.dataRootPath + "shaders/18_hello_normal/model.frag"
-	);
+    normalShader_.LoadFromFile(
+            config.dataRootPath + "shaders/18_hello_normal/normal.vert",
+            config.dataRootPath + "shaders/18_hello_normal/normal.frag");
+    diffuseShader_.LoadFromFile(
+            config.dataRootPath + "shaders/18_hello_normal/model.vert",
+            config.dataRootPath + "shaders/18_hello_normal/model.frag");
 
 	plane_.Init();
 	cube_.Init();

@@ -15,17 +15,16 @@ void HelloCubemapsProgram::Init()
 		config.dataRootPath+"sprites/skybox/front.jpg",
 		config.dataRootPath+"sprites/skybox/back.jpg"
 	});
-	skyboxShader_.LoadFromFile(
-		config.dataRootPath + "shaders/15_hello_cubemaps/skybox.vert",
-		config.dataRootPath + "shaders/15_hello_cubemaps/skybox.frag"
-	);
+    skyboxShader_.LoadFromFile(
+            config.dataRootPath + "shaders/15_hello_cubemaps/skybox.vert",
+            config.dataRootPath + "shaders/15_hello_cubemaps/skybox.frag");
 	model_.LoadModel(config.dataRootPath + "model/nanosuit2/nanosuit.obj");
-	modelShader_.LoadFromFile(config.dataRootPath + "shaders/15_hello_cubemaps/model.vert",
-		config.dataRootPath + "shaders/15_hello_cubemaps/model.frag");
-	modelReflectionShader_.LoadFromFile(config.dataRootPath + "shaders/15_hello_cubemaps/model.vert",
-		config.dataRootPath + "shaders/15_hello_cubemaps/model_reflection.frag");
-	modelRefractionShader_.LoadFromFile(config.dataRootPath + "shaders/15_hello_cubemaps/model.vert",
-		config.dataRootPath + "shaders/15_hello_cubemaps/model_refraction.frag");
+    modelShader_.LoadFromFile(config.dataRootPath + "shaders/15_hello_cubemaps/model.vert",
+                              config.dataRootPath + "shaders/15_hello_cubemaps/model.frag");
+    modelReflectionShader_.LoadFromFile(config.dataRootPath + "shaders/15_hello_cubemaps/model.vert",
+                                        config.dataRootPath + "shaders/15_hello_cubemaps/model_reflection.frag");
+    modelRefractionShader_.LoadFromFile(config.dataRootPath + "shaders/15_hello_cubemaps/model.vert",
+                                        config.dataRootPath + "shaders/15_hello_cubemaps/model_refraction.frag");
 	camera_.position = Vec3f(0, 3, 3);
 	camera_.LookAt(Vec3f::zero);
 	cube_.Init();

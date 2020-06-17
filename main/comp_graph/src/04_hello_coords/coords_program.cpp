@@ -11,8 +11,8 @@ void HelloCoordsProgram::Init()
 {
     const auto& config = BasicEngine::GetInstance()->config;
     shader_.LoadFromFile(
-            config.dataRootPath+"shaders/04_hello_coords/coords.vert",
-            config.dataRootPath+"shaders/04_hello_coords/coords.frag");
+            config.dataRootPath + "shaders/04_hello_coords/coords.vert",
+            config.dataRootPath + "shaders/04_hello_coords/coords.frag");
     textureWall_ = gl::stbCreateTexture(config.dataRootPath+"sprites/wall.jpg");
     cube_.Init();
 

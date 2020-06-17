@@ -9,10 +9,10 @@ void HelloStencilProgam::Init()
 	plane_.Init();
 
 	const auto& config = BasicEngine::GetInstance()->config;
-	cubeShader_.LoadFromFile(config.dataRootPath + "shaders/12_hello_stencil/cube.vert",
-		config.dataRootPath + "shaders/12_hello_stencil/cube.frag");
-	floorShader_.LoadFromFile(config.dataRootPath + "shaders/12_hello_stencil/floor.vert",
-		config.dataRootPath + "shaders/12_hello_stencil/floor.frag");
+    cubeShader_.LoadFromFile(config.dataRootPath + "shaders/12_hello_stencil/cube.vert",
+                             config.dataRootPath + "shaders/12_hello_stencil/cube.frag");
+    floorShader_.LoadFromFile(config.dataRootPath + "shaders/12_hello_stencil/floor.vert",
+                              config.dataRootPath + "shaders/12_hello_stencil/floor.frag");
 	cubeTexture_.SetPath(config.dataRootPath + "sprites/container.jpg");
 	cubeTexture_.LoadFromDisk();
 

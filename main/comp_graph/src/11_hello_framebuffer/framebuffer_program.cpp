@@ -46,30 +46,25 @@ void HelloFramebufferProgram::Init()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     screenShader_.LoadFromFile(
-            config.dataRootPath+"shaders/11_hello_framebuffer/screen.vert",
-            config.dataRootPath+"shaders/11_hello_framebuffer/screen.frag"
-            );
+            config.dataRootPath + "shaders/11_hello_framebuffer/screen.vert",
+            config.dataRootPath + "shaders/11_hello_framebuffer/screen.frag");
     screenInverseShader_.LoadFromFile(
-            config.dataRootPath+"shaders/11_hello_framebuffer/screen.vert",
-            config.dataRootPath+"shaders/11_hello_framebuffer/screen_inverse.frag"
-    );
+            config.dataRootPath + "shaders/11_hello_framebuffer/screen.vert",
+            config.dataRootPath + "shaders/11_hello_framebuffer/screen_inverse.frag");
     screenGrayscaleShader_.LoadFromFile(
-            config.dataRootPath+"shaders/11_hello_framebuffer/screen.vert",
-            config.dataRootPath+"shaders/11_hello_framebuffer/screen_grayscale.frag"
-    );
+            config.dataRootPath + "shaders/11_hello_framebuffer/screen.vert",
+            config.dataRootPath + "shaders/11_hello_framebuffer/screen_grayscale.frag");
     screenBlurShader_.LoadFromFile(
-            config.dataRootPath+"shaders/11_hello_framebuffer/screen.vert",
-            config.dataRootPath+"shaders/11_hello_framebuffer/screen_blur.frag"
-    );
+            config.dataRootPath + "shaders/11_hello_framebuffer/screen.vert",
+            config.dataRootPath + "shaders/11_hello_framebuffer/screen_blur.frag");
     screenEdgeDetectionShader_.LoadFromFile(
-            config.dataRootPath+"shaders/11_hello_framebuffer/screen.vert",
-            config.dataRootPath+"shaders/11_hello_framebuffer/screen_edge_detection.frag"
-    );
+            config.dataRootPath + "shaders/11_hello_framebuffer/screen.vert",
+            config.dataRootPath + "shaders/11_hello_framebuffer/screen_edge_detection.frag");
     containerTexture_.SetPath(config.dataRootPath + "sprites/container.jpg");
     containerTexture_.LoadFromDisk();
 
-    modelShader_.LoadFromFile(config.dataRootPath+"shaders/11_hello_framebuffer/model.vert",
-            config.dataRootPath+"shaders/11_hello_framebuffer/model.frag");
+    modelShader_.LoadFromFile(config.dataRootPath + "shaders/11_hello_framebuffer/model.vert",
+                              config.dataRootPath + "shaders/11_hello_framebuffer/model.frag");
     camera_.position = Vec3f(0.0f,-5.0f,-5.0f);
     camera_.LookAt(Vec3f::zero);
 }

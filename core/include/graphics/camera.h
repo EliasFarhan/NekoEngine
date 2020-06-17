@@ -11,30 +11,21 @@ struct Camera
 {
 	virtual ~Camera() = default;
 	Vec3f position;
-    Vec3f reverseDirection;
+    Vec3f reverseDirection = Vec3f::back, right = Vec3f::left, up = Vec3f::down;
 	float nearPlane = 0.1f;
 	float farPlane = 100.0f;
-	void LookAt(Vec3f target)
+	void LookAt(Vec3f target, Vec3f lookUp = Vec3f::down)
 	{
-		const Vec3f direction = position - target;
-		reverseDirection = direction.Normalized();
+		const Vec3f direction = (position - target).Normalized();
+		right = Vec3f::Cross(direction, lookUp).Normalized();
+		up = Vec3f::Cross(direction, right).Normalized();
+		reverseDirection = direction;
 		
 	}
-	
-	[[nodiscard]] Vec3f GetRight() const
-	{
-		return Vec3f::Cross(Vec3f::up, reverseDirection).Normalized();
-	}
 
-	[[nodiscard]] Vec3f GetUp() const
-	{
-		const Vec3f right = GetRight();
-		return Vec3f::Cross(reverseDirection, right).Normalized();
-	}
 	[[nodiscard]] Mat4f GenerateViewMatrix() const
 	{
-		const Vec3f right = GetRight();
-		const Vec3f up = GetUp();
+
 		const Mat4f rotation(std::array<Vec4f, 4>{
 			Vec4f(right.x, up.x, reverseDirection.x, 0.0f),
 				Vec4f(right.y, up.y, reverseDirection.y, 0.0f),
@@ -57,12 +48,13 @@ struct Camera
 	}
 	void Rotate(const EulerAngles& angles)
 	{
-		const auto pitch = Quaternion::AngleAxis(angles.x, GetRight());
+		const auto pitch = Quaternion::AngleAxis(angles.x, right);
 
-		const auto yaw = Quaternion::AngleAxis(angles.y, GetUp());
+		const auto yaw = Quaternion::AngleAxis(angles.y, up);
 
 		const auto roll = Quaternion::AngleAxis(angles.z, reverseDirection);
 		reverseDirection = Vec3f(Transform3d::RotationMatrixFrom(pitch*yaw*roll) * Vec4f(reverseDirection));
+		LookAt(-reverseDirection+position);
 	}
 
 	[[nodiscard]] virtual Mat4f GenerateProjectionMatrix() const = 0;

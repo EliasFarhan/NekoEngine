@@ -6,10 +6,10 @@ namespace neko
 void HelloBlinnProgram::Init()
 {
 	const auto& config = BasicEngine::GetInstance()->config;
-	modelShader_.LoadFromFile(config.dataRootPath + "shaders/22_hello_blinn/model.vert",
-		config.dataRootPath + "shaders/22_hello_blinn/model.frag");
-	blinnShader_.LoadFromFile(config.dataRootPath + "shaders/22_hello_blinn/model.vert",
-		config.dataRootPath + "shaders/22_hello_blinn/model_blinn.frag");
+    modelShader_.LoadFromFile(config.dataRootPath + "shaders/22_hello_blinn/model.vert",
+                              config.dataRootPath + "shaders/22_hello_blinn/model.frag");
+    blinnShader_.LoadFromFile(config.dataRootPath + "shaders/22_hello_blinn/model.vert",
+                              config.dataRootPath + "shaders/22_hello_blinn/model_blinn.frag");
 	floor_.Init();
 	floorTexture_.SetTextureFlags(gl::Texture::TextureFlags(gl::Texture::REPEAT_WRAP | gl::Texture::DEFAULT));
 	floorTexture_.SetPath(config.dataRootPath + "sprites/brickwall/brickwall.jpg");
