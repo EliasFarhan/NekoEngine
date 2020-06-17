@@ -149,17 +149,20 @@ void Mesh::SetupMesh()
     EASY_BLOCK("Generate Buffers");
     EASY_BLOCK("Generate VAO");
 #endif
+    glCheckError();
     glGenVertexArrays(1, &VAO);
 #ifdef EASY_PROFILE_USE
     EASY_END_BLOCK;
     EASY_BLOCK("Generate VBO");
 #endif
     glGenBuffers(1, &VBO);
+    glCheckError();
 #ifdef EASY_PROFILE_USE
     EASY_END_BLOCK;
     EASY_BLOCK("Generate EBO");
 #endif
     glGenBuffers(1, &EBO);
+    glCheckError();
 #ifdef EASY_PROFILE_USE
     EASY_END_BLOCK;
     EASY_END_BLOCK;
@@ -167,12 +170,13 @@ void Mesh::SetupMesh()
 #endif
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
+    glCheckError();
     glBufferData(GL_ARRAY_BUFFER, vertices_.size() * sizeof(Vertex), &vertices_[0], GL_STATIC_DRAW);
-
+    glCheckError();
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_.size() * sizeof(unsigned int),
         &indices_[0], GL_STATIC_DRAW);
+        glCheckError();
 #ifdef EASY_PROFILE_USE
     EASY_END_BLOCK;
     EASY_BLOCK("Vertex Attrib");
@@ -181,16 +185,19 @@ void Mesh::SetupMesh()
     // vertex positions
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)nullptr);
+        glCheckError();
     // vertex texture coords
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
+        glCheckError();
     // vertex normals
     glEnableVertexAttribArray(2);
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+        glCheckError();
     // vertex tangent
     glEnableVertexAttribArray(3);
     glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tangent));
-
+    glCheckError();
     glBindVertexArray(0);
     glCheckError();
 }

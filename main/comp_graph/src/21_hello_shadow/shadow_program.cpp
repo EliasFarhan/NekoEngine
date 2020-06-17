@@ -20,7 +20,7 @@ void HelloShadowProgram::Init()
 	glGenTextures(1, &depthMap_);
 	glBindTexture(GL_TEXTURE_2D, depthMap_);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16,
-		SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, NULL);
+		SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -41,7 +41,8 @@ void HelloShadowProgram::Init()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	depthCamera_.SetSize(Vec2f::one * 4.0f);
 	depthCamera_.position = light_.lightPos;
-	depthCamera_.reverseDirection = -light_.lightDir;
+	depthCamera_.LookAt(light_.lightPos+light_.lightDir);
+
 	
 	camera_.position = Vec3f(0, 3, 3);
 	camera_.LookAt(Vec3f::zero);

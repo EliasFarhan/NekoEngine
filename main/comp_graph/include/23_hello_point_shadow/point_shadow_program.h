@@ -32,6 +32,8 @@ private:
         radian_t angle = radian_t(0.0f);
     };
 
+
+
     void RenderScene(const gl::Shader& shader);
 
     sdl::Camera3D camera3D_;
@@ -39,7 +41,6 @@ private:
 
     gl::Shader lightCubeShader_;
     Camera3D lightCamera_;
-    Vec3f lightPos_ = Vec3f::zero;
     gl::Shader simpleDepthShader_;
 
     gl::Shader cubeShader_;
@@ -49,6 +50,7 @@ private:
     unsigned int depthMapFbo_;
     unsigned int depthCubemap_;
     float dt_ = 0.0f;
+    float bias_ = 0.005f;
 
     std::array<Transform, 5> transforms_ =
             {

@@ -35,8 +35,9 @@ void Shader::LoadFromFile(const std::string_view vertexShaderPath, const std::st
     {
         logDebug(std::string("[Error] Vertex shader: ")+vertexShaderPath.data()+" does not exist");
     }
+    glCheckError();
     const unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-
+    glCheckError();
 
     const auto vertexShaderProgram = LoadFile(vertexShaderPath.data());
     const char* vertexShaderChar = vertexShaderProgram.c_str();
@@ -55,11 +56,13 @@ void Shader::LoadFromFile(const std::string_view vertexShaderPath, const std::st
         logDebug(oss.str());
         return;
     }
+    glCheckError();
     if(!FileExists(fragmentShaderPath))
     {
         logDebug(std::string("[Error] Fragment shader: ")+fragmentShaderPath.data()+" does not exist");
     }
     const unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glCheckError();
     auto fragmentShaderProgram = LoadFile(fragmentShaderPath.data());
     const char* fragmentShaderChar = fragmentShaderProgram.c_str();
     glShaderSource(fragmentShader, 1, &fragmentShaderChar, NULL);
@@ -74,6 +77,7 @@ void Shader::LoadFromFile(const std::string_view vertexShaderPath, const std::st
         logDebug(oss.str());
         return;
     }
+    glCheckError();
     shaderProgram_ = glCreateProgram();
     glAttachShader(shaderProgram_, vertexShader);
     glAttachShader(shaderProgram_, fragmentShader);
@@ -87,9 +91,10 @@ void Shader::LoadFromFile(const std::string_view vertexShaderPath, const std::st
         oss << "[Error] Shader program with vertex: "<< vertexShaderPath<<" and fragment:"<< fragmentShaderPath << "LINK_FAILED\n" << infoLog;
         return;
     }
-
+    glCheckError();
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
+    glCheckError();
 }
 
 

@@ -73,6 +73,7 @@ void HelloTriangleProgram::Init()
     circle_.Init();
 
     glEnable(GL_DEPTH_TEST);
+    glCheckError();
 }
 
 void HelloTriangleProgram::Update(seconds dt)

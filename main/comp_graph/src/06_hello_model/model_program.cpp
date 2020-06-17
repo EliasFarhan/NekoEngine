@@ -10,6 +10,7 @@ void HelloModelProgram::Init()
 	const auto& config = BasicEngine::GetInstance()->config;
 
 	const std::string path = config.dataRootPath + "model/nanosuit2/nanosuit.obj";
+    glCheckError();
 	model_.LoadModel(path);
 	camera_.Init();
     shader_.LoadFromFile(
@@ -23,6 +24,7 @@ void HelloModelProgram::Init()
 void HelloModelProgram::Update(seconds dt)
 {
 	std::lock_guard<std::mutex> lock(updateMutex_);
+
 	camera_.Update(dt);
 	const auto& config = BasicEngine::GetInstance()->config;
 
@@ -47,6 +49,7 @@ void HelloModelProgram::Render()
 {
 	if (shader_.GetProgram() == 0)
 		return;
+    glCheckError();
 	std::lock_guard<std::mutex> lock(updateMutex_);
 	if(!model_.IsLoaded())
 		return;

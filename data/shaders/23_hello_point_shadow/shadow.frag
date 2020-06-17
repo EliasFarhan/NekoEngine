@@ -33,29 +33,23 @@ float ShadowCalculation()
     closestDepth *= lightFarPlane;
     // get depth of current fragment from light's perspective
 
-    if(enablePcf)
+    float shadow  = 0.0;
+    const float samples = 4.0;
+    const float offset  = 0.1;
+    for(float x = -offset; x < offset; x += offset / (samples * 0.5))
     {
-        float shadow  = 0.0;
-        const float samples = 4.0;
-        const float offset  = 0.1;
-        for(float x = -offset; x < offset; x += offset / (samples * 0.5))
+        for(float y = -offset; y < offset; y += offset / (samples * 0.5))
         {
-            for(float y = -offset; y < offset; y += offset / (samples * 0.5))
+            for(float z = -offset; z < offset; z += offset / (samples * 0.5))
             {
-                for(float z = -offset; z < offset; z += offset / (samples * 0.5))
-                {
-                    float closestDepth = texture(shadowMap, fragToLight + vec3(x, y, z)).r;
-                    closestDepth *= lightFarPlane;   // undo mapping [0;1]
-                    if(currentDepth - bias > closestDepth)
-                        shadow += 1.0;
-                }
+                float closestDepth = texture(shadowMap, fragToLight + vec3(x, y, z)).r;
+                closestDepth *= lightFarPlane;   // undo mapping [0;1]
+                if(currentDepth - bias > closestDepth)
+                    shadow += 1.0;
             }
         }
-        shadow /= (samples * samples * samples);
-        return shadow;
     }
-    // check whether current frag pos is in shadow
-    float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
+    shadow /= (samples * samples * samples);
     return shadow;
 
 

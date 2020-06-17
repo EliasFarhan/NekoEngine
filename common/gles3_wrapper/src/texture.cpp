@@ -181,6 +181,7 @@ void DestroyTexture(TextureId textureId)
 
 void Texture::CreateTexture()
 {
+    glCheckError();
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("Generate Texture");
 #endif
@@ -190,20 +191,21 @@ void Texture::CreateTexture()
     EASY_END_BLOCK;
 #endif
     glBindTexture(GL_TEXTURE_2D, textureId_);
+    glCheckError();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, flags_ & CLAMP_WRAP ? GL_CLAMP_TO_EDGE : GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, flags_ & CLAMP_WRAP ? GL_CLAMP_TO_EDGE : GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, flags_ & SMOOTH_TEXTURE ? GL_LINEAR : GL_NEAREST);
-    
+    glCheckError();
 	if (flags_ & MIPMAPS_TEXTURE)
     {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
                         flags_ & SMOOTH_TEXTURE ? GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_LINEAR);
-        
+        glCheckError();
     }
     else
     {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, flags_ & SMOOTH_TEXTURE ? GL_LINEAR : GL_NEAREST);
-        
+        glCheckError();
     }
     
 #ifdef EASY_PROFILE_USE
@@ -234,7 +236,7 @@ void Texture::CreateTexture()
             break;
     }
     glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, image_.width, image_.height, 0, dataFormat, GL_UNSIGNED_BYTE, image_.data);
-    
+    glCheckError();
 #ifdef EASY_PROFILE_USE
     EASY_END_BLOCK;
 #endif
@@ -250,6 +252,7 @@ void Texture::CreateTexture()
 #endif
         glGenerateMipmap(GL_TEXTURE_2D);
     }
+    glCheckError();
     
 }
 

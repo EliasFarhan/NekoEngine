@@ -74,8 +74,9 @@ void Gles3Window::Init()
 		assert(false);
 	}
 #endif
-
+    glCheckError();
 	InitImGui();
+    glCheckError();
 }
 
 void Gles3Window::InitImGui()

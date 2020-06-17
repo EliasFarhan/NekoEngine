@@ -68,8 +68,7 @@ void HelloPointShadowProgram::Update(seconds dt)
 	camera3D_.SetAspect(config.windowSize.x, config.windowSize.y);
 	camera3D_.Update(dt);
 	dt_ += dt.count();
-	lightPos_ = 2.0f * Vec3f(Sin(radian_t(dt_)), 0.0f, Sin(radian_t(dt_)));
-	lightCamera_.position = lightPos_;
+	lightCamera_.position = 4.0f * Vec3f(Sin(radian_t(dt_)), 0.0f, Sin(radian_t(dt_)));
 }
 
 void HelloPointShadowProgram::Destroy()
@@ -86,7 +85,10 @@ void HelloPointShadowProgram::Destroy()
 
 void HelloPointShadowProgram::DrawImGui()
 {
-
+    ImGui::Begin("Point Shadow Program");
+    ImGui::InputFloat3("Light Pos", &lightCamera_.position[0]);
+    ImGui::InputFloat("Shadow Bias", &bias_);
+    ImGui::End();
 }
 
 void HelloPointShadowProgram::Render()
@@ -123,9 +125,9 @@ void HelloPointShadowProgram::Render()
 	{
 		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
 			depthCubemap_, 0);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClear(GL_DEPTH_BUFFER_BIT);
 
-		lightCamera_.LookAt(lightDirs[i], lightUps[i]);
+		lightCamera_.LookAt(lightCamera_.position+lightDirs[i], lightUps[i]);
 		const auto lightSpaceMatrix = lightCamera_.GenerateProjectionMatrix() * lightCamera_.GenerateViewMatrix();
 		simpleDepthShader_.SetMat4("lightSpaceMatrix", lightSpaceMatrix);
 		simpleDepthShader_.SetFloat("lightFarPlane", lightCamera_.farPlane);
@@ -140,11 +142,11 @@ void HelloPointShadowProgram::Render()
 	const auto projection = camera3D_.GenerateProjectionMatrix();
 	cubeShader_.SetMat4("view", view);
 	cubeShader_.SetMat4("projection", projection);
-	cubeShader_.SetVec3("light.lightPos", lightPos_);
+	cubeShader_.SetVec3("light.lightPos", lightCamera_.position);
 	cubeShader_.SetVec3("viewPos", camera3D_.position);
 
 	cubeShader_.SetFloat("lightFarPlane", lightCamera_.farPlane);
-	cubeShader_.SetFloat("bias", 0.005f);
+	cubeShader_.SetFloat("bias", bias_);
 	//Render the scene with shadow
 	cubeShader_.SetTexture("material.texture_diffuse1", cubeTexture_, 0);
 	cubeShader_.SetInt("shadowMap", 1);
@@ -158,7 +160,7 @@ void HelloPointShadowProgram::Render()
 	lightCubeShader_.SetMat4("view", view);
 	lightCubeShader_.SetMat4("projection", projection);
 	auto model = Mat4f::Identity;
-	model = Transform3d::Translate(model, lightPos_);
+	model = Transform3d::Translate(model, lightCamera_.position);
 	model = Transform3d::Scale(model, Vec3f::one * 0.2f);
 	lightCubeShader_.SetMat4("model", model);
 	cube_.Draw();
