@@ -8,6 +8,37 @@
 #include "easy/profiler.h"
 #endif
 
+void CheckGlError(const char* file, int line)
+{
+    GLenum err;
+    while ((err = glGetError()) != GL_NO_ERROR)
+    {
+        std::string log;
+        // Process/log the error.
+        switch (err)
+        {
+        case GL_INVALID_ENUM:
+            log += "[Error] GL Invalid Enum";
+            break;
+        case GL_INVALID_VALUE:
+            log += "[Error] GL Invalid Value";
+            break;
+        case GL_INVALID_OPERATION:
+            log += "[Error] GL Invalid Operation";
+            break;
+        case GL_OUT_OF_MEMORY:
+            log += "[Error] GL Out Of Memory";
+            break;
+        case GL_INVALID_FRAMEBUFFER_OPERATION:
+            log += "[Error] GL Invalid Framebuffer Operation";
+            break;
+        default:
+        	continue;
+        }
+        logDebug(log + " in file: " + file + " at line: " + std::to_string(line));
+    }
+}
+
 
 void CheckFramebuffer()
 {

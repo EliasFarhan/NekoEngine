@@ -11,15 +11,14 @@ struct Camera
 {
 	virtual ~Camera() = default;
 	Vec3f position;
-    Vec3f reverseDirection = Vec3f::back, right = Vec3f::left, up = Vec3f::down;
+    Vec3f reverseDirection = Vec3f::back, right = Vec3f::right, up = Vec3f::up;
 	float nearPlane = 0.1f;
 	float farPlane = 100.0f;
 	void LookAt(Vec3f target, Vec3f lookUp = Vec3f::down)
 	{
-		const Vec3f direction = (position - target).Normalized();
-		right = Vec3f::Cross(direction, lookUp).Normalized();
-		up = Vec3f::Cross(direction, right).Normalized();
-		reverseDirection = direction;
+		reverseDirection = (position - target).Normalized();
+		right = Vec3f::Cross(reverseDirection, lookUp).Normalized();
+		up = Vec3f::Cross(reverseDirection, right).Normalized();
 		
 	}
 
@@ -28,9 +27,9 @@ struct Camera
 
 		const Mat4f rotation(std::array<Vec4f, 4>{
 			Vec4f(right.x, up.x, reverseDirection.x, 0.0f),
-				Vec4f(right.y, up.y, reverseDirection.y, 0.0f),
-				Vec4f(right.z, up.z, reverseDirection.z, 0.0f),
-				Vec4f(0.0f, 0.0f, 0.0f, 1.0f)
+			Vec4f(right.y, up.y, reverseDirection.y, 0.0f),
+			Vec4f(right.z, up.z, reverseDirection.z, 0.0f),
+			Vec4f(0.0f, 0.0f, 0.0f, 1.0f)
 		});
 		const Mat4f translation(std::array<Vec4f, 4>{
 			Vec4f(1,0,0,0),

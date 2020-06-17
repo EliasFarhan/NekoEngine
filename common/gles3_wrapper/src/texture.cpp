@@ -168,6 +168,7 @@ TextureId LoadCubemap(std::vector<std::string> facesFilename)
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
+    
     return textureID;
 }
 
@@ -184,22 +185,27 @@ void Texture::CreateTexture()
     EASY_BLOCK("Generate Texture");
 #endif
     glGenTextures(1, &textureId_);
+    
 #ifdef EASY_PROFILE_USE
     EASY_END_BLOCK;
 #endif
     glBindTexture(GL_TEXTURE_2D, textureId_);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, flags_ & CLAMP_WRAP ? GL_CLAMP_TO_EDGE : GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, flags_ & CLAMP_WRAP ? GL_CLAMP_TO_EDGE : GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, flags_ & SMOOTH_TEXTURE ? GL_LINEAR : GL_NEAREST);
-    if (flags_ & MIPMAPS_TEXTURE)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, flags_ & SMOOTH_TEXTURE ? GL_LINEAR : GL_NEAREST);
+    
+	if (flags_ & MIPMAPS_TEXTURE)
     {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
                         flags_ & SMOOTH_TEXTURE ? GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_LINEAR);
+        
     }
     else
     {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, flags_ & SMOOTH_TEXTURE ? GL_LINEAR : GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, flags_ & SMOOTH_TEXTURE ? GL_LINEAR : GL_NEAREST);
+        
     }
+    
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("Copy Buffer");
 #endif
@@ -228,6 +234,7 @@ void Texture::CreateTexture()
             break;
     }
     glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, image_.width, image_.height, 0, dataFormat, GL_UNSIGNED_BYTE, image_.data);
+    
 #ifdef EASY_PROFILE_USE
     EASY_END_BLOCK;
 #endif

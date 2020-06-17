@@ -1,4 +1,6 @@
 #pragma once
+#include "engine/log.h"
+
 #ifdef NEKO_GLES3
 #ifdef EMSCRIPTEN
 #include <GLES3/gl3.h>
@@ -8,6 +10,7 @@
 #endif
 
 void CheckFramebuffer();
-
+void CheckGlError(const char* file, int line);
+#define glCheckError() CheckGlError(__FILE__, __LINE__) 
 
 #endif

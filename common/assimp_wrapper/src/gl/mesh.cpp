@@ -192,6 +192,7 @@ void Mesh::SetupMesh()
     glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tangent));
 
     glBindVertexArray(0);
+    glCheckError();
 }
 
 Sphere Mesh::GenerateBoundingSphere() const

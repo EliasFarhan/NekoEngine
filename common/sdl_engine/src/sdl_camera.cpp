@@ -26,7 +26,7 @@ namespace neko::sdl
 	void Camera3D::Init()
 	{
 		position = cameraOriginPos;
-		SetDirectionFromEuler(cameraOriginAngles);
+		LookAt(Vec3f::zero);
 	}
 
 	void Camera3D::Update(seconds dt)

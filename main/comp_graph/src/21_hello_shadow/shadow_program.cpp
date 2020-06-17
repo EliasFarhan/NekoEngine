@@ -8,6 +8,7 @@ namespace neko
 void HelloShadowProgram::Init()
 {
 	const auto& config = BasicEngine::GetInstance()->config;
+	glCheckError();
 	cube_.Init();
 	floor_.Init();
 
@@ -24,17 +25,19 @@ void HelloShadowProgram::Init()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE,
+		GL_COMPARE_REF_TO_TEXTURE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC,
+		GL_LEQUAL);
+	glBindTexture(GL_TEXTURE_2D, 0);
 	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFbo_);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap_, 0);
-    GLenum drawBuffers[] = {GL_NONE };
-    glDrawBuffers(1, drawBuffers);
+    GLenum drawBuffers =  GL_NONE ;
+    glDrawBuffers(1, &drawBuffers);
 	glReadBuffer(GL_NONE);
 
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-	{
-		logDebug("[Error] Shadow depth map framebuffer is incomplete");
-	}
+	CheckFramebuffer();
+	glCheckError();
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	depthCamera_.SetSize(Vec2f::one * 4.0f);
 	depthCamera_.position = light_.lightPos;
@@ -47,6 +50,7 @@ void HelloShadowProgram::Init()
                                     config.dataRootPath + "shaders/21_hello_shadow/simple_depth.frag");
     modelShader_.LoadFromFile(config.dataRootPath + "shaders/21_hello_shadow/shadow.vert",
                               config.dataRootPath + "shaders/21_hello_shadow/shadow.frag");
+	glCheckError();
 }
 
 void HelloShadowProgram::Update(seconds dt)
@@ -61,9 +65,16 @@ void HelloShadowProgram::Destroy()
 {
 	cube_.Destroy();
 	floor_.Destroy();
+	model_.Destroy();
 
+	modelShader_.Destroy();
+	simpleDepthShader_.Destroy();
+
+	floorTexture_.Destroy();
+	
 	glDeleteFramebuffers(1, &depthMapFbo_);
 	glDeleteTextures(1, &depthMap_);
+	
 }
 
 	
@@ -120,6 +131,7 @@ void HelloShadowProgram::Render()
 		return;
 	}
 	std::lock_guard<std::mutex> lock(updateMutex_);
+	glCheckError();
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 	const auto& config = BasicEngine::GetInstance()->config;
@@ -146,6 +158,7 @@ void HelloShadowProgram::Render()
 		}
 		//Render scene with shadow
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glCheckError();
 		glViewport(0, 0, config.windowSize.x, config.windowSize.y);
 	}
 	modelShader_.Bind();
@@ -161,6 +174,7 @@ void HelloShadowProgram::Render()
 	modelShader_.SetFloat("bias", shadowBias_);
 	modelShader_.SetVec3("light.lightDir", light_.lightDir);
 	RenderScene(modelShader_);
+	glCheckError();
 }
 
 void HelloShadowProgram::RenderScene(const gl::Shader& shader)

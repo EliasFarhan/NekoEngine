@@ -16,6 +16,7 @@ void HelloModelProgram::Init()
             config.dataRootPath + "shaders/06_hello_model/model.vert",
             config.dataRootPath + "shaders/06_hello_model/model.frag");
 
+	glCheckError();
 
 
 }
@@ -49,6 +50,8 @@ void HelloModelProgram::Render()
 	std::lock_guard<std::mutex> lock(updateMutex_);
 	if(!model_.IsLoaded())
 		return;
+
+	glCheckError();
 	shader_.Bind();
 	shader_.SetMat4("view", camera_.GenerateViewMatrix());
 	shader_.SetMat4("projection", projection_);
