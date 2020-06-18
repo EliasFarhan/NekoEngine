@@ -9,6 +9,7 @@ namespace neko
 	{
 		const auto& config = BasicEngine::GetInstance()->config;
 		glCheckError();
+		plane_.Init();
 		// Create the FBO
 		glGenFramebuffers(1, &fbo_);
 
@@ -57,6 +58,10 @@ namespace neko
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glCheckError();
+
+		camera_.position = Vec3f::one * 3.0f;
+		camera_.LookAt(Vec3f::zero);
+		camera_.farPlane = 100.0f;
 	}
 
 	void HelloCascadedShadowProgram::Update(seconds dt)
@@ -73,6 +78,8 @@ namespace neko
 		shadowShader_.Destroy();
 		glDeleteFramebuffers(1, &fbo_);
 		glDeleteTextures(shadowMaps_.size(), &shadowMaps_[0]);
+		dragonModel_.Destroy();
+		plane_.Destroy();
 	}
 
 	void HelloCascadedShadowProgram::DrawImGui()
@@ -81,7 +88,10 @@ namespace neko
 
 		ImGui::SliderFloat("Near Ratio", &cascadedNearRatio_, 0.0001f, cascadedMiddleRatio_);
 		ImGui::SliderFloat("Middle Ratio", &cascadedMiddleRatio_, cascadedNearRatio_, 1.0f);
-		ImGui::InputFloat3("Light Direction", &light_.direction[0]);
+		if(ImGui::InputFloat3("Light Direction", &lights_[0].direction[0]))
+		{
+			lights_[1].direction = lights_[2].direction = lights_[0].direction;
+		}
 		ImGui::End();
 	}
 
@@ -94,10 +104,10 @@ namespace neko
 		std::lock_guard<std::mutex> lock(updateMutex_);
 		glCheckError();
 		const auto dirY = camera_.up;
-		const auto dirX = (light_.direction - Vec3f::Dot(light_.direction, dirY) * dirY).Normalized();
+		const auto dirX = (lights_[0].direction - Vec3f::Dot(lights_[0].direction, dirY) * dirY).Normalized();
 		const auto dirZ = Vec3f::Cross(dirX, dirY).Normalized();
 
-		const auto lightDir = light_.direction.Normalized();
+		const auto lightDir = lights_[0].direction.Normalized();
 		const auto cameraDir = -camera_.reverseDirection;
 		const auto fovX = camera_.GetFovX();
 		const auto rightQuaternion = Quaternion::AngleAxis(fovX / 2.0f, camera_.up);
@@ -138,7 +148,9 @@ namespace neko
 		lightCamera_.position = dirX*nearPos.x+dirZ*nearPos.y;
 		lightCamera_.SetSize(nearAabb.CalculateExtends());
 		lightCamera_.LookAt(lightCamera_.position + lightDir);
+		lightCamera_.position = lightCamera_.position - lightDir * lightCameraHeight_;
 
+		lights_[0].position = lightCamera_.position;
 		simpleDepthShader_.SetMat4("lightSpaceMatrix",
 			lightCamera_.GenerateProjectionMatrix() * lightCamera_.GenerateViewMatrix());
 
@@ -171,7 +183,9 @@ namespace neko
 		lightCamera_.position = dirX * middlePos.x + dirZ * middlePos.y;
 		lightCamera_.SetSize(middleAabb.CalculateExtends());
 		lightCamera_.LookAt(lightCamera_.position + lightDir);
+		lightCamera_.position = lightCamera_.position - lightDir * lightCameraHeight_;
 
+		lights_[1].position = lightCamera_.position;
 		simpleDepthShader_.SetMat4("lightSpaceMatrix",
 			lightCamera_.GenerateProjectionMatrix() * lightCamera_.GenerateViewMatrix());
 
@@ -204,7 +218,9 @@ namespace neko
 		lightCamera_.position = dirX * farPos.x + dirZ * farPos.y;
 		lightCamera_.SetSize(farAabb.CalculateExtends());
 		lightCamera_.LookAt(lightCamera_.position + lightDir);
+		lightCamera_.position = lightCamera_.position - lightDir * lightCameraHeight_;
 
+		lights_[2].position = lightCamera_.position;
 		simpleDepthShader_.SetMat4("lightSpaceMatrix",
 			lightCamera_.GenerateProjectionMatrix() * lightCamera_.GenerateViewMatrix());
 
@@ -219,7 +235,20 @@ namespace neko
 		shadowShader_.SetMat4("view", camera_.GenerateViewMatrix());
 		shadowShader_.SetMat4("projection", camera_.GenerateProjectionMatrix());
 		shadowShader_.SetTexture("material.texture_diffuse1", whiteTexture_);
-		
+		for(size_t i = 0; i < lights_.size(); i++)
+		{
+			shadowShader_.SetVec3("lights[" + std::to_string(i) + "].position", lights_[i].position);
+			shadowShader_.SetVec3("lights[" + std::to_string(i) + "].direction", lights_[i].direction);
+		}
+		shadowShader_.SetVec3("viewPos", camera_.position);
+		for(size_t i = 0; i < shadowMaps_.size(); i++)
+		{
+			shadowShader_.SetTexture("lights[" + std::to_string(i) + "].shadowMap", shadowMaps_[i], i + 3);
+		}
+		shadowShader_.SetFloat("lightFarPlane", lightCameraFar_);
+		shadowShader_.SetFloat("bias", shadowBias_);
+		shadowShader_.SetFloat("maxNearCascade", camera_.farPlane * cascadedNearRatio_);
+		shadowShader_.SetFloat("maxMiddleCascade", camera_.farPlane * cascadedMiddleRatio_);
 		RenderScene(shadowShader_);
 	}
 
@@ -230,6 +259,22 @@ namespace neko
 
 	void HelloCascadedShadowProgram::RenderScene(const gl::Shader& shader)
 	{
-		
+		for(int z = 0; z < 5; z++)
+		{
+			for(int x = 0; x < 2; x++)
+			{
+				auto model = Mat4f::Identity;
+				model = Transform3d::Translate(model, Vec3f(10.0f * float(x), 0, 10.0f * float(z)+5.0f));
+				shader.SetMat4("model", model);
+				shader.SetMat4("transposeInverseModel", model.Inverse().Transpose());
+				dragonModel_.Draw(shader);
+			}
+		}
+		auto model = Mat4f::Identity;
+		model = Transform3d::Translate(model, Vec3f::forward * camera_.farPlane / 2.0f);
+		model = Transform3d::Scale(model, Vec3f::one * camera_.farPlane / 2.0f);
+		model = Transform3d::Rotate(model, degree_t(90.0f), Vec3f::right);
+		shader.SetMat4("model", model);
+		plane_.Draw();
 	}
 }

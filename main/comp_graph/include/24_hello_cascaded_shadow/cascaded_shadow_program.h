@@ -21,6 +21,7 @@ private:
 	struct DirectionalLight
 	{
 		Vec3f direction = -Vec3f::one;
+		Vec3f position = Vec3f::zero;
 	};
 
 	void RenderScene(const gl::Shader& shader);
@@ -36,9 +37,13 @@ private:
 	std::array<unsigned, 3> shadowMaps_{};
 	float cascadedNearRatio_ = 0.1f;
 	float cascadedMiddleRatio_ = 0.6f;
-	DirectionalLight light_;
+	float lightCameraHeight_ = 10.0f;
+	float lightCameraFar_ = 20.0f;
+	float shadowBias_ = 0.005f;
+	std::array<DirectionalLight, 3> lights_;
 
+	gl::RenderQuad plane_{Vec3f::zero, Vec2f::one};
 	assimp::Model dragonModel_;
-	TextureId whiteTexture_;
+	TextureId whiteTexture_ = 0;
 };
 }
