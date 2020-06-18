@@ -48,6 +48,8 @@ namespace neko
 			config.dataRootPath + "shaders/24_hello_cascaded_shadow/shadow.vert",
 			config.dataRootPath + "shaders/24_hello_cascaded_shadow/shadow.frag"
 		);
+		brickWall_.SetPath(config.dataRootPath+"sprites/brickwall/brickwall.jpg");
+		brickWall_.LoadFromDisk();
 		dragonModel_.LoadModel(config.dataRootPath + "model/dragon/dragon.obj");
 		glGenTextures(1, &whiteTexture_);
 		glBindTexture(GL_TEXTURE_2D, whiteTexture_);
@@ -59,8 +61,8 @@ namespace neko
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glCheckError();
 
-		camera_.position = Vec3f::one * 3.0f;
-		camera_.LookAt(Vec3f::zero);
+		camera_.position = Vec3f(0,3.0f,-3.0f);
+		camera_.LookAt(Vec3f::forward * camera_.farPlane / 2.0f);
 		camera_.farPlane = 100.0f;
 	}
 
@@ -101,11 +103,15 @@ namespace neko
 		{
 			return;
 		}
+		if(!brickWall_.IsLoaded())
+        {
+		    return;
+        }
 		std::lock_guard<std::mutex> lock(updateMutex_);
 		glCheckError();
 		const auto dirY = camera_.up;
 		const auto dirX = (lights_[0].direction - Vec3f::Dot(lights_[0].direction, dirY) * dirY).Normalized();
-		const auto dirZ = Vec3f::Cross(dirX, dirY).Normalized();
+		const auto dirZ = Vec3f::Cross(dirY, dirX).Normalized();
 
 		const auto lightDir = lights_[0].direction.Normalized();
 		const auto cameraDir = -camera_.reverseDirection;
@@ -114,20 +120,20 @@ namespace neko
 		const auto leftQuaternion = Quaternion::AngleAxis(-fovX / 2.0f, camera_.up);
 		const auto cameraDirLeft = Vec3f(Transform3d::RotationMatrixFrom(rightQuaternion) * Vec4f(cameraDir));
 		const auto cameraDirRight = Vec3f(Transform3d::RotationMatrixFrom(leftQuaternion) * Vec4f(cameraDir));
-		
-		const float deltaNearFar = camera_.farPlane - camera_.nearPlane;
+
 
 		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
 		glBindFramebuffer(GL_FRAMEBUFFER, fbo_);
 		
 		//Near BB
 		simpleDepthShader_.Bind();
+		simpleDepthShader_.SetFloat("lightFarPlane", lightCameraFar_);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadowMaps_[0], 0);
 		glClear(GL_DEPTH_BUFFER_BIT);
 		const Vec3f nearSides[4] =
 		{
-			camera_.position+cameraDirLeft*(camera_.farPlane*cascadedNearRatio_),
-			camera_.position+cameraDirRight*(camera_.farPlane*cascadedNearRatio_),
+			camera_.position+cameraDirLeft*(camera_.farPlane * cascadedNearRatio_),
+			camera_.position+cameraDirRight*(camera_.farPlane * cascadedNearRatio_),
 			camera_.position+cameraDirLeft*(camera_.nearPlane),
 			camera_.position+cameraDirRight*(camera_.nearPlane),
 		};
@@ -147,13 +153,15 @@ namespace neko
 		const auto nearPos = nearAabb.CalculateCenter();
 		lightCamera_.position = dirX*nearPos.x+dirZ*nearPos.y;
 		lightCamera_.SetSize(nearAabb.CalculateExtends());
-		lightCamera_.LookAt(lightCamera_.position + lightDir);
-		lightCamera_.position = lightCamera_.position - lightDir * lightCameraHeight_;
+        const auto nearHeight = std::sqrt(lightCamera_.right*lightCamera_.right+lightCamera_.top*lightCamera_.top);
+
+        lightCamera_.LookAt(lightCamera_.position + lightDir);
+		lightCamera_.position = lightCamera_.position - lightDir * nearHeight;
 
 		lights_[0].position = lightCamera_.position;
 		simpleDepthShader_.SetMat4("lightSpaceMatrix",
 			lightCamera_.GenerateProjectionMatrix() * lightCamera_.GenerateViewMatrix());
-
+        simpleDepthShader_.SetVec3("lightPos", lights_[0].position);
 		RenderScene(simpleDepthShader_);
 		
 		//Middle BB
@@ -182,17 +190,18 @@ namespace neko
 		const auto middlePos = middleAabb.CalculateCenter();
 		lightCamera_.position = dirX * middlePos.x + dirZ * middlePos.y;
 		lightCamera_.SetSize(middleAabb.CalculateExtends());
+		const auto middleHeight = std::sqrt(lightCamera_.right*lightCamera_.right+lightCamera_.top*lightCamera_.top);
 		lightCamera_.LookAt(lightCamera_.position + lightDir);
-		lightCamera_.position = lightCamera_.position - lightDir * lightCameraHeight_;
+		lightCamera_.position = lightCamera_.position - lightDir * middleHeight;
 
 		lights_[1].position = lightCamera_.position;
 		simpleDepthShader_.SetMat4("lightSpaceMatrix",
 			lightCamera_.GenerateProjectionMatrix() * lightCamera_.GenerateViewMatrix());
-
+        simpleDepthShader_.SetVec3("lightPos", lights_[1].position);
 		RenderScene(simpleDepthShader_);
 		
 		//Far BB
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadowMaps_[1], 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadowMaps_[2], 0);
 		glClear(GL_DEPTH_BUFFER_BIT);
 		const Vec3f farSides[4] =
 		{
@@ -217,13 +226,15 @@ namespace neko
 		const auto farPos = farAabb.CalculateCenter();
 		lightCamera_.position = dirX * farPos.x + dirZ * farPos.y;
 		lightCamera_.SetSize(farAabb.CalculateExtends());
-		lightCamera_.LookAt(lightCamera_.position + lightDir);
-		lightCamera_.position = lightCamera_.position - lightDir * lightCameraHeight_;
+        const auto farHeight = std::sqrt(lightCamera_.right*lightCamera_.right+lightCamera_.top*lightCamera_.top);
+
+        lightCamera_.LookAt(lightCamera_.position + lightDir);
+		lightCamera_.position = lightCamera_.position - lightDir * farHeight;
 
 		lights_[2].position = lightCamera_.position;
 		simpleDepthShader_.SetMat4("lightSpaceMatrix",
 			lightCamera_.GenerateProjectionMatrix() * lightCamera_.GenerateViewMatrix());
-
+        simpleDepthShader_.SetVec3("lightPos", lights_[2].position);
 		RenderScene(simpleDepthShader_);
 
 		//Render scene from camera
@@ -264,17 +275,20 @@ namespace neko
 			for(int x = 0; x < 2; x++)
 			{
 				auto model = Mat4f::Identity;
-				model = Transform3d::Translate(model, Vec3f(10.0f * float(x), 0, 10.0f * float(z)+5.0f));
+                model = Transform3d::Scale(model, Vec3f::one * 5.0f);
+				model = Transform3d::Translate(model, Vec3f(-10.0f * float(x), 0, 10.0f * float(z)+5.0f));
 				shader.SetMat4("model", model);
 				shader.SetMat4("transposeInverseModel", model.Inverse().Transpose());
 				dragonModel_.Draw(shader);
 			}
 		}
 		auto model = Mat4f::Identity;
-		model = Transform3d::Translate(model, Vec3f::forward * camera_.farPlane / 2.0f);
-		model = Transform3d::Scale(model, Vec3f::one * camera_.farPlane / 2.0f);
-		model = Transform3d::Rotate(model, degree_t(90.0f), Vec3f::right);
-		shader.SetMat4("model", model);
+        model = Transform3d::Rotate(model, Quaternion::AngleAxis(degree_t(-90.0f), Vec3f::right));
+        model = Transform3d::Scale(model, Vec3f::one * camera_.farPlane);
+        model = Transform3d::Translate(model, Vec3f::forward * camera_.farPlane / 2.0f);
+        shader.SetTexture("material.texture_diffuse1", brickWall_);
+        shader.SetMat4("model", model);
+		shader.SetMat4("transposeInverseModel", model.Inverse().Transpose());
 		plane_.Draw();
 	}
 }

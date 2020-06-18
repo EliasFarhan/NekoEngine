@@ -41,17 +41,7 @@ float ShadowCalculation()
     float closestDepth = texture(lights[cascadeIndex].shadowMap, fragToLight.xz).r;
     closestDepth *= lightFarPlane;
 
-    float shadow = 0.0;
-    vec2 texelSize = 1.0 / vec2(textureSize(lights[cascadeIndex].shadowMap, 0));
-    for(int x = -1; x <= 1; ++x)
-    {
-        for(int y = -1; y <= 1; ++y)
-        {
-            float pcfDepth = texture(lights[cascadeIndex].shadowMap, fragToLight.xz + vec2(x, y) * texelSize).r; 
-            shadow += currentDepth - bias > pcfDepth  ? 1.0 : 0.0;        
-        }    
-    }
-    shadow /= 9.0;
+    float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
     return shadow;
     
 }
@@ -64,7 +54,7 @@ void main()
     // ambient
     vec3 ambient = 0.15 * color;
     // diffuse
-    vec3 lightDir = -lights[0].direction;
+    vec3 lightDir = normalize(-lights[0].direction);
     float diff = max(dot(lightDir, normal), 0.0);
     vec3 diffuse = diff * lightColor;
     // specular
