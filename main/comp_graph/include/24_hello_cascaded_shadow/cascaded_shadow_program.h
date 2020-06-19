@@ -20,6 +20,7 @@ public:
 private:
 	struct DirectionalLight
 	{
+	    Vec3f position = Vec3f::zero;
 		Vec3f direction = -Vec3f::one;
 		Mat4f lightSpaceMatrix;
 	};
@@ -33,7 +34,7 @@ private:
 	gl::Shader simpleDepthShader_;
 	gl::Shader shadowShader_;
 
-	const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+	const unsigned int SHADOW_WIDTH = 2048, SHADOW_HEIGHT = 2048;
 	unsigned fbo_ = 0;
 	std::array<unsigned, 3> shadowMaps_{};
 	float cascadedNearRatio_ = 0.1f;

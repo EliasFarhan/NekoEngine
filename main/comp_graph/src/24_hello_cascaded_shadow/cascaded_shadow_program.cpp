@@ -23,9 +23,9 @@ void HelloCascadedShadowProgram::Init()
                      SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, nullptr);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, fbo_);
@@ -153,65 +153,57 @@ void HelloCascadedShadowProgram::OnEvent(const SDL_Event& event)
 Camera2D HelloCascadedShadowProgram::CalculateOrthoLight(float cascadeNear, float cascadeFar, Vec3f lightDir) const
 {
     Camera2D lightCamera;
+    Camera3D camera = camera_;
+    camera.nearPlane = cascadeNear;
+    camera.farPlane = cascadeFar;
     lightCamera.position = Vec3f::zero;
     lightCamera.LookAt(lightDir);
-    const auto lightView = lightCamera.GenerateViewMatrix();
 
-    const auto view = camera_.GenerateViewMatrix();
-    const auto viewInverse = view.Inverse();
     const auto tanHalfFovY = Tan(camera_.fovY / 2.0f);
     const auto tanHalfFovX = tanHalfFovY * camera_.aspect;
-
     const float nearX = cascadeNear * tanHalfFovX;
     const float nearY = cascadeNear * tanHalfFovY;
     const float farX = cascadeFar * tanHalfFovX;
     const float farY = cascadeFar * tanHalfFovY;
 
-    Vec4f viewFrustumCorners[8] =
+    const auto view = camera.GenerateViewMatrix();
+    const auto viewInverse = view.Inverse();
+
+
+
+    Vec3f frustumCorners[8] =
     {
         // near face
-        Vec4f(nearX, nearY, cascadeNear, 1.0),
-        Vec4f(-nearX, nearY, cascadeNear, 1.0),
-        Vec4f(nearX, -nearY, cascadeNear, 1.0),
-        Vec4f(-nearX, -nearY, cascadeNear, 1.0),
+        camera.position-cascadeNear*camera.reverseDir+camera.rightDir*nearX+camera.upDir*nearY,
+        camera.position-cascadeNear*camera.reverseDir-camera.rightDir*nearX+camera.upDir*nearY,
+        camera.position-cascadeNear*camera.reverseDir+camera.rightDir*nearX-camera.upDir*nearY,
+        camera.position-cascadeNear*camera.reverseDir-camera.rightDir*nearX-camera.upDir*nearY,
 
-        // far face
-        Vec4f(farX, farY, cascadeFar, 1.0),
-        Vec4f(-farX, farY, cascadeFar, 1.0),
-        Vec4f(farX, -farY, cascadeFar, 1.0),
-        Vec4f(-farX, -farY, cascadeFar, 1.0),
+        camera.position-cascadeFar*camera.reverseDir+camera.rightDir*farX+camera.upDir*farY,
+        camera.position-cascadeFar*camera.reverseDir-camera.rightDir*farX+camera.upDir*farY,
+        camera.position-cascadeFar*camera.reverseDir+camera.rightDir*farX-camera.upDir*farY,
+        camera.position-cascadeFar*camera.reverseDir-camera.rightDir*farX-camera.upDir*farY,
     };
 
-    float minX = std::numeric_limits<float>::max();
-    float maxX = std::numeric_limits<float>::min();
-    float minY = std::numeric_limits<float>::max();
-    float maxY = std::numeric_limits<float>::min();
-    float minZ = std::numeric_limits<float>::max();
-    float maxZ = std::numeric_limits<float>::min();
 
-    for (const auto& viewCorner : viewFrustumCorners)
+    float radius = 0.0f;
+    Vec3f center = Vec3f::zero;
+    for (int i = 0; i < 8; i++)
     {
-        const auto worldFrustumCorner = viewInverse * viewCorner;
-        const auto frustumCornersLight = lightView * worldFrustumCorner;
-
-        minX = std::min(minX, frustumCornersLight.x);
-        maxX = std::max(maxX, frustumCornersLight.x);
-        minY = std::min(minY, frustumCornersLight.y);
-        maxY = std::max(maxY, frustumCornersLight.y);
-        minZ = std::min(minZ, frustumCornersLight.z);
-        maxZ = std::max(maxZ, frustumCornersLight.z);
+        center += frustumCorners[i];
+        float length = (frustumCorners[i]-center).SquareMagnitude();
+        if(length > radius)
+        {
+            radius = length;
+        }
     }
-    const auto center = Vec3f(
-            lightView.Inverse() * Vec4f((maxX + minX) / 2.0f, (maxY + minY) / 2.0f, (maxZ + minZ) / 2.0f, 1.0f));
+    center /= 8.0f;
 
-    const auto size = Vec2f(maxX - minX, maxY - minY) * 0.5f;
-    lightCamera.right = size.x;
-    lightCamera.left = -size.x;
-    lightCamera.top = size.y;
-    lightCamera.bottom = -size.y;
-    lightCamera.farPlane = maxZ - minZ;
+    radius = std::sqrt(radius);
+    lightCamera.SetSize(Vec2f(radius, radius));
+    lightCamera.farPlane = 2.0f * radius;
     lightCamera.nearPlane = 0.0f;
-    lightCamera.position = center + lightCamera.reverseDir * lightCamera.farPlane / 2.0f;
+    lightCamera.position = center + lightCamera.reverseDir*radius;
     return lightCamera;
 }
 
@@ -228,7 +220,7 @@ void HelloCascadedShadowProgram::ShadowPass(int cascadeIndex)
 
 
     auto lightCamera = CalculateOrthoLight(cascadeNear, cascadeFar, lights_[cascadeIndex].direction);
-
+    lights_[cascadeIndex].position = lightCamera.position;
     lights_[cascadeIndex].lightSpaceMatrix =
             lightCamera.GenerateProjectionMatrix() * lightCamera.GenerateViewMatrix();
 
@@ -243,7 +235,7 @@ void HelloCascadedShadowProgram::RenderScene(const gl::Shader& shader)
 {
     for (int z = 0; z < 5; z++)
     {
-        for (int x = 0; x < 2; x++)
+        for (int x = -1; x < 2; x++)
         {
             auto model = Mat4f::Identity;
             model = Transform3d::Scale(model, Vec3f::one * 0.2f);
