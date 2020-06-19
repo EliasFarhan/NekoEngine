@@ -94,7 +94,16 @@ void HelloCascadedShadowProgram::DrawImGui()
     {
         lights_[1].direction = lights_[2].direction = lights_[0].direction;
     }
-    ImGui::Checkbox("Enable Cascade Color", &enableCascadeColor_);
+    bool enableAabbCascade = flags_ & ENABLE_AABB_CASCADE;
+    if(ImGui::Checkbox("Enable AABB Cascade", &enableAabbCascade))
+    {
+        flags_ = enableAabbCascade ? flags_ | ENABLE_AABB_CASCADE : flags_ & ~ENABLE_AABB_CASCADE;
+    }
+    bool enableCascadeColor = flags_ & ENABLE_CASCADE_COLOR;
+    if(ImGui::Checkbox("Enable Cascade Color", &enableCascadeColor))
+    {
+        flags_ = enableCascadeColor? flags_ | ENABLE_CASCADE_COLOR : flags_ & ~ENABLE_CASCADE_COLOR;
+    }
     ImGui::End();
 }
 
@@ -137,7 +146,7 @@ void HelloCascadedShadowProgram::Render()
     {
         shadowShader_.SetTexture("lights[" + std::to_string(i) + "].shadowMap", shadowMaps_[i], i + 3);
     }
-    shadowShader_.SetBool("enableCascadeColor", enableCascadeColor_);
+    shadowShader_.SetBool("enableCascadeColor", flags_ & ENABLE_CASCADE_COLOR);
     shadowShader_.SetFloat("farPlane", camera_.farPlane);
     shadowShader_.SetFloat("bias", shadowBias_);
     shadowShader_.SetFloat("maxNearCascade", camera_.farPlane * cascadedNearRatio_);
@@ -170,7 +179,7 @@ Camera2D HelloCascadedShadowProgram::CalculateOrthoLight(float cascadeNear, floa
     const auto viewInverse = view.Inverse();
 
 
-
+    const auto lightView = lightCamera.GenerateViewMatrix();
     Vec3f frustumCorners[8] =
     {
         // near face
@@ -185,25 +194,58 @@ Camera2D HelloCascadedShadowProgram::CalculateOrthoLight(float cascadeNear, floa
         camera.position-cascadeFar*camera.reverseDir-camera.rightDir*farX-camera.upDir*farY,
     };
 
+    float minX = std::numeric_limits<float>::max();
+    float maxX = std::numeric_limits<float>::lowest();
+    float minY = std::numeric_limits<float>::max();
+    float maxY = std::numeric_limits<float>::lowest();
+    float minZ = std::numeric_limits<float>::max();
+    float maxZ = std::numeric_limits<float>::lowest();
 
     float radius = 0.0f;
     Vec3f center = Vec3f::zero;
     for (int i = 0; i < 8; i++)
     {
-        center += frustumCorners[i];
-        float length = (frustumCorners[i]-center).SquareMagnitude();
-        if(length > radius)
+
+        if(flags_ & ENABLE_AABB_CASCADE)
         {
-            radius = length;
+            const auto frustumCornersLight = lightView * Vec4f(frustumCorners[i], 1.0f);
+            minX = std::min(minX, frustumCornersLight.x);
+            maxX = std::max(maxX, frustumCornersLight.x);
+            minY = std::min(minY, frustumCornersLight.y);
+            maxY = std::max(maxY, frustumCornersLight.y);
+            minZ = std::min(minZ, frustumCornersLight.z);
+            maxZ = std::max(maxZ, frustumCornersLight.z);
+        }
+        else
+        {
+            center += frustumCorners[i];
+            const float length = (frustumCorners[i]-center).SquareMagnitude();
+            if(length > radius)
+            {
+                radius = length;
+            }
         }
     }
-    center /= 8.0f;
-
-    radius = std::sqrt(radius);
-    lightCamera.SetSize(Vec2f(radius, radius));
-    lightCamera.farPlane = 2.0f * radius;
-    lightCamera.nearPlane = 0.0f;
-    lightCamera.position = center + lightCamera.reverseDir*radius;
+    if(flags_ & ENABLE_AABB_CASCADE)
+    {
+        auto lightCenter = lightView.Inverse()*Vec4f((minX+maxX)/2.0f, (minY+maxY)/2.0f, (minZ+maxZ)/2.0f, 1.0f);
+        lightCenter = lightCenter/lightCenter.w;
+        center = Vec3f(lightCenter);
+        Vec2f size = Vec2f((maxX-minX)/2.0f, (maxY-minY)/2.0f);
+        lightCamera.SetSize(size);
+        lightCamera.nearPlane = 0.0f;
+        lightCamera.farPlane = maxZ-minZ;
+        lightCamera.position = center + lightCamera.reverseDir * lightCamera.farPlane/2.0f;
+    }
+    else
+    {
+        center /= 8.0f;
+        radius = std::sqrt(radius);
+        lightCamera.SetSize(Vec2f(radius, radius));
+        lightCamera.farPlane = 2.0f * radius;
+        lightCamera.nearPlane = 0.0f;
+        lightCamera.position = center + lightCamera.reverseDir * radius;
+    }
     return lightCamera;
 }
 

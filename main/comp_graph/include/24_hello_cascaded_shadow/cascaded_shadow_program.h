@@ -18,6 +18,14 @@ public:
 	void Render() override;
 	void OnEvent(const SDL_Event& event) override;
 private:
+
+    enum CascadedShadowFlags : std::uint8_t
+    {
+        NONE = 0u,
+        ENABLE_CASCADE_COLOR = 1u,
+        ENABLE_AABB_CASCADE = 1u<<1u
+    };
+
 	struct DirectionalLight
 	{
 	    Vec3f position = Vec3f::zero;
@@ -40,7 +48,7 @@ private:
 	float cascadedNearRatio_ = 0.1f;
 	float cascadedMiddleRatio_ = 0.6f;
 	float shadowBias_ = 0.005f;
-	bool enableCascadeColor_ = false;
+	std::uint8_t flags_ = NONE;
 	std::array<DirectionalLight, 3> lights_;
 
 	gl::RenderQuad plane_{Vec3f::zero, Vec2f::one};

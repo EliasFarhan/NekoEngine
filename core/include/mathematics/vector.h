@@ -676,6 +676,15 @@ public:
     }
 
     template<typename U>
+    explicit Vec4(const Vec3<U>& vec3, U w)
+            : x(static_cast<T>(vec3.x)),
+              y(static_cast<T>(vec3.y)),
+              z(static_cast<T>(vec3.z)),
+              w(static_cast<T>(w))
+    {
+    }
+
+    template<typename U>
     explicit Vec4(const Vec4<U>& vector)
             : x(static_cast<T>(vector.x)),
               y(static_cast<T>(vector.y)),
