@@ -78,7 +78,8 @@ namespace neko::assimp
 			import.SetIOHandler(ioSystem);
 
 			scene = import.ReadFile(path_.data(),
-			aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+			aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals |
+				aiProcess_CalcTangentSpace);
 		});
 		BasicEngine::GetInstance()->ScheduleJob(&loadingModelJob, JobThreadType::RESOURCE_THREAD);
 		loadingModelJob.Join();

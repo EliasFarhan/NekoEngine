@@ -7,6 +7,8 @@ out vec4 FragColor;
 in vec3 FragPos;
 in vec3 Normal;
 in vec2 TexCoords;
+in vec4 LightSpacePos[3];
+in float ClipSpacePosZ;
 
 struct Material
 {
@@ -16,7 +18,6 @@ uniform Material material;
 
 struct DirectionalLight
 {
-    vec3 position;
     vec3 direction;
     sampler2D shadowMap;
 };
@@ -25,21 +26,22 @@ uniform vec3 viewPos;
 
 uniform bool enableCascadeColor;
 uniform float bias;
+
 uniform float maxNearCascade;
 uniform float maxMiddleCascade;
-uniform float lightFarPlane;
+uniform float farPlane;
 
-float ShadowCalculation()
+float ShadowCalculation(int cascadeIndex)
 {
-    float depth = length(FragPos-viewPos);
-    int cascadeIndex = depth < maxNearCascade? 0 : 
-        depth < maxMiddleCascade ? 1 : 2;
-
-    //outside of light frustum view
-    vec3 fragToLight = FragPos - lights[cascadeIndex].position;
-    float currentDepth = length(fragToLight);
-    float closestDepth = texture(lights[cascadeIndex].shadowMap, fragToLight.xz).r;
-    closestDepth *= lightFarPlane;
+    vec4 fragPosLightSpace = LightSpacePos[cascadeIndex];
+     // perform perspective divide
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    // transform to [0,1] range
+    projCoords = projCoords * 0.5 + 0.5;
+    // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
+    float closestDepth = texture(lights[cascadeIndex].shadowMap, projCoords.xy).r; 
+    // get depth of current fragment from light's perspective
+    float currentDepth = projCoords.z;
 
     float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
     return shadow;
@@ -64,8 +66,30 @@ void main()
     spec = pow(max(dot(normal, halfwayDir), 0.0), 64.0);
     vec3 specular = spec * lightColor;    
     // calculate shadow
-    float shadow = ShadowCalculation();       
-    vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular)) * color;    
+    vec3 cascadeIndicator = vec3(0.0, 0.0, 0.0);
+    float shadow = 0.0;
+    float cascadeFarPlanes[3] = float[3](
+        maxNearCascade,
+        maxMiddleCascade,
+        farPlane
+    );
+    for (int i = 0 ; i < 3 ; i++) 
+    {
+        if (ClipSpacePosZ <= cascadeFarPlanes[i]) 
+        {
+            shadow = ShadowCalculation(i);
+
+            if (i == 0) 
+                cascadeIndicator = vec3(0.1, 0.0, 0.0);
+            else if (i == 1)
+                cascadeIndicator = vec3(0.0, 0.1, 0.0);
+            else if (i == 2)
+                cascadeIndicator = vec3(0.0, 0.0, 0.1);
+
+            break;
+        }
+   }      
+    vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular)) * color + (enableCascadeColor? cascadeIndicator : vec3(0.0));    
     
     FragColor = vec4(lighting, 1.0);
 }

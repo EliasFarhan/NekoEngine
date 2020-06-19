@@ -21,9 +21,11 @@ private:
 	struct DirectionalLight
 	{
 		Vec3f direction = -Vec3f::one;
-		Vec3f position = Vec3f::zero;
+		Mat4f lightSpaceMatrix;
 	};
 
+	Camera2D CalculateOrthoLight(float cascadeNear, float cascadeFar, Vec3f lightDir) const;
+	void ShadowPass(int cascadeIndex);
 	void RenderScene(const gl::Shader& shader);
 
 	sdl::Camera3D camera_;
@@ -40,6 +42,7 @@ private:
 	float lightCameraHeight_ = 10.0f;
 	float lightCameraFar_ = 20.0f;
 	float shadowBias_ = 0.005f;
+	bool enableCascadeColor_ = false;
 	std::array<DirectionalLight, 3> lights_;
 
 	gl::RenderQuad plane_{Vec3f::zero, Vec2f::one};

@@ -11,14 +11,14 @@ struct Camera
 {
 	virtual ~Camera() = default;
 	Vec3f position;
-    Vec3f reverseDirection = Vec3f::back, right = Vec3f::right, up = Vec3f::up;
+    Vec3f reverseDir = Vec3f::back, rightDir = Vec3f::right, upDir = Vec3f::up;
 	float nearPlane = 0.1f;
 	float farPlane = 100.0f;
 	void LookAt(Vec3f target, Vec3f lookUp = Vec3f::down)
 	{
-		reverseDirection = (position - target).Normalized();
-		right = Vec3f::Cross(reverseDirection, lookUp).Normalized();
-		up = Vec3f::Cross(reverseDirection, right).Normalized();
+		reverseDir = (position - target).Normalized();
+		rightDir = Vec3f::Cross(reverseDir, lookUp).Normalized();
+		upDir = Vec3f::Cross(reverseDir, rightDir).Normalized();
 		
 	}
 
@@ -26,9 +26,9 @@ struct Camera
 	{
 
 		const Mat4f rotation(std::array<Vec4f, 4>{
-			Vec4f(right.x, up.x, reverseDirection.x, 0.0f),
-			Vec4f(right.y, up.y, reverseDirection.y, 0.0f),
-			Vec4f(right.z, up.z, reverseDirection.z, 0.0f),
+			Vec4f(rightDir.x, upDir.x, reverseDir.x, 0.0f),
+			Vec4f(rightDir.y, upDir.y, reverseDir.y, 0.0f),
+			Vec4f(rightDir.z, upDir.z, reverseDir.z, 0.0f),
 			Vec4f(0.0f, 0.0f, 0.0f, 1.0f)
 		});
 		const Mat4f translation(std::array<Vec4f, 4>{
@@ -43,17 +43,17 @@ struct Camera
 	void SetDirectionFromEuler(const EulerAngles& angles)
 	{
 		const Quaternion q = Quaternion::FromEuler(angles);
-		reverseDirection = Vec3f(Transform3d::RotationMatrixFrom(q)*Vec4f(0,0,1,0));
+		reverseDir = Vec3f(Transform3d::RotationMatrixFrom(q)*Vec4f(0,0,1,0));
 	}
 	void Rotate(const EulerAngles& angles)
 	{
-		const auto pitch = Quaternion::AngleAxis(angles.x, right);
+		const auto pitch = Quaternion::AngleAxis(angles.x, rightDir);
 
-		const auto yaw = Quaternion::AngleAxis(angles.y, up);
+		const auto yaw = Quaternion::AngleAxis(angles.y, upDir);
 
-		const auto roll = Quaternion::AngleAxis(angles.z, reverseDirection);
-		reverseDirection = Vec3f(Transform3d::RotationMatrixFrom(pitch*yaw*roll) * Vec4f(reverseDirection));
-		LookAt(-reverseDirection+position);
+		const auto roll = Quaternion::AngleAxis(angles.z, reverseDir);
+		reverseDir = Vec3f(Transform3d::RotationMatrixFrom(pitch*yaw*roll) * Vec4f(reverseDir));
+		LookAt(-reverseDir+position);
 	}
 
 	[[nodiscard]] virtual Mat4f GenerateProjectionMatrix() const = 0;

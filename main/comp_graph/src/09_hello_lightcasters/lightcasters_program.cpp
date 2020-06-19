@@ -37,7 +37,7 @@ void HelloLightCastersProgram::Init()
 	cube_.Init();
 	camera_.Init();
 	camera_.position = Vec3f(15.0f, 12.0f, -14.0f);
-	camera_.reverseDirection = Vec3f(7, 5, -2).Normalized();
+	camera_.reverseDir = Vec3f(7, 5, -2).Normalized();
 }
 
 void HelloLightCastersProgram::Update(seconds dt)
@@ -71,7 +71,7 @@ void HelloLightCastersProgram::DrawImGui()
 	ImGui::Text("Camera Position: %f, %f, %f", 
 		camera_.position.x, camera_.position.y, camera_.position.z);
 	ImGui::Text("Camera Direction: %f, %f, %f", 
-		-camera_.reverseDirection.x, -camera_.reverseDirection.y, -camera_.reverseDirection.z);
+		-camera_.reverseDir.x, -camera_.reverseDir.y, -camera_.reverseDir.z);
 	ImGui::InputFloat("ambientStrength", &ambientStrength_);
 	ImGui::InputFloat("diffuseStrength", &diffuseStrength_);
 	ImGui::InputFloat("specularStrength", &specularStrength_);
@@ -174,7 +174,7 @@ void HelloLightCastersProgram::Render()
 	case LightCasterType::FLASH: {
 		containerShader.SetVec3("light.color", Vec3f(1, 1, 1));
 		containerShader.SetVec3("light.position", camera_.position);
-		containerShader.SetVec3("light.direction", Vec3f::zero - camera_.reverseDirection);
+		containerShader.SetVec3("light.direction", Vec3f::zero - camera_.reverseDir);
 		containerShader.SetFloat("light.cutOff", Cos(lightCutOffAngle_));
 		break;
 	}
@@ -182,7 +182,7 @@ void HelloLightCastersProgram::Render()
 	{
 		containerShader.SetVec3("light.color", Vec3f(1, 1, 1));
 		containerShader.SetVec3("light.position", camera_.position);
-		containerShader.SetVec3("light.direction", Vec3f::zero - camera_.reverseDirection);
+		containerShader.SetVec3("light.direction", Vec3f::zero - camera_.reverseDir);
 		containerShader.SetFloat("light.cutOff", Cos(lightCutOffAngle_));
 		containerShader.SetFloat("light.outerCutOff", Cos(lightOuterCutOffAngle_));
 		break;

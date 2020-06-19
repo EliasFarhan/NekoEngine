@@ -280,9 +280,9 @@ void HelloFrustumProgram::Culling(size_t begin, size_t end)
     EASY_BLOCK("Culling");
 #endif
 	const auto asteroidRadius = model_.GetMesh(0).GenerateBoundingSphere().radius_;
-    const auto cameraDir = -camera_.reverseDirection;
-    const auto cameraRight = camera_.right;
-    const auto cameraUp = camera_.up;
+    const auto cameraDir = -camera_.reverseDir;
+    const auto cameraRight = camera_.rightDir;
+    const auto cameraUp = camera_.upDir;
     const auto fovX = camera_.GetFovX();
 	
     const auto rightQuaternion = Quaternion::AngleAxis(fovX / 2.0f, cameraUp);
@@ -310,7 +310,7 @@ void HelloFrustumProgram::Culling(size_t begin, size_t end)
         {
             const auto planePos = camera_.position + cameraDir * camera_.farPlane;
             const auto asterPos = asteroidPos - planePos;
-            const auto v = Vec3f::Dot(camera_.reverseDirection, asterPos);
+            const auto v = Vec3f::Dot(camera_.reverseDir, asterPos);
             if (v < -asteroidRadius)
                 continue;
         }
