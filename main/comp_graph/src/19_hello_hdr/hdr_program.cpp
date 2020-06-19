@@ -127,6 +127,7 @@ void HelloHdrProgram::CreateFramebuffer()
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, config.windowSize.x, config.windowSize.y, 0, GL_RGBA, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBindTexture(GL_TEXTURE_2D, 0);
     // create depth buffer (renderbuffer)
     glGenRenderbuffers(1, &hdrRbo_);
     glBindRenderbuffer(GL_RENDERBUFFER, hdrRbo_);
@@ -140,5 +141,6 @@ void HelloHdrProgram::CreateFramebuffer()
         logDebug("[Error] Framebuffer not complete!");
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glCheckError();
 }
 }
