@@ -9,10 +9,10 @@ void HelloBloomProgram::Init()
 {
 	const auto& config = BasicEngine::GetInstance()->config;
     cubeShader_.LoadFromFile(
-            config.dataRootPath + "shaders/20_hello_bloom/shadow.vert",
+            config.dataRootPath + "shaders/20_hello_bloom/cube.vert",
             config.dataRootPath + "shaders/20_hello_bloom/cube.frag");
     lightShader_.LoadFromFile(
-            config.dataRootPath + "shaders/20_hello_bloom/shadow.vert",
+            config.dataRootPath + "shaders/20_hello_bloom/cube.vert",
             config.dataRootPath + "shaders/20_hello_bloom/light_cube.frag");
     blurShader_.LoadFromFile(
             config.dataRootPath + "shaders/20_hello_bloom/blur.vert",

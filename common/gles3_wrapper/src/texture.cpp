@@ -217,18 +217,18 @@ void Texture::CreateTexture()
     {
         case 1:
         {
-            internalFormat = dataFormat = GL_RED;
+            internalFormat = dataFormat = GL_R8;
         		break;
         }
         case 3:
         {
-            internalFormat = flags_ & GAMMA_CORRECTION ? GL_SRGB8 : GL_RGB;
+            internalFormat = flags_ & GAMMA_CORRECTION ? GL_SRGB8 : GL_RGB8;
             dataFormat = GL_RGB;
         	break;
         }
         case 4:
         {
-            internalFormat = flags_ & GAMMA_CORRECTION ? GL_SRGB8_ALPHA8 : GL_RGBA;
+            internalFormat = flags_ & GAMMA_CORRECTION ? GL_SRGB8_ALPHA8 : GL_RGBA8;
             dataFormat = GL_RGBA;
             break;
         }
