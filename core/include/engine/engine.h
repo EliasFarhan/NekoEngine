@@ -30,7 +30,6 @@
 #include <graphics/color.h>
 #include <utilities/time_utility.h>
 #include <mathematics/vector.h>
-#include <atomic>
 
 #include "jobsystem.h"
 
@@ -88,7 +87,7 @@ public:
     void RegisterOnDrawUi(DrawImGuiInterface& drawUi);
 
     float GetDeltaTime() const { return dt_; };
-	
+
     static BasicEngine* GetInstance(){return instance_;}
 
     void ScheduleJob(Job* job, JobThreadType threadType);
@@ -100,7 +99,7 @@ protected:
     Window* window_ = nullptr;
     JobSystem jobSystem_;
 	bool isRunning_;
-    std::atomic<float> dt_;
+    float dt_ = 0.0f;
     Action<> initAction_;
     Action<seconds> updateAction_;
     Action<> drawImGuiAction_;

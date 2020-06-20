@@ -2,7 +2,6 @@
 
 #ifdef NEKO_GLES3
 
-#include <atomic>
 #include <mathematics/vector.h>
 #include "gl/gles3_include.h"
 #include "sdl_engine/sdl_window.h"
@@ -39,7 +38,6 @@ public:
     void MakeCurrentContext() override;
     void LeaveCurrentContext() override;
 protected:
-    std::atomic<std::uint8_t> flags_{0};
     void RenderUi() override;
     SDL_GLContext glRenderContext_{};
     OnResizeRenderCommand onResizeCommand_;

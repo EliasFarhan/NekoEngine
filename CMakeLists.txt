@@ -9,7 +9,6 @@ set_property(GLOBAL PROPERTY USE_FOLDERS On)
 include(cmake/neko_executable.cmake)
 
 
-set(Neko_SameThread OFF CACHE BOOL "Used for Emscripten and other system when render and engine has to be in the same thread")
 set(Neko_Profile OFF CACHE BOOL "Activate Profiling with Easy Profile")
 set(Neko_GLES3 ON CACHE BOOL "Activate OpenGL ES 3.0")
 set(Neko_SDL2 ON CACHE BOOL "Activate SDL2")
@@ -49,12 +48,9 @@ if(Neko_Assert)
     add_compile_definitions("NEKO_ASSERT=1")
 endif()
 
-if(Neko_SameThread)
-    MESSAGE("Neko Update and Render will be on the same thread")
-    add_compile_definitions("NEKO_SAMETHREAD=1")
-endif()
 
 if(Neko_Profile)
+    MESSAGE("Enable profiling")
     set(EASY_PROFILE_DIR "${EXTERNAL_DIR}/easy_profiler-2.1.0")
     add_compile_definitions("EASY_PROFILE_USE=1")
     add_subdirectory(${EASY_PROFILE_DIR})

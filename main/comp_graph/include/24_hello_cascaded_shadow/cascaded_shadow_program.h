@@ -33,7 +33,7 @@ private:
 		Mat4f lightSpaceMatrix;
 	};
 
-	Camera2D CalculateOrthoLight(float cascadeNear, float cascadeFar, Vec3f lightDir) const;
+	[[nodiscard]] Camera2D CalculateOrthoLight(float cascadeNear, float cascadeFar, Vec3f lightDir) const;
 	void ShadowPass(int cascadeIndex);
 	void RenderScene(const gl::Shader& shader);
 
@@ -42,7 +42,7 @@ private:
 	gl::Shader simpleDepthShader_;
 	gl::Shader shadowShader_;
 
-	const unsigned int SHADOW_WIDTH = 2048, SHADOW_HEIGHT = 2048;
+	const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
 	unsigned fbo_ = 0;
 	std::array<unsigned, 3> shadowMaps_{};
 	float cascadedNearRatio_ = 0.1f;

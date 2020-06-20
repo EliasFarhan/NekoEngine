@@ -48,11 +48,9 @@ struct Camera
 	void Rotate(const EulerAngles& angles)
 	{
 		const auto pitch = Quaternion::AngleAxis(angles.x, rightDir);
-
 		const auto yaw = Quaternion::AngleAxis(angles.y, upDir);
-
 		const auto roll = Quaternion::AngleAxis(angles.z, reverseDir);
-		reverseDir = Vec3f(Transform3d::RotationMatrixFrom(pitch*yaw*roll) * Vec4f(reverseDir));
+		reverseDir = Vec3f(Transform3d::RotationMatrixFrom(pitch*yaw*roll) * Vec4f(reverseDir)).Normalized();
 		LookAt(-reverseDir+position);
 	}
 

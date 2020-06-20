@@ -55,9 +55,11 @@ void JobSystem::ScheduleJob(Job* func, JobThreadType threadType)
 
 void JobSystem::Work(JobQueue& jobQueue)
 {
-    ++initializedWorkers_; // Atomic increment.
-
-    while (status_ & Status::RUNNING) // Atomic check.
+    {
+        std::lock_guard<std::mutex> lock(statusMutex_);
+        ++workersStarted_;
+    }
+    while (IsRunning())
     {
         Job* job = nullptr;
         {// CRITICAL
@@ -81,7 +83,7 @@ void JobSystem::Work(JobQueue& jobQueue)
             }
             else
             {
-                if (status_ & Status::RUNNING) // Atomic check.
+                if (IsRunning()) // Atomic check.
                 {
                     jobQueue.cv_.wait(lock); // !CRITICAL
                 }
@@ -94,10 +96,9 @@ void JobSystem::Work(JobQueue& jobQueue)
 
 void JobSystem::Init()
 {
-    numberOfWorkers = std::thread::hardware_concurrency() - 1;
-    //TODO@Oleg: Add neko assert to check number of worker threads is valid!
+    numberOfWorkers = std::max(3u, std::thread::hardware_concurrency() - 1);
     workers_.resize(numberOfWorkers);
-
+    status_ = RUNNING;
     const size_t len = numberOfWorkers;
     for (size_t i = 0; i < len; ++i)
     {
@@ -126,13 +127,20 @@ void JobSystem::Init()
 void JobSystem::Destroy()
 {
 // Spin-lock waiting for all threads to become ready for shutdown.
-    while (initializedWorkers_ != numberOfWorkers ||
-        !jobs_.jobs_.empty() ||
-        !renderJobs_.jobs_.empty() ||
-        !resourceJobs_.jobs_.empty())
-    {} // WARNING: Not locking mutex for task_ access here!
+    std::function<bool()> checkFunc = [this]()
+    {
+        std::lock_guard<std::mutex> lock(statusMutex_);
+        return workersStarted_ != numberOfWorkers ||
+                  !jobs_.jobs_.empty() ||
+                  !renderJobs_.jobs_.empty() ||
+                  !resourceJobs_.jobs_.empty();
+    };
+    while (checkFunc())
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds (1));
+    }
 
-    status_ = 0u; // Atomic assign.
+    status_ = NONE;
     renderJobs_.cv_.notify_all();
     resourceJobs_.cv_.notify_all();
 	jobs_.cv_.notify_all(); // Wake all workers.
@@ -141,6 +149,18 @@ void JobSystem::Destroy()
     {
         workers_[i].join(); // Join all workers.
     }
+}
+
+bool JobSystem::IsRunning()
+{
+    std::lock_guard<std::mutex> lock(statusMutex_);
+    return status_ & Status::RUNNING;
+}
+
+std::uint8_t JobSystem::CountStartedWorkers()
+{
+    std::lock_guard<std::mutex> lock(statusMutex_);
+    return workersStarted_;
 }
 
 
@@ -152,9 +172,28 @@ Job::Job(std::function<void()> task) :
 
 }
 
+Job::Job(Job&& job) noexcept
+{
+    promise_ = std::move(job.promise_);
+    dependencies_ = std::move(job.dependencies_);
+    task_ = std::move(job.task_);
+    taskDoneFuture_ = std::move(job.taskDoneFuture_);
+    status_ = job.status_;
+}
+
+Job& Job::operator=(Job&& job) noexcept
+{
+    promise_ = std::move(job.promise_);
+    dependencies_ = std::move(job.dependencies_);
+    task_ = std::move(job.task_);
+    taskDoneFuture_ = std::move(job.taskDoneFuture_);
+    status_ = job.status_;
+    return *this;
+}
+
 void Job::Join() const
 {
-    if(!(status_ & DONE))
+    if(!IsDone())
         taskDoneFuture_.get();
 }
 
@@ -169,9 +208,15 @@ void Job::Execute()
         }
     }
 
-    status_ |= STARTED;
+    {
+        std::lock_guard<std::mutex> lock(statusLock_);
+        status_ |= STARTED;
+    }
     task_();
-    status_ |= DONE;
+    {
+        std::lock_guard<std::mutex> lock(statusLock_);
+        status_ |= DONE;
+    }
     promise_.set_value();
 }
 
@@ -179,14 +224,21 @@ bool Job::CheckDependenciesStarted()
 {
 	for(auto& dep : dependencies_)
 	{
-		if(!(dep->status_ & STARTED))
+		if(!dep->HasStarted())
             return false;
 	}
     return true;
 }
 
+bool Job::HasStarted() const
+{
+    std::lock_guard<std::mutex> lock(statusLock_);
+    return status_ & STARTED;
+}
+
 bool Job::IsDone() const
 {
+    std::lock_guard<std::mutex> lock(statusLock_);
     return status_ & DONE;
 }
 
@@ -222,4 +274,8 @@ void Job::Reset()
     status_ = 0;
     dependencies_.clear();
 }
+
+
+
+
 }

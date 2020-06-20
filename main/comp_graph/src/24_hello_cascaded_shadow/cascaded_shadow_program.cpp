@@ -176,9 +176,6 @@ Camera2D HelloCascadedShadowProgram::CalculateOrthoLight(float cascadeNear, floa
     const float farY = cascadeFar * tanHalfFovY;
 
     const auto view = camera.GenerateViewMatrix();
-    const auto viewInverse = view.Inverse();
-
-
     const auto lightView = lightCamera.GenerateViewMatrix();
     Vec3f frustumCorners[8] =
     {
@@ -203,12 +200,12 @@ Camera2D HelloCascadedShadowProgram::CalculateOrthoLight(float cascadeNear, floa
 
     float radius = 0.0f;
     Vec3f center = Vec3f::zero;
-    for (int i = 0; i < 8; i++)
+    for (auto & frustumCorner : frustumCorners)
     {
-
+        center += frustumCorner;
         if(flags_ & ENABLE_AABB_CASCADE)
         {
-            const auto frustumCornersLight = lightView * Vec4f(frustumCorners[i], 1.0f);
+            const auto frustumCornersLight = lightView * Vec4f(frustumCorner, 1.0f);
             minX = std::min(minX, frustumCornersLight.x);
             maxX = std::max(maxX, frustumCornersLight.x);
             minY = std::min(minY, frustumCornersLight.y);
@@ -216,22 +213,14 @@ Camera2D HelloCascadedShadowProgram::CalculateOrthoLight(float cascadeNear, floa
             minZ = std::min(minZ, frustumCornersLight.z);
             maxZ = std::max(maxZ, frustumCornersLight.z);
         }
-        else
-        {
-            center += frustumCorners[i];
-            const float length = (frustumCorners[i]-center).SquareMagnitude();
-            if(length > radius)
-            {
-                radius = length;
-            }
-        }
     }
     if(flags_ & ENABLE_AABB_CASCADE)
     {
-        auto lightCenter = lightView.Inverse()*Vec4f((minX+maxX)/2.0f, (minY+maxY)/2.0f, (minZ+maxZ)/2.0f, 1.0f);
-        lightCenter = lightCenter/lightCenter.w;
-        center = Vec3f(lightCenter);
-        Vec2f size = Vec2f((maxX-minX)/2.0f, (maxY-minY)/2.0f);
+
+        const auto maxSizeLength = std::max((maxX-minX)/2.0f, (maxY-minY)/2.0f);
+        const auto size = Vec2f(maxSizeLength, maxSizeLength);
+        //const auto lightCenter = lightView.Inverse()*Vec4f((minX+maxX)/2.0f, (minY+maxY)/2.0f, (minZ+maxZ)/2.0f, 1.0f);
+        center /= 8.0f;// = Vec3f(lightCenter);
         lightCamera.SetSize(size);
         lightCamera.nearPlane = 0.0f;
         lightCamera.farPlane = maxZ-minZ;
@@ -240,6 +229,14 @@ Camera2D HelloCascadedShadowProgram::CalculateOrthoLight(float cascadeNear, floa
     else
     {
         center /= 8.0f;
+        for(const auto& frustumCorner : frustumCorners)
+        {
+            const float length = (frustumCorner-center).SquareMagnitude();
+            if(length > radius)
+            {
+                radius = length;
+            }
+        }
         radius = std::sqrt(radius);
         lightCamera.SetSize(Vec2f(radius, radius));
         lightCamera.farPlane = 2.0f * radius;

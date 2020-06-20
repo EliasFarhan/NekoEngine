@@ -28,7 +28,6 @@
 #include <array>
 #include <vector>
 #include <thread>
-#include <atomic>
 #include <utilities/service_locator.h>
 
 #include "engine/system.h"
@@ -109,6 +108,7 @@ public:
     void Destroy();
 
     void SetFlag(RendererFlag flag);
+    std::uint8_t GetFlag() const;
     void SetWindow(Window* window);
 
 	void AddPreRenderJob(Job* job) override;
@@ -145,8 +145,8 @@ protected:
 
     Window* window_ = nullptr;
 
-    std::atomic<std::uint8_t> flags_{IS_RENDERING_UI};
-    std::atomic<float> dt_{0.0f};
+    mutable std::mutex statusMutex_;
+    std::uint8_t flags_{IS_RENDERING_UI};
 	
     std::vector<RenderCommandInterface*> currentCommandBuffer_ = {};
     std::vector<RenderCommandInterface*> nextCommandBuffer_ = {};

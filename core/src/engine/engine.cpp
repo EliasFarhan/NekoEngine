@@ -211,7 +211,7 @@ void BasicEngine::GenerateUiFrame()
 	ImGui::Begin("Neko Window");
 
 	std::ostringstream oss;
-	oss << "App FPS: " << 1.0f / GetDeltaTime() << '\n'
+	oss << "App FPS: " << 1.0f / dt_ << '\n'
 		<< '\n';
 	ImGui::Text("%s", oss.str().c_str());
 	ImGui::End();
