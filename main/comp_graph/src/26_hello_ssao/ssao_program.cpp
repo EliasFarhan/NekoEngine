@@ -1,4 +1,5 @@
 #include "26_hello_ssao/ssao_program.h"
+#include "imgui.h"
 
 namespace neko
 {
@@ -30,6 +31,44 @@ void HelloSsaoProgram::Init()
 	ssaoLightingShader_.LoadFromFile(
         config.dataRootPath + "shaders/26_hello_ssao/ssao.vert",
         config.dataRootPath + "shaders/26_hello_ssao/ssao_lighting.frag");
+    // generate sample kernel
+    ssaoKernel_.clear();
+    ssaoKernel_.reserve(maxKernelSize_);
+    for (int i = 0; i < maxKernelSize_; ++i)
+    {
+        Vec3f sample(
+            RandomRange(-1.0f, 1.0f), 
+            RandomRange(-1.0f,1.0f), 
+            RandomRange(-1.0f,1.0f));
+        sample = sample.Normalized();
+        sample *= RandomRange(-1.0f, 1.0f);
+        float scale = float(i) / 64.0;
+
+        // scale samples s.t. they're more aligned to center of kernel
+        scale = Lerp(0.1f, 1.0f, scale * scale);
+        sample *= scale;
+        ssaoKernel_.push_back(sample);
+    }
+    // generate noise texture
+    std::array<Vec3f, 16> ssaoNoise;
+	for (auto& noise : ssaoNoise)
+	{
+		const Vec3f noiseValue = Vec3f(RandomRange(-1.0f, 1.0f), RandomRange(-1.0f, 1.0f), 0.0f);
+        noise = noiseValue;
+	}
+    glGenTextures(1, &noiseTexture_);
+    glBindTexture(GL_TEXTURE_2D, noiseTexture_);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, 4, 4, 0, GL_RGB, GL_FLOAT, &ssaoNoise[0]);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    plane_.Init();
+    screenPlane_.Init();
+    model_.LoadModel(config.dataRootPath + "model/nanosuit2/nanosuit.obj");
+
+    camera_.Init();
 }
 
 void HelloSsaoProgram::Update(seconds dt)
@@ -43,19 +82,112 @@ void HelloSsaoProgram::Update(seconds dt)
 void HelloSsaoProgram::Destroy()
 {
     DestroyFramebuffer();
+    glDeleteTextures(1, &whiteTexture_);
+    glDeleteTextures(1, &noiseTexture_);
+    ssaoBlurShader_.Destroy();
+    ssaoGeometryShader_.Destroy();
+    ssaoShader_.Destroy();
+    ssaoLightingShader_.Destroy();
+    plane_.Destroy();
+    screenPlane_.Destroy();
+    model_.Destroy();
 }
 
 void HelloSsaoProgram::DrawImGui()
 {
+    ImGui::Begin("SSAO Program");
+    ImGui::SliderFloat("Radius", &ssaoRadius_, 0.1f, 0.7f);
+    ImGui::SliderFloat("Bias", &ssaoBias_, 0.005f, 0.05f);
+    ImGui::SliderInt("Kernel Size", &kernelSize_, 1, maxKernelSize_);
+    bool enableSsao = flags_ & ENABLE_SSAO;
+	if(ImGui::Checkbox("Enable SSAO", &enableSsao))
+	{
+        flags_ = enableSsao ? flags_ | ENABLE_SSAO : flags_ & ~ENABLE_SSAO;
+	}
+	ImGui::End();
 }
 
 void HelloSsaoProgram::Render()
 {
+	if(!model_.IsLoaded())
+	{
+        return;
+	}
     std::lock_guard<std::mutex> lock(updateMutex_);
+	if(flags_ & RESIZE_SCREEN)
+	{
+        DestroyFramebuffer();
+        CreateFramebuffer();
+        flags_ = flags_ & ~RESIZE_SCREEN;	
+	}
+    const auto view = camera_.GenerateViewMatrix();
+    const auto projection = camera_.GenerateProjectionMatrix();
+
+    // 1. geometry pass: render scene's geometry/color data into gbuffer
+    glBindFramebuffer(GL_FRAMEBUFFER, gBuffer_);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    ssaoGeometryShader_.Bind();
+    
+    ssaoGeometryShader_.SetMat4("view", view);
+    ssaoGeometryShader_.SetMat4("projection", projection);
+    RenderScene(ssaoGeometryShader_);
+
+    // 2. generate SSAO texture
+    glBindFramebuffer(GL_FRAMEBUFFER, ssaoFbo_);
+    glClear(GL_COLOR_BUFFER_BIT);
+    ssaoShader_.Bind();
+	for(unsigned int i = 0; i < 64; i++)
+	{
+        ssaoShader_.SetVec3("samples[" + std::to_string(i) + "]", ssaoKernel_[i]);
+	}
+    ssaoShader_.SetMat4("projection", projection);
+    ssaoShader_.SetTexture("gPosition", gPosition_, 0);
+    ssaoShader_.SetTexture("gNormal", gNormal_, 1);
+    ssaoShader_.SetTexture("noiseTexture", noiseTexture_, 2);
+
+    ssaoShader_.SetInt("kernelSize", kernelSize_);
+    ssaoShader_.SetFloat("radius", ssaoRadius_);
+    ssaoShader_.SetFloat("bias", ssaoBias_);
+    screenPlane_.Draw();
+
+    // 3. blur SSAO texture to remove noise
+    glBindFramebuffer(GL_FRAMEBUFFER, ssaoBlurFbo_);
+    glClear(GL_COLOR_BUFFER_BIT);
+    ssaoBlurShader_.Bind();
+    ssaoBlurShader_.SetTexture("ssaoInput", ssaoColorBuffer_, 0);
+    screenPlane_.Draw();
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    // 4. lighting pass: traditional deferred Blinn-Phong lighting with added screen-space ambient occlusion
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    ssaoLightingShader_.Bind();
+    const auto lightPosView = Vec3f(view * Vec4f(light_.position, 1.0f));
+    ssaoLightingShader_.SetVec3("light.position", lightPosView);
+    ssaoLightingShader_.SetVec3("light.color", light_.color);
+    ssaoLightingShader_.SetFloat("light.linear", light_.linear);
+    ssaoLightingShader_.SetFloat("light.quadratic", light_.quadratic);
+    ssaoLightingShader_.SetFloat("light.constant", light_.constant);
+    ssaoLightingShader_.SetTexture("gPosition", gPosition_, 0);
+    ssaoLightingShader_.SetTexture("gNormal", gNormal_, 1);
+    ssaoLightingShader_.SetTexture("gAlbedo", gAlbedoSpec_, 2);
+    ssaoLightingShader_.SetTexture("ssao", ssaoColorBufferBlur_, 3);
+    ssaoLightingShader_.SetBool("enableSSAO", flags_ & ENABLE_SSAO);
+    screenPlane_.Draw();
+	
+	
+	
 }
 
 void HelloSsaoProgram::OnEvent(const SDL_Event& event)
 {
+    camera_.OnEvent(event);
+    if (event.type == SDL_WINDOWEVENT)
+    {
+        if (event.window.event == SDL_WINDOWEVENT_RESIZED)
+        {
+            flags_ = flags_ | RESIZE_SCREEN;
+        }
+    }
 }
 
 void HelloSsaoProgram::DestroyFramebuffer()
@@ -144,6 +276,30 @@ void HelloSsaoProgram::CreateFramebuffer()
     CheckFramebuffer();
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glCheckError();
+}
+
+void HelloSsaoProgram::RenderScene(const gl::Shader& shader)
+{
+    const auto view = camera_.GenerateViewMatrix();
+
+	//Draw floor
+    auto model = Mat4f::Identity;
+    model = Transform3d::Rotate(model, Quaternion::AngleAxis(degree_t(-90.0f), Vec3f::right));
+    model = Transform3d::Scale(model, Vec3f::one * 5.0f);
+    //model = Transform3d::Translate(model, Vec3f::forward * camera_.farPlane / 2.0f);
+    shader.SetMat4("model", model);
+    shader.SetMat4("normalMatrix", (view * model).Inverse().Transpose());
+    plane_.Draw();
+	//Draw model
+    model = Mat4f::Identity;
+	model = model = Transform3d::Rotate(model, degree_t(90.0f), Vec3f::right);
+    model = Transform3d::Scale(model, Vec3f::one * 0.1f);
+    model = Transform3d::Translate(model, Vec3f::up*0.1f);
+    shader.SetMat4("model", model);
+    shader.SetMat4("normalMatrix", (view * model).Inverse().Transpose());
+	model_.Draw(shader);
+	
     glCheckError();
 }
 }
