@@ -75,6 +75,7 @@ void HelloShadowProgram::Destroy()
 	
 	glDeleteFramebuffers(1, &depthMapFbo_);
 	glDeleteTextures(1, &depthMap_);
+	glDisable(GL_CULL_FACE);
 	
 }
 
