@@ -23,6 +23,7 @@ Image StbImageConvert(BufferFile imageFile, int requireComponents)
     EASY_BLOCK("Convert Image");
 #endif
     Image image;
+    stbi_set_flip_vertically_on_load(true);
     image.data = stbi_load_from_memory((unsigned char*) (imageFile.dataBuffer),
                                        imageFile.dataLength, &image.width, &image.height, &image.nbChannels, 0);
     return image;
