@@ -162,7 +162,7 @@ void HelloCascadedShadowProgram::OnEvent(const SDL_Event& event)
 Camera2D HelloCascadedShadowProgram::CalculateOrthoLight(float cascadeNear, float cascadeFar, Vec3f lightDir) const
 {
     Camera2D lightCamera;
-    Camera3D camera = camera_;
+    Camera3D camera = static_cast<Camera3D>(camera_);
     camera.nearPlane = cascadeNear;
     camera.farPlane = cascadeFar;
     lightCamera.position = Vec3f::zero;

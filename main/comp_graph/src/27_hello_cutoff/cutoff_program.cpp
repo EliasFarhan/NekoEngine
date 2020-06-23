@@ -11,7 +11,7 @@ namespace neko
 			config.dataRootPath + "shaders/27_hello_cutoff/cutoff.frag");
 		camera_.Init();
 		grassTexture_.SetPath(config.dataRootPath + "sprites/grass.png");
-		grassTexture_.SetTextureFlags(gl::Texture::TextureFlags::CLAMP_WRAP);
+		grassTexture_.SetTextureFlags(static_cast<Texture::TextureFlags>(gl::Texture::CLAMP_WRAP));
 		
 		grassTexture_.LoadFromDisk();
 		cubeTexture_.SetPath(config.dataRootPath + "sprites/container.jpg");
@@ -80,7 +80,9 @@ namespace neko
 		for (const auto& position : vegetationPositions)
 		{
 			auto model = Mat4f::Identity;
+			model = Transform3d::Scale(model, Vec3f(1, -1, 1));
 			model = Transform3d::Translate(model, position);
+			
 			cutoffShader_.SetMat4("model", model);
 			plane_.Draw();
 		}

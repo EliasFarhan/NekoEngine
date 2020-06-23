@@ -14,8 +14,7 @@ public:
     Texture() : neko::Texture(){}
 
     Texture(Texture&& tex) noexcept :
-		neko::Texture(std::move(tex)),
-		flags_(tex.flags_)
+		neko::Texture(std::move(tex))
     {
         if (!tex.IsLoaded())
         {
@@ -23,22 +22,12 @@ public:
             std::abort();
         }
     }
-    enum TextureFlags : unsigned
-    {
-        SMOOTH_TEXTURE = 1u << 0u,
-        MIPMAPS_TEXTURE = 1u << 1u,
-        CLAMP_WRAP = 1u << 2u,
-        REPEAT_WRAP = 1u << 3u,
-        MIRROR_REPEAT_WRAP = 1u << 4u,
-        GAMMA_CORRECTION = 1u << 5u,
-        DEFAULT = SMOOTH_TEXTURE | MIPMAPS_TEXTURE,
-    };
-    void SetTextureFlags(TextureFlags textureFlags){flags_ = textureFlags;}
+   
+
     void Destroy() override;
 protected:
     void CreateTexture() override;
 
-    TextureFlags flags_ = DEFAULT;
 };
 
 class TextureManager : public neko::TextureManager
