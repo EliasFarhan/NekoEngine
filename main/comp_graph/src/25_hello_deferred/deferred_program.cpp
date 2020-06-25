@@ -5,6 +5,10 @@
 #include "25_hello_deferred/deferred_progam.h"
 #include "imgui.h"
 
+#ifdef EASY_PROFILE_USE
+#include "easy/profiler.h"
+#endif
+
 namespace neko
 {
 
@@ -128,6 +132,9 @@ void HelloDeferredProgram::Render()
 
     if(flags_ & FORWARD_RENDERING)
     {
+#ifdef EASY_PROFILE_USE
+        EASY_BLOCK("Forward Rendering");
+#endif
         forwardShader_.Bind();
         forwardShader_.SetMat4("view", camera_.GenerateViewMatrix());
         forwardShader_.SetMat4("projection", camera_.GenerateProjectionMatrix());
@@ -141,6 +148,9 @@ void HelloDeferredProgram::Render()
     }
     else
     {
+#ifdef EASY_PROFILE_USE
+        EASY_BLOCK("Deferred Rendering");
+#endif
         //G-Buffer pass
         glBindFramebuffer(GL_FRAMEBUFFER, gBuffer_);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -178,6 +188,7 @@ void HelloDeferredProgram::OnEvent(const SDL_Event& event)
 
 void HelloDeferredProgram::CreateFramebuffer()
 {
+	
     const auto& config = BasicEngine::GetInstance()->config;
     glCheckError();
     glGenFramebuffers(1, &gBuffer_);
@@ -227,6 +238,9 @@ void HelloDeferredProgram::CreateFramebuffer()
 
 void HelloDeferredProgram::RenderScene(const gl::Shader& shader)
 {
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("¨Render Scene");
+#endif
     for(int x = -2; x < 3; x++)
     {
         for(int z = -2; z < 3; z++)

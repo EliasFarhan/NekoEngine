@@ -102,7 +102,7 @@ void HelloBlendingProgram::Render()
 	cube_.Draw();
 
 	
-	//Draw grass
+	//Draw windows
 	cutoffShader_.SetTexture("texture1", windowTexture_, 0);
 	const std::array<Vec3f, 5> windowPositions
 	{
