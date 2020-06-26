@@ -118,11 +118,11 @@ void BasicEngine::Update(seconds dt)
 	
     Job eventJob([this]
     {
-#if defined(__ANDROID__)
+#if defined(__ANDROID__) or defined(EMSCRIPTEN)
         window_->MakeCurrentContext();
 #endif
 	    ManageEvent();
-#if defined(__ANDROID__)
+#if defined(__ANDROID__) or defined(EMSCRIPTEN)
         window_->LeaveCurrentContext();
 #endif
     });
@@ -143,15 +143,20 @@ void BasicEngine::Update(seconds dt)
     jobSystem_.ScheduleJob(swapBufferJob, JobThreadType::RENDER_THREAD);
     jobSystem_.ScheduleJob(&eventJob, JobThreadType::MAIN_THREAD);
     jobSystem_.ScheduleJob(&updateJob, JobThreadType::MAIN_THREAD);
-
+#ifndef NEKO_SAMETHREAD
     swapBufferJob->Join();
+#else
+    jobSystem_.KickJobs();
+#endif
 }
 
 void BasicEngine::Destroy()
 {
+
+#ifndef NEKO_SAMETHREAD
     Job leaveContext([this] {window_->LeaveCurrentContext(); });
     jobSystem_.ScheduleJob(&leaveContext, JobThreadType::RENDER_THREAD);
-    leaveContext.Join();
+#endif
     window_->MakeCurrentContext();
     renderer_->Destroy();
 	jobSystem_.Destroy();

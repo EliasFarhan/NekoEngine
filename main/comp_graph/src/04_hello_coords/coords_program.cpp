@@ -13,7 +13,8 @@ void HelloCoordsProgram::Init()
     shader_.LoadFromFile(
             config.dataRootPath + "shaders/04_hello_coords/coords.vert",
             config.dataRootPath + "shaders/04_hello_coords/coords.frag");
-    textureWall_ = gl::stbCreateTexture(config.dataRootPath+"sprites/wall.jpg");
+    textureWall_.SetPath(config.dataRootPath+"sprites/wall.jpg");
+    textureWall_.LoadFromDisk();
     cube_.Init();
 
     // note that we're translating the scene in the reverse direction of where we want to move
@@ -45,9 +46,13 @@ void HelloCoordsProgram::Render()
 {
     if(shader_.GetProgram() == 0)
         return;
+    if(!textureWall_.IsLoaded())
+    {
+        return;
+    }
     std::lock_guard<std::mutex> lock(updateMutex_);
     shader_.Bind();
-    glBindTexture(GL_TEXTURE_2D, textureWall_);
+    glBindTexture(GL_TEXTURE_2D, textureWall_.GetTextureId());
     shader_.SetMat4("view", view);
     shader_.SetMat4("projection", projection);
 
@@ -67,7 +72,7 @@ void HelloCoordsProgram::Destroy()
 {
     shader_.Destroy();
     cube_.Destroy();
-    gl::DestroyTexture(textureWall_);
+    textureWall_.Destroy();
 
 }
 

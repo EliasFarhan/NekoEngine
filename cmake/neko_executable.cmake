@@ -3,14 +3,14 @@ function(neko_bin_config binary)
     if(Emscripten)
         if("${CMAKE_BUILD_TYPE}" MATCHES "Debug")
             set_target_properties(${binary} PROPERTIES  COMPILE_FLAGS
-                " -s USE_PTHREADS=1  -g4 -O0 -fno-rtti -s ASSERTIONS=2 -s ALIASING_FUNCTION_POINTERS=1 -s SAFE_HEAP=1 -s DEMANGLE_SUPPORT=1  ")#-s SIMD=1
+                "   -g4 -O0 -fno-rtti -s ASSERTIONS=2 -s ALIASING_FUNCTION_POINTERS=1 -s SAFE_HEAP=1 -s DEMANGLE_SUPPORT=1  ")#-s SIMD=1
         endif()
         if("${CMAKE_BUILD_TYPE}" MATCHES "Release")
         set_target_properties(${binary} PROPERTIES   COMPILE_FLAGS
-                " -s USE_PTHREADS=1 -O3 -fno-rtti -fno-exceptions -s ASSERTIONS=1 ")
+                "  -O3 -fno-rtti -fno-exceptions -s ASSERTIONS=1 ")
         endif()
         set_target_properties(${binary} PROPERTIES  LINK_FLAGS
-                " -s PTHREAD_POOL_SIZE=4 --emrun -Wl,--shared-memory,--no-check-features -s ASSERTIONS=1 -s EXPORT_ALL=1 -s TOTAL_MEMORY=128MB --preload-file ${CMAKE_BINARY_DIR}/data/ ")
+                " -flto  --emrun -s ASSERTIONS=1 -s EXPORT_ALL=1 -s TOTAL_MEMORY=512MB --preload-file ${CMAKE_BINARY_DIR}/data/@ ")
         set_target_properties(${binary} PROPERTIES SUFFIX ".html")
     elseif(MSVC)
             set_target_properties(${binary} PROPERTIES COMPILE_FLAGS " /arch:AVX2 /Oi ")
@@ -37,14 +37,14 @@ function(neko_lib_config library)
     if(Emscripten)
         if("${CMAKE_BUILD_TYPE}" MATCHES "Debug")
             set_target_properties(${library} PROPERTIES  COMPILE_FLAGS
-                " -s USE_PTHREADS=1  -g4 -O0 -fno-rtti -s ASSERTIONS=2 -s ALIASING_FUNCTION_POINTERS=1 -s SAFE_HEAP=1 -s DEMANGLE_SUPPORT=1  ") #-s SIMD=1
+                "  -g4 -O0 -fno-rtti -s ASSERTIONS=2 -s ALIASING_FUNCTION_POINTERS=1 -s SAFE_HEAP=1 -s DEMANGLE_SUPPORT=1  ") #-s SIMD=1
         endif()
         if("${CMAKE_BUILD_TYPE}" MATCHES "Release")
             set_target_properties(${library} PROPERTIES  COMPILE_FLAGS
-                " -s USE_PTHREADS=1 -O3 -fno-rtti -fno-exceptions -s ASSERTIONS=1 ")
+                "  -O3 -fno-rtti -fno-exceptions -s ASSERTIONS=1 ")
         endif()
         set_property(TARGET ${library} APPEND_STRING PROPERTY LINK_FLAGS
-                " --shared-memory -Wl,--shared-memory,--no-check-features -s PTHREAD_POOL_SIZE=4  -s EXPORT_ALL=1 -s TOTAL_MEMORY=256MB -s ASSERTIONS=1 --emrun ")
+                " -flto  -s EXPORT_ALL=1 -s TOTAL_MEMORY=512MB -s ASSERTIONS=1 --emrun ")
         #-Wl,--shared-memory,--no-check-features
     elseif(MSVC)
         set_target_properties(${library} PROPERTIES COMPILE_FLAGS " /arch:AVX2 /Oi ")
