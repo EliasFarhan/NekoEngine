@@ -22,7 +22,7 @@ void HelloBloomProgram::Init()
             config.dataRootPath + "shaders/20_hello_bloom/bloom.frag");
 
 	cube_.Init();
-    cubeTexture_.SetTextureFlags(gl::Texture::TextureFlags(gl::Texture::DEFAULT | gl::Texture::GAMMA_CORRECTION));
+    cubeTexture_.SetTextureFlags(gl::Texture::TextureFlags(gl::Texture::REPEAT_WRAP | gl::Texture::SMOOTH_TEXTURE | gl::Texture::GAMMA_CORRECTION));
     cubeTexture_.SetPath(config.dataRootPath + "sprites/container.jpg");
     cubeTexture_.LoadFromDisk();
 
@@ -99,9 +99,8 @@ void HelloBloomProgram::Render()
     cubeShader_.Bind();
     cubeShader_.SetMat4("view", view);
     cubeShader_.SetMat4("projection", projection);
-    cubeShader_.SetInt("diffuseTexture", 0);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, cubeTexture_.GetTextureId());
+    cubeShader_.SetTexture("diffuseTexture", cubeTexture_, 0);
+
 	for(size_t i = 0; i < lights_.size(); i++)
     {
         cubeShader_.SetVec3("lights["+std::to_string(i)+"}.Position", lights_[i].position_);
@@ -134,8 +133,8 @@ void HelloBloomProgram::Render()
 	}
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     // 2. blur bright fragments with two-pass Gaussian Blur 
-        // --------------------------------------------------
-        //
+    // --------------------------------------------------
+    //
     bool horizontal = true, firstIteration = true;
     if (flags_ & ENABLE_BLOOM)
     {
@@ -198,11 +197,8 @@ void HelloBloomProgram::CreateFramebuffer()
     unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
     glDrawBuffers(2, attachments);
     // finally check if framebuffer is complete
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-    {
-        logDebug("[Error] HDR Framebuffer not complete!");
-    }
-
+    glCheckFramebuffer();
+    glCheckError();
     // ping-pong-framebuffer for blurring
 
     glGenFramebuffers(2, pingpongFbo_);
@@ -217,11 +213,8 @@ void HelloBloomProgram::CreateFramebuffer()
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); // we clamp to the edge as the blur filter would otherwise sample repeated texture values!
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pingpongColorBuffers_[i], 0);
-        // also check if framebuffers are complete (no need for depth buffer)
-        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        {
-            logDebug("[Error] Ping Pong Framebuffer not complete!");
-        }
+        glCheckFramebuffer();
+        glCheckError();
     }
 }
 

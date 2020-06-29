@@ -20,8 +20,11 @@
  */
 
 #include <functional>
+#ifndef NEKO_SAMETHREAD
 #include <thread>
+#include <future>
 #include <condition_variable>
+#endif
 #include <queue>
 #include "engine/system.h"
 
@@ -87,8 +90,8 @@ protected:
     std::vector<const Job*> dependencies_;
     std::function<void()> task_;
 #ifndef NEKO_SAMETHREAD
-    mutable std::mutex executionLock_;
-    mutable std::condition_variable cv_;
+    mutable std::promise<void> promise_;
+    mutable std::shared_future<void> taskDoneFuture_;
     mutable std::mutex statusLock_;
 #endif
     std::uint8_t status_;

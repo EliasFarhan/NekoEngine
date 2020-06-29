@@ -199,6 +199,9 @@ std::uint8_t JobSystem::CountStartedWorkers()
 Job::Job(std::function<void()> task) :
         task_(std::move(task)),
         status_(0)
+#ifndef NEKO_SAMETHREAD
+, taskDoneFuture_(promise_.get_future())
+#endif
 {
 
 }
@@ -208,6 +211,10 @@ Job::Job(Job&& job) noexcept
     dependencies_ = std::move(job.dependencies_);
     task_ = std::move(job.task_);
     status_ = job.status_;
+#ifndef NEKO_SAMETHREAD
+    promise_ = std::move(job.promise_);
+    taskDoneFuture_ = std::move(job.taskDoneFuture_);
+#endif
 }
 
 Job& Job::operator=(Job&& job) noexcept
@@ -220,20 +227,9 @@ Job& Job::operator=(Job&& job) noexcept
 #ifndef NEKO_SAMETHREAD
 void Job::Join() const
 {
-    if(IsDone())
+    if(!IsDone())
     {
-        return;
-    }
-
-    for(const auto& dep : dependencies_)
-    {
-        dep->Join();
-    }
-
-    std::unique_lock<std::mutex> lock(executionLock_);
-    if(!HasStarted())
-    {
-        cv_.wait(lock);
+        taskDoneFuture_.get();
     }
 }
 #endif
@@ -256,19 +252,16 @@ void Job::Execute()
 #endif
         status_ |= STARTED;
     }
-    {
-#ifndef NEKO_SAMETHREAD
-        std::lock_guard<std::mutex> lock(executionLock_);
-        cv_.notify_all(); //Notify all the dependees that we started!
-#endif
-        task_();
-    }
+    task_();
     {
 #ifndef NEKO_SAMETHREAD
         std::lock_guard<std::mutex> lock(statusLock_);
 #endif
         status_ |= DONE;
     }
+#ifndef NEKO_SAMETHREAD
+    promise_.set_value();
+#endif
 }
 
 bool Job::CheckDependenciesStarted() const
@@ -324,6 +317,10 @@ void Job::AddDependency(const Job* dependentJob)
 
 void Job::Reset()
 {
+#ifndef NEKO_SAMETHREAD
+    promise_ = std::promise<void>();
+    taskDoneFuture_ = promise_.get_future();
+#endif
     status_ = 0;
     dependencies_.clear();
 }

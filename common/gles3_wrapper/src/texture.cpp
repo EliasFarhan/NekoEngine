@@ -216,7 +216,7 @@ void Texture::CreateTexture()
         case 1:
         {
             internalFormat = dataFormat = GL_R8;
-        		break;
+            break;
         }
         case 3:
         {
@@ -250,6 +250,7 @@ void Texture::CreateTexture()
 #endif
         glGenerateMipmap(GL_TEXTURE_2D);
     }
+    glBindTexture(GL_TEXTURE_2D, 0);
     glCheckError();
     
 }
