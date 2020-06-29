@@ -23,7 +23,7 @@ void HelloHdrProgram::Init()
             config.dataRootPath + "shaders/19_hello_hdr/hdr_screen.vert",
             config.dataRootPath + "shaders/19_hello_hdr/hdr_screen.frag");
     camera_.position = Vec3f::zero;
-    camera_.LookAt(camera_.position+Vec3f::forward);
+    camera_.WorldLookAt(camera_.position+Vec3f::forward);
 
 }
 

@@ -41,11 +41,11 @@ void HelloShadowProgram::Init()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	depthCamera_.SetSize(Vec2f::one * 4.0f);
 	depthCamera_.position = light_.lightPos;
-	depthCamera_.LookAt(light_.lightPos+light_.lightDir);
+	depthCamera_.WorldLookAt(light_.lightPos+light_.lightDir);
 
 	
 	camera_.position = Vec3f(0, 3, 3);
-	camera_.LookAt(Vec3f::zero);
+	camera_.WorldLookAt(Vec3f::zero);
 
     simpleDepthShader_.LoadFromFile(config.dataRootPath + "shaders/21_hello_shadow/simple_depth.vert",
                                     config.dataRootPath + "shaders/21_hello_shadow/simple_depth.frag");

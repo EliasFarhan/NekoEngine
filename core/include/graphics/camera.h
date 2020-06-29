@@ -14,7 +14,7 @@ struct Camera
     Vec3f reverseDir = Vec3f::back, rightDir = Vec3f::right, upDir = Vec3f::up;
 	float nearPlane = 0.1f;
 	float farPlane = 100.0f;
-	void LookAt(Vec3f target, Vec3f lookUp = Vec3f::down)
+	void WorldLookAt(Vec3f target, Vec3f lookUp = Vec3f::down)
 	{
 		reverseDir = (position - target).Normalized();
 		rightDir = Vec3f::Cross(reverseDir, lookUp).Normalized();
@@ -51,7 +51,7 @@ struct Camera
 		const auto yaw = Quaternion::AngleAxis(angles.y, upDir);
 		const auto roll = Quaternion::AngleAxis(angles.z, reverseDir);
 		reverseDir = Vec3f(Transform3d::RotationMatrixFrom(pitch*yaw*roll) * Vec4f(reverseDir)).Normalized();
-		LookAt(-reverseDir+position);
+		WorldLookAt(-reverseDir+position);
 	}
 
 	[[nodiscard]] virtual Mat4f GenerateProjectionMatrix() const = 0;

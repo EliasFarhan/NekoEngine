@@ -51,7 +51,7 @@ void HelloPointShadowProgram::Init()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	camera3D_.position = Vec3f::one * 3.0f;
-	camera3D_.LookAt(Vec3f::zero);
+	camera3D_.WorldLookAt(Vec3f::zero);
 
 	lightCamera_.position = Vec3f::zero;
 	lightCamera_.farPlane = 50.0f;
@@ -127,7 +127,7 @@ void HelloPointShadowProgram::Render()
 			depthCubemap_, 0);
 		glClear(GL_DEPTH_BUFFER_BIT);
 
-		lightCamera_.LookAt(lightCamera_.position+lightDirs[i], lightUps[i]);
+		lightCamera_.WorldLookAt(lightCamera_.position+lightDirs[i], lightUps[i]);
 		const auto lightSpaceMatrix = lightCamera_.GenerateProjectionMatrix() * lightCamera_.GenerateViewMatrix();
 		simpleDepthShader_.SetMat4("lightSpaceMatrix", lightSpaceMatrix);
 		simpleDepthShader_.SetFloat("lightFarPlane", lightCamera_.farPlane);

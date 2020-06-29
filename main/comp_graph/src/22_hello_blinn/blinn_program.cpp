@@ -17,7 +17,7 @@ void HelloBlinnProgram::Init()
 	model_.LoadModel(config.dataRootPath + "model/nanosuit2/nanosuit.obj");
 
 	camera_.position = Vec3f(0.0f, 3.0f, 3.0f);
-	camera_.LookAt(Vec3f::zero);
+	camera_.WorldLookAt(Vec3f::zero);
 }
 
 void HelloBlinnProgram::Update(seconds dt)

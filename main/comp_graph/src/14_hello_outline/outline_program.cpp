@@ -15,7 +15,7 @@ void HelloOutlineProgram::Init()
     outlineShader_.LoadFromFile(config.dataRootPath + "shaders/14_hello_outline/outline.vert",
                                 config.dataRootPath + "shaders/14_hello_outline/outline.frag");
 	camera_.position = Vec3f(0.0f, 3.0f, 3.0f);
-	camera_.LookAt(Vec3f::zero);
+	camera_.WorldLookAt(Vec3f::zero);
 }
 
 void HelloOutlineProgram::Update(seconds dt)

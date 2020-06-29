@@ -66,7 +66,7 @@ void HelloFramebufferProgram::Init()
     modelShader_.LoadFromFile(config.dataRootPath + "shaders/11_hello_framebuffer/model.vert",
                               config.dataRootPath + "shaders/11_hello_framebuffer/model.frag");
     camera_.position = Vec3f(0.0f,-5.0f,-5.0f);
-    camera_.LookAt(Vec3f::zero);
+    camera_.WorldLookAt(Vec3f::zero);
 }
 
 void HelloFramebufferProgram::Update(seconds dt)

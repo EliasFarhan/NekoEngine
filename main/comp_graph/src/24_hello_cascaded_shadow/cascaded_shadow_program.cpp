@@ -62,7 +62,7 @@ void HelloCascadedShadowProgram::Init()
     glCheckError();
 
     camera_.position = Vec3f(0, 3.0f, -3.0f);
-    camera_.LookAt(Vec3f::forward * camera_.farPlane / 2.0f);
+    camera_.WorldLookAt(Vec3f::forward * camera_.farPlane / 2.0f);
     camera_.farPlane = 100.0f;
 }
 
@@ -166,7 +166,7 @@ Camera2D HelloCascadedShadowProgram::CalculateOrthoLight(float cascadeNear, floa
     camera.nearPlane = cascadeNear;
     camera.farPlane = cascadeFar;
     lightCamera.position = Vec3f::zero;
-    lightCamera.LookAt(lightDir);
+    lightCamera.WorldLookAt(lightDir);
 
     const auto tanHalfFovY = Tan(camera_.fovY / 2.0f);
     const auto tanHalfFovX = tanHalfFovY * camera_.aspect;
@@ -219,11 +219,12 @@ Camera2D HelloCascadedShadowProgram::CalculateOrthoLight(float cascadeNear, floa
 
         const auto maxSizeLength = std::max((maxX-minX)/2.0f, (maxY-minY)/2.0f);
         const auto size = Vec2f(maxSizeLength, maxSizeLength);
+        //const auto size = Vec2f((maxX - minX) / 2.0f, (maxY - minY) / 2.0f);
         //const auto lightCenter = lightView.Inverse()*Vec4f((minX+maxX)/2.0f, (minY+maxY)/2.0f, (minZ+maxZ)/2.0f, 1.0f);
         center /= 8.0f;// = Vec3f(lightCenter);
         lightCamera.SetSize(size);
         lightCamera.nearPlane = 0.0f;
-        lightCamera.farPlane = maxZ-minZ;
+        lightCamera.farPlane = (maxZ-minZ)*1.5f;//HACK multiply by 1.5f to get the whole frustum?
         lightCamera.position = center + lightCamera.reverseDir * lightCamera.farPlane/2.0f;
     }
     else

@@ -26,7 +26,7 @@ void HelloCubemapsProgram::Init()
     modelRefractionShader_.LoadFromFile(config.dataRootPath + "shaders/15_hello_cubemaps/model.vert",
                                         config.dataRootPath + "shaders/15_hello_cubemaps/model_refraction.frag");
 	camera_.position = Vec3f(0, 3, 3);
-	camera_.LookAt(Vec3f::zero);
+	camera_.WorldLookAt(Vec3f::zero);
 	cube_.Init();
 	cubeTexture_.SetPath(config.dataRootPath + "sprites/container.jpg");
 	cubeTexture_.LoadFromDisk();

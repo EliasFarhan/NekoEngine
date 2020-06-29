@@ -48,7 +48,7 @@ void HelloDeferredProgram::Init()
     containerSpecular_.LoadFromDisk();
 
     camera_.position = Vec3f(0.0f, 3.0f, -3.0f);
-    camera_.LookAt(Vec3f::zero);
+    camera_.WorldLookAt(Vec3f::zero);
 
 
     for(int x = -2; x < 3; x++)

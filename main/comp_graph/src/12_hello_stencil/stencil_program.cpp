@@ -17,7 +17,7 @@ void HelloStencilProgam::Init()
 	cubeTexture_.LoadFromDisk();
 
 	camera_.position = Vec3f(0.0f, 4.0f, 4.0f);
-	camera_.LookAt(Vec3f::zero);
+	camera_.WorldLookAt(Vec3f::zero);
 }
 
 void HelloStencilProgam::Update(seconds dt)

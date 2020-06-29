@@ -42,11 +42,11 @@ void HelloFrustumProgram::Init()
 
     camera_.position = Vec3f(0.0f, 600.0f, -500.0f);
     camera_.farPlane = 1'000.0f;
-    camera_.LookAt(Vec3f::zero);
+    camera_.WorldLookAt(Vec3f::zero);
 
     overCamera_.position = Vec3f(0.0f, 600.0f, -500.0f);
     overCamera_.farPlane = 1'000.0f;
-    overCamera_.LookAt(Vec3f::zero);
+    overCamera_.WorldLookAt(Vec3f::zero);
     overCamera_.SetAspect(1024,1024);
 	
     mainPlane_.Init();

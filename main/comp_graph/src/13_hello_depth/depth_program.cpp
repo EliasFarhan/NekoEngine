@@ -39,7 +39,7 @@ void HelloDepthProgram::Init()
     depthOnlyShader_.LoadFromFile(config.dataRootPath + "shaders/13_hello_depth/screen.vert",
                                   config.dataRootPath + "shaders/13_hello_depth/screen_depth.frag");
 	camera_.position = Vec3f(0, 4, 4);
-	camera_.LookAt(Vec3f::zero);
+	camera_.WorldLookAt(Vec3f::zero);
 }
 
 void HelloDepthProgram::Update(seconds dt)

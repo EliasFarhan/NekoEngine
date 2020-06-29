@@ -43,7 +43,7 @@ void HelloInstancingProgram::Init()
 
     camera_.position = Vec3f(0.0f, 500.0f, -500.0f);
     camera_.farPlane = 1'000.0f;
-    camera_.LookAt(asteroidPositions_.front());
+    camera_.WorldLookAt(asteroidPositions_.front());
 
 
 }
