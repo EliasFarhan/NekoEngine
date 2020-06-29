@@ -18,6 +18,7 @@ set(Neko_Assert ON CACHE BOOL "Activate Neko Assertion")
 set(Neko_Benchmark ON CACHE BOOL "Activate Benchmark")
 set(Neko_Lua ON CACHE BOOL "Activate Lua Wrapper")
 set(Neko_Assimp ON CACHE BOOL "Activate Assimp Wrapper")
+set(Neko_SameThread OFF CACHE BOOL "Activate Same Thread Rendering and Resource Loading")
 
 MESSAGE("CMAKE SYSTEM NAME: ${CMAKE_SYSTEM_NAME}")
 
@@ -25,7 +26,7 @@ if ("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
     include(cmake/platforms/emscripten.cmake)
     set(CMAKE_EXECUTABLE_SUFFIX ".html")
     set(CMAKE_STATIC_LIBRARY_SUFFIX ".a")
-    set(Neko_SameThread ON CACHE BOOL "Used for Emscripten and other system when render and engine has to be in the same thread")
+    set(Neko_SameThread ON CACHE BOOL "")
     mark_as_advanced(Neko_SameThread)
 endif()
 
@@ -46,6 +47,10 @@ set(UTILITIES_DIR "${EXTERNAL_DIR}/utilities" CACHE INTERNAL "")
 
 if(Neko_Assert)
     add_compile_definitions("NEKO_ASSERT=1")
+endif()
+
+if(Neko_SameThread)
+    add_compile_definitions("NEKO_SAMETHREAD=1")
 endif()
 
 

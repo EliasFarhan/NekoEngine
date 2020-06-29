@@ -34,7 +34,7 @@ public:
     Window() : swapBufferJob_([this]
     {
         SwapBuffer();
-#if defined(__ANDROID__)
+#if defined(__ANDROID__) or defined(EMSCRIPTEN)
         LeaveCurrentContext();
 #endif
     })

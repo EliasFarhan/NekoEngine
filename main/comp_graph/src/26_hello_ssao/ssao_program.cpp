@@ -39,10 +39,10 @@ void HelloSsaoProgram::Init()
         Vec3f sample(
             RandomRange(-1.0f, 1.0f), 
             RandomRange(-1.0f,1.0f), 
-            RandomRange(-1.0f,1.0f));
+            RandomRange(0.0f,1.0f));
         sample = sample.Normalized();
-        sample *= RandomRange(-1.0f, 1.0f);
-        float scale = float(i) / 64.0;
+        sample *= RandomRange(0.0f, 1.0f);
+        float scale = float(i) / 64.0f;
 
         // scale samples s.t. they're more aligned to center of kernel
         scale = Lerp(0.1f, 1.0f, scale * scale);
@@ -143,7 +143,7 @@ void HelloSsaoProgram::Render()
     ssaoShader_.SetMat4("projection", projection);
     ssaoShader_.SetTexture("gPosition", gPosition_, 0);
     ssaoShader_.SetTexture("gNormal", gNormal_, 1);
-    ssaoShader_.SetTexture("noiseTexture", noiseTexture_, 2);
+    ssaoShader_.SetTexture("texNoise", noiseTexture_, 2);
 
     ssaoShader_.SetInt("kernelSize", kernelSize_);
     ssaoShader_.SetFloat("radius", ssaoRadius_);

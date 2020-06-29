@@ -22,11 +22,19 @@ Mesh::Mesh() : loadMeshToGpu([this]
 
 void Mesh::Init()
 {
+#ifdef NEKO_SAMETHREAD
+    loadMeshToGpu.Execute();
+    for(auto& texture : textures_)
+    {
+        texture.texture.LoadFromDisk();
+    }
+#else
     RendererLocator::get().AddPreRenderJob(&loadMeshToGpu);
 	for(auto& texture : textures_)
 	{
         texture.texture.LoadFromDisk();
 	}
+#endif
 }
 
 
