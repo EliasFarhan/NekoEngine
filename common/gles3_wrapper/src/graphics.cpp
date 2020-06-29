@@ -40,29 +40,30 @@ void CheckGlError(const char* file, int line)
 }
 
 
-void CheckFramebuffer()
+void CheckFramebuffer(const char* file, int line)
 {
     const auto status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     if (status != GL_FRAMEBUFFER_COMPLETE)
     {
-
+        std::string log;
         switch (status)
         {
             case GL_FRAMEBUFFER_UNDEFINED:
-                logDebug("[Error] Framebuffer is undefined!");
+                log+="[Error] Framebuffer is undefined!";
                 break;
             case GL_FRAMEBUFFER_UNSUPPORTED:
-                logDebug("[Error] Framebuffer is unsupported!");
+                log+="[Error] Framebuffer is unsupported!";
                 break;
             case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-                logDebug("[Error] Framebuffer has incomplete attachment!");
+                log+="[Error] Framebuffer has incomplete attachment!";
                 break;
             case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-                logDebug("[Error] Framebuffer has incomplete missing attachment!");
+                log+="[Error] Framebuffer has incomplete missing attachment!";
                 break;
             default:
-                break;
+                return;
         }
+        logDebug(log + " in file: " + file + " at line: " + std::to_string(line));
     }
 }
 

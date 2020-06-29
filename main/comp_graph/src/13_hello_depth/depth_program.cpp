@@ -29,7 +29,7 @@ void HelloDepthProgram::Init()
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, depthTexture_, 0);
 	glBindTexture(GL_TEXTURE_2D, 0);
 	
-	CheckFramebuffer();
+	glCheckFramebuffer();
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     sceneShader_.LoadFromFile(config.dataRootPath + "shaders/99_hello_scene/cube.vert",

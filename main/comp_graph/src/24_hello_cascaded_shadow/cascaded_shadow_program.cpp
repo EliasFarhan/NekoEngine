@@ -36,7 +36,7 @@ void HelloCascadedShadowProgram::Init()
     glDrawBuffers(1, &drawBuffers);
     glReadBuffer(GL_NONE);
 
-    CheckFramebuffer();
+    glCheckFramebuffer();
     glCheckError();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 

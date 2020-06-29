@@ -47,7 +47,7 @@ void HelloPointShadowProgram::Init()
 	glReadBuffer(GL_NONE);
 	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_CUBE_MAP_POSITIVE_X, depthCubemap_, 0);
 
-	CheckFramebuffer();
+	glCheckFramebuffer();
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	camera3D_.position = Vec3f::one * 3.0f;

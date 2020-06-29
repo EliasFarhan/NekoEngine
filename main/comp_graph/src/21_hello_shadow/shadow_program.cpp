@@ -36,7 +36,7 @@ void HelloShadowProgram::Init()
     glDrawBuffers(1, &drawBuffers);
 	glReadBuffer(GL_NONE);
 
-	CheckFramebuffer();
+	glCheckFramebuffer();
 	glCheckError();
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	depthCamera_.SetSize(Vec2f::one * 4.0f);

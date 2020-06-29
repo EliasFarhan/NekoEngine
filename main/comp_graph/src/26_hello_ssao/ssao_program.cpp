@@ -1,10 +1,15 @@
 #include "26_hello_ssao/ssao_program.h"
 #include "imgui.h"
-
+#ifdef EASY_PROFILE_USE
+#include "easy/profiler.h"
+#endif
 namespace neko
 {
 void HelloSsaoProgram::Init()
 {
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("Init SSAO Program");
+#endif
     const auto& config = BasicEngine::GetInstance()->config;
     glCheckError();
     CreateFramebuffer();
@@ -58,16 +63,17 @@ void HelloSsaoProgram::Init()
 	}
     glGenTextures(1, &noiseTexture_);
     glBindTexture(GL_TEXTURE_2D, noiseTexture_);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, 4, 4, 0, GL_RGB, GL_FLOAT, &ssaoNoise[0]);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, 4, 4, 0, GL_RGB, GL_FLOAT, &ssaoNoise[0]);
+    glCheckError();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
+    glCheckError();
     plane_.Init();
     screenPlane_.Init();
     model_.LoadModel(config.dataRootPath + "model/nanosuit2/nanosuit.obj");
-
+    glCheckError();
     camera_.Init();
 }
 
@@ -114,6 +120,9 @@ void HelloSsaoProgram::Render()
         return;
 	}
     std::lock_guard<std::mutex> lock(updateMutex_);
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("Render SSAO Program");
+#endif
 	if(flags_ & RESIZE_SCREEN)
 	{
         DestroyFramebuffer();
@@ -124,6 +133,9 @@ void HelloSsaoProgram::Render()
     const auto projection = camera_.GenerateProjectionMatrix();
 
     // 1. geometry pass: render scene's geometry/color data into gbuffer
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("Geometry Pass");
+#endif
     glBindFramebuffer(GL_FRAMEBUFFER, gBuffer_);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     ssaoGeometryShader_.Bind();
@@ -133,6 +145,10 @@ void HelloSsaoProgram::Render()
     RenderScene(ssaoGeometryShader_);
 
     // 2. generate SSAO texture
+#ifdef EASY_PROFILE_USE
+    EASY_END_BLOCK;
+    EASY_BLOCK("Generate SSAO Texture");
+#endif
     glBindFramebuffer(GL_FRAMEBUFFER, ssaoFbo_);
     glClear(GL_COLOR_BUFFER_BIT);
     ssaoShader_.Bind();
@@ -151,6 +167,10 @@ void HelloSsaoProgram::Render()
     screenPlane_.Draw();
 
     // 3. blur SSAO texture to remove noise
+#ifdef EASY_PROFILE_USE
+    EASY_END_BLOCK;
+    EASY_BLOCK("Blur SSAO Texture");
+#endif
     glBindFramebuffer(GL_FRAMEBUFFER, ssaoBlurFbo_);
     glClear(GL_COLOR_BUFFER_BIT);
     ssaoBlurShader_.Bind();
@@ -159,6 +179,10 @@ void HelloSsaoProgram::Render()
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     // 4. lighting pass: traditional deferred Blinn-Phong lighting with added screen-space ambient occlusion
+#ifdef EASY_PROFILE_USE
+    EASY_END_BLOCK;
+    EASY_BLOCK("Lighting pass");
+#endif
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     ssaoLightingShader_.Bind();
     const auto lightPosView = Vec3f(view * Vec4f(light_.position, 1.0f));
@@ -202,7 +226,7 @@ void HelloSsaoProgram::DestroyFramebuffer()
     glDeleteFramebuffers(1, &ssaoBlurFbo_);
     glDeleteTextures(1, &ssaoColorBuffer_);
     glDeleteTextures(1, &ssaoColorBufferBlur_);
-	
+
 }
 
 void HelloSsaoProgram::CreateFramebuffer()
@@ -219,7 +243,7 @@ void HelloSsaoProgram::CreateFramebuffer()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gPosition_, 0);
-
+    glCheckError();
     // - normal color buffer
     glGenTextures(1, &gNormal_);
     glBindTexture(GL_TEXTURE_2D, gNormal_);
@@ -227,7 +251,7 @@ void HelloSsaoProgram::CreateFramebuffer()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gNormal_, 0);
-
+    glCheckError();
     // - color + specular color buffer
     glGenTextures(1, &gAlbedoSpec_);
     glBindTexture(GL_TEXTURE_2D, gAlbedoSpec_);
@@ -235,7 +259,7 @@ void HelloSsaoProgram::CreateFramebuffer()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, gAlbedoSpec_, 0);
-
+    glCheckError();
     // - tell OpenGL which color attachments we'll use (of this framebuffer) for rendering
     unsigned int attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
     glDrawBuffers(3, attachments);
@@ -246,8 +270,8 @@ void HelloSsaoProgram::CreateFramebuffer()
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
     //Bind depth-stencil RBO to screen FBO
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo_);
-
-    CheckFramebuffer();
+    glCheckError();
+    glCheckFramebuffer();
     glCheckError();
 	
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -260,20 +284,27 @@ void HelloSsaoProgram::CreateFramebuffer()
     // SSAO color buffer
     glGenTextures(1, &ssaoColorBuffer_);
     glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer_);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, config.windowSize.x, config.windowSize.y, 0, GL_RED, GL_FLOAT, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, config.windowSize.x, config.windowSize.y, 0, GL_RED, GL_FLOAT, NULL);
+    glCheckError();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssaoColorBuffer_, 0);
-    CheckFramebuffer();
+    const GLenum colorAttachment = GL_COLOR_ATTACHMENT0;
+    glDrawBuffers(1, &colorAttachment);
+    glCheckFramebuffer();
+    glCheckError();
     // and blur stage
     glBindFramebuffer(GL_FRAMEBUFFER, ssaoBlurFbo_);
     glGenTextures(1, &ssaoColorBufferBlur_);
     glBindTexture(GL_TEXTURE_2D, ssaoColorBufferBlur_);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, config.windowSize.x, config.windowSize.y, 0, GL_RED, GL_FLOAT, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, config.windowSize.x, config.windowSize.y, 0, GL_RED, GL_FLOAT, NULL);
+    glCheckError();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssaoColorBufferBlur_, 0);
-    CheckFramebuffer();
+    glDrawBuffers(1, &colorAttachment);
+    glCheckFramebuffer();
+    glCheckError();
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glCheckError();

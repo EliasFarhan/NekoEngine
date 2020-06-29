@@ -181,7 +181,6 @@ void DestroyTexture(TextureId textureId)
 
 void Texture::CreateTexture()
 {
-    glCheckError();
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("Generate Texture");
 #endif
@@ -191,7 +190,6 @@ void Texture::CreateTexture()
     EASY_END_BLOCK;
 #endif
     glBindTexture(GL_TEXTURE_2D, textureId_);
-    glCheckError();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, flags_ & CLAMP_WRAP ? GL_CLAMP_TO_EDGE : GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, flags_ & CLAMP_WRAP ? GL_CLAMP_TO_EDGE : GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, flags_ & SMOOTH_TEXTURE ? GL_LINEAR : GL_NEAREST);

@@ -276,5 +276,6 @@ void Mesh::BindTextures(const gl::Shader& shader) const
 
     shader.SetBool("enableNormalMap", normalNr > 1);
     glActiveTexture(GL_TEXTURE0);
+    glCheckError();
 }
 }

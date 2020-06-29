@@ -229,7 +229,7 @@ void HelloDeferredProgram::CreateFramebuffer()
     //Bind depth-stencil RBO to screen FBO
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo_);
 
-    CheckFramebuffer();
+    glCheckFramebuffer();
 
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -239,7 +239,7 @@ void HelloDeferredProgram::CreateFramebuffer()
 void HelloDeferredProgram::RenderScene(const gl::Shader& shader)
 {
 #ifdef EASY_PROFILE_USE
-    EASY_BLOCK("¨Render Scene");
+    EASY_BLOCK("ï¿½Render Scene");
 #endif
     for(int x = -2; x < 3; x++)
     {
