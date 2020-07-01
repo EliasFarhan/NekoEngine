@@ -129,6 +129,7 @@ void Mesh::ProcessMesh(
 	        material->GetTextureCount(aiTextureType_DIFFUSE) + 
             material->GetTextureCount(aiTextureType_HEIGHT));
     	
+        material->Get(AI_MATKEY_SHININESS, specularExponent_);
         LoadMaterialTextures(material,
             aiTextureType_DIFFUSE, Texture::TextureType::DIFFUSE, directory);
         LoadMaterialTextures(material,
@@ -273,7 +274,7 @@ void Mesh::BindTextures(const gl::Shader& shader) const
         shader.SetInt("material." + name + number, i);
         glBindTexture(GL_TEXTURE_2D, textures_[i].texture.GetTextureId());
     }
-
+    shader.SetFloat("material.shininess", specularExponent_);
     shader.SetBool("enableNormalMap", normalNr > 1);
     glActiveTexture(GL_TEXTURE0);
     glCheckError();

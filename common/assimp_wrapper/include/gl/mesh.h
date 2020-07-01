@@ -58,6 +58,7 @@ namespace neko::assimp
 		std::vector<Vertex> vertices_;
 		std::vector<unsigned int> indices_;
 		std::vector<Texture> textures_;
+		float specularExponent_ = 0.0f;
 		Vec3f min_, max_;
 		Job loadMeshToGpu;
 		//  render data

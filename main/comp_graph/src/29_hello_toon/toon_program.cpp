@@ -37,7 +37,10 @@ void HelloToonShadingProgram::Destroy()
 void HelloToonShadingProgram::DrawImGui()
 {
 	ImGui::Begin("Toon Program");
-	ImGui::SliderInt("Toon Layers", &toonLayers_, 2, 8);
+	ImGui::SliderFloat("Light Ambient", &light_.ambient, 0.0f, 0.5f);
+	ImGui::SliderInt("Toon Layers", &toonLayers_, 1, 8);
+	ImGui::SliderInt("Specular Layers", &specularLayers_, 1, 8);
+
 	ImGui::End();
 }
 
@@ -57,11 +60,13 @@ void HelloToonShadingProgram::Render()
 	model = Transform3d::Rotate(model, degree_t(180.0f), Vec3f::up);
 	model = Transform3d::Scale(model, Vec3f(0.1f, 0.1f, 0.1f));
 	shader.SetMat4("model", model);
+	shader.SetMat4("normalMatrix", model.Inverse().Transpose());
 
 	//Toon shader specifics
 	shader.SetInt("toonLayers", toonLayers_);
 	shader.SetVec3("viewPos", camera_.position);
 	shader.SetVec3("light.position", light_.position);
+	shader.SetFloat("material.ambient", light_.ambient);
 
 	model_.Draw(shader);
 }
