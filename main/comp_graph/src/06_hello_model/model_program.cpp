@@ -62,6 +62,7 @@ void HelloModelProgram::Render()
 	model = Transform3d::Rotate(model, degree_t(180.0f), Vec3f::up);
 	model = Transform3d::Scale(model, Vec3f(0.1f, 0.1f, 0.1f));
 	shader_.SetMat4("model", model);
+	shader_.SetMat4("normalMatrix", model.Inverse().Transpose());
 	model_.Draw(shader_);
 }
 
