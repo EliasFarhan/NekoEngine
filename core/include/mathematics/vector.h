@@ -547,6 +547,20 @@ public:
         return inVec - normalized * 2 * Dot(inVec, normalized);
     }
 
+	static Vec3<T> Refract(const Vec3<T>& inVec, const Vec3<T>& normal, const T eta)
+    {
+        Vec3<T> N = normal.Normalized();
+    	const T k = 1 - eta * eta * (1.0 - Dot(N, inVec) * Dot(N, inVec));
+    	if(k < 0)
+    	{
+            return Vec3<T>::zero;
+    	}
+        else
+        {
+	        return eta * inVec - (eta * Dot(N, inVec) + std::sqrt(k)) * N;
+        }
+    }
+
     /// \brief Project v1 on v2 (doesn't need to be normalized).
     /// \param v1 the vector to project.
     /// \param v2 the vector to project on.

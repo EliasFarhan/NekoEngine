@@ -245,6 +245,7 @@ void Mesh::LoadMaterialTextures(
 
 void Mesh::BindTextures(const gl::Shader& shader) const
 {
+    glCheckError();
     unsigned int diffuseNr = 1;
     unsigned int specularNr = 1;
     unsigned int normalNr = 1;

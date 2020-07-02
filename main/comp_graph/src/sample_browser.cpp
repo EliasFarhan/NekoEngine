@@ -35,6 +35,7 @@
 #include "28_hello_blending/blending_program.h"
 #include "29_hello_toon/toon_program.h"
 
+#include "97_hello_water/water_program.h"
 #include "98_hello_line/line_program.h"
 #include "99_hello_scene/scene_program.h"
 
@@ -72,7 +73,8 @@ void SampleBrowser::Init()
     RegisterRenderProgram("27 Hello Cutoff", std::make_unique<HelloCutoffProgram>());
     RegisterRenderProgram("28 Hello Blending", std::make_unique<HelloBlendingProgram>());
     RegisterRenderProgram("29 Hello Toon", std::make_unique<HelloToonShadingProgram>());
-	
+
+    RegisterRenderProgram("97 Hello Water", std::make_unique<HelloWaterProgram>());
     RegisterRenderProgram("98 Hello Line", std::make_unique<HelloLineProgram>());
     RegisterRenderProgram("99 Hello Scene", std::make_unique<HelloSceneProgram>());
 	
