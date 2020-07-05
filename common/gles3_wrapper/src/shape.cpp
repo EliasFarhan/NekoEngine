@@ -308,13 +308,15 @@ void RenderSphere::Init()
 	glGenBuffers(1, &EBO);
 
 	std::vector<Vec3f> positions;
-	positions.reserve(segment_ * segment_);
+	positions.reserve((segment_ + 1) * (segment_ + 1));
 	std::vector<Vec2f> uv;
-	uv.reserve(segment_ * segment_);
+	uv.reserve((segment_ + 1) * (segment_ + 1));
 	std::vector<Vec3f> normals;
-	normals.reserve(segment_ * segment_);
+	normals.reserve((segment_ + 1) * (segment_ + 1));
+	std::vector<Vec3f> tangent;
+	tangent.resize((segment_+1) * (segment_+1));
 	std::vector<unsigned int> indices;
-	indices.reserve(segment_ * 2);
+	indices.reserve((segment_ + 1) * segment_);
 	for (unsigned int y = 0; y <= segment_; ++y)
 	{
 		for (unsigned int x = 0; x <= segment_; ++x)
@@ -353,6 +355,19 @@ void RenderSphere::Init()
 		oddRow = !oddRow;
 	}
 	indexCount_ = indices.size();
+	for (size_t i = 0; i < indexCount_ - 2; i++)
+	{
+		const Vec3f edge1 = positions[indices[i + 1]] - positions[indices[i]];
+		const Vec3f edge2 = positions[indices[i + 2]] - positions[indices[i]];
+		const Vec2f deltaUV1 = uv[indices[i + 1]] - uv[indices[i]];
+		const Vec2f deltaUV2 = uv[indices[i + 2]] - uv[indices[i]];
+
+		const float f = 1.0f / (deltaUV1.u * deltaUV2.v - deltaUV2.u * deltaUV1.v);
+		tangent[indices[i]].x = f * (deltaUV2.v * edge1.x - deltaUV1.v * edge2.x);
+		tangent[indices[i]].y = f * (deltaUV2.v * edge1.y - deltaUV1.v * edge2.y);
+		tangent[indices[i]].z = f * (deltaUV2.v * edge1.z - deltaUV1.v * edge2.z);
+
+	}
 
 	std::vector<float> data;
 	data.reserve(positions.size() * sizeof(Vec3f) + uv.size() * sizeof(Vec2f) + normals.size() * sizeof(Vec3f));
@@ -372,19 +387,27 @@ void RenderSphere::Init()
 			data.push_back(normals[i].y);
 			data.push_back(normals[i].z);
 		}
+		if(!tangent.empty())
+		{
+			data.push_back(tangent[i].x);
+			data.push_back(tangent[i].y);
+			data.push_back(tangent[i].z);
+		}
 	}
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
 	glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), &data[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
-	const auto stride = (3 + 2 + 3) * sizeof(float);
+	const auto stride = (3 + 2 + 3 + 3) * sizeof(float);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)(5 * sizeof(float)));
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, stride, (void*)(8 * sizeof(float)));
 	glBindVertexArray(0);
 	glCheckError();
 }

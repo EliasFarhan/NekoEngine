@@ -21,11 +21,13 @@ struct Light
 uniform Light lights[4];
 
 uniform vec3 viewPos;
+uniform bool gammaCorrect;
 
 const float PI = 3.14159265359;
 // ----------------------------------------------------------------------------
 float DistributionGGX(vec3 N, vec3 H, float roughness)
 {
+    //roughness squared based on Disney observations
     float a = roughness*roughness;
     float a2 = a*a;
     float NdotH = max(dot(N, H), 0.0);
@@ -120,8 +122,10 @@ void main()
 
     // HDR tonemapping
     color = color / (color + vec3(1.0));
-    // gamma correct
-    color = pow(color, vec3(1.0/2.2)); 
-
+    if(gammaCorrect)
+    {
+        // gamma correct
+        color = pow(color, vec3(1.0/2.2)); 
+    }
     FragColor = vec4(color, 1.0);
 }

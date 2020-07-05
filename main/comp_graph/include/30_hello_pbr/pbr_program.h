@@ -28,5 +28,6 @@ private:
 
 	Vec3f baseColor_ = { 1.0f,0.5f,0.5f };
 	float spacing_ = 2.5f;
+	bool gammaCorrect_ = true;
 };
 }

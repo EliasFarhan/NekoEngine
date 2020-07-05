@@ -17,7 +17,7 @@ namespace neko
 {
 
 
-Image StbImageConvert(BufferFile imageFile, int requireComponents, bool flipY)
+Image StbImageConvert(BufferFile imageFile, bool flipY)
 {
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("Convert Image");
@@ -41,12 +41,8 @@ Texture::Texture() :
     {
         const auto filename = diskLoadJob_.GetFilePath();
         const auto extension = GetFilenameExtension(filename);
-        int reqComponents = 0;
-        if (extension == ".jpg" || extension == ".tga" || extension == ".hdr")
-            reqComponents = 3;
-        else if (extension == ".png")
-            reqComponents = 4;
-    	image_ = StbImageConvert(diskLoadJob_.GetBufferFile(), reqComponents, flags_ & FLIP_Y);
+       
+    	image_ = StbImageConvert(diskLoadJob_.GetBufferFile(), flags_ & FLIP_Y);
 	    diskLoadJob_.GetBufferFile().Destroy();
 	    RendererLocator::get().AddPreRenderJob(&uploadToGpuJob_);
     })

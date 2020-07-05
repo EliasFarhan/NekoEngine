@@ -22,7 +22,7 @@ void HelloNormalProgram::Init()
 	plane_.Init();
 	cube_.Init();
 	model_.LoadModel(config.dataRootPath + "model/nanosuit2/nanosuit.obj");
-
+	sphere_.Init();
 	camera_.position = Vec3f(-3.0f, 3.0f, 3.0f);
 	camera_.WorldLookAt(Vec3f::zero);
 }
@@ -46,6 +46,7 @@ void HelloNormalProgram::Destroy()
 	model_.Destroy();
 	diffuseTex_.Destroy();
 	normalTex_.Destroy();
+	sphere_.Destroy();
 }
 
 void HelloNormalProgram::DrawImGui()
@@ -66,11 +67,17 @@ void HelloNormalProgram::DrawImGui()
 	{
 		flags_ = useCube ? flags_ | ENABLE_CUBE : flags_ & ~ENABLE_CUBE;
 	}
+	bool enableSphere = flags_ & ENABLE_SPHERE;
+	if (ImGui::Checkbox("Enable Sphere", &enableSphere))
+	{
+		flags_ = enableSphere ? flags_ | ENABLE_SPHERE : flags_ & ENABLE_SPHERE;
+	}
 	bool enableNormal = flags_ & ENABLE_NORMAL_MAP;
 	if (ImGui::Checkbox("Enable Normal Map", &enableNormal))
 	{
 		flags_ = enableNormal ? flags_ | ENABLE_NORMAL_MAP : flags_ & ~ENABLE_NORMAL_MAP;
 	}
+
 	ImGui::End();
 }
 
@@ -145,6 +152,9 @@ void HelloNormalProgram::Render()
 		case ENABLE_CUBE:
 			cube_.Draw();
 			break;
+		case ENABLE_SPHERE:
+			sphere_.Draw();
+			break;
 		default:
 			break;
 		}
@@ -160,6 +170,10 @@ void HelloNormalProgram::Render()
 	if (flags_ & ENABLE_PLANE)
 	{
 		draw(ENABLE_PLANE);
+	}
+	if(flags_ & ENABLE_SPHERE)
+	{
+		draw(ENABLE_SPHERE);
 	}
 	
 }

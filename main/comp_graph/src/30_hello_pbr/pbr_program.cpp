@@ -43,7 +43,7 @@ void HelloPbrProgram::DrawImGui()
 {
 	ImGui::Begin("Pbr Program");
 	ImGui::ColorPicker3("Base Color", &baseColor_[0]);
-	
+	ImGui::Checkbox("Gamma Correct", &gammaCorrect_);
 	ImGui::End();
 }
 
@@ -53,6 +53,7 @@ void HelloPbrProgram::Render()
 	const int nrRows = 7;
 	const int nrColumns = 7;
 	pbrShader_.Bind();
+	pbrShader_.SetBool("gammaCorrect", gammaCorrect_);
 	pbrShader_.SetFloat("ao", 1.0f);
 	pbrShader_.SetVec3("albedo", baseColor_);
 	pbrShader_.SetMat4("view", camera_.GenerateViewMatrix());

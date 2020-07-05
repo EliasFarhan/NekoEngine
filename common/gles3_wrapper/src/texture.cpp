@@ -76,7 +76,7 @@ TextureId stbCreateTexture(const std::string_view filename, Texture::TextureFlag
 #ifdef EASY_PROFILE_USE
     EASY_END_BLOCK;
 #endif
-    Image image = StbImageConvert(textureFile,reqComponents);
+    Image image = StbImageConvert(textureFile);
     /*if (extension == ".hdr")
     {
         //data = stbi_loadf(filename.data(), &width, &height, &reqComponents, 0);
@@ -148,7 +148,7 @@ TextureId LoadCubemap(std::vector<std::string> facesFilename)
             reqComponents = 3;
         else if (extension == ".png")
             reqComponents = 4;
-        Image image = StbImageConvert(textureFile,reqComponents);
+        Image image = StbImageConvert(textureFile);
         textureFile.Destroy();
         if (image.data != nullptr)
         {
@@ -184,6 +184,7 @@ void Texture::CreateTexture()
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("Generate Texture");
 #endif
+    glCheckError();
     glGenTextures(1, &textureId_);
     
 #ifdef EASY_PROFILE_USE
@@ -215,17 +216,29 @@ void Texture::CreateTexture()
     {
         case 1:
         {
-            internalFormat = dataFormat = GL_R8;
+            logDebug("Loading texture: " + diskLoadJob_.GetFilePath() + " as GL_R8");
+            internalFormat = GL_R8;
+            dataFormat = GL_RED;
             break;
         }
+        case 2:
+	    {
+            internalFormat = GL_RG8;
+            dataFormat = GL_RG;
+            break;
+	    }
         case 3:
         {
+
+            logDebug("Loading texture: " + diskLoadJob_.GetFilePath() + " as GL_RGB8");
             internalFormat = flags_ & GAMMA_CORRECTION ? GL_SRGB8 : GL_RGB8;
             dataFormat = GL_RGB;
         	break;
         }
         case 4:
         {
+
+            logDebug("Loading texture: " + diskLoadJob_.GetFilePath() + " as GL_RGBA8");
             internalFormat = flags_ & GAMMA_CORRECTION ? GL_SRGB8_ALPHA8 : GL_RGBA8;
             dataFormat = GL_RGBA;
             break;
@@ -249,9 +262,10 @@ void Texture::CreateTexture()
         EASY_BLOCK("Generate Mipmaps");
 #endif
         glGenerateMipmap(GL_TEXTURE_2D);
+        glCheckError();
     }
     glBindTexture(GL_TEXTURE_2D, 0);
-    glCheckError();
+
     
 }
 
