@@ -17,6 +17,11 @@ inline float Lerp(float start, float end, float t)
 {
 	return start + (end - start) * t;
 }
+template<typename T>
+float Clamp(T value, T lower, T upper)
+{
+	return value < lower ? lower : (value > upper ? upper : value);
+}
 
 float RandomRange(float start, float end);
 }

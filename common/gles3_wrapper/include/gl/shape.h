@@ -44,4 +44,19 @@ public:
 
     void Destroy() override;
 };
+
+class RenderSphere : public neko::RenderSphere, public VertexArrayObject
+{
+public:
+	explicit RenderSphere(Vec3f offset, float radius, size_t segment = 64);
+
+    void Init() override;
+
+    void Draw() const override;
+
+    void Destroy() override;
+protected:
+    size_t segment_ = 0;
+	size_t indexCount_ = 0;
+};
 }

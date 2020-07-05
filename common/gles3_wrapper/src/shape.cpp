@@ -83,7 +83,8 @@ void RenderQuad::Init()
 	//bind EBO
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
+	glBindVertexArray(0);
+	glCheckError();
 }
 
 void RenderQuad::Draw() const
@@ -277,8 +278,8 @@ void RenderCuboid::Init()
 	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
 	glEnableVertexAttribArray(3);
 
-
-
+	glBindVertexArray(0);
+	glCheckError();
 }
 
 void RenderCuboid::Draw() const
@@ -294,8 +295,116 @@ void RenderCuboid::Destroy()
 	//glDeleteBuffers(2, &EBO);
 }
 
+RenderSphere::RenderSphere(Vec3f offset, float radius, size_t segment) : neko::RenderSphere(offset, radius), segment_(segment)
+{
+}
+
+void RenderSphere::Init()
+{
+	glCheckError();
+	glGenVertexArrays(1, &VAO);
+
+	glGenBuffers(1, &VBO[0]);
+	glGenBuffers(1, &EBO);
+
+	std::vector<Vec3f> positions;
+	positions.reserve(segment_ * segment_);
+	std::vector<Vec2f> uv;
+	uv.reserve(segment_ * segment_);
+	std::vector<Vec3f> normals;
+	normals.reserve(segment_ * segment_);
+	std::vector<unsigned int> indices;
+	indices.reserve(segment_ * 2);
+	for (unsigned int y = 0; y <= segment_; ++y)
+	{
+		for (unsigned int x = 0; x <= segment_; ++x)
+		{
+			float xSegment = static_cast<float>(x) / static_cast<float>(segment_);
+			float ySegment = static_cast<float>(y) / static_cast<float>(segment_);
+			float xPos = std::cos(xSegment * 2.0f * PI) * std::sin(ySegment * PI);
+			float yPos = std::cos(ySegment * PI);
+			float zPos = std::sin(xSegment * 2.0f * PI) * std::sin(ySegment * PI);
+
+			positions.emplace_back(xPos, yPos, zPos);
+			uv.emplace_back(xSegment, ySegment);
+			normals.emplace_back(xPos, yPos, zPos);
+		}
+	}
+
+	bool oddRow = false;
+	for (unsigned int y = 0; y < segment_; ++y)
+	{
+		if (!oddRow) // even rows: y == 0, y == 2; and so on
+		{
+			for (unsigned int x = 0; x <= segment_; ++x)
+			{
+				indices.push_back(y * (segment_ + 1) + x);
+				indices.push_back((y + 1) * (segment_ + 1) + x);
+			}
+		}
+		else
+		{
+			for (int x = segment_; x >= 0; --x)
+			{
+				indices.push_back((y + 1) * (segment_ + 1) + x);
+				indices.push_back(y * (segment_ + 1) + x);
+			}
+		}
+		oddRow = !oddRow;
+	}
+	indexCount_ = indices.size();
+
+	std::vector<float> data;
+	data.reserve(positions.size() * sizeof(Vec3f) + uv.size() * sizeof(Vec2f) + normals.size() * sizeof(Vec3f));
+	for (unsigned int i = 0; i < positions.size(); ++i)
+	{
+		data.push_back(positions[i].x);
+		data.push_back(positions[i].y);
+		data.push_back(positions[i].z);
+		if (!uv.empty())
+		{
+			data.push_back(uv[i].x);
+			data.push_back(uv[i].y);
+		}
+		if (!normals.empty())
+		{
+			data.push_back(normals[i].x);
+			data.push_back(normals[i].y);
+			data.push_back(normals[i].z);
+		}
+	}
+	glBindVertexArray(VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
+	glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), &data[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+	const auto stride = (3 + 2 + 3) * sizeof(float);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)(5 * sizeof(float)));
+	glBindVertexArray(0);
+	glCheckError();
+}
+
+void RenderSphere::Draw() const
+{
+	glBindVertexArray(VAO);
+	glDrawElements(GL_TRIANGLE_STRIP, indexCount_, GL_UNSIGNED_INT, 0);
+}
+
+void RenderSphere::Destroy()
+{
+	glDeleteVertexArrays(1, &VAO);
+	glDeleteBuffers(1, &VBO[0]);
+	glDeleteBuffers(1, &EBO);
+}
+
 void RenderCircle::Init()
 {
+	glCheckError();
 	Vec2f vertices[resolution + 2];
 	Vec2f texCoords[resolution + 2];
 	vertices[0] = Vec2f(offset_);
@@ -328,6 +437,8 @@ void RenderCircle::Init()
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(texCoords), texCoords, GL_STATIC_DRAW);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vec2f), (void*) nullptr);
+	glBindVertexArray(0);
+	glCheckError();
 }
 
 void RenderCircle::Draw() const
