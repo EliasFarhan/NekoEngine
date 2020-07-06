@@ -17,7 +17,7 @@ namespace neko
 {
 
 
-Image StbImageConvert(BufferFile imageFile, bool flipY)
+Image StbImageConvert(BufferFile imageFile, bool flipY, bool hdr)
 {
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("Convert Image");
@@ -25,9 +25,17 @@ Image StbImageConvert(BufferFile imageFile, bool flipY)
     Image image;
 	
     stbi_set_flip_vertically_on_load(flipY);
-    image.data = stbi_load_from_memory((unsigned char*) (imageFile.dataBuffer),
-                                       imageFile.dataLength, &image.width, &image.height, &image.nbChannels, 0);
-    return image;
+    if (hdr)
+    {
+        image.data = (unsigned char*)stbi_loadf_from_memory((unsigned char*)(imageFile.dataBuffer),
+            imageFile.dataLength, &image.width, &image.height, &image.nbChannels, 0);
+    }
+    else
+    {
+        image.data = stbi_load_from_memory((unsigned char*)(imageFile.dataBuffer),
+            imageFile.dataLength, &image.width, &image.height, &image.nbChannels, 0);
+    }
+	return image;
 }
 Texture::Texture() :
 	uploadToGpuJob_([this]
@@ -42,7 +50,7 @@ Texture::Texture() :
         const auto filename = diskLoadJob_.GetFilePath();
         const auto extension = GetFilenameExtension(filename);
        
-    	image_ = StbImageConvert(diskLoadJob_.GetBufferFile(), flags_ & FLIP_Y);
+    	image_ = StbImageConvert(diskLoadJob_.GetBufferFile(), flags_ & FLIP_Y,flags_ & HDR);
 	    diskLoadJob_.GetBufferFile().Destroy();
 	    RendererLocator::get().AddPreRenderJob(&uploadToGpuJob_);
     })

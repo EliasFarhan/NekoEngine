@@ -202,4 +202,18 @@ void Shader::SetTexture(const std::string& name, TextureId texture, unsigned slo
     glActiveTexture(GL_TEXTURE0 + slot);
     glBindTexture(GL_TEXTURE_2D, texture);
 }
+
+void Shader::SetCubemap(const std::string& name, const neko::Texture& texture, unsigned slot)
+{
+    glUniform1i(glGetUniformLocation(shaderProgram_, name.c_str()), slot);
+    glActiveTexture(GL_TEXTURE0 + slot);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, texture.GetTextureId());
+}
+
+void Shader::SetCubemap(const std::string& name, TextureId texture, unsigned slot)
+{
+    glUniform1i(glGetUniformLocation(shaderProgram_, name.c_str()), slot);
+    glActiveTexture(GL_TEXTURE0 + slot);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
+}
 }

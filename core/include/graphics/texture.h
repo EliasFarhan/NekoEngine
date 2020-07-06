@@ -20,7 +20,7 @@ struct Image
     void Destroy();
 };
 
-Image StbImageConvert(BufferFile imageFile, bool flipY=false);
+Image StbImageConvert(BufferFile imageFile, bool flipY=false, bool hdr = false);
 
 /**
  * \brief Neko Texture contains an Image loaded async from disk, converted by stb_image
@@ -37,7 +37,9 @@ public:
         MIRROR_REPEAT_WRAP = 1u << 4u,
         GAMMA_CORRECTION = 1u << 5u,
     	FLIP_Y = 1u << 6u,
-        DEFAULT = REPEAT_WRAP | SMOOTH_TEXTURE | MIPMAPS_TEXTURE,
+        HDR = 1u << 7u,
+    	DEFAULT = REPEAT_WRAP | SMOOTH_TEXTURE | MIPMAPS_TEXTURE,
+        
     };
 	virtual ~Texture() = default;
 	Texture();

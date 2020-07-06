@@ -36,6 +36,7 @@
 #include "29_hello_toon/toon_program.h"
 #include "30_hello_pbr/pbr_program.h"
 #include "31_hello_pbr_texture/pbr_texture_program.h"
+#include "32_hello_ibl/ibl_program.h"
 
 #include "97_hello_water/water_program.h"
 #include "98_hello_line/line_program.h"
@@ -77,6 +78,7 @@ void SampleBrowser::Init()
     RegisterRenderProgram("29 Hello Toon", std::make_unique<HelloToonShadingProgram>());
     RegisterRenderProgram("30 Hello Pbr", std::make_unique<HelloPbrProgram>());
     RegisterRenderProgram("31 Hello Texture Pbr", std::make_unique<HelloPbrTextureProgram>());
+    RegisterRenderProgram("32 Hello IBL", std::make_unique<HelloIblProgram>());
 	
     RegisterRenderProgram("97 Hello Water", std::make_unique<HelloWaterProgram>());
     RegisterRenderProgram("98 Hello Line", std::make_unique<HelloLineProgram>());

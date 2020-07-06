@@ -212,8 +212,42 @@ void Texture::CreateTexture()
 #endif
     GLenum internalFormat = 0;
     GLenum dataFormat = 0;
-    switch (image_.nbChannels)
+	if(flags_ & HDR)
+	{
+		switch(image_.nbChannels)
+		{
+        case 1:
+            logDebug("Loading texture: " + diskLoadJob_.GetFilePath() + " as GL_R16F");
+            internalFormat = GL_R16F;
+            dataFormat = GL_RED;
+            break;
+        case 2:
+
+            logDebug("Loading texture: " + diskLoadJob_.GetFilePath() + " as GL_RG16F");
+            internalFormat = GL_RG16F;
+            dataFormat = GL_RG;
+            break;
+        case 3:
+
+            logDebug("Loading texture: " + diskLoadJob_.GetFilePath() + " as GL_RGB16F");
+            internalFormat = GL_RGB16F;
+            dataFormat = GL_RGB;
+            break;
+        case 4:
+
+            logDebug("Loading texture: " + diskLoadJob_.GetFilePath() + " as GL_RGBA16F");
+            internalFormat = GL_RGBA16F;
+            dataFormat = GL_RGBA;
+            break;
+		default:
+            break;
+		}
+
+	}
+    else
     {
+        switch (image_.nbChannels)
+        {
         case 1:
         {
             logDebug("Loading texture: " + diskLoadJob_.GetFilePath() + " as GL_R8");
@@ -222,18 +256,18 @@ void Texture::CreateTexture()
             break;
         }
         case 2:
-	    {
+        {
             internalFormat = GL_RG8;
             dataFormat = GL_RG;
             break;
-	    }
+        }
         case 3:
         {
 
             logDebug("Loading texture: " + diskLoadJob_.GetFilePath() + " as GL_RGB8");
             internalFormat = flags_ & GAMMA_CORRECTION ? GL_SRGB8 : GL_RGB8;
             dataFormat = GL_RGB;
-        	break;
+            break;
         }
         case 4:
         {
@@ -245,17 +279,23 @@ void Texture::CreateTexture()
         }
         default:
             break;
+        }
     }
-    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, image_.width, image_.height, 0, dataFormat, GL_UNSIGNED_BYTE, image_.data);
-    glCheckError();
+	if(!(flags_ & HDR))
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, image_.width, image_.height, 0, dataFormat, GL_UNSIGNED_BYTE, image_.data);
+		glCheckError();
+	}
+    else
+    {
+	    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, image_.width, image_.height, 0, dataFormat, GL_FLOAT, (float*)image_.data);
+	    glCheckError();
+    }
+
 #ifdef EASY_PROFILE_USE
     EASY_END_BLOCK;
 #endif
-    //TODO import hdr textures
-    /*else if(extension == ".hdr")
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, data);
-    }*/
+
     if (flags_ & MIPMAPS_TEXTURE)
     {
 #ifdef EASY_PROFILE_USE
