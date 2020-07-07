@@ -23,6 +23,8 @@ private:
 		FIRST_FRAME = 1u,
 		SHOW_IRRADIANCE = 1u << 1u,
 		ENABLE_IRRADIANCE = 1u << 2u,
+		SHOW_PREFILTER = 1u << 3u,
+		ENABLE_IBL_SPECULAR = 1u << 4u
 		
 	};
 	struct Light
@@ -32,21 +34,26 @@ private:
 	};
 	void GenerateCubemap();
 	void GenerateDiffuseIrradiance();
+	void GeneratePrefilter();
+	void GenerateLUT();
 	
 	std::array<Light, 4> lights_;
 	gl::Texture hdrTexture_;
 	gl::RenderSphere sphere_{Vec3f::zero, 1.0f};
 	gl::RenderCuboid skybox_{ Vec3f::zero, Vec3f::one*2.0f };
-	gl::RenderCuboid cube_{ Vec3f::zero, Vec3f::one };
+	gl::RenderQuad quad_{ Vec3f::zero, Vec2f::one*2.0f };
 
 	gl::Shader equiToCubemap_;
 	gl::Shader skyboxShader_;
 	gl::Shader pbrShader_;
 	gl::Shader irradianceShader_;
+	gl::Shader prefilterShader_;
+	gl::Shader brdfShader_;
 
 	unsigned int captureFbo_ = 0, captureRbo_ = 0;
-	unsigned int envCubemap_ = 0;
+	TextureId envCubemap_ = 0;
 	TextureId irradianceMap_ = 0;
+	TextureId brdfLUTTexture_ = 0;
 
 	sdl::Camera3D camera_;
 	Vec3f baseColor_ = { 1.0f,0.5f,0.5f };
@@ -76,5 +83,6 @@ private:
 		Vec3f(0.0f, 1.0f,  0.0f),
 		}
 	};
+	TextureId prefilterMap_ = 0;
 };
 }

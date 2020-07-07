@@ -19,8 +19,8 @@ void main()
     vec3 irradiance = vec3(0.0);   
     
     // tangent space calculation from origin point
-    vec3 up    = vec3(0.0, 1.0, 0.0);
-    vec3 right = normalize(cross(up, N));
+    vec3 up    = vec3(0.0, -1.0, 0.0);
+    vec3 right = normalize(cross(N, up));
     up         = normalize(cross(N, right));
        
     float sampleDelta = 0.025;
