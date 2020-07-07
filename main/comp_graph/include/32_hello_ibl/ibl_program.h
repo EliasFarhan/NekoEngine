@@ -22,6 +22,7 @@ private:
 		NONE = 0u,
 		FIRST_FRAME = 1u,
 		SHOW_IRRADIANCE = 1u << 1u,
+		ENABLE_IRRADIANCE = 1u << 2u,
 		
 	};
 	struct Light
@@ -56,10 +57,10 @@ private:
 	{
 		{
 
-		Vec3f(-1.0f,  0.0f,  0.0f),
 		Vec3f(1.0f,  0.0f,  0.0f),
-		Vec3f(0.0f, -1.0f,  0.0f),
+		Vec3f(-1.0f,  0.0f,  0.0f),
 		Vec3f(0.0f,  1.0f,  0.0f),
+		Vec3f(0.0f, -1.0f,  0.0f),
 		Vec3f(0.0f,  0.0f,  1.0f),
 		Vec3f(0.0f,  0.0f, -1.0f),
 		}
@@ -67,12 +68,12 @@ private:
 	const std::array<Vec3f, 6> upDirs =
 	{
 		{
-		Vec3f(0.0f, -1.0f,  0.0f),
-		Vec3f(0.0f, -1.0f,  0.0f),
-		Vec3f(0.0f,  0.0f, -1.0f),
-		Vec3f(0.0f,  0.0f,  1.0f),
-		Vec3f(0.0f, -1.0f,  0.0f),
-		Vec3f(0.0f, -1.0f,  0.0f),
+		Vec3f(0.0f, 1.0f,  0.0f),
+		Vec3f(0.0f, 1.0f,  0.0f),
+		Vec3f(0.0f,  0.0f,  -1.0f),
+		Vec3f(0.0f,  0.0f, 1.0f),
+		Vec3f(0.0f, 1.0f,  0.0f),
+		Vec3f(0.0f, 1.0f,  0.0f),
 		}
 	};
 };

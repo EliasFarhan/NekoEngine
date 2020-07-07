@@ -40,6 +40,7 @@ void HelloIblProgram::Init()
 	hdrTexture_.SetTextureFlags(Texture::TextureFlags(
 		Texture::TextureFlags::CLAMP_WRAP |
 		Texture::TextureFlags::SMOOTH_TEXTURE |
+		Texture::TextureFlags::FLIP_Y |
 		Texture::TextureFlags::HDR));
 	hdrTexture_.SetPath(config.dataRootPath + "textures/Ridgecrest_Road_Ref.hdr");
 	hdrTexture_.LoadFromDisk();
@@ -76,6 +77,11 @@ void HelloIblProgram::DrawImGui()
 	{
 		flags_ = showIrradianceMap ? flags_ | SHOW_IRRADIANCE : flags_ & ~SHOW_IRRADIANCE;
 	}
+	bool enableIrradiance = flags_ & ENABLE_IRRADIANCE;
+	if(ImGui::Checkbox("Enable Irradiance", &enableIrradiance))
+	{
+		flags_ = enableIrradiance ? flags_ | ENABLE_IRRADIANCE : flags_ & ~ENABLE_IRRADIANCE;
+	}
 	ImGui::End();
 }
 
@@ -89,6 +95,9 @@ void HelloIblProgram::Render()
 	}
 	if (flags_ & FIRST_FRAME)
 	{
+#ifdef EASY_PROFILE_USE
+		EASY_BLOCK("Generate IBL textures");
+#endif
 		glDepthFunc(GL_LEQUAL);
 		GenerateCubemap();
 		GenerateDiffuseIrradiance();
@@ -98,7 +107,9 @@ void HelloIblProgram::Render()
 		glViewport(0, 0, config.windowSize.x, config.windowSize.y);
 		flags_ = flags_ & ~FIRST_FRAME;
 	}
-
+#ifdef EASY_PROFILE_USE
+	EASY_BLOCK("Render IBL");
+#endif
 	const auto view = camera_.GenerateViewMatrix();
 	const auto projection = camera_.GenerateProjectionMatrix();
 
@@ -106,12 +117,14 @@ void HelloIblProgram::Render()
 	const int nrRows = 7;
 	const int nrColumns = 7;
 	pbrShader_.Bind();
+	pbrShader_.SetBool("enableIrradiance", flags_ & ENABLE_IRRADIANCE);
 	pbrShader_.SetBool("gammaCorrect", true);
 	pbrShader_.SetFloat("ao", 1.0f);
 	pbrShader_.SetVec3("albedo", baseColor_);
 	pbrShader_.SetMat4("view", view);
 	pbrShader_.SetVec3("viewPos", camera_.position);
 	pbrShader_.SetMat4("projection", projection);
+	pbrShader_.SetCubemap("irradianceMap", irradianceMap_, 0);
 	for (size_t i = 0; i < lights_.size(); i++)
 	{
 		pbrShader_.SetVec3("lights[" + std::to_string(i) + "].position", lights_[i].position);
@@ -163,9 +176,8 @@ void HelloIblProgram::GenerateCubemap()
 	glBindFramebuffer(GL_FRAMEBUFFER, captureFbo_);
 	glBindRenderbuffer(GL_RENDERBUFFER, captureRbo_);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 512, 512);
-	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, captureRbo_);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	
 	glGenTextures(1, &envCubemap_);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap_);
 	for (unsigned int i = 0; i < 6; ++i)
@@ -191,6 +203,7 @@ void HelloIblProgram::GenerateCubemap()
 	equiToCubemap_.SetTexture("equirectangularMap", hdrTexture_, 0);
 	equiToCubemap_.SetMat4("projection", captureCamera.GenerateProjectionMatrix());
 	glViewport(0, 0, 512, 512);
+	glBindFramebuffer(GL_FRAMEBUFFER, captureFbo_);
 	for (unsigned int i = 0; i < 6; ++i)
 	{
 		captureCamera.WorldLookAt(viewDirs[i], upDirs[i]);
@@ -198,7 +211,7 @@ void HelloIblProgram::GenerateCubemap()
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, envCubemap_, 0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		cube_.Draw();
+		skybox_.Draw();
 	}
 	glCheckFramebuffer();
 	glCheckError();
@@ -210,7 +223,7 @@ void HelloIblProgram::GenerateDiffuseIrradiance()
 #ifdef EASY_PROFILE_USE
 	EASY_BLOCK("Generate Diffuse Irradiance");
 #endif
-	logDebug("Generate Irradiance Map");
+	logDebug("Generate DIffuse Irradiance");
 	glGenTextures(1, &irradianceMap_);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap_);
 	for (unsigned int i = 0; i < 6; ++i)
@@ -226,8 +239,6 @@ void HelloIblProgram::GenerateDiffuseIrradiance()
 	glBindFramebuffer(GL_FRAMEBUFFER, captureFbo_);
 	glBindRenderbuffer(GL_RENDERBUFFER, captureRbo_);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 32, 32);
-	glBindRenderbuffer(GL_RENDERBUFFER, 0);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	
 
 	Camera3D captureCamera;
@@ -242,15 +253,15 @@ void HelloIblProgram::GenerateDiffuseIrradiance()
 	irradianceShader_.SetMat4("projection", camera_.GenerateProjectionMatrix());
 	irradianceShader_.SetCubemap("environmentMap", envCubemap_, 0);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, captureFbo_);
 	glViewport(0, 0, 32, 32);
+	glBindFramebuffer(GL_FRAMEBUFFER, captureFbo_);
 	for(int i = 0; i < 6; i++)
 	{
 		captureCamera.WorldLookAt(viewDirs[i], upDirs[i]);
 		irradianceShader_.SetMat4("view", captureCamera.GenerateViewMatrix());
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, irradianceMap_, 0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		cube_.Draw();
+		skybox_.Draw();
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	
