@@ -28,8 +28,8 @@ uniform Light lights[4];
 uniform vec3 viewPos;
 uniform bool gammaCorrect;
 uniform bool enableIrradiance;
+uniform bool enableSchlickRoughness;
 uniform bool enableIblSpecular;
-
 const float PI = 3.14159265359;
 // ----------------------------------------------------------------------------
 float DistributionGGX(vec3 N, vec3 H, float roughness)
@@ -151,7 +151,15 @@ void main()
     else if(enableIrradiance)
     {
         // ambient lighting (we now use IBL as the ambient term)
-        vec3 kS = fresnelSchlick(max(dot(N, V), 0.0), F0);
+        vec3 kS;
+        if(enableSchlickRoughness)
+        {
+            kS = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness); 
+        }
+        else
+        {
+            kS = fresnelSchlick(max(dot(N, V), 0.0), F0);
+        }
         vec3 kD = 1.0 - kS;
         kD *= 1.0 - metallic;	  
         vec3 irradiance = texture(irradianceMap, N).rgb;

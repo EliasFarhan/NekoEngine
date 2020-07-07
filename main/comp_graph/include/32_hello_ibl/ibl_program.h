@@ -24,7 +24,8 @@ private:
 		SHOW_IRRADIANCE = 1u << 1u,
 		ENABLE_IRRADIANCE = 1u << 2u,
 		SHOW_PREFILTER = 1u << 3u,
-		ENABLE_IBL_SPECULAR = 1u << 4u
+		ENABLE_IBL_SPECULAR = 1u << 4u,
+		ENABLE_SCHLICK_ROUGHNESS = 1u << 5u,
 		
 	};
 	struct Light

@@ -109,11 +109,17 @@ void HelloIblProgram::DrawImGui()
 	{
 		flags_ = enableIrradiance ? flags_ | ENABLE_IRRADIANCE : flags_ & ~ENABLE_IRRADIANCE;
 	}
+	bool enableSchlickRoughness = flags_ & ENABLE_SCHLICK_ROUGHNESS;
+	if(ImGui::Checkbox("Enable Schlick Roughness", &enableSchlickRoughness))
+	{
+		flags_ = enableSchlickRoughness ? flags_ | ENABLE_SCHLICK_ROUGHNESS : flags_ & ~ENABLE_SCHLICK_ROUGHNESS;
+	}
 	bool enableIblSpecular = flags_ & ENABLE_IBL_SPECULAR;
 	if(ImGui::Checkbox("Enable Specular IBL", &enableIblSpecular))
 	{
 		flags_ = enableIblSpecular ? flags_ | ENABLE_IBL_SPECULAR : flags_ & ~ENABLE_IBL_SPECULAR;
 	}
+	
 	ImGui::End();
 }
 
@@ -152,6 +158,7 @@ void HelloIblProgram::Render()
 	pbrShader_.Bind();
 	pbrShader_.SetBool("enableIrradiance", flags_ & ENABLE_IRRADIANCE);
 	pbrShader_.SetBool("enableIblSpecular", flags_ & ENABLE_IBL_SPECULAR);
+	pbrShader_.SetBool("enableSchlickRoughness", flags_ & ENABLE_SCHLICK_ROUGHNESS);
 	pbrShader_.SetBool("gammaCorrect", true);
 	pbrShader_.SetFloat("ao", 1.0f);
 	pbrShader_.SetVec3("albedo", baseColor_);
