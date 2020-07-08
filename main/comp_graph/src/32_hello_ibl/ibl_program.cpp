@@ -217,23 +217,27 @@ void HelloIblProgram::GenerateCubemap()
 	EASY_BLOCK("Generate Cubemap");
 #endif
 	logDebug("Generate Cubemap");
-	glBindFramebuffer(GL_FRAMEBUFFER, captureFbo_);
+    glBindFramebuffer(GL_FRAMEBUFFER, captureFbo_);
+    glGenTextures(1, &envCubemap_);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap_);
+    for (unsigned int i = 0; i < 6; ++i)
+    {
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, 512, 512, 0, GL_RGB, GL_FLOAT, nullptr);
+    }
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+    glCheckError();
+
 	glBindRenderbuffer(GL_RENDERBUFFER, captureRbo_);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 512, 512);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, captureRbo_);
-	
-	glGenTextures(1, &envCubemap_);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap_);
-	for (unsigned int i = 0; i < 6; ++i)
-	{
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, 512, 512, 0, GL_RGB, GL_FLOAT, nullptr);
-	}
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, 512, 512);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, captureRbo_);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X, envCubemap_, 0);
+	glCheckError();
+
 	Camera3D captureCamera;
 	captureCamera.position = Vec3f::zero;
 	captureCamera.aspect = 1.0f;
@@ -242,7 +246,6 @@ void HelloIblProgram::GenerateCubemap()
 	captureCamera.farPlane = 10.0f;
 
 
-	glBindFramebuffer(GL_FRAMEBUFFER, captureFbo_);
 	equiToCubemap_.Bind();
 	equiToCubemap_.SetTexture("equirectangularMap", hdrTexture_, 0);
 	equiToCubemap_.SetMat4("projection", captureCamera.GenerateProjectionMatrix());
@@ -253,12 +256,14 @@ void HelloIblProgram::GenerateCubemap()
 		captureCamera.WorldLookAt(viewDirs[i], upDirs[i]);
 		equiToCubemap_.SetMat4("view", captureCamera.GenerateViewMatrix());
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, envCubemap_, 0);
+        glCheckFramebuffer();
+        glCheckError();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		skybox_.Draw();
 	}
-	glCheckFramebuffer();
-	glCheckError();
+
+
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
@@ -268,22 +273,26 @@ void HelloIblProgram::GenerateDiffuseIrradiance()
 	EASY_BLOCK("Generate Diffuse Irradiance");
 #endif
 	logDebug("Generate DIffuse Irradiance");
-	glGenTextures(1, &irradianceMap_);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap_);
-	for (unsigned int i = 0; i < 6; ++i)
-	{
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, 32, 32, 0, GL_RGB, GL_FLOAT, nullptr);
-	}
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-	glBindFramebuffer(GL_FRAMEBUFFER, captureFbo_);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, captureFbo_);
+    glGenTextures(1, &irradianceMap_);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap_);
+    for (unsigned int i = 0; i < 6; ++i)
+    {
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, 32, 32, 0, GL_RGB, GL_FLOAT, nullptr);
+    }
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+    glCheckError();
 	glBindRenderbuffer(GL_RENDERBUFFER, captureRbo_);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 32, 32);
-	
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X, irradianceMap_, 0);
+
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, 32, 32);
+    glCheckError();
 
 	Camera3D captureCamera;
 	captureCamera.position = Vec3f::zero;
@@ -304,6 +313,8 @@ void HelloIblProgram::GenerateDiffuseIrradiance()
 		captureCamera.WorldLookAt(viewDirs[i], upDirs[i]);
 		irradianceShader_.SetMat4("view", captureCamera.GenerateViewMatrix());
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, irradianceMap_, 0);
+		glCheckFramebuffer();
+        glCheckError();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		skybox_.Draw();
 	}
@@ -325,6 +336,7 @@ void HelloIblProgram::GeneratePrefilter()
 	captureCamera.nearPlane = 0.1f;
 	captureCamera.farPlane = 10.0f;
 
+    glBindFramebuffer(GL_FRAMEBUFFER, captureFbo_);
 	glGenTextures(1, &prefilterMap_);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, prefilterMap_);
 	for (unsigned int i = 0; i < 6; ++i)
@@ -346,7 +358,8 @@ void HelloIblProgram::GeneratePrefilter()
 	prefilterShader_.SetMat4("projection", captureCamera.GenerateProjectionMatrix());
 
 
-	glBindFramebuffer(GL_FRAMEBUFFER, captureFbo_);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X,
+                           prefilterMap_, 0);
 	unsigned int maxMipLevels = 5;
 	for (unsigned int mip = 0; mip < maxMipLevels; ++mip)
 	{
@@ -354,7 +367,7 @@ void HelloIblProgram::GeneratePrefilter()
 		unsigned int mipWidth = 128 * std::pow(0.5, mip);
 		unsigned int mipHeight = 128 * std::pow(0.5, mip);
 		glBindRenderbuffer(GL_RENDERBUFFER, captureRbo_);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, mipWidth, mipHeight);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, mipWidth, mipHeight);
 		glBindRenderbuffer(GL_RENDERBUFFER, 0);
 		glViewport(0, 0, mipWidth, mipHeight);
 
@@ -366,12 +379,13 @@ void HelloIblProgram::GeneratePrefilter()
 			prefilterShader_.SetMat4("view", captureCamera.GenerateViewMatrix());
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 
 				prefilterMap_, mip);
-
+            glCheckFramebuffer();
+            glCheckError();
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			skybox_.Draw();
 		}
 	}
-	glCheckFramebuffer();
+
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	glCheckError();
@@ -398,7 +412,7 @@ void HelloIblProgram::GenerateLUT()
 	// then re-configure capture framebuffer object and render screen-space quad with BRDF shader.
 	glBindFramebuffer(GL_FRAMEBUFFER, captureFbo_);
 	glBindRenderbuffer(GL_RENDERBUFFER, captureRbo_);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 512, 512);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, 512, 512);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, brdfLUTTexture_, 0);
 
 	glViewport(0, 0, 512, 512);
