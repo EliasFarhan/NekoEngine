@@ -21,11 +21,12 @@ public:
 	void Render() override;
 	void OnEvent(const SDL_Event& event) override;
 private:
-	struct Character {
-		unsigned int textureID; // ID handle of the glyph texture
+	struct Character
+    {
+		unsigned int textureID = 0; // ID handle of the glyph texture
 		Vec2i   size;      // Size of glyph
 		Vec2i   bearing;   // Offset from baseline to left/top of glyph
-		unsigned int advance;   // Horizontal offset to advance to next glyph
+		long advance = 0;   // Horizontal offset to advance to next glyph
 	};
 	void RenderText(gl::Shader& shader, std::string_view text, float x, float y, float scale, Color3 color);
 	gl::Shader textShader_;
