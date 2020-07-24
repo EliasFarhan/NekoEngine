@@ -62,14 +62,7 @@ struct Camera2D : Camera
 	float right = 0.0f, left = 0.0f, top = 0.0f, bottom =0.0f;
 	[[nodiscard]] Mat4f GenerateProjectionMatrix() const override
 	{
-		return Mat4f(std::array<Vec4f, 4>{
-			Vec4f(2.0f / (right - left), 0, 0, 0),
-			Vec4f(0, 2.0f / (top - bottom), 0, 0),
-			Vec4f(0, 0, -2.0f / (farPlane - nearPlane), 0),
-			Vec4f(-(right + left) / (right - left), 
-					-(top + bottom) / (top - bottom), 
-					-(farPlane + nearPlane) / (farPlane - nearPlane), 1.0f)
-		});
+		return Transform3d::Orthographic(left, right, top, bottom, nearPlane, farPlane);
 	}
 	void SetSize(Vec2f size)
 	{

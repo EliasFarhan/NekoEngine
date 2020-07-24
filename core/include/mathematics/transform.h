@@ -33,6 +33,6 @@ Mat4f Rotate(const Mat4f& transform, const EulerAngles eulerAngles);
 
 
 Mat4f Perspective(radian_t fovy, float aspect, float near, float far);
-
+Mat4f Orthographic(float left, float right, float bottom, float top, float nearPlane = 0.0f, float farPlane = 100.0f);
 
 }

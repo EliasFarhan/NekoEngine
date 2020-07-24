@@ -208,4 +208,16 @@ Mat4f Perspective(radian_t fovy, float aspect, float near, float far)
     perspective[3][2] = - (2.0f * far * near) / (far - near);
     return perspective;
 }
+
+Mat4f Orthographic(float left, float right, float bottom, float top, float nearPlane, float farPlane)
+{
+    return Mat4f(std::array<Vec4f, 4>{
+        Vec4f(2.0f / (right - left), 0, 0, 0),
+            Vec4f(0, 2.0f / (top - bottom), 0, 0),
+            Vec4f(0, 0, -2.0f / (farPlane - nearPlane), 0),
+            Vec4f(-(right + left) / (right - left),
+                -(top + bottom) / (top - bottom),
+                -(farPlane + nearPlane) / (farPlane - nearPlane), 1.0f)
+    });
+}
 }
