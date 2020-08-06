@@ -26,7 +26,7 @@
 #include <ostream>
 #include <array>
 #include "mathematics/const.h"
-#include <mathematics/intrinsincs.h>
+#include <engine/intrinsincs.h>
 #include "mathematics/angle.h"
 #include "mathematics/trigo.h"
 
