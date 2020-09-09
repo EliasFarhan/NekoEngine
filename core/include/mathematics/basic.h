@@ -45,25 +45,22 @@ float Clamp(T value, T lower, T upper)
 {
     return value < lower ? lower : (value > upper ? upper : value);
 }
+
 template<typename T>
-T RandomRange(T start, T end) = delete;
-
-
-template<>
-inline int RandomRange(int start, int end)
+typename std::enable_if<std::is_integral<T>::value, T>::type RandomRange(T start, T end)
 {
     static std::random_device rd;  //Will be used to obtain a seed for the random number engine
     static std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
-    std::uniform_int_distribution<int> dis(start, end);
+    std::uniform_int_distribution<T> dis(start, end);
     return dis(gen);
 }
 
-template<>
-inline float RandomRange(float start, float end)
+template<typename T>
+typename std::enable_if<std::is_floating_point<T>::value, T>::type RandomRange(T start, T end)
 {
     static std::random_device rd;  //Will be used to obtain a seed for the random number engine
     static std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
-    std::uniform_real_distribution<float> dis(start, end);
+    std::uniform_real_distribution<T> dis(start, end);
     return dis(gen);
 }
 }

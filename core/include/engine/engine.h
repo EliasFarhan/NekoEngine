@@ -56,7 +56,6 @@ struct Configuration
 #else
     std::string dataRootPath = "../../data/";
 #endif
-    std::string appId = "d23e2b29-4044-4f77-b6f3-a2db2cff92e9";
 };
 
 

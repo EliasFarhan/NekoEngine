@@ -150,6 +150,11 @@ struct Vec2
         return Vec2<T>(x * rhs.x, y * rhs.y);
     }
 
+    Vec2<T> operator/(const Vec2<T>& rhs) const
+    {
+        return Vec2<T>(x / rhs.x, y / rhs.y);
+    }
+
     Vec2<T>& operator*=(T rhs)
     {
         this->x *= rhs;
@@ -169,12 +174,12 @@ struct Vec2
         return *this;
     }
 
-    bool operator==(const Vec2<T>& right)
+    bool operator==(const Vec2<T>& right) const
     {
         return x == right.x && y == right.y;
     }
 
-    bool operator!=(const Vec2<T>& right)
+    bool operator!=(const Vec2<T>& right) const
     {
         return !(*this == right);
     }

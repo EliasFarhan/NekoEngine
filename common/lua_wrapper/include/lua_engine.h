@@ -22,7 +22,9 @@
  SOFTWARE.
  */
 
-#include <luapp/lua.hpp>
+#include <luapp.hpp>
+#include <string>
+
 namespace neko
 {
 
@@ -35,7 +37,7 @@ public:
     }
 
 private:
-	lua::State state_;
+    lua::State<> state_;
 };
 
 }
