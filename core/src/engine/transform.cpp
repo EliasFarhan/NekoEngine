@@ -1,7 +1,7 @@
 /*
  MIT License
 
- Copyright (c) 2017 SAE Institute Switzerland AG
+ Copyright (c) 2020 SAE Institute Switzerland AG
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -45,6 +45,36 @@ Index Scale3dManager::AddComponent(Entity entity)
 	ResizeIfNecessary(components_, entity, Vec3f::one);
 	return ComponentManager::AddComponent(entity);
 }
+
+
+Transform2dManager::Transform2dManager(EntityManager& entityManager) :
+	ComponentManager<Mat3f, neko::ComponentType::TRANSFORM2D>(entityManager),
+	positionManager_(entityManager),
+	rotationManager_(entityManager),
+	scaleManager_(entityManager)
+{
+}
+
+void Transform2dManager::SetPosition(Entity entity, Vec2f position)
+{
+	positionManager_.SetComponent(entity, position);
+}
+
+void Transform2dManager::SetRotation(Entity entity, degree_t angles)
+{
+	rotationManager_.SetComponent(entity, angles);
+}
+
+Vec2f Transform2dManager::GetPosition(Entity entity) const
+{
+	return positionManager_.GetComponent(entity);
+}
+
+degree_t Transform2dManager::GetRotation(Entity entity) const
+{
+	return rotationManager_.GetComponent(entity);
+}
+
 
 Transform3dManager::Transform3dManager(EntityManager& entityManager) :
 	DoubleBufferComponentManager(entityManager),

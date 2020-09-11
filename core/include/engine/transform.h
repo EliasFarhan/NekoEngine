@@ -1,9 +1,8 @@
 #pragma once
-
 /*
  MIT License
 
- Copyright (c) 2017 SAE Institute Switzerland AG
+ Copyright (c) 2020 SAE Institute Switzerland AG
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -49,7 +48,7 @@ public:
 
 };
 
-class Rotation2dManager : public ComponentManager<float, ComponentType::ROTATION2D>
+class Rotation2dManager : public ComponentManager<degree_t, ComponentType::ROTATION2D>
 {
     using ComponentManager::ComponentManager;
 };
@@ -77,8 +76,17 @@ public:
 class Transform2dManager : public ComponentManager<Mat3f, ComponentType::TRANSFORM2D>
 {
 public:
+    explicit Transform2dManager(EntityManager& entityManager);
+    void SetPosition(Entity entity, Vec2f position);
+    void SetScale(Entity entity, Vec2f scale);
+    void SetRotation(Entity entity, degree_t angles);
+    [[nodiscard]] Vec2f GetPosition(Entity entity) const;
+    [[nodiscard]] Vec2f GetScale(Entity entity) const;
+    [[nodiscard]] degree_t GetRotation(Entity entity) const;
 protected:
-
+    Position2dManager positionManager_;
+    Scale2dManager scaleManager_;
+    Rotation2dManager rotationManager_;
 };
 
 class Transform3dManager : public DoubleBufferComponentManager<Mat4f, ComponentType::TRANSFORM3D>,

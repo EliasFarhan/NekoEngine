@@ -11,5 +11,5 @@ if(EMSCRIPTEN)
     set_target_properties(neko_editor3d PROPERTIES LINK_FLAGS
             "${bin_link_flags} -s USE_SDL=2 -s USE_WEBGL2=1 ")
 endif()
-set_target_properties (neko_editor3d PROPERTIES FOLDER Neko\\Main)
+set_target_properties (neko_editor3d PROPERTIES FOLDER Neko/Main)
 set_target_properties(neko_editor3d PROPERTIES UNITY_BUILD ON)

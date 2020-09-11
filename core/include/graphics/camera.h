@@ -1,4 +1,28 @@
 #pragma once
+/*
+ MIT License
+
+ Copyright (c) 2020 SAE Institute Switzerland AG
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
+ */
+
 
 #include <mathematics/vector.h>
 #include <mathematics/matrix.h>
@@ -62,14 +86,7 @@ struct Camera2D : Camera
 	float right = 0.0f, left = 0.0f, top = 0.0f, bottom =0.0f;
 	[[nodiscard]] Mat4f GenerateProjectionMatrix() const override
 	{
-		return Mat4f(std::array<Vec4f, 4>{
-			Vec4f(2.0f / (right - left), 0, 0, 0),
-			Vec4f(0, 2.0f / (top - bottom), 0, 0),
-			Vec4f(0, 0, -2.0f / (farPlane - nearPlane), 0),
-			Vec4f(-(right + left) / (right - left), 
-					-(top + bottom) / (top - bottom), 
-					-(farPlane + nearPlane) / (farPlane - nearPlane), 1.0f)
-		});
+		return Transform3d::Orthographic(left, right, bottom, top, nearPlane, farPlane);
 	}
 	void SetSize(Vec2f size)
 	{

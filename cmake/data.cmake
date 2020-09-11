@@ -41,15 +41,19 @@ file(GLOB_RECURSE SND_FILES
         "${PROJECT_SOURCE_DIR}/data/*.ogg"
         )
 
+file(GLOB_RECURSE FONT_FILES
+        "${PROJECT_SOURCE_DIR}/data/*.ttf"
+        )
+
 
 source_group("Scripts"				FILES ${SCRIPT_FILES})
-source_group("Shader" FILES ${SHADER_FILES})
-source_group("Data\\Text"           FILES ${TEXT_FILES})
-source_group("Data\\Img"            FILES ${IMG_FILES})
-source_group("Data\\Snd"			FILES ${SND_FILES})
-source_group("Data\\Shaders"		FILES ${SHADER_FILES})
-source_group("DATA\\Model" FILES ${MODEL_FILES})
-LIST(APPEND DATA_FILES ${IMG_FILES} ${MODEL_FILES} ${SND_FILES} ${TEXT_FILES} ${SHADER_FILES})
+source_group("Data/Font"           FILES ${FONT_FILES})
+source_group("Data/Text"           FILES ${TEXT_FILES})
+source_group("Data/Img"            FILES ${IMG_FILES})
+source_group("Data/Snd"			FILES ${SND_FILES})
+source_group("Shaders"		FILES ${SHADER_FILES})
+source_group("Data/Model" FILES ${MODEL_FILES})
+LIST(APPEND DATA_FILES ${IMG_FILES} ${MODEL_FILES} ${SND_FILES} ${TEXT_FILES} ${SHADER_FILES} ${FONT_FILES})
 
 foreach(DATA ${DATA_FILES})
     get_filename_component(FILE_NAME ${DATA} NAME)

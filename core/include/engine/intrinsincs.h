@@ -1,0 +1,49 @@
+#pragma once
+/*
+ MIT License
+
+ Copyright (c) 2020 SAE Institute Switzerland AG
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
+ */
+#if defined(EMSCRIPTEN)
+#include <wasm_simd128.h>
+typedef float v4f __attribute__ ((vector_size (16)));
+#endif
+
+#ifdef WIN32
+#include <intrin.h>
+#ifdef __AVX2__
+#define __SSE__
+#define __SSE4_2__
+#define __FMA__
+#else
+static_assert(false, "AVX2 is not enabled");
+#endif
+#else
+#if defined(__amd64__) || defined(__i386__)
+#include <x86intrin.h>
+#endif
+#endif
+
+#if defined(__arm__) || defined(__ANDROID__)
+typedef float v4f __attribute__ ((vector_size (16)));
+#endif
+
+

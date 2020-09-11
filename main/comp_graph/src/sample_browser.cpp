@@ -1,7 +1,26 @@
-//
-// Created by efarhan on 26.01.20.
-//
+/*
+ MIT License
 
+ Copyright (c) 2020 SAE Institute Switzerland AG
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
+ */
 #include <imgui.h>
 #include "comp_graph/sample_browser.h"
 
@@ -38,6 +57,7 @@
 #include "31_hello_pbr_texture/pbr_texture_program.h"
 #include "32_hello_ibl/ibl_program.h"
 
+#include "96_hello_text/text_program.h"
 #include "97_hello_water/water_program.h"
 #include "98_hello_line/line_program.h"
 #include "99_hello_scene/scene_program.h"
@@ -79,7 +99,8 @@ void SampleBrowser::Init()
     RegisterRenderProgram("30 Hello Pbr", std::make_unique<HelloPbrProgram>());
     RegisterRenderProgram("31 Hello Texture Pbr", std::make_unique<HelloPbrTextureProgram>());
     RegisterRenderProgram("32 Hello IBL", std::make_unique<HelloIblProgram>());
-	
+
+    RegisterRenderProgram("96 Hello Text", std::make_unique<HelloTextProgram>());
     RegisterRenderProgram("97 Hello Water", std::make_unique<HelloWaterProgram>());
     RegisterRenderProgram("98 Hello Line", std::make_unique<HelloLineProgram>());
     RegisterRenderProgram("99 Hello Scene", std::make_unique<HelloSceneProgram>());

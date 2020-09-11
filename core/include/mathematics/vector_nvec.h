@@ -24,7 +24,7 @@
  */
 
 #include <mathematics/vector.h>
-#include "mathematics/intrinsincs.h"
+#include "engine/intrinsincs.h"
 namespace neko
 {
 //-----------------------------------------------------------------------------

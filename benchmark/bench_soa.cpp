@@ -28,7 +28,7 @@ SOFTWARE.
 #include <benchmark/benchmark.h>
 #include <memory>
 #include <cmath>
-#include "mathematics/intrinsincs.h"
+#include "engine/intrinsincs.h"
 
 const int fromRange = 8;
 const int toRange = 1 << 20;
