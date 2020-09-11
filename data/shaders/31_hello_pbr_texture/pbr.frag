@@ -76,7 +76,7 @@ vec3 GetNormalFromNormalMap()
 void main()
 {		
 
-    vec3 albedo     = pow(texture(albedoMap, TexCoords).rgb,vec3(2.2));
+    vec3 albedo     = pow(texture(albedoMap, TexCoords).rgb,vec3(2.2));//from sRGB to linear space
     vec3 normal     = GetNormalFromNormalMap();
     float metallic  = texture(metallicMap, TexCoords).r;
     float roughness = texture(roughnessMap, TexCoords).r;

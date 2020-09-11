@@ -151,7 +151,7 @@ void HelloTriangleProgram::Destroy()
 	
     glDeleteVertexArrays(1, &eboProgram_.VAO);
     glDeleteBuffers(2, &eboProgram_.VBO[0]);
-    glDeleteBuffers(2, &eboProgram_.EBO);
+    glDeleteBuffers(1, &eboProgram_.EBO);
 
     glDeleteVertexArrays(1, &vaoProgam_.VAO);
     glDeleteBuffers(1, &vaoProgam_.VBO);
