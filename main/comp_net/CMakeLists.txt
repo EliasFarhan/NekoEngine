@@ -2,6 +2,7 @@ include_directories("include/")
 
 file(GLOB_RECURSE comp_net_src include/*.h src/*.cpp)
 
+message("SFML LIBRARIES: ${SFML_LIBRARIES}")
 add_executable(comp_net ${comp_net_src} )
 target_link_libraries(comp_net PUBLIC Neko_Core sdl_engine gles3_wrapper assimp_wrapper ${SFML_LIBRARIES})
 neko_bin_config(comp_net)
