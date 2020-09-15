@@ -23,3 +23,4 @@ script:
   - mkdir build
   - cd build
   - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. && make
+  - ./test/Neko_TEST
