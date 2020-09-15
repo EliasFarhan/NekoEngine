@@ -14,7 +14,7 @@ int main(int argc, char** argv)
     sf::IpAddress sender;
     unsigned short port;
     socket.receive(buffer, sizeof(buffer), received, sender, port);
-    std::cout << sender.toString() << " said: " << buffer << std::endl;
+    std::cout << sender.toString() <<':'<<port<< " said: " << buffer << std::endl;
     // Send an answer
     std::string message = "Welcome " + sender.toString();
     socket.send(message.c_str(), message.size() + 1, sender, port);
