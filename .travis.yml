@@ -1,0 +1,25 @@
+sudo: false
+language: cpp
+compiler:
+  - clang
+os:
+  - linux
+dist: focal
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - clang
+      - libsdl2-dev
+      - python3-dev
+      - glslang-tools
+
+before_install:
+  - eval "CC=clang && CXX=clang++"
+
+script:
+  - mkdir build
+  - cd build
+  - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. && make
