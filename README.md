@@ -1,4 +1,5 @@
-# Neko Game Engine
+# Neko Game Engine 
+develop branch: [![Build Status](https://travis-ci.com/EliasFarhan/NekoEngine.svg?branch=develop)](https://travis-ci.com/EliasFarhan/NekoEngine)
 
 Neko is a 3D game engine based on SDL2 and OpenGL ES 3.0 that works on Desktop, WebGL2 and Nintendo Switch (port to Android and iOS possible) used at [SAE Institute Geneva](https://sae.swiss).
 
