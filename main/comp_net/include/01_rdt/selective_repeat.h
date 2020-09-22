@@ -3,6 +3,8 @@
 #include "rdt_base.h"
 namespace neko::rdt
 {
+
+const static auto selRepNPacketSize = Packet::packetSize - 3;
 template<ClientType type>
 class SelRepClient : public Client<type>
 {
@@ -20,10 +22,12 @@ private:
     friend class SelRepManager;
     void SendNPacket(int start, int n = windowSize);
     std::vector<Packet> sentPackets_;
+
     std::array<bool, windowSize> ackPackets_{};
     int base_ = 0;
     int nextSendNmb_ = 0;
-    float currentTimer_ = 0.0f;
+    std::array<float, windowSize> packetTimers_;
+
     float timerPeriod_;
 };
 
@@ -37,7 +41,6 @@ public:
     void SendRaw(const Packet& packet) override;
     void Update(seconds dt) override;
 private:
-
     size_t packetNmb = 0;
     std::vector<Packet> arrivedPackets_;
 };
@@ -56,8 +59,8 @@ public:
     void DrawImGui() override;
 
 private:
-    SelRepClient<ClientType::SENDER> sender_;
-    SelRepClient<ClientType::RECEIVER> receiver_;
+    SelRepSender sender_;
+    SelRepReceiver receiver_;
     SelRepChannel channel_;
 };
 }

@@ -21,6 +21,7 @@ private:
     void SendNPacket(int start, int n = windowSize);
     std::vector<Packet> sentPackets_;
     int base_ = 0;
+    //For debug purpose, we store the last sent packet
     int nextSendNmb_ = 0;
     float currentTimer_ = 0.0f;
     float timerPeriod_;

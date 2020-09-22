@@ -55,32 +55,112 @@ void SelRepClient<type>::ClearMsg()
     Client<type>::ClearMsg();
     base_ = 0;
 }
-template<ClientType type>
-void SelRepClient<type>::ReceiveRaw(const Packet& packet)
+
+template<>
+void SelRepSender::ReceiveRaw(const Packet& packet)
 {
+    if (base_ >= sentPackets_.size())
+    {
+        return;
+    }
+    bool isCorrupt = false;
+    const auto packetChecksum = packet.data[SelRepManager::CHECKSUM];
+    char checkSum = 0;
+    for (size_t j = 0; j < SelRepManager::CHECKSUM; j++)
+    {
+        char c = packet.data[j];
+        checkSum += c;
+    }
+    if (checkSum + packetChecksum != -1)
+    {
+        isCorrupt = true;
+    }
+    const auto type = packet.data[SelRepManager::TYPE];
+    const auto sequenceNmb = static_cast<int>(packet.data[SelRepManager::SEQUENCE_NMB]) + 128;
+
+
+    //Check corruption
+    if (isCorrupt)
+    {
+
+        return;
+    }
+    //TODO increase base if necessary
 
 }
+
+template<>
+void SelRepReceiver::ReceiveRaw(const Packet& packet)
+{
+    char content[selRepPacketSize + 1];
+    content[selRepPacketSize] = 0;
+    std::memcpy(content, packet.data.data(), selRepPacketSize);
+    std::cout << "Client receives data: " << content << '\n';
+    bool isCorrupt = false;
+
+    const auto packetChecksum = packet.data[SelRepManager::CHECKSUM];
+    char checkSum = 0;
+    for (size_t j = 0; j < SelRepManager::CHECKSUM; j++)
+    {
+        char c = packet.data[j];
+        checkSum += c;
+    }
+    if (checkSum + packetChecksum != -1)
+    {
+        isCorrupt = true;
+    }
+    const auto type = packet.data[SelRepManager::TYPE];
+    const auto sequenceNmb = static_cast<int>(packet.data[SelRepManager::SEQUENCE_NMB]) + 128;
+
+    // Receiver part
+    if (isCorrupt)
+    {
+    }
+
+
+}
+
 template<ClientType type>
 void SelRepClient<type>::Update(seconds dt)
 {
     Client<type>::Update(dt);
     if (base_ + 1 == sentPackets_.size())
         return;
-    currentTimer_ += dt.count();
-    if (currentTimer_ > timerPeriod_)
+    for(auto& currentTimer : packetTimers_)
     {
-        SendNPacket(base_);
+        const auto index = std::distance(&packetTimers_[0], &currentTimer);
+        currentTimer += dt.count();
+        if (currentTimer > timerPeriod_)
+        {
+            SendNPacket(base_+index, 1);
+        }
     }
+
 }
 template<ClientType type>
 void SelRepClient<type>::SendRaw(const Packet& packet)
 {
+    Client<type>::SendRaw(packet);
 
+    timerPeriod_ = this->channel_.baseDelay * 2.7f;
 }
 template<ClientType type>
 void SelRepClient<type>::SendNPacket(int start, int n)
 {
-
+    for (int i = start; i < n + start; i++)
+    {
+        if (i >= sentPackets_.size())
+        {
+            if (nextSendNmb_ < i)
+                nextSendNmb_ = i;
+            return;
+        }
+        sentPackets_[i].currentDelay = -float(i - start) * this->channel_.pktDelay;
+        packetTimers_[i-base_] = -float(i - start) * this->channel_.pktDelay;
+        SendRaw(sentPackets_[i]);
+        if (nextSendNmb_ < i)
+            nextSendNmb_ = i;
+    }
 }
 template <>
 bool SelRepSender::IsComplete() const
