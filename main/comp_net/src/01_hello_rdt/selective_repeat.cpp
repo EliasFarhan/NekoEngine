@@ -8,7 +8,7 @@
 namespace neko::rdt
 {
 
-const static auto selRepPacketSize = Packet::packetSize - 3;
+constexpr static auto selRepPacketSize = Packet::packetSize - 3;
 template<ClientType type>
 void SelRepClient<type>::Send(std::string_view msg)
 {
@@ -55,7 +55,24 @@ void SelRepClient<type>::ClearMsg()
     Client<type>::ClearMsg();
     base_ = 0;
 }
+template<ClientType type>
+void SelRepClient<type>::MoveBase()
+{
+    const auto it = std::find(ackPackets_.begin(), ackPackets_.end(), false);
+    const auto delta = std::distance(ackPackets_.begin(), it);
+    for(int i = 0; i < windowSize-delta; i++)
+    {
+        ackPackets_[i] = ackPackets_[i+delta];
+        packetTimers_[i] = packetTimers_[i+delta];
+    }
+    for(int i = windowSize-delta; i < windowSize; i++)
+    {
+        ackPackets_[i] = false;
+        packetTimers_[i] = 0.0f;
+    }
 
+    base_ += delta;
+}
 template<>
 void SelRepSender::ReceiveRaw(const Packet& packet)
 {
@@ -75,18 +92,26 @@ void SelRepSender::ReceiveRaw(const Packet& packet)
     {
         isCorrupt = true;
     }
-    const auto type = packet.data[SelRepManager::TYPE];
     const auto sequenceNmb = static_cast<int>(packet.data[SelRepManager::SEQUENCE_NMB]) + 128;
 
 
     //Check corruption
     if (isCorrupt)
     {
-
         return;
     }
-    //TODO increase base if necessary
+    if(sequenceNmb >= base_+1 && sequenceNmb < base_+1+windowSize)
+    {
+        ackPackets_[sequenceNmb-base_-1] = true;
+        if(sequenceNmb == base_+1)
+        {
+            const auto oldBase = base_;
+            MoveBase();
+            const auto delta = base_-oldBase;
 
+            SendNPacket(base_, delta);
+        }
+    }
 }
 
 template<>
@@ -109,15 +134,53 @@ void SelRepReceiver::ReceiveRaw(const Packet& packet)
     {
         isCorrupt = true;
     }
-    const auto type = packet.data[SelRepManager::TYPE];
     const auto sequenceNmb = static_cast<int>(packet.data[SelRepManager::SEQUENCE_NMB]) + 128;
 
-    // Receiver part
-    if (isCorrupt)
+    if(isCorrupt)
     {
+        return;
     }
+    if(sequenceNmb >= base_+1 + windowSize)
+    {
+        return;
+    }
+    if(sequenceNmb >= base_+1 && sequenceNmb < base_+1+windowSize)
+    {
+        ackPackets_[sequenceNmb-1-base_] = true;
+        const auto it = std::find_if(receivePackets_.cbegin(), receivePackets_.cend(),
+                                     [sequenceNmb](const Packet& packet){
+                                         const auto seqNum = static_cast<int>(packet.data[SelRepManager::SEQUENCE_NMB]) + 128;
+                                         return seqNum == sequenceNmb; });
+        if(it == receivePackets_.cend())
+        {
+            receivePackets_.push_back(packet);
+            std::sort(receivePackets_.begin(), receivePackets_.end(),[](const Packet& p1, const Packet& p2){
+                const auto seqNum1 = static_cast<int>(p1.data[SelRepManager::SEQUENCE_NMB]) + 128;
+                const auto seqNum2 = static_cast<int>(p2.data[SelRepManager::SEQUENCE_NMB]) + 128;
 
-
+                return seqNum1 < seqNum2;
+            });
+        }
+        if(sequenceNmb == base_+1)
+        {
+            const auto oldBase = base_;
+            MoveBase();
+            const auto delta = base_-oldBase;
+            for(int i = oldBase; i < oldBase+delta; i++)
+            {
+                std::array<char, selRepPacketSize + 1> msg{};
+                msg[selRepPacketSize] = 0;
+                std::memcpy(&msg[0], &receivePackets_[i].data[0], selRepPacketSize);
+                this->receivedMsg_ += &msg[0];
+            }
+        }
+    }
+    Packet p;
+    p.flags = Packet::ACK;
+    p.data[SelRepManager::TYPE] = Packet::ACK;
+    p.data[SelRepManager::SEQUENCE_NMB] = static_cast<int>(sequenceNmb) - 128;
+    p.data[SelRepManager::CHECKSUM] = ~(p.data[SelRepManager::SEQUENCE_NMB] + p.data[SelRepManager::TYPE]);
+    channel_.SendRaw(p);
 }
 
 template<ClientType type>
@@ -167,6 +230,9 @@ bool SelRepSender::IsComplete() const
 {
     return base_ == sentPackets_.size();
 }
+
+
+
 template <>
 bool SelRepReceiver::IsComplete() const
 {
@@ -183,13 +249,13 @@ void SelRepChannel::SendRaw(const Packet& packet)
 
     Packet p = packet;
     p.totalDelay = baseDelay;
-    //10% corruption chance
+    //20% corruption chance
     if (RandomRange(0.0f, 1.0f) < 0.2f)
     {
         p.flags = p.flags | Packet::CORRUPTED;
         p.data[RandomRange<int>(0, Packet::packetSize - 1)] = RandomRange(-128, 127);
     }
-    //loss chance
+    //20% loss chance
     if (RandomRange(0.0f, 1.0f) < 0.2f)
     {
         p.flags = p.flags | Packet::LOST;

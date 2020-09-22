@@ -41,7 +41,7 @@ void Rdt10Client<type>::ReceiveRaw(const Packet& packet)
         std::memcpy(content, packet.data.data(), Packet::packetSize);
         std::cout << "Client receives data: "<<content<<'\n';
     }
-    std::array<char, Packet::packetSize+1> msg;
+    std::array<char, Packet::packetSize+1> msg{};
     msg[Packet::packetSize] = 0;
     std::memcpy(&msg[0], &packet.data[0], Packet::packetSize);
     this->receivedMsg_ += &msg[0];

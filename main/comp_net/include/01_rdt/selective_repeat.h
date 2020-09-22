@@ -1,6 +1,6 @@
 #pragma once
 
-#include "rdt_base.h"
+#include "01_rdt/rdt_base.h"
 namespace neko::rdt
 {
 
@@ -16,19 +16,20 @@ public:
     void ReceiveRaw(const Packet& packet) override;
     //Only called on sender
     void Update(seconds dt) override;
-	bool IsComplete() const override;
+	[[nodiscard]] bool IsComplete() const override;
     static const int windowSize = 5;
-private:
+protected:
     friend class SelRepManager;
+    void MoveBase();
     void SendNPacket(int start, int n = windowSize);
-    std::vector<Packet> sentPackets_;
 
+    std::vector<Packet> sentPackets_;
+    std::vector<Packet> receivePackets_;
     std::array<bool, windowSize> ackPackets_{};
     int base_ = 0;
     int nextSendNmb_ = 0;
     std::array<float, windowSize> packetTimers_;
-
-    float timerPeriod_;
+    float timerPeriod_{};
 };
 
 using SelRepReceiver = SelRepClient<ClientType::RECEIVER>;
