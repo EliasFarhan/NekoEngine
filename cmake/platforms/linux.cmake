@@ -1,4 +1,4 @@
-	add_compile_options(-fno-rtti)
+
 
     MESSAGE("Linux Compiler ${CMAKE_CXX_COMPILER_ID}")
     if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")

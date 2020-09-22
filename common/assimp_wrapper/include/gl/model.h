@@ -29,6 +29,7 @@
 
 namespace neko::assimp
 {
+
 class Model
 {
 public:

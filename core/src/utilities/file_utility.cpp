@@ -241,6 +241,13 @@ void IterateDirectory(const std::string_view dirname, std::function<void(const s
 			}
 		}
 	}
+	else
+	{
+		std::string msg = "[Error] Path: ";
+		msg += dirname;
+		msg += " is not a directory!";
+		logDebug(msg);
+	}
 }
 
 size_t CalculateFileSize(const std::string& filename)

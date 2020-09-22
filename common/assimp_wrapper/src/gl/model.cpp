@@ -39,19 +39,22 @@
 #endif
 namespace neko::assimp
 {
-	void Model::Draw(const gl::Shader& shader)
-	{
-		for (auto& mesh : meshes_)
-			mesh.Draw(shader);
-	}
 
-	void Model::Destroy()
-	{
-		for (auto& mesh : meshes_)
-			mesh.Destroy();
-		meshes_.clear();
-		processModelJob_.Reset();
-	}
+void Model::Draw(const gl::Shader& shader)
+{
+	for (auto& mesh : meshes_)
+		mesh.Draw(shader);
+}
+
+void Model::Destroy()
+{
+	for (auto& mesh : meshes_)
+		mesh.Destroy();
+	meshes_.clear();
+	processModelJob_.Reset();
+}
+
+
 
 	Model::Model() : processModelJob_([this]
 	{
@@ -79,7 +82,7 @@ namespace neko::assimp
 		{
 			return false;
 		}
-		for(auto& mesh : meshes_)
+		for(const auto& mesh : meshes_)
 		{
 			if (!mesh.IsLoaded())
 				return false;
