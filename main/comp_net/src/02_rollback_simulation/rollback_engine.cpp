@@ -1,5 +1,6 @@
 #include "02_rollback_simulation/rollback_engine.h"
 #include "mathematics/transform.h"
+#include "imgui.h"
 
 namespace neko::net
 {
