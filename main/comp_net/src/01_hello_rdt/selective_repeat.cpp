@@ -8,7 +8,7 @@
 namespace neko::rdt
 {
 
-const static auto selRepPacketSize = Packet::packetSize - 3;
+constexpr static auto selRepPacketSize = Packet::packetSize - 3;
 template<ClientType type>
 void SelRepClient<type>::Send(std::string_view msg)
 {
@@ -56,37 +56,183 @@ void SelRepClient<type>::ClearMsg()
     base_ = 0;
 }
 template<ClientType type>
-void SelRepClient<type>::ReceiveRaw(const Packet& packet)
+void SelRepClient<type>::MoveBase()
 {
+    const auto it = std::find(ackPackets_.begin(), ackPackets_.end(), false);
+    const auto delta = std::distance(ackPackets_.begin(), it);
+    for(int i = 0; i < windowSize-delta; i++)
+    {
+        ackPackets_[i] = ackPackets_[i+delta];
+        packetTimers_[i] = packetTimers_[i+delta];
+    }
+    for(int i = windowSize-delta; i < windowSize; i++)
+    {
+        ackPackets_[i] = false;
+        packetTimers_[i] = 0.0f;
+    }
 
+    base_ += delta;
 }
+template<>
+void SelRepSender::ReceiveRaw(const Packet& packet)
+{
+    if (base_ >= sentPackets_.size())
+    {
+        return;
+    }
+    bool isCorrupt = false;
+    const auto packetChecksum = packet.data[SelRepManager::CHECKSUM];
+    char checkSum = 0;
+    for (size_t j = 0; j < SelRepManager::CHECKSUM; j++)
+    {
+        char c = packet.data[j];
+        checkSum += c;
+    }
+    if (checkSum + packetChecksum != -1)
+    {
+        isCorrupt = true;
+    }
+    const auto sequenceNmb = static_cast<int>(packet.data[SelRepManager::SEQUENCE_NMB]) + 128;
+
+
+    //Check corruption
+    if (isCorrupt)
+    {
+        return;
+    }
+    if(sequenceNmb >= base_+1 && sequenceNmb < base_+1+windowSize)
+    {
+        ackPackets_[sequenceNmb-base_-1] = true;
+        if(sequenceNmb == base_+1)
+        {
+            const auto oldBase = base_;
+            MoveBase();
+            const auto delta = base_-oldBase;
+
+            SendNPacket(base_, delta);
+        }
+    }
+}
+
+template<>
+void SelRepReceiver::ReceiveRaw(const Packet& packet)
+{
+    char content[selRepPacketSize + 1];
+    content[selRepPacketSize] = 0;
+    std::memcpy(content, packet.data.data(), selRepPacketSize);
+    std::cout << "Client receives data: " << content << '\n';
+    bool isCorrupt = false;
+
+    const auto packetChecksum = packet.data[SelRepManager::CHECKSUM];
+    char checkSum = 0;
+    for (size_t j = 0; j < SelRepManager::CHECKSUM; j++)
+    {
+        char c = packet.data[j];
+        checkSum += c;
+    }
+    if (checkSum + packetChecksum != -1)
+    {
+        isCorrupt = true;
+    }
+    const auto sequenceNmb = static_cast<int>(packet.data[SelRepManager::SEQUENCE_NMB]) + 128;
+
+    if(isCorrupt)
+    {
+        return;
+    }
+    if(sequenceNmb >= base_+1 + windowSize)
+    {
+        return;
+    }
+    if(sequenceNmb >= base_+1 && sequenceNmb < base_+1+windowSize)
+    {
+        ackPackets_[sequenceNmb-1-base_] = true;
+        const auto it = std::find_if(receivePackets_.cbegin(), receivePackets_.cend(),
+                                     [sequenceNmb](const Packet& packet){
+                                         const auto seqNum = static_cast<int>(packet.data[SelRepManager::SEQUENCE_NMB]) + 128;
+                                         return seqNum == sequenceNmb; });
+        if(it == receivePackets_.cend())
+        {
+            receivePackets_.push_back(packet);
+            std::sort(receivePackets_.begin(), receivePackets_.end(),[](const Packet& p1, const Packet& p2){
+                const auto seqNum1 = static_cast<int>(p1.data[SelRepManager::SEQUENCE_NMB]) + 128;
+                const auto seqNum2 = static_cast<int>(p2.data[SelRepManager::SEQUENCE_NMB]) + 128;
+
+                return seqNum1 < seqNum2;
+            });
+        }
+        if(sequenceNmb == base_+1)
+        {
+            const auto oldBase = base_;
+            MoveBase();
+            const auto delta = base_-oldBase;
+            for(int i = oldBase; i < oldBase+delta; i++)
+            {
+                std::array<char, selRepPacketSize + 1> msg{};
+                msg[selRepPacketSize] = 0;
+                std::memcpy(&msg[0], &receivePackets_[i].data[0], selRepPacketSize);
+                this->receivedMsg_ += &msg[0];
+            }
+        }
+    }
+    Packet p;
+    p.flags = Packet::ACK;
+    p.data[SelRepManager::TYPE] = Packet::ACK;
+    p.data[SelRepManager::SEQUENCE_NMB] = static_cast<int>(sequenceNmb) - 128;
+    p.data[SelRepManager::CHECKSUM] = ~(p.data[SelRepManager::SEQUENCE_NMB] + p.data[SelRepManager::TYPE]);
+    channel_.SendRaw(p);
+}
+
 template<ClientType type>
 void SelRepClient<type>::Update(seconds dt)
 {
     Client<type>::Update(dt);
     if (base_ + 1 == sentPackets_.size())
         return;
-    currentTimer_ += dt.count();
-    if (currentTimer_ > timerPeriod_)
+    for(auto& currentTimer : packetTimers_)
     {
-        SendNPacket(base_);
+        const auto index = std::distance(&packetTimers_[0], &currentTimer);
+        currentTimer += dt.count();
+        if (currentTimer > timerPeriod_)
+        {
+            SendNPacket(base_+index, 1);
+        }
     }
+
 }
 template<ClientType type>
 void SelRepClient<type>::SendRaw(const Packet& packet)
 {
+    Client<type>::SendRaw(packet);
 
+    timerPeriod_ = this->channel_.baseDelay * 2.7f;
 }
 template<ClientType type>
 void SelRepClient<type>::SendNPacket(int start, int n)
 {
-
+    for (int i = start; i < n + start; i++)
+    {
+        if (i >= sentPackets_.size())
+        {
+            if (nextSendNmb_ < i)
+                nextSendNmb_ = i;
+            return;
+        }
+        sentPackets_[i].currentDelay = -float(i - start) * this->channel_.pktDelay;
+        packetTimers_[i-base_] = -float(i - start) * this->channel_.pktDelay;
+        SendRaw(sentPackets_[i]);
+        if (nextSendNmb_ < i)
+            nextSendNmb_ = i;
+    }
 }
 template <>
 bool SelRepSender::IsComplete() const
 {
     return base_ == sentPackets_.size();
 }
+
+
+
 template <>
 bool SelRepReceiver::IsComplete() const
 {
@@ -103,13 +249,13 @@ void SelRepChannel::SendRaw(const Packet& packet)
 
     Packet p = packet;
     p.totalDelay = baseDelay;
-    //10% corruption chance
+    //20% corruption chance
     if (RandomRange(0.0f, 1.0f) < 0.2f)
     {
         p.flags = p.flags | Packet::CORRUPTED;
         p.data[RandomRange<int>(0, Packet::packetSize - 1)] = RandomRange(-128, 127);
     }
-    //loss chance
+    //20% loss chance
     if (RandomRange(0.0f, 1.0f) < 0.2f)
     {
         p.flags = p.flags | Packet::LOST;

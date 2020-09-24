@@ -75,7 +75,7 @@ bool IsDirectory(const std::string_view filename);
 
 void IterateDirectory(const std::string_view dirname, std::function<void(const std::string_view)> func, bool recursive=false);
 
-	size_t CalculateFileSize(const std::string& filename);
+size_t CalculateFileSize(const std::string& filename);
 
 std::string GetCurrentPath();
 

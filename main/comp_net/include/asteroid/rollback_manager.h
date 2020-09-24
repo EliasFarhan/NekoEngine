@@ -2,6 +2,7 @@
 #include "game.h"
 #include "engine/transform.h"
 #include "asteroid/packet_type.h"
+#include "player_character.h"
 
 namespace neko::asteroid
 {

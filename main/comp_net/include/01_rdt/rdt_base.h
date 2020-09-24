@@ -1,4 +1,5 @@
 #pragma once
+
 #include <array>
 #include <vector>
 #include <string_view>
@@ -13,7 +14,7 @@ namespace neko::rdt
 {
 struct Packet
 {
-    const static size_t packetSize = 32;
+    constexpr static size_t packetSize = 32;
     std::array<char, packetSize> data{};
     float currentDelay = 0.0f;
     float totalDelay = 0.0f;
@@ -45,11 +46,11 @@ public:
     [[nodiscard]] std::string_view GetReceivedMsg() const { return receivedMsg_; }
     virtual void ClearMsg() { receivedMsg_=""; }
     virtual void Update(seconds dt){}
-    virtual bool IsComplete() const = 0;
+    [[nodiscard]] virtual bool IsComplete() const = 0;
 protected:
     virtual void SendRaw(const Packet& packet);
     Channel& channel_;
-    std::string receivedMsg_ = "";
+    std::string receivedMsg_;
     const ClientType clientType_ = type;
 };
 
@@ -61,9 +62,9 @@ public:
     virtual void Update(seconds dt) = 0;
     const float baseDelay = 1.0f;
     const float pktDelay = 0.1f;
-    const std::vector<Packet>& GetPackets() const { return packets_; }
-    const Client<ClientType::SENDER>& GetSender() const { return sender_; }
-    const Client<ClientType::RECEIVER>& GetReceiver() const { return receiver_; }
+    [[nodiscard]] const std::vector<Packet>& GetPackets() const { return packets_; }
+    [[nodiscard]] const Client<ClientType::SENDER>& GetSender() const { return sender_; }
+    [[nodiscard]] const Client<ClientType::RECEIVER>& GetReceiver() const { return receiver_; }
 protected:
     friend class RdtManager;
     Client<ClientType::SENDER>& sender_;

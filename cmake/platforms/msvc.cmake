@@ -6,5 +6,3 @@ add_compile_options(
         $<$<CONFIG:RelWithDebInfo>:/MTd>
         $<$<CONFIG:Release>:/MT> #--|
 )
-
-add_compile_options(/GR-)

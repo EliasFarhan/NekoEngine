@@ -17,6 +17,7 @@ file(GLOB_RECURSE TEXT_FILES
 file(GLOB_RECURSE MODEL_FILES
     "${PROJECT_SOURCE_DIR}/data/*.obj"
     "${PROJECT_SOURCE_DIR}/data/*.mtl"
+    "${PROJECT_SOURCE_DIR}/data/*.fbx"
     )
 file(GLOB_RECURSE SHADER_FILES
         "${PROJECT_SOURCE_DIR}/data/*.vert"

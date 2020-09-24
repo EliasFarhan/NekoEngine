@@ -1,4 +1,7 @@
 #pragma once
+#include "mathematics/angle.h"
+#include "engine/entity.h"
+#include "engine/component.h"
 
 namespace neko::asteroid
 {

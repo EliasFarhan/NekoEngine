@@ -1,4 +1,3 @@
-#pragma once
 /*
  MIT License
 
@@ -23,37 +22,19 @@
  SOFTWARE.
  */
 
-#include "gl/mesh.h"
-#include "gl/shader.h"
-#include <assimp/scene.h>
+#include <gl/gles3_window.h>
+#include <gl/graphics.h>
+#include "comp_net/engine.h"
 
-namespace neko::assimp
+int main(int argc, char** argv)
 {
+    neko::sdl::Gles3Window window;
+    neko::gl::Gles3Renderer renderer;
+    neko::net::CompNetEngine engine;
 
-class Model
-{
-public:
-    Model();
-    void LoadModel(std::string_view path);
-    bool IsLoaded() const;
-    void Draw(const gl::Shader& shader);
-    void Destroy();
-    [[nodiscard]] size_t GetMeshCount() const
-    {
-	    return meshes_.size();
-    };
-    [[nodiscard]] const Mesh& GetMesh(size_t index) const
-    {
-	    return meshes_[index];
-    };
-private:
-    // model data
-    std::vector<Mesh> meshes_;
-    std::string directory_;
-    std::string path_;
-    Job processModelJob_;
-	
-    void ProcessModel();
-    void ProcessNode(aiNode* node, const aiScene* scene);
-};
+    engine.SetWindowAndRenderer(&window, &renderer);
+
+    engine.Init();
+    engine.EngineLoop();
+    return EXIT_SUCCESS;
 }

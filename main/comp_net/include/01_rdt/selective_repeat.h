@@ -1,8 +1,10 @@
 #pragma once
 
-#include "rdt_base.h"
+#include "01_rdt/rdt_base.h"
 namespace neko::rdt
 {
+
+const static auto selRepNPacketSize = Packet::packetSize - 3;
 template<ClientType type>
 class SelRepClient : public Client<type>
 {
@@ -14,17 +16,20 @@ public:
     void ReceiveRaw(const Packet& packet) override;
     //Only called on sender
     void Update(seconds dt) override;
-	bool IsComplete() const override;
+	[[nodiscard]] bool IsComplete() const override;
     static const int windowSize = 5;
-private:
+protected:
     friend class SelRepManager;
+    void MoveBase();
     void SendNPacket(int start, int n = windowSize);
+
     std::vector<Packet> sentPackets_;
+    std::vector<Packet> receivePackets_;
     std::array<bool, windowSize> ackPackets_{};
     int base_ = 0;
     int nextSendNmb_ = 0;
-    float currentTimer_ = 0.0f;
-    float timerPeriod_;
+    std::array<float, windowSize> packetTimers_;
+    float timerPeriod_{};
 };
 
 using SelRepReceiver = SelRepClient<ClientType::RECEIVER>;
@@ -37,7 +42,6 @@ public:
     void SendRaw(const Packet& packet) override;
     void Update(seconds dt) override;
 private:
-
     size_t packetNmb = 0;
     std::vector<Packet> arrivedPackets_;
 };
@@ -56,8 +60,8 @@ public:
     void DrawImGui() override;
 
 private:
-    SelRepClient<ClientType::SENDER> sender_;
-    SelRepClient<ClientType::RECEIVER> receiver_;
+    SelRepSender sender_;
+    SelRepReceiver receiver_;
     SelRepChannel channel_;
 };
 }
