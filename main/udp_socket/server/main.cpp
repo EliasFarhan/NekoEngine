@@ -1,22 +1,25 @@
+#include <chrono>
 #include <iostream>
 #include "SFML/Network.hpp"
 
-int main(int argc, char** argv)
+int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 {
     // ----- The server -----
     // Create a socket and bind it to the port 55002
     sf::UdpSocket socket;
     socket.bind(55002);
     std::cout << "Server binded\n";
-    // Receive a message from anyone
-    char buffer[1024];
-    std::size_t received = 0;
-    sf::IpAddress sender;
-    unsigned short port;
-    socket.receive(buffer, sizeof(buffer), received, sender, port);
-    std::cout << sender.toString() <<':'<<port<< " said: " << buffer << std::endl;
-    // Send an answer
-    std::string message = "Welcome " + sender.toString();
-    socket.send(message.c_str(), message.size() + 1, sender, port);
+    while (true)
+    {
+        // Receive a message from anyone
+        sf::Packet packet;
+        std::size_t received = 0;
+        sf::IpAddress sender;
+        unsigned short port;
+        socket.receive(packet, sender, port);
+        std::cout << "Received packet from " <<sender.toString() << ':' << port << std::endl;
+
+        socket.send(packet, sender, port);
+    }
     return 0;
 }
