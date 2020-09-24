@@ -72,8 +72,8 @@ void ReceivePacket(sf::Packet& packet)
 int main(int argc, char** argv)
 {
     // ----- The client -----
-    const sf::IpAddress destinationHost = "localhost";
-    const unsigned short destinationPort = 55002;
+    const sf::IpAddress destinationHost = "eliasfarhan.ch";
+    const unsigned short destinationPort = 12345;
 	// Create a socket and bind it to the port 55001
     sf::UdpSocket socket;
     socket.bind(55001);
@@ -124,5 +124,8 @@ int main(int argc, char** argv)
     {
         return sum + result.deltaTime*result.deltaTime;
     }) / static_cast<float>(receiveCount)-avgPing*avgPing;
-    std::cout << "Sent success: "<<successfulSentPacketNmb<<", Received Success: "<< receiveCount << " / "<<packetSentNmb<<" packet sent, Avg RTT: "<< avgPing << ", Var RTT: "<< varPing <<std::endl;
+	
+    std::cout << "Sent success: "<<successfulSentPacketNmb<<
+        "\nReceived Success: "<< receiveCount << " / "<<packetSentNmb<<" packet sent\nAvg RTT: "<< avgPing << 
+        "\nVar RTT: "<< varPing  <<"\nStandard deviation: "<<std::sqrt(varPing)<<std::endl;
 }

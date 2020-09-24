@@ -7,7 +7,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
     // ----- The server -----
     // Create a socket and bind it to the port 55002
     sf::UdpSocket socket;
-    socket.bind(55002);
+    socket.bind(12345);
     std::cout << "Server binded\n";
     while (true)
     {
