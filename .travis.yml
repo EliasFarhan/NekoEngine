@@ -1,26 +1,45 @@
 sudo: false
 language: cpp
-compiler:
-  - clang
-os:
-  - linux
 dist: focal
 
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-    packages:
-      - clang
-      - libsdl2-dev
-      - python3-dev
-      - glslang-tools
 
-before_install:
-  - eval "CC=clang && CXX=clang++"
 
-script:
-  - mkdir build
-  - cd build
-  - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. && make
-  - ./test/Neko_TEST
+
+matrix:
+  include:
+    - name: "Linux Clang"
+      os: linux
+      dist: focal
+      compiler: clang
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - clang
+            - libsdl2-dev
+            - python3-dev
+            - glslang-tools
+
+      before_install:
+        - eval "CC=clang && CXX=clang++"
+      script:
+        - mkdir build
+        - cd build
+        - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. && make
+        - ./test/Neko_TEST
+    - name: "Windows"
+      os: windows
+      env:
+        - CMAKE_PATH="/c/Program Files/CMake/bin"
+      script:
+        - export PATH=$CMAKE_PATH:$PATH
+        - mkdir build && cd build
+        - cmake ..
+        - cmake --build .
+
+# Don't send notifications on success
+notifications:
+  email:
+    on_success: never
+
