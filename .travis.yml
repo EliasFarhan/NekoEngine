@@ -44,7 +44,7 @@ matrix:
         - mkdir build && cd build
         - cmake -G "Visual Studio 16 2019" ..
         - cmake --build .
-        - ./test/Neko_TEST.exe
+        - .\test\Neko_TEST.exe
 
 # Don't send notifications on success
 notifications:
