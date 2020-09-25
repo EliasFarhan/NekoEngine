@@ -24,7 +24,6 @@ matrix:
       before_install:
         - eval "CC=clang && CXX=clang++"
       script:
-
         - mkdir build
         - cd build
         - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. && make
@@ -33,13 +32,13 @@ matrix:
       os: windows
       env:
         - CMAKE_PATH="/c/Program Files/CMake/bin"
+      before_install:
+        - choco install python
+        - choco install vulkan-sdk
       script:
         - export PATH=$CMAKE_PATH:$PATH
-        - choco install python
-        - choco install choco install vulkan-sdk
         - mkdir build && cd build
         - cmake ..
-        - cmake --build .
 
 # Don't send notifications on success
 notifications:
