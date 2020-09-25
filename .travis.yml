@@ -13,8 +13,6 @@ matrix:
       compiler: clang
       addons:
         apt:
-          sources:
-            - ubuntu-toolchain-r-test
           packages:
             - clang-8
             - libsdl2-dev
@@ -22,7 +20,7 @@ matrix:
             - glslang-tools
 
       before_install:
-        - eval "CC=clang && CXX=clang++"
+        - eval "CC=clang-8 && CXX=clang++-8"
       script:
         - mkdir build
         - cd build
@@ -44,7 +42,7 @@ matrix:
         - mkdir build && cd build
         - cmake -G "Visual Studio 16 2019" ..
         - cmake --build .
-        - .\test\Neko_TEST.exe
+        - .\test\Debug\Neko_TEST.exe
 
 # Don't send notifications on success
 notifications:
