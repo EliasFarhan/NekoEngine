@@ -32,6 +32,7 @@ namespace neko
 {
 void HelloIblProgram::Init()
 {
+	textureManager_.Init();
 	const auto& config = BasicEngine::GetInstance()->config;
 	sphere_.Init();
 	quad_.Init();
@@ -67,13 +68,13 @@ void HelloIblProgram::Init()
 		}
 	};
 
-	hdrTexture_.SetTextureFlags(Texture::TextureFlags(
+	hdrTextureId_ = textureManager_.LoadTexture(
+		config.dataRootPath + "textures/Ridgecrest_Road_Ref.hdr", Texture::TextureFlags(
 		Texture::TextureFlags::CLAMP_WRAP |
 		Texture::TextureFlags::SMOOTH_TEXTURE |
 		Texture::TextureFlags::FLIP_Y |
 		Texture::TextureFlags::HDR));
-	hdrTexture_.SetPath(config.dataRootPath + "textures/Ridgecrest_Road_Ref.hdr");
-	hdrTexture_.LoadFromDisk();
+
 	flags_ = FIRST_FRAME;
 
 	glGenFramebuffers(1, &captureFbo_);
@@ -87,7 +88,7 @@ void HelloIblProgram::Update(seconds dt)
 	std::lock_guard<std::mutex> lock(updateMutex_);
 	const auto& config = BasicEngine::GetInstance()->config;
 	camera_.SetAspect(config.windowSize.x, config.windowSize.y);
-	camera_.Update(dt);
+	camera_.Update(dt);	textureManager_.Update(dt);
 }
 
 void HelloIblProgram::Destroy()
@@ -96,7 +97,7 @@ void HelloIblProgram::Destroy()
 	quad_.Destroy();
 	skybox_.Destroy();
 
-	hdrTexture_.Destroy();
+	textureManager_.Destroy();
 	
 	equiToCubemap_.Destroy();
 	irradianceShader_.Destroy();
@@ -151,9 +152,11 @@ void HelloIblProgram::Render()
 {
 
 	std::lock_guard<std::mutex> lock(updateMutex_);
-	if (!hdrTexture_.IsLoaded())
+	if (hdrTexture_ == INVALID_TEXTURE_NAME)
 	{
-		return;
+		hdrTexture_ = textureManager_.GetTextureId(hdrTextureId_);
+		if (hdrTexture_ == INVALID_TEXTURE_NAME)
+			return;
 	}
 	if (flags_ & FIRST_FRAME)
 	{

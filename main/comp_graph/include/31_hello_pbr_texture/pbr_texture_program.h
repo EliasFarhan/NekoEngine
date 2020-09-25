@@ -49,11 +49,15 @@ private:
 	gl::RenderSphere sphere_{ Vec3f::zero, 1.0f };
 	gl::Shader pbrShader_;
 	sdl::Camera3D camera_;
-
-	gl::Texture albedo_;
-	gl::Texture normal_;
-	gl::Texture metallic_;
-	gl::Texture roughness_;
+	gl::TextureManager textureManager_;
+	TextureName albedo_;
+	TextureId albedoId_;
+	TextureName normal_;
+	TextureId normalId_;
+	TextureName metallic_;
+	TextureId metallicId_;
+	TextureName roughness_;
+	TextureId roughnessId_;
 	unsigned int ao_ = 0;
 
 

@@ -31,6 +31,7 @@ namespace neko
 
 void HelloShadowProgram::Init()
 {
+	textureManager_.Init();
 	const auto& config = BasicEngine::GetInstance()->config;
 	glCheckError();
 	cube_.Init();
@@ -38,8 +39,8 @@ void HelloShadowProgram::Init()
 
 	model_.LoadModel(config.dataRootPath + "model/nanosuit2/nanosuit.obj");
 
-	floorTexture_.SetPath(config.dataRootPath + "sprites/brickwall/brickwall.jpg");
-	floorTexture_.LoadFromDisk();
+	floorTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/brickwall/brickwall.jpg");
+
 	glGenFramebuffers(1, &depthMapFbo_);
 	glGenTextures(1, &depthMap_);
 	glBindTexture(GL_TEXTURE_2D, depthMap_);
@@ -83,7 +84,7 @@ void HelloShadowProgram::Update(seconds dt)
 	std::lock_guard<std::mutex> lock(updateMutex_);
 	const auto& config = BasicEngine::GetInstance()->config;
 	camera_.SetAspect(config.windowSize.x, config.windowSize.y);
-	camera_.Update(dt);
+	camera_.Update(dt);	textureManager_.Update(dt);
 }
 
 void HelloShadowProgram::Destroy()
@@ -95,7 +96,7 @@ void HelloShadowProgram::Destroy()
 	modelShader_.Destroy();
 	simpleDepthShader_.Destroy();
 
-	floorTexture_.Destroy();
+	textureManager_.Destroy();
 	
 	glDeleteFramebuffers(1, &depthMapFbo_);
 	glDeleteTextures(1, &depthMap_);
@@ -152,8 +153,9 @@ void HelloShadowProgram::Render()
 	{
 		return;
 	}
-	if(!floorTexture_.IsLoaded())
+	if(floorTexture_ == INVALID_TEXTURE_NAME)
 	{
+		floorTexture_ = textureManager_.GetTextureId(floorTextureId_);
 		return;
 	}
 	std::lock_guard<std::mutex> lock(updateMutex_);

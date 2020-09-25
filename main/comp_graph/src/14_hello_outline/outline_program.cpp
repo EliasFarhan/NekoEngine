@@ -29,10 +29,11 @@ namespace neko
 {
 void HelloOutlineProgram::Init()
 {
+	textureManager_.Init();
 	const auto& config = BasicEngine::GetInstance()->config;
 	cube_.Init();
-	cubeTexture_.SetPath(config.dataRootPath + "sprites/container.jpg");
-	cubeTexture_.LoadFromDisk();
+	cubeTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/container.jpg");
+
 
     modelShader_.LoadFromFile(config.dataRootPath + "shaders/14_hello_outline/model.vert",
                               config.dataRootPath + "shaders/14_hello_outline/model.frag");
@@ -47,13 +48,13 @@ void HelloOutlineProgram::Update(seconds dt)
 	std::lock_guard<std::mutex> lock(updateMutex_);
 	const auto& config = BasicEngine::GetInstance()->config;
 	camera_.SetAspect(config.windowSize.x, config.windowSize.y);
-	camera_.Update(dt);
+	camera_.Update(dt);	textureManager_.Update(dt);
 }
 
 void HelloOutlineProgram::Destroy()
 {
 	cube_.Destroy();
-	cubeTexture_.Destroy();
+	textureManager_.Destroy();
 	modelShader_.Destroy();
 	outlineShader_.Destroy();
 }
@@ -79,8 +80,11 @@ void HelloOutlineProgram::DrawImGui()
 
 void HelloOutlineProgram::Render()
 {
-	if (!cubeTexture_.IsLoaded())
+	if (cubeTexture_ == INVALID_TEXTURE_NAME)
+	{
+		cubeTexture_ = textureManager_.GetTextureId(cubeTextureId_);
 		return;
+	}
 
 	std::lock_guard<std::mutex> lock(updateMutex_);
 	const auto view = camera_.GenerateViewMatrix();
@@ -102,7 +106,7 @@ void HelloOutlineProgram::Render()
 
 	modelShader_.SetInt("texture_diffuse1", 0);
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, cubeTexture_.GetTextureId());
+	glBindTexture(GL_TEXTURE_2D, cubeTexture_);
 
 	cube_.Draw();
 

@@ -31,6 +31,7 @@ namespace neko
 {
 void HelloModelProgram::Init()
 {
+	textureManager_.Init();
 	const auto& config = BasicEngine::GetInstance()->config;
 
 	const std::string path = config.dataRootPath + "model/nanosuit2/nanosuit.obj";
@@ -56,13 +57,14 @@ void HelloModelProgram::Update(seconds dt)
 		degree_t(45.0f),
 		static_cast<float>(config.windowSize.x) / config.windowSize.y,
 		0.1f,
-		100.0f);
+		100.0f);	textureManager_.Update(dt);
 }
 
 void HelloModelProgram::Destroy()
 {
 	model_.Destroy();
 	shader_.Destroy();
+	textureManager_.Destroy();
 }
 
 void HelloModelProgram::DrawImGui()

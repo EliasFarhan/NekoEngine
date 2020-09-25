@@ -56,61 +56,6 @@ Image StbImageConvert(BufferFile imageFile, bool flipY, bool hdr)
     }
 	return image;
 }
-/*
-Texture::Texture() :
-	uploadToGpuJob_([this]
-	{
-#ifdef EASY_PROFILE_USE
-            EASY_BLOCK("Create GPU Texture");
-#endif
-		CreateTexture();
-	}),
-    convertImageJob_([this]
-    {
-        const auto filename = diskLoadJob_.GetFilePath();
-        const auto extension = GetFilenameExtension(filename);
-       
-    	image_ = StbImageConvert(diskLoadJob_.GetBufferFile(), flags_ & FLIP_Y,flags_ & HDR);
-	    diskLoadJob_.GetBufferFile().Destroy();
-	    RendererLocator::get().AddPreRenderJob(&uploadToGpuJob_);
-    })
-{
-
-}
-
-void Texture::LoadFromDisk()
-{
-    if (textureId_ == INVALID_TEXTURE_NAME)
-    {
-        BasicEngine::GetInstance()->ScheduleJob(&diskLoadJob_, JobThreadType::RESOURCE_THREAD);
-        convertImageJob_.AddDependency(&diskLoadJob_);
-        BasicEngine::GetInstance()->ScheduleJob(&convertImageJob_, JobThreadType::OTHER_THREAD);
-    }
-}
-
-bool Texture::IsLoaded() const
-{
-    return uploadToGpuJob_.IsDone();
-}
-
-
-void Texture::SetPath(std::string_view path)
-{
-    diskLoadJob_.SetFilePath(path);
-}
-
-void Texture::FreeImage()
-{
-    image_.Destroy();
-}
-
-void Texture::Reset()
-{
-    diskLoadJob_.Reset();
-    convertImageJob_.Reset();
-    uploadToGpuJob_.Reset();
-}
-	*/
 
 TextureLoader::TextureLoader(TextureManager& textureManager) :
 	textureManager_(textureManager),
@@ -158,7 +103,7 @@ TextureManager::TextureManager() : textureLoader_(*this), uploadToGpuJob_([this]
 	currentUploadedTexture_.textureId = INVALID_TEXTURE_ID;
 })
 {
-    TextureManagerLocator::provide(this);
+
 }
 
 TextureId TextureManager::LoadTexture(std::string_view path, Texture::TextureFlags flags)
@@ -207,7 +152,12 @@ std::string TextureManager::GetPath(TextureId textureId) const
 	return "";
 }
 
-void TextureManager::Update()
+void TextureManager::Init()
+{
+    TextureManagerLocator::provide(this);
+}
+
+void TextureManager::Update([[maybe_unused]]seconds dt)
 {
     if (!texturesToLoad_.empty())
     {

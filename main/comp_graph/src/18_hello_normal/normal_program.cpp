@@ -30,11 +30,12 @@ namespace neko
 
 void HelloNormalProgram::Init()
 {
+	textureManager_.Init();
 	const auto& config = BasicEngine::GetInstance()->config;
-	diffuseTex_.SetPath(config.dataRootPath + "sprites/brickwall/brickwall.jpg");
-	diffuseTex_.LoadFromDisk();
-	normalTex_.SetPath(config.dataRootPath + "sprites/brickwall/brickwall_normal.jpg");
-	normalTex_.LoadFromDisk();
+	diffuseTexId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/brickwall/brickwall.jpg");
+
+	normalTexId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/brickwall/brickwall_normal.jpg");
+	
 
     normalShader_.LoadFromFile(
             config.dataRootPath + "shaders/18_hello_normal/normal.vert",
@@ -58,7 +59,7 @@ void HelloNormalProgram::Update(seconds dt)
 	dt_ += dt.count();
 	lightPos_ = Vec3f(Cos(radian_t(dt_)), 1.0f, Sin(radian_t(dt_))) * 3.0f;
 	camera_.SetAspect(config.windowSize.x, config.windowSize.y);
-	camera_.Update(dt);
+	camera_.Update(dt);	textureManager_.Update(dt);
 }
 
 void HelloNormalProgram::Destroy()
@@ -68,8 +69,7 @@ void HelloNormalProgram::Destroy()
 	plane_.Destroy();
 	cube_.Destroy();
 	model_.Destroy();
-	diffuseTex_.Destroy();
-	normalTex_.Destroy();
+	textureManager_.Destroy();
 	sphere_.Destroy();
 }
 
@@ -109,10 +109,16 @@ void HelloNormalProgram::Render()
 {
 	if (!model_.IsLoaded())
 		return;
-	if (!normalTex_.IsLoaded())
+	if (normalTex_ == INVALID_TEXTURE_NAME)
+	{
+		normalTex_ = textureManager_.GetTextureId(normalTexId_);
 		return;
-	if (!diffuseTex_.IsLoaded())
+	}
+	if (diffuseTex_ == INVALID_TEXTURE_NAME)
+	{
+		diffuseTex_ = textureManager_.GetTextureId(diffuseTexId_);
 		return;
+	}
 	std::lock_guard<std::mutex> lock(updateMutex_);
 
 	const std::function<void(NormalFlags)> draw = [this](NormalFlags flag)
@@ -142,10 +148,10 @@ void HelloNormalProgram::Render()
 			{
 				normalShader_.SetInt("material.texture_diffuse1", 0);
 				glActiveTexture(GL_TEXTURE0);
-				glBindTexture(GL_TEXTURE_2D, diffuseTex_.GetTextureId());
+				glBindTexture(GL_TEXTURE_2D, diffuseTex_);
 				normalShader_.SetInt("material.texture_normal1", 1);
 				glActiveTexture(GL_TEXTURE1);
-				glBindTexture(GL_TEXTURE_2D, normalTex_.GetTextureId());
+				glBindTexture(GL_TEXTURE_2D, normalTex_);
 			}
 		}
 		else
@@ -162,7 +168,7 @@ void HelloNormalProgram::Render()
 			{
 				diffuseShader_.SetInt("material.texture_diffuse1", 0);
 				glActiveTexture(GL_TEXTURE0);
-				glBindTexture(GL_TEXTURE_2D, diffuseTex_.GetTextureId());
+				glBindTexture(GL_TEXTURE_2D, diffuseTex_);
 			}
 		}
 		switch (flag)

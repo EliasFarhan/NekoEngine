@@ -67,7 +67,7 @@ void ClientGameManager::Init()
 
 void ClientGameManager::Update(seconds dt)
 {
-    textureManager_.Update();
+    textureManager_.Update(dt);
     spriteManager_.Update(dt);
 	fixedTimer_ += dt.count();
 	while (fixedTimer_> FixedPeriod)

@@ -35,13 +35,15 @@ void HelloBlinnProgram::Init()
     blinnShader_.LoadFromFile(config.dataRootPath + "shaders/22_hello_blinn/model.vert",
                               config.dataRootPath + "shaders/22_hello_blinn/model_blinn.frag");
 	floor_.Init();
-	floorTexture_.SetTextureFlags(gl::Texture::TextureFlags(gl::Texture::REPEAT_WRAP | gl::Texture::DEFAULT));
-	floorTexture_.SetPath(config.dataRootPath + "sprites/brickwall/brickwall.jpg");
-	floorTexture_.LoadFromDisk();
+	floorTextureId_ = textureManager_.LoadTexture(
+		config.dataRootPath + "sprites/brickwall/brickwall.jpg", 
+		Texture::TextureFlags(Texture::REPEAT_WRAP | Texture::DEFAULT));
+
 	model_.LoadModel(config.dataRootPath + "model/nanosuit2/nanosuit.obj");
 
 	camera_.position = Vec3f(0.0f, 3.0f, 3.0f);
 	camera_.WorldLookAt(Vec3f::zero);
+	textureManager_.Init();
 }
 
 void HelloBlinnProgram::Update(seconds dt)
@@ -52,6 +54,8 @@ void HelloBlinnProgram::Update(seconds dt)
 	camera_.Update(dt);
 	dt_ += dt.count();
 	lightPos_ = Vec3f(3.0f*Cos(radian_t(dt_)), 3.0f, 3.0f*Sin(radian_t(dt_)));
+
+	textureManager_.Update(dt);
 }
 
 void HelloBlinnProgram::Destroy()
@@ -59,7 +63,7 @@ void HelloBlinnProgram::Destroy()
 	modelShader_.Destroy();
 	blinnShader_.Destroy();
 	floor_.Destroy();
-	floorTexture_.Destroy();
+	textureManager_.Destroy();
 	model_.Destroy();
 }
 
@@ -85,8 +89,11 @@ void HelloBlinnProgram::Render()
 {
 	if(!model_.IsLoaded())
 		return;
-	if (!floorTexture_.IsLoaded())
+	if (floorTexture_ == INVALID_TEXTURE_NAME)
+	{
+		floorTexture_ = textureManager_.GetTextureId(floorTextureId_);
 		return;
+	}
 	std::lock_guard<std::mutex> lock(updateMutex_);
 
 	auto& shader = flags_ & ENABLE_BLINN ? blinnShader_ : modelShader_;
@@ -116,7 +123,7 @@ void HelloBlinnProgram::Render()
 
 	shader.SetFloat("material.shininess", static_cast<float>(specularPow_));
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, floorTexture_.GetTextureId());
+	glBindTexture(GL_TEXTURE_2D, floorTexture_);
 	floor_.Draw();
 }
 

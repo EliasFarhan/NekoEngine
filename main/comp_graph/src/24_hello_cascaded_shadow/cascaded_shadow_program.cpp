@@ -31,6 +31,7 @@ namespace neko
 
 void HelloCascadedShadowProgram::Init()
 {
+    textureManager_.Init();
     const auto& config = BasicEngine::GetInstance()->config;
     glCheckError();
     plane_.Init();
@@ -72,8 +73,8 @@ void HelloCascadedShadowProgram::Init()
             config.dataRootPath + "shaders/24_hello_cascaded_shadow/shadow.vert",
             config.dataRootPath + "shaders/24_hello_cascaded_shadow/shadow.frag"
     );
-    brickWall_.SetPath(config.dataRootPath + "sprites/brickwall/brickwall.jpg");
-    brickWall_.LoadFromDisk();
+    brickWallId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/brickwall/brickwall.jpg");
+
     dragonModel_.LoadModel(config.dataRootPath + "model/dragon/dragon.obj");
     glGenTextures(1, &whiteTexture_);
     glBindTexture(GL_TEXTURE_2D, whiteTexture_);
@@ -95,7 +96,7 @@ void HelloCascadedShadowProgram::Update(seconds dt)
     std::lock_guard<std::mutex> lock(updateMutex_);
     const auto& config = BasicEngine::GetInstance()->config;
     camera_.SetAspect(config.windowSize.x, config.windowSize.y);
-    camera_.Update(dt);
+    camera_.Update(dt);	textureManager_.Update(dt);
 }
 
 void HelloCascadedShadowProgram::Destroy()
@@ -106,6 +107,7 @@ void HelloCascadedShadowProgram::Destroy()
     glDeleteTextures(shadowMaps_.size(), &shadowMaps_[0]);
     dragonModel_.Destroy();
     plane_.Destroy();
+    textureManager_.Destroy();
 }
 
 void HelloCascadedShadowProgram::DrawImGui()
@@ -137,8 +139,9 @@ void HelloCascadedShadowProgram::Render()
     {
         return;
     }
-    if (!brickWall_.IsLoaded())
+    if (brickWall_ == INVALID_TEXTURE_NAME)
     {
+        brickWall_ = textureManager_.GetTextureId(brickWallId_);
         return;
     }
     std::lock_guard<std::mutex> lock(updateMutex_);

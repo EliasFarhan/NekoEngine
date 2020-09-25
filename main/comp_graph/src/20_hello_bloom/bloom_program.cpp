@@ -31,6 +31,7 @@ namespace neko
 
 void HelloBloomProgram::Init()
 {
+    textureManager_.Init();
 	const auto& config = BasicEngine::GetInstance()->config;
     cubeShader_.LoadFromFile(
             config.dataRootPath + "shaders/20_hello_bloom/cube.vert",
@@ -46,9 +47,10 @@ void HelloBloomProgram::Init()
             config.dataRootPath + "shaders/20_hello_bloom/bloom.frag");
 
 	cube_.Init();
-    cubeTexture_.SetTextureFlags(gl::Texture::TextureFlags(gl::Texture::REPEAT_WRAP | gl::Texture::SMOOTH_TEXTURE | gl::Texture::GAMMA_CORRECTION));
-    cubeTexture_.SetPath(config.dataRootPath + "sprites/container.jpg");
-    cubeTexture_.LoadFromDisk();
+    cubeTextureId_ = textureManager_.LoadTexture(
+        config.dataRootPath + "sprites/container.jpg",
+        Texture::TextureFlags(Texture::REPEAT_WRAP | Texture::SMOOTH_TEXTURE | Texture::GAMMA_CORRECTION));
+
 
     screenPlane_.Init();
 
@@ -64,10 +66,12 @@ void HelloBloomProgram::Update(seconds dt)
 	const auto& config = BasicEngine::GetInstance()->config;
 	camera_.SetAspect(config.windowSize.x, config.windowSize.y);
 	camera_.Update(dt);
+	textureManager_.Update(dt);
 }
 
 void HelloBloomProgram::Destroy()
 {
+    textureManager_.Destroy();
 	cubeShader_.Destroy();
 	lightShader_.Destroy();
 	blurShader_.Destroy();
@@ -99,8 +103,9 @@ void HelloBloomProgram::DrawImGui()
 
 void HelloBloomProgram::Render()
 {
-	if(!cubeTexture_.IsLoaded())
+	if(cubeTexture_ == INVALID_TEXTURE_NAME)
 	{
+        cubeTexture_ = textureManager_.GetTextureId(cubeTextureId_);
         return;
 	}
 	if(flags_ & RESIZE_FRAMEBUFFER)

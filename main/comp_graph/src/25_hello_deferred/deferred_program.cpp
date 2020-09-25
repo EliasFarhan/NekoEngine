@@ -33,6 +33,7 @@ namespace neko
 
 void HelloDeferredProgram::Init()
 {
+    textureManager_.Init();
     const auto& config = BasicEngine::GetInstance()->config;
     glCheckError();
     floor_.Init();
@@ -64,11 +65,9 @@ void HelloDeferredProgram::Init()
 
     model_.LoadModel(config.dataRootPath+"model/nanosuit2/nanosuit.obj");
     cube_.Init();
-    container_.SetPath(config.dataRootPath+"material/container2.png");
-    containerSpecular_.SetPath(config.dataRootPath + "material/container2_specular.png");
+    containerId_ = textureManager_.LoadTexture(config.dataRootPath + "material/container2.png");
+    containerSpecularId_ = textureManager_.LoadTexture(config.dataRootPath + "material/container2_specular.png");
 
-    container_.LoadFromDisk();
-    containerSpecular_.LoadFromDisk();
 
     camera_.position = Vec3f(0.0f, 3.0f, -3.0f);
     camera_.WorldLookAt(Vec3f::zero);
@@ -91,7 +90,7 @@ void HelloDeferredProgram::Update(seconds dt)
     std::lock_guard<std::mutex> lock(updateMutex_);
     const auto& config = BasicEngine::GetInstance()->config;
     camera_.SetAspect(config.windowSize.x, config.windowSize.y);
-    camera_.Update(dt);
+    camera_.Update(dt);	textureManager_.Update(dt);
 
 }
 
@@ -109,8 +108,7 @@ void HelloDeferredProgram::Destroy()
 
     glDeleteTextures(1, &whiteTexture_);
 
-    container_.Destroy();
-    containerSpecular_.Destroy();
+    textureManager_.Destroy();
 }
 
 void HelloDeferredProgram::DrawImGui()
@@ -130,8 +128,17 @@ void HelloDeferredProgram::Render()
     {
         return;
     }
-    if(!containerSpecular_.IsLoaded() || !container_.IsLoaded())
+    if (containerSpecular_ == INVALID_TEXTURE_NAME)
     {
+        containerSpecular_ = textureManager_.GetTextureId(containerSpecularId_);
+        if (containerSpecular_ == INVALID_TEXTURE_NAME)
+			return;
+    }
+    if(container_ == INVALID_TEXTURE_NAME)
+    {
+        container_ = textureManager_.GetTextureId(containerId_);
+        if (container_ == INVALID_TEXTURE_NAME)
+            return;
         return;
     }
 

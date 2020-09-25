@@ -52,7 +52,9 @@ private:
 	gl::RenderQuad plane_{ Vec3f::zero, Vec2f::one * 4.0f };
 	gl::Shader cubeShader_;
 	gl::Shader floorShader_;
-	gl::Texture cubeTexture_;
+	gl::TextureManager textureManager_;
+	TextureName cubeTexture_ = INVALID_TEXTURE_NAME;
+	TextureId cubeTextureId_;
 
 	sdl::Camera3D camera_;
 	std::uint8_t flags_ = NONE;

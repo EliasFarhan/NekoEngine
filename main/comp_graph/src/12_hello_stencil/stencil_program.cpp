@@ -29,6 +29,7 @@ namespace neko
 {
 void HelloStencilProgam::Init()
 {
+	textureManager_.Init();
 	cube_.Init();
 	plane_.Init();
 
@@ -37,8 +38,8 @@ void HelloStencilProgam::Init()
                              config.dataRootPath + "shaders/12_hello_stencil/cube.frag");
     floorShader_.LoadFromFile(config.dataRootPath + "shaders/12_hello_stencil/floor.vert",
                               config.dataRootPath + "shaders/12_hello_stencil/floor.frag");
-	cubeTexture_.SetPath(config.dataRootPath + "sprites/container.jpg");
-	cubeTexture_.LoadFromDisk();
+	cubeTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/container.jpg");
+
 
 	camera_.position = Vec3f(0.0f, 4.0f, 4.0f);
 	camera_.WorldLookAt(Vec3f::zero);
@@ -49,13 +50,13 @@ void HelloStencilProgam::Update(seconds dt)
 	std::lock_guard<std::mutex> lock(updateMutex_);
 	const auto& config = BasicEngine::GetInstance()->config;
 	camera_.SetAspect(config.windowSize.x, config.windowSize.y);
-	camera_.Update(dt);
+	camera_.Update(dt);	textureManager_.Update(dt);
 }
 
 void HelloStencilProgam::Destroy()
 {
 	cube_.Destroy();
-	cubeTexture_.Destroy();
+	textureManager_.Destroy();
 	cubeShader_.Destroy();
 
 	floorShader_.Destroy();
@@ -81,8 +82,11 @@ void HelloStencilProgam::DrawImGui()
 
 void HelloStencilProgam::Render()
 {
-	if (!cubeTexture_.IsLoaded())
+	if (cubeTexture_ == INVALID_TEXTURE_NAME)
+	{
+		cubeTexture_ = textureManager_.GetTextureId(cubeTextureId_);
 		return;
+	}
 	std::lock_guard<std::mutex> lock(updateMutex_);
 	//Draw upper cube
 	glEnable(GL_DEPTH_TEST);
@@ -101,7 +105,7 @@ void HelloStencilProgam::Render()
 
 	cubeShader_.SetInt("ourTexture", 0);
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, cubeTexture_.GetTextureId());
+	glBindTexture(GL_TEXTURE_2D, cubeTexture_);
 
 	cube_.Draw();
 	if(flags_ & USE_STENCIL)

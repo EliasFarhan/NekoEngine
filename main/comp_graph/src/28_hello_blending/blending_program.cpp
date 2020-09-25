@@ -34,12 +34,10 @@ void HelloBlendingProgram::Init()
 		config.dataRootPath + "shaders/28_hello_blending/blending.vert",
 		config.dataRootPath + "shaders/28_hello_blending/blending.frag");
 	camera_.Init();
-	windowTexture_.SetPath(config.dataRootPath + "sprites/blending_transparent_window.png");
+	windowTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/blending_transparent_window.png");
 	
-	windowTexture_.LoadFromDisk();
-	cubeTexture_.SetPath(config.dataRootPath + "sprites/container.jpg");
-	cubeTexture_.LoadFromDisk();
-
+	cubeTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/container.jpg");
+	
 	plane_.Init();
 	cube_.Init();
 
@@ -52,6 +50,7 @@ void HelloBlendingProgram::Init()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glCheckError();
+	textureManager_.Init();
 }
 
 void HelloBlendingProgram::Update(seconds dt)
@@ -60,13 +59,13 @@ void HelloBlendingProgram::Update(seconds dt)
 	const auto& config = BasicEngine::GetInstance()->config;
 	camera_.SetAspect(config.windowSize.x, config.windowSize.y);
 	camera_.Update(dt);
+	textureManager_.Update(dt);
 }
 
 void HelloBlendingProgram::Destroy()
 {
 	cutoffShader_.Destroy();
-	windowTexture_.Destroy();
-	cubeTexture_.Destroy();
+	textureManager_.Destroy();
 	plane_.Destroy();
 	cube_.Destroy();
 }
@@ -89,9 +88,17 @@ void HelloBlendingProgram::DrawImGui()
 
 void HelloBlendingProgram::Render()
 {
-	if (!windowTexture_.IsLoaded() || !cubeTexture_.IsLoaded())
+	if (windowTexture_ == INVALID_TEXTURE_NAME )
 	{
-		return;
+		windowTexture_ = textureManager_.GetTextureId(windowTextureId_);
+		if (windowTexture_ == INVALID_TEXTURE_NAME)
+			return;
+	}
+	if ( cubeTexture_ == INVALID_TEXTURE_NAME)
+	{
+		cubeTexture_ = textureManager_.GetTextureId(cubeTextureId_);
+		if (cubeTexture_ == INVALID_TEXTURE_NAME)
+			return;
 	}
 	std::lock_guard<std::mutex> lock(updateMutex_);
 	if(flags_ & ENABLE_BLENDING)

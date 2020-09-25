@@ -50,8 +50,9 @@ private:
 	gl::RenderCuboid cube_{Vec3f::zero, Vec3f::one};
 	gl::Shader modelShader_;
 	gl::Shader outlineShader_;
-
-	gl::Texture cubeTexture_;
+	gl::TextureManager textureManager_;
+	TextureName cubeTexture_ = INVALID_TEXTURE_NAME;
+	TextureId cubeTextureId_;
 
 	sdl::Camera3D camera_;
 

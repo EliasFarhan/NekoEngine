@@ -39,6 +39,7 @@ public:
 	void OnEvent(const SDL_Event& event) override;
 private:
 	sdl::Camera3D camera_;
+	gl::TextureManager textureManager_;
 	assimp::Model model_;
 	gl::Shader shader_;
 	Mat4f projection_{ Mat4f::Identity };

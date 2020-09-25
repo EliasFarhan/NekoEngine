@@ -52,8 +52,12 @@ private:
 	gl::Shader modelShader_;
 	gl::Shader waterShader_;
 	gl::Shader skyboxShader_;
-	gl::Texture dudvTexturer_;
-	gl::Texture normalMap_;
+
+	gl::TextureManager textureManager_;
+	TextureName dudvTexturer_;
+	TextureId dudvTexturerId_;
+	TextureName normalMap_;
+	TextureId normalMapId_;
 
 	const Vec2u reflectionFrameSize = Vec2u(480, 240);
 	unsigned int reflectionFramebuffer_;

@@ -52,7 +52,9 @@ private:
 	sdl::Camera3D camera_;
 	assimp::Model model_;
 	gl::RenderCuboid cube_{ Vec3f::zero, Vec3f::one };
-	gl::Texture cubeTexture_;
+	gl::TextureManager textureManager_;
+	TextureName cubeTexture_ = INVALID_TEXTURE_NAME;
+	TextureId cubeTextureId_;
 	gl::Shader modelShader_;
 
 	sdl::Camera3D externalCamera_;

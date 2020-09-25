@@ -30,6 +30,7 @@ namespace neko
 
 void HelloTextureProgram::Init()
 {
+    textureManager_.Init();
     const auto& config = BasicEngine::GetInstance()->config;
     shader_.LoadFromFile(
             config.dataRootPath + "shaders/02_hello_texture/texture.vert",
@@ -37,8 +38,7 @@ void HelloTextureProgram::Init()
     quad_.Init();
 
     const auto texturePath = config.dataRootPath + "sprites/wall.jpg";
-    texture_.SetPath(texturePath);
-    texture_.LoadFromDisk();
+    textureId_=textureManager_.LoadTexture(texturePath);
     auto& textureManager = TextureManagerLocator::get();
 	//textureId_ = neko::gl::stbCreateTexture(texturePath);
     ddsTexture_ = gl::gliCreateTexture(config.dataRootPath + "sprites/wall.dds");
@@ -48,14 +48,14 @@ void HelloTextureProgram::Init()
 
 void HelloTextureProgram::Update(seconds dt)
 {
-
+    textureManager_.Update(dt);
 }
 
 void HelloTextureProgram::Destroy()
 {
     quad_.Destroy();
     shader_.Destroy();
-    texture_.Destroy();
+    textureManager_.Destroy();
 }
 
 void HelloTextureProgram::Render()
@@ -64,8 +64,9 @@ void HelloTextureProgram::Render()
     {
         return;
     }
-	if (texture_.GetTextureId() == INVALID_TEXTURE_NAME)
+	if (texture_ == INVALID_TEXTURE_NAME)
 	{
+        texture_ = textureManager_.GetTextureId(textureId_);
         return;
 	}
     shader_.Bind();
@@ -75,7 +76,7 @@ void HelloTextureProgram::Render()
     {
     case TextureType::STB_TEXTURE:
     {
-        glBindTexture(GL_TEXTURE_2D, texture_.GetTextureId());//bind texture id to texture slot
+        glBindTexture(GL_TEXTURE_2D, texture_);//bind texture id to texture slot
         break;
     }
     case TextureType::DDS_TEXTURE:

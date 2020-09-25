@@ -28,6 +28,7 @@ namespace neko
 {
 void HelloPbrTextureProgram::Init()
 {
+	textureManager_.Init();
 	const auto& config = BasicEngine::GetInstance()->config;
 	sphere_.Init();
 	pbrShader_.LoadFromFile(
@@ -55,14 +56,14 @@ void HelloPbrTextureProgram::Init()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glCheckError();
 
-	albedo_.SetPath(config.dataRootPath + "textures/rustediron2/rustediron2_basecolor.png");
-	albedo_.LoadFromDisk();
-	normal_.SetPath(config.dataRootPath + "textures/rustediron2/rustediron2_normal.png");
-	normal_.LoadFromDisk();
-	metallic_.SetPath(config.dataRootPath + "textures/rustediron2/rustediron2_metallic.png");
-	metallic_.LoadFromDisk();
-	roughness_.SetPath(config.dataRootPath + "textures/rustediron2/rustediron2_roughness.png");
-	roughness_.LoadFromDisk();
+	albedoId_ = textureManager_.LoadTexture(config.dataRootPath + "textures/rustediron2/rustediron2_basecolor.png");
+	
+	normalId_ = textureManager_.LoadTexture(config.dataRootPath + "textures/rustediron2/rustediron2_normal.png");
+	
+	metallicId_ = textureManager_.LoadTexture(config.dataRootPath + "textures/rustediron2/rustediron2_metallic.png");
+	
+	roughnessId_ = textureManager_.LoadTexture(config.dataRootPath + "textures/rustediron2/rustediron2_roughness.png");
+	
 }
 
 void HelloPbrTextureProgram::Update(seconds dt)
@@ -70,17 +71,14 @@ void HelloPbrTextureProgram::Update(seconds dt)
 	std::lock_guard<std::mutex> lock(updateMutex_);
 	const auto& config = BasicEngine::GetInstance()->config;
 	camera_.SetAspect(config.windowSize.x, config.windowSize.y);
-	camera_.Update(dt);
+	camera_.Update(dt);	textureManager_.Update(dt);
 }
 
 void HelloPbrTextureProgram::Destroy()
 {
 	sphere_.Destroy();
 	pbrShader_.Destroy();
-	albedo_.Destroy();
-	normal_.Destroy();
-	metallic_.Destroy();
-	roughness_.Destroy();
+	textureManager_.Destroy();
 }
 
 void HelloPbrTextureProgram::DrawImGui()
@@ -90,12 +88,29 @@ void HelloPbrTextureProgram::DrawImGui()
 void HelloPbrTextureProgram::Render()
 {
 	std::lock_guard<std::mutex> lock(updateMutex_);
-	if(!albedo_.IsLoaded() or 
-		!normal_.IsLoaded() or 
-		!metallic_.IsLoaded() or 
-		!roughness_.IsLoaded())
+	if(albedo_ == INVALID_TEXTURE_NAME )
 	{
-		return;
+		albedo_ = textureManager_.GetTextureId(albedoId_);
+		if (albedo_ == INVALID_TEXTURE_NAME)
+			return;
+	}
+	if (normal_ == INVALID_TEXTURE_NAME)
+	{
+		normal_ = textureManager_.GetTextureId(normalId_);
+		if (normal_ == INVALID_TEXTURE_NAME)
+			return;
+	}
+	if (metallic_ == INVALID_TEXTURE_NAME)
+	{
+		metallic_ = textureManager_.GetTextureId(metallicId_);
+		if (metallic_ == INVALID_TEXTURE_NAME)
+			return;
+	}
+	if (roughness_ == INVALID_TEXTURE_NAME)
+	{
+		roughness_ = textureManager_.GetTextureId(roughnessId_);
+		if (roughness_ == INVALID_TEXTURE_NAME)
+			return;
 	}
 	pbrShader_.Bind();
 	pbrShader_.SetTexture("albedoMap", albedo_, 0);

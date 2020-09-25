@@ -28,6 +28,7 @@ namespace neko
 {
 void HelloWaterProgram::Init()
 {
+	textureManager_.Init();
 	const auto& config = BasicEngine::GetInstance()->config;
 	skyboxCube_.Init();
 	skyboxTexture_ = gl::LoadCubemap({
@@ -51,10 +52,10 @@ void HelloWaterProgram::Init()
 		config.dataRootPath + "shaders/97_hello_water/water.vert",
 		config.dataRootPath + "shaders/97_hello_water/water.frag");
 
-	dudvTexturer_.SetPath(config.dataRootPath + "sprites/water/waveDUDV.png");
-	dudvTexturer_.LoadFromDisk();
-	normalMap_.SetPath(config.dataRootPath + "sprites/water/waveNM.png");
-	normalMap_.LoadFromDisk();
+	dudvTexturerId_ = textureManager_.LoadTexture(
+		config.dataRootPath + "sprites/water/waveDUDV.png");
+	normalMapId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/water/waveNM.png");
+	
 	CreateFramebuffer();
 	CreateDepthbuffer();
 	camera_.Init();
@@ -66,7 +67,7 @@ void HelloWaterProgram::Update(seconds dt)
 	const auto& config = BasicEngine::GetInstance()->config;
 	camera_.SetAspect(config.windowSize.x, config.windowSize.y);
 	camera_.Update(dt);
-
+	textureManager_.Update(dt);
 	dt_ += dt.count();
 }
 
@@ -78,8 +79,7 @@ void HelloWaterProgram::Destroy()
 	skyboxShader_.Destroy();
 	modelShader_.Destroy();
 	waterShader_.Destroy();
-	dudvTexturer_.Destroy();
-	normalMap_.Destroy();
+	textureManager_.Destroy();
 	//Destroy framebuffers
 	glDeleteFramebuffers(1, &reflectionFramebuffer_);
 	glDeleteFramebuffers(1, &refractionFramebuffer_);
@@ -102,13 +102,17 @@ void HelloWaterProgram::Render()
 	{
 		return;
 	}
-	if (!dudvTexturer_.IsLoaded())
+	if (dudvTexturer_ == INVALID_TEXTURE_NAME)
 	{
-		return;
+		dudvTexturer_ = textureManager_.GetTextureId(dudvTexturerId_);
+		if (dudvTexturer_ == INVALID_TEXTURE_NAME)
+			return;
 	}
-	if (!normalMap_.IsLoaded())
+	if (normalMap_ == INVALID_TEXTURE_NAME)
 	{
-		return;
+		normalMap_ = textureManager_.GetTextureId(normalMapId_);
+		if (normalMap_ == INVALID_TEXTURE_NAME)
+			return;
 	}
 	std::lock_guard<std::mutex> lock(updateMutex_);
 

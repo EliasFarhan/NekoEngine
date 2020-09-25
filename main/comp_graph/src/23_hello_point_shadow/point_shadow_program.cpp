@@ -31,6 +31,7 @@ namespace neko
 void HelloPointShadowProgram::Init()
 {
 
+	textureManager_.Init();
 	const auto& config = BasicEngine::GetInstance()->config;
 	cube_.Init();
 
@@ -42,8 +43,8 @@ void HelloPointShadowProgram::Init()
 	lightCubeShader_.LoadFromFile(config.dataRootPath + "shaders/23_hello_point_shadow/lamp.vert",
 		config.dataRootPath + "shaders/23_hello_point_shadow/lamp.frag");
 
-	cubeTexture_.SetPath(config.dataRootPath + "sprites/brickwall/brickwall.jpg");
-	cubeTexture_.LoadFromDisk();
+	cubeTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/brickwall/brickwall.jpg");
+
 	glGenFramebuffers(1, &depthMapFbo_);
 	// create depth cubemap texture
 	glGenTextures(1, &depthCubemap_);
@@ -88,6 +89,7 @@ void HelloPointShadowProgram::Update(seconds dt)
 	camera3D_.Update(dt);
 	dt_ += dt.count();
 	lightCamera_.position = 4.0f * Vec3f(Sin(radian_t(dt_)), 0.0f, Sin(radian_t(dt_)));
+	textureManager_.Update(dt);
 }
 
 void HelloPointShadowProgram::Destroy()
@@ -99,7 +101,7 @@ void HelloPointShadowProgram::Destroy()
 	lightCubeShader_.Destroy();
 	cubeShader_.Destroy();
 	simpleDepthShader_.Destroy();
-	cubeTexture_.Destroy();
+	textureManager_.Destroy();
 }
 
 void HelloPointShadowProgram::DrawImGui()
@@ -112,8 +114,9 @@ void HelloPointShadowProgram::DrawImGui()
 
 void HelloPointShadowProgram::Render()
 {
-	if (!cubeTexture_.IsLoaded())
+	if (cubeTexture_ == INVALID_TEXTURE_NAME)
 	{
+		cubeTexture_ = textureManager_.GetTextureId(cubeTextureId_);
 		return;
 	}
 	std::lock_guard<std::mutex> lock(updateMutex_);

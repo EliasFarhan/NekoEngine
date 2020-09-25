@@ -31,14 +31,17 @@ namespace neko
 
 void HelloHdrProgram::Init()
 {
+    textureManager_.Init();
     const auto& config = BasicEngine::GetInstance()->config;
     cube_.Init();
     cubeShader_.LoadFromFile(
             config.dataRootPath + "shaders/19_hello_hdr/tunnel.vert",
             config.dataRootPath + "shaders/19_hello_hdr/tunnel.frag");
-    cubeTexture_.SetTextureFlags(gl::Texture::TextureFlags(gl::Texture::MIRROR_REPEAT_WRAP | gl::Texture::GAMMA_CORRECTION | gl::Texture::DEFAULT));
-    cubeTexture_.SetPath(config.dataRootPath+"sprites/brickwall/brickwall.jpg");
-    cubeTexture_.LoadFromDisk();
+
+    cubeTextureId_ = textureManager_.LoadTexture(
+        config.dataRootPath+"sprites/brickwall/brickwall.jpg",
+        Texture::TextureFlags(Texture::MIRROR_REPEAT_WRAP | Texture::GAMMA_CORRECTION | Texture::DEFAULT));
+
 
     CreateFramebuffer();
     
@@ -56,12 +59,12 @@ void HelloHdrProgram::Update(seconds dt)
     std::lock_guard<std::mutex> lock(updateMutex_);
     const auto& config = BasicEngine::GetInstance()->config;
     camera_.SetAspect(config.windowSize.x, config.windowSize.y);
-    camera_.Update(dt);
+    camera_.Update(dt);	textureManager_.Update(dt);
 }
 
 void HelloHdrProgram::Destroy()
 {
-    cubeTexture_.Destroy();
+    textureManager_.Destroy();
     cubeShader_.Destroy();
     cube_.Destroy();
 
@@ -84,8 +87,9 @@ void HelloHdrProgram::DrawImGui()
 
 void HelloHdrProgram::Render()
 {
-    if (!cubeTexture_.IsLoaded())
+    if (cubeTexture_ == INVALID_TEXTURE_NAME)
     {
+        cubeTexture_ = textureManager_.GetTextureId(cubeTextureId_);
         return;
     }
 	if(flags_ & RESIZE_FRAMEBUFFER)
@@ -110,7 +114,7 @@ void HelloHdrProgram::Render()
     cubeShader_.SetMat4("transposeInverseModel", Mat4f::Identity);
     cubeShader_.SetInt("diffuseTexture", 0);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, cubeTexture_.GetTextureId());
+    glBindTexture(GL_TEXTURE_2D, cubeTexture_);
     for(size_t i = 0; i < lights_.size(); i++)
     {
         cubeShader_.SetVec3("lights["+std::to_string(i)+"].Position", lights_[i].lightPos_);

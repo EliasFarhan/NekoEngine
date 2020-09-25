@@ -148,15 +148,16 @@ struct TextureInfo
     Texture::TextureFlags flags = Texture::DEFAULT;
 };
 
-class TextureManager : public TextureManagerInterface
+class TextureManager : public TextureManagerInterface, public SystemInterface
 {
 public:
     TextureManager();
     TextureId LoadTexture(std::string_view path, Texture::TextureFlags flags = Texture::DEFAULT) override;
     std::string GetPath(TextureId textureId) const;
-    void Update();
+    void Init() override;
+	void Update(seconds dt) override;
 	
-    virtual void Destroy();
+    void Destroy() override;
     virtual void UploadToGpu(TextureInfo&& texture);
 
 	TextureName GetTextureId(TextureId index) const override;

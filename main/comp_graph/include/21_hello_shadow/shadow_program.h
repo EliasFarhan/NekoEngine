@@ -71,7 +71,9 @@ private:
     void RenderScene(const gl::Shader& shader);
 	
     gl::RenderQuad floor_{Vec3f::zero, Vec2f::one*5.0f};
-    gl::Texture floorTexture_;
+    gl::TextureManager textureManager_;
+    TextureName floorTexture_ = INVALID_TEXTURE_NAME;
+    TextureId floorTextureId_;
 
     gl::RenderCuboid cube_{Vec3f::zero, Vec3f::one};
     std::array<Transform, 4> cubeTransforms_ = {

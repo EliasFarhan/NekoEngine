@@ -38,6 +38,7 @@ screenFrame_(gl::RenderQuad(Vec3f::zero, Vec2f(2.0f,2.0f)))
 
 void HelloFramebufferProgram::Init()
 {
+    textureManager_.Init();
     const auto& config = BasicEngine::GetInstance()->config;
     screenFrame_.Init();
     cube_.Init();
@@ -81,8 +82,8 @@ void HelloFramebufferProgram::Init()
     screenEdgeDetectionShader_.LoadFromFile(
             config.dataRootPath + "shaders/11_hello_framebuffer/screen.vert",
             config.dataRootPath + "shaders/11_hello_framebuffer/screen_edge_detection.frag");
-    containerTexture_.SetPath(config.dataRootPath + "sprites/container.jpg");
-    containerTexture_.LoadFromDisk();
+    containerTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/container.jpg");
+
 
     modelShader_.LoadFromFile(config.dataRootPath + "shaders/11_hello_framebuffer/model.vert",
                               config.dataRootPath + "shaders/11_hello_framebuffer/model.frag");
@@ -95,12 +96,12 @@ void HelloFramebufferProgram::Update(seconds dt)
     std::lock_guard<std::mutex> lock(updateMutex_);
     const auto& config = BasicEngine::GetInstance()->config;
     camera_.SetAspect(config.windowSize.x, config.windowSize.y);
-    camera_.Update(dt);
+    camera_.Update(dt);	textureManager_.Update(dt);
 }
 
 void HelloFramebufferProgram::Destroy()
 {
-    containerTexture_.Destroy();
+    textureManager_.Destroy();
 
     glDeleteFramebuffers(1, &fbo_);
     glDeleteTextures(1, &fboColorBufferTexture_);
@@ -139,8 +140,11 @@ void HelloFramebufferProgram::DrawImGui()
 void HelloFramebufferProgram::Render()
 {
 
-    if(!containerTexture_.IsLoaded())
+    if (containerTexture_ == INVALID_TEXTURE_NAME)
+    {
+        containerTexture_ = textureManager_.GetTextureId(containerTextureId_);
         return;
+    }
     std::lock_guard<std::mutex> lock(updateMutex_);
     if(hasScreenResize_)
     {
@@ -190,7 +194,7 @@ void HelloFramebufferProgram::Render()
 
     modelShader_.SetInt("texture_diffuse1", 0);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, containerTexture_.GetTextureId());
+    glBindTexture(GL_TEXTURE_2D, containerTexture_);
     cube_.Draw();
 
     //Bind backbuffer

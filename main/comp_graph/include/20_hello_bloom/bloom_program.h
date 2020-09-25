@@ -71,8 +71,9 @@ private:
 	gl::Shader lightShader_;
 	gl::Shader blurShader_;
 	gl::Shader bloomShader_;
-
-	gl::Texture cubeTexture_;
+	gl::TextureManager textureManager_;
+	TextureName cubeTexture_ = INVALID_TEXTURE_NAME;
+	TextureId cubeTextureId_;
 	gl::RenderCuboid cube_{ Vec3f::zero, Vec3f::one };
 
 	std::array<Transform, 6> cubeTransforms_ = {

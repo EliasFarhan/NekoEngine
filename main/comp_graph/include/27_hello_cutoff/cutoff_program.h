@@ -45,9 +45,11 @@ namespace neko
 		gl::RenderQuad plane_{Vec3f::zero, Vec2f::one};
 		gl::RenderCuboid cube_{ Vec3f::zero, Vec3f::one };
 		gl::Shader cutoffShader_;
-
-		gl::Texture grassTexture_;
-		gl::Texture cubeTexture_;
+		gl::TextureManager textureManager_;
+		TextureName grassTexture_ = INVALID_TEXTURE_NAME;
+		TextureId grassTextureId_;
+		TextureName cubeTexture_ = INVALID_TEXTURE_NAME;
+		TextureId cubeTextureId_;
 
 		sdl::Camera3D camera_;
 		bool enableCutoff_ = false;

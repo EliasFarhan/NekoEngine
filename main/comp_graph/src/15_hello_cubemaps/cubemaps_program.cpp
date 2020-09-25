@@ -29,6 +29,7 @@ namespace neko
 {
 void HelloCubemapsProgram::Init()
 {
+	textureManager_.Init();
 	const auto& config = BasicEngine::GetInstance()->config;
 	skyboxCube_.Init();
 	skyboxTexture_ = gl::LoadCubemap({
@@ -52,8 +53,8 @@ void HelloCubemapsProgram::Init()
 	camera_.position = Vec3f(0, 3, 3);
 	camera_.WorldLookAt(Vec3f::zero);
 	cube_.Init();
-	cubeTexture_.SetPath(config.dataRootPath + "sprites/container.jpg");
-	cubeTexture_.LoadFromDisk();
+	cubeTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/container.jpg");
+
 }
 
 void HelloCubemapsProgram::Update(seconds dt)
@@ -61,7 +62,7 @@ void HelloCubemapsProgram::Update(seconds dt)
 	std::lock_guard<std::mutex> lock(updateMutex_);
 	const auto& config = BasicEngine::GetInstance()->config;
 	camera_.SetAspect(config.windowSize.x, config.windowSize.y);
-	camera_.Update(dt);
+	camera_.Update(dt);	textureManager_.Update(dt);
 }
 
 void HelloCubemapsProgram::Destroy()
@@ -112,8 +113,9 @@ void HelloCubemapsProgram::Render()
 	{
 		return;
 	}
-	if(!cubeTexture_.IsLoaded())
+	if(cubeTexture_ == INVALID_TEXTURE_NAME)
 	{
+		cubeTexture_ = textureManager_.GetTextureId(cubeTextureId_);
 		return;
 	}
 	std::lock_guard<std::mutex> lock(updateMutex_);
@@ -137,7 +139,7 @@ void HelloCubemapsProgram::Render()
 		model = Transform3d::Translate(model, Vec3f::left * 2.0f);
 		modelShader_.SetMat4("model", model);
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, cubeTexture_.GetTextureId());
+		glBindTexture(GL_TEXTURE_2D, cubeTexture_);
 		cube_.Draw();
 		break;
 	}
@@ -160,7 +162,7 @@ void HelloCubemapsProgram::Render()
 		model = Transform3d::Translate(model, Vec3f::left * 2.0f);
 		modelReflectionShader_.SetMat4("model", model);
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, cubeTexture_.GetTextureId());
+		glBindTexture(GL_TEXTURE_2D, cubeTexture_);
 		cube_.Draw();
 		break;
 	}
@@ -185,7 +187,7 @@ void HelloCubemapsProgram::Render()
 		model = Transform3d::Translate(model, Vec3f::left * 2.0f);
 		modelRefractionShader_.SetMat4("model", model);
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, cubeTexture_.GetTextureId());
+		glBindTexture(GL_TEXTURE_2D, cubeTexture_);
 		cube_.Draw();
 		break;
 	}

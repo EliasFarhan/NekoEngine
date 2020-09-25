@@ -62,7 +62,9 @@ private:
 
     gl::RenderCuboid cube_{Vec3f::zero, Vec3f::one};
     gl::Shader modelShader_;
-    gl::Texture containerTexture_;
+    gl::TextureManager textureManager_;
+    TextureName containerTexture_ = INVALID_TEXTURE_NAME;
+    TextureId containerTextureId_;
 
     gl::RenderQuad screenFrame_;
     gl::Shader screenShader_;

@@ -47,7 +47,9 @@ private:
 
 	assimp::Model model_;
 	gl::RenderQuad floor_{Vec3f::zero, Vec2f::one*10.0f};
-	gl::Texture floorTexture_;
+	gl::TextureManager textureManager_;
+	TextureName floorTexture_ = INVALID_TEXTURE_NAME;
+	TextureId floorTextureId_;
 	float floorResolution_ = 6.0f;
 	int specularPow_ = 32;
 	enum BlinnFlags : std::uint8_t

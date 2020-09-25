@@ -29,17 +29,18 @@ namespace neko
 {
 	void HelloCutoffProgram::Init()
 	{
+		textureManager_.Init();
 		const auto& config = BasicEngine::GetInstance()->config;
 		cutoffShader_.LoadFromFile(
 			config.dataRootPath + "shaders/27_hello_cutoff/cutoff.vert",
 			config.dataRootPath + "shaders/27_hello_cutoff/cutoff.frag");
 		camera_.Init();
-		grassTexture_.SetPath(config.dataRootPath + "sprites/grass.png");
-		grassTexture_.SetTextureFlags(static_cast<Texture::TextureFlags>(gl::Texture::CLAMP_WRAP));
+		grassTextureId_ = textureManager_.LoadTexture(
+			config.dataRootPath + "sprites/grass.png",
+			static_cast<Texture::TextureFlags>(Texture::CLAMP_WRAP));
 		
-		grassTexture_.LoadFromDisk();
-		cubeTexture_.SetPath(config.dataRootPath + "sprites/container.jpg");
-		cubeTexture_.LoadFromDisk();
+		cubeTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/container.jpg");
+
 
 		plane_.Init();
 		cube_.Init();
@@ -60,14 +61,13 @@ namespace neko
 		std::lock_guard<std::mutex> lock(updateMutex_);
 		const auto& config = BasicEngine::GetInstance()->config;
 		camera_.SetAspect(config.windowSize.x, config.windowSize.y);
-		camera_.Update(dt);
+		camera_.Update(dt);	textureManager_.Update(dt);
 	}
 
 	void HelloCutoffProgram::Destroy()
 	{
 		cutoffShader_.Destroy();
-		grassTexture_.Destroy();
-		cubeTexture_.Destroy();
+		textureManager_.Destroy();
 		plane_.Destroy();
 		cube_.Destroy();
 	}
@@ -81,8 +81,17 @@ namespace neko
 
 	void HelloCutoffProgram::Render()
 	{
-		if(!grassTexture_.IsLoaded() || !cubeTexture_.IsLoaded())
+		if(grassTexture_ == INVALID_TEXTURE_NAME)
 		{
+			grassTexture_ = textureManager_.GetTextureId(grassTextureId_);
+			if (grassTexture_ == INVALID_TEXTURE_NAME)
+				return;
+		}
+		if (cubeTexture_ == INVALID_TEXTURE_NAME)
+		{
+			cubeTexture_ = textureManager_.GetTextureId(cubeTextureId_);
+			if (cubeTexture_ == INVALID_TEXTURE_NAME)
+				return;
 			return;
 		}
 		std::lock_guard<std::mutex> lock(updateMutex_);

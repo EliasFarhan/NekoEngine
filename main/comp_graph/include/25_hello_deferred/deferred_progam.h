@@ -76,9 +76,11 @@ private:
     gl::RenderQuad screenQuad_{Vec3f::zero, Vec2f::one*2.0f};
     gl::RenderCuboid cube_{Vec3f(0.0f,0.5f,0.0f), Vec3f::one};
     assimp::Model model_;
-
-    gl::Texture container_;
-    gl::Texture containerSpecular_;
+    gl::TextureManager textureManager_;
+    TextureName container_ = INVALID_TEXTURE_NAME;
+    TextureId containerId_;
+    TextureName containerSpecular_ = INVALID_TEXTURE_NAME;
+    TextureId containerSpecularId_;
     TextureName whiteTexture_ = 0;
 
     unsigned int gBuffer_ = 0;
