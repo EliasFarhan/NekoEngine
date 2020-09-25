@@ -26,7 +26,8 @@ public:
 private:
 	neko::Transform2dManager& transformManager_;
 	ClientGameManager& gameManager_;
-	gl::Texture shipTexture_;
+	TextureName shipTextureName_;
+	TextureId shipTextureId_;
 	gl::Shader spriteShader_;
 	gl::RenderQuad spriteQuad_{ Vec3f::zero, Vec2f::one };
 };

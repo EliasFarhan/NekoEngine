@@ -51,7 +51,7 @@ namespace neko
 
 		sdl::Camera3D camera_;
 		bool enableCutoff_ = false;
-		TextureId whiteTexture_ = 0;
+		TextureName whiteTexture_ = 0;
 	};
 	
 }

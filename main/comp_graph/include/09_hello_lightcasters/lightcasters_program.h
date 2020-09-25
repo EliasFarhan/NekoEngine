@@ -54,8 +54,8 @@ private:
 	LightCasterType casterType_ = LightCasterType::DIRECTIONAL;
 	gl::Shader containerShaders_[(int)LightCasterType::LENGTH];
 	gl::Shader lampShader_;
-	TextureId containerDiffuse_;
-	TextureId containerSpecular_;
+	TextureName containerDiffuse_;
+	TextureName containerSpecular_;
 	int specularPow_ = 32;
 
 	gl::RenderCuboid cube_{ Vec3f::zero, Vec3f::one };

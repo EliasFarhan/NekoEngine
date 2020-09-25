@@ -55,7 +55,7 @@ private:
 
 	sdl::Camera3D camera_;
 
-	TextureId whiteTexture_ = 0;
+	TextureName whiteTexture_ = 0;
 	std::uint8_t flags_ = NONE;
 };
 }

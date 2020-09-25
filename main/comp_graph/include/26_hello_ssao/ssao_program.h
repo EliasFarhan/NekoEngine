@@ -62,7 +62,7 @@ private:
 	sdl::Camera3D camera_;
 	gl::Texture container_;
 	gl::Texture containerSpecular_;
-	TextureId whiteTexture_ = 0;
+	TextureName whiteTexture_ = 0;
 
 	gl::Shader ssaoGeometryShader_;
 	gl::Shader ssaoLightingShader_;
@@ -83,7 +83,7 @@ private:
 
 	float ssaoRadius_ = 0.5f;
 	float ssaoBias_ = 0.025f;
-	TextureId noiseTexture_ = 0;
+	TextureName noiseTexture_ = 0;
 	const int maxKernelSize_ = 64;
 	int kernelSize_ = maxKernelSize_;
 	std::vector<Vec3f> ssaoKernel_;

@@ -75,9 +75,9 @@ private:
 	gl::Shader brdfShader_;
 
 	unsigned int captureFbo_ = 0, captureRbo_ = 0;
-	TextureId envCubemap_ = 0;
-	TextureId irradianceMap_ = 0;
-	TextureId brdfLUTTexture_ = 0;
+	TextureName envCubemap_ = 0;
+	TextureName irradianceMap_ = 0;
+	TextureName brdfLUTTexture_ = 0;
 
 	sdl::Camera3D camera_;
 	Vec3f baseColor_ = { 1.0f,0.5f,0.5f };
@@ -107,6 +107,6 @@ private:
 		Vec3f(0.0f, 1.0f,  0.0f),
 		}
 	};
-	TextureId prefilterMap_ = 0;
+	TextureName prefilterMap_ = 0;
 };
 }

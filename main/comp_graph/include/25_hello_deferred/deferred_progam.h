@@ -79,7 +79,7 @@ private:
 
     gl::Texture container_;
     gl::Texture containerSpecular_;
-    TextureId whiteTexture_ = 0;
+    TextureName whiteTexture_ = 0;
 
     unsigned int gBuffer_ = 0;
     unsigned int gPosition_ = 0;

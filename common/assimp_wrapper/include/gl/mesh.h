@@ -48,7 +48,8 @@ namespace neko::assimp
 	struct Texture
 	{
 		Texture() = default;
-		gl::Texture texture;
+		TextureId textureId = INVALID_TEXTURE_ID;
+		TextureName textureName = INVALID_TEXTURE_NAME;
 		enum class TextureType : std::uint8_t
 		{
 			DIFFUSE,

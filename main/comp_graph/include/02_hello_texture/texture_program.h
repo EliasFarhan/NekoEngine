@@ -51,8 +51,8 @@ private:
 
     gl::Texture texture_;
 
-    TextureId ddsTexture_ = 0;
-    TextureId ktxTexture_ = 0;
+    TextureName ddsTexture_ = 0;
+    TextureName ktxTexture_ = 0;
 
 	enum class TextureType
 	{

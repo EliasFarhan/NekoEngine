@@ -60,6 +60,6 @@ private:
     degree_t angle_{0.0f};
     EulerAngles eulerAngle_{Vec3f::zero};
     gl::Shader shaderProgram_;
-    TextureId textureWall_;
+    TextureName textureWall_;
 };
 }

@@ -22,6 +22,9 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
+
+#include "graphics/texture.h"
+
 namespace neko::gl
 {
 class Sprite
@@ -29,6 +32,6 @@ class Sprite
 public:
 private:
     static gl::Shader spriteShader_;
-    gl::Texture texture_;
+    TextureName texture_;
 };
 }

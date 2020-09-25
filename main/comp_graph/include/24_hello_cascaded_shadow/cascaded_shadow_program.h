@@ -77,6 +77,6 @@ private:
 	gl::RenderQuad plane_{Vec3f::zero, Vec2f::one};
 	assimp::Model dragonModel_;
 	gl::Texture brickWall_;
-	TextureId whiteTexture_ = 0;
+	TextureName whiteTexture_ = 0;
 };
 }

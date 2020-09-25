@@ -67,6 +67,8 @@ void ClientGameManager::Init()
 
 void ClientGameManager::Update(seconds dt)
 {
+    textureManager_.Update();
+    spriteManager_.Update(dt);
 	fixedTimer_ += dt.count();
 	while (fixedTimer_> FixedPeriod)
 	{
@@ -78,6 +80,7 @@ void ClientGameManager::Update(seconds dt)
 void ClientGameManager::Destroy()
 {
 	GameManager::Destroy();
+    textureManager_.Destroy();
 	spriteManager_.Destroy();
 }
 

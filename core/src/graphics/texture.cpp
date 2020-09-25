@@ -56,6 +56,7 @@ Image StbImageConvert(BufferFile imageFile, bool flipY, bool hdr)
     }
 	return image;
 }
+/*
 Texture::Texture() :
 	uploadToGpuJob_([this]
 	{
@@ -79,7 +80,7 @@ Texture::Texture() :
 
 void Texture::LoadFromDisk()
 {
-    if (textureId_ == INVALID_TEXTURE_ID)
+    if (textureId_ == INVALID_TEXTURE_NAME)
     {
         BasicEngine::GetInstance()->ScheduleJob(&diskLoadJob_, JobThreadType::RESOURCE_THREAD);
         convertImageJob_.AddDependency(&diskLoadJob_);
@@ -109,20 +110,187 @@ void Texture::Reset()
     convertImageJob_.Reset();
     uploadToGpuJob_.Reset();
 }
+	*/
 
-TextureManager::TextureManager()
+TextureLoader::TextureLoader(TextureManager& textureManager) :
+	textureManager_(textureManager),
+	convertImageJob_([this]
+    {
+        const auto filename = diskLoadJob_.GetFilePath();
+        const auto extension = GetFilenameExtension(filename);
+
+        image_ = StbImageConvert(diskLoadJob_.GetBufferFile(), flags_ & Texture::FLIP_Y, flags_ & Texture::HDR);
+        diskLoadJob_.GetBufferFile().Destroy();
+        TextureInfo textureInfo{ textureId_, std::move(image_), flags_ };
+        textureManager_.UploadToGpu(std::move(textureInfo));
+    })
 {
+}
+
+void TextureLoader::SetTextureId(TextureId textureId)
+{
+	textureId_ = textureId;
+	const auto path = textureManager_.GetPath(textureId_);
+	diskLoadJob_.SetFilePath(path);
+}
+
+void TextureLoader::LoadFromDisk()
+{
+    if (textureId_ != INVALID_TEXTURE_ID)
+    {
+        BasicEngine::GetInstance()->ScheduleJob(&diskLoadJob_, JobThreadType::RESOURCE_THREAD);
+        convertImageJob_.AddDependency(&diskLoadJob_);
+        BasicEngine::GetInstance()->ScheduleJob(&convertImageJob_, JobThreadType::OTHER_THREAD);
+    }
+}
+
+void TextureLoader::Reset()
+{
+	convertImageJob_.Reset();
+	diskLoadJob_.Reset();
+}
+
+
+
+TextureManager::TextureManager() : textureLoader_(*this), uploadToGpuJob_([this]()
+{
+	CreateTexture();
+	currentUploadedTexture_.textureId = INVALID_TEXTURE_ID;
+})
+{
+    TextureManagerLocator::provide(this);
+}
+
+TextureId TextureManager::LoadTexture(std::string_view path, Texture::TextureFlags flags)
+{
+	
+	const std::string metaPath = std::string(path) + ".meta";
+    auto metaJson = LoadJson(metaPath);
+    TextureId textureId = INVALID_TEXTURE_ID;
+	if(CheckJsonExists(metaJson, "uuid"))
+	{
+        textureId = sole::rebuild(metaJson["uuid"].get<std::string>());
+	}
+    else
+    {
+        logDebug("[Error] Could not find texture id in json file");
+        return textureId;
+    }
+    if (textureId == INVALID_TEXTURE_ID)
+    {
+
+        logDebug("[Error] Invalid texture id on texture load");
+        return textureId;
+    }
+    const auto it = texturePathMap_.find(textureId);
+	if(it != texturePathMap_.end())
+	{
+		//Texture is already in queue or even loaded
+        return textureId;
+	}
+	//Put texture in queue
+    texturePathMap_[textureId] = std::string(path.data());
+    TextureInfo textureInfo;
+    textureInfo.textureId = textureId;
+    textureInfo.flags = flags;
+    texturesToLoad_.push(std::move(textureInfo));
+    return textureId;
+}
+
+std::string TextureManager::GetPath(TextureId textureId) const
+{
+	const auto pathIt = texturePathMap_.find(textureId);
+	if (pathIt != texturePathMap_.end())
+	{
+		return pathIt->second;
+	}
+	return "";
+}
+
+void TextureManager::Update()
+{
+    if (!texturesToLoad_.empty())
+    {
+        if (textureLoader_.IsLoaded() || !textureLoader_.HasStarted())
+        {
+            logDebug("[TextureManager] Loading a texture from disk");
+            textureLoader_.Reset();
+            const auto& textureInfo = texturesToLoad_.front();
+            textureLoader_.SetTextureId(textureInfo.textureId);
+            textureLoader_.SetTextureFlags(textureInfo.flags);
+            textureLoader_.LoadFromDisk();
+            texturesToLoad_.pop();
+        }
+    }
+	if(!texturesToUpload_.empty() && currentUploadedTexture_.textureId == INVALID_TEXTURE_ID)
+    {
+
+        logDebug("[TextureManager] Uploading a texture to the GPU");
+		auto& textureInfo = texturesToUpload_.front();
+        currentUploadedTexture_ = std::move(textureInfo);
+	    texturesToUpload_.pop();
+        uploadToGpuJob_.Reset();
+	    RendererLocator::get().AddPreRenderJob(&uploadToGpuJob_);
+	}
 }
 
 void TextureManager::Destroy()
 {
-    textureIndexMap_.clear();
-    currentIndex_ = 0;
+    texturePathMap_.clear();
+    textureNameMap_.clear();
+}
+
+void TextureManager::UploadToGpu(TextureInfo&& texture)
+{
+	texturesToUpload_.push(std::move(texture));
+}
+
+TextureName TextureManager::GetTextureId(TextureId index) const
+{
+    const auto it = textureNameMap_.find(index);
+	if(it != textureNameMap_.end())
+	{
+        return it->second;
+	}
+    return INVALID_TEXTURE_NAME;
+}
+
+bool TextureManager::IsTextureLoaded(TextureId textureId) const
+{
+    return textureNameMap_.find(textureId) != textureNameMap_.end();
+}
+
+
+Image::Image(Image&& image) noexcept
+{
+	data = image.data;
+	image.data = nullptr;
+	width = image.width;
+	height = image.height;
+	nbChannels = image.nbChannels;
+}
+
+Image& Image::operator=(Image&& image) noexcept
+{
+	data = image.data;
+	image.data = nullptr;
+	width = image.width;
+	height = image.height;
+	nbChannels = image.nbChannels;
+	return *this;
+}
+
+Image::~Image()
+{
+	Destroy();
 }
 
 void Image::Destroy()
 {
-    stbi_image_free(data);
+    if (data)
+    {
+        stbi_image_free(data);
+    }
     data = nullptr;
     height = -1;
     width = -1;

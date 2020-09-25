@@ -64,7 +64,7 @@ void HelloTextureProgram::Render()
     {
         return;
     }
-	if (texture_.GetTextureId() == INVALID_TEXTURE_ID)
+	if (texture_.GetTextureId() == INVALID_TEXTURE_NAME)
 	{
         return;
 	}

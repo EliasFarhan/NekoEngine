@@ -30,6 +30,7 @@
 
 #include "gl/gles3_include.h"
 #include "graphics/graphics.h"
+#include "graphics/texture.h"
 
 #ifdef EASY_PROFILE_USE
 #include "easy/profiler.h"
@@ -48,16 +49,19 @@ void Mesh::Init()
 {
 #ifdef NEKO_SAMETHREAD
     loadMeshToGpu.Execute();
-    for(auto& texture : textures_)
-    {
-        texture.texture.LoadFromDisk();
-    }
+
 #else
     RendererLocator::get().AddPreRenderJob(&loadMeshToGpu);
-	for(auto& texture : textures_)
-	{
-        texture.texture.LoadFromDisk();
-	}
+    const TextureManagerInterface& textureManager = TextureManagerLocator::get();
+    for (auto& texture : textures_)
+    {
+    	//Waiting for texture to be loaded
+    	while(!textureManager.IsTextureLoaded(texture.textureId))
+    	{
+    		
+    	}
+        texture.textureName = textureManager.GetTextureId(texture.textureId);
+    }
 #endif
 }
 
@@ -79,7 +83,7 @@ void Mesh::Destroy()
 
 	for(auto& texture : textures_)
 	{
-        gl::DestroyTexture(texture.texture.GetTextureId());
+        gl::DestroyTexture(texture.textureName);
 	}
     textures_.clear();
     vertices_.clear();
@@ -169,10 +173,14 @@ bool Mesh::IsLoaded() const
     {
         return false;
     }
+    const TextureManagerInterface& textureManager = TextureManagerLocator::get();
 	for(const auto& texture : textures_)
 	{
-        if (!texture.texture.IsLoaded())
+        if (!textureManager.IsTextureLoaded(texture.textureId))
+        {
             return false;
+        }
+
 	}
     return true;
 }
@@ -251,6 +259,7 @@ void Mesh::LoadMaterialTextures(
     Texture::TextureType texture,
     const std::string_view directory)
 {
+    auto& textureManager = TextureManagerLocator::get();
     for (unsigned int i = 0; i < material->GetTextureCount(aiTexture); i++)
     {
         aiString str;
@@ -259,11 +268,11 @@ void Mesh::LoadMaterialTextures(
         textures_.emplace_back();
         auto& assTexture = textures_.back();
         assTexture.type = texture;
-        auto& glTexture = assTexture.texture;
         std::string path = directory.data();
         path += '/';
     	path += str.C_Str();
-        glTexture.SetPath(path);
+    	
+        assTexture.textureId = textureManager.LoadTexture(path);
     }
 }
 
@@ -297,7 +306,7 @@ void Mesh::BindTextures(const gl::Shader& shader) const
             default: ;
         }
         shader.SetInt("material." + name + number, i);
-        glBindTexture(GL_TEXTURE_2D, textures_[i].texture.GetTextureId());
+        glBindTexture(GL_TEXTURE_2D, textures_[i].textureName);
     }
     shader.SetFloat("material.shininess", specularExponent_);
     shader.SetBool("enableNormalMap", normalNr > 1);

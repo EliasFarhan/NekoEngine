@@ -28,7 +28,7 @@ void SpriteManager::Render()
 			model = Transform3d::Rotate(model, rotation, Vec3f::forward);
 			model = Transform3d::Translate(model, position);
 			spriteShader_.SetMat4("model", model);
-			spriteShader_.SetTexture("texture", shipTexture_);
+			spriteShader_.SetTexture("texture", shipTextureName_);
 			spriteQuad_.Draw();
 		}
 	}
@@ -37,10 +37,10 @@ void SpriteManager::Render()
 void SpriteManager::Init()
 {
 	const auto& config = BasicEngine::GetInstance()->config;
-	shipTexture_.SetPath(config.dataRootPath + "sprites/asteroid/ship.png");
-	shipTexture_.SetTextureFlags(
-            static_cast<Texture::TextureFlags>(Texture::TextureFlags::FLIP_Y | Texture::TextureFlags::CLAMP_WRAP));
-	shipTexture_.LoadFromDisk();
+	auto& textureManager = TextureManagerLocator::get();
+	shipTextureId_ = textureManager.LoadTexture(
+		config.dataRootPath + "sprites/asteroid/ship.png", 
+		static_cast<Texture::TextureFlags>(Texture::TextureFlags::FLIP_Y | Texture::TextureFlags::CLAMP_WRAP));
 	spriteQuad_.Init();
 	spriteShader_.LoadFromFile(
 		config.dataRootPath + "shaders/comp_net/sprite.vert",
@@ -50,11 +50,15 @@ void SpriteManager::Init()
 
 void SpriteManager::Update(seconds dt)
 {
+	if (shipTextureName_ == INVALID_TEXTURE_NAME)
+	{
+		const auto& textureManager = TextureManagerLocator::get();
+		shipTextureName_ = textureManager.GetTextureId(shipTextureId_);
+	}
 }
 
 void SpriteManager::Destroy()
 {
-	shipTexture_.Destroy();
 	spriteQuad_.Destroy();
 	spriteShader_.Destroy();
 }

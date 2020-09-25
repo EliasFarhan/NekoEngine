@@ -6,7 +6,7 @@ message("SFML LIBRARIES: ${SFML_LIBRARIES}")
 add_library(comp_net_lib ${comp_net_src})
 target_link_libraries(comp_net_lib PUBLIC Neko_Core sdl_engine gles3_wrapper assimp_wrapper sfml-network)
 set_target_properties (comp_net_lib PROPERTIES FOLDER Neko/Main/CompNet)
-
+set_target_properties(comp_net_lib PROPERTIES UNITY_BUILD ON)
 set(net_main_project_dir "main/")
 file(GLOB net_main_projects "${net_main_project_dir}/*")
 

@@ -59,8 +59,8 @@ public:
      */
     void SetSize(Vec2u size);
 
-    [[nodiscard]] TextureId GetColorTexture() const { return colorBuffer_; }
-    [[nodiscard]] TextureId GetDepthTexture() const { return depthBuffer_; }
+    [[nodiscard]] TextureName GetColorTexture() const { return colorBuffer_; }
+    [[nodiscard]] TextureName GetDepthTexture() const { return depthBuffer_; }
 private:
     inline static unsigned int currentFramebufferBind_ = 0;
     Type frameBufferType_ = DEFAULT;

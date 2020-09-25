@@ -70,6 +70,7 @@ protected:
 	Vec2u windowSize_;
 	Camera2D camera_;
 	net::PlayerNumber clientPlayer_ = net::INVALID_PLAYER;
+	gl::TextureManager textureManager_;
 	asteroid::SpriteManager spriteManager_;
 	float fixedTimer_ = 0.0f;
 	unsigned startingTime_ = 0;

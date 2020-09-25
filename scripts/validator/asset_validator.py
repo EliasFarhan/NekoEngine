@@ -2,8 +2,11 @@ import json
 import sys
 import os
 import shader_validator
+import texture_validator
 from pathlib import Path
 from enum import Enum
+import os.path
+import uuid
 
 
 def create_out_subdirectories(data_out):
@@ -32,10 +35,22 @@ class AssetType(Enum):
     FRAG_SHADER = 5
 
 
+img_extension = [
+    ".jpeg",
+    ".jpg",
+    ".png",
+    ".bmp",
+    ".hdr",
+    ".ktx",
+    ".dds"
+]
+
+
 def define_asset_type(filename) -> AssetType:
+    global img_extension
     path = Path(filename)
     extension = path.suffix.lower()
-    if extension == ".jpg"  or extension == ".jpeg":
+    if extension in img_extension:
         return AssetType.TEXTURE
     if extension == '.mtl':
         return AssetType.MTL
@@ -48,11 +63,17 @@ def define_asset_type(filename) -> AssetType:
     return AssetType.UNKNOWN
 
 
-def validate_asset(data_src):
+def validate_asset():
+    global data_src
+    meta_content = {}
     asset_type = define_asset_type(data_src)
     if asset_type != AssetType.UNKNOWN:
-        #TODO check if .meta file exists
-        pass
+        if not os.path.isfile(data_out+".meta"):
+            # We generate the meta file
+            meta_content = {"uuid": str(uuid.uuid1())}
+            meta_json = json.dumps(meta_content)
+            with open(data_out+".meta", "w") as meta_file:
+                meta_file.write(meta_json)
 
     if asset_type == AssetType.VERT_SHADER or asset_type == AssetType.FRAG_SHADER:
         shader_validator.validate_shader(data_src)
@@ -64,4 +85,4 @@ if __name__ == "__main__":
     data_src = sys.argv[1]
     data_out = sys.argv[2]
     create_out_subdirectories(data_out)
-    validate_asset(data_src)
+    validate_asset()

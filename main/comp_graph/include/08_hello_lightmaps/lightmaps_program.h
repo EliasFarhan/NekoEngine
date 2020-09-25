@@ -43,8 +43,8 @@ public:
 private:
 	gl::Shader containerShader_;
 	gl::Shader lampShader_;
-	TextureId containerDiffuse_;
-	TextureId containerSpecular_;
+	TextureName containerDiffuse_;
+	TextureName containerSpecular_;
 	int specularPow_ = 32;
 
 	gl::RenderCuboid cube_{ Vec3f::zero, Vec3f::one };

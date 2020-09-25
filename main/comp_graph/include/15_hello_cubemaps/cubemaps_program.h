@@ -52,7 +52,7 @@ private:
 	gl::RenderCuboid skyboxCube_{ Vec3f::zero, Vec3f::one*2.0f };
 	gl::Shader skyboxShader_;
 	
-	TextureId skyboxTexture_ = 0;
+	TextureName skyboxTexture_ = 0;
 
 	gl::Shader modelShader_;
 	gl::Shader modelReflectionShader_;
