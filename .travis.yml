@@ -32,13 +32,15 @@ matrix:
       os: windows
       env:
         - CMAKE_PATH="/c/Program Files/CMake/bin"
+        - VULKAN_SDK="/c/VulkanSDK/1.2.141.0"
       before_install:
         - choco install python
-        - choco install vulkan-sdk
+        - choco install vulkan-sdk --version=1.2.141.0
       script:
         - export PATH=$CMAKE_PATH:$PATH
         - mkdir build && cd build
         - cmake ..
+        - cmake --build .
 
 # Don't send notifications on success
 notifications:
