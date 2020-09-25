@@ -16,7 +16,7 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-            - clang
+            - clang-8
             - libsdl2-dev
             - python3-dev
             - glslang-tools
@@ -44,6 +44,7 @@ matrix:
         - mkdir build && cd build
         - cmake -G "Visual Studio 16 2019" ..
         - cmake --build .
+        - ./test/Neko_TEST.exe
 
 # Don't send notifications on success
 notifications:
