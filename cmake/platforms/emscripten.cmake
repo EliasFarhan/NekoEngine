@@ -4,7 +4,7 @@ set(Emscripten ON CACHE BOOL "")
 add_compile_definitions(EMSCRIPTEN=1)
 add_compile_definitions(__EMSCRIPTEN__=1)
 
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --emrun -s EXPORT_ALL=1 --use-preload-plugins --preload-file shaders/ " CACHE STRING "")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --emrun -s EXPORT_ALL=1" CACHE STRING "")
 
 set(NEKO_LIBS_FLAGS "")
 

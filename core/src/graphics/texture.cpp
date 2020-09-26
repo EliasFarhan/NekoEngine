@@ -81,9 +81,14 @@ void TextureLoader::LoadFromDisk()
 {
     if (textureId_ != INVALID_TEXTURE_ID)
     {
+#ifndef NEKO_SAMETHREAD
         BasicEngine::GetInstance()->ScheduleJob(&diskLoadJob_, JobThreadType::RESOURCE_THREAD);
         convertImageJob_.AddDependency(&diskLoadJob_);
         BasicEngine::GetInstance()->ScheduleJob(&convertImageJob_, JobThreadType::OTHER_THREAD);
+#else
+        diskLoadJob_.Execute();
+        convertImageJob_.Execute();
+#endif
     }
 }
 
@@ -131,12 +136,26 @@ TextureId TextureManager::LoadTexture(std::string_view path, Texture::TextureFla
 		//Texture is already in queue or even loaded
         return textureId;
 	}
-	//Put texture in queue
     texturePathMap_[textureId] = std::string(path.data());
+#ifndef NEKO_SAMETHREAD
+	//Put texture in queue
     TextureInfo textureInfo;
     textureInfo.textureId = textureId;
     textureInfo.flags = flags;
     texturesToLoad_.push(std::move(textureInfo));
+#else
+    textureLoader_.Reset();
+
+    textureLoader_.SetTextureId(textureId);
+    textureLoader_.SetTextureFlags(flags);
+    textureLoader_.LoadFromDisk();
+
+    auto& textureInfo = texturesToUpload_.front();
+    currentUploadedTexture_ = std::move(textureInfo);
+    texturesToUpload_.pop();
+    uploadToGpuJob_.Reset();
+    uploadToGpuJob_.Execute();
+#endif
     return textureId;
 }
 
@@ -157,6 +176,7 @@ void TextureManager::Init()
 
 void TextureManager::Update([[maybe_unused]]seconds dt)
 {
+#ifndef NEKO_SAMETHREAD
     if (!texturesToLoad_.empty())
     {
         if (textureLoader_.IsLoaded() || !textureLoader_.HasStarted())
@@ -180,6 +200,7 @@ void TextureManager::Update([[maybe_unused]]seconds dt)
         uploadToGpuJob_.Reset();
 	    RendererLocator::get().AddPreRenderJob(&uploadToGpuJob_);
 	}
+#endif
 }
 
 void TextureManager::Destroy()
