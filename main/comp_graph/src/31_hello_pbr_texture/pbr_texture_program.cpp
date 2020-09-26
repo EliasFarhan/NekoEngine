@@ -79,6 +79,7 @@ void HelloPbrTextureProgram::Destroy()
 	sphere_.Destroy();
 	pbrShader_.Destroy();
 	textureManager_.Destroy();
+	albedo_ = INVALID_TEXTURE_NAME;
 }
 
 void HelloPbrTextureProgram::DrawImGui()

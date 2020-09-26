@@ -38,8 +38,7 @@ void HelloTextureProgram::Init()
     quad_.Init();
 
     const auto texturePath = config.dataRootPath + "sprites/wall.jpg";
-    textureId_=textureManager_.LoadTexture(texturePath);
-    auto& textureManager = TextureManagerLocator::get();
+    textureId_ = textureManager_.LoadTexture(texturePath);
 	//textureId_ = neko::gl::stbCreateTexture(texturePath);
     ddsTexture_ = gl::gliCreateTexture(config.dataRootPath + "sprites/wall.dds");
     ktxTexture_ = gl::gliCreateTexture(config.dataRootPath + "sprites/wall.ktx");

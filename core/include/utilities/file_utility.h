@@ -48,6 +48,13 @@ namespace neko
  */
 struct BufferFile
 {
+    BufferFile() = default;
+    ~BufferFile();
+    BufferFile(BufferFile&& bufferFile) noexcept;
+    BufferFile& operator=(BufferFile&& bufferFile) noexcept;
+    BufferFile(const BufferFile&) = delete;
+    BufferFile& operator= (const BufferFile&) = delete;
+
     char* dataBuffer = nullptr;
     size_t dataLength = 0;
 
@@ -61,7 +68,8 @@ public:
     ResourceJob();
     void SetFilePath(std::string_view path);
     std::string GetFilePath() const {return filePath_; }
-    BufferFile GetBufferFile() const {return bufferFile_;}
+    const BufferFile& GetBufferFile() const {return bufferFile_;}
+    void Reset() override;
 private:
     std::string filePath_;
     BufferFile bufferFile_;

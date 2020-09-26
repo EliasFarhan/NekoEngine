@@ -149,7 +149,8 @@ ResourceJob::ResourceJob() : Job([this]
 #ifdef EASY_PROFILE_USE
 		EASY_BLOCK("Load Resource");
 #endif
-	bufferFile_.Load(filePath_);
+    bufferFile_.Destroy();
+    bufferFile_.Load(filePath_);
 })
 {
 }
@@ -159,15 +160,27 @@ void ResourceJob::SetFilePath(std::string_view path)
     filePath_ = path;
 }
 
+void ResourceJob::Reset()
+{
+    Job::Reset();
+    bufferFile_.Destroy();
+}
+
 
 void BufferFile::Load(std::string_view path)
 {
+    if(dataBuffer != nullptr)
+    {
+        Destroy();
+    }
 	std::ifstream is(path.data(),std::ifstream::binary);
 	if(!is)
 	{
 		std::ostringstream oss;
 		oss << "[Error] Could not open file: " << path << " for BufferFile";
 		logDebug(oss.str());
+		dataLength = 0;
+		dataBuffer = nullptr;
 		return;
 	}
 	if(is)
@@ -184,9 +197,34 @@ void BufferFile::Load(std::string_view path)
 
 void BufferFile::Destroy()
 {
-	delete[] dataBuffer;
-	dataBuffer = nullptr;
-	dataLength = 0;
+    if(dataBuffer != nullptr)
+    {
+        delete[] dataBuffer;
+        dataBuffer = nullptr;
+        dataLength = 0;
+    }
+}
+
+BufferFile::~BufferFile()
+{
+    Destroy();
+}
+
+BufferFile::BufferFile(BufferFile&& bufferFile) noexcept
+{
+    this->dataBuffer = bufferFile.dataBuffer;
+    this->dataLength = bufferFile.dataLength;
+    bufferFile.dataBuffer = nullptr;
+    bufferFile.dataLength = 0;
+}
+
+BufferFile& BufferFile::operator=(BufferFile&& bufferFile) noexcept
+{
+    this->dataBuffer = bufferFile.dataBuffer;
+    this->dataLength = bufferFile.dataLength;
+    bufferFile.dataBuffer = nullptr;
+    bufferFile.dataLength = 0;
+    return *this;
 }
 
 bool FileExists(const std::string_view filename)

@@ -60,7 +60,7 @@ struct Image
     void Destroy();
 };
 
-Image StbImageConvert(BufferFile imageFile, bool flipY=false, bool hdr = false);
+Image StbImageConvert(const BufferFile& imageFile, bool flipY=false, bool hdr = false);
 
 /**
  * \brief Neko Texture contains an Image loaded async from disk, converted by stb_image
@@ -122,8 +122,14 @@ public:
 	 */
     void LoadFromDisk();
 
-    [[nodiscard]] bool IsLoaded() const { return diskLoadJob_.IsDone(); }
-    [[nodiscard]] bool HasStarted() const { return convertImageJob_.HasStarted(); }
+    [[nodiscard]] bool IsLoaded() const
+    {
+        return diskLoadJob_.IsDone() && convertImageJob_.IsDone();
+    }
+    [[nodiscard]] bool HasStarted() const
+    {
+        return textureId_ != INVALID_TEXTURE_ID && diskLoadJob_.HasStarted();
+    }
     void Reset();
 private:
     TextureManager& textureManager_;

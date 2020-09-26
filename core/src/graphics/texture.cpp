@@ -36,7 +36,7 @@ namespace neko
 {
 
 
-Image StbImageConvert(BufferFile imageFile, bool flipY, bool hdr)
+Image StbImageConvert(const BufferFile& imageFile, bool flipY, bool hdr)
 {
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("Convert Image");
@@ -61,13 +61,11 @@ TextureLoader::TextureLoader(TextureManager& textureManager) :
 	textureManager_(textureManager),
 	convertImageJob_([this]
     {
-        const auto filename = diskLoadJob_.GetFilePath();
-        const auto extension = GetFilenameExtension(filename);
-
+	    logDebug("[Texture Manager] Convert buffer file to image");
         image_ = StbImageConvert(diskLoadJob_.GetBufferFile(), flags_ & Texture::FLIP_Y, flags_ & Texture::HDR);
-        diskLoadJob_.GetBufferFile().Destroy();
         TextureInfo textureInfo{ textureId_, std::move(image_), flags_ };
         textureManager_.UploadToGpu(std::move(textureInfo));
+        logDebug("[Texture Manager] Finish converting buffer file to image");
     })
 {
 }

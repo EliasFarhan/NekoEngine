@@ -180,7 +180,7 @@ namespace neko::gl
         neko::TextureManager::Destroy();
 	}
 
-	TextureName gliCreateTexture(const std::string_view filename, Texture::TextureFlags flags)
+TextureName gliCreateTexture(const std::string_view filename, Texture::TextureFlags flags)
 {
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("Create GLI Texture");
