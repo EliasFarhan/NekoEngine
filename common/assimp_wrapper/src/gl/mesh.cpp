@@ -49,6 +49,11 @@ void Mesh::Init()
 {
 #ifdef NEKO_SAMETHREAD
     loadMeshToGpu.Execute();
+    const TextureManagerInterface& textureManager = TextureManagerLocator::get();
+    for (auto& texture : textures_)
+    {
+        texture.textureName = textureManager.GetTextureId(texture.textureId);
+    }
 
 #else
     RendererLocator::get().AddPreRenderJob(&loadMeshToGpu);
