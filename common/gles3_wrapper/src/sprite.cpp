@@ -27,4 +27,28 @@
 namespace neko::gl
 {
 
+
+void SpriteManager::Init()
+{
+}
+
+void SpriteManager::Update(seconds dt)
+{
+}
+
+void SpriteManager::Destroy()
+{
+}
+
+void SpriteManager::Render()
+{
+	spriteShader_.Bind();
+	for(Entity entity = 0; entity < entityManager_.GetEntitiesSize(); entity++)
+	{
+		if(entityManager_.HasComponent(entity, static_cast<EntityMask>(ComponentType::SPRITE2D)))
+		{
+			
+		}
+	}
+}
 }
