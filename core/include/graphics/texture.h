@@ -23,6 +23,7 @@
  SOFTWARE.
  */
 #include <queue>
+#include "engine/assert.h"
 #include <engine/log.h>
 #include <engine/resource.h>
 #include <xxhash.hpp>
@@ -63,48 +64,52 @@ struct Image
 Image StbImageConvert(const BufferFile& imageFile, bool flipY=false, bool hdr = false);
 
 /**
- * \brief Neko Texture contains an Image loaded async from disk, converted by stb_image
+ * \brief Result from Texture Manager functions: LoadTexture and GetTexture
  */
-namespace Texture
+struct Texture
 {
-enum TextureFlags : unsigned
-{
-    SMOOTH_TEXTURE = 1u << 0u,
-    MIPMAPS_TEXTURE = 1u << 1u,
-    CLAMP_WRAP = 1u << 2u,
-    REPEAT_WRAP = 1u << 3u,
-    MIRROR_REPEAT_WRAP = 1u << 4u,
-    GAMMA_CORRECTION = 1u << 5u,
-    FLIP_Y = 1u << 6u,
-    HDR = 1u << 7u,
-    DEFAULT = REPEAT_WRAP | SMOOTH_TEXTURE | MIPMAPS_TEXTURE,
+    enum TextureFlags : unsigned
+    {
+        SMOOTH_TEXTURE = 1u << 0u,
+        MIPMAPS_TEXTURE = 1u << 1u,
+        CLAMP_WRAP = 1u << 2u,
+        REPEAT_WRAP = 1u << 3u,
+        MIRROR_REPEAT_WRAP = 1u << 4u,
+        GAMMA_CORRECTION = 1u << 5u,
+        FLIP_Y = 1u << 6u,
+        HDR = 1u << 7u,
+        DEFAULT = REPEAT_WRAP | SMOOTH_TEXTURE | MIPMAPS_TEXTURE,
 
+    };
+    TextureName name = INVALID_TEXTURE_NAME;
+    Vec2i size;
 };
-}
 
 class TextureManagerInterface
 {
 public:
 	virtual ~TextureManagerInterface() = default;
 	virtual TextureId LoadTexture(std::string_view path, Texture::TextureFlags flags = Texture::DEFAULT) = 0;
-    virtual TextureName GetTextureId(TextureId index) const = 0;
+    [[nodiscard]] virtual Texture GetTexture(TextureId index) const = 0;
     [[nodiscard]] virtual bool IsTextureLoaded(TextureId textureId) const = 0;
 };
 
 class NullTextureManager : public TextureManagerInterface
 {
 public:
-    TextureId LoadTexture([[maybe_unused]] std::string_view path, Texture::TextureFlags flags = Texture::DEFAULT) override
+    TextureId LoadTexture([[maybe_unused]] std::string_view path, [[maybe_unused]] Texture::TextureFlags flags = Texture::DEFAULT) override
     {
+        neko_assert(false, "[Warning] Using NullTextureManager to Load Texture");
         logDebug("[Warning] Using NullTextureManager to Load Texture");
 	    return INVALID_TEXTURE_ID;
     }
-    TextureName GetTextureId([[maybe_unused]] TextureId index) const override
+    [[nodiscard]] Texture GetTexture([[maybe_unused]] TextureId index) const override
     {
+        neko_assert(false, "[Warning] Using NullTextureManager to Get Texture Id");
         logDebug("[Warning] Using NullTextureManager to Get Texture Id");
-	    return INVALID_TEXTURE_NAME;
+	    return {};
     }
-    bool IsTextureLoaded(TextureId textureId) const override  { return false; }
+    [[nodiscard]] bool IsTextureLoaded([[maybe_unused]] TextureId textureId) const override  { return false; }
 };
 
 class TextureManager;
@@ -166,7 +171,7 @@ public:
     void Destroy() override;
     virtual void UploadToGpu(TextureInfo&& texture);
 
-	TextureName GetTextureId(TextureId index) const override;
+	Texture GetTexture(TextureId index) const override;
 	bool IsTextureLoaded(TextureId textureId) const override;
 protected:
 	/**
@@ -174,7 +179,7 @@ protected:
 	 */
     virtual void CreateTexture() = 0;
     std::unordered_map<TextureId, std::string> texturePathMap_;
-    std::unordered_map<TextureId, TextureName> textureNameMap_;
+    std::unordered_map<TextureId, Texture> textureMap_;
     std::queue<TextureInfo> texturesToLoad_;
     std::queue<TextureInfo> texturesToUpload_;
     TextureLoader textureLoader_;

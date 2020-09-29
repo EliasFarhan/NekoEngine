@@ -10,11 +10,10 @@
 
 namespace neko::net
 {
-class HelloRollbackSimulation : public SampleProgram
+class AsteroidDebugApp : public SampleProgram
 {
 public:
-    HelloRollbackSimulation();
-    void OnEvent(const SDL_Event& event) override;
+    AsteroidDebugApp();
 
     void Init() override;
 
@@ -25,10 +24,16 @@ public:
     void DrawImGui() override;
 
     void Render() override;
+
+    void OnEvent(const SDL_Event& event) override;
 private:
     std::array<std::unique_ptr<SimulationClient>, 2> clients_;
     SimulationServer server_;
     gl::RenderQuad quad_{ Vec3f::zero, Vec2f(2.0f) };
     gl::Shader clientShader_;
 };
+
+
+
 }
+

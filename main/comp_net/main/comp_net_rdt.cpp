@@ -1,4 +1,3 @@
-#pragma once
 /*
  MIT License
 
@@ -22,28 +21,20 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-#include <string_view>
-#include <graphics/texture.h>
-#include "gl/gles3_include.h"
 
-namespace neko::gl
+#include <gl/gles3_window.h>
+#include <gl/graphics.h>
+#include "comp_net/engine.h"
+
+int main(int argc, char** argv)
 {
+    neko::sdl::Gles3Window window;
+    neko::gl::Gles3Renderer renderer;
+    neko::net::RdtEngine engine;
 
+    engine.SetWindowAndRenderer(&window, &renderer);
 
-class TextureManager : public neko::TextureManager
-{
-public:
-	using neko::TextureManager::TextureManager;
-	void Destroy() override;
-protected:
-	void CreateTexture() override;
-
-};
-
-TextureName stbCreateTexture(const std::string_view filename, Texture::TextureFlags flags = Texture::DEFAULT);
-TextureName LoadCubemap(std::vector<std::string> facesFilename);
-void DestroyTexture(TextureName);
-
-
-
+    engine.Init();
+    engine.EngineLoop();
+    return EXIT_SUCCESS;
 }

@@ -23,6 +23,8 @@
  */
 
 #include "gl/sprite.h"
+#include "engine/transform.h"
+#include "graphics/camera.h"
 
 namespace neko::gl
 {
@@ -34,6 +36,18 @@ void SpriteManager::Init()
 
 void SpriteManager::Update(seconds dt)
 {
+    //Update sprite if textureName is INVALID
+    for(Entity entity = 0; entity < entityManager_.GetEntitiesSize(); entity++)
+    {
+        if(entityManager_.HasComponent(entity, static_cast<EntityMask>(ComponentType::SPRITE2D)))
+        {
+            auto& sprite = components_[entity];
+            if(sprite.textureId != INVALID_TEXTURE_ID && sprite.texture == INVALID_TEXTURE_NAME)
+            {
+                sprite.texture = textureManager_.GetTexture(sprite.textureId).name;
+            }
+        }
+    }
 }
 
 void SpriteManager::Destroy()
@@ -43,11 +57,18 @@ void SpriteManager::Destroy()
 void SpriteManager::Render()
 {
 	spriteShader_.Bind();
+	const auto& camera = CameraLocator::get();
+	spriteShader_.SetMat4("view", camera.GenerateViewMatrix());
+	spriteShader_.SetMat4("projection", camera.GenerateProjectionMatrix());
 	for(Entity entity = 0; entity < entityManager_.GetEntitiesSize(); entity++)
 	{
 		if(entityManager_.HasComponent(entity, static_cast<EntityMask>(ComponentType::SPRITE2D)))
 		{
-			
+			const auto& transform = transformManager_.GetComponent(entity);
+			const auto& sprite = GetComponent(entity);
+            spriteShader_.SetMat4("model", transform);
+            spriteShader_.SetTexture("spriteTexture", sprite.texture);
+            spriteQuad_.Draw();
 		}
 	}
 }

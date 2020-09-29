@@ -24,7 +24,6 @@
 
 #include "gl/texture.h"
 #include "gl/gles3_include.h"
-#include "gli/gli.hpp"
 
 #include "utilities/file_utility.h"
 
@@ -46,7 +45,7 @@ namespace neko::gl
         auto& image = currentUploadedTexture_.image;
         if (image.data == nullptr)
         {
-            textureNameMap_[textureId] = INVALID_TEXTURE_NAME;
+            textureMap_[textureId] = {};
             return;
         }
 #ifdef EASY_PROFILE_USE
@@ -167,54 +166,20 @@ namespace neko::gl
             glCheckError();
         }
         glBindTexture(GL_TEXTURE_2D, 0);
-        textureNameMap_[textureId] = texture;
+        textureMap_[textureId] = {texture, {currentUploadedTexture_.image.width, currentUploadedTexture_.image.height}};
 
 	}
 
 	void TextureManager::Destroy()
 	{
-		for(auto& textureName : textureNameMap_)
+		for(auto& textureName : textureMap_)
 		{
-            DestroyTexture(textureName.second);
+            DestroyTexture(textureName.second.name);
+            textureName.second.name = INVALID_TEXTURE_NAME;
 		}
         neko::TextureManager::Destroy();
 	}
 
-TextureName gliCreateTexture(const std::string_view filename, Texture::TextureFlags flags)
-{
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Create GLI Texture");
-#endif
-    gli::texture texture = gli::load(filename.data());
-    if (texture.empty())
-        return 0;
-
-    gli::gl GL(gli::gl::PROFILE_ES30);
-    const gli::gl::format  format = GL.translate(texture.format(), texture.swizzles());
-    GLenum target = GL.translate(texture.target());
-    assert(gli::is_compressed(texture.format()) && target == gli::TARGET_2D);
-
-    GLuint textureId = 0;
-    glGenTextures(1, &textureId);
-    glBindTexture(target, textureId);
-    glTexParameteri(target, GL_TEXTURE_BASE_LEVEL, 0);
-    glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(texture.levels() - 1));
-    glTexParameteri(target, GL_TEXTURE_SWIZZLE_R, format.Swizzles[0]);
-    glTexParameteri(target, GL_TEXTURE_SWIZZLE_G, format.Swizzles[1]);
-    glTexParameteri(target, GL_TEXTURE_SWIZZLE_B, format.Swizzles[2]);
-    glTexParameteri(target, GL_TEXTURE_SWIZZLE_A, format.Swizzles[3]);
-    const Vec3<GLsizei>  extent(texture.extent());
-    glTexStorage2D(target, static_cast<GLint>(texture.levels()), format.Internal, extent.x, extent.y);
-    for (std::size_t level = 0; level < texture.levels(); ++level)
-    {
-        const Vec3<GLsizei> extent(texture.extent(level));
-        glCompressedTexSubImage2D(
-            target, static_cast<GLint>(level), 0, 0, extent.x, extent.y,
-            format.Internal, static_cast<GLsizei>(texture.size(level)), texture.data(0, 0, level));
-    }
-
-    return textureId;
-}
 
 TextureName stbCreateTexture(const std::string_view filename, Texture::TextureFlags flags)
 {

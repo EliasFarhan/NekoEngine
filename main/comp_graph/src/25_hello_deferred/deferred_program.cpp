@@ -130,13 +130,13 @@ void HelloDeferredProgram::Render()
     }
     if (containerSpecular_ == INVALID_TEXTURE_NAME)
     {
-        containerSpecular_ = textureManager_.GetTextureId(containerSpecularId_);
+        containerSpecular_ = textureManager_.GetTexture(containerSpecularId_).name;
         if (containerSpecular_ == INVALID_TEXTURE_NAME)
 			return;
     }
     if(container_ == INVALID_TEXTURE_NAME)
     {
-        container_ = textureManager_.GetTextureId(containerId_);
+        container_ = textureManager_.GetTexture(containerId_).name;
         if (container_ == INVALID_TEXTURE_NAME)
             return;
         return;

@@ -14,7 +14,6 @@ namespace neko::net
 void SampleBrowser::Init()
 {
     RegisterRenderProgram("01 Hello Rdt", std::make_unique<rdt::HelloRdtProgram>());
-    RegisterRenderProgram("02 Hello Rollback", std::make_unique<HelloRollbackSimulation>());
     
 	programs_[currentProgramIndex_]->Init();
 }

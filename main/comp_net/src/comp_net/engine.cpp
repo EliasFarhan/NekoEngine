@@ -2,14 +2,14 @@
 
 namespace neko::net
 {
-CompNetEngine::CompNetEngine(Configuration* config) : SdlEngine(config)
+RdtEngine::RdtEngine(Configuration* config) : SdlEngine(config)
 {
     RegisterSystem(sampleBrowser_);
     RegisterOnDrawUi(sampleBrowser_);
     RegisterOnEvent(sampleBrowser_);
 }
 
-void CompNetEngine::Destroy()
+void RdtEngine::Destroy()
 {
     sampleBrowser_.Destroy();
     SdlEngine::Destroy();

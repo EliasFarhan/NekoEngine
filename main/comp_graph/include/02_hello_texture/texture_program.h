@@ -53,9 +53,6 @@ private:
     TextureName texture_ = INVALID_TEXTURE_NAME;
     TextureId textureId_;
 
-    TextureName ddsTexture_ = 0;
-    TextureName ktxTexture_ = 0;
-
 	enum class TextureType
 	{
 		STB_TEXTURE,

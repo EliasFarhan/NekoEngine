@@ -4,7 +4,7 @@
 
 namespace neko::net
 {
-HelloRollbackSimulation::HelloRollbackSimulation() : server_(clients_)
+AsteroidDebugApp::AsteroidDebugApp() : server_(clients_)
 {
 	for(int i = 0; i < clients_.size();i++)
 	{
@@ -12,11 +12,11 @@ HelloRollbackSimulation::HelloRollbackSimulation() : server_(clients_)
 	}
 }
 
-void HelloRollbackSimulation::OnEvent(const SDL_Event& event)
+void AsteroidDebugApp::OnEvent(const SDL_Event& event)
 {
 }
 
-void HelloRollbackSimulation::Init()
+void AsteroidDebugApp::Init()
 {
 	const auto& config = BasicEngine::GetInstance()->config;
 	quad_.Init();
@@ -32,7 +32,7 @@ void HelloRollbackSimulation::Init()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
-void HelloRollbackSimulation::Update(seconds dt)
+void AsteroidDebugApp::Update(seconds dt)
 {
 	//Checking if keys are down
 	const Uint8* keys = SDL_GetKeyboardState(nullptr);
@@ -60,7 +60,7 @@ void HelloRollbackSimulation::Update(seconds dt)
 	server_.Update(dt);
 }
 
-void HelloRollbackSimulation::Destroy()
+void AsteroidDebugApp::Destroy()
 {
 	for (auto& client : clients_)
 	{
@@ -70,7 +70,7 @@ void HelloRollbackSimulation::Destroy()
 	glDisable(GL_BLEND);
 }
 
-void HelloRollbackSimulation::DrawImGui()
+void AsteroidDebugApp::DrawImGui()
 {
     ImGui::Begin("Rollback Simulation");
     ImGui::End();
@@ -80,7 +80,7 @@ void HelloRollbackSimulation::DrawImGui()
     }
 }
 
-void HelloRollbackSimulation::Render()
+void AsteroidDebugApp::Render()
 {
 	const auto& config = BasicEngine::GetInstance()->config;
 	for (auto& client : clients_)

@@ -53,7 +53,7 @@ void SpriteManager::Update(seconds dt)
 	if (shipTextureName_ == INVALID_TEXTURE_NAME)
 	{
 		const auto& textureManager = TextureManagerLocator::get();
-		shipTextureName_ = textureManager.GetTextureId(shipTextureId_);
+		shipTextureName_ = textureManager.GetTexture(shipTextureId_).name;
 	}
 }
 

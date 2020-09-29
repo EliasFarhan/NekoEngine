@@ -48,10 +48,11 @@ Index Scale3dManager::AddComponent(Entity entity)
 
 
 Transform2dManager::Transform2dManager(EntityManager& entityManager) :
-	ComponentManager<Mat3f, neko::ComponentType::TRANSFORM2D>(entityManager),
+	ComponentManager<Mat4f, neko::ComponentType::TRANSFORM2D>(entityManager),
 	positionManager_(entityManager),
-	rotationManager_(entityManager),
-	scaleManager_(entityManager)
+	scaleManager_(entityManager),
+    rotationManager_(entityManager),
+	dirtyManager_(entityManager)
 {
 }
 
@@ -73,6 +74,52 @@ Vec2f Transform2dManager::GetPosition(Entity entity) const
 degree_t Transform2dManager::GetRotation(Entity entity) const
 {
 	return rotationManager_.GetComponent(entity);
+}
+
+void Transform2dManager::SetScale(Entity entity, Vec2f scale)
+{
+    scaleManager_.SetComponent(entity, scale);
+}
+
+Vec2f Transform2dManager::GetScale(Entity entity) const
+{
+    return scaleManager_.GetComponent(entity);
+}
+
+void Transform2dManager::OnChangeParent(Entity entity, [[maybe_unused]] Entity newParent, [[maybe_unused]] Entity oldParent)
+{
+    //TODO change local transform to not change the global transform when changing parent
+    dirtyManager_.SetDirty(entity);
+}
+
+void Transform2dManager::UpdateDirtyComponent(Entity entity)
+{
+    UpdateTransform(entity);
+}
+
+void Transform2dManager::Update()
+{
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("Update Transform");
+#endif
+    dirtyManager_.UpdateDirtyEntities();
+}
+
+void Transform2dManager::UpdateTransform(Entity entity)
+{
+    Mat4f transform = Mat4f::Identity;
+    const auto eulerAngles = EulerAngles(degree_t (0),degree_t (0),rotationManager_.GetComponent(entity));
+    transform = Transform3d::Rotate(transform, eulerAngles);
+    transform = Transform3d::Scale(transform, Vec3f(scaleManager_.GetComponent(entity), 1.0f));
+    transform = Transform3d::Translate(transform, Vec3f(positionManager_.GetComponent(entity), 1.0f));
+
+    const auto parent = entityManager_.GetEntityParent(entity);
+    if (parent != INVALID_ENTITY)
+    {
+        transform =  GetComponent(parent) * transform;
+    }
+
+    SetComponent(entity, transform);
 }
 
 
@@ -173,7 +220,7 @@ EulerAngles Transform3dManager::GetAngles(Entity entity) const
 	return rotation3DManager_.GetComponent(entity);
 }
 
-void Transform3dManager::OnChangeParent(Entity entity, Entity newParent, Entity oldParent)
+void Transform3dManager::OnChangeParent(Entity entity, [[maybe_unused]] Entity newParent, [[maybe_unused]] Entity oldParent)
 {
 	dirtyManager_.SetDirty(entity);
 }

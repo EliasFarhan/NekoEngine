@@ -364,6 +364,10 @@ public:
     {
 	    
     }
+    explicit Vec3(Vec2<T> v, T z) : x(v.x), y(v.y), z(z)
+    {
+
+    }
 	explicit Vec3(Vec4<T> v) : x(v.x), y(v.y), z(v.z)
     {
 	    

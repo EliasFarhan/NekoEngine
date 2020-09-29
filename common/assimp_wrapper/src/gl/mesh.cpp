@@ -52,7 +52,7 @@ void Mesh::Init()
     const TextureManagerInterface& textureManager = TextureManagerLocator::get();
     for (auto& texture : textures_)
     {
-        texture.textureName = textureManager.GetTextureId(texture.textureId);
+        texture.textureName = textureManager.GetTexture(texture.textureId).name;
     }
 
 #else

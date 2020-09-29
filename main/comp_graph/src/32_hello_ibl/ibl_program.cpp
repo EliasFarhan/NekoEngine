@@ -154,7 +154,7 @@ void HelloIblProgram::Render()
 	std::lock_guard<std::mutex> lock(updateMutex_);
 	if (hdrTexture_ == INVALID_TEXTURE_NAME)
 	{
-		hdrTexture_ = textureManager_.GetTextureId(hdrTextureId_);
+		hdrTexture_ = textureManager_.GetTexture(hdrTextureId_).name;
 		if (hdrTexture_ == INVALID_TEXTURE_NAME)
 			return;
 	}

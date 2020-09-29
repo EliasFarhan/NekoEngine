@@ -206,7 +206,7 @@ void TextureManager::Update([[maybe_unused]]seconds dt)
 void TextureManager::Destroy()
 {
     texturePathMap_.clear();
-    textureNameMap_.clear();
+    textureMap_.clear();
 }
 
 void TextureManager::UploadToGpu(TextureInfo&& texture)
@@ -214,19 +214,19 @@ void TextureManager::UploadToGpu(TextureInfo&& texture)
 	texturesToUpload_.push(std::move(texture));
 }
 
-TextureName TextureManager::GetTextureId(TextureId index) const
+Texture TextureManager::GetTexture(TextureId index) const
 {
-    const auto it = textureNameMap_.find(index);
-	if(it != textureNameMap_.end())
+    const auto it = textureMap_.find(index);
+	if(it != textureMap_.end())
 	{
         return it->second;
 	}
-    return INVALID_TEXTURE_NAME;
+    return {};
 }
 
 bool TextureManager::IsTextureLoaded(TextureId textureId) const
 {
-    return textureNameMap_.find(textureId) != textureNameMap_.end();
+    return textureMap_.find(textureId) != textureMap_.end();
 }
 
 

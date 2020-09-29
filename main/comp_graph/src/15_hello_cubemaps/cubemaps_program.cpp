@@ -115,7 +115,7 @@ void HelloCubemapsProgram::Render()
 	}
 	if(cubeTexture_ == INVALID_TEXTURE_NAME)
 	{
-		cubeTexture_ = textureManager_.GetTextureId(cubeTextureId_);
+		cubeTexture_ = textureManager_.GetTexture(cubeTextureId_).name;
 		return;
 	}
 	std::lock_guard<std::mutex> lock(updateMutex_);
