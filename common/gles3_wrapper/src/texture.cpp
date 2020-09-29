@@ -302,10 +302,10 @@ TextureName LoadCubemap(std::vector<std::string> facesFilename)
     return textureID;
 }
 
-void DestroyTexture(TextureName textureId)
+void DestroyTexture(TextureName textureName)
 {
-    glDeleteTextures(1, &textureId);
-    textureId = INVALID_TEXTURE_NAME;
+    glDeleteTextures(1, &textureName);
+    textureName = INVALID_TEXTURE_NAME;
 
 }
 }

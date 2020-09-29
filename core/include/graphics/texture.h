@@ -23,6 +23,7 @@
  SOFTWARE.
  */
 #include <queue>
+#include <map>
 #include "engine/assert.h"
 #include <engine/log.h>
 #include <engine/resource.h>
@@ -178,8 +179,8 @@ protected:
 	 * \brief Called on the renderer pre render
 	 */
     virtual void CreateTexture() = 0;
-    std::unordered_map<TextureId, std::string> texturePathMap_;
-    std::unordered_map<TextureId, Texture> textureMap_;
+    std::map<TextureId, std::string> texturePathMap_;
+    std::map<TextureId, Texture> textureMap_;
     std::queue<TextureInfo> texturesToLoad_;
     std::queue<TextureInfo> texturesToUpload_;
     TextureLoader textureLoader_;

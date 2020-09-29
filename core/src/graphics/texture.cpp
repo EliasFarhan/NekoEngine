@@ -124,9 +124,9 @@ TextureId TextureManager::LoadTexture(std::string_view path, Texture::TextureFla
         logDebug("[Error] Could not find texture id in json file");
         return textureId;
     }
+
     if (textureId == INVALID_TEXTURE_ID)
     {
-
         logDebug("[Error] Invalid texture id on texture load");
         return textureId;
     }
@@ -134,8 +134,13 @@ TextureId TextureManager::LoadTexture(std::string_view path, Texture::TextureFla
 	if(it != texturePathMap_.end())
 	{
 		//Texture is already in queue or even loaded
+        logDebug("[Texture Manager] Texture is already loaded");
         return textureId;
 	}
+	std::string log = "[Texture Manager] Loading texture path: ";
+	log += path;
+	logDebug(log);
+
     texturePathMap_[textureId] = std::string(path.data());
 #ifndef NEKO_SAMETHREAD
 	//Put texture in queue
@@ -181,7 +186,7 @@ void TextureManager::Update([[maybe_unused]]seconds dt)
     {
         if (textureLoader_.IsLoaded() || !textureLoader_.HasStarted())
         {
-            logDebug("[TextureManager] Loading a texture from disk");
+            logDebug("[Texture Manager] Loading a texture from disk");
             textureLoader_.Reset();
             const auto& textureInfo = texturesToLoad_.front();
             textureLoader_.SetTextureId(textureInfo.textureId);
@@ -193,7 +198,7 @@ void TextureManager::Update([[maybe_unused]]seconds dt)
 	if(!texturesToUpload_.empty() && currentUploadedTexture_.textureId == INVALID_TEXTURE_ID)
     {
 
-        logDebug("[TextureManager] Uploading a texture to the GPU");
+        logDebug("[Texture Manager] Uploading a texture to the GPU");
 		auto& textureInfo = texturesToUpload_.front();
         currentUploadedTexture_ = std::move(textureInfo);
 	    texturesToUpload_.pop();

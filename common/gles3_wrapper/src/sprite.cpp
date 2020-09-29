@@ -54,6 +54,8 @@ void SpriteManager::Render()
 	spriteShader_.SetMat4("projection", camera.GenerateProjectionMatrix());
 	for(Entity entity = 0; entity < entityManager_.GetEntitiesSize(); entity++)
 	{
+        if(!entityManager_.EntityExists(entity))
+            continue;
 		if(entityManager_.HasComponent(entity, static_cast<EntityMask>(ComponentType::SPRITE2D)))
 		{
 			const auto& transform = transformManager_.GetComponent(entity);

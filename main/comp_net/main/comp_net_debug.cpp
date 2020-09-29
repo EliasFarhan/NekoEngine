@@ -41,6 +41,7 @@ public:
 
     void Destroy() override
     {
+        sdl::SdlEngine::Destroy();
         app_.Destroy();
     }
 
