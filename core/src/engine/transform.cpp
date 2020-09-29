@@ -54,16 +54,20 @@ Transform2dManager::Transform2dManager(EntityManager& entityManager) :
     rotationManager_(entityManager),
 	dirtyManager_(entityManager)
 {
+    entityManager_.RegisterOnChangeParent(this);
+    dirtyManager_.RegisterComponentManager(this);
 }
 
 void Transform2dManager::SetPosition(Entity entity, Vec2f position)
 {
 	positionManager_.SetComponent(entity, position);
+    dirtyManager_.SetDirty(entity);
 }
 
 void Transform2dManager::SetRotation(Entity entity, degree_t angles)
 {
 	rotationManager_.SetComponent(entity, angles);
+	dirtyManager_.SetDirty(entity);
 }
 
 Vec2f Transform2dManager::GetPosition(Entity entity) const
@@ -79,6 +83,7 @@ degree_t Transform2dManager::GetRotation(Entity entity) const
 void Transform2dManager::SetScale(Entity entity, Vec2f scale)
 {
     scaleManager_.SetComponent(entity, scale);
+    dirtyManager_.SetDirty(entity);
 }
 
 Vec2f Transform2dManager::GetScale(Entity entity) const
@@ -108,10 +113,12 @@ void Transform2dManager::Update()
 void Transform2dManager::UpdateTransform(Entity entity)
 {
     Mat4f transform = Mat4f::Identity;
-    const auto eulerAngles = EulerAngles(degree_t (0),degree_t (0),rotationManager_.GetComponent(entity));
+    const auto eulerAngles = EulerAngles(degree_t (0),degree_t (0),-rotationManager_.GetComponent(entity));
     transform = Transform3d::Rotate(transform, eulerAngles);
-    transform = Transform3d::Scale(transform, Vec3f(scaleManager_.GetComponent(entity), 1.0f));
-    transform = Transform3d::Translate(transform, Vec3f(positionManager_.GetComponent(entity), 1.0f));
+    const auto scale = scaleManager_.GetComponent(entity);
+    transform = Transform3d::Scale(transform, Vec3f(scale, 1.0f));
+    const auto position = positionManager_.GetComponent(entity);
+    transform = Transform3d::Translate(transform, Vec3f(position, 0.0f));
 
     const auto parent = entityManager_.GetEntityParent(entity);
     if (parent != INVALID_ENTITY)
@@ -120,6 +127,15 @@ void Transform2dManager::UpdateTransform(Entity entity)
     }
 
     SetComponent(entity, transform);
+}
+
+Index Transform2dManager::AddComponent(Entity entity)
+{
+    positionManager_.AddComponent(entity);
+    scaleManager_.AddComponent(entity);
+    scaleManager_.SetComponent(entity, Vec2f::one);
+    rotationManager_.AddComponent(entity);
+    return ComponentManager::AddComponent(entity);
 }
 
 
@@ -242,6 +258,7 @@ Index Transform3dManager::AddComponent(Entity entity)
 {
 	position3DManager_.AddComponent(entity);
 	scale3DManager_.AddComponent(entity);
+	scale3DManager_.SetComponent(entity, Vec3f::one);
 	rotation3DManager_.AddComponent(entity);
 	return DoubleBufferComponentManager::AddComponent(entity);
 }

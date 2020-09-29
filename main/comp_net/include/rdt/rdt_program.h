@@ -1,7 +1,7 @@
 #pragma once
 #include "comp_net/sample_program.h"
 #include "graphics/camera.h"
-#include "01_rdt/rdt_base.h"
+#include "rdt/rdt_base.h"
 
 namespace neko::rdt
 {

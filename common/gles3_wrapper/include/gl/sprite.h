@@ -34,12 +34,11 @@ namespace neko::gl
 class SpriteManager : public neko::SpriteManager
 {
 public:
+    using neko::SpriteManager::SpriteManager;
 	void Init() override;
-	void Update(seconds dt) override;
 	void Destroy() override;
 
 	void Render() override;
-	using neko::SpriteManager::SpriteManager;
 	
 private:
 	gl::Shader spriteShader_;

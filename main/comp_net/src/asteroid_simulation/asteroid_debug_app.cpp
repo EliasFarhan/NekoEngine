@@ -1,4 +1,5 @@
-#include "02_rollback_simulation/rollback_engine.h"
+
+#include "asteroid_simulation/asteroid_debug_app.h"
 #include "mathematics/transform.h"
 #include "imgui.h"
 
@@ -58,6 +59,8 @@ void AsteroidDebugApp::Update(seconds dt)
 		client->Update(dt);
 	}
 	server_.Update(dt);
+
+	RendererLocator::get().Render(this);
 }
 
 void AsteroidDebugApp::Destroy()

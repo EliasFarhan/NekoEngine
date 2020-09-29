@@ -1,6 +1,6 @@
-#include "02_rollback_simulation/rollback_server.h"
+#include "asteroid_simulation/simulation_server.h"
 
-#include "02_rollback_simulation/rollback_client.h"
+#include "asteroid_simulation/simulation_client.h"
 #include "asteroid/game_manager.h"
 #include "asteroid/packet_type.h"
 #include "comp_net/packet.h"

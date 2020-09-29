@@ -36,8 +36,7 @@ struct Sprite
     Sprite() = default;
     ~Sprite() = default;
     TextureId textureId = INVALID_TEXTURE_ID;
-    TextureName texture = INVALID_TEXTURE_NAME;
-    Rect2f rect;
+    Texture texture{};
 };
 
 class SpriteManager :
@@ -55,6 +54,8 @@ public:
 	transformManager_(transformManager)
 	{}
 
+	void Update(seconds dt) override;
+	void SetTexture(Entity entity, TextureId textureId);
 protected:
     TextureManager& textureManager_;
     Transform2dManager& transformManager_;

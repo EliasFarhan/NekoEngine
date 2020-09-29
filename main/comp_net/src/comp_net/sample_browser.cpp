@@ -4,8 +4,7 @@
 
 #include <imgui.h>
 #include "comp_net/sample_browser.h"
-#include "01_rdt/rdt_program.h"
-#include "02_rollback_simulation/rollback_engine.h"
+#include "rdt/rdt_program.h"
 
 
 namespace neko::net

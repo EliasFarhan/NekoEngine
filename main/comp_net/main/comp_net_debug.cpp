@@ -22,7 +22,43 @@
  SOFTWARE.
  */
 
-int main(int argc, char** argv)
+#include <gl/graphics.h>
+#include <gl/gles3_window.h>
+#include "sdl_engine/sdl_engine.h"
+#include "asteroid_simulation/asteroid_debug_app.h"
+
+namespace neko::asteroid
 {
-    return 0;
+class DebugEngine : public sdl::SdlEngine
+{
+public:
+    explicit DebugEngine(Configuration* config = nullptr) : sdl::SdlEngine(config)
+    {
+        RegisterSystem(app_);
+        RegisterOnDrawUi(app_);
+        RegisterOnEvent(app_);
+    }
+
+    void Destroy() override
+    {
+        app_.Destroy();
+    }
+
+private:
+    net::AsteroidDebugApp app_;
+};
+}
+
+int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
+{
+    neko::asteroid::DebugEngine engine;
+
+    neko::sdl::Gles3Window window;
+    neko::gl::Gles3Renderer renderer;
+
+    engine.SetWindowAndRenderer(&window, &renderer);
+
+    engine.Init();
+    engine.EngineLoop();
+    return EXIT_SUCCESS;
 }

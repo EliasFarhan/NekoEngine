@@ -2,7 +2,7 @@
 // Created by efarhan on 7/31/20.
 //
 
-#include "01_rdt/go_back_n.h"
+#include "rdt/go_back_n.h"
 #include "imgui.h"
 
 namespace neko::rdt

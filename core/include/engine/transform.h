@@ -98,6 +98,7 @@ public:
     void OnChangeParent(Entity entity, Entity newParent, Entity oldParent) override;
     void UpdateDirtyComponent(Entity entity) override;
     void Update() override;
+    Index AddComponent(Entity entity) override;
 protected:
     void UpdateTransform(Entity entity) override;
 

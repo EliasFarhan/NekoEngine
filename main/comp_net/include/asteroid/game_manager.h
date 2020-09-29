@@ -1,6 +1,7 @@
 #pragma once
+
+#include <gl/sprite.h>
 #include "player_character.h"
-#include "sprite_manager.h"
 #include "engine/component.h"
 #include "engine/transform.h"
 #include "graphics/camera.h"
@@ -71,11 +72,12 @@ protected:
 	Camera2D camera_;
 	net::PlayerNumber clientPlayer_ = net::INVALID_PLAYER;
 	gl::TextureManager textureManager_;
-	asteroid::SpriteManager spriteManager_;
+	gl::SpriteManager spriteManager_;
 	float fixedTimer_ = 0.0f;
 	unsigned startingTime_ = 0;
-	std::uint32_t state_ = 0;	
+	std::uint32_t state_ = 0;
 
+    TextureId shipTextureId_ = INVALID_TEXTURE_ID;
 };
 
 }

@@ -27,11 +27,8 @@ public:
 	void SendPacket(std::unique_ptr<asteroid::Packet> packet) override;
     void ReceivePacket(const asteroid::Packet* packet);
 
-
-
     void DrawImGui() override;
 	void SetPlayerInput(net::PlayerInput input);
-
 
 private:
 	asteroid::ClientGameManager gameManager_;

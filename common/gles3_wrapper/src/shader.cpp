@@ -166,8 +166,11 @@ void Shader::SetVec4(const std::string& name, float x, float y, float z, float w
 
 void Shader::Destroy()
 {
-    glDeleteProgram(shaderProgram_);
-    shaderProgram_ = 0;
+    if(shaderProgram_ != 0)
+    {
+        glDeleteProgram(shaderProgram_);
+        shaderProgram_ = 0;
+    }
 }
 
 /*
@@ -203,5 +206,10 @@ void Shader::SetCubemap(const std::string& name, TextureName texture, unsigned s
     glUniform1i(glGetUniformLocation(shaderProgram_, name.c_str()), slot);
     glActiveTexture(GL_TEXTURE0 + slot);
     glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
+}
+
+Shader::~Shader()
+{
+    Destroy();
 }
 }

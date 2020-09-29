@@ -257,7 +257,7 @@ void EntityViewer::DrawImGui()
 	}
     if (ImGui::Button("Add Entity"))
     {
-        const auto entity = entityManager_.CreateEntity();
+        [[maybe_unused]]const auto entity = entityManager_.CreateEntity();
     }
     ImGui::End();
 }

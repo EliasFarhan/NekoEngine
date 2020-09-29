@@ -50,7 +50,7 @@ Entity GameManager::GetEntityFromPlayerNumber(net::PlayerNumber playerNumber) co
 
 ClientGameManager::ClientGameManager(PacketSenderInterface& packetSenderInterface) :
     GameManager(),
-    spriteManager_(*this, entityManager_, transformManager_),
+    spriteManager_(entityManager_, textureManager_, transformManager_),
     packetSenderInterface_(packetSenderInterface)
 {
 }
@@ -61,7 +61,10 @@ void ClientGameManager::Init()
 	camera_.WorldLookAt(Vec3f::zero);
 	camera_.nearPlane = 0.0f;
 	camera_.farPlane = 2.0f;
+
+	textureManager_.Init();
 	spriteManager_.Init();
+
 	GameManager::Init();
 }
 
@@ -69,6 +72,7 @@ void ClientGameManager::Update(seconds dt)
 {
     textureManager_.Update(dt);
     spriteManager_.Update(dt);
+    transformManager_.Update();
 	fixedTimer_ += dt.count();
 	while (fixedTimer_> FixedPeriod)
 	{
@@ -93,6 +97,7 @@ void ClientGameManager::SetWindowSize(Vec2u windowsSize)
 void ClientGameManager::Render()
 {
 	glViewport(0, 0, windowSize_.x, windowSize_.y);
+    CameraLocator::provide(&camera_);
 	spriteManager_.Render();
 }
 
@@ -101,7 +106,10 @@ void ClientGameManager::SpawnPlayer(net::PlayerNumber playerNumber, Vec2f positi
 	logDebug("Spawn player: " + std::to_string(playerNumber));
 	GameManager::SpawnPlayer(playerNumber, position, rotation);
 	const auto entity = GetEntityFromPlayerNumber(playerNumber);
-	entityManager_.AddComponentType(entity, EntityMask(neko::ComponentType::SPRITE2D));
+	const auto& config = BasicEngine::GetInstance()->config;
+	shipTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/asteroid/ship.png");
+	spriteManager_.AddComponent(entity);
+	spriteManager_.SetTexture(entity, shipTextureId_);
 
 }
 

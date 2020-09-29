@@ -2,7 +2,7 @@
 // Created by efarhan on 7/24/20.
 //
 
-#include "01_rdt/rdt_1_0.h"
+#include "rdt/rdt_1_0.h"
 #include <cstring>
 
 namespace neko::rdt

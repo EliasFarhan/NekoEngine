@@ -1,13 +1,13 @@
-#include "01_rdt/rdt_program.h"
+#include "rdt/rdt_program.h"
 #include "imgui.h"
 
-#include "01_rdt/rdt_1_0.h"
-#include "01_rdt/rdt_2_0.h"
-#include "01_rdt/rdt_2_1.h"
-#include "01_rdt/rdt_2_2.h"
-#include "01_rdt/rdt_3_0.h"
-#include "01_rdt/go_back_n.h"
-#include "01_rdt/selective_repeat.h"
+#include "rdt/rdt_1_0.h"
+#include "rdt/rdt_2_0.h"
+#include "rdt/rdt_2_1.h"
+#include "rdt/rdt_2_2.h"
+#include "rdt/rdt_3_0.h"
+#include "rdt/go_back_n.h"
+#include "rdt/selective_repeat.h"
 
 namespace neko::rdt
 {
