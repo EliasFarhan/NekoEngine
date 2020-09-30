@@ -22,7 +22,34 @@
  SOFTWARE.
  */
 
+#include <chrono>
+#include "utilities/time_utility.h"
+#include "asteroid_net/network_server.h"
+
+
 int main(int argc, char** argv)
 {
+    unsigned short port = 0;
+    if(argc == 2)
+    {
+        std::string portArg = argv[1];
+        port = std::stoi(portArg);
+    }
+    neko::net::ServerNetworkManager server;
+    if(port != 0)
+    {
+        server.SetTcpPort(port);
+    }
+    server.Init();
+    auto clock = std::chrono::system_clock::now();
+    while(true)
+    {
+        const auto start = std::chrono::system_clock::now();
+        const auto dt = std::chrono::duration_cast<neko::seconds>(start - clock);
+        clock = start;
+        server.Update(dt);
+        using namespace std::chrono_literals;
+        std::this_thread::sleep_for(10ms);
+    }
     return 0;
 }

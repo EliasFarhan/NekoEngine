@@ -159,7 +159,6 @@ void ClientGameManager::FixedUpdate()
     const auto* framePtr = reinterpret_cast<std::uint8_t*>(&currentFrame_);
 
     std::unique_ptr<asteroid::PlayerInputPacket> playerInputPacket = std::make_unique<asteroid::PlayerInputPacket>();
-    playerInputPacket->packetType = asteroid::PacketType::INPUT;
     playerInputPacket->playerNumber = GetPlayerNumber();
     for(size_t i = 0; i < sizeof(net::Frame);i++)
     {
@@ -174,7 +173,7 @@ void ClientGameManager::FixedUpdate()
 
         playerInputPacket->inputs[i] = inputs[i];
     }
-    packetSenderInterface_.SendPacket(std::move(playerInputPacket));
+    packetSenderInterface_.SendUnreliablePacket(std::move(playerInputPacket));
 
 
     currentFrame_++;

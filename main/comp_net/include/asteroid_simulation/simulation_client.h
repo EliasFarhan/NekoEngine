@@ -24,7 +24,8 @@ public:
 
 	[[nodiscard]] const gl::Framebuffer& GetFramebuffer() const { return framebuffer_; }
 
-	void SendPacket(std::unique_ptr<asteroid::Packet> packet) override;
+	void SendUnreliablePacket(std::unique_ptr<asteroid::Packet> packet) override;
+	void SendReliablePacket(std::unique_ptr<asteroid::Packet> packet) override;
     void ReceivePacket(const asteroid::Packet* packet);
 
     void DrawImGui() override;

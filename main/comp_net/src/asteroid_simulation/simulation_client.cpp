@@ -81,26 +81,30 @@ void SimulationClient::DrawImGui()
     if(gameManager_.GetPlayerNumber() == INVALID_PLAYER && ImGui::Button("Spawn Player"))
     {
         auto joinPacket = std::make_unique<asteroid::JoinPacket>();
-        joinPacket->packetType = asteroid::PacketType::JOIN;
         auto* clientIdPtr = reinterpret_cast<std::uint8_t*>(&clientId_);
         for(int i = 0; i < sizeof(clientId_); i++)
         {
             joinPacket->clientId[i] = clientIdPtr[i];
         }
-        SendPacket(std::move(joinPacket));
+        SendReliablePacket(std::move(joinPacket));
     }
     gameManager_.DrawImGui();
     ImGui::End();
 }
 
-void SimulationClient::SendPacket(std::unique_ptr<asteroid::Packet> packet)
+void SimulationClient::SendUnreliablePacket(std::unique_ptr<asteroid::Packet> packet)
+{
+    server_.ReceivePacket(std::move(packet));
+}
+
+void SimulationClient::SendReliablePacket(std::unique_ptr<asteroid::Packet> packet)
 {
     server_.ReceivePacket(std::move(packet));
 }
 
 void SimulationClient::ReceivePacket(const asteroid::Packet* packet)
 {
-    const auto packetType = static_cast<asteroid::PacketType>(packet->packetType);
+    const auto packetType = packet->packetType;
     switch (packetType)
     {
         case asteroid::PacketType::SPAWN_PLAYER:
