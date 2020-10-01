@@ -28,11 +28,13 @@ public:
     void SendUnreliablePacket(std::unique_ptr<asteroid::Packet> packet) override;
 
 private:
+    void ReceivePacket(sf::Packet& packet);
     sf::UdpSocket udpSocket_;
     sf::TcpSocket tcpSocket_;
 
     std::string host_ = "localhost";
     unsigned short tcpPort_ = 12345;
+    unsigned short udpPort_ = 0;
 
     asteroid::ClientGameManager gameManager_;
     Vec2u windowSize_;

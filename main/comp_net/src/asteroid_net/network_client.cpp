@@ -1,4 +1,6 @@
 #include "asteroid_net/network_client.h"
+#include "engine/engine.h"
+#include "imgui.h"
 
 namespace neko::net
 {
@@ -58,6 +60,15 @@ void ClientNetworkManager::DrawImGui()
                 joinPacket->clientId[i] = clientIdPtr[i];
             }
             SendReliablePacket(std::move(joinPacket));
+            //Need to send the packet on the unreliable channel
+            joinPacket = std::make_unique<asteroid::JoinPacket>();
+            clientIdPtr = reinterpret_cast<std::uint8_t*>(&clientId_);
+            for (int i = 0; i < sizeof(clientId_); i++)
+            {
+                joinPacket->clientId[i] = clientIdPtr[i];
+            }
+            SendUnreliablePacket(std::move(joinPacket));
+
         }
         else
         {
@@ -86,7 +97,7 @@ void ClientNetworkManager::SendReliablePacket(std::unique_ptr<asteroid::Packet> 
 {
     sf::Packet tcpPacket;
     //TODO create correct packet
-
+    GeneratePacket(tcpPacket, *packet);
 
     tcpSocket_.send(tcpPacket);
 }
@@ -96,7 +107,9 @@ void ClientNetworkManager::SendUnreliablePacket(std::unique_ptr<asteroid::Packet
     sf::Packet udpPacket;
     //TODO generate correct packet
 
+    udpSocket_.send(udpPacket, host_, udpPort_);
 }
+
 
 ClientNetworkManager::ClientNetworkManager() : gameManager_(*this)
 {

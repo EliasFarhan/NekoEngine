@@ -7,9 +7,21 @@
 
 namespace neko::net
 {
+struct ClientInfo
+{
+    ClientId clientId = 0;
+    sf::IpAddress udpRemoteAddress;
+    unsigned short udpRemotePort = 0;
+
+};
 class ServerNetworkManager : public asteroid::PacketSenderInterface, public SystemInterface
 {
 public:
+    enum class PacketSocketSource
+    {
+        TCP,
+        UDP
+    };
     void SendReliablePacket(std::unique_ptr<asteroid::Packet> packet) override;
 
     void SendUnreliablePacket(std::unique_ptr<asteroid::Packet> packet) override;
@@ -23,14 +35,19 @@ public:
     void SetTcpPort(unsigned short i);
 
 private:
-
-    void ReceivePacket(sf::Packet& packet);
+    void ProcessReceivePacket(std::unique_ptr<asteroid::Packet> packet, 
+        PacketSocketSource packetSource, 
+        sf::IpAddress address = "localhost", 
+        unsigned short port = 0);
+    void ReceivePacket(sf::Packet& packet, PacketSocketSource packetSource,
+        sf::IpAddress address = "localhost",
+        unsigned short port = 0);
 
     sf::UdpSocket udpSocket_;
     sf::TcpListener tcpListener_;
     std::array<sf::TcpSocket, asteroid::maxPlayerNmb> tcpSockets_;
 
-    std::array<ClientId, asteroid::maxPlayerNmb> clientMap_{};
+    std::array<ClientInfo, asteroid::maxPlayerNmb> clientMap_{};
     //Server game manager
     asteroid::GameManager gameManager_;
 
