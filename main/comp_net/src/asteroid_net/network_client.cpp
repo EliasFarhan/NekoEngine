@@ -1,6 +1,7 @@
 #include "asteroid_net/network_client.h"
 #include "engine/engine.h"
 #include "imgui.h"
+#include "engine/conversion.h"
 
 namespace neko::net
 {
@@ -109,6 +110,40 @@ void ClientNetworkManager::SendUnreliablePacket(std::unique_ptr<asteroid::Packet
     sf::Packet udpPacket;
     GeneratePacket(udpPacket, *packet);
     udpSocket_.send(udpPacket, host_, udpPort_);
+}
+
+void ClientNetworkManager::ReceivePacket(sf::Packet &packet)
+{
+  asteroid::Packet tmpPacket;
+  packet >> tmpPacket;
+  switch (tmpPacket.packetType)
+  {
+
+  case asteroid::PacketType::JOIN:
+  {
+
+  }
+  case asteroid::PacketType::SPAWN_PLAYER:
+    break;
+  case asteroid::PacketType::INPUT:
+    break;
+  case asteroid::PacketType::SPAWN_BULLET:
+    break;
+  case asteroid::PacketType::VALIDATE_STATE:
+    break;
+  case asteroid::PacketType::START_GAME:
+    break;
+  case asteroid::PacketType::JOIN_ACK:
+  {
+    auto joinAckPacket = asteroid::GenerateReceivedPacket<asteroid::JoinAckPacket>(packet);
+    ClientId clientId = ConvertFromBinary<ClientId>(joinAckPacket->clientId);
+
+    break;
+  }
+  case asteroid::PacketType::NONE:
+    break;
+  default: ;
+  }
 }
 
 
