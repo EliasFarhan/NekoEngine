@@ -29,10 +29,12 @@ void ClientNetworkManager::Update(seconds dt)
 	RendererLocator::get().Render(this);
 	if (currentState_ != State::NONE)
 	{
+	    auto status = sf::Socket::Done;
 		//Receive TCP Packet
+		while(status == sf::Socket::Done)
 		{
 			sf::Packet packet;
-			const auto status = tcpSocket_.receive(packet);
+			status = tcpSocket_.receive(packet);
 			switch (status)
 			{
 			case sf::Socket::Done:
@@ -50,12 +52,13 @@ void ClientNetworkManager::Update(seconds dt)
 			}
 		}
 		//Receive UDP packet
-
+        status = sf::Socket::Done;
+        while(status == sf::Socket::Done)
 		{
 			sf::Packet packet;
 			sf::IpAddress sender;
 			unsigned short port;
-			const auto status = udpSocket_.receive(packet, sender, port);
+			status = udpSocket_.receive(packet, sender, port);
 			switch (status)
 			{
 			case sf::Socket::Done:
