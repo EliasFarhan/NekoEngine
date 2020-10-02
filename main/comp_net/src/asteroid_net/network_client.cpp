@@ -22,6 +22,7 @@ void ClientNetworkManager::Init()
 void ClientNetworkManager::Update(seconds dt)
 {
     gameManager_.Update(dt);
+    
 }
 
 void ClientNetworkManager::Destroy()
@@ -55,19 +56,11 @@ void ClientNetworkManager::DrawImGui()
             tcpSocket_.setBlocking(false);
 
             auto joinPacket = std::make_unique<asteroid::JoinPacket>();
-            auto* clientIdPtr = reinterpret_cast<std::uint8_t*>(&clientId_);
-            for (int i = 0; i < sizeof(clientId_); i++)
-            {
-                joinPacket->clientId[i] = clientIdPtr[i];
-            }
+            joinPacket->clientId = ConvertToBinary<ClientId>(clientId_);
             SendReliablePacket(std::move(joinPacket));
             //Need to send the packet on the unreliable channel
             joinPacket = std::make_unique<asteroid::JoinPacket>();
-            clientIdPtr = reinterpret_cast<std::uint8_t*>(&clientId_);
-            for (int i = 0; i < sizeof(clientId_); i++)
-            {
-                joinPacket->clientId[i] = clientIdPtr[i];
-            }
+            joinPacket->clientId = ConvertToBinary<ClientId>(clientId_);
             SendUnreliablePacket(std::move(joinPacket));
 
         }
@@ -135,9 +128,7 @@ void ClientNetworkManager::ReceivePacket(sf::Packet &packet)
     break;
   case asteroid::PacketType::JOIN_ACK:
   {
-    auto joinAckPacket = asteroid::GenerateReceivedPacket<asteroid::JoinAckPacket>(packet);
-    ClientId clientId = ConvertFromBinary<ClientId>(joinAckPacket->clientId);
-
+    
     break;
   }
   case asteroid::PacketType::NONE:

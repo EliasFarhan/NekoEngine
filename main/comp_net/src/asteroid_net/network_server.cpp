@@ -280,7 +280,7 @@ void ServerNetworkManager::ReceivePacket(sf::Packet& packet, PacketSocketSource 
     auto receivedPacket = asteroid::GenerateReceivedPacket(packet);
     if(receivedPacket != nullptr)
     {
-		ProcessReceivePacket(std::move(receivedPacket), packetSource);
+      ProcessReceivePacket(std::move(receivedPacket), packetSource);
     }
 }
 }

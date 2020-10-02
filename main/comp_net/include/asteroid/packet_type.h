@@ -228,8 +228,7 @@ inline void GeneratePacket(sf::Packet& packet, asteroid::Packet& sendingPacket)
 	default: ;
 	}
 }
-template<class T>
-inline std::unique_ptr<T> GenerateReceivedPacket(sf::Packet& packet)
+inline std::unique_ptr<Packet> GenerateReceivedPacket(sf::Packet& packet)
 {
     Packet packetTmp;
     packet >> packetTmp;
