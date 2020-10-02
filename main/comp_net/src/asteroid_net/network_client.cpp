@@ -299,7 +299,7 @@ void ClientNetworkManager::ReceivePacket(sf::Packet& packet, PacketSource source
 	case asteroid::PacketType::START_GAME:
 	{
 		const auto* startGamePacket = static_cast<const asteroid::StartGamePacket*>(receivePacket.get());
-		gameManager_.StartGame(ConvertFromBinary<long>(startGamePacket->startTime));
+		gameManager_.StartGame(ConvertFromBinary<unsigned>(startGamePacket->startTime));
 		break;
 	}
 	case asteroid::PacketType::JOIN_ACK:

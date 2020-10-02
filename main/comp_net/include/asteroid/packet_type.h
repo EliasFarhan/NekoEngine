@@ -154,7 +154,7 @@ inline sf::Packet& operator>>(sf::Packet& packet, PlayerInputPacket& playerInput
 
 struct StartGamePacket : TypedPacket<PacketType::START_GAME>
 {
-    std::array<std::uint8_t, sizeof(unsigned )> startTime{};
+    std::array<std::uint8_t, sizeof(unsigned)> startTime{};
 };
 
 
