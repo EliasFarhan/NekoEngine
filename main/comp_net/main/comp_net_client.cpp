@@ -38,6 +38,12 @@ public:
         RegisterOnDrawUi(client_);
         RegisterSystem(client_);
     }
+	void Init() override
+    {
+        SdlEngine::Init();
+        const auto& config = BasicEngine::GetInstance()->config;
+        client_.SetWindowSize(config.windowSize);
+    }
 private:
     net::ClientNetworkManager client_;
 };

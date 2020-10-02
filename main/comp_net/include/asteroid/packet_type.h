@@ -123,12 +123,12 @@ inline sf::Packet& operator<<(sf::Packet& packet, const SpawnPlayerPacket& spawn
 
 inline sf::Packet& operator>>(sf::Packet& packet, SpawnPlayerPacket& spawnPlayerPacket)
 {
-    return packet >> spawnPlayerPacket.clientId << spawnPlayerPacket.playerNumber <<
+    return packet >> spawnPlayerPacket.clientId >> spawnPlayerPacket.playerNumber >>
         spawnPlayerPacket.pos >> spawnPlayerPacket.angle;
 }
 
 //
-const size_t maxInputNmb = 150;
+const size_t maxInputNmb = 50;
 /**
  * \brief Packet sent by the player client and then replicated by the server to all clients to share the currentFrame
  * and all the previous ones player inputs.

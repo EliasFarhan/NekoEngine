@@ -2,6 +2,7 @@
 #include "asteroid_simulation/simulation_server.h"
 #include "asteroid/packet_type.h"
 #include "engine/engine.h"
+#include "engine/conversion.h"
 
 #include "imgui.h"
 
@@ -110,8 +111,7 @@ void SimulationClient::ReceivePacket(const asteroid::Packet* packet)
         case asteroid::PacketType::SPAWN_PLAYER:
         {
             const auto* spawnPlayerPacket = static_cast<const asteroid::SpawnPlayerPacket*>(packet);
-            ClientId clientId = spawnPlayerPacket->clientId[0];
-            clientId += spawnPlayerPacket->clientId[1] << 8u;
+            const ClientId clientId = ConvertFromBinary<ClientId>(spawnPlayerPacket->clientId);
 
             const PlayerNumber playerNumber = spawnPlayerPacket->playerNumber;
             if (clientId == clientId_)
@@ -119,18 +119,10 @@ void SimulationClient::ReceivePacket(const asteroid::Packet* packet)
                 gameManager_.SetClientPlayer(playerNumber);
             }
 
-            Vec2f pos;
-            auto* posPtr = reinterpret_cast<std::uint8_t*>(&pos[0]);
-            for(size_t i = 0; i < sizeof(Vec2f);i++)
-            {
-                posPtr[i] = spawnPlayerPacket->pos[i];
-            }
-            degree_t rotation;
-            auto* rotationPtr = reinterpret_cast<std::uint8_t*>(&rotation);
-            for(size_t i = 0; i < sizeof(degree_t); i++)
-            {
-                rotationPtr[i] = spawnPlayerPacket->angle[i];
-            }
+            const Vec2f pos = ConvertFromBinary<Vec2f>(spawnPlayerPacket->pos);
+
+            const degree_t rotation = ConvertFromBinary<degree_t>(spawnPlayerPacket->angle);
+           
             gameManager_.SpawnPlayer(playerNumber, pos, rotation);
             break;
         }
@@ -150,12 +142,8 @@ void SimulationClient::ReceivePacket(const asteroid::Packet* packet)
         {
             const auto* playerInputPacket = static_cast<const asteroid::PlayerInputPacket*>(packet);
             const auto playerNumber = playerInputPacket->playerNumber;
-            net::Frame inputFrame = 0;
-            auto* inputPtr = reinterpret_cast<std::uint8_t*>(&inputFrame);
-            for(size_t i = 0; i < sizeof(net::Frame);i++)
-            {
-                inputPtr[i] = playerInputPacket->currentFrame[i];
-            }
+            const net::Frame inputFrame = ConvertFromBinary<Frame>(playerInputPacket->currentFrame);
+            
             if(playerNumber == gameManager_.GetPlayerNumber())
             {
                 //Verify the inputs coming back from the server
@@ -202,12 +190,8 @@ void SimulationClient::ReceivePacket(const asteroid::Packet* packet)
         {
         	
             const auto* validateFramePacket = static_cast<const asteroid::ValidateFramePacket*>(packet);
-            Frame newValidateFrame = 0;
-            auto* framePtr = reinterpret_cast<std::uint8_t*>(&newValidateFrame);
-        	for(size_t i = 0; i < sizeof(Frame);i++)
-        	{
-                framePtr[i] = validateFramePacket->newValidateFrame[i];
-        	}
+            const Frame newValidateFrame = ConvertFromBinary<Frame>(validateFramePacket->newValidateFrame);
+
         	std::array<asteroid::PhysicsState, asteroid::maxPlayerNmb> physicsStates{};
         	for(size_t i = 0; i < validateFramePacket->physicsState.size(); i++)
             {

@@ -113,13 +113,13 @@ void RollbackManager::ValidateFrame(net::Frame newValidateFrame)
     }
 	lastValidateFrame_ = newValidateFrame;
 }
-void RollbackManager::ConfirmFrame(net::Frame newValidateFrame, const std::array<PhysicsState, maxPlayerNmb>& physicsStates)
+void RollbackManager::ConfirmFrame(net::Frame newValidateFrame, const std::array<PhysicsState, maxPlayerNmb>& serverPhysicsState)
 {
     ValidateFrame(newValidateFrame);
     for(net::PlayerNumber playerNumber = 0; playerNumber < maxPlayerNmb; playerNumber++)
     {
         const PhysicsState lastPhysicsState = GetValidatePhysicsState(playerNumber);
-        if(physicsStates[playerNumber] != lastPhysicsState)
+        if(serverPhysicsState[playerNumber] != lastPhysicsState)
         {
             neko_assert(false, "Physics State are not equal");
         }

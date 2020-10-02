@@ -14,6 +14,7 @@ GameManager::GameManager() :
 
 void GameManager::Init()
 {
+    entityMap_.fill(INVALID_ENTITY);
     /*
     for(net::PlayerNumber i = 0; i < maxPlayerNmb ; i++)
     {
@@ -34,6 +35,9 @@ void GameManager::Destroy()
 
 void GameManager::SpawnPlayer(net::PlayerNumber playerNumber, Vec2f position, degree_t rotation)
 {
+    if (GetEntityFromPlayerNumber(playerNumber) != INVALID_ENTITY)
+        return;
+    logDebug("[GameManager] Spawning new player");
 	const auto entity = entityManager_.CreateEntity(playerNumber);
 	entityMap_[playerNumber] = entity;
 	entityManager_.AddComponentType(entity, static_cast<EntityMask>(ComponentType::PLAYER_CHARACTER));

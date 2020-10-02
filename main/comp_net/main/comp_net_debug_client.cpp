@@ -22,7 +22,39 @@
  SOFTWARE.
  */
 
+#include <sdl_engine/sdl_engine.h>
+#include <gl/gles3_window.h>
+#include <gl/graphics.h>
+
+#include "asteroid_net/debug_net_app.h"
+#include "asteroid_net/network_client.h"
+
+namespace neko::asteroid
+{
+class ClientEngine : public sdl::SdlEngine
+{
+public:
+    explicit ClientEngine(Configuration* config = nullptr) : sdl::SdlEngine(config)
+    {
+        RegisterOnDrawUi(app_);
+        RegisterSystem(app_);
+    }
+
+private:
+    net::DebugApp app_;
+};
+}
+
 int main(int argc, char** argv)
 {
-    return 0;
+    neko::asteroid::ClientEngine engine;
+
+    neko::sdl::Gles3Window window;
+    neko::gl::Gles3Renderer renderer;
+
+    engine.SetWindowAndRenderer(&window, &renderer);
+
+    engine.Init();
+    engine.EngineLoop();
+    return EXIT_SUCCESS;
 }

@@ -26,6 +26,14 @@
 
 namespace neko::gl
 {
+Framebuffer::~Framebuffer()
+{
+    if (fbo_ != 0)
+    {
+        Destroy();
+    }
+}
+
 void Framebuffer::Create()
 {
     glCheckError();

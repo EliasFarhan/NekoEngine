@@ -3,109 +3,152 @@
 //
 
 #include "asteroid_net/network_server.h"
+#include "engine/conversion.h"
 
 namespace neko::net
 {
-void ServerNetworkManager::SendReliablePacket(std::unique_ptr<asteroid::Packet> packet)
+void ServerNetworkManager::SendReliablePacket(
+	std::unique_ptr<asteroid::Packet> packet)
 {
-    for(PlayerNumber playerNumber = 0; playerNumber < asteroid::maxPlayerNmb; playerNumber++)
-    {
-        if (clientMap_[playerNumber].udpRemotePort == 0)
-            continue;
-        tcpPackets_.emplace_back();
-        auto& sendingPacket = tcpPackets_.back();
-        GeneratePacket(sendingPacket, *packet);
-        auto status = sf::Socket::Partial;
-        while(status == sf::Socket::Partial)
-        {
-            status = tcpSockets_[playerNumber].send(sendingPacket);
-        }
-        tcpPackets_.pop_back();
-    }
+	logDebug("[Server] Sending TCP packet: " +
+		std::to_string(static_cast<int>(packet->packetType)));
+	for (PlayerNumber playerNumber = 0; playerNumber < asteroid::maxPlayerNmb;
+		playerNumber++)
+	{
+		sf::Packet sendingPacket;
+		GeneratePacket(sendingPacket, *packet);
+
+		auto status = sf::Socket::Partial;
+		while (status == sf::Socket::Partial)
+		{
+			status = tcpSockets_[playerNumber].send(sendingPacket);
+			if (status == sf::Socket::NotReady)
+			{
+				logDebug("[Server] Error trying to send packet to Player: " +
+					std::to_string(playerNumber) + " socket is not ready");
+			}
+		}
+	}
 }
 
-void ServerNetworkManager::SendUnreliablePacket(std::unique_ptr<asteroid::Packet> packet)
+void ServerNetworkManager::SendUnreliablePacket(
+	std::unique_ptr<asteroid::Packet> packet)
 {
-	for(PlayerNumber playerNumber = 0; playerNumber < asteroid::maxPlayerNmb; playerNumber++)
+	for (PlayerNumber playerNumber = 0; playerNumber < asteroid::maxPlayerNmb;
+		playerNumber++)
 	{
 		if (clientMap_[playerNumber].udpRemotePort == 0)
 			continue;
+
+
 		sf::Packet sendingPacket;
 		GeneratePacket(sendingPacket, *packet);
-		udpSocket_.send(sendingPacket, tcpSockets_[playerNumber].getRemoteAddress(), clientMap_[playerNumber].udpRemotePort);
-	}
+		const auto status = udpSocket_.send(sendingPacket, clientMap_[playerNumber].udpRemoteAddress,
+			clientMap_[playerNumber].udpRemotePort);
+		switch (status)
+		{
+		case sf::Socket::Done:
+			//logDebug("[Server] Sending UDP packet: " +
+				//std::to_string(static_cast<int>(packet->packetType)));
+			break;
 
-	
+		case sf::Socket::Disconnected:
+		{
+			logDebug("[Server] Error while sending UDP packet, DISCONNECTED");
+			break;
+		}
+		case sf::Socket::NotReady:
+			logDebug("[Server] Error while sending UDP packet, NOT READY");
+
+			break;
+
+		case sf::Socket::Error:
+			logDebug("[Server] Error while sending UDP packet, DISCONNECTED");
+			break;
+		default:
+			break;
+		}
+
+	}
 
 }
 
 void ServerNetworkManager::Init()
 {
-    sf::Socket::Status status = sf::Socket::Error;
-    while(status != sf::Socket::Done)
-    {
-        // bind the listener to a port
-        status = tcpListener_.listen(tcpPort_);
-        if(status != sf::Socket::Done)
-        {
-            tcpPort_++;
-        }
-    }
-    tcpListener_.setBlocking(false);
-    std::string log = "[Server] Tcp Socket on port: ";
-    log += std::to_string(tcpPort_);
-    logDebug(log);
+	sf::Socket::Status status = sf::Socket::Error;
+	while (status != sf::Socket::Done)
+	{
+		// bind the listener to a port
+		status = tcpListener_.listen(tcpPort_);
+		if (status != sf::Socket::Done)
+		{
+			tcpPort_++;
+		}
+	}
+	tcpListener_.setBlocking(false);
+	for (auto& socket : tcpSockets_)
+	{
+		socket.setBlocking(false);
+	}
+	std::string log = "[Server] Tcp Socket on port: ";
+	log += std::to_string(tcpPort_);
+	logDebug(log);
 
-    status = sf::Socket::Error;
-    while(status != sf::Socket::Done)
-    {
-        status = udpSocket_.bind((udpPort_));
-        if(status != sf::Socket::Done)
-        {
-            udpPort_++;
-        }
-    }
-    udpSocket_.setBlocking(false);
-    log = "[Server] Udp Socket on port: ";
-    log += std::to_string(udpPort_);
-    logDebug(log);
+	status = sf::Socket::Error;
+	while (status != sf::Socket::Done)
+	{
+		status = udpSocket_.bind(udpPort_);
+		if (status != sf::Socket::Done)
+		{
+			udpPort_++;
+		}
+	}
+	udpSocket_.setBlocking(false);
+	log = "[Server] Udp Socket on port: ";
+	log += std::to_string(udpPort_);
+	logDebug(log);
+	gameManager_.Init();
 }
 
 void ServerNetworkManager::Update(seconds dt)
 {
-    if(lastPlayerNumber_ < 2)
-    {
-        sf::Socket::Status status = tcpListener_.accept(tcpSockets_[lastPlayerNumber_]);
-        if(status == sf::Socket::Done)
-        {
-            const auto remoteAddress = tcpSockets_[lastPlayerNumber_].getRemoteAddress().toString();
-            const auto port = std::to_string(tcpSockets_[lastPlayerNumber_].getRemotePort());
-            const std::string log = "New player connection with address: "+remoteAddress+" and port: "+port;
-            logDebug(log);
-            lastPlayerNumber_++;
-        }
-    }
-
-    for(PlayerNumber playerNumber = 0; playerNumber < lastPlayerNumber_; playerNumber++)
-    {
-        sf::Packet tcpPacket;
-        const sf::Socket::Status status = tcpSockets_[playerNumber].receive(tcpPacket);
-        if(status == sf::Socket::Done)
-        {
-            ReceivePacket(tcpPacket, PacketSocketSource::TCP);
-        }
-    }
-	sf::Packet packet;
-	sf::IpAddress sender;
-	unsigned short port;
-	const sf::Socket::Status status = udpSocket_.receive(packet, sender, port);
-	if(status == sf::Socket::Done)
+	if (lastSocketIndex_ < asteroid::maxPlayerNmb)
 	{
-		ReceivePacket(packet, PacketSocketSource::UDP);
+		const sf::Socket::Status status = tcpListener_.accept(
+			tcpSockets_[lastSocketIndex_]);
+		if (status == sf::Socket::Done)
+		{
+			const auto remoteAddress = tcpSockets_[lastSocketIndex_].
+				getRemoteAddress();
+			const auto port = std::to_string(
+				tcpSockets_[lastSocketIndex_].getRemotePort());
+			const std::string log = "[Server] New player connection with address: " +
+				remoteAddress.toString() + " and port: " + port;
+			logDebug(log);
+			lastSocketIndex_++;
+		}
 	}
 
-
-
+	for (PlayerNumber playerNumber = 0; playerNumber < asteroid::maxPlayerNmb;
+		playerNumber++)
+	{
+		sf::Packet tcpPacket;
+		const auto status = tcpSockets_[playerNumber].receive(
+			tcpPacket);
+		if (status == sf::Socket::Done)
+		{
+			ReceivePacket(tcpPacket, PacketSocketSource::TCP);
+		}
+	}
+	sf::Packet udpPacket;
+	sf::IpAddress address;
+	unsigned short port;
+	const auto status = udpSocket_.receive(udpPacket, address, port);
+	if (status == sf::Socket::Done)
+	{
+		ReceivePacket(udpPacket, PacketSocketSource::UDP, address, port);
+	}
+	gameManager_.Update(dt);
 }
 
 void ServerNetworkManager::Destroy()
@@ -115,10 +158,11 @@ void ServerNetworkManager::Destroy()
 
 void ServerNetworkManager::SetTcpPort(unsigned short i)
 {
-    tcpPort_ = i;
+	tcpPort_ = i;
 }
 
-void ServerNetworkManager::ProcessReceivePacket(std::unique_ptr<asteroid::Packet> packet, 
+void ServerNetworkManager::ProcessReceivePacket(
+	std::unique_ptr<asteroid::Packet> packet,
 	PacketSocketSource packetSource,
 	sf::IpAddress address,
 	unsigned short port)
@@ -129,92 +173,92 @@ void ServerNetworkManager::ProcessReceivePacket(std::unique_ptr<asteroid::Packet
 	case asteroid::PacketType::JOIN:
 	{
 		const auto* joinPacket = static_cast<asteroid::JoinPacket*>(packet.get());
-		ClientId clientId = 0;
-		auto* clientIdPtr = reinterpret_cast<std::uint8_t*>(&clientId);
-		for (size_t i = 0; i < sizeof(ClientId); i++)
+		auto clientId = ConvertFromBinary<ClientId>(joinPacket->clientId);
+		logDebug("[Server] Received Join Packet from: " + std::to_string(clientId) +
+			(packetSource == PacketSocketSource::UDP ? " UDP with port: " + std::to_string(port) : " TCP"));
+		const auto it = std::find_if(clientMap_.begin(), clientMap_.end(),
+			[&clientId](const auto& clientInfo)
+			{
+				return clientInfo.clientId == clientId;
+			});
+		PlayerNumber playerNumber;
+		if (it != clientMap_.end())
 		{
-			clientIdPtr[i] = clientId;
+			playerNumber = std::distance(clientMap_.begin(), it);
+			clientMap_[playerNumber].udpRemoteAddress = address;
+			clientMap_[playerNumber].udpRemotePort = port;
 		}
+		else
+		{
+			playerNumber = lastPlayerNumber_;
+		}
+		auto joinAckPacket = std::make_unique<asteroid::JoinAckPacket>();
+		joinAckPacket->clientId = ConvertToBinary(clientId);
+		joinAckPacket->udpPort = ConvertToBinary(udpPort_);
 		if (packetSource == PacketSocketSource::UDP)
 		{
-			const auto it = std::find_if(clientMap_.begin(), clientMap_.end(), [&clientId](const auto& clientInfo)
-				{
-					return clientInfo.clientId == clientId;
-				});
-			if (it != clientMap_.end())
-			{
-				const PlayerNumber playerNumber = std::distance(clientMap_.begin(), it);
-				clientMap_[playerNumber].udpRemoteAddress = address;
-				clientMap_[playerNumber].udpRemotePort = port;
-			}
+			clientMap_[playerNumber].udpRemoteAddress = address;
+			clientMap_[playerNumber].udpRemotePort = port;
+			SendUnreliablePacket(std::move(joinAckPacket));
 		}
-		if (std::find_if(clientMap_.begin(), clientMap_.end(), [&clientId](const auto& clientInfo)
-		    {
-			    return clientInfo.clientId == clientId;
-		    }) != clientMap_.end())
+		else
+		{
+			SendReliablePacket(std::move(joinAckPacket));
+		}
+		if (it != clientMap_.end())
 		{
 			//Player joined twice!
 			return;
 		}
-		
-		//Spawning the new player in the arena
-		logDebug("Managing Received Packet Join from: " + std::to_string(clientId));
-		auto spawnPlayer = std::make_unique<asteroid::SpawnPlayerPacket>();
-		spawnPlayer->packetType = asteroid::PacketType::SPAWN_PLAYER;
-		spawnPlayer->clientId = joinPacket->clientId;
-		spawnPlayer->playerNumber = lastPlayerNumber_;
-
-		const auto pos = spawnPositions_[lastPlayerNumber_] * 3.0f;
-		const auto* const posPtr = reinterpret_cast<const std::uint8_t*>(&pos[0]);
-		for (size_t i = 0; i < sizeof(Vec2f); i++)
-		{
-			spawnPlayer->pos[i] = posPtr[i];
-		}
-		const auto rotation = spawnRotations_[lastPlayerNumber_];
-		const auto* const rotationPtr = reinterpret_cast<const std::uint8_t*>(&rotation);
-		for (size_t i = 0; i < sizeof(degree_t); i++)
-		{
-			spawnPlayer->angle[i] = rotationPtr[i];
-		}
 		clientMap_[lastPlayerNumber_] = {
-		        clientId,
-		        packetSource == PacketSocketSource::UDP ? address : "",
-		        packetSource == PacketSocketSource::UDP ? port:static_cast<unsigned short>(0u)};
-		gameManager_.SpawnPlayer(lastPlayerNumber_, pos, rotation);
+			clientId,
+			"",
+			static_cast<unsigned short>(0u) };
+		//Spawning the new player in the arena
+		for (PlayerNumber p = 0; p <= lastPlayerNumber_; p++)
+		{
+			auto spawnPlayer = std::make_unique<asteroid::SpawnPlayerPacket>();
+			spawnPlayer->packetType = asteroid::PacketType::SPAWN_PLAYER;
+			spawnPlayer->clientId = ConvertToBinary(clientMap_[p].clientId);
+			spawnPlayer->playerNumber = p;
+
+			const auto pos = spawnPositions_[p] * 3.0f;
+			spawnPlayer->pos = ConvertToBinary(pos);
+
+			const auto rotation = spawnRotations_[p];
+			spawnPlayer->angle = ConvertToBinary(rotation);
+			gameManager_.SpawnPlayer(p, pos, rotation);
+
+			SendReliablePacket(std::move(spawnPlayer));
+		}
+		
 		lastPlayerNumber_++;
-		SendReliablePacket(std::move(spawnPlayer));
 
 		if (lastPlayerNumber_ == asteroid::maxPlayerNmb)
 		{
 			auto startGamePacket = std::make_unique<asteroid::StartGamePacket>();
 			startGamePacket->packetType = asteroid::PacketType::START_GAME;
 			using namespace std::chrono;
-			auto ms = (duration_cast<milliseconds>(
+			const auto ms = (duration_cast<milliseconds>(
 				system_clock::now().time_since_epoch()
 				) + milliseconds(3000)).count();
-			const auto* msPtr = reinterpret_cast<std::uint8_t*>(&ms);
-			for (size_t i = 0; i < sizeof(ms); i++)
-			{
-				startGamePacket->startTime[i] = msPtr[i];
-			}
+
+			startGamePacket->startTime = ConvertToBinary(ms);
 			SendReliablePacket(std::move(startGamePacket));
 		}
 
 		break;
 	}
-	case asteroid::PacketType::SPAWN_PLAYER: break;
+	case asteroid::PacketType::SPAWN_PLAYER:
+		break;
 	case asteroid::PacketType::INPUT:
 	{
 		//Manage internal state
-		const auto* playerInputPacket = static_cast<const asteroid::PlayerInputPacket*>(packet.get());
+		const auto* playerInputPacket = static_cast<const
+			asteroid::PlayerInputPacket*>(packet.get());
 		const auto playerNumber = playerInputPacket->playerNumber;
-		std::uint32_t inputFrame = 0;
-		auto* inputPtr = reinterpret_cast<std::uint8_t*>(&inputFrame);
-		for (size_t i = 0; i < sizeof(std::uint32_t); i++)
-		{
-			inputPtr[i] = playerInputPacket->currentFrame[i];
-		}
-		for (std::uint32_t i = 0; i < playerInputPacket->inputs.size(); i++)
+		const auto inputFrame = ConvertFromBinary<Frame>(playerInputPacket->currentFrame);
+		for (Frame i = 0; i < playerInputPacket->inputs.size(); i++)
 		{
 			gameManager_.SetPlayerInput(playerNumber,
 				playerInputPacket->inputs[i],
@@ -228,10 +272,12 @@ void ServerNetworkManager::ProcessReceivePacket(std::unique_ptr<asteroid::Packet
 		SendUnreliablePacket(std::move(packet));
 
 		//Validate new frame if needed
-		std::uint32_t lastReceiveFrame = gameManager_.GetRollbackManager().GetLastReceivedFrame(0);
+		Frame lastReceiveFrame = gameManager_.GetRollbackManager().
+			GetLastReceivedFrame(0);
 		for (PlayerNumber i = 1; i < asteroid::maxPlayerNmb; i++)
 		{
-			const auto playerLastFrame = gameManager_.GetRollbackManager().GetLastReceivedFrame(i);
+			const auto playerLastFrame = gameManager_.GetRollbackManager().
+				GetLastReceivedFrame(i);
 			if (playerLastFrame < lastReceiveFrame)
 			{
 				lastReceiveFrame = playerLastFrame;
@@ -243,44 +289,46 @@ void ServerNetworkManager::ProcessReceivePacket(std::unique_ptr<asteroid::Packet
 			gameManager_.Validate(lastReceiveFrame);
 
 			auto validatePacket = std::make_unique<asteroid::ValidateFramePacket>();
-			validatePacket->packetType = asteroid::PacketType::VALIDATE_STATE;
-			const auto* framePtr = reinterpret_cast<std::uint8_t*>(&lastReceiveFrame);
-			for (size_t i = 0; i < sizeof(std::uint32_t); i++)
-			{
-				validatePacket->newValidateFrame[i] = framePtr[i];
-			}
+			validatePacket->newValidateFrame = ConvertToBinary(lastReceiveFrame);
+			
 			//copy physics state
 			for (PlayerNumber i = 0; i < asteroid::maxPlayerNmb; i++)
 			{
-				auto physicsState = gameManager_.GetRollbackManager().GetValidatePhysicsState(i);
-				const auto* statePtr = reinterpret_cast<const std::uint8_t*>(&physicsState);
+				auto physicsState = gameManager_.GetRollbackManager().
+					GetValidatePhysicsState(i);
+				const auto* statePtr = reinterpret_cast<const std::uint8_t*>(&
+					physicsState);
 				for (size_t j = 0; j < sizeof(asteroid::PhysicsState); j++)
 				{
-					validatePacket->physicsState[i * sizeof(asteroid::PhysicsState) + j] = statePtr[j];
+					validatePacket->physicsState[i * sizeof(asteroid::PhysicsState) + j] =
+						statePtr[j];
 				}
 			}
 			SendUnreliablePacket(std::move(validatePacket));
 		}
-
 		break;
 	}
 
-	case asteroid::PacketType::SPAWN_BULLET: break;
-	case asteroid::PacketType::VALIDATE_STATE: break;
-	case asteroid::PacketType::START_GAME: break;
-	case asteroid::PacketType::NONE: break;
+	case asteroid::PacketType::SPAWN_BULLET:
+		break;
+	case asteroid::PacketType::VALIDATE_STATE:
+		break;
+	case asteroid::PacketType::START_GAME:
+		break;
 	default:;
 	}
 }
 
-void ServerNetworkManager::ReceivePacket(sf::Packet& packet, PacketSocketSource packetSource,
+void ServerNetworkManager::ReceivePacket(sf::Packet& packet,
+	PacketSocketSource packetSource,
 	sf::IpAddress address,
-	unsigned short port )
+	unsigned short port)
 {
-    auto receivedPacket = asteroid::GenerateReceivedPacket(packet);
-    if(receivedPacket != nullptr)
-    {
-      ProcessReceivePacket(std::move(receivedPacket), packetSource);
-    }
+	auto receivedPacket = asteroid::GenerateReceivedPacket(packet);
+
+	if (receivedPacket != nullptr)
+	{
+		ProcessReceivePacket(std::move(receivedPacket), packetSource, address, port);
+	}
 }
 }

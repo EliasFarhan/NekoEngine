@@ -12,6 +12,20 @@ namespace neko::net
 class ClientNetworkManager : public RenderProgram, public DrawImGuiInterface, public asteroid::PacketSenderInterface
 {
 public:
+	enum class State
+	{
+		NONE,
+		JOINING,
+		JOINED,
+		GAME_STARTING,
+		GAME
+		
+	};
+	enum class PacketSource
+	{
+		TCP,
+		UDP
+	};
     ClientNetworkManager();
     void Init() override;
 
@@ -26,22 +40,22 @@ public:
     void SendReliablePacket(std::unique_ptr<asteroid::Packet> packet) override;
 
     void SendUnreliablePacket(std::unique_ptr<asteroid::Packet> packet) override;
+	void SetPlayerInput(PlayerInput input);
 
+    void SetWindowSize(Vec2u windowSize);
 private:
-    void ReceivePacket(sf::Packet& packet);
+    void ReceivePacket(sf::Packet& packet, PacketSource source);
     sf::UdpSocket udpSocket_;
     sf::TcpSocket tcpSocket_;
 
-    std::string host_ = "localhost";
-    unsigned short tcpPort_ = 12345;
-    unsigned short udpPort_ = 0;
+    sf::IpAddress serverAddress_ = "localhost";
+    unsigned short serverTcpPort_ = 12345;
+    unsigned short serverUdpPort_ = 0;
 
     asteroid::ClientGameManager gameManager_;
     Vec2u windowSize_;
     ClientId clientId_ = 0;
-
+    State currentState_ = State::NONE;
 };
-
-
 
 }

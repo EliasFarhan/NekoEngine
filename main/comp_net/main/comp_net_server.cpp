@@ -48,8 +48,10 @@ int main(int argc, char** argv)
         const auto dt = std::chrono::duration_cast<neko::seconds>(start - clock);
         clock = start;
         server.Update(dt);
+    	/*
         using namespace std::chrono_literals;
         std::this_thread::sleep_for(10ms);
+        */
     }
     return 0;
 }
