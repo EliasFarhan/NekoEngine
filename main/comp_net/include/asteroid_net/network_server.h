@@ -1,5 +1,6 @@
 #pragma once
 
+#include <queue>
 #include "SFML/Network.hpp"
 #include "asteroid/game.h"
 #include "asteroid/packet_type.h"
@@ -43,6 +44,7 @@ private:
         sf::IpAddress address = "localhost",
         unsigned short port = 0);
 
+    std::deque<sf::Packet> tcpPackets_;
     sf::UdpSocket udpSocket_;
     sf::TcpListener tcpListener_;
     std::array<sf::TcpSocket, asteroid::maxPlayerNmb> tcpSockets_;

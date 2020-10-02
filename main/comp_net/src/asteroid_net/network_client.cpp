@@ -96,17 +96,18 @@ void ClientNetworkManager::Render()
 void ClientNetworkManager::SendReliablePacket(std::unique_ptr<asteroid::Packet> packet)
 {
     sf::Packet tcpPacket;
-    //TODO create correct packet
     GeneratePacket(tcpPacket, *packet);
-
-    tcpSocket_.send(tcpPacket);
+    auto status = sf::Socket::Partial;
+    while(status == sf::Socket::Partial)
+    {
+        status = tcpSocket_.send(tcpPacket);
+    }
 }
 
 void ClientNetworkManager::SendUnreliablePacket(std::unique_ptr<asteroid::Packet> packet)
 {
     sf::Packet udpPacket;
-    //TODO generate correct packet
-
+    GeneratePacket(udpPacket, *packet);
     udpSocket_.send(udpPacket, host_, udpPort_);
 }
 

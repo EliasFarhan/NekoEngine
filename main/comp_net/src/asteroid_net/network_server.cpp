@@ -8,7 +8,20 @@ namespace neko::net
 {
 void ServerNetworkManager::SendReliablePacket(std::unique_ptr<asteroid::Packet> packet)
 {
-
+    for(PlayerNumber playerNumber = 0; playerNumber < asteroid::maxPlayerNmb; playerNumber++)
+    {
+        if (clientMap_[playerNumber].udpRemotePort == 0)
+            continue;
+        tcpPackets_.emplace_back();
+        auto& sendingPacket = tcpPackets_.back();
+        GeneratePacket(sendingPacket, *packet);
+        auto status = sf::Socket::Partial;
+        while(status == sf::Socket::Partial)
+        {
+            status = tcpSockets_[playerNumber].send(sendingPacket);
+        }
+        tcpPackets_.pop_back();
+    }
 }
 
 void ServerNetworkManager::SendUnreliablePacket(std::unique_ptr<asteroid::Packet> packet)
@@ -72,6 +85,7 @@ void ServerNetworkManager::Update(seconds dt)
             lastPlayerNumber_++;
         }
     }
+
     for(PlayerNumber playerNumber = 0; playerNumber < lastPlayerNumber_; playerNumber++)
     {
         sf::Packet tcpPacket;
@@ -89,6 +103,8 @@ void ServerNetworkManager::Update(seconds dt)
 	{
 		ReceivePacket(packet, PacketSocketSource::UDP);
 	}
+
+
 
 }
 
@@ -160,7 +176,10 @@ void ServerNetworkManager::ProcessReceivePacket(std::unique_ptr<asteroid::Packet
 		{
 			spawnPlayer->angle[i] = rotationPtr[i];
 		}
-		clientMap_[lastPlayerNumber_] = { clientId , packetSource == PacketSocketSource::UDP ? address : "",packetSource == PacketSocketSource::UDP?port:0u};
+		clientMap_[lastPlayerNumber_] = {
+		        clientId,
+		        packetSource == PacketSocketSource::UDP ? address : "",
+		        packetSource == PacketSocketSource::UDP ? port:static_cast<unsigned short>(0u)};
 		gameManager_.SpawnPlayer(lastPlayerNumber_, pos, rotation);
 		lastPlayerNumber_++;
 		SendReliablePacket(std::move(spawnPlayer));

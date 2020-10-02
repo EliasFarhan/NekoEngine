@@ -55,15 +55,15 @@ sf::Packet& operator<<(sf::Packet& packet, const std::array<T, N>& t)
 {
 	for (auto& tmp : t)
 	{
-		packet << t;
+		packet << tmp;
 	}
 	return packet;
 }
 
 template <typename T, size_t N>
-sf::Packet& operator>>(sf::Packet& packet, const std::array<T, N>& t) {
+sf::Packet& operator>>(sf::Packet& packet, std::array<T, N>& t) {
   for (auto& tmp : t) {
-    packet >> t;
+    packet >> tmp;
   }
   return packet;
 }
@@ -170,8 +170,8 @@ inline sf::Packet& operator>>(sf::Packet& packet, StartGamePacket& startGamePack
 
 struct ValidateFramePacket : TypedPacket<PacketType::VALIDATE_STATE>
 {
-    std::array<std::uint8_t, sizeof(net::Frame)> newValidateFrame;
-    std::array<std::uint8_t, sizeof(asteroid::PhysicsState) * maxPlayerNmb> physicsState;
+    std::array<std::uint8_t, sizeof(net::Frame)> newValidateFrame{};
+    std::array<std::uint8_t, sizeof(asteroid::PhysicsState) * maxPlayerNmb> physicsState{};
 };
 
 inline sf::Packet& operator<<(sf::Packet& packet, const ValidateFramePacket& validateFramePacket)
