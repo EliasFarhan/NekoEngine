@@ -34,7 +34,7 @@ matrix:
       before_install:
         - choco install python
         - choco install vulkan-sdk
-        - refreshenv
+        - cmd.exe //c "RefreshEnv.cmd & iisexpress.exe"
       install:
         - choco install visualstudio2019buildtools --package-parameters "--add Microsoft.VisualStudio.Component.VC.Tools.x86.x64"
       script:
