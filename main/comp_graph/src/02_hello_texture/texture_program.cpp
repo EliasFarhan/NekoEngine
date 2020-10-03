@@ -40,8 +40,6 @@ void HelloTextureProgram::Init()
     const auto texturePath = config.dataRootPath + "sprites/wall.jpg";
     textureId_ = textureManager_.LoadTexture(texturePath);
 	//textureId_ = neko::gl::stbCreateTexture(texturePath);
-    ddsTexture_ = gl::gliCreateTexture(config.dataRootPath + "sprites/wall.dds");
-    ktxTexture_ = gl::gliCreateTexture(config.dataRootPath + "sprites/wall.ktx");
     glEnable(GL_DEPTH_TEST);
 }
 
@@ -65,7 +63,7 @@ void HelloTextureProgram::Render()
     }
 	if (texture_ == INVALID_TEXTURE_NAME)
 	{
-        texture_ = textureManager_.GetTextureId(textureId_);
+        texture_ = textureManager_.GetTexture(textureId_).name;
         return;
 	}
     shader_.Bind();
@@ -78,12 +76,6 @@ void HelloTextureProgram::Render()
         glBindTexture(GL_TEXTURE_2D, texture_);//bind texture id to texture slot
         break;
     }
-    case TextureType::DDS_TEXTURE:
-        glBindTexture(GL_TEXTURE_2D, ddsTexture_);//bind texture id to texture slot
-    	break;
-    case TextureType::KTX_TEXTURE:
-        glBindTexture(GL_TEXTURE_2D, ktxTexture_);//bind texture id to texture slot
-    	break;
     default: ;
     }
     quad_.Draw();

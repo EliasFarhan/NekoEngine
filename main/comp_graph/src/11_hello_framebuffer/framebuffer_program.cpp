@@ -142,7 +142,7 @@ void HelloFramebufferProgram::Render()
 
     if (containerTexture_ == INVALID_TEXTURE_NAME)
     {
-        containerTexture_ = textureManager_.GetTextureId(containerTextureId_);
+        containerTexture_ = textureManager_.GetTexture(containerTextureId_).name;
         return;
     }
     std::lock_guard<std::mutex> lock(updateMutex_);

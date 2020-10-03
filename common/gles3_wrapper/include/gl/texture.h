@@ -40,7 +40,6 @@ protected:
 
 };
 
-TextureName gliCreateTexture(const std::string_view filename, Texture::TextureFlags flags = Texture::DEFAULT);
 TextureName stbCreateTexture(const std::string_view filename, Texture::TextureFlags flags = Texture::DEFAULT);
 TextureName LoadCubemap(std::vector<std::string> facesFilename);
 void DestroyTexture(TextureName);

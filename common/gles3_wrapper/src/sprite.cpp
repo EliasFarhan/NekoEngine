@@ -22,9 +22,50 @@
  SOFTWARE.
  */
 
+#include <graphics/sprite.h>
+
 #include "gl/sprite.h"
+#include "engine/transform.h"
+#include "graphics/camera.h"
 
 namespace neko::gl
 {
 
+
+void SpriteManager::Init()
+{
+    const auto& config = BasicEngine::GetInstance()->config;
+    spriteShader_.LoadFromFile(config.dataRootPath+"shaders/engine/sprite.vert",
+                               config.dataRootPath+"shaders/engine/sprite.frag");
+    spriteQuad_.Init();
 }
+
+void SpriteManager::Destroy()
+{
+    spriteQuad_.Destroy();
+    spriteShader_.Destroy();
+}
+
+void SpriteManager::Render()
+{
+	spriteShader_.Bind();
+	const auto& camera = CameraLocator::get();
+	spriteShader_.SetMat4("view", camera.GenerateViewMatrix());
+	spriteShader_.SetMat4("projection", camera.GenerateProjectionMatrix());
+	for(Entity entity = 0; entity < entityManager_.GetEntitiesSize(); entity++)
+	{
+        if(!entityManager_.EntityExists(entity))
+            continue;
+		if(entityManager_.HasComponent(entity, static_cast<EntityMask>(ComponentType::SPRITE2D)))
+		{
+			const auto& transform = transformManager_.GetComponent(entity);
+			const auto& sprite = GetComponent(entity);
+            spriteShader_.SetMat4("model", transform);
+            spriteShader_.SetTexture("spriteTexture", sprite.texture.name);
+            spriteQuad_.Draw();
+		}
+	}
+}
+}
+
+

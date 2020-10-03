@@ -77,7 +77,7 @@ int main(int argc, char** argv)
     const unsigned short destinationPort = 12345;
 	// Create a socket and bind it to the port 55001
     sf::UdpSocket socket;
-    socket.bind(55001);
+    socket.bind(12345);
     socket.setBlocking(false);
 	
     size_t successfulSentPacketNmb = 0;

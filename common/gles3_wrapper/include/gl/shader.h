@@ -34,12 +34,14 @@ namespace neko::gl
 class Shader : public neko::Shader
 {
 public:
+    ~Shader() override;
+
     void LoadFromFile(const std::string_view vertexShaderPath, const std::string_view fragmentShaderPath) override;
 
 
     void Bind() const;
 
-    void Destroy();
+    void Destroy() override;
 
     GLuint GetProgram();
 

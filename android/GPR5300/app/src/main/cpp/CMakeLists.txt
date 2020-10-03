@@ -70,12 +70,15 @@ add_subdirectory(${NEKO_SRC_DIR}/externals/glad ${CMAKE_CURRENT_BINARY_DIR}/glad
 add_subdirectory(${NEKO_SRC_DIR}/externals/imgui-1.74 ${CMAKE_CURRENT_BINARY_DIR}/imgui-1.74)
 add_subdirectory(${NEKO_SRC_DIR}/externals/SDL2-2.0.9 ${CMAKE_CURRENT_BINARY_DIR}/SDL2-2.0.9)
 add_subdirectory(${NEKO_SRC_DIR}/externals/assimp-5.0.1 ${CMAKE_CURRENT_BINARY_DIR}/assimp-5.0.1)
+add_subdirectory("${NEKO_SRC_DIR}/externals/freetype-2.10.0" ${CMAKE_CURRENT_BINARY_DIR}/freetype-2.10.0)
+
 include(${NEKO_SRC_DIR}/cmake/data.cmake)
 include(${NEKO_SRC_DIR}/cmake/neko_executable.cmake)
 add_subdirectory(${NEKO_SRC_DIR}/core ${CMAKE_CURRENT_BINARY_DIR}/core)
 add_subdirectory(${NEKO_SRC_DIR}/common/sdl_engine ${CMAKE_CURRENT_BINARY_DIR}/sdl_engine)
 add_subdirectory(${NEKO_SRC_DIR}/common/gles3_wrapper ${CMAKE_CURRENT_BINARY_DIR}/gles3_wrapper)
 add_subdirectory(${NEKO_SRC_DIR}/common/assimp_wrapper ${CMAKE_CURRENT_BINARY_DIR}/assimp_wrapper)
+add_subdirectory(${NEKO_SRC_DIR}/common/ft_wrapper ${CMAKE_CURRENT_BINARY_DIR}/ft_wrapper)
 
 #comp_graph
 set(COMP_GRAPH_DIR ${NEKO_SRC_DIR}/main/comp_graph)
@@ -96,4 +99,4 @@ target_link_libraries( # Specifies the target library.
 
                        # Links the target library to the log library
                        # included in the NDK.
-                       ${log-lib} ${opengl-lib} Neko_Core SDL2-static sdl_engine glad gles3_wrapper imgui assimp_wrapper)
+                       ${log-lib} ${opengl-lib} Neko_Core SDL2-static sdl_engine glad gles3_wrapper imgui assimp_wrapper ft_wrapper)

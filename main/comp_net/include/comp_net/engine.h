@@ -5,10 +5,10 @@
 
 namespace neko::net
 {
-class CompNetEngine : public sdl::SdlEngine
+class RdtEngine : public sdl::SdlEngine
 {
 public:
-    explicit CompNetEngine(Configuration* config = nullptr);
+    explicit RdtEngine(Configuration* config = nullptr);
 
     void Destroy() override;
 

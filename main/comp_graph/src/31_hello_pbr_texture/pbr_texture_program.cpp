@@ -91,25 +91,25 @@ void HelloPbrTextureProgram::Render()
 	std::lock_guard<std::mutex> lock(updateMutex_);
 	if(albedo_ == INVALID_TEXTURE_NAME )
 	{
-		albedo_ = textureManager_.GetTextureId(albedoId_);
+		albedo_ = textureManager_.GetTexture(albedoId_).name;
 		if (albedo_ == INVALID_TEXTURE_NAME)
 			return;
 	}
 	if (normal_ == INVALID_TEXTURE_NAME)
 	{
-		normal_ = textureManager_.GetTextureId(normalId_);
+		normal_ = textureManager_.GetTexture(normalId_).name;
 		if (normal_ == INVALID_TEXTURE_NAME)
 			return;
 	}
 	if (metallic_ == INVALID_TEXTURE_NAME)
 	{
-		metallic_ = textureManager_.GetTextureId(metallicId_);
+		metallic_ = textureManager_.GetTexture(metallicId_).name;
 		if (metallic_ == INVALID_TEXTURE_NAME)
 			return;
 	}
 	if (roughness_ == INVALID_TEXTURE_NAME)
 	{
-		roughness_ = textureManager_.GetTextureId(roughnessId_);
+		roughness_ = textureManager_.GetTexture(roughnessId_).name;
 		if (roughness_ == INVALID_TEXTURE_NAME)
 			return;
 	}

@@ -77,12 +77,12 @@ struct Vec2
     //-----------------------------------------------------------------------------
     // Constructors
     //-----------------------------------------------------------------------------
-    Vec2()
+    Vec2() noexcept
             : x(0), y(0)
     {
     }
 
-    explicit Vec2(T same)
+    explicit Vec2(T same) noexcept
             : x(same), y(same)
     {
     }
@@ -93,21 +93,21 @@ struct Vec2
     }
 
     template<typename U>
-    explicit Vec2(const Vec2<U>& vector)
+    explicit Vec2(const Vec2<U>& vector)  noexcept
             : x(static_cast<T>(vector.x)),
               y(static_cast<T>(vector.y))
     {
     }
 
     template<typename U>
-    explicit Vec2(const Vec3<U>& vec3)
+    explicit Vec2(const Vec3<U>& vec3)  noexcept
             : x(static_cast<T>(vec3.x)),
               y(static_cast<T>(vec3.y))
     {
     }
 
     template<typename U>
-    explicit Vec2(const Vec4<U>& vec4)
+    explicit Vec2(const Vec4<U>& vec4)  noexcept
             : x(static_cast<T>(vec4.x)),
               y(static_cast<T>(vec4.y))
     {
@@ -329,6 +329,13 @@ public:
             T y; ///< Y coordinate of the vector
             T z;
         };
+        //For color
+        struct
+        {
+            T r; ///< X coordinate of the vector
+            T g; ///< Y coordinate of the vector
+            T b;
+        };
         T coord[3];
     };
 
@@ -344,27 +351,31 @@ public:
     //-----------------------------------------------------------------------------
     // Constructors
     //-----------------------------------------------------------------------------
-    Vec3() : x(0), y(0), z(0)
+    Vec3()  noexcept : x(0), y(0), z(0)
     {
     }
 
-    explicit Vec3(T same)
+    explicit Vec3(T same)  noexcept
             : x(same), y(same), z(same)
     {
 
     }
 
-    Vec3(T X, T Y, T Z)
+    Vec3(T X, T Y, T Z)  noexcept
             : x(X), y(Y), z(Z)
     {
 
     }
 
-	explicit Vec3(Vec2<T> v) : x(v.x), y(v.y),z(0)
+	explicit Vec3(Vec2<T> v)  noexcept : x(v.x), y(v.y),z(0)
     {
 	    
     }
-	explicit Vec3(Vec4<T> v) : x(v.x), y(v.y), z(v.z)
+    explicit Vec3(Vec2<T> v, T z)  noexcept : x(v.x), y(v.y), z(z)
+    {
+
+    }
+	explicit Vec3(Vec4<T> v)  noexcept : x(v.x), y(v.y), z(v.z)
     {
 	    
     }
@@ -372,18 +383,18 @@ public:
      * \brief Adding explicit constructor for vector-like type
      */
 	template<class U>
-	explicit Vec3(U u) : x(u.x), y(u.y), z(u.z)
+	explicit Vec3(U u) noexcept : x(u.x), y(u.y), z(u.z)
     {
 	    
     }
 
-	explicit Vec3(const T* ptr) : x(ptr[0]), y(ptr[1]), z(ptr[2])
+	explicit Vec3(const T* ptr) noexcept : x(ptr[0]), y(ptr[1]), z(ptr[2])
     {
 	    
     }
 
     template<typename U>
-    explicit Vec3(const Vec2<U>& vec2)
+    explicit Vec3(const Vec2<U>& vec2)  noexcept
             : x(static_cast<T>(vec2.x)),
               y(static_cast<T>(vec2.y)),
               z(static_cast<T>(0))
@@ -393,7 +404,7 @@ public:
 
     template<typename U>
     explicit
-    Vec3(const Vec3<U>& vector)
+    Vec3(const Vec3<U>& vector)  noexcept
             : x(static_cast<T>(vector.x)),
               y(static_cast<T>(vector.y)),
               z(static_cast<T>(vector.z))
@@ -656,13 +667,13 @@ public:
     {
     }
 
-    explicit Vec4(T same)
+    explicit Vec4(T same)  noexcept
             : x(same), y(same), z(same), w(same)
     {
 
     }
 
-    explicit Vec4(std::array<T, 4> v)
+    explicit Vec4(std::array<T, 4> v)  noexcept
     {
         for (int i = 0; i < 4; i++)
         {
@@ -670,14 +681,14 @@ public:
         }
     }
 
-    Vec4(T X, T Y, T Z, T W)
+    Vec4(T X, T Y, T Z, T W)  noexcept
             : x(X), y(Y), z(Z), w(W)
     {
 
     }
 
     template<typename U>
-    explicit Vec4(const Vec2<U>& vec2)
+    explicit Vec4(const Vec2<U>& vec2)  noexcept
             : x(static_cast<T>(vec2.x)),
               y(static_cast<T>(vec2.y)),
               z(static_cast<T>(0)),
@@ -686,7 +697,7 @@ public:
     }
 
     template<typename U>
-    explicit Vec4(const Vec3<U>& vec3)
+    explicit Vec4(const Vec3<U>& vec3)  noexcept
             : x(static_cast<T>(vec3.x)),
               y(static_cast<T>(vec3.y)),
               z(static_cast<T>(vec3.z)),
@@ -695,7 +706,7 @@ public:
     }
 
     template<typename U>
-    explicit Vec4(const Vec3<U>& vec3, U w)
+    explicit Vec4(const Vec3<U>& vec3, U w)  noexcept
             : x(static_cast<T>(vec3.x)),
               y(static_cast<T>(vec3.y)),
               z(static_cast<T>(vec3.z)),
@@ -704,7 +715,7 @@ public:
     }
 
     template<typename U>
-    explicit Vec4(const Vec4<U>& vector)
+    explicit Vec4(const Vec4<U>& vector)  noexcept
             : x(static_cast<T>(vector.x)),
               y(static_cast<T>(vector.y)),
               z(static_cast<T>(vector.z)),

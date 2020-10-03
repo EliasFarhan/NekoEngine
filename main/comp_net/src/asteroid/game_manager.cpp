@@ -14,6 +14,7 @@ GameManager::GameManager() :
 
 void GameManager::Init()
 {
+    entityMap_.fill(INVALID_ENTITY);
     /*
     for(net::PlayerNumber i = 0; i < maxPlayerNmb ; i++)
     {
@@ -34,6 +35,9 @@ void GameManager::Destroy()
 
 void GameManager::SpawnPlayer(net::PlayerNumber playerNumber, Vec2f position, degree_t rotation)
 {
+    if (GetEntityFromPlayerNumber(playerNumber) != INVALID_ENTITY)
+        return;
+    logDebug("[GameManager] Spawning new player");
 	const auto entity = entityManager_.CreateEntity(playerNumber);
 	entityMap_[playerNumber] = entity;
 	entityManager_.AddComponentType(entity, static_cast<EntityMask>(ComponentType::PLAYER_CHARACTER));
@@ -50,7 +54,7 @@ Entity GameManager::GetEntityFromPlayerNumber(net::PlayerNumber playerNumber) co
 
 ClientGameManager::ClientGameManager(PacketSenderInterface& packetSenderInterface) :
     GameManager(),
-    spriteManager_(*this, entityManager_, transformManager_),
+    spriteManager_(entityManager_, textureManager_, transformManager_),
     packetSenderInterface_(packetSenderInterface)
 {
 }
@@ -61,7 +65,10 @@ void ClientGameManager::Init()
 	camera_.WorldLookAt(Vec3f::zero);
 	camera_.nearPlane = 0.0f;
 	camera_.farPlane = 2.0f;
+
+	textureManager_.Init();
 	spriteManager_.Init();
+
 	GameManager::Init();
 }
 
@@ -69,6 +76,7 @@ void ClientGameManager::Update(seconds dt)
 {
     textureManager_.Update(dt);
     spriteManager_.Update(dt);
+    transformManager_.Update();
 	fixedTimer_ += dt.count();
 	while (fixedTimer_> FixedPeriod)
 	{
@@ -93,6 +101,7 @@ void ClientGameManager::SetWindowSize(Vec2u windowsSize)
 void ClientGameManager::Render()
 {
 	glViewport(0, 0, windowSize_.x, windowSize_.y);
+    CameraLocator::provide(&camera_);
 	spriteManager_.Render();
 }
 
@@ -101,7 +110,10 @@ void ClientGameManager::SpawnPlayer(net::PlayerNumber playerNumber, Vec2f positi
 	logDebug("Spawn player: " + std::to_string(playerNumber));
 	GameManager::SpawnPlayer(playerNumber, position, rotation);
 	const auto entity = GetEntityFromPlayerNumber(playerNumber);
-	entityManager_.AddComponentType(entity, EntityMask(neko::ComponentType::SPRITE2D));
+	const auto& config = BasicEngine::GetInstance()->config;
+	shipTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/asteroid/ship.png");
+	spriteManager_.AddComponent(entity);
+	spriteManager_.SetTexture(entity, shipTextureId_);
 
 }
 
@@ -151,7 +163,6 @@ void ClientGameManager::FixedUpdate()
     const auto* framePtr = reinterpret_cast<std::uint8_t*>(&currentFrame_);
 
     std::unique_ptr<asteroid::PlayerInputPacket> playerInputPacket = std::make_unique<asteroid::PlayerInputPacket>();
-    playerInputPacket->packetType = asteroid::PacketType::INPUT;
     playerInputPacket->playerNumber = GetPlayerNumber();
     for(size_t i = 0; i < sizeof(net::Frame);i++)
     {
@@ -166,7 +177,7 @@ void ClientGameManager::FixedUpdate()
 
         playerInputPacket->inputs[i] = inputs[i];
     }
-    packetSenderInterface_.SendPacket(std::move(playerInputPacket));
+    packetSenderInterface_.SendUnreliablePacket(std::move(playerInputPacket));
 
 
     currentFrame_++;

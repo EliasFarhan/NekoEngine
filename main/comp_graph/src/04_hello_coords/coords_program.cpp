@@ -73,7 +73,7 @@ void HelloCoordsProgram::Render()
         return;
     if(textureWall_ == INVALID_TEXTURE_NAME)
     {
-        textureWall_ = textureManager_.GetTextureId(textureWallId_);
+        textureWall_ = textureManager_.GetTexture(textureWallId_).name;
         return;
     }
     std::lock_guard<std::mutex> lock(updateMutex_);

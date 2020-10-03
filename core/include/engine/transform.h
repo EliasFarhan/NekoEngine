@@ -73,7 +73,19 @@ public:
 
 };
 
-class Transform2dManager : public ComponentManager<Mat3f, ComponentType::TRANSFORM2D>
+class TransformManagerInterface :
+        public OnChangeParentInterface
+{
+public:
+    virtual void UpdateDirtyComponent(Entity entity) = 0;
+    virtual void Update() = 0;
+protected:
+    virtual void UpdateTransform(Entity entity) = 0;
+};
+
+class Transform2dManager :
+        public ComponentManager<Mat4f, ComponentType::TRANSFORM2D>,
+        public TransformManagerInterface
 {
 public:
     explicit Transform2dManager(EntityManager& entityManager);
@@ -83,17 +95,26 @@ public:
     [[nodiscard]] Vec2f GetPosition(Entity entity) const;
     [[nodiscard]] Vec2f GetScale(Entity entity) const;
     [[nodiscard]] degree_t GetRotation(Entity entity) const;
+    void OnChangeParent(Entity entity, Entity newParent, Entity oldParent) override;
+    void UpdateDirtyComponent(Entity entity) override;
+    void Update() override;
+    Index AddComponent(Entity entity) override;
 protected:
+    void UpdateTransform(Entity entity) override;
+
     Position2dManager positionManager_;
     Scale2dManager scaleManager_;
     Rotation2dManager rotationManager_;
+    DirtyManager dirtyManager_;
 };
 
-class Transform3dManager : public DoubleBufferComponentManager<Mat4f, ComponentType::TRANSFORM3D>,
-public OnChangeParentInterface
+class Transform3dManager :
+        public DoubleBufferComponentManager<Mat4f, ComponentType::TRANSFORM3D>,
+        public TransformManagerInterface
+
 {
 public:
-    Transform3dManager(EntityManager& entityManager);
+    explicit Transform3dManager(EntityManager& entityManager);
     void Init();
     void SetPosition(Entity entity, Vec3f position);
     void SetScale(Entity entity, Vec3f scale);
@@ -106,11 +127,11 @@ public:
 	 * \brief This function is called by the Dirty Manager
 	 */
     void UpdateDirtyComponent(Entity entity) override;
-    void Update();
+    void Update() override;
 	Index AddComponent(Entity entity) override;
 protected:
 
-    void UpdateTransform(Entity entity);
+    void UpdateTransform(Entity entity) override;
     Position3dManager position3DManager_;
     Scale3dManager scale3DManager_;
     Rotation3dManager rotation3DManager_;

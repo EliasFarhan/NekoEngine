@@ -29,5 +29,19 @@ namespace neko
 
 using Color3 = Vec3f;
 using Color4 = Vec4f;
-	
+
+namespace Color
+{
+    const static Color3 black = Color3(0.0f,0.0f,0.0f);
+    const static Color3 blue = Color3(0.0f,0.0f,1.0f);
+    const static Color4 transparent = Color4(0.0f,0.0f,0.0f,0.0f);
+    const static Color3 cyan = Color3(0.0f,1.0f,1.0f);
+    const static Color3 gray = Color3(0.5f, 0.5f,0.5f);
+    const static Color3 green = Color3(0,1,0);
+    const static Color3 grey = gray;
+    const static Color3 magenta = Color3(1,0,1);
+    const static Color3 red = Color3(1,0,0);
+    const static Color3 white = Color3(1,1,1);
+    const static Color3 yellow = Color3(1,0.92f, 0.016f);
+}
 }

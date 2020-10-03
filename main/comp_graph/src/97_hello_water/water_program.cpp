@@ -104,13 +104,13 @@ void HelloWaterProgram::Render()
 	}
 	if (dudvTexturer_ == INVALID_TEXTURE_NAME)
 	{
-		dudvTexturer_ = textureManager_.GetTextureId(dudvTexturerId_);
+		dudvTexturer_ = textureManager_.GetTexture(dudvTexturerId_).name;
 		if (dudvTexturer_ == INVALID_TEXTURE_NAME)
 			return;
 	}
 	if (normalMap_ == INVALID_TEXTURE_NAME)
 	{
-		normalMap_ = textureManager_.GetTextureId(normalMapId_);
+		normalMap_ = textureManager_.GetTexture(normalMapId_).name;
 		if (normalMap_ == INVALID_TEXTURE_NAME)
 			return;
 	}

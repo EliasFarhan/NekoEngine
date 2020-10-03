@@ -19,7 +19,7 @@ public:
 	void SetPlayerInput(net::PlayerNumber playerNumber, net::PlayerInput playerInput, net::Frame inputFrame);
 	void StartNewFrame(net::Frame newFrame);
 	void ValidateFrame(net::Frame newValidateFrame);
-	void ConfirmFrame(net::Frame newValidatedFrame, const std::array<PhysicsState, maxPlayerNmb>& physicsStates);
+	void ConfirmFrame(net::Frame newValidatedFrame, const std::array<PhysicsState, maxPlayerNmb>& serverPhysicsState);
 	[[nodiscard]] PhysicsState GetValidatePhysicsState(net::PlayerNumber playerNumber) const;
 	[[nodiscard]] net::Frame GetLastValidateFrame() const { return lastValidateFrame_; }
 	[[nodiscard]] net::Frame GetLastReceivedFrame(net::PlayerNumber playerNumber) const { return lastReceivedFrame_[playerNumber]; }
@@ -37,7 +37,7 @@ private:
 
 	std::uint32_t lastValidateFrame_ = 0;
 	std::uint32_t currentFrame_ = 0;
-	static const size_t windowBufferSize = 3 * 50;
+	static const size_t windowBufferSize = 5 * 50;
 	std::array<std::uint32_t, maxPlayerNmb> lastReceivedFrame_{};
 	std::array<std::array<net::PlayerInput, windowBufferSize>, maxPlayerNmb> inputs_{};
 public:

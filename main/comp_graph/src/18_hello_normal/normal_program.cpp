@@ -111,12 +111,12 @@ void HelloNormalProgram::Render()
 		return;
 	if (normalTex_ == INVALID_TEXTURE_NAME)
 	{
-		normalTex_ = textureManager_.GetTextureId(normalTexId_);
+		normalTex_ = textureManager_.GetTexture(normalTexId_).name;
 		return;
 	}
 	if (diffuseTex_ == INVALID_TEXTURE_NAME)
 	{
-		diffuseTex_ = textureManager_.GetTextureId(diffuseTexId_);
+		diffuseTex_ = textureManager_.GetTexture(diffuseTexId_).name;
 		return;
 	}
 	std::lock_guard<std::mutex> lock(updateMutex_);

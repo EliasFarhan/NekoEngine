@@ -43,6 +43,7 @@ public:
         DEPTH_STENCIL_ATTACHMENT = 1u << 6u,
         DEFAULT = COLOR_ATTACHMENT_0 | DEPTH_RBO
     };
+	~Framebuffer();
     void Create();
     void Reload();
     void Destroy();

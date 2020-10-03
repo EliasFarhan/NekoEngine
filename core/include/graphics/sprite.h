@@ -23,19 +23,41 @@
  SOFTWARE.
  */
 #include <engine/component.h>
+#include "engine/system.h"
+#include "graphics/graphics.h"
 #include "graphics/texture.h"
 
 namespace neko
 {
-template<class T, class S>
-class SpriteManager : public ComponentManager<S, EntityMask(NekoComponentType::SPRITE2D)>
+class Transform2dManager;
+
+struct Sprite
+{
+    Sprite() = default;
+    ~Sprite() = default;
+    TextureId textureId = INVALID_TEXTURE_ID;
+    Texture texture{};
+};
+
+class SpriteManager :
+	public ComponentManager<Sprite, ComponentType::SPRITE2D>,
+	public SystemInterface,
+	public RenderCommandInterface
 {
 public:
-    explicit SpriteManager(EntityManager& entityManager, TextureManager<T>& textureManager) :
-            ComponentManager<S, EntityMask(NekoComponentType::SPRITE2D)>(entityManager),textureManager_(textureManager)
-    {}
+    explicit SpriteManager(
+        EntityManager& entityManager,
+        TextureManager& textureManager, 
+        Transform2dManager& transformManager) :
+    ComponentManager<Sprite, ComponentType::SPRITE2D>(entityManager),
+	textureManager_(textureManager),
+	transformManager_(transformManager)
+	{}
 
+	void Update(seconds dt) override;
+	void SetTexture(Entity entity, TextureId textureId);
 protected:
-    TextureManager<T>& textureManager_;
+    TextureManager& textureManager_;
+    Transform2dManager& transformManager_;
 };
 }

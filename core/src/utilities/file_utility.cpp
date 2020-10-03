@@ -122,6 +122,18 @@ void BufferFile::Destroy()
 	dataBuffer = nullptr;
 	dataLength = 0;
 }
+
+
+BufferFile::~BufferFile()
+{
+	Destroy();
+}
+
+void ResourceJob::Reset()
+{
+	Job::Reset();
+	bufferFile_.Destroy();
+}
 }
 
 #else

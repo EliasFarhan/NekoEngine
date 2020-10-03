@@ -30,10 +30,8 @@ namespace neko
 template<class T = Vec2f>
 struct Rect
 {
-    explicit Rect(T Center, T HalfSize) : center(Center), halfSize(HalfSize)
-    {
-
-    }
+    Rect() : center(T()), halfSize(T()) { }
+    explicit Rect(T Center, T HalfSize) : center(Center), halfSize(HalfSize) { }
 
     template<typename U = float>
     U GetRadius()

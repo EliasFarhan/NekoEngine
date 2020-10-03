@@ -23,15 +23,25 @@
  SOFTWARE.
  */
 
-#include "graphics/texture.h"
+#include "graphics/sprite.h"
+#include "gl/shader.h"
+#include "gl/shape.h"
+
 
 namespace neko::gl
 {
-class Sprite
+
+class SpriteManager : public neko::SpriteManager
 {
 public:
+    using neko::SpriteManager::SpriteManager;
+	void Init() override;
+	void Destroy() override;
+
+	void Render() override;
+	
 private:
-    static gl::Shader spriteShader_;
-    TextureName texture_;
+	gl::Shader spriteShader_;
+	gl::RenderQuad spriteQuad_{Vec3f::zero, Vec2f::one};
 };
 }

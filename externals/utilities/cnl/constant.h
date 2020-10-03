@@ -63,19 +63,12 @@ namespace cnl {
 #endif
         }
 
-#if defined(_MSC_VER)
-        // NOLINTNEXTLINE(hicpp-explicit-conversions, google-explicit-constructor)
-        CNL_NODISCARD constexpr operator auto() const -> value_type
-        {
-            return value;
-        }
-#else
         // NOLINTNEXTLINE(hicpp-explicit-conversions, google-explicit-constructor)
         CNL_NODISCARD constexpr operator value_type() const
         {
             return value;
         }
-#endif
+
     };
 
     ////////////////////////////////////////////////////////////////////////////////
