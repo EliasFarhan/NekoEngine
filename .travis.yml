@@ -30,11 +30,10 @@ matrix:
       os: windows
       env:
         - CMAKE_PATH="/c/Program Files/CMake/bin"
-        - VULKAN_SDK="/c/VulkanSDK/1.2.141.0"
         - MSBUILD_PATH="C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin"
       before_install:
         - choco install python
-        - choco install vulkan-sdk --version=1.2.141.0
+        - choco install vulkan-sdk
       install:
         - choco install visualstudio2019buildtools --package-parameters "--add Microsoft.VisualStudio.Component.VC.Tools.x86.x64"
       script:
