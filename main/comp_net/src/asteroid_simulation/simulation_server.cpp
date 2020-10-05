@@ -4,6 +4,7 @@
 #include "asteroid/game_manager.h"
 #include "asteroid/packet_type.h"
 #include "comp_net/packet.h"
+#include "imgui.h"
 
 namespace neko::net
 {
@@ -61,14 +62,30 @@ void SimulationServer::Destroy()
 {
 }
 
+void SimulationServer::DrawImGui()
+{
+	ImGui::Begin("Server");
+	float minDelay = avgDelay_-marginDelay_;
+	float maxDelay = avgDelay_+marginDelay_;
+	bool hasDelayChanged = false;
+	hasDelayChanged = hasDelayChanged || ImGui::SliderFloat("Min Delay", &minDelay, 0.01f, maxDelay);
+	hasDelayChanged = hasDelayChanged || ImGui::SliderFloat("Max Delay", &maxDelay, minDelay, 1.0f);
+	if(hasDelayChanged)
+	{
+		avgDelay_ = (maxDelay + minDelay) / 2.0f;
+		marginDelay_ = (maxDelay - minDelay) / 2.0f;
+	}
+	ImGui::End();
+}
+
 void SimulationServer::SendPacket(std::unique_ptr<asteroid::Packet> packet)
 {
-    sentPackets_.push_back({ avgDelay, std::move(packet) });
+    sentPackets_.push_back({ avgDelay_+RandomRange(-marginDelay_, marginDelay_), std::move(packet) });
 }
 
 void SimulationServer::ReceivePacket(std::unique_ptr<asteroid::Packet> packet)
 {
-    receivedPackets_.push_back({ avgDelay, std::move(packet) });
+    receivedPackets_.push_back({ avgDelay_ + RandomRange(-marginDelay_, marginDelay_), std::move(packet) });
 }
 
 void SimulationServer::ProcessReceivePacket(std::unique_ptr<asteroid::Packet> packet)

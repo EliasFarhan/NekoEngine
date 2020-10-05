@@ -10,20 +10,20 @@
 namespace neko::net
 {
 
-const float avgDelay = 0.25f;
 struct DelayPacket
 {
 	float currentTime = 0.0f;
 	std::unique_ptr<asteroid::Packet> packet = nullptr;
 };
 class SimulationClient;
-class SimulationServer : public SystemInterface
+class SimulationServer : public SystemInterface, public DrawImGuiInterface
 {
 public:
 	explicit SimulationServer(std::array<std::unique_ptr<SimulationClient>, 2>& clients);
 	void Init() override;
 	void Update(seconds dt) override;
 	void Destroy() override;
+	void DrawImGui() override;
     void ReceivePacket(std::unique_ptr<asteroid::Packet> packet);
 private:
     void SendPacket(std::unique_ptr<asteroid::Packet> packet);
@@ -50,5 +50,8 @@ private:
 	    degree_t(-90.0f),
 	    degree_t(90.0f)
 	};
+
+	float avgDelay_ = 0.25f;
+	float marginDelay_ = 0.1f;
 };
 }
