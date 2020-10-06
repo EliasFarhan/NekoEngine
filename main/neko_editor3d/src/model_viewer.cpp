@@ -59,7 +59,19 @@ void ModelViewer::DrawImGui()
 		{
 			ImGui::Text("Meshes");
 			ImGui::Text("Meshes Nmb: %u", scene_->mNumMeshes);
-			
+			for(unsigned i = 0; i < scene_->mNumMeshes; i++)
+			{
+				auto* mesh = scene_->mMeshes[i];
+				if(mesh->HasBones())
+				{
+					ImGui::Text("Mesh %s has %u bones", mesh->mName.C_Str(), mesh->mNumBones);
+					for(unsigned j = 0; j < mesh->mNumBones; j++)
+					{
+						auto* bone = mesh->mBones[j];
+						ImGui::Text("Bone %s", bone->mName.C_Str());
+					}
+				}
+			}
 		}
 		if(scene_->HasMaterials())
 		{

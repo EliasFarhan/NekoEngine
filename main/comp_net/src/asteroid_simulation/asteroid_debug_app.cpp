@@ -98,8 +98,7 @@ void AsteroidDebugApp::Destroy()
 
 void AsteroidDebugApp::DrawImGui()
 {
-	ImGui::Begin("Rollback Simulation");
-	ImGui::End();
+	server_.DrawImGui();
 	for (auto& client : clients_)
 	{
 		client->DrawImGui();
