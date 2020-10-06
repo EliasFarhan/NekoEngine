@@ -50,7 +50,7 @@ const EntityMask INVALID_ENTITY_MASK = 0u;
 const EntityHash INVALID_ENTITY_HASH = EntityHash(0);
 enum class ComponentType : std::uint32_t;
 
-template<typename T, ComponentType componentType>
+template<typename T, EntityMask componentType>
 class ComponentManager;
 
 /**
@@ -95,7 +95,7 @@ public:
 
     [[nodiscard]] Entity FindEntityByName(const std::string& entityName);
 
-    template<typename T, ComponentType componentType>
+    template<typename T, EntityMask componentType>
     void RegisterComponentManager(ComponentManager<T, componentType>& componentManager)
     {
         onDestroyEntity.RegisterCallback(
@@ -125,11 +125,12 @@ class DirtyManager
 {
 public:
     explicit DirtyManager(EntityManager& entityManager);
+    DirtyManager( const DirtyManager & ) = default;
     void SetDirty(Entity entity);
 
     void UpdateDirtyEntities();
 	
-    template<typename T, ComponentType componentType>
+    template<typename T, EntityMask componentType>
     void RegisterComponentManager(ComponentManager<T, componentType>* componentManager)
     {
         updateDirtyEntity.RegisterCallback(
@@ -138,7 +139,7 @@ public:
 	
 private:
 	
-    EntityManager& entityManager_;
+    std::reference_wrapper<EntityManager> entityManager_;
     Action<Entity> updateDirtyEntity;
     std::vector<Entity> dirtyEntities_;
 };

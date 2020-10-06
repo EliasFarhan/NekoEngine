@@ -35,12 +35,12 @@ namespace neko
 {
 
 
-class Position2dManager : public ComponentManager<Vec2f, ComponentType::POSITION2D>
+class Position2dManager : public ComponentManager<Vec2f, EntityMask(ComponentType::POSITION2D)>
 {
     using ComponentManager::ComponentManager;
 };
 
-class Scale2dManager : public ComponentManager<Vec2f, ComponentType::SCALE2D>
+class Scale2dManager : public ComponentManager<Vec2f, EntityMask(ComponentType::SCALE2D)>
 {
 public:
     using ComponentManager::ComponentManager;
@@ -48,24 +48,24 @@ public:
 
 };
 
-class Rotation2dManager : public ComponentManager<degree_t, ComponentType::ROTATION2D>
+class Rotation2dManager : public ComponentManager<degree_t, EntityMask(ComponentType::ROTATION2D)>
 {
     using ComponentManager::ComponentManager;
 };
 
 
-class Position3dManager : public ComponentManager<Vec3f, ComponentType::POSITION3D>
+class Position3dManager : public ComponentManager<Vec3f, EntityMask(ComponentType::POSITION3D)>
 {
     using ComponentManager::ComponentManager;
 };
 
 
-class Rotation3dManager : public ComponentManager<EulerAngles, ComponentType::ROTATION3D>
+class Rotation3dManager : public ComponentManager<EulerAngles, EntityMask(ComponentType::ROTATION3D)>
 {
     using ComponentManager::ComponentManager;
 };
 
-class Scale3dManager : public ComponentManager<Vec3f, ComponentType::SCALE3D>
+class Scale3dManager : public ComponentManager<Vec3f, EntityMask(ComponentType::SCALE3D)>
 {
 public:
     using ComponentManager::ComponentManager;
@@ -84,7 +84,7 @@ protected:
 };
 
 class Transform2dManager :
-        public ComponentManager<Mat4f, ComponentType::TRANSFORM2D>,
+        public ComponentManager<Mat4f, EntityMask(ComponentType::TRANSFORM2D)>,
         public TransformManagerInterface
 {
 public:
@@ -109,7 +109,7 @@ protected:
 };
 
 class Transform3dManager :
-        public DoubleBufferComponentManager<Mat4f, ComponentType::TRANSFORM3D>,
+        public DoubleBufferComponentManager<Mat4f, EntityMask(ComponentType::TRANSFORM3D)>,
         public TransformManagerInterface
 
 {

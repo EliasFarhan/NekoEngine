@@ -223,6 +223,12 @@ void GameManager::Validate(net::Frame newValidateFrame)
 	}
     rollbackManager_.ValidateFrame(newValidateFrame);
 }
+
+void GameManager::SpawnBullet(net::PlayerNumber, Vec2f position, Vec2f velocity)
+{
+
+}
+
 void ClientGameManager::SetPlayerInput(net::PlayerNumber playerNumber, net::PlayerInput playerInput, std::uint32_t inputFrame)
 {
 	if (playerNumber == net::INVALID_PLAYER)

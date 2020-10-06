@@ -45,6 +45,7 @@ public:
 	void Update(seconds dt) override;
 	void Destroy() override;
 	virtual void SpawnPlayer(net::PlayerNumber playerNumber, Vec2f position, degree_t rotation);
+	virtual void SpawnBullet(net::PlayerNumber, Vec2f position, Vec2f velocity);
 	[[nodiscard]] Entity GetEntityFromPlayerNumber(net::PlayerNumber playerNumber) const;
 	[[nodiscard]] net::Frame GetCurrentFrame() const { return currentFrame_; }
 	[[nodiscard]] net::Frame GetLastValidateFrame() const { return rollbackManager_.GetLastValidateFrame(); }

@@ -32,8 +32,8 @@ namespace neko::asteroid
 RollbackManager::RollbackManager(GameManager& gameManager, EntityManager& entityManager):
 	gameManager_(gameManager), currentTransformManager_(entityManager),
 	currentPhysicsManager_(entityManager), lastValidatePhysicsManager_(entityManager),
-	currentPlayerManager_(entityManager, currentPhysicsManager_),
-	lastValidatePlayerCharacter_(entityManager, lastValidatePhysicsManager_)
+	currentPlayerManager_(entityManager, currentPhysicsManager_, gameManager_),
+	lastValidatePlayerCharacter_(entityManager, lastValidatePhysicsManager_, gameManager_)
 {
 	for(auto& input: inputs_)
 	{
@@ -152,8 +152,9 @@ PhysicsState RollbackManager::GetValidatePhysicsState(net::PlayerNumber playerNu
 {
 	PhysicsState state = 0;
     const Entity playerEntity = gameManager_.GetEntityFromPlayerNumber(playerNumber);
-    const auto& playerCharacter = lastValidatePhysicsManager_.GetBody(playerEntity);
-	auto pos = playerCharacter.position;
+    const auto& playerBody = lastValidatePhysicsManager_.GetBody(playerEntity);
+
+    const auto pos = playerBody.position;
 	const auto* posPtr = reinterpret_cast<const PhysicsState*>(&pos);
 	//Adding position
 	for(size_t i = 0; i < sizeof(Vec2f)/sizeof(PhysicsState); i++)
@@ -162,23 +163,23 @@ PhysicsState RollbackManager::GetValidatePhysicsState(net::PlayerNumber playerNu
 	}
 
 	//Adding velocity
-	auto velocity = playerCharacter.velocity;
+	const auto velocity = playerBody.velocity;
 	const auto* velocityPtr = reinterpret_cast<const PhysicsState*>(&velocity);
 	for(size_t i = 0; i < sizeof(Vec2f)/sizeof(PhysicsState); i++)
     {
 	    state += velocityPtr[i];
     }
     //Adding rotation
-    auto angle = playerCharacter.rotation;
+    const auto angle = playerBody.rotation.value();
     const auto* anglePtr = reinterpret_cast<const PhysicsState*>(&angle);
-    for (size_t i = 0; i < sizeof(degree_t) / sizeof(PhysicsState); i++)
+    for (size_t i = 0; i < sizeof(float) / sizeof(PhysicsState); i++)
     {
         state += anglePtr[i];
     }
     //Adding angular Velocity
-    auto angularVelocity = playerCharacter.angularVelocity;
+    const auto angularVelocity = playerBody.angularVelocity.value();
     const auto* angularVelPtr = reinterpret_cast<const PhysicsState*>(&angularVelocity);
-    for (size_t i = 0; i < sizeof(degree_t) / sizeof(PhysicsState); i++)
+    for (size_t i = 0; i < sizeof(float) / sizeof(PhysicsState); i++)
     {
         state += angularVelPtr[i];
     }
@@ -190,8 +191,10 @@ void RollbackManager::SpawnPlayer(net::PlayerNumber playerNumber, Entity entity,
     Body playerBody;
     playerBody.position = position;
     playerBody.rotation = rotation;
+    currentPlayerManager_.AddComponent(entity);
     currentPhysicsManager_.AddBody(entity);
     currentPhysicsManager_.SetBody(entity, playerBody);
+    lastValidatePlayerCharacter_.AddComponent(entity);
     lastValidatePhysicsManager_.AddBody(entity);
     lastValidatePhysicsManager_.SetBody(entity, playerBody);
 

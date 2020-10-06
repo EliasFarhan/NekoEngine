@@ -63,32 +63,19 @@ struct Component
  * \brief The Component Manager connects data to entity
  */
 
-template<typename T, ComponentType componentType>
+template<typename T, EntityMask componentType>
 class ComponentManager
 {
 public:
     explicit ComponentManager(EntityManager& entityManager) :
         entityManager_(entityManager)
     {
-		entityManager_.RegisterComponentManager(*this);
+		entityManager_.get().RegisterComponentManager(*this);
         ResizeIfNecessary(components_, INIT_ENTITY_NMB - 1, T{});
     }
 
     virtual ~ComponentManager()
     {};
-    ComponentManager( const ComponentManager & componentManager ) :
-        entityManager_(componentManager.entityManager_),
-        components_(componentManager.components_)
-    {
-
-    }
-
-    ComponentManager & operator= ( const ComponentManager & componentManager)
-    {
-        entityManager_ = componentManager.entityManager_;
-        components_ = componentManager.components_;
-        return *this;
-    }
 
     virtual Index AddComponent(Entity entity);
 
@@ -110,24 +97,24 @@ public:
     virtual void UpdateDirtyComponent([[maybe_unused]]Entity entity){};
 protected:
     std::vector<T> components_;
-    EntityManager& entityManager_;
+    std::reference_wrapper<EntityManager> entityManager_;
 };
 
-template<typename T, ComponentType componentType>
+template<typename T, EntityMask componentType>
 Index ComponentManager<T, componentType>::AddComponent(Entity entity)
 {
     ResizeIfNecessary(components_, entity, T{});
-    entityManager_.AddComponentType(entity, static_cast<EntityMask>(componentType));
+    entityManager_.get().AddComponentType(entity, componentType);
     return entity;
 }
 
-template<typename T, ComponentType componentType>
+template<typename T, EntityMask componentType>
 void ComponentManager<T, componentType>::DestroyComponent(Entity entity)
 {
-    entityManager_.RemoveComponentType(entity, static_cast<EntityMask>(componentType));
+    entityManager_.get().RemoveComponentType(entity, static_cast<EntityMask>(componentType));
 }
 
-template <typename T, ComponentType componentType>
+template <typename T, EntityMask componentType>
 void ComponentManager<T, componentType>::SetComponent(Entity entity, const T& component)
 {
 	components_[entity] = component;
@@ -148,7 +135,7 @@ public:
  * using two buffers instead of one. It can be used for example for component that are modified by the
  * main thread and rendered by the render thread.
  */
-template<typename  T, ComponentType componentType>
+template<typename  T, EntityMask  componentType>
 class DoubleBufferComponentManager :
 	public ComponentManager<T, componentType>,
     public SyncBuffersInterface
@@ -182,7 +169,7 @@ public:
         ResizeIfNecessary(currentComponents_, newSize - 1, {});
 		for(size_t i = 0; i < newSize; i++)
 		{
-			if(this->entityManager_.HasComponent(i, EntityMask(componentType)))
+			if(this->entityManager_.get().HasComponent(i, EntityMask(componentType)))
 			{
                 currentComponents_[i] = this->components_[i];
 			}

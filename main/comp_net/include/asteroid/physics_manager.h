@@ -50,11 +50,11 @@ struct Box
     bool isTrigger = false;
 };
 
-class BodyManager : public ComponentManager<Body, neko::ComponentType::BODY2D>
+class BodyManager : public ComponentManager<Body, EntityMask(neko::ComponentType::BODY2D)>
 {
     using ComponentManager::ComponentManager;
 };
-class BoxManager : public ComponentManager<Box, neko::ComponentType::BOX_COLLIDER2D>
+class BoxManager : public ComponentManager<Box, EntityMask(neko::ComponentType::BOX_COLLIDER2D)>
 {
     using ComponentManager::ComponentManager;
 };
@@ -63,14 +63,13 @@ class PhysicsManager
 {
 public:
     explicit PhysicsManager(EntityManager& entityManager);
-    PhysicsManager (const PhysicsManager& physicsManager);
-    PhysicsManager& operator= ( const PhysicsManager& physicsManager);
+    PhysicsManager (const PhysicsManager& physicsManager) = default;
     void FixedUpdate(seconds dt);
     [[nodiscard]] const Body& GetBody(Entity entity) const;
     void SetBody(Entity entity, const Body& body);
     void AddBody(Entity entity);
 private:
-    EntityManager& entityManager_;
+    std::reference_wrapper<EntityManager> entityManager_;
     BodyManager bodyManager_;
     BoxManager boxManager_;
 };

@@ -34,9 +34,9 @@ PhysicsManager::PhysicsManager(EntityManager& entityManager) :
 
 void PhysicsManager::FixedUpdate(seconds dt)
 {
-    for(Entity entity = 0; entity < entityManager_.GetEntitiesSize(); entity++)
+    for(Entity entity = 0; entity < entityManager_.get().GetEntitiesSize(); entity++)
     {
-        if (!entityManager_.HasComponent(entity, EntityMask(neko::ComponentType::BODY2D)))
+        if (!entityManager_.get().HasComponent(entity, EntityMask(neko::ComponentType::BODY2D)))
             continue;
         auto body = bodyManager_.GetComponent(entity);
         body.position += body.velocity * dt.count();
@@ -60,19 +60,4 @@ void PhysicsManager::AddBody(Entity entity)
     bodyManager_.AddComponent(entity);
 }
 
-PhysicsManager::PhysicsManager(const PhysicsManager& physicsManager) :
-    entityManager_(physicsManager.entityManager_),
-    bodyManager_(physicsManager.bodyManager_),
-    boxManager_(physicsManager.boxManager_)
-{
-
-}
-
-PhysicsManager& PhysicsManager::operator=(const PhysicsManager& physicsManager)
-{
-    entityManager_ = physicsManager.entityManager_;
-    bodyManager_ = physicsManager.bodyManager_;
-    boxManager_ = physicsManager.boxManager_;
-    return *this;
-}
 }

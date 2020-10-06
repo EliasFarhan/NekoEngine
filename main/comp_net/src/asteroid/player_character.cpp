@@ -23,24 +23,26 @@
  */
 
 #include "asteroid/player_character.h"
+#include "asteroid/game_manager.h"
 
 namespace neko::asteroid
 {
 
-PlayerCharacterManager::PlayerCharacterManager(EntityManager& entityManager, PhysicsManager& physicsManager) :
+PlayerCharacterManager::PlayerCharacterManager(EntityManager& entityManager, PhysicsManager& physicsManager, GameManager& gameManager) :
     physicsManager_(physicsManager),
-    ComponentManager<PlayerCharacter, neko::ComponentType(ComponentType::PLAYER_CHARACTER)>(entityManager)
+    gameManager_(gameManager),
+    ComponentManager(entityManager)
 {
 
 }
 
 void PlayerCharacterManager::FixedUpdate(seconds dt)
 {
-    for(Entity playerEntity = 0; playerEntity < entityManager_.GetEntitiesSize(); playerEntity++)
+    for(Entity playerEntity = 0; playerEntity < entityManager_.get().GetEntitiesSize(); playerEntity++)
     {
-        if(!entityManager_.HasComponent(playerEntity, EntityMask(ComponentType::PLAYER_CHARACTER)))
+        if(!entityManager_.get().HasComponent(playerEntity, EntityMask(ComponentType::PLAYER_CHARACTER)))
             continue;
-        auto playerBody = physicsManager_.GetBody(playerEntity);
+        auto playerBody = physicsManager_.get().GetBody(playerEntity);
         auto input = GetComponent(playerEntity).input;
 
         const bool right = input & PlayerInput::RIGHT;
@@ -57,26 +59,19 @@ void PlayerCharacterManager::FixedUpdate(seconds dt)
 
         auto acceleration = ((down ? -1.0f : 0.0f) + (up ? 1.0f : 0.0f)) * dir;
 
-        auto& velocity = playerBody.velocity;
-        velocity += acceleration * GameManager::FixedPeriod;
 
-        physicsManager_.SetBody(playerEntity, playerBody);
+        playerBody.velocity += acceleration * dt.count();
+
+        physicsManager_.get().SetBody(playerEntity, playerBody);
 
     }
 }
 
-PlayerCharacterManager::PlayerCharacterManager(const PlayerCharacterManager& playerCharacterManager) :
-    ComponentManager<PlayerCharacter, neko::ComponentType(ComponentType::PLAYER_CHARACTER)>(playerCharacterManager),
-    physicsManager_(playerCharacterManager.physicsManager_)
-{
-
-}
-
 PlayerCharacterManager& PlayerCharacterManager::operator=(const PlayerCharacterManager& playerCharacterManager)
 {
-    entityManager_ = playerCharacterManager.entityManager_;
-    physicsManager_ = playerCharacterManager.physicsManager_;
+    gameManager_ = playerCharacterManager.gameManager_;
     components_ = playerCharacterManager.components_;
+    //We do NOT copy the physics manager
     return *this;
 }
 }

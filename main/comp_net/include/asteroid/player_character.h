@@ -36,17 +36,17 @@ struct PlayerCharacter
     net::PlayerInput input = 0;
 
 };
-
-class PlayerCharacterManager : public ComponentManager<PlayerCharacter, neko::ComponentType(ComponentType::PLAYER_CHARACTER)>
+class GameManager;
+class PlayerCharacterManager : public ComponentManager<PlayerCharacter, EntityMask(ComponentType::PLAYER_CHARACTER)>
 {
 public:
-    explicit PlayerCharacterManager(EntityManager& entityManager, PhysicsManager& physicsManager);
-    PlayerCharacterManager ( const PlayerCharacterManager & );
-    PlayerCharacterManager& operator= ( const PlayerCharacterManager& );
+    explicit PlayerCharacterManager(EntityManager& entityManager, PhysicsManager& physicsManager, GameManager& gameManager);
+    PlayerCharacterManager& operator= ( const PlayerCharacterManager & );
     void FixedUpdate(seconds dt);
 
 private:
-    PhysicsManager& physicsManager_;
+    std::reference_wrapper<PhysicsManager> physicsManager_;
+    std::reference_wrapper<GameManager> gameManager_;
 };
 
 }

@@ -40,7 +40,7 @@ struct Sprite
 };
 
 class SpriteManager :
-	public ComponentManager<Sprite, ComponentType::SPRITE2D>,
+	public ComponentManager<Sprite, EntityMask(ComponentType::SPRITE2D)>,
 	public SystemInterface,
 	public RenderCommandInterface
 {
@@ -49,7 +49,7 @@ public:
         EntityManager& entityManager,
         TextureManager& textureManager, 
         Transform2dManager& transformManager) :
-    ComponentManager<Sprite, ComponentType::SPRITE2D>(entityManager),
+    ComponentManager(entityManager),
 	textureManager_(textureManager),
 	transformManager_(transformManager)
 	{}

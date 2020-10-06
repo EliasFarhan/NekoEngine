@@ -150,11 +150,11 @@ void DirtyManager::SetDirty(Entity entity)
 void DirtyManager::UpdateDirtyEntities()
 {
     //Fill the dirty entities with all the children in O(n)
-    for (Entity entity = 0; entity < entityManager_.GetEntitiesSize(); entity++)
+    for (Entity entity = 0; entity < entityManager_.get().GetEntitiesSize(); entity++)
     {
-    	if(!entityManager_.EntityExists(entity))
+    	if(!entityManager_.get().EntityExists(entity))
             continue;
-        auto parent = entityManager_.GetEntityParent(entity);
+        auto parent = entityManager_.get().GetEntityParent(entity);
         while (parent != INVALID_ENTITY)
         {
             if (std::find(dirtyEntities_.cbegin(), dirtyEntities_.cend(), parent) != dirtyEntities_.end())
@@ -162,7 +162,7 @@ void DirtyManager::UpdateDirtyEntities()
                 SetDirty(entity);
                 break;
             }
-            parent = entityManager_.GetEntityParent(parent);
+            parent = entityManager_.get().GetEntityParent(parent);
         }
     }
     for (auto entity : dirtyEntities_)

@@ -48,13 +48,13 @@ Index Scale3dManager::AddComponent(Entity entity)
 
 
 Transform2dManager::Transform2dManager(EntityManager& entityManager) :
-	ComponentManager<Mat4f, neko::ComponentType::TRANSFORM2D>(entityManager),
+	ComponentManager<Mat4f, EntityMask(neko::ComponentType::TRANSFORM2D)>(entityManager),
 	positionManager_(entityManager),
 	scaleManager_(entityManager),
     rotationManager_(entityManager),
 	dirtyManager_(entityManager)
 {
-    entityManager_.RegisterOnChangeParent(this);
+    entityManager_.get().RegisterOnChangeParent(this);
     dirtyManager_.RegisterComponentManager(this);
 }
 
@@ -120,7 +120,7 @@ void Transform2dManager::UpdateTransform(Entity entity)
     const auto position = positionManager_.GetComponent(entity);
     transform = Transform3d::Translate(transform, Vec3f(position, 0.0f));
 
-    const auto parent = entityManager_.GetEntityParent(entity);
+    const auto parent = entityManager_.get().GetEntityParent(entity);
     if (parent != INVALID_ENTITY)
     {
         transform =  GetComponent(parent) * transform;
@@ -146,7 +146,7 @@ Transform3dManager::Transform3dManager(EntityManager& entityManager) :
 	rotation3DManager_(entityManager),
 	dirtyManager_(entityManager)
 {
-	entityManager_.RegisterOnChangeParent(this);
+	entityManager_.get().RegisterOnChangeParent(this);
 	dirtyManager_.RegisterComponentManager(this);
 }
 
@@ -162,7 +162,7 @@ void Transform3dManager::UpdateTransform(Entity entity)
 	transform = Transform3d::Scale(transform, scale3DManager_.GetComponent(entity));
     transform = Transform3d::Translate(transform, position3DManager_.GetComponent(entity));
 
-	const auto parent = entityManager_.GetEntityParent(entity);
+	const auto parent = entityManager_.get().GetEntityParent(entity);
 	if (parent != INVALID_ENTITY)
 	{
 		transform =  GetComponent(parent) * transform;

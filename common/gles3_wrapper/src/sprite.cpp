@@ -52,11 +52,11 @@ void SpriteManager::Render()
 	const auto& camera = CameraLocator::get();
 	spriteShader_.SetMat4("view", camera.GenerateViewMatrix());
 	spriteShader_.SetMat4("projection", camera.GenerateProjectionMatrix());
-	for(Entity entity = 0; entity < entityManager_.GetEntitiesSize(); entity++)
+	for(Entity entity = 0; entity < entityManager_.get().GetEntitiesSize(); entity++)
 	{
-        if(!entityManager_.EntityExists(entity))
+        if(!entityManager_.get().EntityExists(entity))
             continue;
-		if(entityManager_.HasComponent(entity, static_cast<EntityMask>(ComponentType::SPRITE2D)))
+		if(entityManager_.get().HasComponent(entity, static_cast<EntityMask>(ComponentType::SPRITE2D)))
 		{
 			const auto& transform = transformManager_.GetComponent(entity);
 			const auto& sprite = GetComponent(entity);
