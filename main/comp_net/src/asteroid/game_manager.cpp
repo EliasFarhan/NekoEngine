@@ -38,13 +38,6 @@ GameManager::GameManager() :
 void GameManager::Init()
 {
     entityMap_.fill(INVALID_ENTITY);
-    /*
-    for(net::PlayerNumber i = 0; i < maxPlayerNmb ; i++)
-    {
-        playerCharacters_.emplace_back(*this);
-    }
-     */
-	//playerCharacters_.resize(4, PlayerCharacter{ *this });
 }
 
 void GameManager::Update(seconds dt)
@@ -195,7 +188,7 @@ void ClientGameManager::FixedUpdate()
         if(startingTime_ != 0)
         {
             using namespace std::chrono;
-            const auto ms = duration_cast< milliseconds >(
+            unsigned long long ms = duration_cast< milliseconds >(
                     system_clock::now().time_since_epoch()
             ).count();
             if(ms > startingTime_)
@@ -260,10 +253,10 @@ void ClientGameManager::SetPlayerInput(net::PlayerNumber playerNumber, net::Play
 	GameManager::SetPlayerInput(playerNumber, playerInput, inputFrame);
 }
 
-void ClientGameManager::StartGame(long startingTIme)
+void ClientGameManager::StartGame(unsigned long long int startingTime)
 {
-    logDebug("Start game at starting time: "+std::to_string(startingTIme));
-    startingTime_ = startingTIme;
+    logDebug("Start game at starting time: "+std::to_string(startingTime));
+    startingTime_ = startingTime;
 }
 
 void ClientGameManager::DrawImGui()
@@ -271,12 +264,12 @@ void ClientGameManager::DrawImGui()
     ImGui::Text(state_ & STARTED ? "Game has started" : "Game has not started");
 	if(startingTime_ != 0)
 	{
-		ImGui::Text("Starting Time: %u", startingTime_);
+		ImGui::Text("Starting Time: %llu", startingTime_);
 		using namespace std::chrono;
-		const auto ms = duration_cast<milliseconds>(
+        unsigned long long ms = duration_cast<milliseconds>(
 			system_clock::now().time_since_epoch()
 			).count();
-		ImGui::Text("Current Time: %u", ms);
+		ImGui::Text("Current Time: %llu", ms);
 	}
 }
 

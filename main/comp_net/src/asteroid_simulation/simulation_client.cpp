@@ -153,12 +153,7 @@ void SimulationClient::ReceivePacket(const asteroid::Packet* packet)
         case asteroid::PacketType::START_GAME:
         {
             const auto* startGamePacket = static_cast<const asteroid::StartGamePacket*>(packet);
-            long startingTime = 0;
-            auto* ptr = reinterpret_cast<std::uint8_t*>(&startingTime);
-            for(int i = 0; i < sizeof(startingTime); i++)
-            {
-                ptr[i] = startGamePacket->startTime[i];
-            }
+            unsigned long long startingTime = ConvertFromBinary<unsigned long long>(startGamePacket->startTime);
             gameManager_.StartGame(startingTime);
             break;
         }

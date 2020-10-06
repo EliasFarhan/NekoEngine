@@ -258,7 +258,7 @@ void ServerNetworkManager::ProcessReceivePacket(
 			auto startGamePacket = std::make_unique<asteroid::StartGamePacket>();
 			startGamePacket->packetType = asteroid::PacketType::START_GAME;
 			using namespace std::chrono;
-			const auto ms = (duration_cast<milliseconds>(
+			const unsigned long long ms = (duration_cast<milliseconds>(
 				system_clock::now().time_since_epoch()
 				) + milliseconds(3000)).count();
 

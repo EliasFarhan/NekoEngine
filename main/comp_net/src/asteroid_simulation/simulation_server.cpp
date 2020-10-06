@@ -159,14 +159,10 @@ void SimulationServer::ProcessReceivePacket(std::unique_ptr<asteroid::Packet> pa
 		    auto startGamePacket = std::make_unique<asteroid::StartGamePacket>();
             startGamePacket->packetType = asteroid::PacketType::START_GAME;
             using namespace std::chrono;
-            auto ms = (duration_cast< milliseconds >(
+            unsigned long long ms = (duration_cast< milliseconds >(
                     system_clock::now().time_since_epoch()
             )+milliseconds(3000)).count();
-            const auto* msPtr = reinterpret_cast<std::uint8_t*>(&ms);
-            for(size_t i = 0; i < sizeof(ms); i++)
-            {
-                startGamePacket->startTime[i] = msPtr[i];
-            }
+            startGamePacket->startTime = ConvertToBinary(ms);
             SendPacket(std::move(startGamePacket));
         }
 

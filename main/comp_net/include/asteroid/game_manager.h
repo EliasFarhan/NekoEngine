@@ -75,7 +75,7 @@ public:
         FINISHED = 1u << 1u,
     };
 	explicit ClientGameManager(PacketSenderInterface& packetSenderInterface);
-	void StartGame(long startingTIme);
+	void StartGame(unsigned long long int startingTime);
 	void Init() override;
 	void Update(seconds dt) override;
 	void Destroy() override;
@@ -101,7 +101,7 @@ protected:
 	gl::TextureManager textureManager_;
 	gl::SpriteManager spriteManager_;
 	float fixedTimer_ = 0.0f;
-	unsigned startingTime_ = 0;
+    unsigned long long startingTime_ = 0;
 	std::uint32_t state_ = 0;
 
     TextureId shipTextureId_ = INVALID_TEXTURE_ID;
