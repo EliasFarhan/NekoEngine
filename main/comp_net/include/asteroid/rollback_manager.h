@@ -51,7 +51,7 @@ public:
     [[nodiscard]] const Transform2dManager& GetTransformManager()const{ return currentTransformManager_; }
 	void SpawnPlayer(net::PlayerNumber playerNumber, Entity entity, Vec2f position, degree_t rotation);
 private:
-    [[nodiscard]] static Body SimulateOneFrame(const Body& playerBody, net::PlayerInput input) ;
+    [[nodiscard]] static Body PlayerFixedUpdate(const Body& playerBodyInput, net::PlayerInput input) ;
 	net::PlayerInput GetInputAtFrame(net::PlayerNumber playerNumber, net::Frame frame);
 	GameManager& gameManager_;
 	/**

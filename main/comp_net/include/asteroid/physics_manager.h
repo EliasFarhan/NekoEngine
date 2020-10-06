@@ -38,13 +38,16 @@ struct Body
 {
     Vec2f position = Vec2f::zero;
     Vec2f velocity = Vec2f::zero;
+    degree_t angularVelocity = degree_t(0.0f);
     degree_t rotation = degree_t(0.0f);
     BodyType bodyType = BodyType::DYNAMIC;
 };
 
 struct Box
 {
-    Vec2f extends;
+    Vec2f center = Vec2f::zero;
+    Vec2f extends = Vec2f::one;
+    bool isTrigger = false;
 };
 
 class BodyManager : public ComponentManager<Body, neko::ComponentType::BODY2D>
@@ -60,11 +63,14 @@ class PhysicsManager
 {
 public:
     explicit PhysicsManager(EntityManager& entityManager);
+    PhysicsManager (const PhysicsManager& physicsManager);
+    PhysicsManager& operator= ( const PhysicsManager& physicsManager);
     void FixedUpdate(seconds dt);
     [[nodiscard]] const Body& GetBody(Entity entity) const;
     void SetBody(Entity entity, const Body& body);
     void AddBody(Entity entity);
 private:
+    EntityManager& entityManager_;
     BodyManager bodyManager_;
     BoxManager boxManager_;
 };

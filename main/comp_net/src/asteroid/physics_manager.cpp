@@ -27,14 +27,22 @@ namespace neko::asteroid
 {
 
 PhysicsManager::PhysicsManager(EntityManager& entityManager) :
-    bodyManager_(entityManager), boxManager_(entityManager)
+    bodyManager_(entityManager), boxManager_(entityManager), entityManager_(entityManager)
 {
 
 }
 
 void PhysicsManager::FixedUpdate(seconds dt)
 {
-
+    for(Entity entity = 0; entity < entityManager_.GetEntitiesSize(); entity++)
+    {
+        if (!entityManager_.HasComponent(entity, EntityMask(neko::ComponentType::BODY2D)))
+            continue;
+        auto body = bodyManager_.GetComponent(entity);
+        body.position += body.velocity * dt.count();
+        body.rotation += body.angularVelocity * dt.count();
+        bodyManager_.SetComponent(entity, body);
+    }
 }
 
 void PhysicsManager::SetBody(Entity entity, const Body& body)
@@ -50,5 +58,21 @@ const Body& PhysicsManager::GetBody(Entity entity) const
 void PhysicsManager::AddBody(Entity entity)
 {
     bodyManager_.AddComponent(entity);
+}
+
+PhysicsManager::PhysicsManager(const PhysicsManager& physicsManager) :
+    entityManager_(physicsManager.entityManager_),
+    bodyManager_(physicsManager.bodyManager_),
+    boxManager_(physicsManager.boxManager_)
+{
+
+}
+
+PhysicsManager& PhysicsManager::operator=(const PhysicsManager& physicsManager)
+{
+    entityManager_ = physicsManager.entityManager_;
+    bodyManager_ = physicsManager.bodyManager_;
+    boxManager_ = physicsManager.boxManager_;
+    return *this;
 }
 }

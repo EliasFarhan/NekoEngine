@@ -21,6 +21,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
+#include <engine/conversion.h>
 #include "asteroid/rollback_manager.h"
 #include "asteroid/game_manager.h"
 
@@ -42,26 +43,25 @@ void RollbackManager::SimulateToCurrentFrame()
 {
 	auto currentFrame = gameManager_.GetCurrentFrame();
 	auto lastValidateFrame = gameManager_.GetLastValidateFrame();
-	std::array<Body, maxPlayerNmb> playerBodies;
+	currentPhysicsManager_ = lastValidatePhysicsManager_;
+	for(net::Frame frame = lastValidateFrame+1; frame <= currentFrame; frame++)
+    {
+        for(net::PlayerNumber playerNumber = 0; playerNumber < maxPlayerNmb; playerNumber++)
+        {
+            const auto playerInput = GetInputAtFrame(playerNumber, frame);
+            const auto playerEntity = gameManager_.GetEntityFromPlayerNumber(playerNumber);
+            auto playerBody = currentPhysicsManager_.GetBody(playerEntity);
+            playerBody = PlayerFixedUpdate(playerBody, playerInput);
+            currentPhysicsManager_.SetBody(playerEntity, playerBody);
+        }
+	    currentPhysicsManager_.FixedUpdate(seconds(GameManager::FixedPeriod));
+    }
     for(net::PlayerNumber playerNumber = 0; playerNumber < maxPlayerNmb; playerNumber++)
     {
         const auto playerEntity = gameManager_.GetEntityFromPlayerNumber(playerNumber);
-        playerBodies[playerNumber] = lastValidatePhysicsManager_.GetBody(playerEntity);
-    }
-	for(net::Frame frame = lastValidateFrame + 1; frame <= currentFrame; frame++)
-    {
-	    for(net::PlayerNumber playerNumber = 0; playerNumber < maxPlayerNmb; playerNumber++)
-        {
-            const auto playerInput = GetInputAtFrame(playerNumber, frame);
-            playerBodies[playerNumber] = SimulateOneFrame(playerBodies[playerNumber], playerInput);
-        }
-    }
-	for(net::PlayerNumber playerNumber = 0; playerNumber < maxPlayerNmb; playerNumber++)
-    {
-	    const auto playerEntity = gameManager_.GetEntityFromPlayerNumber(playerNumber);
-	    currentTransformManager_.SetPosition(playerEntity, playerBodies[playerNumber].position);
-	    currentTransformManager_.SetRotation(playerEntity, playerBodies[playerNumber].rotation);
-	    currentPhysicsManager_.SetBody(playerEntity, playerBodies[playerNumber]);
+        const auto playerBody = currentPhysicsManager_.GetBody(playerEntity);
+        currentTransformManager_.SetPosition(playerEntity, playerBody.position);
+        currentTransformManager_.SetRotation(playerEntity, playerBody.rotation);
     }
 }
 void RollbackManager::SetPlayerInput(net::PlayerNumber playerNumber, net::PlayerInput playerInput, std::uint32_t inputFrame)
@@ -115,24 +115,18 @@ void RollbackManager::ValidateFrame(net::Frame newValidateFrame)
 			return;
 		}
 	}
-    std::array<Body, maxPlayerNmb> playerBodies;
-    for(net::PlayerNumber playerNumber = 0; playerNumber < maxPlayerNmb; playerNumber++)
-    {
-        const auto playerEntity = gameManager_.GetEntityFromPlayerNumber(playerNumber);
-        playerBodies[playerNumber] = lastValidatePhysicsManager_.GetBody(playerEntity);
-    }
+
     for(net::Frame frame = lastValidateFrame_ + 1; frame <= newValidateFrame; frame++)
     {
         for(net::PlayerNumber playerNumber = 0; playerNumber < maxPlayerNmb; playerNumber++)
         {
             const auto playerInput = GetInputAtFrame(playerNumber, frame);
-            playerBodies[playerNumber] = SimulateOneFrame(playerBodies[playerNumber], playerInput);
+            const auto playerEntity = gameManager_.GetEntityFromPlayerNumber(playerNumber);
+            auto playerBody = lastValidatePhysicsManager_.GetBody(playerEntity);
+            playerBody = PlayerFixedUpdate(playerBody, playerInput);
+            lastValidatePhysicsManager_.SetBody(playerEntity, playerBody);
         }
-    }
-    for(net::PlayerNumber playerNumber = 0; playerNumber < maxPlayerNmb; playerNumber++)
-    {
-        const auto playerEntity = gameManager_.GetEntityFromPlayerNumber(playerNumber);
-        lastValidatePhysicsManager_.SetBody(playerEntity, playerBodies[playerNumber]);
+        lastValidatePhysicsManager_.FixedUpdate(seconds(GameManager::FixedPeriod));
     }
 	lastValidateFrame_ = newValidateFrame;
 }
@@ -171,23 +165,29 @@ PhysicsState RollbackManager::GetValidatePhysicsState(net::PlayerNumber playerNu
     //Adding rotation
     auto angle = playerCharacter.rotation;
     const auto* anglePtr = reinterpret_cast<const PhysicsState*>(&angle);
-    for (size_t i = 0; i < sizeof(float) / sizeof(PhysicsState); i++)
+    for (size_t i = 0; i < sizeof(degree_t) / sizeof(PhysicsState); i++)
     {
         state += anglePtr[i];
     }
-
+    //Adding angular Velocity
+    auto angularVelocity = playerCharacter.angularVelocity;
+    const auto* angularVelPtr = reinterpret_cast<const PhysicsState*>(&angularVelocity);
+    for (size_t i = 0; i < sizeof(degree_t) / sizeof(PhysicsState); i++)
+    {
+        state += angularVelPtr[i];
+    }
 	return state;
 }
 
 void RollbackManager::SpawnPlayer(net::PlayerNumber playerNumber, Entity entity, Vec2f position, degree_t rotation)
 {
-    Body playerCharacter;
-    playerCharacter.position = position;
-    playerCharacter.rotation = rotation;
+    Body playerBody;
+    playerBody.position = position;
+    playerBody.rotation = rotation;
     currentPhysicsManager_.AddBody(entity);
-    currentPhysicsManager_.SetBody(entity, playerCharacter);
+    currentPhysicsManager_.SetBody(entity, playerBody);
     lastValidatePhysicsManager_.AddBody(entity);
-    lastValidatePhysicsManager_.SetBody(entity, playerCharacter);
+    lastValidatePhysicsManager_.SetBody(entity, playerBody);
 
     currentTransformManager_.AddComponent(entity);
     currentTransformManager_.SetPosition(entity, position);
@@ -199,34 +199,28 @@ net::PlayerInput RollbackManager::GetInputAtFrame(net::PlayerNumber playerNumber
 	return inputs_[playerNumber][currentFrame_ - frame];
 }
 
-Body RollbackManager::SimulateOneFrame(const Body& playerCharacterInput, net::PlayerInput playerInput)
+Body RollbackManager::PlayerFixedUpdate(const Body& playerBodyInput, net::PlayerInput input)
 {
-    Body playerCharacterOutput;
+    Body playerBodyOutput = playerBodyInput;
 
-    const bool right = playerInput & PlayerInput::RIGHT;
-    const bool left = playerInput & PlayerInput::LEFT;
-    const bool up = playerInput & PlayerInput::UP;
-    const bool down = playerInput & PlayerInput::DOWN;
+    const bool right = input & PlayerInput::RIGHT;
+    const bool left = input & PlayerInput::LEFT;
+    const bool up = input & PlayerInput::UP;
+    const bool down = input & PlayerInput::DOWN;
 
     auto angularVelocity = ((left ? 1.0f : 0.0f) + (right ? -1.0f : 0.0f)) * playerAngularSpeed;
 
-    auto& rotation = playerCharacterOutput.rotation;
-    rotation = playerCharacterInput.rotation;
-    rotation += angularVelocity * GameManager::FixedPeriod;
+    playerBodyOutput.angularVelocity = angularVelocity;
 
     auto dir = Vec2f::up;
-    dir = dir.Rotate(-rotation);
+    dir = dir.Rotate(-playerBodyInput.rotation);
 
     auto acceleration = ((down ? -1.0f : 0.0f) + (up ? 1.0f : 0.0f)) * dir;
 
-    auto& velocity = playerCharacterOutput.velocity;
-    velocity = playerCharacterInput.velocity;
+    auto& velocity = playerBodyOutput.velocity;
     velocity += acceleration * GameManager::FixedPeriod;
 
-    auto& position = playerCharacterOutput.position;
-    position = playerCharacterInput.position;
-    position += velocity * GameManager::FixedPeriod;
-    return playerCharacterOutput;
+    return playerBodyOutput;
 }
 
 

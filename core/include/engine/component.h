@@ -76,6 +76,19 @@ public:
 
     virtual ~ComponentManager()
     {};
+    ComponentManager( const ComponentManager & componentManager ) :
+        entityManager_(componentManager.entityManager_),
+        components_(componentManager.components_)
+    {
+
+    }
+
+    ComponentManager & operator= ( const ComponentManager & componentManager)
+    {
+        entityManager_ = componentManager.entityManager_;
+        components_ = componentManager.components_;
+        return *this;
+    }
 
     virtual Index AddComponent(Entity entity);
 
