@@ -57,9 +57,11 @@ public:
 	[[nodiscard]] net::Frame GetCurrentFrame()const { return currentFrame_; }
     [[nodiscard]] const Transform2dManager& GetTransformManager()const{ return currentTransformManager_; }
 	void SpawnPlayer(net::PlayerNumber playerNumber, Entity entity, Vec2f position, degree_t rotation);
+	void SpawnBullet(net::PlayerNumber playerNumber, Entity entity, Vec2f position, Vec2f velocity);
 private:
 	net::PlayerInput GetInputAtFrame(net::PlayerNumber playerNumber, net::Frame frame);
 	GameManager& gameManager_;
+	EntityManager& entityManager_;
 	/**
 	 * \brief Used for rendering
 	 */
@@ -70,9 +72,11 @@ private:
 	PlayerCharacterManager lastValidatePlayerCharacter_;
 
 
-	std::uint32_t lastValidateFrame_ = 0;
-	std::uint32_t currentFrame_ = 0;
-	static const size_t windowBufferSize = 5 * 50;
+	net::Frame lastValidateFrame_ = 0;
+	net::Frame currentFrame_ = 0;
+	net::Frame testedFrame_ = 0;
+
+    static const size_t windowBufferSize = 5 * 50;
 	std::array<std::uint32_t, maxPlayerNmb> lastReceivedFrame_{};
 	std::array<std::array<net::PlayerInput, windowBufferSize>, maxPlayerNmb> inputs_{};
 	std::vector<CreatedEntity> createdEntities_;

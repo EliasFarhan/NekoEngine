@@ -239,8 +239,8 @@ void ClientNetworkManager::SetWindowSize(Vec2u windowSize)
 void ClientNetworkManager::ReceivePacket(sf::Packet& packet, PacketSource source)
 {
 	const auto receivePacket = asteroid::GenerateReceivedPacket(packet);
-	logDebug("[Client] Received packet: " +
-		std::to_string(static_cast<int>(receivePacket->packetType)));
+	//logDebug("[Client] Received packet: " +
+	//	std::to_string(static_cast<int>(receivePacket->packetType)));
 	switch (receivePacket->packetType)
 	{
 	case asteroid::PacketType::SPAWN_PLAYER:

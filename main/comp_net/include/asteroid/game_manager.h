@@ -45,12 +45,12 @@ public:
 	void Update(seconds dt) override;
 	void Destroy() override;
 	virtual void SpawnPlayer(net::PlayerNumber playerNumber, Vec2f position, degree_t rotation);
-	virtual void SpawnBullet(net::PlayerNumber, Vec2f position, Vec2f velocity);
+	virtual Entity SpawnBullet(net::PlayerNumber, Vec2f position, Vec2f velocity);
 	[[nodiscard]] Entity GetEntityFromPlayerNumber(net::PlayerNumber playerNumber) const;
 	[[nodiscard]] net::Frame GetCurrentFrame() const { return currentFrame_; }
 	[[nodiscard]] net::Frame GetLastValidateFrame() const { return rollbackManager_.GetLastValidateFrame(); }
-	const Transform2dManager& GetTransformManager() const { return transformManager_; }
-	const RollbackManager& GetRollbackManager() const { return rollbackManager_; }
+	[[nodiscard]] const Transform2dManager& GetTransformManager() const { return transformManager_; }
+    [[nodiscard]] const RollbackManager& GetRollbackManager() const { return rollbackManager_; }
 	virtual void SetPlayerInput(net::PlayerNumber playerNumber, net::PlayerInput playerInput, std::uint32_t inputFrame);
 	/*
 	 * \brief Called by the server to validate a frame
@@ -85,6 +85,7 @@ public:
 	void SetClientPlayer(net::PlayerNumber clientPlayer) { clientPlayer_ = clientPlayer; }
 	[[nodiscard]] const Camera2D& GetCamera() const { return camera_; }
 	void SpawnPlayer(net::PlayerNumber playerNumber, Vec2f position, degree_t rotation) override;
+	Entity SpawnBullet(net::PlayerNumber playerNumber, Vec2f position, Vec2f velocity) override;
 	void FixedUpdate();
 	void SetPlayerInput(net::PlayerNumber playerNumber, net::PlayerInput playerInput, std::uint32_t inputFrame) override;
     void DrawImGui() override;
@@ -104,6 +105,7 @@ protected:
 	std::uint32_t state_ = 0;
 
     TextureId shipTextureId_ = INVALID_TEXTURE_ID;
+    TextureId bulletTextureId_ = INVALID_TEXTURE_ID;
 };
 
 }

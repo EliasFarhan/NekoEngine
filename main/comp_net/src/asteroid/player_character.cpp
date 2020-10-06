@@ -21,7 +21,6 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-
 #include "asteroid/player_character.h"
 #include "asteroid/game_manager.h"
 
@@ -43,7 +42,8 @@ void PlayerCharacterManager::FixedUpdate(seconds dt)
         if(!entityManager_.get().HasComponent(playerEntity, EntityMask(ComponentType::PLAYER_CHARACTER)))
             continue;
         auto playerBody = physicsManager_.get().GetBody(playerEntity);
-        auto input = GetComponent(playerEntity).input;
+        auto playerCharacter = GetComponent(playerEntity);
+        auto input = playerCharacter.input;
 
         const bool right = input & PlayerInput::RIGHT;
         const bool left = input & PlayerInput::LEFT;
@@ -64,6 +64,23 @@ void PlayerCharacterManager::FixedUpdate(seconds dt)
 
         physicsManager_.get().SetBody(playerEntity, playerBody);
 
+        if(playerCharacter.shootingTime < playerShootingPeriod)
+        {
+            playerCharacter.shootingTime += dt.count();
+            SetComponent(playerEntity, playerCharacter);
+        }
+
+        if (playerCharacter.shootingTime >= playerShootingPeriod)
+        {
+            if(input & PlayerInput::SHOOT)
+            {
+                gameManager_.get().SpawnBullet(playerCharacter.playerNumber,
+                                               playerBody.position,
+                                               dir * bulletSpeed);
+                playerCharacter.shootingTime = 0.0f;
+                SetComponent(playerEntity, playerCharacter);
+            }
+        }
     }
 }
 

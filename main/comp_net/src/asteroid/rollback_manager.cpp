@@ -31,6 +31,7 @@ namespace neko::asteroid
 
 RollbackManager::RollbackManager(GameManager& gameManager, EntityManager& entityManager):
 	gameManager_(gameManager), currentTransformManager_(entityManager),
+	entityManager_(entityManager),
 	currentPhysicsManager_(entityManager), lastValidatePhysicsManager_(entityManager),
 	currentPlayerManager_(entityManager, currentPhysicsManager_, gameManager_),
 	lastValidatePlayerCharacter_(entityManager, lastValidatePhysicsManager_, gameManager_)
@@ -45,10 +46,19 @@ void RollbackManager::SimulateToCurrentFrame()
 {
 	auto currentFrame = gameManager_.GetCurrentFrame();
 	auto lastValidateFrame = gameManager_.GetLastValidateFrame();
+	for(auto& createdEntity : createdEntities_)
+    {
+	    if(createdEntity.createdFrame > lastValidateFrame)
+        {
+            entityManager_.DestroyEntity(createdEntity.entity);
+        }
+    }
+	createdEntities_.clear();
 	currentPhysicsManager_ = lastValidatePhysicsManager_;
 	currentPlayerManager_ = lastValidatePlayerCharacter_;
 	for(net::Frame frame = lastValidateFrame+1; frame <= currentFrame; frame++)
     {
+        testedFrame_ = frame;
 	    //Copy player input to player manager
         for(net::PlayerNumber playerNumber = 0; playerNumber < maxPlayerNmb; playerNumber++)
         {
@@ -61,12 +71,13 @@ void RollbackManager::SimulateToCurrentFrame()
         currentPlayerManager_.FixedUpdate(seconds(GameManager::FixedPeriod));
 	    currentPhysicsManager_.FixedUpdate(seconds(GameManager::FixedPeriod));
     }
-    for(net::PlayerNumber playerNumber = 0; playerNumber < maxPlayerNmb; playerNumber++)
+    for(Entity entity = 0; entity < entityManager_.GetEntitiesSize(); entity++)
     {
-        const auto playerEntity = gameManager_.GetEntityFromPlayerNumber(playerNumber);
-        const auto playerBody = currentPhysicsManager_.GetBody(playerEntity);
-        currentTransformManager_.SetPosition(playerEntity, playerBody.position);
-        currentTransformManager_.SetRotation(playerEntity, playerBody.rotation);
+        if(!entityManager_.HasComponent(entity, EntityMask(neko::ComponentType::BODY2D) | EntityMask(neko::ComponentType::TRANSFORM2D)))
+            continue;
+        const auto body = currentPhysicsManager_.GetBody(entity);
+        currentTransformManager_.SetPosition(entity, body.position);
+        currentTransformManager_.SetRotation(entity, body.rotation);
     }
 }
 void RollbackManager::SetPlayerInput(net::PlayerNumber playerNumber, net::PlayerInput playerInput, std::uint32_t inputFrame)
@@ -112,6 +123,17 @@ void RollbackManager::StartNewFrame(net::Frame newFrame)
 
 void RollbackManager::ValidateFrame(net::Frame newValidateFrame)
 {
+
+    auto lastValidateFrame = gameManager_.GetLastValidateFrame();
+    for(auto& createdEntity : createdEntities_)
+    {
+        if(createdEntity.createdFrame > lastValidateFrame)
+        {
+            entityManager_.DestroyEntity(createdEntity.entity);
+        }
+    }
+    createdEntities_.clear();
+
 	for(net::PlayerNumber playerNumber = 0; playerNumber < maxPlayerNmb; playerNumber++ )
 	{
 		if(GetLastReceivedFrame(playerNumber) < newValidateFrame)
@@ -120,21 +142,30 @@ void RollbackManager::ValidateFrame(net::Frame newValidateFrame)
 			return;
 		}
 	}
-
+    currentPhysicsManager_ = lastValidatePhysicsManager_;
+    currentPlayerManager_ = lastValidatePlayerCharacter_;
     for(net::Frame frame = lastValidateFrame_ + 1; frame <= newValidateFrame; frame++)
     {
+        testedFrame_ = frame;
         for(net::PlayerNumber playerNumber = 0; playerNumber < maxPlayerNmb; playerNumber++)
         {
             const auto playerInput = GetInputAtFrame(playerNumber, frame);
             const auto playerEntity = gameManager_.GetEntityFromPlayerNumber(playerNumber);
-            auto playerCharacter = lastValidatePlayerCharacter_.GetComponent(playerEntity);
+            auto playerCharacter = currentPlayerManager_.GetComponent(playerEntity);
             playerCharacter.input = playerInput;
-            lastValidatePlayerCharacter_.SetComponent(playerEntity, playerCharacter);
+            currentPlayerManager_.SetComponent(playerEntity, playerCharacter);
         }
-        lastValidatePlayerCharacter_.FixedUpdate(seconds(GameManager::FixedPeriod));
-        lastValidatePhysicsManager_.FixedUpdate(seconds(GameManager::FixedPeriod));
+        currentPlayerManager_.FixedUpdate(seconds(GameManager::FixedPeriod));
+        currentPhysicsManager_.FixedUpdate(seconds(GameManager::FixedPeriod));
     }
+    lastValidatePlayerCharacter_ = currentPlayerManager_;
+    lastValidatePhysicsManager_ = currentPhysicsManager_;
 	lastValidateFrame_ = newValidateFrame;
+	//Remove validated bullet
+	createdEntities_.erase(std::remove_if(createdEntities_.begin(), createdEntities_.end(),
+                                       [this](const auto& createdEntitiy) {
+	    return createdEntitiy.createdFrame <= lastValidateFrame_;
+	}), createdEntities_.end());
 }
 void RollbackManager::ConfirmFrame(net::Frame newValidateFrame, const std::array<PhysicsState, maxPlayerNmb>& serverPhysicsState)
 {
@@ -191,10 +222,19 @@ void RollbackManager::SpawnPlayer(net::PlayerNumber playerNumber, Entity entity,
     Body playerBody;
     playerBody.position = position;
     playerBody.rotation = rotation;
+
+    PlayerCharacter playerCharacter;
+    playerCharacter.playerNumber = playerNumber;
+
     currentPlayerManager_.AddComponent(entity);
+    currentPlayerManager_.SetComponent(entity, playerCharacter);
+
     currentPhysicsManager_.AddBody(entity);
     currentPhysicsManager_.SetBody(entity, playerBody);
+
     lastValidatePlayerCharacter_.AddComponent(entity);
+    lastValidatePlayerCharacter_.SetComponent(entity, playerCharacter);
+
     lastValidatePhysicsManager_.AddBody(entity);
     lastValidatePhysicsManager_.SetBody(entity, playerBody);
 
@@ -206,6 +246,23 @@ void RollbackManager::SpawnPlayer(net::PlayerNumber playerNumber, Entity entity,
 net::PlayerInput RollbackManager::GetInputAtFrame(net::PlayerNumber playerNumber, net::Frame frame)
 {
 	return inputs_[playerNumber][currentFrame_ - frame];
+}
+
+void RollbackManager::SpawnBullet(net::PlayerNumber playerNumber, Entity entity, Vec2f position, Vec2f velocity)
+{
+    createdEntities_.push_back({entity, testedFrame_});
+
+    Body bulletBody;
+    bulletBody.position = position;
+    bulletBody.velocity = velocity;
+
+    currentPhysicsManager_.AddBody(entity);
+    currentPhysicsManager_.SetBody(entity, bulletBody);
+
+    currentTransformManager_.AddComponent(entity);
+    currentTransformManager_.SetPosition(entity, position);
+    currentTransformManager_.SetScale(entity, Vec2f::one*bulletScale);
+    currentTransformManager_.SetRotation(entity, degree_t(0.0f));
 }
 
 }

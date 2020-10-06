@@ -59,7 +59,7 @@ Entity EntityManager::CreateEntity(Entity entity)
         {
             const auto newEntity = entityMaskArray_.size();
             ResizeIfNecessary(entityMaskArray_, newEntity, INVALID_ENTITY_MASK);
-            ResizeIfNecessary(parentEntities_, entity, INVALID_ENTITY);
+            ResizeIfNecessary(parentEntities_, newEntity, INVALID_ENTITY);
 			ResizeIfNecessary(entityHashArray_, newEntity, INVALID_ENTITY_HASH);
         	AddComponentType(Entity(newEntity), static_cast<EntityMask>(ComponentType::EMPTY));
             return Entity(newEntity);

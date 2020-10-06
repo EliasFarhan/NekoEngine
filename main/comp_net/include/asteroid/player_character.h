@@ -34,6 +34,7 @@ struct PlayerCharacter
 {
     float shootingTime = 0.0f;
     net::PlayerInput input = 0;
+    net::PlayerNumber playerNumber = net::INVALID_PLAYER;
 
 };
 class GameManager;
