@@ -1,3 +1,26 @@
+/*
+ MIT License
+
+ Copyright (c) 2020 SAE Institute Switzerland AG
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
+ */
 #include "asteroid/rollback_manager.h"
 #include "asteroid/game_manager.h"
 
@@ -7,7 +30,7 @@ namespace neko::asteroid
 
 RollbackManager::RollbackManager(GameManager& gameManager, EntityManager& entityManager):
 	gameManager_(gameManager), currentTransformManager_(entityManager),
-	currentPlayerManager_(entityManager), lastValidatePlayerManager_(entityManager)
+	currentPhysicsManager_(entityManager), lastValidatePhysicsManager_(entityManager)
 {
 	for(auto& input: inputs_)
 	{
@@ -19,26 +42,26 @@ void RollbackManager::SimulateToCurrentFrame()
 {
 	auto currentFrame = gameManager_.GetCurrentFrame();
 	auto lastValidateFrame = gameManager_.GetLastValidateFrame();
-	std::array<PlayerCharacter, maxPlayerNmb> players;
+	std::array<Body, maxPlayerNmb> playerBodies;
     for(net::PlayerNumber playerNumber = 0; playerNumber < maxPlayerNmb; playerNumber++)
     {
         const auto playerEntity = gameManager_.GetEntityFromPlayerNumber(playerNumber);
-        players[playerNumber] = lastValidatePlayerManager_.GetComponent(playerEntity);
+        playerBodies[playerNumber] = lastValidatePhysicsManager_.GetBody(playerEntity);
     }
 	for(net::Frame frame = lastValidateFrame + 1; frame <= currentFrame; frame++)
     {
 	    for(net::PlayerNumber playerNumber = 0; playerNumber < maxPlayerNmb; playerNumber++)
         {
             const auto playerInput = GetInputAtFrame(playerNumber, frame);
-            players[playerNumber] = SimulateOneFrame(players[playerNumber], playerInput);
+            playerBodies[playerNumber] = SimulateOneFrame(playerBodies[playerNumber], playerInput);
         }
     }
 	for(net::PlayerNumber playerNumber = 0; playerNumber < maxPlayerNmb; playerNumber++)
     {
 	    const auto playerEntity = gameManager_.GetEntityFromPlayerNumber(playerNumber);
-	    currentTransformManager_.SetPosition(playerEntity, players[playerNumber].position);
-	    currentTransformManager_.SetRotation(playerEntity, players[playerNumber].rotation);
-	    currentPlayerManager_.SetComponent(playerEntity, players[playerNumber]);
+	    currentTransformManager_.SetPosition(playerEntity, playerBodies[playerNumber].position);
+	    currentTransformManager_.SetRotation(playerEntity, playerBodies[playerNumber].rotation);
+	    currentPhysicsManager_.SetBody(playerEntity, playerBodies[playerNumber]);
     }
 }
 void RollbackManager::SetPlayerInput(net::PlayerNumber playerNumber, net::PlayerInput playerInput, std::uint32_t inputFrame)
@@ -92,24 +115,24 @@ void RollbackManager::ValidateFrame(net::Frame newValidateFrame)
 			return;
 		}
 	}
-    std::array<PlayerCharacter, maxPlayerNmb> players;
+    std::array<Body, maxPlayerNmb> playerBodies;
     for(net::PlayerNumber playerNumber = 0; playerNumber < maxPlayerNmb; playerNumber++)
     {
         const auto playerEntity = gameManager_.GetEntityFromPlayerNumber(playerNumber);
-        players[playerNumber] = lastValidatePlayerManager_.GetComponent(playerEntity);
+        playerBodies[playerNumber] = lastValidatePhysicsManager_.GetBody(playerEntity);
     }
     for(net::Frame frame = lastValidateFrame_ + 1; frame <= newValidateFrame; frame++)
     {
         for(net::PlayerNumber playerNumber = 0; playerNumber < maxPlayerNmb; playerNumber++)
         {
             const auto playerInput = GetInputAtFrame(playerNumber, frame);
-            players[playerNumber] = SimulateOneFrame(players[playerNumber], playerInput);
+            playerBodies[playerNumber] = SimulateOneFrame(playerBodies[playerNumber], playerInput);
         }
     }
     for(net::PlayerNumber playerNumber = 0; playerNumber < maxPlayerNmb; playerNumber++)
     {
         const auto playerEntity = gameManager_.GetEntityFromPlayerNumber(playerNumber);
-        lastValidatePlayerManager_.SetComponent(playerEntity, players[playerNumber]);
+        lastValidatePhysicsManager_.SetBody(playerEntity, playerBodies[playerNumber]);
     }
 	lastValidateFrame_ = newValidateFrame;
 }
@@ -129,7 +152,7 @@ PhysicsState RollbackManager::GetValidatePhysicsState(net::PlayerNumber playerNu
 {
 	PhysicsState state = 0;
     const Entity playerEntity = gameManager_.GetEntityFromPlayerNumber(playerNumber);
-    const auto& playerCharacter = lastValidatePlayerManager_.GetComponent(playerEntity);
+    const auto& playerCharacter = lastValidatePhysicsManager_.GetBody(playerEntity);
 	auto pos = playerCharacter.position;
 	const auto* posPtr = reinterpret_cast<const PhysicsState*>(&pos);
 	//Adding position
@@ -158,13 +181,13 @@ PhysicsState RollbackManager::GetValidatePhysicsState(net::PlayerNumber playerNu
 
 void RollbackManager::SpawnPlayer(net::PlayerNumber playerNumber, Entity entity, Vec2f position, degree_t rotation)
 {
-    PlayerCharacter playerCharacter;
+    Body playerCharacter;
     playerCharacter.position = position;
     playerCharacter.rotation = rotation;
-    currentPlayerManager_.AddComponent(entity);
-    currentPlayerManager_.SetComponent(entity, playerCharacter);
-    lastValidatePlayerManager_.AddComponent(entity);
-    lastValidatePlayerManager_.SetComponent(entity, playerCharacter);
+    currentPhysicsManager_.AddBody(entity);
+    currentPhysicsManager_.SetBody(entity, playerCharacter);
+    lastValidatePhysicsManager_.AddBody(entity);
+    lastValidatePhysicsManager_.SetBody(entity, playerCharacter);
 
     currentTransformManager_.AddComponent(entity);
     currentTransformManager_.SetPosition(entity, position);
@@ -176,9 +199,9 @@ net::PlayerInput RollbackManager::GetInputAtFrame(net::PlayerNumber playerNumber
 	return inputs_[playerNumber][currentFrame_ - frame];
 }
 
-PlayerCharacter RollbackManager::SimulateOneFrame(const PlayerCharacter& playerCharacterInput, net::PlayerInput playerInput)
+Body RollbackManager::SimulateOneFrame(const Body& playerCharacterInput, net::PlayerInput playerInput)
 {
-    PlayerCharacter playerCharacterOutput;
+    Body playerCharacterOutput;
 
     const bool right = playerInput & PlayerInput::RIGHT;
     const bool left = playerInput & PlayerInput::LEFT;

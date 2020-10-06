@@ -21,38 +21,34 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-
-#pragma once
-#include "mathematics/angle.h"
-#include "engine/entity.h"
-#include "engine/component.h"
+#include "asteroid/physics_manager.h"
 
 namespace neko::asteroid
 {
 
-const std::uint32_t maxPlayerNmb = 2;
-const float playerSpeed = 1.0f;
-const degree_t playerAngularSpeed = degree_t(90.0f);
-
-enum class ComponentType : EntityMask
+PhysicsManager::PhysicsManager(EntityManager& entityManager) :
+    bodyManager_(entityManager), boxManager_(entityManager)
 {
-    PLAYER_CHARACTER = static_cast<EntityMask>(neko::ComponentType::OTHER_TYPE),
-    BULLET = static_cast<EntityMask>(neko::ComponentType::OTHER_TYPE) << 1u,
-    ASTEROID = static_cast<EntityMask>(neko::ComponentType::OTHER_TYPE) << 2u,
-    PLAYER_INPUT = static_cast<EntityMask>(neko::ComponentType::OTHER_TYPE) << 3u,
 
-};
+}
 
-namespace PlayerInput
+void PhysicsManager::FixedUpdate(seconds dt)
 {
-enum PlayerInput : std::uint8_t
+
+}
+
+void PhysicsManager::SetBody(Entity entity, const Body& body)
 {
-    NONE = 0u,
-    UP = 1u << 0u,
-    DOWN = 1u << 1u,
-    LEFT = 1u << 2u,
-    RIGHT = 1u << 3u,
-    SHOOT = 1u << 4u,
-};
+    bodyManager_.SetComponent(entity, body);
+}
+
+const Body& PhysicsManager::GetBody(Entity entity) const
+{
+    return bodyManager_.GetComponent(entity);
+}
+
+void PhysicsManager::AddBody(Entity entity)
+{
+    bodyManager_.AddComponent(entity);
 }
 }

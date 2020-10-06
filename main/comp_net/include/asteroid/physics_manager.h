@@ -23,36 +23,50 @@
  */
 
 #pragma once
-#include "mathematics/angle.h"
-#include "engine/entity.h"
+#include "mathematics/vector.h"
 #include "engine/component.h"
 
 namespace neko::asteroid
 {
 
-const std::uint32_t maxPlayerNmb = 2;
-const float playerSpeed = 1.0f;
-const degree_t playerAngularSpeed = degree_t(90.0f);
-
-enum class ComponentType : EntityMask
+enum class BodyType
 {
-    PLAYER_CHARACTER = static_cast<EntityMask>(neko::ComponentType::OTHER_TYPE),
-    BULLET = static_cast<EntityMask>(neko::ComponentType::OTHER_TYPE) << 1u,
-    ASTEROID = static_cast<EntityMask>(neko::ComponentType::OTHER_TYPE) << 2u,
-    PLAYER_INPUT = static_cast<EntityMask>(neko::ComponentType::OTHER_TYPE) << 3u,
-
+    DYNAMIC,
+    STATIC
+};
+struct Body
+{
+    Vec2f position = Vec2f::zero;
+    Vec2f velocity = Vec2f::zero;
+    degree_t rotation = degree_t(0.0f);
+    BodyType bodyType = BodyType::DYNAMIC;
 };
 
-namespace PlayerInput
+struct Box
 {
-enum PlayerInput : std::uint8_t
-{
-    NONE = 0u,
-    UP = 1u << 0u,
-    DOWN = 1u << 1u,
-    LEFT = 1u << 2u,
-    RIGHT = 1u << 3u,
-    SHOOT = 1u << 4u,
+    Vec2f extends;
 };
-}
+
+class BodyManager : public ComponentManager<Body, neko::ComponentType::BODY2D>
+{
+    using ComponentManager::ComponentManager;
+};
+class BoxManager : public ComponentManager<Box, neko::ComponentType::BOX_COLLIDER2D>
+{
+    using ComponentManager::ComponentManager;
+};
+
+class PhysicsManager
+{
+public:
+    explicit PhysicsManager(EntityManager& entityManager);
+    void FixedUpdate(seconds dt);
+    [[nodiscard]] const Body& GetBody(Entity entity) const;
+    void SetBody(Entity entity, const Body& body);
+    void AddBody(Entity entity);
+private:
+    BodyManager bodyManager_;
+    BoxManager boxManager_;
+};
+
 }
