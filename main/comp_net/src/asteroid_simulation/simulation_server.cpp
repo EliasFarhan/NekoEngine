@@ -174,12 +174,8 @@ void SimulationServer::ProcessReceivePacket(std::unique_ptr<asteroid::Packet> pa
 		//Manage internal state
 		const auto* playerInputPacket = static_cast<const asteroid::PlayerInputPacket*>(packet.get());
 		const auto playerNumber = playerInputPacket->playerNumber;
-		std::uint32_t inputFrame = 0;
-		auto* inputPtr = reinterpret_cast<std::uint8_t*>(&inputFrame);
-		for (size_t i = 0; i < sizeof(std::uint32_t); i++)
-		{
-			inputPtr[i] = playerInputPacket->currentFrame[i];
-		}
+		std::uint32_t inputFrame = ConvertFromBinary<net::Frame>(playerInputPacket->currentFrame);
+
 		for (std::uint32_t i = 0; i < playerInputPacket->inputs.size(); i++)
 		{
 			gameManager_.SetPlayerInput(playerNumber,

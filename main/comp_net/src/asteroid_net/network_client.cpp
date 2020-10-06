@@ -21,7 +21,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-
+#include <chrono>
 #include "asteroid_net/network_client.h"
 #include "engine/engine.h"
 #include "imgui.h"
@@ -49,8 +49,7 @@ void ClientNetworkManager::Init()
 
 void ClientNetworkManager::Update(seconds dt)
 {
-	gameManager_.Update(dt);
-	RendererLocator::get().Render(this);
+
 	if (currentState_ != State::NONE)
 	{
 	    auto status = sf::Socket::Done;
@@ -118,6 +117,9 @@ void ClientNetworkManager::Update(seconds dt)
 			break;
 		}
 	}
+
+    gameManager_.Update(dt);
+    RendererLocator::get().Render(this);
 }
 
 void ClientNetworkManager::Destroy()
@@ -153,6 +155,9 @@ void ClientNetworkManager::DrawImGui()
 			logDebug("[Client] Connect to server " + serverAddress_.toString() + " with port: " + std::to_string(serverTcpPort_));
 			auto joinPacket = std::make_unique<asteroid::JoinPacket>();
 			joinPacket->clientId = ConvertToBinary<ClientId>(clientId_);
+            using namespace std::chrono;
+			auto clientTime = (duration_cast<milliseconds>(system_clock::now().time_since_epoch())).count();
+            joinPacket->startTime = ConvertToBinary<unsigned long>(clientTime);
 			SendReliablePacket(std::move(joinPacket));
 			currentState_ = State::JOINING;
 		}
@@ -183,7 +188,7 @@ void ClientNetworkManager::Render()
 void ClientNetworkManager::SendReliablePacket(std::unique_ptr<asteroid::Packet> packet)
 {
 
-	logDebug("[Client] Sending reliable packet to server");
+	//logDebug("[Client] Sending reliable packet to server");
 	sf::Packet tcpPacket;
 	GeneratePacket(tcpPacket, *packet);
 	auto status = sf::Socket::Partial;
@@ -202,8 +207,8 @@ void ClientNetworkManager::SendUnreliablePacket(std::unique_ptr<asteroid::Packet
 	switch (status)
 	{
 	case sf::Socket::Done:
-		logDebug("[Client] Sending UDP packet to server at host: " +
-			serverAddress_.toString() + " port: " + std::to_string(serverUdpPort_));
+		//logDebug("[Client] Sending UDP packet to server at host: " +
+		//	serverAddress_.toString() + " port: " + std::to_string(serverUdpPort_));
 		break;
 	case sf::Socket::NotReady:
 		logDebug("[Client] Error sending UDP to server, NOT READY");
@@ -326,7 +331,7 @@ void ClientNetworkManager::ReceivePacket(sf::Packet& packet, PacketSource source
 	case asteroid::PacketType::START_GAME:
 	{
 		const auto* startGamePacket = static_cast<const asteroid::StartGamePacket*>(receivePacket.get());
-		gameManager_.StartGame(ConvertFromBinary<unsigned long long>(startGamePacket->startTime));
+		gameManager_.StartGame(ConvertFromBinary<unsigned long>(startGamePacket->startTime));
 		break;
 	}
 	case asteroid::PacketType::JOIN_ACK:

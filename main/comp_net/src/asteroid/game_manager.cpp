@@ -21,10 +21,15 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
+#include <engine/conversion.h>
 #include "asteroid/game_manager.h"
 #include "engine/engine.h"
 #include "imgui.h"
 #include "asteroid/rollback_manager.h"
+
+#ifdef EASY_PROFILE_USE
+#include "easy/profiler.h"
+#endif
 
 namespace neko::asteroid
 {
@@ -121,15 +126,19 @@ void ClientGameManager::Init()
 
 void ClientGameManager::Update(seconds dt)
 {
-    textureManager_.Update(dt);
-    spriteManager_.Update(dt);
-    transformManager_.Update();
+    std::lock_guard<std::mutex> lock(renderMutex_);
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("Game Manager Update");
+#endif
 	fixedTimer_ += dt.count();
 	while (fixedTimer_> FixedPeriod)
 	{
 		FixedUpdate();
 		fixedTimer_ -= FixedPeriod;
 	}
+	textureManager_.Update(dt);
+    spriteManager_.Update(dt);
+    transformManager_.Update();
 }
 
 void ClientGameManager::Destroy()
@@ -147,6 +156,10 @@ void ClientGameManager::SetWindowSize(Vec2u windowsSize)
 
 void ClientGameManager::Render()
 {
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("Game Manager Render");
+#endif
+    std::lock_guard<std::mutex> lock(renderMutex_);
 	glViewport(0, 0, windowSize_.x, windowSize_.y);
     CameraLocator::provide(&camera_);
 	spriteManager_.Render();
@@ -183,6 +196,9 @@ Entity ClientGameManager::SpawnBullet(net::PlayerNumber playerNumber, Vec2f posi
 
 void ClientGameManager::FixedUpdate()
 {
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("Game Manager Fixed Update");
+#endif
     if(!(state_ & STARTED))
     {
         if(startingTime_ != 0)
@@ -211,24 +227,19 @@ void ClientGameManager::FixedUpdate()
     //Copy rollback transform position to our own
 	for(Entity entity = 0; entity < entityManager_.GetEntitiesSize(); entity++)
 	{
-        if (entity == INVALID_ENTITY ||
-            !entityManager_.HasComponent(entity, EntityMask(neko::ComponentType::TRANSFORM2D)))
+        if (!entityManager_.HasComponent(entity, EntityMask(neko::ComponentType::TRANSFORM2D)))
             continue;
         transformManager_.SetPosition(entity, rollbackManager_.GetTransformManager().GetPosition(entity));
         transformManager_.SetScale(entity, rollbackManager_.GetTransformManager().GetScale(entity));
         transformManager_.SetRotation(entity, rollbackManager_.GetTransformManager().GetRotation(entity));
+        transformManager_.UpdateDirtyComponent(entity);
     }
     //We send the player inputs when the game started
 
     const auto& inputs = rollbackManager_.GetInputs(GetPlayerNumber());
-    const auto* framePtr = reinterpret_cast<std::uint8_t*>(&currentFrame_);
-
     std::unique_ptr<asteroid::PlayerInputPacket> playerInputPacket = std::make_unique<asteroid::PlayerInputPacket>();
     playerInputPacket->playerNumber = GetPlayerNumber();
-    for(size_t i = 0; i < sizeof(net::Frame);i++)
-    {
-        playerInputPacket->currentFrame[i] = framePtr[i];
-    }
+    playerInputPacket->currentFrame = ConvertToBinary(currentFrame_);
     for (size_t i = 0; i < playerInputPacket->inputs.size(); i++)
     {
         if(i > currentFrame_)

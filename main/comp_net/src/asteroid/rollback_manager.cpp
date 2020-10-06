@@ -25,6 +25,10 @@
 #include "asteroid/rollback_manager.h"
 #include "asteroid/game_manager.h"
 
+#ifdef EASY_PROFILE_USE
+#include "easy/profiler.h"
+#endif
+
 namespace neko::asteroid
 {
 
@@ -44,9 +48,12 @@ RollbackManager::RollbackManager(GameManager& gameManager, EntityManager& entity
 
 void RollbackManager::SimulateToCurrentFrame()
 {
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("Simulate To Current Frame");
+#endif
 	auto currentFrame = gameManager_.GetCurrentFrame();
 	auto lastValidateFrame = gameManager_.GetLastValidateFrame();
-	for(auto& createdEntity : createdEntities_)
+	for(const auto& createdEntity : createdEntities_)
     {
 	    if(createdEntity.createdFrame > lastValidateFrame)
         {
@@ -78,6 +85,7 @@ void RollbackManager::SimulateToCurrentFrame()
         const auto body = currentPhysicsManager_.GetBody(entity);
         currentTransformManager_.SetPosition(entity, body.position);
         currentTransformManager_.SetRotation(entity, body.rotation);
+        currentTransformManager_.UpdateDirtyComponent(entity);
     }
 }
 void RollbackManager::SetPlayerInput(net::PlayerNumber playerNumber, net::PlayerInput playerInput, std::uint32_t inputFrame)
@@ -113,7 +121,7 @@ void RollbackManager::StartNewFrame(net::Frame newFrame)
 			inputs[i] = inputs[i-delta];
 		}
 
-		for (std::uint32_t i = 0; i < delta; i++)
+		for (net::Frame i = 0; i < delta; i++)
 		{
 			inputs[i] = inputs[delta];
 		}
@@ -123,9 +131,11 @@ void RollbackManager::StartNewFrame(net::Frame newFrame)
 
 void RollbackManager::ValidateFrame(net::Frame newValidateFrame)
 {
-
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("Validate Frame");
+#endif
     auto lastValidateFrame = gameManager_.GetLastValidateFrame();
-    for(auto& createdEntity : createdEntities_)
+    for(const auto& createdEntity : createdEntities_)
     {
         if(createdEntity.createdFrame > lastValidateFrame)
         {
@@ -261,8 +271,9 @@ void RollbackManager::SpawnBullet(net::PlayerNumber playerNumber, Entity entity,
 
     currentTransformManager_.AddComponent(entity);
     currentTransformManager_.SetPosition(entity, position);
-    currentTransformManager_.SetScale(entity, Vec2f::one*bulletScale);
+    currentTransformManager_.SetScale(entity, Vec2f::one * bulletScale);
     currentTransformManager_.SetRotation(entity, degree_t(0.0f));
+    currentTransformManager_.UpdateDirtyComponent(entity);
 }
 
 }

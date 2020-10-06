@@ -98,16 +98,17 @@ sf::Packet& operator>>(sf::Packet& packet, std::array<T, N>& t) {
 struct JoinPacket : TypedPacket<PacketType::JOIN>
 {
     std::array<std::uint8_t, sizeof(net::ClientId)> clientId{};
+    std::array<std::uint8_t, sizeof(unsigned long long)> startTime{};
 };
 
 inline sf::Packet& operator<<(sf::Packet& packet, const JoinPacket& joinPacket)
 {
-	return packet << joinPacket.clientId;
+	return packet << joinPacket.clientId << joinPacket.startTime;
 }
 
 inline sf::Packet& operator>>(sf::Packet& packet, JoinPacket& joinPacket)
 {
-	return packet >> joinPacket.clientId;
+	return packet >> joinPacket.clientId >> joinPacket.startTime;
 }
 /**
  * \brief TCP Packet sent by the server to the client to answer a join packet
@@ -178,7 +179,7 @@ inline sf::Packet& operator>>(sf::Packet& packet, PlayerInputPacket& playerInput
 
 struct StartGamePacket : TypedPacket<PacketType::START_GAME>
 {
-    std::array<std::uint8_t, sizeof(unsigned long long)> startTime{};
+    std::array<std::uint8_t, sizeof(unsigned long)> startTime{};
 };
 
 

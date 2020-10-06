@@ -11,8 +11,10 @@ namespace neko::net
 struct ClientInfo
 {
     ClientId clientId = 0;
+    unsigned long long timeDifference = 0;
     sf::IpAddress udpRemoteAddress;
     unsigned short udpRemotePort = 0;
+
 
 };
 class ServerNetworkManager : public asteroid::PacketSenderInterface, public SystemInterface

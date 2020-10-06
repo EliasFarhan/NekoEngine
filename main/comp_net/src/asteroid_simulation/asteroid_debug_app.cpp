@@ -77,12 +77,11 @@ void AsteroidDebugApp::Update(seconds dt)
 	clientInput2 = clientInput2 | (keys[SDL_SCANCODE_SPACE] ? asteroid::PlayerInput::SHOOT : 0u);
 
 	clients_[1]->SetPlayerInput(clientInput2);
+    server_.Update(dt);
 	for (auto& client : clients_)
 	{
 		client->Update(dt);
 	}
-	server_.Update(dt);
-
 	RendererLocator::get().Render(this);
 }
 

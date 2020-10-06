@@ -43,21 +43,21 @@ void PlayerCharacterManager::FixedUpdate(seconds dt)
             continue;
         auto playerBody = physicsManager_.get().GetBody(playerEntity);
         auto playerCharacter = GetComponent(playerEntity);
-        auto input = playerCharacter.input;
+        const auto input = playerCharacter.input;
 
         const bool right = input & PlayerInput::RIGHT;
         const bool left = input & PlayerInput::LEFT;
         const bool up = input & PlayerInput::UP;
         const bool down = input & PlayerInput::DOWN;
 
-        auto angularVelocity = ((left ? 1.0f : 0.0f) + (right ? -1.0f : 0.0f)) * playerAngularSpeed;
+        const auto angularVelocity = ((left ? 1.0f : 0.0f) + (right ? -1.0f : 0.0f)) * playerAngularSpeed;
 
         playerBody.angularVelocity = angularVelocity;
 
         auto dir = Vec2f::up;
-        dir = dir.Rotate(-playerBody.rotation);
+        dir = dir.Rotate(-(playerBody.rotation + playerBody.angularVelocity * dt.count()));
 
-        auto acceleration = ((down ? -1.0f : 0.0f) + (up ? 1.0f : 0.0f)) * dir;
+        const auto acceleration = ((down ? -1.0f : 0.0f) + (up ? 1.0f : 0.0f)) * dir;
 
 
         playerBody.velocity += acceleration * dt.count();
@@ -74,9 +74,12 @@ void PlayerCharacterManager::FixedUpdate(seconds dt)
         {
             if(input & PlayerInput::SHOOT)
             {
+                const auto bulletVelocity = dir * bulletSpeed +
+                        (Vec2f::Dot(playerBody.velocity, dir) > 0.0f ? playerBody.velocity : Vec2f::zero);
+                const auto bulletPosition = playerBody.position + dir * 0.5f + playerBody.velocity * dt.count();
                 gameManager_.get().SpawnBullet(playerCharacter.playerNumber,
-                                               playerBody.position,
-                                               dir * bulletSpeed);
+                                               bulletPosition,
+                                               bulletVelocity);
                 playerCharacter.shootingTime = 0.0f;
                 SetComponent(playerEntity, playerCharacter);
             }

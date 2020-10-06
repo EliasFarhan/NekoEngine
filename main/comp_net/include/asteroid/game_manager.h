@@ -106,6 +106,7 @@ protected:
 
     TextureId shipTextureId_ = INVALID_TEXTURE_ID;
     TextureId bulletTextureId_ = INVALID_TEXTURE_ID;
+    std::mutex renderMutex_;
 };
 
 }

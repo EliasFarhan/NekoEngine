@@ -216,8 +216,9 @@ void ServerNetworkManager::ProcessReceivePacket(
 		joinAckPacket->udpPort = ConvertToBinary(udpPort_);
 		if (packetSource == PacketSocketSource::UDP)
 		{
-			clientMap_[playerNumber].udpRemoteAddress = address;
-			clientMap_[playerNumber].udpRemotePort = port;
+		    auto& clientInfo = clientMap_[playerNumber];
+			clientInfo.udpRemoteAddress = address;
+			clientInfo.udpRemotePort = port;
 			SendUnreliablePacket(std::move(joinAckPacket));
 		}
 		else
@@ -229,8 +230,14 @@ void ServerNetworkManager::ProcessReceivePacket(
 			//Player joined twice!
 			return;
 		}
+		//Calculate time difference
+		auto clientTime = ConvertFromBinary<unsigned long long>(joinPacket->startTime);
+        using namespace std::chrono;
+		unsigned long deltaTime = (duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count())-clientTime;
+		logDebug("Client Server deltaTime: "+std::to_string(deltaTime));
 		clientMap_[lastPlayerNumber_] = {
 			clientId,
+			deltaTime,
 			"",
 			static_cast<unsigned short>(0u) };
 		//Spawning the new player in the arena
@@ -258,7 +265,7 @@ void ServerNetworkManager::ProcessReceivePacket(
 			auto startGamePacket = std::make_unique<asteroid::StartGamePacket>();
 			startGamePacket->packetType = asteroid::PacketType::START_GAME;
 			using namespace std::chrono;
-			const unsigned long long ms = (duration_cast<milliseconds>(
+			const unsigned long ms = (duration_cast<milliseconds>(
 				system_clock::now().time_since_epoch()
 				) + milliseconds(3000)).count();
 
