@@ -27,10 +27,17 @@
 #include "engine/transform.h"
 #include "asteroid/packet_type.h"
 #include "asteroid/physics_manager.h"
+#include "player_character.h"
 
 namespace neko::asteroid
 {
 class GameManager;
+
+struct CreatedEntity
+{
+    Entity entity = INVALID_ENTITY;
+    net::Frame createdFrame = 0;
+};
 
 class RollbackManager
 {
@@ -51,7 +58,6 @@ public:
     [[nodiscard]] const Transform2dManager& GetTransformManager()const{ return currentTransformManager_; }
 	void SpawnPlayer(net::PlayerNumber playerNumber, Entity entity, Vec2f position, degree_t rotation);
 private:
-    [[nodiscard]] static Body PlayerFixedUpdate(const Body& playerBodyInput, net::PlayerInput input) ;
 	net::PlayerInput GetInputAtFrame(net::PlayerNumber playerNumber, net::Frame frame);
 	GameManager& gameManager_;
 	/**
@@ -59,7 +65,9 @@ private:
 	 */
 	Transform2dManager currentTransformManager_;
     PhysicsManager currentPhysicsManager_;
+    PlayerCharacterManager currentPlayerManager_;
 	PhysicsManager lastValidatePhysicsManager_;
+	PlayerCharacterManager lastValidatePlayerCharacter_;
 
 
 	std::uint32_t lastValidateFrame_ = 0;
@@ -67,6 +75,7 @@ private:
 	static const size_t windowBufferSize = 5 * 50;
 	std::array<std::uint32_t, maxPlayerNmb> lastReceivedFrame_{};
 	std::array<std::array<net::PlayerInput, windowBufferSize>, maxPlayerNmb> inputs_{};
+	std::vector<CreatedEntity> createdEntities_;
 public:
 	[[nodiscard]] const std::array<net::PlayerInput, windowBufferSize>& GetInputs(net::PlayerNumber playerNumber) const
 	{

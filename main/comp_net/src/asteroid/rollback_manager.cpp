@@ -31,7 +31,9 @@ namespace neko::asteroid
 
 RollbackManager::RollbackManager(GameManager& gameManager, EntityManager& entityManager):
 	gameManager_(gameManager), currentTransformManager_(entityManager),
-	currentPhysicsManager_(entityManager), lastValidatePhysicsManager_(entityManager)
+	currentPhysicsManager_(entityManager), lastValidatePhysicsManager_(entityManager),
+	currentPlayerManager_(entityManager, currentPhysicsManager_),
+	lastValidatePlayerCharacter_(entityManager, lastValidatePhysicsManager_)
 {
 	for(auto& input: inputs_)
 	{
@@ -44,16 +46,19 @@ void RollbackManager::SimulateToCurrentFrame()
 	auto currentFrame = gameManager_.GetCurrentFrame();
 	auto lastValidateFrame = gameManager_.GetLastValidateFrame();
 	currentPhysicsManager_ = lastValidatePhysicsManager_;
+	currentPlayerManager_ = lastValidatePlayerCharacter_;
 	for(net::Frame frame = lastValidateFrame+1; frame <= currentFrame; frame++)
     {
+	    //Copy player input to player manager
         for(net::PlayerNumber playerNumber = 0; playerNumber < maxPlayerNmb; playerNumber++)
         {
             const auto playerInput = GetInputAtFrame(playerNumber, frame);
             const auto playerEntity = gameManager_.GetEntityFromPlayerNumber(playerNumber);
-            auto playerBody = currentPhysicsManager_.GetBody(playerEntity);
-            playerBody = PlayerFixedUpdate(playerBody, playerInput);
-            currentPhysicsManager_.SetBody(playerEntity, playerBody);
+            auto playerCharacter = currentPlayerManager_.GetComponent(playerEntity);
+            playerCharacter.input = playerInput;
+            currentPlayerManager_.SetComponent(playerEntity, playerCharacter);
         }
+        currentPlayerManager_.FixedUpdate(seconds(GameManager::FixedPeriod));
 	    currentPhysicsManager_.FixedUpdate(seconds(GameManager::FixedPeriod));
     }
     for(net::PlayerNumber playerNumber = 0; playerNumber < maxPlayerNmb; playerNumber++)
@@ -122,10 +127,11 @@ void RollbackManager::ValidateFrame(net::Frame newValidateFrame)
         {
             const auto playerInput = GetInputAtFrame(playerNumber, frame);
             const auto playerEntity = gameManager_.GetEntityFromPlayerNumber(playerNumber);
-            auto playerBody = lastValidatePhysicsManager_.GetBody(playerEntity);
-            playerBody = PlayerFixedUpdate(playerBody, playerInput);
-            lastValidatePhysicsManager_.SetBody(playerEntity, playerBody);
+            auto playerCharacter = lastValidatePlayerCharacter_.GetComponent(playerEntity);
+            playerCharacter.input = playerInput;
+            lastValidatePlayerCharacter_.SetComponent(playerEntity, playerCharacter);
         }
+        lastValidatePlayerCharacter_.FixedUpdate(seconds(GameManager::FixedPeriod));
         lastValidatePhysicsManager_.FixedUpdate(seconds(GameManager::FixedPeriod));
     }
 	lastValidateFrame_ = newValidateFrame;
@@ -198,30 +204,5 @@ net::PlayerInput RollbackManager::GetInputAtFrame(net::PlayerNumber playerNumber
 {
 	return inputs_[playerNumber][currentFrame_ - frame];
 }
-
-Body RollbackManager::PlayerFixedUpdate(const Body& playerBodyInput, net::PlayerInput input)
-{
-    Body playerBodyOutput = playerBodyInput;
-
-    const bool right = input & PlayerInput::RIGHT;
-    const bool left = input & PlayerInput::LEFT;
-    const bool up = input & PlayerInput::UP;
-    const bool down = input & PlayerInput::DOWN;
-
-    auto angularVelocity = ((left ? 1.0f : 0.0f) + (right ? -1.0f : 0.0f)) * playerAngularSpeed;
-
-    playerBodyOutput.angularVelocity = angularVelocity;
-
-    auto dir = Vec2f::up;
-    dir = dir.Rotate(-playerBodyInput.rotation);
-
-    auto acceleration = ((down ? -1.0f : 0.0f) + (up ? 1.0f : 0.0f)) * dir;
-
-    auto& velocity = playerBodyOutput.velocity;
-    velocity += acceleration * GameManager::FixedPeriod;
-
-    return playerBodyOutput;
-}
-
 
 }

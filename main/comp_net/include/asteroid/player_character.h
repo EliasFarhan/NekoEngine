@@ -23,37 +23,30 @@
  */
 
 #pragma once
-#include "mathematics/angle.h"
-#include "engine/entity.h"
 #include "engine/component.h"
+#include "asteroid/game.h"
+#include "asteroid/physics_manager.h"
 
 namespace neko::asteroid
 {
 
-const std::uint32_t maxPlayerNmb = 2;
-const float playerSpeed = 1.0f;
-const degree_t playerAngularSpeed = degree_t(90.0f);
-const float playerShootingPeriod = 0.2f;
-
-enum class ComponentType : EntityMask
+struct PlayerCharacter
 {
-    PLAYER_CHARACTER = static_cast<EntityMask>(neko::ComponentType::OTHER_TYPE),
-    BULLET = static_cast<EntityMask>(neko::ComponentType::OTHER_TYPE) << 1u,
-    ASTEROID = static_cast<EntityMask>(neko::ComponentType::OTHER_TYPE) << 2u,
-    PLAYER_INPUT = static_cast<EntityMask>(neko::ComponentType::OTHER_TYPE) << 3u,
+    float shootingTime = 0.0f;
+    net::PlayerInput input = 0;
 
 };
 
-namespace PlayerInput
+class PlayerCharacterManager : public ComponentManager<PlayerCharacter, neko::ComponentType(ComponentType::PLAYER_CHARACTER)>
 {
-enum PlayerInput : std::uint8_t
-{
-    NONE = 0u,
-    UP = 1u << 0u,
-    DOWN = 1u << 1u,
-    LEFT = 1u << 2u,
-    RIGHT = 1u << 3u,
-    SHOOT = 1u << 4u,
+public:
+    explicit PlayerCharacterManager(EntityManager& entityManager, PhysicsManager& physicsManager);
+    PlayerCharacterManager ( const PlayerCharacterManager & );
+    PlayerCharacterManager& operator= ( const PlayerCharacterManager& );
+    void FixedUpdate(seconds dt);
+
+private:
+    PhysicsManager& physicsManager_;
 };
-}
+
 }
