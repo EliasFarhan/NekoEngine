@@ -156,7 +156,7 @@ void ClientNetworkManager::DrawImGui()
 			auto joinPacket = std::make_unique<asteroid::JoinPacket>();
 			joinPacket->clientId = ConvertToBinary<ClientId>(clientId_);
             using namespace std::chrono;
-			auto clientTime = (duration_cast<milliseconds>(system_clock::now().time_since_epoch())).count();
+			unsigned long clientTime = (duration_cast<milliseconds>(system_clock::now().time_since_epoch())).count();
             joinPacket->startTime = ConvertToBinary<unsigned long>(clientTime);
 			SendReliablePacket(std::move(joinPacket));
 			currentState_ = State::JOINING;

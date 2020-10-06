@@ -231,9 +231,9 @@ void ServerNetworkManager::ProcessReceivePacket(
 			return;
 		}
 		//Calculate time difference
-		auto clientTime = ConvertFromBinary<unsigned long long>(joinPacket->startTime);
+		const auto clientTime = ConvertFromBinary<unsigned long>(joinPacket->startTime);
         using namespace std::chrono;
-		unsigned long deltaTime = (duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count())-clientTime;
+		const unsigned long deltaTime = (duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count()) - clientTime;
 		logDebug("Client Server deltaTime: "+std::to_string(deltaTime));
 		clientMap_[lastPlayerNumber_] = {
 			clientId,

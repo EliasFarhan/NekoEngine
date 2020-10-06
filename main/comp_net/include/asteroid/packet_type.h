@@ -98,7 +98,7 @@ sf::Packet& operator>>(sf::Packet& packet, std::array<T, N>& t) {
 struct JoinPacket : TypedPacket<PacketType::JOIN>
 {
     std::array<std::uint8_t, sizeof(net::ClientId)> clientId{};
-    std::array<std::uint8_t, sizeof(unsigned long long)> startTime{};
+    std::array<std::uint8_t, sizeof(unsigned long)> startTime{};
 };
 
 inline sf::Packet& operator<<(sf::Packet& packet, const JoinPacket& joinPacket)

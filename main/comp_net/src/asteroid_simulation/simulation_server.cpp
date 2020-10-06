@@ -23,7 +23,7 @@
  */
 
 #include "asteroid_simulation/simulation_server.h"
-
+#include "engine/conversion.h"
 #include "asteroid_simulation/simulation_client.h"
 #include "asteroid/game_manager.h"
 #include "asteroid/packet_type.h"
@@ -159,7 +159,7 @@ void SimulationServer::ProcessReceivePacket(std::unique_ptr<asteroid::Packet> pa
 		    auto startGamePacket = std::make_unique<asteroid::StartGamePacket>();
             startGamePacket->packetType = asteroid::PacketType::START_GAME;
             using namespace std::chrono;
-            unsigned long long ms = (duration_cast< milliseconds >(
+            unsigned long ms = (duration_cast< milliseconds >(
                     system_clock::now().time_since_epoch()
             )+milliseconds(3000)).count();
             startGamePacket->startTime = ConvertToBinary(ms);
