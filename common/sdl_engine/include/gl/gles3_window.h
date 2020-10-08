@@ -58,10 +58,11 @@ public:
     void SwapBuffer() override;
 
     void OnResize(Vec2u newWindowSize) override;
-
-    void MakeCurrentContext() override;
-    void LeaveCurrentContext() override;
+    void BeforeRenderLoop() override;
+    void AfterRenderLoop() override;
 protected:
+    virtual void MakeCurrentContext();
+    virtual void LeaveCurrentContext();
     void RenderUi() override;
     SDL_GLContext glRenderContext_{};
     OnResizeRenderCommand onResizeCommand_;

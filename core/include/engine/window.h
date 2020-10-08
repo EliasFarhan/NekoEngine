@@ -53,12 +53,11 @@ public:
     virtual void OnResize(Vec2u newWindowSize) = 0;
 
     Job* GetSwapBufferJob() { return &swapBufferJob_; }
-    /**
-     * \brief Called by a render thread to take ownership of the context, typically used in OpenGL
-     */
-    virtual void MakeCurrentContext() {}
+
     void ResetJobs() { swapBufferJob_.Reset(); }
-    virtual void LeaveCurrentContext() {};
+
+    virtual void BeforeRenderLoop() {}
+    virtual void AfterRenderLoop() {}
 protected:
     Job swapBufferJob_;
 };

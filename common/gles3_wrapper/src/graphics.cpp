@@ -110,7 +110,6 @@ void Gles3Renderer::ClearScreen()
 void Gles3Renderer::BeforeRenderLoop()
 {
     Renderer::BeforeRenderLoop();
-	
     glEnable(GL_DEPTH_TEST);
 }
 

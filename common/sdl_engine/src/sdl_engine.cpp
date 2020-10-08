@@ -58,8 +58,6 @@ void SdlEngine::Init()
 void SdlEngine::Destroy()
 {
     BasicEngine::Destroy();
-    destroyAction_.Execute();
-    window_->Destroy();
 
     // Shutdown SDL 2
     SDL_Quit();

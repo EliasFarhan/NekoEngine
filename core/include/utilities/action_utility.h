@@ -32,14 +32,14 @@ template<class ... Ts>
 class Action
 {
 public:
-	Action() = default;
-	virtual ~Action() = default;
+    Action() = default;
+    virtual ~Action() = default;
 
-	void RegisterCallback(const std::function<void(Ts ...)>& callback)
-	{
-		callbacks_.push_back(callback);
-		
-	}
+    void RegisterCallback(const std::function<void(Ts ...)>& callback)
+    {
+	callbacks_.push_back(callback);
+	    
+    }
     /*
     void UnregisterCallback(const std::function<void(Ts ...)>& callback)
     {
@@ -47,13 +47,13 @@ public:
     }
     */
 
-	void Execute(Ts ... args)
+    void Execute(Ts ... args)
+    {
+	for(auto& callback : callbacks_)
 	{
-		for(auto& callback : callbacks_)
-		{
-			callback(args...);
-		}
+	    callback(args...);
 	}
+    }
 
 private:
 	std::vector<std::function<void(Ts...)>> callbacks_;

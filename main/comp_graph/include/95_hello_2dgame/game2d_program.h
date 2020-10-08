@@ -18,9 +18,9 @@ public:
     void Render() override;
     void OnEvent(const SDL_Event &event) override;
 private:
+    EntityManager entityManager_;
+    Transform2dManager transform2dManager_;
     gl::SpriteManager spriteManager_;
     gl::TextureManager textureManager_;
-    Transform2dManager transform2dManager_;
-    EntityManager entityManager_;
 };
 }

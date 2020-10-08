@@ -39,13 +39,13 @@
 
 namespace neko::sdl
 {
-	void OnResizeRenderCommand::Render()
-	{
-		std::ostringstream oss;
-		oss << "Resize window with new size: " << newWindowSize_;
-		logDebug(oss.str());
-		glViewport(0, 0, newWindowSize_.x, newWindowSize_.y);
-	}
+void OnResizeRenderCommand::Render()
+{
+	std::ostringstream oss;
+	oss << "Resize window with new size: " << newWindowSize_;
+	logDebug(oss.str());
+	glViewport(0, 0, newWindowSize_.x, newWindowSize_.y);
+}
 
 void Gles3Window::Init()
 {
@@ -80,7 +80,7 @@ void Gles3Window::Init()
 #ifndef __EMSCRIPTEN__
 
 
-	std::string videoDriver = SDL_GetCurrentVideoDriver();
+    const std::string videoDriver = SDL_GetCurrentVideoDriver();
 	logDebug(videoDriver);
 #endif
 
@@ -89,7 +89,7 @@ void Gles3Window::Init()
 #ifndef __EMSCRIPTEN__
 	SDL_GL_SetSwapInterval(config.vSync);
 
-	if (!gladLoadGLES2Loader((GLADloadproc)SDL_GL_GetProcAddress))
+	if (!gladLoadGLES2Loader(static_cast<GLADloadproc>(SDL_GL_GetProcAddress)))
 	{
 		logDebug("Failed to initialize OpenGL context\n");
 		assert(false);
@@ -100,6 +100,14 @@ void Gles3Window::Init()
     glCheckError();
 	InitImGui();
     glCheckError();
+	
+    LeaveCurrentContext();
+	
+	Job initRenderJob([this] { MakeCurrentContext(); });
+	auto* engine = BasicEngine::GetInstance();
+	engine->ScheduleJob(&initRenderJob, JobThreadType::RENDER_THREAD);
+	initRenderJob.Join();
+	
 }
 
 void Gles3Window::InitImGui()
@@ -141,6 +149,14 @@ void Gles3Window::Destroy()
 #ifdef EASY_PROFILE_USE
 	EASY_BLOCK("DestroyWindow");
 #endif
+#ifndef NEKO_SAMETHREAD
+	Job leaveContext([this]
+	{
+	    LeaveCurrentContext();
+	});
+	BasicEngine::GetInstance()->ScheduleJob(&leaveContext, JobThreadType::RENDER_THREAD);
+	leaveContext.Join();
+#endif
 	MakeCurrentContext();
 	ImGui_ImplOpenGL3_Shutdown();
 	// Delete our OpengL context
@@ -167,6 +183,17 @@ void Gles3Window::OnResize(Vec2u newWindowSize)
 
 }
 
+void Gles3Window::BeforeRenderLoop()
+{
+	MakeCurrentContext();
+	glCheckError();
+}
+
+void Gles3Window::AfterRenderLoop()
+{
+	LeaveCurrentContext();
+}
+
 void Gles3Window::MakeCurrentContext()
 {
 	SDL_GL_MakeCurrent(window_, glRenderContext_);
@@ -178,7 +205,7 @@ void Gles3Window::MakeCurrentContext()
 	{
 		oss << "\nSDL Error: " << SDL_GetError();
 	}
-	//logDebug(oss.str());
+	logDebug(oss.str());
 #endif
 }
 
@@ -194,7 +221,7 @@ void Gles3Window::LeaveCurrentContext()
 	{
 		oss << "[Error] After Leave Current Context, context: " << currentContext;
 	}
-	//logDebug(oss.str());
+	logDebug(oss.str());
 #endif
 }
 }

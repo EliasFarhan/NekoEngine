@@ -131,6 +131,7 @@ protected:
     void PreRender();
     virtual void RenderAll();
     virtual void BeforeRenderLoop();
+
     virtual void AfterRenderLoop();
 
     Action<> syncBuffersAction_;

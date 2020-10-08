@@ -42,7 +42,7 @@ void Shader::LoadFromFile(const std::string_view vertexShaderPath, const std::st
     const auto vertexShaderProgram = LoadFile(vertexShaderPath.data());
     const char* vertexShaderChar = vertexShaderProgram.c_str();
 
-    glShaderSource(vertexShader, 1, &vertexShaderChar, NULL);
+    glShaderSource(vertexShader, 1, &vertexShaderChar, nullptr);
     glCompileShader(vertexShader);
     //Check success status of shader compilation
     int success;
@@ -50,7 +50,7 @@ void Shader::LoadFromFile(const std::string_view vertexShaderPath, const std::st
     glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
     if (!success)
     {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+        glGetShaderInfoLog(vertexShader, 512, nullptr, infoLog);
         std::ostringstream oss;
         oss << "[Error] Vertex shader at: " << vertexShaderPath <<" compilation failed: \n" << infoLog<<'\n'<<vertexShaderChar;
         logDebug(oss.str());
@@ -65,13 +65,13 @@ void Shader::LoadFromFile(const std::string_view vertexShaderPath, const std::st
     glCheckError();
     auto fragmentShaderProgram = LoadFile(fragmentShaderPath.data());
     const char* fragmentShaderChar = fragmentShaderProgram.c_str();
-    glShaderSource(fragmentShader, 1, &fragmentShaderChar, NULL);
+    glShaderSource(fragmentShader, 1, &fragmentShaderChar, nullptr);
     glCompileShader(fragmentShader);
     //Check success status of shader compilation
     glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
     if (!success)
     {
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+        glGetShaderInfoLog(fragmentShader, 512, nullptr, infoLog);
         std::ostringstream oss;
         oss << "[Error] Fragment shader at: " << fragmentShaderPath <<" compilation failed\n" << infoLog << '\n' << fragmentShaderChar;
         logDebug(oss.str());
@@ -86,7 +86,7 @@ void Shader::LoadFromFile(const std::string_view vertexShaderPath, const std::st
     glGetProgramiv(shaderProgram_, GL_LINK_STATUS, &success);
     if (!success)
     {
-        glGetProgramInfoLog(shaderProgram_, 512, NULL, infoLog);
+        glGetProgramInfoLog(shaderProgram_, 512, nullptr, infoLog);
         std::ostringstream oss;
         oss << "[Error] Shader program with vertex: "<< vertexShaderPath<<" and fragment:"<< fragmentShaderPath << "LINK_FAILED\n" << infoLog;
         return;
@@ -96,9 +96,6 @@ void Shader::LoadFromFile(const std::string_view vertexShaderPath, const std::st
     glDeleteShader(fragmentShader);
     glCheckError();
 }
-
-
-
 
 void Shader::Bind() const
 {
