@@ -93,8 +93,6 @@ void DebugApp::Destroy()
 
 void DebugApp::DrawImGui()
 {
-	ImGui::Begin("Rollback Simulation");
-	ImGui::End();
 	for (auto& client : clients_)
 	{
 		client.DrawImGui();

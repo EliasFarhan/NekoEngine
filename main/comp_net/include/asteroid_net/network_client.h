@@ -48,7 +48,7 @@ private:
     sf::UdpSocket udpSocket_;
     sf::TcpSocket tcpSocket_;
 
-    sf::IpAddress serverAddress_ = "localhost";
+    std::string serverAddress_ = "localhost";
     unsigned short serverTcpPort_ = 12345;
     unsigned short serverUdpPort_ = 0;
 

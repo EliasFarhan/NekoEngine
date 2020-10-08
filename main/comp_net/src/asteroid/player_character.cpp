@@ -74,8 +74,10 @@ void PlayerCharacterManager::FixedUpdate(seconds dt)
         {
             if(input & PlayerInput::SHOOT)
             {
-                const auto bulletVelocity = dir * bulletSpeed +
-                        (Vec2f::Dot(playerBody.velocity, dir) > 0.0f ? playerBody.velocity : Vec2f::zero);
+                const auto currentPlayerSpeed = playerBody.velocity.Magnitude();
+                const auto bulletVelocity = dir * 
+                    ((Vec2f::Dot(playerBody.velocity, dir) > 0.0f ? currentPlayerSpeed : 0.0f)
+                    + bulletSpeed);
                 const auto bulletPosition = playerBody.position + dir * 0.5f + playerBody.velocity * dt.count();
                 gameManager_.get().SpawnBullet(playerCharacter.playerNumber,
                                                bulletPosition,
