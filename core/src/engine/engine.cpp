@@ -118,13 +118,7 @@ void BasicEngine::Update(seconds dt)
 	
     Job eventJob([this]
     {
-#if defined(__ANDROID__) or defined(EMSCRIPTEN)
-        window_->MakeCurrentContext();
-#endif
 	    ManageEvent();
-#if defined(__ANDROID__) or defined(EMSCRIPTEN)
-        window_->LeaveCurrentContext();
-#endif
     });
     Job updateJob([this, &dt]{updateAction_.Execute(dt);});
     updateJob.AddDependency(&eventJob);

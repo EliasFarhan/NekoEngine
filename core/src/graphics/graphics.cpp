@@ -40,9 +40,6 @@ namespace neko
 Renderer::Renderer() :
     renderAllJob_([this]
         {
-#if defined(__ANDROID__) or defined(EMSCRIPTEN)
-            window_->MakeCurrentContext();
-#endif
             auto* engine = BasicEngine::GetInstance();
             PreRender();
             ClearScreen();
