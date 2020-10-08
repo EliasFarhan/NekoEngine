@@ -106,7 +106,7 @@ void SampleBrowser::Init()
     RegisterRenderProgram("97 Hello Water", std::make_unique<HelloWaterProgram>());
     RegisterRenderProgram("98 Hello Line", std::make_unique<HelloLineProgram>());
     RegisterRenderProgram("99 Hello Scene", std::make_unique<HelloSceneProgram>());
-#ifndef __EMSCRIPTEN__
+#ifndef NEKO_SAMETHREAD
     Job initJob{ [this]() { programs_[currentProgramIndex_]->Init(); } };
     BasicEngine::GetInstance()->ScheduleJob(&initJob, JobThreadType::RENDER_THREAD);
     initJob.Join();

@@ -23,6 +23,7 @@
  */
 
 #include "graphics/camera.h"
+#include "engine/log.h"
 
 namespace neko
 {

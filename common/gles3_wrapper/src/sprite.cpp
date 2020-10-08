@@ -27,6 +27,7 @@
 #include "gl/sprite.h"
 #include "engine/transform.h"
 #include "graphics/camera.h"
+#include "engine/engine.h"
 
 namespace neko::gl
 {
