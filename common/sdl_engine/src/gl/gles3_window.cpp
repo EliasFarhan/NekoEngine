@@ -100,13 +100,13 @@ void Gles3Window::Init()
     glCheckError();
 	InitImGui();
     glCheckError();
-	
+#ifndef NEKO_SAMETHREAD
     LeaveCurrentContext();
 	
 	Job initRenderJob([this] { MakeCurrentContext(); });
 	auto* engine = BasicEngine::GetInstance();
 	engine->ScheduleJob(&initRenderJob, JobThreadType::RENDER_THREAD);
-#ifndef NEKO_SAMETHREAD
+
 	initRenderJob.Join();
 #endif
 	
