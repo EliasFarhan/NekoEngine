@@ -1,7 +1,9 @@
+#!/usr/bin/env python3
+
 import json
 import sys
 import os
-from .shader_validator import validate_shader
+from shader_validator import validate_shader
 from pathlib import Path
 from enum import Enum
 import os.path
