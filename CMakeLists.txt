@@ -60,7 +60,7 @@ endif()
 
 if(Neko_KTX)
     set(KTX_DIR "${EXTERNAL_DIR}/KTX-Software")
-    set(KTX_VERSION "v4.0.0-beta4" CACHE STRING "")
+    set(KTX_VERSION_FULL "v4.0.0-beta4" CACHE STRING "")
     add_subdirectory("${KTX_DIR}")
 endif()
 

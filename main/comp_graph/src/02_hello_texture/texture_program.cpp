@@ -55,6 +55,8 @@ void HelloTextureProgram::Destroy()
     quad_.Destroy();
     shader_.Destroy();
     textureManager_.Destroy();
+    if(textureKtx_ != INVALID_TEXTURE_NAME)
+        gl::DestroyTexture(textureKtx_);
 }
 
 void HelloTextureProgram::Render()
