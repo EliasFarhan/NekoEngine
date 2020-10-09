@@ -55,7 +55,7 @@ struct BufferFile
     BufferFile(const BufferFile&) = delete;
     BufferFile& operator= (const BufferFile&) = delete;
 
-    char* dataBuffer = nullptr;
+    unsigned char* dataBuffer = nullptr;
     size_t dataLength = 0;
 
     void Load(std::string_view path);

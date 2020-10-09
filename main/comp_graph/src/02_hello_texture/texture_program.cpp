@@ -39,6 +39,8 @@ void HelloTextureProgram::Init()
 
     const auto texturePath = config.dataRootPath + "sprites/wall.jpg";
     textureId_ = textureManager_.LoadTexture(texturePath);
+    textureKtx_ = gl::CreateTextureFromKTX(
+        config.dataRootPath + "sprites/wall.jpg.ktx");
 	//textureId_ = neko::gl::stbCreateTexture(texturePath);
     glEnable(GL_DEPTH_TEST);
 }
@@ -74,6 +76,11 @@ void HelloTextureProgram::Render()
     case TextureType::STB_TEXTURE:
     {
         glBindTexture(GL_TEXTURE_2D, texture_);//bind texture id to texture slot
+        break;
+    }
+    case TextureType::KTX_TEXTURE:
+    {
+        glBindTexture(GL_TEXTURE_2D, textureKtx_);//bind texture id to texture slot
         break;
     }
     default: ;

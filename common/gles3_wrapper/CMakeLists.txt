@@ -1,6 +1,6 @@
 
 #opengl
-LIST(APPEND GLES3_WRAPPER_LIBS Neko_Core)
+LIST(APPEND GLES3_WRAPPER_LIBS Neko_Core ktx)
 if(NOT Emscripten)
     if(NOT Neko_Android)
         set(OpenGL_GL_PREFERENCE GLVND)

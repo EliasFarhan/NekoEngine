@@ -10,7 +10,7 @@ else:
     program = 'glslangValidator'
 
 
-def validate_shader(data_src):
+def validate_shader(data_src, meta_content):
     status = subprocess.run([program, data_src])
     if status.returncode != 0:
         exit(1)

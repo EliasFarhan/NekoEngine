@@ -1,3 +1,7 @@
+if (NOT Neko_GLES3 OR NOT Neko_SDL2 OR NOT Neko_SFML_NET)
+    return()
+endif()
+
 include_directories("include/")
 
 file(GLOB_RECURSE comp_net_src include/*.h src/*.cpp)

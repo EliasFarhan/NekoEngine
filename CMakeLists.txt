@@ -19,6 +19,7 @@ set(Neko_Assert ON CACHE BOOL "Activate Neko Assertion")
 set(Neko_Benchmark ON CACHE BOOL "Activate Benchmark")
 set(Neko_Assimp ON CACHE BOOL "Activate Assimp Wrapper")
 set(Neko_SFML_NET ON CACHE BOOL "Activate SFML Net Wrapper")
+set(Neko_KTX ON CACHE BOOL "Activate SFML Net Wrapper")
 set(Neko_SameThread OFF CACHE BOOL "Activate Same Thread Rendering and Resource Loading")
 
 MESSAGE("CMAKE SYSTEM NAME: ${CMAKE_SYSTEM_NAME}")
@@ -29,6 +30,9 @@ if ("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
     set(CMAKE_STATIC_LIBRARY_SUFFIX ".a")
     set(Neko_SameThread ON CACHE BOOL "")
     mark_as_advanced(Neko_SameThread)
+    #We currently disable SFML Net
+    set(Neko_SFML_NET OFF CACHE BOOL "")
+    mark_as_advanced(Neko_SFML_NET)
 endif()
 
 if(UNIX)
@@ -52,6 +56,12 @@ endif()
 
 if(Neko_SameThread)
     add_compile_definitions("NEKO_SAMETHREAD=1")
+endif()
+
+if(Neko_KTX)
+    set(KTX_DIR "${EXTERNAL_DIR}/KTX-Software")
+    set(KTX_VERSION "v4.0.0-beta4" CACHE STRING "")
+    add_subdirectory("${KTX_DIR}")
 endif()
 
 

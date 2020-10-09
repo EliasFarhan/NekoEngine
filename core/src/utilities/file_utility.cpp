@@ -185,26 +185,25 @@ void BufferFile::Load(std::string_view path)
     {
         Destroy();
     }
-	std::ifstream is(path.data(),std::ifstream::binary);
-	if(!is)
-	{
-		std::ostringstream oss;
-		oss << "[Error] Could not open file: " << path << " for BufferFile";
-		logDebug(oss.str());
-		dataLength = 0;
-		dataBuffer = nullptr;
-		return;
-	}
-	if(is)
-	{
-		is.seekg(0, is.end);
-		dataLength = is.tellg();
-		is.seekg(0, is.beg);
-		dataBuffer = new char[dataLength+1];
-		dataBuffer[dataLength] = 0;
-		is.read(dataBuffer, dataLength);
-		is.close();
-	}
+    std::ifstream is(path.data(),std::ifstream::binary);
+    if(!is)
+    {
+	std::ostringstream oss;
+	oss << "[Error] Could not open file: " << path << " for BufferFile";
+	logDebug(oss.str());
+	dataLength = 0;
+	dataBuffer = nullptr;
+    }
+    else
+    {
+	is.seekg(0, is.end);
+	dataLength = is.tellg();
+	is.seekg(0, is.beg);
+	dataBuffer = new unsigned char[dataLength+1];
+	dataBuffer[dataLength] = 0;
+	is.read(reinterpret_cast<char*>(dataBuffer), dataLength);
+	is.close();
+    }
 }
 
 void BufferFile::Destroy()

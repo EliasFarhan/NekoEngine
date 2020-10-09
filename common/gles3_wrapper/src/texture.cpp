@@ -32,6 +32,8 @@
 #include <graphics/texture.h>
 #include <engine/engine.h>
 
+#include "ktx.h"
+
 
 #ifdef EASY_PROFILE_USE
 #include "easy/profiler.h"
@@ -258,6 +260,100 @@ TextureName stbCreateTexture(const std::string_view filename, Texture::TextureFl
         glGenerateMipmap(GL_TEXTURE_2D);
     }
     image.Destroy();
+    return texture;
+}
+
+TextureName CreateTextureFromDDS(const std::string_view filename)
+{
+    return INVALID_TEXTURE_NAME;
+}
+
+TextureName CreateTextureFromKTX(const std::string_view filename)
+{
+#ifdef EASY_PROFILE_USE
+  EASY_BLOCK("Load KTX Texture");
+#endif
+    ktxTexture* kTexture = nullptr;
+    GLuint texture = 0;
+    GLenum target, glerror;
+
+    BufferFile textureFile;
+    {
+#ifdef EASY_PROFILE_USE
+      EASY_BLOCK("Open File");
+#endif
+      textureFile.Load(filename);
+    }
+    KTX_error_code result;
+    {
+#ifdef EASY_PROFILE_USE
+      EASY_BLOCK("Create KTX from memory");
+#endif
+      result = ktxTexture_CreateFromMemory(
+        reinterpret_cast<const ktx_uint8_t*>(textureFile.dataBuffer),
+        textureFile.dataLength,
+        KTX_TEXTURE_CREATE_NO_FLAGS,
+        &kTexture);
+    }
+    if (result != KTX_SUCCESS)
+    {
+        switch(result)
+        {
+        case KTX_FILE_DATA_ERROR: 
+            logDebug("[KTX] Error file data error");
+            break;
+        case KTX_FILE_ISPIPE: 
+            logDebug("[KTX] Error file is pipe");
+            break;
+        case KTX_FILE_OPEN_FAILED: 
+            logDebug("[KTX] Error file open failed");
+            break;
+        case KTX_FILE_OVERFLOW: 
+            logDebug("[KTX] Error file overflow");
+            break;
+        case KTX_FILE_READ_ERROR: 
+            logDebug("[KTX] Error file read error");
+            break;
+        case KTX_FILE_SEEK_ERROR: 
+            logDebug("[KTX] Error file seek error");
+            break;
+        case KTX_FILE_UNEXPECTED_EOF: 
+            logDebug("[KTX] Error file unexpected eof");
+            break;
+        case KTX_FILE_WRITE_ERROR: 
+            logDebug("[KTX] Error file write error");
+            break;
+        case KTX_GL_ERROR: 
+            logDebug("[KTX] Error gl error");
+            break;
+        case KTX_INVALID_OPERATION: break;
+        case KTX_INVALID_VALUE: break;
+        case KTX_NOT_FOUND: break;
+        case KTX_OUT_OF_MEMORY: break;
+        case KTX_TRANSCODE_FAILED: break;
+        case KTX_UNKNOWN_FILE_FORMAT: 
+            logDebug("[KTX] Error file unknown file format");
+            break;
+        case KTX_UNSUPPORTED_TEXTURE_TYPE: 
+            logDebug("[KTX] Error unsupported texture type");
+            break;
+        case KTX_UNSUPPORTED_FEATURE: 
+            logDebug("[KTX] Error unsupported feature");
+            break;
+        case KTX_LIBRARY_NOT_LINKED: break;
+        default: ;
+        }
+        return INVALID_TEXTURE_NAME;
+    }
+    {
+#ifdef EASY_PROFILE_USE
+      EASY_BLOCK("Upload Texture to GPU");
+#endif
+      glGenTextures(1, &texture); // Optional. GLUpload can generate a texture.
+      result = ktxTexture_GLUpload(kTexture, &texture, &target, &glerror);
+      glCheckError();
+    }
+    ktxTexture_Destroy(kTexture);
     return texture;
 }
 

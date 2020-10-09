@@ -1,0 +1,16 @@
+#! /bin/sh
+# Copyright 2019-2020 The Khronos Group, Inc.
+# SPDX-License-Identifier: Apache-2.0
+
+if [ "$EUID" -ne 0 ]
+  then echo "Please run as root to uninstall KTX-Software" >&2
+  exit -1
+fi
+
+cd /
+for pkg in com.khronos.ktx.dev com.khronos.ktx.library com.khronos.ktx.tools
+do
+    pkgutil --only-files --files $pkg | xargs -n 1 rm # sudo rm -i
+    pkgutil --forget $pkg
+done
+

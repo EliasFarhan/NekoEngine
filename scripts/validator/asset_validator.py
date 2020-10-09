@@ -4,6 +4,7 @@ import json
 import sys
 import os
 from shader_validator import validate_shader
+from texture_validator import validate_texture
 from pathlib import Path
 from enum import Enum
 import os.path
@@ -43,7 +44,10 @@ img_extension = [
     ".bmp",
     ".hdr",
     ".ktx",
-    ".dds"
+    ".dds",
+    ".pam",
+    ".ppm",
+    ".pgm"
 ]
 
 
@@ -71,16 +75,24 @@ def validate_asset(src="", out=""):
         data_out = out
     meta_content = {}
     asset_type = define_asset_type(data_src)
-    if asset_type != AssetType.UNKNOWN:
-        if not os.path.isfile(data_out+".meta"):
-            # We generate the meta file
-            meta_content = {"uuid": str(uuid.uuid1())}
-            meta_json = json.dumps(meta_content)
-            with open(data_out+".meta", "w") as meta_file:
-                meta_file.write(meta_json)
 
+    if asset_type != AssetType.UNKNOWN:
+        if os.path.isfile(data_out + ".meta"):
+            with open(data_out + ".meta", "r") as meta_file:
+                meta_content = json.loads(meta_file.read())
+
+    if asset_type == AssetType.TEXTURE:
+        validate_texture(data_src, data_out, meta_content)
     if asset_type == AssetType.VERT_SHADER or asset_type == AssetType.FRAG_SHADER:
-        validate_shader(data_src)
+        validate_shader(data_src, meta_content)
+
+    if asset_type != AssetType.UNKNOWN:
+        if not os.path.isfile(data_out + ".meta"):
+            # We generate the meta file
+            meta_content["uuid"] = str(uuid.uuid1())
+        meta_json = json.dumps(meta_content)
+        with open(data_out + ".meta", "w") as meta_file:
+            meta_file.write(meta_json)
 
 
 if __name__ == "__main__":

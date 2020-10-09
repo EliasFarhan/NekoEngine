@@ -52,8 +52,9 @@ private:
     gl::TextureManager textureManager_;
     TextureName texture_ = INVALID_TEXTURE_NAME;
     TextureId textureId_;
+    TextureName textureKtx_ = INVALID_TEXTURE_NAME;
 
-	enum class TextureType
+    enum class TextureType
 	{
 		STB_TEXTURE,
 		DDS_TEXTURE,

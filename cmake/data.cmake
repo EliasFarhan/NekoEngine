@@ -66,9 +66,10 @@ foreach(DATA ${DATA_FILES})
     add_custom_command(
             OUTPUT ${DATA_OUTPUT}
             DEPENDS ${DATA}
-            DEPENDS 
-            COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/scripts/validator/asset_validator.py"  "${DATA}" "${DATA_OUTPUT}"
+            DEPENDS
             COMMAND ${CMAKE_COMMAND} -E copy ${DATA} "${PROJECT_BINARY_DIR}/${PATH_NAME}/${FILE_NAME}"
+            COMMAND ${CMAKE_COMMAND} -E env TOKTX_EXE=$<TARGET_FILE:toktx> "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/scripts/validator/asset_validator.py"  "${DATA}" "${DATA_OUTPUT}"
+
     )
     list(APPEND DATA_BINARY_FILES ${DATA_OUTPUT})
 endforeach(DATA)
@@ -76,7 +77,9 @@ endforeach(DATA)
 add_custom_target(
         DataTarget
         DEPENDS ${DATA_BINARY_FILES} ${DATA_FILES})
-
+if(Neko_KTX) 
+    add_dependencies(DataTarget toktx)
+endif()
 set_target_properties (DataTarget PROPERTIES FOLDER Neko/Core)
 
 if(MSVC)
