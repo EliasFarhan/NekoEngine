@@ -1,8 +1,7 @@
 import json
 import sys
 import os
-import shader_validator
-import texture_validator
+from .shader_validator import validate_shader
 from pathlib import Path
 from enum import Enum
 import os.path
@@ -63,8 +62,11 @@ def define_asset_type(filename) -> AssetType:
     return AssetType.UNKNOWN
 
 
-def validate_asset():
-    global data_src
+def validate_asset(src="", out=""):
+    global data_src, data_out
+    if src != "" and out != "":
+        data_src = src
+        data_out = out
     meta_content = {}
     asset_type = define_asset_type(data_src)
     if asset_type != AssetType.UNKNOWN:
@@ -76,7 +78,7 @@ def validate_asset():
                 meta_file.write(meta_json)
 
     if asset_type == AssetType.VERT_SHADER or asset_type == AssetType.FRAG_SHADER:
-        shader_validator.validate_shader(data_src)
+        validate_shader(data_src)
 
 
 if __name__ == "__main__":
