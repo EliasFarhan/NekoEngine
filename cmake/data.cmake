@@ -62,7 +62,16 @@ foreach(DATA ${DATA_FILES})
     get_filename_component(EXTENSION ${DATA} EXT)
     file(RELATIVE_PATH PATH_NAME "${PROJECT_SOURCE_DIR}" ${PATH_NAME})
     set(DATA_OUTPUT "${PROJECT_BINARY_DIR}/${PATH_NAME}/${FILE_NAME}")
+    if(Emscripten)
+    add_custom_command(
+        OUTPUT ${DATA_OUTPUT}
+        DEPENDS ${DATA}
+        DEPENDS
+        COMMAND ${CMAKE_COMMAND} -E copy ${DATA} "${PROJECT_BINARY_DIR}/${PATH_NAME}/${FILE_NAME}"
+        COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/scripts/validator/asset_validator.py"  "${DATA}" "${DATA_OUTPUT}"
 
+)
+    else()
     add_custom_command(
             OUTPUT ${DATA_OUTPUT}
             DEPENDS ${DATA}
@@ -71,13 +80,14 @@ foreach(DATA ${DATA_FILES})
             COMMAND ${CMAKE_COMMAND} -E env TOKTX_EXE=$<TARGET_FILE:toktx> "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/scripts/validator/asset_validator.py"  "${DATA}" "${DATA_OUTPUT}"
 
     )
+    endif()
     list(APPEND DATA_BINARY_FILES ${DATA_OUTPUT})
 endforeach(DATA)
 
 add_custom_target(
         DataTarget
         DEPENDS ${DATA_BINARY_FILES} ${DATA_FILES})
-if(Neko_KTX) 
+if(Neko_KTX AND NOT Emscripten) 
     add_dependencies(DataTarget toktx)
 endif()
 set_target_properties (DataTarget PROPERTIES FOLDER Neko/Core)

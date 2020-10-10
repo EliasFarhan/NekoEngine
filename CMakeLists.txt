@@ -6,7 +6,7 @@ set (CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS On)
 
-include(cmake/neko_executable.cmake)
+
 
 
 set(Neko_Profile OFF CACHE BOOL "Activate Profiling with Easy Profile")
@@ -46,6 +46,8 @@ endif()
 if(MSVC)
     include(cmake/platforms/msvc.cmake)
 endif()
+
+include(cmake/neko_executable.cmake)
 
 set(EXTERNAL_DIR ${CMAKE_SOURCE_DIR}/externals CACHE INTERNAL "Externals folder")
 set(UTILITIES_DIR "${EXTERNAL_DIR}/utilities" CACHE INTERNAL "")

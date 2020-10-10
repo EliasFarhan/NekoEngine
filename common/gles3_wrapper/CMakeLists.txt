@@ -34,4 +34,7 @@ target_link_libraries(gles3_wrapper PUBLIC ${GLES3_WRAPPER_LIBS})
 
 target_include_directories(gles3_wrapper PUBLIC "include/")
 neko_lib_config(gles3_wrapper)
+if(Emscripten)
+    set_property(TARGET gles3_wrapper APPEND_STRING PROPERTY LINK_FLAGS " -s USE_WEBGL2=1 ")
+endif()
 set_target_properties (gles3_wrapper PROPERTIES FOLDER Neko/Common)

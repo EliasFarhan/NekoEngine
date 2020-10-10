@@ -16,6 +16,8 @@ ktxable_texture_ext = [
 
 def convert_to_ktx(img, img_out, meta_data):
     toktx_exe = environ.get("TOKTX_EXE")
+    if toktx_exe is None:
+        return 1
     print("Convert {} to {} with {}".format(img, img_out, toktx_exe))
     arg = ""
 

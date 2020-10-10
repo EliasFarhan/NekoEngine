@@ -26,6 +26,8 @@
 
 #ifdef NEKO_GLES3
 #ifdef EMSCRIPTEN
+#pragma message("Importing GLES3 Emscripten header")
+#include <emscripten.h>
 #include <GLES3/gl3.h>
 #else
 #include <glad/glad.h>
