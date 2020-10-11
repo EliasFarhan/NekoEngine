@@ -140,7 +140,7 @@ add_library( ktx ${LIB_TYPE}
         lib/vkformat_enum.h
         lib/vkformat_str.c
         )
-set_target_properties (ktx PROPERTIES FOLDER Externals/ktx)
+set_target_properties (ktx PROPERTIES FOLDER Externals/libktx)
 set_target_properties(ktx PROPERTIES
         PUBLIC_HEADER ${CMAKE_SOURCE_DIR}/include/ktx.h
         VERSION ${PROJECT_VERSION}
@@ -505,7 +505,7 @@ target_include_directories(
         PUBLIC
         utils
 )
-set_target_properties (objUtil PROPERTIES FOLDER Externals/ktx)
+set_target_properties (objUtil PROPERTIES FOLDER Externals/libktx)
 
 add_subdirectory(interface/basisu_c_binding)
 
