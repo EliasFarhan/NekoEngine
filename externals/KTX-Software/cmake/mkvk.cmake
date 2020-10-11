@@ -128,3 +128,8 @@ add_dependencies(mkvk
         makevkswitch
         makedfd2vk
         )
+set_target_properties (mkvk PROPERTIES FOLDER Externals/ktx)
+set_target_properties (mkvkformatfiles PROPERTIES FOLDER Externals/ktx)
+set_target_properties (makevkswitch PROPERTIES FOLDER Externals/ktx)
+set_target_properties (makedfd2vk PROPERTIES FOLDER Externals/ktx)
+
