@@ -88,6 +88,7 @@ add_custom_target(
         DataTarget
         DEPENDS ${DATA_BINARY_FILES} ${DATA_FILES})
 if(Neko_KTX AND NOT Emscripten) 
+    add_dependencies(DataTarget mkvk)
     add_dependencies(DataTarget toktx)
 endif()
 set_target_properties (DataTarget PROPERTIES FOLDER Neko/Core)

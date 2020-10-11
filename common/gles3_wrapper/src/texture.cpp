@@ -268,6 +268,70 @@ TextureName CreateTextureFromDDS(const std::string_view filename)
     return INVALID_TEXTURE_NAME;
 }
 
+void PrintKTXError(ktx_error_code_e result, const char* file, int line)
+{
+    std::string log;
+    switch(result)
+    {
+        case KTX_FILE_DATA_ERROR:
+            log += ("[KTX] Error file data error");
+            break;
+        case KTX_FILE_ISPIPE:
+            log += ("[KTX] Error file is pipe");
+            break;
+        case KTX_FILE_OPEN_FAILED:
+            log += ("[KTX] Error file open failed");
+            break;
+        case KTX_FILE_OVERFLOW:
+            log += ("[KTX] Error file overflow");
+            break;
+        case KTX_FILE_READ_ERROR:
+            log += ("[KTX] Error file read error");
+            break;
+        case KTX_FILE_SEEK_ERROR:
+            log += ("[KTX] Error file seek error");
+            break;
+        case KTX_FILE_UNEXPECTED_EOF:
+            log += ("[KTX] Error file unexpected eof");
+            break;
+        case KTX_FILE_WRITE_ERROR:
+            log += ("[KTX] Error file write error");
+            break;
+        case KTX_GL_ERROR:
+            log += ("[KTX] Error gl error");
+            break;
+        case KTX_INVALID_OPERATION:
+            log += ("[KTX] Error Invalid Operation");
+            break;
+        case KTX_INVALID_VALUE:
+            log += ("[KTX] Error Invliad value");
+            break;
+        case KTX_NOT_FOUND:
+            log += ("[KTX] Error KTX not found");
+            break;
+        case KTX_OUT_OF_MEMORY:
+            log += ("[KTX] Error Out fo memory");
+            break;
+        case KTX_TRANSCODE_FAILED:
+            log += ("[KTX] Error transcode failed");
+            break;
+        case KTX_UNKNOWN_FILE_FORMAT:
+            log += ("[KTX] Error file unknown file format");
+            break;
+        case KTX_UNSUPPORTED_TEXTURE_TYPE:
+            log += ("[KTX] Error unsupported texture type");
+            break;
+        case KTX_UNSUPPORTED_FEATURE:
+            log += ("[KTX] Error unsupported feature");
+            break;
+        case KTX_LIBRARY_NOT_LINKED:
+            log += ("[KTX] Error Library not linked");
+            break;
+        default: ;
+    }
+    logDebug(log+" in file: "+file+" at line: "+std::to_string(line));
+}
+
 TextureName CreateTextureFromKTX(const std::string_view filename)
 {
 #ifdef EASY_PROFILE_USE
@@ -297,52 +361,7 @@ TextureName CreateTextureFromKTX(const std::string_view filename)
     }
     if (result != KTX_SUCCESS)
     {
-        switch(result)
-        {
-        case KTX_FILE_DATA_ERROR: 
-            logDebug("[KTX] Error file data error");
-            break;
-        case KTX_FILE_ISPIPE: 
-            logDebug("[KTX] Error file is pipe");
-            break;
-        case KTX_FILE_OPEN_FAILED: 
-            logDebug("[KTX] Error file open failed");
-            break;
-        case KTX_FILE_OVERFLOW: 
-            logDebug("[KTX] Error file overflow");
-            break;
-        case KTX_FILE_READ_ERROR: 
-            logDebug("[KTX] Error file read error");
-            break;
-        case KTX_FILE_SEEK_ERROR: 
-            logDebug("[KTX] Error file seek error");
-            break;
-        case KTX_FILE_UNEXPECTED_EOF: 
-            logDebug("[KTX] Error file unexpected eof");
-            break;
-        case KTX_FILE_WRITE_ERROR: 
-            logDebug("[KTX] Error file write error");
-            break;
-        case KTX_GL_ERROR: 
-            logDebug("[KTX] Error gl error");
-            break;
-        case KTX_INVALID_OPERATION: break;
-        case KTX_INVALID_VALUE: break;
-        case KTX_NOT_FOUND: break;
-        case KTX_OUT_OF_MEMORY: break;
-        case KTX_TRANSCODE_FAILED: break;
-        case KTX_UNKNOWN_FILE_FORMAT: 
-            logDebug("[KTX] Error file unknown file format");
-            break;
-        case KTX_UNSUPPORTED_TEXTURE_TYPE: 
-            logDebug("[KTX] Error unsupported texture type");
-            break;
-        case KTX_UNSUPPORTED_FEATURE: 
-            logDebug("[KTX] Error unsupported feature");
-            break;
-        case KTX_LIBRARY_NOT_LINKED: break;
-        default: ;
-        }
+        PrintKTXError(result, __FILE__, __LINE__);
         return INVALID_TEXTURE_NAME;
     }
     {
@@ -352,6 +371,10 @@ TextureName CreateTextureFromKTX(const std::string_view filename)
       glGenTextures(1, &texture); // Optional. GLUpload can generate a texture.
       result = ktxTexture_GLUpload(kTexture, &texture, &target, &glerror);
       glCheckError();
+      if(result != KTX_SUCCESS)
+      {
+          PrintKTXError(result, __FILE__, __LINE__);
+      }
     }
     ktxTexture_Destroy(kTexture);
     return texture;

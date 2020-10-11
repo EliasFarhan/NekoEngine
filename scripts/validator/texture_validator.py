@@ -25,7 +25,7 @@ def convert_to_ktx(img, img_out, meta_data):
         linear = meta_data["linear"]
     else:
         linear = True
-        meta_data["linear"] = True
+        meta_data["linear"] = linear
     if linear:
         arg += " --linear "
     else:
@@ -35,7 +35,7 @@ def convert_to_ktx(img, img_out, meta_data):
         ktx2 = meta_data["ktx2"]
     else:
         ktx2 = True
-        meta_data["ktx2"] = True
+        meta_data["ktx2"] = ktx2
     if ktx2:
         arg += " --t2 "
 
@@ -43,9 +43,24 @@ def convert_to_ktx(img, img_out, meta_data):
         genmipmap = meta_data["genmipmap"]
     else:
         genmipmap = True
-        meta_data["genmipmap"] = True
+        meta_data["genmipmap"] = genmipmap
     if genmipmap:
         arg += " --genmipmap "
+
+    if "compression" in meta_data:
+        compression = meta_data["compression"]
+    else:
+        compression = "none"
+        meta_data["compression"] = compression
+    if compression == "bcmp":
+        arg += " --bcmp "
+    elif compression == "zcmp":
+        if "zcmp_level" in meta_data:
+            zcmp_level = meta_data["zcmp_level"]
+        else:
+            zcmp_level = 3
+            meta_data["zcmp_level"] = zcmp_level
+        arg += " --zcmp {} ".format(zcmp_level)
 
     if os.path.isfile(img_out):
         os.remove(img_out)
