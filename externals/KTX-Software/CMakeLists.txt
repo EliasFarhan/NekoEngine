@@ -74,11 +74,8 @@ if(NOT CMAKE_SIZEOF_VOID_P EQUAL 8 OR FORCE32)
     set(bitness 32)
 endif()
 
-if(EMSCRIPTEN OR IOS)
-    set(LIB_TYPE STATIC)
-else()
-    set(LIB_TYPE SHARED)
-endif()
+set(LIB_TYPE STATIC)
+
 
 # Global Optimization Flags
 if(EMSCRIPTEN)
@@ -150,6 +147,7 @@ set_target_properties(ktx PROPERTIES
         SOVERSION ${PROJECT_VERSION_MAJOR}
         XCODE_ATTRIBUTE_ENABLE_HARDENED_RUNTIME "YES"
         )
+add_dependencies(ktx mkvk)
 set_xcode_code_sign(ktx)
 
 ## Creating vulkan headers is only required when Vulkan SDK updates.
