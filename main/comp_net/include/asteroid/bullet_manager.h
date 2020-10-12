@@ -23,40 +23,23 @@
  */
 
 #pragma once
-#include "mathematics/angle.h"
-#include "engine/entity.h"
+
 #include "engine/component.h"
+#include "comp_net/type.h"
+#include "asteroid/game.h"
 
 namespace neko::asteroid
 {
-
-const std::uint32_t maxPlayerNmb = 2;
-const float playerSpeed = 1.0f;
-const degree_t playerAngularSpeed = degree_t(90.0f);
-const float playerShootingPeriod = 0.2f;
-const float bulletSpeed = 2.0f;
-const float bulletScale = 0.2f;
-const float bulletPeriod = 1.5f;
-
-enum class ComponentType : EntityMask
+struct Bullet
 {
-    PLAYER_CHARACTER = static_cast<EntityMask>(neko::ComponentType::OTHER_TYPE),
-    BULLET = static_cast<EntityMask>(neko::ComponentType::OTHER_TYPE) << 1u,
-    ASTEROID = static_cast<EntityMask>(neko::ComponentType::OTHER_TYPE) << 2u,
-    PLAYER_INPUT = static_cast<EntityMask>(neko::ComponentType::OTHER_TYPE) << 3u,
-
+    float remainingTime = 0.0f;
+    net::PlayerNumber playerNumber = net::INVALID_PLAYER;
 };
 
-namespace PlayerInput
+class BulletManager : public ComponentManager<Bullet, EntityMask(ComponentType::BULLET)>
 {
-enum PlayerInput : std::uint8_t
-{
-    NONE = 0u,
-    UP = 1u << 0u,
-    DOWN = 1u << 1u,
-    LEFT = 1u << 2u,
-    RIGHT = 1u << 3u,
-    SHOOT = 1u << 4u,
+public:
+    using ComponentManager::ComponentManager;
+    void FixedUpdate(seconds dt);
 };
-}
 }

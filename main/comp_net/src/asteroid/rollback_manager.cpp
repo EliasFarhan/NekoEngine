@@ -38,7 +38,8 @@ RollbackManager::RollbackManager(GameManager& gameManager, EntityManager& entity
 	entityManager_(entityManager),
 	currentPhysicsManager_(entityManager), lastValidatePhysicsManager_(entityManager),
 	currentPlayerManager_(entityManager, currentPhysicsManager_, gameManager_),
-	lastValidatePlayerCharacter_(entityManager, lastValidatePhysicsManager_, gameManager_)
+	lastValidatePlayerCharacter_(entityManager, lastValidatePhysicsManager_, gameManager_),
+	lastValidateBulletManager_(entityManager), currentBulletManager_(entityManager)
 {
 	for(auto& input: inputs_)
 	{
@@ -61,6 +62,7 @@ void RollbackManager::SimulateToCurrentFrame()
         }
     }
 	createdEntities_.clear();
+	currentBulletManager_ = lastValidateBulletManager_;
 	currentPhysicsManager_ = lastValidatePhysicsManager_;
 	currentPlayerManager_ = lastValidatePlayerCharacter_;
 	for(net::Frame frame = lastValidateFrame+1; frame <= currentFrame; frame++)
@@ -75,6 +77,7 @@ void RollbackManager::SimulateToCurrentFrame()
             playerCharacter.input = playerInput;
             currentPlayerManager_.SetComponent(playerEntity, playerCharacter);
         }
+        currentBulletManager_.FixedUpdate(seconds(GameManager::FixedPeriod));
         currentPlayerManager_.FixedUpdate(seconds(GameManager::FixedPeriod));
 	    currentPhysicsManager_.FixedUpdate(seconds(GameManager::FixedPeriod));
     }
@@ -152,6 +155,7 @@ void RollbackManager::ValidateFrame(net::Frame newValidateFrame)
 			return;
 		}
 	}
+	currentBulletManager_ = lastValidateBulletManager_;
     currentPhysicsManager_ = lastValidatePhysicsManager_;
     currentPlayerManager_ = lastValidatePlayerCharacter_;
     for(net::Frame frame = lastValidateFrame_ + 1; frame <= newValidateFrame; frame++)
@@ -165,9 +169,11 @@ void RollbackManager::ValidateFrame(net::Frame newValidateFrame)
             playerCharacter.input = playerInput;
             currentPlayerManager_.SetComponent(playerEntity, playerCharacter);
         }
+        currentBulletManager_.FixedUpdate(seconds(GameManager::FixedPeriod));
         currentPlayerManager_.FixedUpdate(seconds(GameManager::FixedPeriod));
         currentPhysicsManager_.FixedUpdate(seconds(GameManager::FixedPeriod));
     }
+    lastValidateBulletManager_ = currentBulletManager_;
     lastValidatePlayerCharacter_ = currentPlayerManager_;
     lastValidatePhysicsManager_ = currentPhysicsManager_;
 	lastValidateFrame_ = newValidateFrame;
@@ -265,6 +271,9 @@ void RollbackManager::SpawnBullet(net::PlayerNumber playerNumber, Entity entity,
     Body bulletBody;
     bulletBody.position = position;
     bulletBody.velocity = velocity;
+
+    currentBulletManager_.AddComponent(entity);
+    currentBulletManager_.SetComponent(entity, {bulletPeriod, playerNumber});
 
     currentPhysicsManager_.AddBody(entity);
     currentPhysicsManager_.SetBody(entity, bulletBody);

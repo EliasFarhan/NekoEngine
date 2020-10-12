@@ -22,41 +22,24 @@
  SOFTWARE.
  */
 
-#pragma once
-#include "mathematics/angle.h"
-#include "engine/entity.h"
-#include "engine/component.h"
+#include "asteroid/bullet_manager.h"
 
 namespace neko::asteroid
 {
 
-const std::uint32_t maxPlayerNmb = 2;
-const float playerSpeed = 1.0f;
-const degree_t playerAngularSpeed = degree_t(90.0f);
-const float playerShootingPeriod = 0.2f;
-const float bulletSpeed = 2.0f;
-const float bulletScale = 0.2f;
-const float bulletPeriod = 1.5f;
-
-enum class ComponentType : EntityMask
+void BulletManager::FixedUpdate(seconds dt)
 {
-    PLAYER_CHARACTER = static_cast<EntityMask>(neko::ComponentType::OTHER_TYPE),
-    BULLET = static_cast<EntityMask>(neko::ComponentType::OTHER_TYPE) << 1u,
-    ASTEROID = static_cast<EntityMask>(neko::ComponentType::OTHER_TYPE) << 2u,
-    PLAYER_INPUT = static_cast<EntityMask>(neko::ComponentType::OTHER_TYPE) << 3u,
-
-};
-
-namespace PlayerInput
-{
-enum PlayerInput : std::uint8_t
-{
-    NONE = 0u,
-    UP = 1u << 0u,
-    DOWN = 1u << 1u,
-    LEFT = 1u << 2u,
-    RIGHT = 1u << 3u,
-    SHOOT = 1u << 4u,
-};
+    for(Entity entity = 0; entity < entityManager_.get().GetEntitiesSize(); entity++)
+    {
+        if(entityManager_.get().HasComponent(entity, EntityMask(ComponentType::BULLET)))
+        {
+            auto& bullet = components_[entity];
+            bullet.remainingTime -= dt.count();
+            if(bullet.remainingTime < 0.0f)
+            {
+                entityManager_.get().DestroyEntity(entity);
+            }
+        }
+    }
 }
 }
