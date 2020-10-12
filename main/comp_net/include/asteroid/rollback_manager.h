@@ -40,7 +40,14 @@ struct CreatedEntity
     net::Frame createdFrame = 0;
 };
 
-class RollbackManager
+struct DestroyedBullet
+{
+	Bullet bullet;
+	Body body;
+	net::Frame destroyedFrame = 0;
+};
+
+class RollbackManager : public OnCollisionInterface
 {
 public:
 	explicit RollbackManager(GameManager& gameManager, EntityManager& entityManager);
@@ -59,6 +66,7 @@ public:
     [[nodiscard]] const Transform2dManager& GetTransformManager()const{ return currentTransformManager_; }
 	void SpawnPlayer(net::PlayerNumber playerNumber, Entity entity, Vec2f position, degree_t rotation);
 	void SpawnBullet(net::PlayerNumber playerNumber, Entity entity, Vec2f position, Vec2f velocity);
+    void DestroyBullet(Entity entity);
 private:
 	net::PlayerInput GetInputAtFrame(net::PlayerNumber playerNumber, net::Frame frame);
 	GameManager& gameManager_;
@@ -83,10 +91,13 @@ private:
 	std::array<std::uint32_t, maxPlayerNmb> lastReceivedFrame_{};
 	std::array<std::array<net::PlayerInput, windowBufferSize>, maxPlayerNmb> inputs_{};
 	std::vector<CreatedEntity> createdEntities_;
+	std::vector<DestroyedBullet> destroyedBullets_;
 public:
 	[[nodiscard]] const std::array<net::PlayerInput, windowBufferSize>& GetInputs(net::PlayerNumber playerNumber) const
 	{
 		return inputs_[playerNumber];
 	}
+
+    void OnCollision(Entity entity1, Entity entity2) override;
 };
 }

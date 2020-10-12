@@ -34,17 +34,18 @@ namespace neko::asteroid
 
 
 RollbackManager::RollbackManager(GameManager& gameManager, EntityManager& entityManager):
-	gameManager_(gameManager), currentTransformManager_(entityManager),
-	entityManager_(entityManager),
-	currentPhysicsManager_(entityManager), lastValidatePhysicsManager_(entityManager),
-	currentPlayerManager_(entityManager, currentPhysicsManager_, gameManager_),
-	lastValidatePlayerCharacter_(entityManager, lastValidatePhysicsManager_, gameManager_),
-	lastValidateBulletManager_(entityManager), currentBulletManager_(entityManager)
+	gameManager_(gameManager), entityManager_(entityManager),
+	currentTransformManager_(entityManager),
+	currentPhysicsManager_(entityManager), currentPlayerManager_(entityManager, currentPhysicsManager_, gameManager_),
+	currentBulletManager_(entityManager, gameManager),
+	lastValidatePhysicsManager_(entityManager),
+	lastValidatePlayerCharacter_(entityManager, lastValidatePhysicsManager_, gameManager_), lastValidateBulletManager_(entityManager, gameManager)
 {
 	for(auto& input: inputs_)
 	{
 		std::fill(input.begin(), input.end(), 0u);
 	}
+    lastValidatePhysicsManager_.RegisterCollisionListener(*this);
 }
 
 void RollbackManager::SimulateToCurrentFrame()
@@ -62,6 +63,21 @@ void RollbackManager::SimulateToCurrentFrame()
         }
     }
 	createdEntities_.clear();
+
+    for (const auto& destroyedBullet : destroyedBullets_)
+    {
+        if (destroyedBullet.destroyedFrame <= currentFrame)
+        {
+            Entity entity = gameManager_.SpawnBullet(
+                destroyedBullet.bullet.playerNumber,
+                destroyedBullet.body.position,
+                destroyedBullet.body.velocity);
+            auto bullet = currentBulletManager_.GetComponent(entity);
+            bullet.remainingTime = destroyedBullet.bullet.remainingTime;
+            currentBulletManager_.SetComponent(entity, bullet);
+        }
+    }
+    destroyedBullets_.clear();
 	currentBulletManager_ = lastValidateBulletManager_;
 	currentPhysicsManager_ = lastValidatePhysicsManager_;
 	currentPlayerManager_ = lastValidatePlayerCharacter_;
@@ -146,7 +162,20 @@ void RollbackManager::ValidateFrame(net::Frame newValidateFrame)
         }
     }
     createdEntities_.clear();
-
+    for(const auto& destroyedBullet : destroyedBullets_)
+    {
+        if(destroyedBullet.destroyedFrame <= newValidateFrame)
+        {
+            Entity entity = gameManager_.SpawnBullet(
+                destroyedBullet.bullet.playerNumber, 
+                destroyedBullet.body.position, 
+                destroyedBullet.body.velocity);
+            auto bullet = currentBulletManager_.GetComponent(entity);
+            bullet.remainingTime = destroyedBullet.bullet.remainingTime;
+            currentBulletManager_.SetComponent(entity, bullet);
+        }
+    }
+    destroyedBullets_.clear();
 	for(net::PlayerNumber playerNumber = 0; playerNumber < maxPlayerNmb; playerNumber++ )
 	{
 		if(GetLastReceivedFrame(playerNumber) < newValidateFrame)
@@ -238,6 +267,8 @@ void RollbackManager::SpawnPlayer(net::PlayerNumber playerNumber, Entity entity,
     Body playerBody;
     playerBody.position = position;
     playerBody.rotation = rotation;
+    Box playerBox;
+    playerBox.extends = Vec2f::one*0.5f;
 
     PlayerCharacter playerCharacter;
     playerCharacter.playerNumber = playerNumber;
@@ -247,12 +278,16 @@ void RollbackManager::SpawnPlayer(net::PlayerNumber playerNumber, Entity entity,
 
     currentPhysicsManager_.AddBody(entity);
     currentPhysicsManager_.SetBody(entity, playerBody);
+    currentPhysicsManager_.AddBox(entity);
+    currentPhysicsManager_.SetBox(entity, playerBox);
 
     lastValidatePlayerCharacter_.AddComponent(entity);
     lastValidatePlayerCharacter_.SetComponent(entity, playerCharacter);
 
     lastValidatePhysicsManager_.AddBody(entity);
     lastValidatePhysicsManager_.SetBody(entity, playerBody);
+    lastValidatePhysicsManager_.AddBox(entity);
+    lastValidatePhysicsManager_.SetBox(entity, playerBox);
 
     currentTransformManager_.AddComponent(entity);
     currentTransformManager_.SetPosition(entity, position);
@@ -264,6 +299,35 @@ net::PlayerInput RollbackManager::GetInputAtFrame(net::PlayerNumber playerNumber
 	return inputs_[playerNumber][currentFrame_ - frame];
 }
 
+void RollbackManager::OnCollision(Entity entity1, Entity entity2)
+{
+    std::function<void(const PlayerCharacter&, const Bullet&, Entity)> ManageCollision = 
+        [this](const auto& player, const auto& bullet, auto bulletEntity)
+    {
+        if (player.playerNumber != bullet.playerNumber)
+        {
+            //TODO lower health point
+
+            gameManager_.DestroyBullet(bulletEntity);
+        }
+    };
+    if(entityManager_.HasComponent(entity1, EntityMask(ComponentType::PLAYER_CHARACTER)) && 
+        entityManager_.HasComponent(entity2, EntityMask(ComponentType::BULLET)))
+    {
+        const auto& player = currentPlayerManager_.GetComponent(entity1);
+        const auto& bullet = currentBulletManager_.GetComponent(entity2);
+        ManageCollision(player, bullet, entity2);
+       
+    }
+    if (entityManager_.HasComponent(entity2, EntityMask(ComponentType::PLAYER_CHARACTER)) &&
+        entityManager_.HasComponent(entity1, EntityMask(ComponentType::BULLET)))
+    {
+        const auto& player = currentPlayerManager_.GetComponent(entity2);
+        const auto& bullet = currentBulletManager_.GetComponent(entity1);
+        ManageCollision(player, bullet, entity1);
+    }
+}
+
 void RollbackManager::SpawnBullet(net::PlayerNumber playerNumber, Entity entity, Vec2f position, Vec2f velocity)
 {
     createdEntities_.push_back({entity, testedFrame_});
@@ -271,12 +335,24 @@ void RollbackManager::SpawnBullet(net::PlayerNumber playerNumber, Entity entity,
     Body bulletBody;
     bulletBody.position = position;
     bulletBody.velocity = velocity;
+    Box bulletBox;
+    bulletBox.extends = Vec2f::one * bulletScale * 0.5f;
 
     currentBulletManager_.AddComponent(entity);
     currentBulletManager_.SetComponent(entity, {bulletPeriod, playerNumber});
 
+    lastValidateBulletManager_.AddComponent(entity);
+    lastValidateBulletManager_.SetComponent(entity, { bulletPeriod, playerNumber });
+
     currentPhysicsManager_.AddBody(entity);
     currentPhysicsManager_.SetBody(entity, bulletBody);
+    currentPhysicsManager_.AddBox(entity);
+    currentPhysicsManager_.SetBox(entity, bulletBox);
+
+    lastValidatePhysicsManager_.AddBody(entity);
+    lastValidatePhysicsManager_.SetBody(entity, bulletBody);
+    lastValidatePhysicsManager_.AddBox(entity);
+    lastValidatePhysicsManager_.SetBox(entity, bulletBox);
 
     currentTransformManager_.AddComponent(entity);
     currentTransformManager_.SetPosition(entity, position);
@@ -285,4 +361,12 @@ void RollbackManager::SpawnBullet(net::PlayerNumber playerNumber, Entity entity,
     currentTransformManager_.UpdateDirtyComponent(entity);
 }
 
+void RollbackManager::DestroyBullet(Entity entity)
+{
+    auto bullet = currentBulletManager_.GetComponent(entity);
+    auto body = lastValidatePhysicsManager_.GetBody(entity);
+
+    destroyedBullets_.push_back({ bullet, body, testedFrame_ });
+    entityManager_.DestroyEntity(entity);
+}
 }

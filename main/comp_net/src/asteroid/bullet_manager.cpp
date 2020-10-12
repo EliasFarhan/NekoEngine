@@ -23,9 +23,14 @@
  */
 
 #include "asteroid/bullet_manager.h"
+#include "asteroid/game.h"
 
 namespace neko::asteroid
 {
+BulletManager::BulletManager(EntityManager& entityManager, GameManager& gameManager) :
+    ComponentManager(entityManager), gameManager_(gameManager)
+{
+}
 
 void BulletManager::FixedUpdate(seconds dt)
 {

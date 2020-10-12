@@ -45,9 +45,14 @@ struct Body
 
 struct Box
 {
-    Vec2f center = Vec2f::zero;
     Vec2f extends = Vec2f::one;
     bool isTrigger = false;
+};
+
+class OnCollisionInterface
+{
+public:
+    virtual void OnCollision(Entity entity1, Entity entity2) = 0;
 };
 
 class BodyManager : public ComponentManager<Body, EntityMask(neko::ComponentType::BODY2D)>
@@ -68,10 +73,17 @@ public:
     [[nodiscard]] const Body& GetBody(Entity entity) const;
     void SetBody(Entity entity, const Body& body);
     void AddBody(Entity entity);
+
+    void AddBox(Entity entity);
+    void SetBox(Entity entity, const Box& box);
+    [[nodiscard]] const Box& GetBox(Entity entity) const;
+
+    void RegisterCollisionListener(OnCollisionInterface& collisionInterface);
 private:
     std::reference_wrapper<EntityManager> entityManager_;
     BodyManager bodyManager_;
     BoxManager boxManager_;
+    Action<Entity, Entity> onCollisionAction_;
 };
 
 }

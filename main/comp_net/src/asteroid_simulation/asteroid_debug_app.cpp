@@ -42,18 +42,24 @@ void AsteroidDebugApp::OnEvent(const SDL_Event& event)
 
 void AsteroidDebugApp::Init()
 {
-	const auto& config = BasicEngine::GetInstance()->config;
-	quad_.Init();
-	//client shader init
-	clientShader_.LoadFromFile(config.dataRootPath + "shaders/comp_net/client.vert",
-		config.dataRootPath + "shaders/comp_net/client.frag");
-	for (auto& client : clients_)
+	
+	Job initJob = Job([this]()
 	{
-		client->Init();
-	}
-	server_.Init();
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		quad_.Init();
+		//client shader init
+		const auto& config = BasicEngine::GetInstance()->config;
+		clientShader_.LoadFromFile(config.dataRootPath + "shaders/comp_net/client.vert",
+			config.dataRootPath + "shaders/comp_net/client.frag");
+		for (auto& client : clients_)
+		{
+			client->Init();
+		}
+		server_.Init();
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	});
+	BasicEngine::GetInstance()->ScheduleJob(&initJob, JobThreadType::RENDER_THREAD);
+	initJob.Join();
 }
 
 void AsteroidDebugApp::Update(seconds dt)

@@ -33,23 +33,28 @@ DebugApp::DebugApp()
 
 void DebugApp::Init()
 {
-	const auto& config = BasicEngine::GetInstance()->config;
-	windowSize_ = config.windowSize;
-	for (auto& framebuffer : clientsFramebuffer_)
-	{
-		framebuffer.SetSize(windowSize_ / Vec2u(2, 1));
-		framebuffer.Create();
-	}
-	quad_.Init();
-	//client shader init
-	clientShader_.LoadFromFile(config.dataRootPath + "shaders/comp_net/client.vert",
-		config.dataRootPath + "shaders/comp_net/client.frag");
-	for (auto& client : clients_)
-	{
-		client.Init();
-	}
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	Job initJob = Job([this]()
+		{
+			const auto& config = BasicEngine::GetInstance()->config;
+			windowSize_ = config.windowSize;
+			for (auto& framebuffer : clientsFramebuffer_)
+			{
+				framebuffer.SetSize(windowSize_ / Vec2u(2, 1));
+				framebuffer.Create();
+			}
+			quad_.Init();
+			//client shader init
+			clientShader_.LoadFromFile(config.dataRootPath + "shaders/comp_net/client.vert",
+				config.dataRootPath + "shaders/comp_net/client.frag");
+			for (auto& client : clients_)
+			{
+				client.Init();
+			}
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		});
+	BasicEngine::GetInstance()->ScheduleJob(&initJob, JobThreadType::RENDER_THREAD);
+	initJob.Join();
 }
 
 void DebugApp::Update(seconds dt)

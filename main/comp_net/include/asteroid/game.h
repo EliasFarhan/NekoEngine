@@ -36,7 +36,7 @@ const degree_t playerAngularSpeed = degree_t(90.0f);
 const float playerShootingPeriod = 0.2f;
 const float bulletSpeed = 2.0f;
 const float bulletScale = 0.2f;
-const float bulletPeriod = 1.5f;
+const float bulletPeriod = 3.0f;
 
 enum class ComponentType : EntityMask
 {

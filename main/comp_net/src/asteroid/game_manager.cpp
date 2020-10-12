@@ -104,6 +104,11 @@ Entity GameManager::SpawnBullet(net::PlayerNumber playerNumber, Vec2f position, 
     return entity;
 }
 
+void GameManager::DestroyBullet(Entity entity)
+{
+    rollbackManager_.DestroyBullet(entity);
+}
+
 ClientGameManager::ClientGameManager(PacketSenderInterface& packetSenderInterface) :
     GameManager(),
     spriteManager_(entityManager_, textureManager_, transformManager_),

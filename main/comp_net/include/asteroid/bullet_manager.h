@@ -23,10 +23,9 @@
  */
 
 #pragma once
-
+#include "game.h"
 #include "engine/component.h"
 #include "comp_net/type.h"
-#include "asteroid/game.h"
 
 namespace neko::asteroid
 {
@@ -35,11 +34,13 @@ struct Bullet
     float remainingTime = 0.0f;
     net::PlayerNumber playerNumber = net::INVALID_PLAYER;
 };
-
-class BulletManager : public ComponentManager<Bullet, EntityMask(ComponentType::BULLET)>
+class GameManager;
+class BulletManager : public ComponentManager<Bullet, static_cast<EntityMask>(ComponentType::BULLET)>
 {
 public:
-    using ComponentManager::ComponentManager;
+    explicit BulletManager(EntityManager& entityManager, GameManager& gameManager);
     void FixedUpdate(seconds dt);
+private:
+    std::reference_wrapper<GameManager> gameManager_;
 };
 }
