@@ -26,6 +26,7 @@
 #include "engine/system.h"
 #include "graphics/graphics.h"
 #include "graphics/texture.h"
+#include "graphics/color.h"
 
 namespace neko
 {
@@ -35,6 +36,7 @@ struct Sprite
 {
     Sprite() = default;
     ~Sprite() = default;
+    Color4 color = Color4(Color::white, 1.0f);
     TextureId textureId = INVALID_TEXTURE_ID;
     Texture texture{};
 };

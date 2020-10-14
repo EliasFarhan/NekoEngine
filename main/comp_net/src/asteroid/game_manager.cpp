@@ -182,12 +182,15 @@ void ClientGameManager::SpawnPlayer(net::PlayerNumber playerNumber, Vec2f positi
     }
 	spriteManager_.AddComponent(entity);
 	spriteManager_.SetTexture(entity, shipTextureId_);
+    auto sprite = spriteManager_.GetComponent(entity);
+    sprite.color = playerColors[playerNumber];
+    spriteManager_.SetComponent(entity, sprite);
 
 }
 
 Entity ClientGameManager::SpawnBullet(net::PlayerNumber playerNumber, Vec2f position, Vec2f velocity)
 {
-    auto entity = GameManager::SpawnBullet(playerNumber, position, velocity);
+    const auto entity = GameManager::SpawnBullet(playerNumber, position, velocity);
     const auto& config = BasicEngine::GetInstance()->config;
     if(bulletTextureId_ == INVALID_TEXTURE_ID)
     {
@@ -195,6 +198,9 @@ Entity ClientGameManager::SpawnBullet(net::PlayerNumber playerNumber, Vec2f posi
     }
     spriteManager_.AddComponent(entity);
     spriteManager_.SetTexture(entity, bulletTextureId_);
+    auto sprite = spriteManager_.GetComponent(entity);
+    sprite.color = playerColors[playerNumber];
+    spriteManager_.SetComponent(entity, sprite);
     return entity;
 }
 

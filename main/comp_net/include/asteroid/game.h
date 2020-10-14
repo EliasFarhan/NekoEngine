@@ -26,6 +26,7 @@
 #include "mathematics/angle.h"
 #include "engine/entity.h"
 #include "engine/component.h"
+#include "graphics/color.h"
 
 namespace neko::asteroid
 {
@@ -37,6 +38,14 @@ const float playerShootingPeriod = 0.2f;
 const float bulletSpeed = 2.0f;
 const float bulletScale = 0.2f;
 const float bulletPeriod = 3.0f;
+
+const std::array<Color4, maxPlayerNmb> playerColors =
+{
+    {
+    Color4(Color::red,1.0f),
+    Color4(Color::blue,1.0f)
+    }
+};
 
 enum class ComponentType : EntityMask
 {

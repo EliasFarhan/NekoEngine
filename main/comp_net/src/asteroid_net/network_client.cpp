@@ -37,6 +37,7 @@ void ClientNetworkManager::Init()
 		std::numeric_limits<ClientId>::max());
 	//JOIN packet
 	gameManager_.Init();
+	gameManager_.SetWindowSize(windowSize_ / Vec2u(2, 1));
 	tcpSocket_.setBlocking(false);
 	udpSocket_.setBlocking(true);
 	auto status = sf::Socket::Error;

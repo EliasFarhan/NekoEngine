@@ -55,12 +55,15 @@ void SpriteManager::Render()
 	spriteShader_.SetMat4("projection", camera.GenerateProjectionMatrix());
 	for(Entity entity = 0; entity < entityManager_.get().GetEntitiesSize(); entity++)
 	{
-		if(entityManager_.get().HasComponent(entity, EntityMask (ComponentType::SPRITE2D)|EntityMask(ComponentType::TRANSFORM2D)))
+		if(entityManager_.get().HasComponent(entity, 
+			EntityMask (ComponentType::SPRITE2D) | 
+			EntityMask(ComponentType::TRANSFORM2D)))
 		{
 			const auto& transform = transformManager_.GetComponent(entity);
 			const auto& sprite = GetComponent(entity);
             spriteShader_.SetMat4("model", transform);
             spriteShader_.SetTexture("spriteTexture", sprite.texture.name);
+			spriteShader_.SetVec4("spriteColor", sprite.color);
             spriteQuad_.Draw();
 		}
 	}
