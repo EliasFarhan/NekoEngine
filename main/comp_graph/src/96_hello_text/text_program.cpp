@@ -44,7 +44,7 @@ void HelloTextProgram::Init()
 	// All functions return a value different than 0 whenever an error occurred
 	if (FT_Init_FreeType(&ft))
 	{
-		logDebug( "[Error] Fretype could not init FreeType Library");
+		logDebug( "[Error] Freetype could not init FreeType Library");
 		return;
 	}
 	const std::string font_name = config.dataRootPath+"font/8-bit-hud.ttf";

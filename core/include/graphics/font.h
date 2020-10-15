@@ -22,38 +22,20 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-#include <ft2build.h>
-#include FT_FREETYPE_H
+#include "graphics.h"
+#include "graphics/color.h"
+#include "mathematics/vector.h"
 
-
-#include "comp_graph/sample_program.h"
-#include "gl/shader.h"
-#include "gl/shape.h"
-#include "gl/texture.h"
-
+#include <string_view>
 namespace neko
 {
-class HelloTextProgram : public SampleProgram
+class FontManager : public RenderCommandInterface
 {
 public:
-	void Init() override;
-	void Update(seconds dt) override;
-	void Destroy() override;
-	void DrawImGui() override;
-	void Render() override;
-	void OnEvent(const SDL_Event& event) override;
-private:
-	struct Character
-    {
-		TextureName textureID = 0; // ID handle of the glyph texture
-		Vec2i   size;      // Size of glyph
-		Vec2i   bearing;   // Offset from baseline to left/top of glyph
-		long advance = 0;   // Horizontal offset to advance to next glyph
-	};
-	void RenderText(gl::Shader& shader, std::string_view text, float x, float y, float scale, Color3 color);
-	gl::Shader textShader_;
-	Mat4f projection_;
-	std::array<Character, 128> characters_;
-	gl::VertexArrayObject textureQuad_;
+  virtual ~FontManager() = default;
+  virtual void Init() = 0;
+  virtual void LoadFont(std::string_view fontName, int pixelHeight) = 0;
+  virtual void RenderText(std::string_view text, Vec2f position, float scale, Color4 color) = 0;
+  virtual void Destroy() = 0;
 };
 }
