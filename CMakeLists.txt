@@ -160,7 +160,6 @@ if(Neko_Freetype)
     include_directories("${FREETYPE_DIR}")
     add_subdirectory("${FREETYPE_DIR}")
     set_target_properties (freetype PROPERTIES FOLDER Externals)
-    add_subdirectory("common/ft_wrapper")
 endif()
 
 if(Neko_Test)

@@ -10,7 +10,7 @@ file(GLOB_RECURSE shaders_src ${CMAKE_SOURCE_DIR}/data/shaders/*.vert ${CMAKE_SO
 source_group("Shaders"	FILES ${shaders_src})
 
 add_executable(comp_graph ${comp_graph_src} ${shaders_src})
-target_link_libraries(comp_graph PUBLIC Neko_Core sdl_engine gles3_wrapper assimp_wrapper ft_wrapper ktx)
+target_link_libraries(comp_graph PUBLIC Neko_Core sdl_engine gles3_wrapper assimp_wrapper ktx)
 neko_bin_config(comp_graph)
 
 if(EMSCRIPTEN)
