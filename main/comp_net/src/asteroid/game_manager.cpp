@@ -125,6 +125,10 @@ void ClientGameManager::Init()
 
 	textureManager_.Init();
 	spriteManager_.Init();
+	fontManager_.Init();
+
+	const auto& config = BasicEngine::GetInstance()->config;
+	fontId_ = fontManager_.LoadFont(config.dataRootPath+"font/8-bit-hud.ttf", 36);
 
 	GameManager::Init();
 }
@@ -141,6 +145,22 @@ void ClientGameManager::Update(seconds dt)
 		FixedUpdate();
 		fixedTimer_ -= FixedPeriod;
 	}
+
+    if(!(state_ & STARTED))
+    {
+        if (startingTime_ != 0)
+        {
+            using namespace std::chrono;
+            unsigned long long ms = duration_cast<milliseconds>(
+                    system_clock::now().time_since_epoch()
+            ).count();
+            if (ms < startingTime_)
+            {
+                std::string countDownText = "Starts in "+std::to_string((startingTime_-ms)/1000+1);
+                fontManager_.RenderText(fontId_, countDownText, Vec2f::zero, TextAnchor::CENTER_LEFT, 1.0f, Color4(Color::white, 1.0f));
+            }
+        }
+    }
 	textureManager_.Update(dt);
     spriteManager_.Update(dt);
     transformManager_.Update();
@@ -151,12 +171,14 @@ void ClientGameManager::Destroy()
 	GameManager::Destroy();
     textureManager_.Destroy();
 	spriteManager_.Destroy();
+	fontManager_.Destroy();
 }
 
 void ClientGameManager::SetWindowSize(Vec2u windowsSize)
 {
 	windowSize_ = windowsSize;
 	camera_.SetSize(Vec2f(windowsSize) / PixelPerUnit);
+	fontManager_.SetWindowSize(Vec2f(windowsSize));
 }
 
 void ClientGameManager::Render()
@@ -168,6 +190,7 @@ void ClientGameManager::Render()
 	glViewport(0, 0, windowSize_.x, windowSize_.y);
     CameraLocator::provide(&camera_);
 	spriteManager_.Render();
+	fontManager_.Render();
 }
 
 void ClientGameManager::SpawnPlayer(net::PlayerNumber playerNumber, Vec2f position, degree_t rotation)
@@ -224,6 +247,7 @@ void ClientGameManager::FixedUpdate()
             }
             else
             {
+
                 return;
             }
         }

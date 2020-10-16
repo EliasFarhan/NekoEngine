@@ -25,6 +25,7 @@
 #pragma once
 
 #include <gl/sprite.h>
+#include "gl/font.h"
 #include "asteroid/physics_manager.h"
 #include "engine/component.h"
 #include "engine/transform.h"
@@ -100,6 +101,7 @@ protected:
 	Camera2D camera_;
 	net::PlayerNumber clientPlayer_ = net::INVALID_PLAYER;
 	gl::TextureManager textureManager_;
+    gl::FontManager fontManager_;
 	gl::SpriteManager spriteManager_;
 	float fixedTimer_ = 0.0f;
     unsigned long long startingTime_ = 0;
@@ -107,6 +109,7 @@ protected:
 
     TextureId shipTextureId_ = INVALID_TEXTURE_ID;
     TextureId bulletTextureId_ = INVALID_TEXTURE_ID;
+    FontId fontId_ = INVALID_FONT_ID;
     std::mutex renderMutex_;
 };
 

@@ -29,13 +29,32 @@
 #include <string_view>
 namespace neko
 {
+
+using FontId = sole::uuid;
+const FontId INVALID_FONT_ID = sole::uuid();
+
+enum class TextAnchor
+{
+    TOP_LEFT,
+    TOP,
+    TOP_RIGHT,
+    CENTER_LEFT,
+    CENTER,
+    CENTER_RIGHT,
+    BOTTOM_LEFT,
+    BOTTOM,
+    BOTTOM_RIGHT
+};
+
 class FontManager : public RenderCommandInterface
 {
 public:
   virtual ~FontManager() = default;
   virtual void Init() = 0;
-  virtual void LoadFont(std::string_view fontName, int pixelHeight) = 0;
-  virtual void RenderText(std::string_view text, Vec2f position, float scale, Color4 color) = 0;
+  virtual FontId LoadFont(std::string_view fontName, int pixelHeight) = 0;
+  virtual void
+  RenderText(FontId font, std::string_view text, Vec2f position, TextAnchor anchor, float scale, Color4 color) = 0;
+  virtual void DestroyFont(FontId font) = 0;
   virtual void Destroy() = 0;
 };
 }

@@ -35,6 +35,7 @@ class AssetType(Enum):
     SCENE = 3
     VERT_SHADER = 4
     FRAG_SHADER = 5
+    FONT = 6
 
 
 img_extension = [
@@ -65,6 +66,8 @@ def define_asset_type(filename) -> AssetType:
         return AssetType.VERT_SHADER
     if extension == '.frag':
         return AssetType.FRAG_SHADER
+    if extension == '.ttf':
+        return AssetType.FONT
     return AssetType.UNKNOWN
 
 
