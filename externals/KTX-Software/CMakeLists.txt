@@ -147,7 +147,7 @@ set_target_properties(ktx PROPERTIES
         SOVERSION ${PROJECT_VERSION_MAJOR}
         XCODE_ATTRIBUTE_ENABLE_HARDENED_RUNTIME "YES"
         )
-add_dependencies(ktx mkvk)
+
 set_xcode_code_sign(ktx)
 
 ## Creating vulkan headers is only required when Vulkan SDK updates.
@@ -374,7 +374,7 @@ elseif(ANDROID)
     # )
     set(ZSTD_BUILD_PROGRAMS OFF)
     set(ZSTD_BUILD_TESTS OFF)
-    add_subdirectory(/Users/Shared/SDK/zstd/build/cmake zstd)
+    add_subdirectory(${ZSTD_DIR}/build/cmake zstd)
     target_link_libraries(
             ktx
             libzstd_static

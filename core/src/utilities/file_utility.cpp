@@ -108,7 +108,7 @@ void BufferFile::Load(std::string_view path)
 	dataLength = static_cast<const size_t>(AAsset_getLength64(file));
 
 	// Allocate memory to read your file
-	dataBuffer = new char[dataLength + 1];
+	dataBuffer = new unsigned char[dataLength + 1];
 	dataBuffer[dataLength] = '\0';
 
 	// Read your file

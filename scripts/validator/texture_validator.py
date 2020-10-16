@@ -18,7 +18,6 @@ def convert_to_ktx(img, img_out, meta_data):
     toktx_exe = environ.get("TOKTX_EXE")
     if toktx_exe is None:
         return 1
-    print("Convert {} to {} with {}".format(img, img_out, toktx_exe))
     arg = ""
 
     if "linear" in meta_data:
@@ -50,7 +49,7 @@ def convert_to_ktx(img, img_out, meta_data):
     if "compression" in meta_data:
         compression = meta_data["compression"]
     else:
-        compression = "none"
+        compression = "zcmp"
         meta_data["compression"] = compression
     if compression == "bcmp":
         arg += " --bcmp "
@@ -64,7 +63,9 @@ def convert_to_ktx(img, img_out, meta_data):
 
     if os.path.isfile(img_out):
         os.remove(img_out)
-    return os.system("{} {} {} {}".format(toktx_exe, arg, img_out, img))
+    command = "{} {} {} {}".format(toktx_exe, arg, img_out, img)
+    print(command)
+    return os.system(command)
 
 
 def validate_texture(img_src, img_out, meta_data):

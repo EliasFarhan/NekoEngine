@@ -4,6 +4,7 @@
 # Sets the minimum version of CMake required to build the native library.
 
 cmake_minimum_required(VERSION 3.10)
+project(Neko)
 
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -62,6 +63,8 @@ set(Neko_GLES3 ON CACHE BOOL "Activate OpenGL ES 3.0")
 set(Neko_SDL2 ON CACHE BOOL "Activate SDL2")
 set(Neko_Android ON CACHE BOOL "Android port")
 set(EXTERNAL_DIR "${NEKO_SRC_DIR}/externals" CACHE STRING "")
+set(KTX_VERSION_FULL "v4.0.0-beta4" CACHE STRING "")
+set(ZSTD_DIR "${EXTERNAL_DIR}/zstd-1.4.5/" CACHE STRING "")
 
 MESSAGE("CMAKE MODULE PATH: ${CMAKE_MODULE_PATH}")
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/")
@@ -71,6 +74,7 @@ add_subdirectory(${NEKO_SRC_DIR}/externals/imgui-1.74 ${CMAKE_CURRENT_BINARY_DIR
 add_subdirectory(${NEKO_SRC_DIR}/externals/SDL2-2.0.9 ${CMAKE_CURRENT_BINARY_DIR}/SDL2-2.0.9)
 add_subdirectory(${NEKO_SRC_DIR}/externals/assimp-5.0.1 ${CMAKE_CURRENT_BINARY_DIR}/assimp-5.0.1)
 add_subdirectory("${NEKO_SRC_DIR}/externals/freetype-2.10.0" ${CMAKE_CURRENT_BINARY_DIR}/freetype-2.10.0)
+add_subdirectory("${NEKO_SRC_DIR}/externals/KTX-Software" ${CMAKE_CURRENT_BINARY_DIR}/KTX-Software)
 
 include(${NEKO_SRC_DIR}/cmake/data.cmake)
 include(${NEKO_SRC_DIR}/cmake/neko_executable.cmake)
@@ -78,7 +82,6 @@ add_subdirectory(${NEKO_SRC_DIR}/core ${CMAKE_CURRENT_BINARY_DIR}/core)
 add_subdirectory(${NEKO_SRC_DIR}/common/sdl_engine ${CMAKE_CURRENT_BINARY_DIR}/sdl_engine)
 add_subdirectory(${NEKO_SRC_DIR}/common/gles3_wrapper ${CMAKE_CURRENT_BINARY_DIR}/gles3_wrapper)
 add_subdirectory(${NEKO_SRC_DIR}/common/assimp_wrapper ${CMAKE_CURRENT_BINARY_DIR}/assimp_wrapper)
-add_subdirectory(${NEKO_SRC_DIR}/common/ft_wrapper ${CMAKE_CURRENT_BINARY_DIR}/ft_wrapper)
 
 #comp_graph
 set(COMP_GRAPH_DIR ${NEKO_SRC_DIR}/main/comp_graph)
@@ -94,9 +97,11 @@ add_library( # Sets the name of the library.
 # can link multiple libraries, such as libraries you define in this
 # build script, prebuilt third-party libraries, or system libraries.
 
-target_link_libraries( # Specifies the target library.
-                       main
-
-                       # Links the target library to the log library
-                       # included in the NDK.
-                       ${log-lib} ${opengl-lib} Neko_Core SDL2-static sdl_engine glad gles3_wrapper imgui assimp_wrapper ft_wrapper)
+target_link_libraries(
+        # Specifies the target library.
+        main
+        # Links the target library to the log library
+        # included in the NDK.
+        ${log-lib} ${opengl-lib}
+        Neko_Core SDL2-static sdl_engine
+        glad gles3_wrapper imgui assimp_wrapper)
