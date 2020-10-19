@@ -58,17 +58,5 @@ private:
     unsigned short udpPort_ = 12345;
     Index lastSocketIndex_ = 0;
     PlayerNumber lastPlayerNumber_ = 0;
-    const std::array<Vec2f, std::max(4u, asteroid::maxPlayerNmb)> spawnPositions_{
-            Vec2f(0,1),
-            Vec2f(0,-1),
-            Vec2f(1,0),
-            Vec2f(-1,0),
-    };
-    const std::array<degree_t, std::max(4u, asteroid::maxPlayerNmb)> spawnRotations_{
-            degree_t(0.0f),
-            degree_t(180.0f),
-            degree_t(-90.0f),
-            degree_t(90.0f)
-    };
 };
 }

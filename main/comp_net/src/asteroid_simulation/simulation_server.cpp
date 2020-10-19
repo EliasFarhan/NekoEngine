@@ -137,13 +137,13 @@ void SimulationServer::ProcessReceivePacket(std::unique_ptr<asteroid::Packet> pa
 		spawnPlayer->clientId = joinPacket->clientId;
 		spawnPlayer->playerNumber = lastPlayerNumber_;
 
-		const auto pos = spawnPositions_[lastPlayerNumber_]*3.0f;
+		const auto pos = asteroid::spawnPositions[lastPlayerNumber_]*3.0f;
 		const auto* const posPtr = reinterpret_cast<const std::uint8_t*>(&pos[0]);
 		for (size_t i = 0; i < sizeof(Vec2f);i++)
 		{
 			spawnPlayer->pos[i] = posPtr[i];
 		}
-		const auto rotation = spawnRotations_[lastPlayerNumber_];
+		const auto rotation = asteroid::spawnRotations[lastPlayerNumber_];
 		const auto* const rotationPtr = reinterpret_cast<const std::uint8_t*>(&rotation);
         for (size_t i = 0; i < sizeof(degree_t);i++)
         {

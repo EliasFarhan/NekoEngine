@@ -34,6 +34,8 @@
 
 #include "ktx.h"
 
+#include <fmt/core.h>
+
 
 #ifdef EASY_PROFILE_USE
 #include "easy/profiler.h"
@@ -192,9 +194,7 @@ TextureName stbCreateTexture(const std::string_view filename, Texture::TextureFl
     const std::string extension = GetFilenameExtension(filename);
     if (!FileExists(filename))
     {
-        std::ostringstream oss;
-        oss << "[Error] Texture: " << filename << " does not exist\n";
-        logDebug(oss.str());
+        logDebug(fmt::format("[Error] Texture: {} does not exist", filename));
         return 0;
     }
 
@@ -219,9 +219,7 @@ TextureName stbCreateTexture(const std::string_view filename, Texture::TextureFl
     textureFile.Destroy();
     if (image.data == nullptr)
     {
-        std::ostringstream oss;
-        oss << "[Error] Texture: cannot load " << filename << "\n";
-        logDebug(oss.str());
+        logDebug(fmt::format("[Error] Texture: cannot load {}", filename));
         return INVALID_TEXTURE_NAME;
     }
 #ifdef EASY_PROFILE_USE
@@ -274,62 +272,62 @@ void PrintKTXError(ktx_error_code_e result, const char* file, int line)
     switch(result)
     {
         case KTX_FILE_DATA_ERROR:
-            log += ("[KTX] Error file data error");
+            log = ("[KTX] Error file data error");
             break;
         case KTX_FILE_ISPIPE:
-            log += ("[KTX] Error file is pipe");
+            log = ("[KTX] Error file is pipe");
             break;
         case KTX_FILE_OPEN_FAILED:
-            log += ("[KTX] Error file open failed");
+            log = ("[KTX] Error file open failed");
             break;
         case KTX_FILE_OVERFLOW:
-            log += ("[KTX] Error file overflow");
+            log = ("[KTX] Error file overflow");
             break;
         case KTX_FILE_READ_ERROR:
-            log += ("[KTX] Error file read error");
+            log = ("[KTX] Error file read error");
             break;
         case KTX_FILE_SEEK_ERROR:
-            log += ("[KTX] Error file seek error");
+            log = ("[KTX] Error file seek error");
             break;
         case KTX_FILE_UNEXPECTED_EOF:
-            log += ("[KTX] Error file unexpected eof");
+            log = ("[KTX] Error file unexpected eof");
             break;
         case KTX_FILE_WRITE_ERROR:
-            log += ("[KTX] Error file write error");
+            log = ("[KTX] Error file write error");
             break;
         case KTX_GL_ERROR:
-            log += ("[KTX] Error gl error");
+            log = ("[KTX] Error gl error");
             break;
         case KTX_INVALID_OPERATION:
-            log += ("[KTX] Error Invalid Operation");
+            log = ("[KTX] Error Invalid Operation");
             break;
         case KTX_INVALID_VALUE:
-            log += ("[KTX] Error Invliad value");
+            log = ("[KTX] Error Invliad value");
             break;
         case KTX_NOT_FOUND:
-            log += ("[KTX] Error KTX not found");
+            log = ("[KTX] Error KTX not found");
             break;
         case KTX_OUT_OF_MEMORY:
-            log += ("[KTX] Error Out fo memory");
+            log = ("[KTX] Error Out fo memory");
             break;
         case KTX_TRANSCODE_FAILED:
-            log += ("[KTX] Error transcode failed");
+            log = ("[KTX] Error transcode failed");
             break;
         case KTX_UNKNOWN_FILE_FORMAT:
-            log += ("[KTX] Error file unknown file format");
+            log = ("[KTX] Error file unknown file format");
             break;
         case KTX_UNSUPPORTED_TEXTURE_TYPE:
-            log += ("[KTX] Error unsupported texture type");
+            log = ("[KTX] Error unsupported texture type");
             break;
         case KTX_UNSUPPORTED_FEATURE:
-            log += ("[KTX] Error unsupported feature");
+            log = ("[KTX] Error unsupported feature");
             break;
         case KTX_LIBRARY_NOT_LINKED:
-            log += ("[KTX] Error Library not linked");
+            log = ("[KTX] Error Library not linked");
             break;
-        default: ;
+        default: return;
     }
-    logDebug(log+" in file: "+file+" at line: "+std::to_string(line));
+    logDebug(fmt::format("{} in file: {} at line: {}", log, file, line));
 }
 
 TextureName CreateTextureFromKTX(const std::string_view filename)
@@ -407,7 +405,7 @@ TextureName LoadCubemap(std::vector<std::string> facesFilename)
         }
         else
         {
-            logDebug("[Error] Cubemap tex failed to load at path: "+ facesFilename[i]);
+            logDebug(fmt::format("[Error] Cubemap tex failed to load at path: {}", facesFilename[i]));
         }
         image.Destroy();
     }

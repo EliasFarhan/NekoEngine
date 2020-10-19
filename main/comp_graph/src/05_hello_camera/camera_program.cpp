@@ -25,7 +25,7 @@
 #include "05_hello_camera/camera_program.h"
 
 #include <sstream>
-
+#include <fmt/core.h>
 #include "imgui.h"
 
 namespace neko
@@ -195,9 +195,7 @@ void HelloCameraProgram::OnEvent(const SDL_Event& event)
 	case SDL_MOUSEMOTION:
 	{
 		mouseMotion_ = Vec2f(event.motion.xrel, event.motion.yrel)/mouseMotionRatio_;
-		std::ostringstream oss;
-		oss << "Mouse motion: " << mouseMotion_;
-		logDebug(oss.str());
+		logDebug(fmt::format("Mouse motion: {}", mouseMotion_.ToString()));
 			
 		break;
 	}

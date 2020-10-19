@@ -44,7 +44,7 @@ class Scale2dManager : public ComponentManager<Vec2f, EntityMask(ComponentType::
 {
 public:
     using ComponentManager::ComponentManager;
-    Index AddComponent(Entity entity) override;
+    void AddComponent(Entity entity) override;
 
 };
 
@@ -69,7 +69,7 @@ class Scale3dManager : public ComponentManager<Vec3f, EntityMask(ComponentType::
 {
 public:
     using ComponentManager::ComponentManager;
-    Index AddComponent(Entity entity) override;
+    void AddComponent(Entity entity) override;
 
 };
 
@@ -98,7 +98,7 @@ public:
     void OnChangeParent(Entity entity, Entity newParent, Entity oldParent) override;
     void UpdateDirtyComponent(Entity entity) override;
     void Update() override;
-    Index AddComponent(Entity entity) override;
+    void AddComponent(Entity entity) override;
 protected:
     void UpdateTransform(Entity entity) override;
 
@@ -128,7 +128,7 @@ public:
 	 */
     void UpdateDirtyComponent(Entity entity) override;
     void Update() override;
-	Index AddComponent(Entity entity) override;
+    void AddComponent(Entity entity) override;
 protected:
 
     void UpdateTransform(Entity entity) override;

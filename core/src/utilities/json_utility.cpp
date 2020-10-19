@@ -28,6 +28,7 @@
 #include <string>
 #include "engine/log.h"
 #include <sstream>
+#include <fmt/core.h>
 
 namespace neko
 {
@@ -95,7 +96,7 @@ json LoadJson(const std::string_view jsonPath)
     json jsonContent;
     if (!neko::FileExists(jsonPath))
     {
-        logDebug("[Error] File does not exist: " + std::string(jsonPath));
+        logDebug(fmt::format("[Error] File does not exist: {}", jsonPath));
         return jsonContent;
     }
 

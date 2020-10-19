@@ -29,6 +29,7 @@
 #include <sstream>
 #include <engine/log.h>
 
+#include <fmt/core.h>
 #include "imgui.h"
 
 namespace neko
@@ -295,7 +296,7 @@ void EntityViewer::DrawEntityHierarchy(neko::Entity entity, bool draw, bool dest
         const std::string entityPopupName = "Entity Popup " + std::to_string(entity);
         if (ImGui::IsItemClicked(1))
         {
-            logDebug("Left Clicked on Entity: " + std::to_string(entity));
+            logDebug(fmt::format("Left Clicked on Entity: {}", entity));
 
             ImGui::OpenPopup(entityPopupName.c_str());
         }
@@ -487,7 +488,7 @@ bool EntityManager::SetEntityParent(Entity child, Entity parent)
     {
 	    if(p == child)
 	    {
-            logDebug("[Warning] Child entity: " + std::to_string(child) + " cannot have parent entity: " + std::to_string(parent));
+            logDebug(fmt::format("[Warning] Child entity: {} cannot have parent entity: {}", child , parent));
             return false;
 	    }
         p = GetEntityParent(p);

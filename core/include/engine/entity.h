@@ -62,13 +62,17 @@ public:
     explicit EntityManager();
 
     EntityMask GetMask(Entity entity);
-
+    /**
+     * \brief create an empty entity (non-null EntityMask)
+     */
     Entity CreateEntity(Entity entity = INVALID_ENTITY);
 
     Entity GetLastEntity();
 
     void DestroyEntity(Entity entity);
-
+    /**
+     *
+     */
     [[nodiscard]] bool HasComponent(Entity entity, EntityMask componentType) const;
 
     [[nodiscard]] bool IsPrefab(Entity entity) const;

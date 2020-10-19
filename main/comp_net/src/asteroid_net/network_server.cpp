@@ -248,10 +248,10 @@ void ServerNetworkManager::ProcessReceivePacket(
 			spawnPlayer->clientId = ConvertToBinary(clientMap_[p].clientId);
 			spawnPlayer->playerNumber = p;
 
-			const auto pos = spawnPositions_[p] * 3.0f;
+			const auto pos = asteroid::spawnPositions[p] * 3.0f;
 			spawnPlayer->pos = ConvertToBinary(pos);
 
-			const auto rotation = spawnRotations_[p];
+			const auto rotation = asteroid::spawnRotations[p];
 			spawnPlayer->angle = ConvertToBinary(rotation);
 			gameManager_.SpawnPlayer(p, pos, rotation);
 
