@@ -52,12 +52,18 @@ class RollbackManager : public OnCollisionInterface
 public:
 	explicit RollbackManager(GameManager& gameManager, EntityManager& entityManager);
 	/**
-	 * \brief Simulate all players with new inputs
+	 * \brief Simulate all players with new inputs, method call only by the clients
 	 */
 	void SimulateToCurrentFrame();
 	void SetPlayerInput(net::PlayerNumber playerNumber, net::PlayerInput playerInput, net::Frame inputFrame);
 	void StartNewFrame(net::Frame newFrame);
+	/**
+	 * \brief Validate all the frame from lastValidateFrame_ to newValidateFrame
+	 */
 	void ValidateFrame(net::Frame newValidateFrame);
+	/**
+	 * \brief Confirm Frame and Check with Physics State checksum, called by the clients when receiving Confirm Frame packet
+	 */
 	void ConfirmFrame(net::Frame newValidatedFrame, const std::array<PhysicsState, maxPlayerNmb>& serverPhysicsState);
 	[[nodiscard]] PhysicsState GetValidatePhysicsState(net::PlayerNumber playerNumber) const;
 	[[nodiscard]] net::Frame GetLastValidateFrame() const { return lastValidateFrame_; }

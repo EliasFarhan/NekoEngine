@@ -6,8 +6,7 @@ set (CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS On)
 
-
-
+add_compile_definitions("FMT_HEADER_ONLY=1")
 
 set(Neko_Profile OFF CACHE BOOL "Activate Profiling with Easy Profile")
 set(Neko_GLES3 ON CACHE BOOL "Activate OpenGL ES 3.0")

@@ -35,7 +35,8 @@ struct PlayerCharacter
     float shootingTime = 0.0f;
     net::PlayerInput input = 0;
     net::PlayerNumber playerNumber = net::INVALID_PLAYER;
-
+    short health = playerHealth;
+    float invincibilityTime = 0.0f;
 };
 class GameManager;
 class PlayerCharacterManager : public ComponentManager<PlayerCharacter, EntityMask(ComponentType::PLAYER_CHARACTER)>

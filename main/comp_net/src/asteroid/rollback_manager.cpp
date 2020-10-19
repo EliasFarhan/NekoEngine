@@ -55,6 +55,7 @@ void RollbackManager::SimulateToCurrentFrame()
 #endif
 	auto currentFrame = gameManager_.GetCurrentFrame();
 	auto lastValidateFrame = gameManager_.GetLastValidateFrame();
+	//Destroying all created Entities after the last validated frame
 	for(const auto& createdEntity : createdEntities_)
     {
 	    if(createdEntity.createdFrame > lastValidateFrame)
@@ -63,7 +64,7 @@ void RollbackManager::SimulateToCurrentFrame()
         }
     }
 	createdEntities_.clear();
-
+    //Creating destroyed bullet after the last validated frame
     for (const auto& destroyedBullet : destroyedBullets_)
     {
         if (destroyedBullet.destroyedFrame <= currentFrame)
@@ -78,13 +79,15 @@ void RollbackManager::SimulateToCurrentFrame()
         }
     }
     destroyedBullets_.clear();
+    //Revert the current game state to the last validated game state
 	currentBulletManager_ = lastValidateBulletManager_;
 	currentPhysicsManager_ = lastValidatePhysicsManager_;
 	currentPlayerManager_ = lastValidatePlayerCharacter_;
+
 	for(net::Frame frame = lastValidateFrame+1; frame <= currentFrame; frame++)
     {
         testedFrame_ = frame;
-	    //Copy player input to player manager
+	    //Copy player inputs to player manager
         for(net::PlayerNumber playerNumber = 0; playerNumber < maxPlayerNmb; playerNumber++)
         {
             const auto playerInput = GetInputAtFrame(playerNumber, frame);
@@ -93,10 +96,12 @@ void RollbackManager::SimulateToCurrentFrame()
             playerCharacter.input = playerInput;
             currentPlayerManager_.SetComponent(playerEntity, playerCharacter);
         }
+        //Simulate one frame of the game
         currentBulletManager_.FixedUpdate(seconds(GameManager::FixedPeriod));
         currentPlayerManager_.FixedUpdate(seconds(GameManager::FixedPeriod));
 	    currentPhysicsManager_.FixedUpdate(seconds(GameManager::FixedPeriod));
     }
+	//Copy the physics states to the transforms
     for(Entity entity = 0; entity < entityManager_.GetEntitiesSize(); entity++)
     {
         if(!entityManager_.HasComponent(entity, EntityMask(neko::ComponentType::BODY2D) | EntityMask(neko::ComponentType::TRANSFORM2D)))
@@ -154,6 +159,7 @@ void RollbackManager::ValidateFrame(net::Frame newValidateFrame)
     EASY_BLOCK("Validate Frame");
 #endif
     auto lastValidateFrame = gameManager_.GetLastValidateFrame();
+    //Destroying all created Entities after the last validated frame
     for(const auto& createdEntity : createdEntities_)
     {
         if(createdEntity.createdFrame > lastValidateFrame)
@@ -162,6 +168,7 @@ void RollbackManager::ValidateFrame(net::Frame newValidateFrame)
         }
     }
     createdEntities_.clear();
+    //Creating destroyed bullet after the last validated frame
     for(const auto& destroyedBullet : destroyedBullets_)
     {
         if(destroyedBullet.destroyedFrame <= newValidateFrame)
@@ -176,6 +183,7 @@ void RollbackManager::ValidateFrame(net::Frame newValidateFrame)
         }
     }
     destroyedBullets_.clear();
+    //We check that we got all the inputs
 	for(net::PlayerNumber playerNumber = 0; playerNumber < maxPlayerNmb; playerNumber++ )
 	{
 		if(GetLastReceivedFrame(playerNumber) < newValidateFrame)
@@ -184,12 +192,15 @@ void RollbackManager::ValidateFrame(net::Frame newValidateFrame)
 			return;
 		}
 	}
+	//We use the current game state as the temporary new validate game state
 	currentBulletManager_ = lastValidateBulletManager_;
     currentPhysicsManager_ = lastValidatePhysicsManager_;
     currentPlayerManager_ = lastValidatePlayerCharacter_;
+    //We simulate the frames until the new validated frame
     for(net::Frame frame = lastValidateFrame_ + 1; frame <= newValidateFrame; frame++)
     {
         testedFrame_ = frame;
+        //Copy the players inputs into the player manager
         for(net::PlayerNumber playerNumber = 0; playerNumber < maxPlayerNmb; playerNumber++)
         {
             const auto playerInput = GetInputAtFrame(playerNumber, frame);
@@ -198,19 +209,16 @@ void RollbackManager::ValidateFrame(net::Frame newValidateFrame)
             playerCharacter.input = playerInput;
             currentPlayerManager_.SetComponent(playerEntity, playerCharacter);
         }
+        //We simulate one frame
         currentBulletManager_.FixedUpdate(seconds(GameManager::FixedPeriod));
         currentPlayerManager_.FixedUpdate(seconds(GameManager::FixedPeriod));
         currentPhysicsManager_.FixedUpdate(seconds(GameManager::FixedPeriod));
     }
+    //Copy back the new validate game state to the last validated game state
     lastValidateBulletManager_ = currentBulletManager_;
     lastValidatePlayerCharacter_ = currentPlayerManager_;
     lastValidatePhysicsManager_ = currentPhysicsManager_;
 	lastValidateFrame_ = newValidateFrame;
-	//Remove validated bullet
-	createdEntities_.erase(std::remove_if(createdEntities_.begin(), createdEntities_.end(),
-                                       [this](const auto& createdEntitiy) {
-	    return createdEntitiy.createdFrame <= lastValidateFrame_;
-	}), createdEntities_.end());
 }
 void RollbackManager::ConfirmFrame(net::Frame newValidateFrame, const std::array<PhysicsState, maxPlayerNmb>& serverPhysicsState)
 {
@@ -301,14 +309,20 @@ net::PlayerInput RollbackManager::GetInputAtFrame(net::PlayerNumber playerNumber
 
 void RollbackManager::OnCollision(Entity entity1, Entity entity2)
 {
-    std::function<void(const PlayerCharacter&, const Bullet&, Entity)> ManageCollision = 
-        [this](const auto& player, const auto& bullet, auto bulletEntity)
+    std::function<void(const PlayerCharacter&, Entity, const Bullet&, Entity)> ManageCollision =
+        [this](const auto& player, auto playerEntity, const auto& bullet, auto bulletEntity)
     {
         if (player.playerNumber != bullet.playerNumber)
         {
-            //TODO lower health point
-
             gameManager_.DestroyBullet(bulletEntity);
+            //lower health point
+            auto playerCharacter = currentPlayerManager_.GetComponent(playerEntity);
+            if(playerCharacter.invincibilityTime <= 0.0f)
+            {
+                playerCharacter.health--;
+                playerCharacter.invincibilityTime = playerInvincibilityPeriod;
+            }
+            currentPlayerManager_.SetComponent(playerEntity, playerCharacter);
         }
     };
     if(entityManager_.HasComponent(entity1, EntityMask(ComponentType::PLAYER_CHARACTER)) && 
@@ -316,7 +330,7 @@ void RollbackManager::OnCollision(Entity entity1, Entity entity2)
     {
         const auto& player = currentPlayerManager_.GetComponent(entity1);
         const auto& bullet = currentBulletManager_.GetComponent(entity2);
-        ManageCollision(player, bullet, entity2);
+        ManageCollision(player, entity1, bullet, entity2);
        
     }
     if (entityManager_.HasComponent(entity2, EntityMask(ComponentType::PLAYER_CHARACTER)) &&
@@ -324,7 +338,7 @@ void RollbackManager::OnCollision(Entity entity1, Entity entity2)
     {
         const auto& player = currentPlayerManager_.GetComponent(entity2);
         const auto& bullet = currentBulletManager_.GetComponent(entity1);
-        ManageCollision(player, bullet, entity1);
+        ManageCollision(player, entity2, bullet, entity1);
     }
 }
 
