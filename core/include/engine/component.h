@@ -77,11 +77,18 @@ public:
     virtual ~ComponentManager()
     {};
 
-    virtual Index AddComponent(Entity entity);
-
+    /**
+     * \brief Add the component type to the entity manager (Warning! it does not set a default value for the component) 
+     */
+    virtual void AddComponent(Entity entity);
+    /**
+     * \brief Remove the component type to the entity manager
+     */
     virtual void DestroyComponent(Entity entity);
-
-	virtual void SetComponent(Entity entity, const T& component);
+    /**
+     * Copy the value component to the component manager (Warning! it does not register the component type to the entity manager)
+     */
+    virtual void SetComponent(Entity entity, const T& component);
 
     [[nodiscard]] const T& GetComponent(Entity entity) const
     { return components_[entity]; }
@@ -101,11 +108,10 @@ protected:
 };
 
 template<typename T, EntityMask componentType>
-Index ComponentManager<T, componentType>::AddComponent(Entity entity)
+void ComponentManager<T, componentType>::AddComponent(Entity entity)
 {
     ResizeIfNecessary(components_, entity, T{});
     entityManager_.get().AddComponentType(entity, componentType);
-    return entity;
 }
 
 template<typename T, EntityMask componentType>

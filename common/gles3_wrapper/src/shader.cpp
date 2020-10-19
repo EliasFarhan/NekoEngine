@@ -25,7 +25,7 @@
 #include <utilities/file_utility.h>
 #include <sstream>
 #include <engine/log.h>
-
+#include <fmt/core.h>
 namespace neko::gl
 {
 
@@ -33,16 +33,16 @@ void Shader::LoadFromFile(const std::string_view vertexShaderPath, const std::st
 {
     if(!FileExists(vertexShaderPath))
     {
-        logDebug(std::string("[Error] Vertex shader: ")+vertexShaderPath.data()+" does not exist");
+        logDebug(fmt::format("[Error] Vertex shader: {}  does not exist", vertexShaderPath));
     }
     glCheckError();
     const unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glCheckError();
 
     const auto vertexShaderProgram = LoadFile(vertexShaderPath.data());
-    const char* vertexShaderChar = vertexShaderProgram.c_str();
+    const char* vertexShaderContent = vertexShaderProgram.c_str();
 
-    glShaderSource(vertexShader, 1, &vertexShaderChar, nullptr);
+    glShaderSource(vertexShader, 1, &vertexShaderContent, nullptr);
     glCompileShader(vertexShader);
     //Check success status of shader compilation
     int success;
@@ -51,9 +51,10 @@ void Shader::LoadFromFile(const std::string_view vertexShaderPath, const std::st
     if (!success)
     {
         glGetShaderInfoLog(vertexShader, 512, nullptr, infoLog);
-        std::ostringstream oss;
-        oss << "[Error] Vertex shader at: " << vertexShaderPath <<" compilation failed: \n" << infoLog<<'\n'<<vertexShaderChar;
-        logDebug(oss.str());
+        logDebug(fmt::format("[Error] Vertex shader at: {} compilation failed with this log:\n{}\nShader content:\n{}", 
+            vertexShaderPath, 
+            infoLog, 
+            vertexShaderContent));
         return;
     }
     glCheckError();
@@ -63,18 +64,17 @@ void Shader::LoadFromFile(const std::string_view vertexShaderPath, const std::st
     }
     const unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glCheckError();
-    auto fragmentShaderProgram = LoadFile(fragmentShaderPath.data());
-    const char* fragmentShaderChar = fragmentShaderProgram.c_str();
-    glShaderSource(fragmentShader, 1, &fragmentShaderChar, nullptr);
+    const auto fragmentShaderProgram = LoadFile(fragmentShaderPath.data());
+    const char* fragmentShaderContent = fragmentShaderProgram.c_str();
+    glShaderSource(fragmentShader, 1, &fragmentShaderContent, nullptr);
     glCompileShader(fragmentShader);
     //Check success status of shader compilation
     glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
     if (!success)
     {
         glGetShaderInfoLog(fragmentShader, 512, nullptr, infoLog);
-        std::ostringstream oss;
-        oss << "[Error] Fragment shader at: " << fragmentShaderPath <<" compilation failed\n" << infoLog << '\n' << fragmentShaderChar;
-        logDebug(oss.str());
+        logDebug(fmt::format("[Error] Fragment shader at: {}  compilation failed with log:\n{}\nShader content:\n{}",
+            fragmentShaderPath, infoLog, fragmentShaderContent));
         return;
     }
     glCheckError();

@@ -32,6 +32,7 @@
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
+#include <fmt/core.h>
 
 #ifdef EASY_PROFILE_USE
 #include <easy/profiler.h>
@@ -41,9 +42,7 @@ namespace neko::sdl
 {
 void OnResizeRenderCommand::Render()
 {
-	std::ostringstream oss;
-	oss << "Resize window with new size: " << newWindowSize_;
-	logDebug(oss.str());
+	logDebug(fmt::format("Resize window with new size: {}", newWindowSize_.ToString()));
 	glViewport(0, 0, newWindowSize_.x, newWindowSize_.y);
 }
 

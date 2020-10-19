@@ -34,6 +34,8 @@
 #include "io_system.h"
 #include "engine/engine.h"
 
+#include <fmt/core.h>
+
 #ifdef EASY_PROFILE_USE
 #include "easy/profiler.h"
 #endif
@@ -67,7 +69,7 @@ void Model::Destroy()
 	{
 		path_ = path;
 		directory_ = path.substr(0, path.find_last_of('/'));
-		logDebug("ASSIMP: Loading model: " + path_);
+		logDebug(fmt::format("ASSIMP: Loading model: {}",path_));
 #ifdef NEKO_SAMETHREAD
 		processModelJob_.Execute();
 #else
@@ -131,9 +133,7 @@ void Model::Destroy()
 #endif
 		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 		{
-			std::ostringstream oss;
-			oss << "[ERROR] ASSIMP " << import.GetErrorString();
-			logDebug(oss.str());
+			logDebug(fmt::format("[ERROR] ASSIMP {}", import.GetErrorString()));
 			return;
 		}
 		meshes_.reserve(scene->mNumMeshes);

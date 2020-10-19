@@ -26,6 +26,8 @@
 #include <utilities/file_utility.h>
 #include <engine/log.h>
 
+#include <fmt/core.h>
+
 namespace neko
 {
 
@@ -56,9 +58,7 @@ void SceneManager::ParseSceneJson(const json& sceneJson)
         }
         else
         {
-            std::ostringstream oss;
-            oss << "[Warning] Scene Path in scene: "<<currentScene_.sceneName<<" contains a bad scene path";
-            logDebug(oss.str());
+            logDebug(fmt::format("[Warning] Scene Path in scene: {} contains a bad scene path", currentScene_.sceneName));
         }
     }
 

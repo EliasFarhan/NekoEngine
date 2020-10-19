@@ -26,6 +26,8 @@
 #include <functional>
 #include "engine/log.h"
 
+#include <fmt/core.h>
+
 #ifdef EASY_PROFILE_USE
 #include "easy/profiler.h"
 #endif
@@ -188,9 +190,7 @@ void BufferFile::Load(std::string_view path)
     std::ifstream is(path.data(),std::ifstream::binary);
     if(!is)
     {
-	std::ostringstream oss;
-	oss << "[Error] Could not open file: " << path << " for BufferFile";
-	logDebug(oss.str());
+	logDebug(fmt::format("[Error] Could not open file: {}  for BufferFile"));
 	dataLength = 0;
 	dataBuffer = nullptr;
     }
@@ -292,10 +292,7 @@ void IterateDirectory(const std::string_view dirname, std::function<void(const s
 	}
 	else
 	{
-		std::string msg = "[Error] Path: ";
-		msg += dirname;
-		msg += " is not a directory!";
-		logDebug(msg);
+		logDebug(fmt::format("[Error] Path: {}  is not a directory!", dirname));
 	}
 }
 

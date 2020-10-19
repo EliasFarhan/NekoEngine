@@ -30,6 +30,8 @@
 #include "mathematics/angle.h"
 #include "mathematics/trigo.h"
 
+#include <fmt/core.h>
+
 namespace neko
 {
 //-----------------------------------------------------------------------------
@@ -200,6 +202,11 @@ struct Vec2
     {
         os << "Vec2(" << dt.x << "," << dt.y << ")";
         return os;
+    }
+
+    std::string ToString()
+    {
+        return fmt::format("Vec2({},{})", x, y);
     }
 
     //Used to specialize in case of other kind of vector
@@ -509,7 +516,10 @@ public:
         os << "Vec3(" << dt.x << "," << dt.y << "," << dt.z << ")";
         return os;
     }
-
+    std::string ToString()
+    {
+        return fmt::format("Vec3({},{},{})", x, y, z);
+    }
 
     //-----------------------------------------------------------------------------
     // Formulas
@@ -809,6 +819,11 @@ public:
     {
         os << "Vec4(" << dt.x << "," << dt.y << "," << dt.z << "," << dt.w << ")";
         return os;
+    }
+
+    std::string ToString()
+    {
+        return fmt::format("Vec4({},{},{},{})", x, y, z, w);
     }
 
     //-----------------------------------------------------------------------------

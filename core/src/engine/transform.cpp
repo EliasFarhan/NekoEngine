@@ -34,13 +34,13 @@
 namespace neko
 {
 
-Index Scale2dManager::AddComponent(Entity entity)
+void Scale2dManager::AddComponent(Entity entity)
 {
 	ResizeIfNecessary(components_, entity, Vec2f::one);
 	return ComponentManager::AddComponent(entity);
 }
 
-Index Scale3dManager::AddComponent(Entity entity)
+void Scale3dManager::AddComponent(Entity entity)
 {
 	ResizeIfNecessary(components_, entity, Vec3f::one);
 	return ComponentManager::AddComponent(entity);
@@ -129,7 +129,7 @@ void Transform2dManager::UpdateTransform(Entity entity)
     SetComponent(entity, transform);
 }
 
-Index Transform2dManager::AddComponent(Entity entity)
+void Transform2dManager::AddComponent(Entity entity)
 {
     positionManager_.AddComponent(entity);
     scaleManager_.AddComponent(entity);
@@ -254,7 +254,7 @@ void Transform3dManager::Update()
 	dirtyManager_.UpdateDirtyEntities();
 }
 
-Index Transform3dManager::AddComponent(Entity entity)
+void Transform3dManager::AddComponent(Entity entity)
 {
 	position3DManager_.AddComponent(entity);
 	scale3DManager_.AddComponent(entity);

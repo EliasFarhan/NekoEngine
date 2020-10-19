@@ -41,12 +41,29 @@ const float bulletScale = 0.2f;
 const float bulletPeriod = 3.0f;
 const float playerInvincibilityPeriod = 1.5f;
 
-const std::array<Color4, maxPlayerNmb> playerColors =
+const std::array<Color4, std::max(maxPlayerNmb, 4u)> playerColors =
 {
-    {
-    Color4(Color::red,1.0f),
-    Color4(Color::blue,1.0f)
+  {
+        Color4(Color::red,1.0f),
+        Color4(Color::blue,1.0f),
+        Color4(Color::yellow, 1.0f),
+        Color4(Color::cyan, 1.0f)
     }
+};
+
+const std::array<Vec2f, std::max(4u, maxPlayerNmb)> spawnPositions
+{
+        Vec2f(0,1),
+        Vec2f(0,-1),
+        Vec2f(1,0),
+        Vec2f(-1,0),
+};
+
+const std::array<degree_t, std::max(4u, maxPlayerNmb)> spawnRotations{
+    degree_t(0.0f),
+    degree_t(180.0f),
+    degree_t(-90.0f),
+    degree_t(90.0f)
 };
 
 enum class ComponentType : EntityMask

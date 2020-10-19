@@ -27,6 +27,7 @@
 #include "stb_image.h"
 #include "engine/engine.h"
 #include "utilities/file_utility.h"
+#include <fmt/core.h>
 
 #ifdef EASY_PROFILE_USE
 #include "easy/profiler.h"
@@ -137,9 +138,7 @@ TextureId TextureManager::LoadTexture(std::string_view path, Texture::TextureFla
         logDebug("[Texture Manager] Texture is already loaded");
         return textureId;
 	}
-	std::string log = "[Texture Manager] Loading texture path: ";
-	log += path;
-	logDebug(log);
+	logDebug(fmt::format("[Texture Manager] Loading texture path: {}", path));
 
     texturePathMap_[textureId] = std::string(path.data());
 #ifndef NEKO_SAMETHREAD
