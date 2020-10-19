@@ -3,7 +3,7 @@
 #include "mathematics/checksum.h"
 #include "mathematics/vector.h"
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 TEST(CompNet, FloatDeterminism)
 {
