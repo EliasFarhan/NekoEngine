@@ -43,12 +43,18 @@ void SpriteManager::Init()
 
 void SpriteManager::Destroy()
 {
+    for(auto& sprite : components_)
+    {
+        sprite.textureId = INVALID_TEXTURE_ID;
+        sprite.texture.name = INVALID_TEXTURE_NAME;
+    }
     spriteQuad_.Destroy();
     spriteShader_.Destroy();
 }
 
 void SpriteManager::Render()
 {
+    //TODO batch sprite with the same texture together
 	spriteShader_.Bind();
 	const auto& camera = CameraLocator::get();
 	spriteShader_.SetMat4("view", camera.GenerateViewMatrix());
@@ -56,16 +62,22 @@ void SpriteManager::Render()
 	for(Entity entity = 0; entity < entityManager_.get().GetEntitiesSize(); entity++)
 	{
 		if(entityManager_.get().HasComponent(entity, 
-			EntityMask (ComponentType::SPRITE2D) | 
-			EntityMask(ComponentType::TRANSFORM2D)))
+			EntityMask (ComponentType::SPRITE2D)))
 		{
-			const auto& transform = transformManager_.GetComponent(entity);
-			const auto& sprite = GetComponent(entity);
-            spriteShader_.SetMat4("model", transform);
+            if (!entityManager_.get().HasComponent(entity, EntityMask(ComponentType::TRANSFORM2D)))
+            {
+                spriteShader_.SetMat4("model", Mat4f::Identity);
+            }
+            else
+            {
+                const auto& transform = transformManager_.GetComponent(entity);
+                spriteShader_.SetMat4("model", transform);
+            }
+            const auto& sprite = GetComponent(entity);
             spriteShader_.SetTexture("spriteTexture", sprite.texture.name);
-			spriteShader_.SetVec4("spriteColor", sprite.color);
+            spriteShader_.SetVec4("spriteColor", sprite.color);
             spriteQuad_.Draw();
-		}
+        }
 	}
 }
 }

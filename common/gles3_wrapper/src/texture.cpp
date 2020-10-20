@@ -34,7 +34,7 @@
 
 #include "ktx.h"
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 
 #ifdef EASY_PROFILE_USE
@@ -42,137 +42,137 @@
 #endif
 namespace neko::gl
 {
-	void TextureManager::CreateTexture()
-	{
-        const auto textureId = currentUploadedTexture_.textureId;
-        const auto flags = currentUploadedTexture_.flags;
-        auto& image = currentUploadedTexture_.image;
-        if (image.data == nullptr)
-        {
-            textureMap_[textureId] = {};
-            return;
-        }
+void TextureManager::CreateTexture()
+{
+    const auto textureId = currentUploadedTexture_.textureId;
+    const auto flags = currentUploadedTexture_.flags;
+    auto& image = currentUploadedTexture_.image;
+    if (image.data == nullptr)
+    {
+        textureMap_[textureId] = {};
+        return;
+    }
 #ifdef EASY_PROFILE_USE
-        EASY_BLOCK("Generate Texture");
+    EASY_BLOCK("Generate Texture");
 #endif
-        TextureName texture;
+    TextureName texture;
+    glCheckError();
+    glGenTextures(1, &texture);
+
+#ifdef EASY_PROFILE_USE
+    EASY_END_BLOCK;
+#endif
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, flags& Texture::CLAMP_WRAP ? GL_CLAMP_TO_EDGE : GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, flags& Texture::CLAMP_WRAP ? GL_CLAMP_TO_EDGE : GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, flags& Texture::SMOOTH_TEXTURE ? GL_LINEAR : GL_NEAREST);
+    glCheckError();
+    if (flags & Texture::MIPMAPS_TEXTURE)
+    {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+            flags & Texture::SMOOTH_TEXTURE ? GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_LINEAR);
         glCheckError();
-        glGenTextures(1, &texture);
-
-#ifdef EASY_PROFILE_USE
-        EASY_END_BLOCK;
-#endif
-        glBindTexture(GL_TEXTURE_2D, texture);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, flags& Texture::CLAMP_WRAP ? GL_CLAMP_TO_EDGE : GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, flags& Texture::CLAMP_WRAP ? GL_CLAMP_TO_EDGE : GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, flags& Texture::SMOOTH_TEXTURE ? GL_LINEAR : GL_NEAREST);
+    }
+    else
+    {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, flags & Texture::SMOOTH_TEXTURE ? GL_LINEAR : GL_NEAREST);
         glCheckError();
-        if (flags & Texture::MIPMAPS_TEXTURE)
-        {
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                flags & Texture::SMOOTH_TEXTURE ? GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_LINEAR);
-            glCheckError();
-        }
-        else
-        {
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, flags & Texture::SMOOTH_TEXTURE ? GL_LINEAR : GL_NEAREST);
-            glCheckError();
-        }
+    }
 
 #ifdef EASY_PROFILE_USE
-        EASY_BLOCK("Copy Buffer");
+    EASY_BLOCK("Copy Buffer");
 #endif
-        GLenum internalFormat = 0;
-        GLenum dataFormat = 0;
-        if (flags & Texture::HDR)
+    GLenum internalFormat = 0;
+    GLenum dataFormat = 0;
+    if (flags & Texture::HDR)
+    {
+        switch (image.nbChannels)
         {
-            switch (image.nbChannels)
-            {
-            case 1:
-                internalFormat = GL_R16F;
-                dataFormat = GL_RED;
-                break;
-            case 2:
+        case 1:
+            internalFormat = GL_R16F;
+            dataFormat = GL_RED;
+            break;
+        case 2:
 
-                internalFormat = GL_RG16F;
-                dataFormat = GL_RG;
-                break;
-            case 3:
+            internalFormat = GL_RG16F;
+            dataFormat = GL_RG;
+            break;
+        case 3:
 
-                internalFormat = GL_RGB16F;
-                dataFormat = GL_RGB;
-                break;
-            case 4:
+            internalFormat = GL_RGB16F;
+            dataFormat = GL_RGB;
+            break;
+        case 4:
 
-                internalFormat = GL_RGBA16F;
-                dataFormat = GL_RGBA;
-                break;
-            default:
-                break;
-            }
-
+            internalFormat = GL_RGBA16F;
+            dataFormat = GL_RGBA;
+            break;
+        default:
+            break;
         }
-        else
+
+    }
+    else
+    {
+        switch (image.nbChannels)
         {
-            switch (image.nbChannels)
-            {
-            case 1:
-            {
-                internalFormat = GL_R8;
-                dataFormat = GL_RED;
-                break;
-            }
-            case 2:
-            {
-                internalFormat = GL_RG8;
-                dataFormat = GL_RG;
-                break;
-            }
-            case 3:
-            {
-
-                internalFormat = flags & Texture::GAMMA_CORRECTION ? GL_SRGB8 : GL_RGB8;
-                dataFormat = GL_RGB;
-                break;
-            }
-            case 4:
-            {
-
-                internalFormat = flags & Texture::GAMMA_CORRECTION ? GL_SRGB8_ALPHA8 : GL_RGBA8;
-                dataFormat = GL_RGBA;
-                break;
-            }
-            default:
-                break;
-            }
-        }
-        if (!(flags & Texture::HDR))
+        case 1:
         {
-            glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, image.width, image.height, 0, dataFormat, GL_UNSIGNED_BYTE, image.data);
-            glCheckError();
+            internalFormat = GL_R8;
+            dataFormat = GL_RED;
+            break;
         }
-        else
+        case 2:
         {
-            glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, image.width, image.height, 0, dataFormat, GL_FLOAT, (float*)image.data);
-            glCheckError();
+            internalFormat = GL_RG8;
+            dataFormat = GL_RG;
+            break;
         }
+        case 3:
+        {
+
+            internalFormat = flags & Texture::GAMMA_CORRECTION ? GL_SRGB8 : GL_RGB8;
+            dataFormat = GL_RGB;
+            break;
+        }
+        case 4:
+        {
+
+            internalFormat = flags & Texture::GAMMA_CORRECTION ? GL_SRGB8_ALPHA8 : GL_RGBA8;
+            dataFormat = GL_RGBA;
+            break;
+        }
+        default:
+            break;
+        }
+    }
+    if (!(flags & Texture::HDR))
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, image.width, image.height, 0, dataFormat, GL_UNSIGNED_BYTE, image.data);
+        glCheckError();
+    }
+    else
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, image.width, image.height, 0, dataFormat, GL_FLOAT, (float*)image.data);
+        glCheckError();
+    }
 
 #ifdef EASY_PROFILE_USE
-        EASY_END_BLOCK;
+    EASY_END_BLOCK;
 #endif
 
-        if (flags & Texture::MIPMAPS_TEXTURE)
-        {
+    if (flags & Texture::MIPMAPS_TEXTURE)
+    {
 #ifdef EASY_PROFILE_USE
-            EASY_BLOCK("Generate Mipmaps");
+        EASY_BLOCK("Generate Mipmaps");
 #endif
-            glGenerateMipmap(GL_TEXTURE_2D);
-            glCheckError();
-        }
-        glBindTexture(GL_TEXTURE_2D, 0);
-        textureMap_[textureId] = {texture, {currentUploadedTexture_.image.width, currentUploadedTexture_.image.height}};
+        glGenerateMipmap(GL_TEXTURE_2D);
+        glCheckError();
+    }
+    glBindTexture(GL_TEXTURE_2D, 0);
+    textureMap_[textureId] = {texture, {currentUploadedTexture_.image.width, currentUploadedTexture_.image.height}};
 
-	}
+}
 
 	void TextureManager::Destroy()
 	{
@@ -261,7 +261,7 @@ TextureName stbCreateTexture(const std::string_view filename, Texture::TextureFl
     return texture;
 }
 
-TextureName CreateTextureFromDDS(const std::string_view filename)
+TextureName CreateTextureFromDDS([[maybe_unused]]const std::string_view filename)
 {
     return INVALID_TEXTURE_NAME;
 }

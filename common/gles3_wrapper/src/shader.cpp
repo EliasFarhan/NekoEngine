@@ -25,7 +25,7 @@
 #include <utilities/file_utility.h>
 #include <sstream>
 #include <engine/log.h>
-#include <fmt/core.h>
+#include <fmt/format.h>
 namespace neko::gl
 {
 

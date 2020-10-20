@@ -222,10 +222,10 @@ std::uint8_t JobSystem::CountStartedWorkers()
 
 Job::Job(std::function<void()> task) :
         task_(std::move(task)),
-        status_(0)
 #ifndef NEKO_SAMETHREAD
-, taskDoneFuture_(promise_.get_future())
+        taskDoneFuture_(promise_.get_future()),
 #endif
+        status_(0)
 {
 
 }

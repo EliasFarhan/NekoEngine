@@ -191,7 +191,7 @@ void BufferFile::Load(std::string_view path)
     std::ifstream is(path.data(),std::ifstream::binary);
     if(!is)
     {
-	logDebug(fmt::format("[Error] Could not open file: {}  for BufferFile"));
+	logDebug(fmt::format("[Error] Could not open file: {}  for BufferFile", path));
 	dataLength = 0;
 	dataBuffer = nullptr;
     }

@@ -28,7 +28,7 @@
 #include <string>
 #include "engine/log.h"
 #include <sstream>
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 namespace neko
 {

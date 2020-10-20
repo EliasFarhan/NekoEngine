@@ -4,8 +4,6 @@ set_target_properties (benchmark benchmark_main PROPERTIES
 
 SET(BENCH_DIR ${CMAKE_SOURCE_DIR}/benchmark)
 file(GLOB BENCH_FILES ${BENCH_DIR}/*.cpp)
-neko_lib_config(benchmark)
-neko_lib_config(benchmark_main)
 include_directories("include/")
 foreach(bench_file ${BENCH_FILES} )
     # I used a simple string replace, to cut off .cpp.

@@ -26,7 +26,7 @@
 #include <utilities/file_utility.h>
 #include <engine/log.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 namespace neko
 {

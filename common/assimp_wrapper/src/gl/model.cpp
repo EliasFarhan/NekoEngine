@@ -34,7 +34,7 @@
 #include "io_system.h"
 #include "engine/engine.h"
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #ifdef EASY_PROFILE_USE
 #include "easy/profiler.h"

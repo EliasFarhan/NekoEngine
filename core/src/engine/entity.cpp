@@ -29,7 +29,7 @@
 #include <sstream>
 #include <engine/log.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 #include "imgui.h"
 
 namespace neko

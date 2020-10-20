@@ -30,7 +30,7 @@
 #include "mathematics/angle.h"
 #include "mathematics/trigo.h"
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 namespace neko
 {
@@ -176,14 +176,14 @@ struct Vec2
         return *this;
     }
 
-    bool operator==(const Vec2<T>& right) const
+    bool operator==(const Vec2<T>& other) const
     {
-        return x == right.x && y == right.y;
+        return x == other.x && y == other.y;
     }
 
-    bool operator!=(const Vec2<T>& right) const
+    bool operator!=(const Vec2<T>& other) const
     {
-        return !(*this == right);
+        return !(*this == other);
     }
 
     const T& operator[](size_t p_axis) const
@@ -501,14 +501,14 @@ public:
         return *this;
     }
 
-    bool operator==(const Vec3<T>& right) const
+    bool operator==(const Vec3<T>& other) const
     {
-        return x == right.x && y == right.y && z == right.z;
+        return x == other.x && y == other.y && z == other.z;
     }
 
-    bool operator!=(const Vec3<T>& right) const
+    bool operator!=(const Vec3<T>& other) const
     {
-        return !(*this == right);
+        return !(*this == other);
     }
 
     friend std::ostream& operator<<(std::ostream& os, const Vec3<T>& dt)
@@ -794,14 +794,14 @@ public:
         return *this;
     }
 
-    bool operator==(const Vec4<T>& right) const
+    bool operator==(const Vec4<T>& other) const
     {
-        return x == right.x && y == right.y && z == right.z && w == right.w;
+        return x == other.x && y == other.y && z == other.z && w == other.w;
     }
 
-    bool operator!=(const Vec4<T>& right) const
+    bool operator!=(const Vec4<T>& other) const
     {
-        return !(*this == right);
+        return !(*this == other);
     }
 
     const T& operator[](size_t p_axis) const

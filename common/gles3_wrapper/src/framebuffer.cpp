@@ -46,7 +46,7 @@ void Framebuffer::Create()
         glGenTextures(1, &depthBuffer_);
         glBindTexture(GL_TEXTURE_2D, depthBuffer_);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16,
-            size_.x, size_.y, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
+            size_.x, size_.y, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, nullptr);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -54,6 +54,8 @@ void Framebuffer::Create()
         glFramebufferTexture2D(GL_FRAMEBUFFER,
             GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthBuffer_, 0);
         GLenum drawBuffers = GL_NONE;
+        glDrawBuffers(1, &drawBuffers);
+        glReadBuffer(GL_NONE);
         glBindTexture(GL_TEXTURE_2D, 0);
         glCheckError();
     }

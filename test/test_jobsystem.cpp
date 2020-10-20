@@ -7,7 +7,7 @@
 namespace neko
 {
 
-void Task(std::atomic<unsigned int>& currentDoneTasks)
+static void Task(std::atomic<unsigned int>& currentDoneTasks)
 {
     const auto TASK_WORK_TIME = std::chrono::seconds(1);
 

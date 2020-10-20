@@ -164,6 +164,10 @@ class TextureManager : public TextureManagerInterface, public SystemInterface
 {
 public:
     TextureManager();
+    /**
+     * \brief Open the meta file of the texture file to get the Texture Id. If not already loaded
+     * it will put the loading texture into the texturesToLoad queue.
+     */
     TextureId LoadTexture(std::string_view path, Texture::TextureFlags flags = Texture::DEFAULT) override;
     std::string GetPath(TextureId textureId) const;
     void Init() override;
@@ -171,7 +175,10 @@ public:
 	
     void Destroy() override;
     virtual void UploadToGpu(TextureInfo&& texture);
-
+    /**
+     * \brief When the loading texture with the TextureId is uploaded to the GPU, the returned Texture
+     * has a valid TextureName
+     */
 	Texture GetTexture(TextureId index) const override;
 	bool IsTextureLoaded(TextureId textureId) const override;
 protected:

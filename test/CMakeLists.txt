@@ -1,7 +1,4 @@
-
-
 #Google Test
-
 
 SET(Neko_TEST_DIR ${CMAKE_SOURCE_DIR}/test)
 file(GLOB TEST_FILES ${Neko_TEST_DIR}/*.cpp)
