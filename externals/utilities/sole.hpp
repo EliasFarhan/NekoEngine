@@ -270,31 +270,28 @@ namespace sole {
 
     inline std::string printftime( uint64_t timestamp_secs = 0, const std::string &locale = std::string() ) {
         std::string timef;
-        try {
-            // Taken from parameter
-            //std::string locale; // = "es-ES", "Chinese_China.936", "en_US.UTF8", etc...
-            std::time_t t = timestamp_secs;
-            std::tm tm;
-            $msvc(
-                localtime_s( &tm, &t );
-            )
-            $melse(
-                $windows(tm = *localtime( &t ); )
-                $welse( localtime_r(&t, &tm); )
-            )
 
-            std::stringstream ss;
-            $melse(
-            std::locale lc( locale.c_str() );
-            ss.imbue( lc );
-            )
-            ss << std::put_time( &tm, "\"%c\"" );
+        // Taken from parameter
+        //std::string locale; // = "es-ES", "Chinese_China.936", "en_US.UTF8", etc...
+        std::time_t t = timestamp_secs;
+        std::tm tm;
+        $msvc(
+            localtime_s( &tm, &t );
+        )
+        $melse(
+            $windows(tm = *localtime( &t ); )
+            $welse( localtime_r(&t, &tm); )
+        )
 
-            timef = ss.str();
-        }
-        catch(...) {
-            timef = "\"\"";
-        }
+        std::stringstream ss;
+        $melse(
+        std::locale lc( locale.c_str() );
+        ss.imbue( lc );
+        )
+        ss << std::put_time( &tm, "\"%c\"" );
+
+        timef = ss.str();
+
         return timef;
     }
 
