@@ -29,6 +29,10 @@
 #include "graphics/camera.h"
 #include "engine/engine.h"
 
+#ifdef EASY_PROFILE_USE
+#include "easy/profiler.h"
+#endif
+
 namespace neko::gl
 {
 
@@ -36,14 +40,14 @@ namespace neko::gl
 void SpriteManager::Init()
 {
     const auto& config = BasicEngine::GetInstance()->config;
-    spriteShader_.LoadFromFile(config.dataRootPath+"shaders/engine/sprite.vert",
-                               config.dataRootPath+"shaders/engine/sprite.frag");
+    spriteShader_.LoadFromFile(config.dataRootPath + "shaders/engine/sprite.vert",
+        config.dataRootPath + "shaders/engine/sprite.frag");
     spriteQuad_.Init();
 }
 
 void SpriteManager::Destroy()
 {
-    for(auto& sprite : components_)
+    for (auto& sprite : components_)
     {
         sprite.textureId = INVALID_TEXTURE_ID;
         sprite.texture.name = INVALID_TEXTURE_NAME;
@@ -54,16 +58,18 @@ void SpriteManager::Destroy()
 
 void SpriteManager::Render()
 {
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("Render Sprite Manager");
+#endif
     //TODO batch sprite with the same texture together
-	spriteShader_.Bind();
-	const auto& camera = CameraLocator::get();
-	spriteShader_.SetMat4("view", camera.GenerateViewMatrix());
-	spriteShader_.SetMat4("projection", camera.GenerateProjectionMatrix());
-	for(Entity entity = 0; entity < entityManager_.get().GetEntitiesSize(); entity++)
-	{
-		if(entityManager_.get().HasComponent(entity, 
-			EntityMask (ComponentType::SPRITE2D)))
-		{
+    spriteShader_.Bind();
+    const auto& camera = CameraLocator::get();
+    spriteShader_.SetMat4("view", camera.GenerateViewMatrix());
+    spriteShader_.SetMat4("projection", camera.GenerateProjectionMatrix());
+    for (Entity entity = 0; entity < entityManager_.get().GetEntitiesSize(); entity++)
+    {
+        if (entityManager_.get().HasComponent(entity,EntityMask(ComponentType::SPRITE2D)))
+        {
             if (!entityManager_.get().HasComponent(entity, EntityMask(ComponentType::TRANSFORM2D)))
             {
                 spriteShader_.SetMat4("model", Mat4f::Identity);
@@ -78,7 +84,7 @@ void SpriteManager::Render()
             spriteShader_.SetVec4("spriteColor", sprite.color);
             spriteQuad_.Draw();
         }
-	}
+    }
 }
 }
 

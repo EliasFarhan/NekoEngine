@@ -35,11 +35,12 @@ const std::uint32_t maxPlayerNmb = 2;
 const short playerHealth = 20;
 const float playerSpeed = 1.0f;
 const degree_t playerAngularSpeed = degree_t(90.0f);
-const float playerShootingPeriod = 0.2f;
+const float playerShootingPeriod = 0.3f;
 const float bulletSpeed = 2.0f;
 const float bulletScale = 0.2f;
 const float bulletPeriod = 3.0f;
 const float playerInvincibilityPeriod = 1.5f;
+const float invincibilityFlashPeriod = 0.5f;
 
 const std::array<Color4, std::max(maxPlayerNmb, 4u)> playerColors =
 {

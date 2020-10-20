@@ -28,9 +28,10 @@ namespace neko::asteroid
 {
 
 PlayerCharacterManager::PlayerCharacterManager(EntityManager& entityManager, PhysicsManager& physicsManager, GameManager& gameManager) :
+    ComponentManager(entityManager),
     physicsManager_(physicsManager),
-    gameManager_(gameManager),
-    ComponentManager(entityManager)
+    gameManager_(gameManager)
+    
 {
 
 }
@@ -39,7 +40,8 @@ void PlayerCharacterManager::FixedUpdate(seconds dt)
 {
     for(Entity playerEntity = 0; playerEntity < entityManager_.get().GetEntitiesSize(); playerEntity++)
     {
-        if(!entityManager_.get().HasComponent(playerEntity, EntityMask(ComponentType::PLAYER_CHARACTER)))
+        if(!entityManager_.get().HasComponent(playerEntity, 
+            EntityMask(ComponentType::PLAYER_CHARACTER)))
             continue;
         auto playerBody = physicsManager_.get().GetBody(playerEntity);
         auto playerCharacter = GetComponent(playerEntity);
@@ -63,6 +65,12 @@ void PlayerCharacterManager::FixedUpdate(seconds dt)
         playerBody.velocity += acceleration * dt.count();
 
         physicsManager_.get().SetBody(playerEntity, playerBody);
+
+        if(playerCharacter.invincibilityTime > 0.0f)
+        {
+            playerCharacter.invincibilityTime -= dt.count();
+            SetComponent(playerEntity, playerCharacter);
+        }
 
         if(playerCharacter.shootingTime < playerShootingPeriod)
         {

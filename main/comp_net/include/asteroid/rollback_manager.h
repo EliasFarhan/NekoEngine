@@ -68,9 +68,10 @@ public:
 	[[nodiscard]] PhysicsState GetValidatePhysicsState(net::PlayerNumber playerNumber) const;
 	[[nodiscard]] net::Frame GetLastValidateFrame() const { return lastValidateFrame_; }
 	[[nodiscard]] net::Frame GetLastReceivedFrame(net::PlayerNumber playerNumber) const { return lastReceivedFrame_[playerNumber]; }
-	[[nodiscard]] net::Frame GetCurrentFrame()const { return currentFrame_; }
-    [[nodiscard]] const Transform2dManager& GetTransformManager()const{ return currentTransformManager_; }
-	void SpawnPlayer(net::PlayerNumber playerNumber, Entity entity, Vec2f position, degree_t rotation);
+	[[nodiscard]] net::Frame GetCurrentFrame() const { return currentFrame_; }
+    [[nodiscard]] const Transform2dManager& GetTransformManager() const { return currentTransformManager_; }
+	[[nodiscard]] const PlayerCharacterManager& GetPlayerCharacterManager() const { return currentPlayerManager_; }
+    void SpawnPlayer(net::PlayerNumber playerNumber, Entity entity, Vec2f position, degree_t rotation);
 	void SpawnBullet(net::PlayerNumber playerNumber, Entity entity, Vec2f position, Vec2f velocity);
     void DestroyBullet(Entity entity);
 private:
@@ -85,7 +86,7 @@ private:
     PlayerCharacterManager currentPlayerManager_;
     BulletManager currentBulletManager_;
 	PhysicsManager lastValidatePhysicsManager_;
-	PlayerCharacterManager lastValidatePlayerCharacter_;
+	PlayerCharacterManager lastValidatePlayerManager_;
 	BulletManager lastValidateBulletManager_;
 
 

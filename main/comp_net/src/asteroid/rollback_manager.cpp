@@ -39,7 +39,7 @@ RollbackManager::RollbackManager(GameManager& gameManager, EntityManager& entity
 	currentPhysicsManager_(entityManager), currentPlayerManager_(entityManager, currentPhysicsManager_, gameManager_),
 	currentBulletManager_(entityManager, gameManager),
 	lastValidatePhysicsManager_(entityManager),
-	lastValidatePlayerCharacter_(entityManager, lastValidatePhysicsManager_, gameManager_), lastValidateBulletManager_(entityManager, gameManager)
+	lastValidatePlayerManager_(entityManager, lastValidatePhysicsManager_, gameManager_), lastValidateBulletManager_(entityManager, gameManager)
 {
 	for(auto& input: inputs_)
 	{
@@ -53,8 +53,8 @@ void RollbackManager::SimulateToCurrentFrame()
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("Simulate To Current Frame");
 #endif
-	auto currentFrame = gameManager_.GetCurrentFrame();
-	auto lastValidateFrame = gameManager_.GetLastValidateFrame();
+    const auto currentFrame = gameManager_.GetCurrentFrame();
+    const auto lastValidateFrame = gameManager_.GetLastValidateFrame();
 	//Destroying all created Entities after the last validated frame
 	for(const auto& createdEntity : createdEntities_)
     {
@@ -65,24 +65,25 @@ void RollbackManager::SimulateToCurrentFrame()
     }
 	createdEntities_.clear();
     //Creating destroyed bullet after the last validated frame
-    for (const auto& destroyedBullet : destroyedBullets_)
+    for (auto& destroyedBullet : destroyedBullets_)
     {
-        if (destroyedBullet.destroyedFrame <= currentFrame)
-        {
-            Entity entity = gameManager_.SpawnBullet(
-                destroyedBullet.bullet.playerNumber,
-                destroyedBullet.body.position,
-                destroyedBullet.body.velocity);
-            auto bullet = currentBulletManager_.GetComponent(entity);
-            bullet.remainingTime = destroyedBullet.bullet.remainingTime;
-            currentBulletManager_.SetComponent(entity, bullet);
-        }
+        const Entity entity = gameManager_.SpawnBullet(
+            destroyedBullet.bullet.playerNumber,
+            destroyedBullet.body.position,
+            destroyedBullet.body.velocity);
+        auto bullet = currentBulletManager_.GetComponent(entity);
+        bullet.remainingTime = destroyedBullet.bullet.remainingTime;
+        lastValidateBulletManager_.SetComponent(entity, bullet);
+        lastValidatePhysicsManager_.SetBody(entity, currentPhysicsManager_.GetBody(entity));
+        lastValidatePhysicsManager_.SetBox(entity, currentPhysicsManager_.GetBox(entity));
     }
+
+    createdEntities_.clear();
     destroyedBullets_.clear();
     //Revert the current game state to the last validated game state
 	currentBulletManager_ = lastValidateBulletManager_;
 	currentPhysicsManager_ = lastValidatePhysicsManager_;
-	currentPlayerManager_ = lastValidatePlayerCharacter_;
+	currentPlayerManager_ = lastValidatePlayerManager_;
 
 	for(net::Frame frame = lastValidateFrame+1; frame <= currentFrame; frame++)
     {
@@ -104,7 +105,9 @@ void RollbackManager::SimulateToCurrentFrame()
 	//Copy the physics states to the transforms
     for(Entity entity = 0; entity < entityManager_.GetEntitiesSize(); entity++)
     {
-        if(!entityManager_.HasComponent(entity, EntityMask(neko::ComponentType::BODY2D) | EntityMask(neko::ComponentType::TRANSFORM2D)))
+        if(!entityManager_.HasComponent(entity, 
+            EntityMask(neko::ComponentType::BODY2D) | 
+            EntityMask(neko::ComponentType::TRANSFORM2D)))
             continue;
         const auto body = currentPhysicsManager_.GetBody(entity);
         currentTransformManager_.SetPosition(entity, body.position);
@@ -158,7 +161,7 @@ void RollbackManager::ValidateFrame(net::Frame newValidateFrame)
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("Validate Frame");
 #endif
-    auto lastValidateFrame = gameManager_.GetLastValidateFrame();
+    const auto lastValidateFrame = gameManager_.GetLastValidateFrame();
     //Destroying all created Entities after the last validated frame
     for(const auto& createdEntity : createdEntities_)
     {
@@ -169,19 +172,21 @@ void RollbackManager::ValidateFrame(net::Frame newValidateFrame)
     }
     createdEntities_.clear();
     //Creating destroyed bullet after the last validated frame
-    for(const auto& destroyedBullet : destroyedBullets_)
+    for (auto& destroyedBullet : destroyedBullets_)
     {
-        if(destroyedBullet.destroyedFrame <= newValidateFrame)
-        {
-            Entity entity = gameManager_.SpawnBullet(
-                destroyedBullet.bullet.playerNumber, 
-                destroyedBullet.body.position, 
-                destroyedBullet.body.velocity);
-            auto bullet = currentBulletManager_.GetComponent(entity);
-            bullet.remainingTime = destroyedBullet.bullet.remainingTime;
-            currentBulletManager_.SetComponent(entity, bullet);
-        }
+        const Entity entity = gameManager_.SpawnBullet(
+            destroyedBullet.bullet.playerNumber,
+            destroyedBullet.body.position,
+            destroyedBullet.body.velocity);
+
+        auto bullet = currentBulletManager_.GetComponent(entity);
+        bullet.remainingTime = destroyedBullet.bullet.remainingTime;
+        lastValidateBulletManager_.SetComponent(entity, bullet);
+        lastValidatePhysicsManager_.SetBody(entity, currentPhysicsManager_.GetBody(entity));
+        lastValidatePhysicsManager_.SetBox(entity, currentPhysicsManager_.GetBox(entity));
+        
     }
+    createdEntities_.clear();
     destroyedBullets_.clear();
     //We check that we got all the inputs
 	for(net::PlayerNumber playerNumber = 0; playerNumber < maxPlayerNmb; playerNumber++ )
@@ -195,7 +200,8 @@ void RollbackManager::ValidateFrame(net::Frame newValidateFrame)
 	//We use the current game state as the temporary new validate game state
 	currentBulletManager_ = lastValidateBulletManager_;
     currentPhysicsManager_ = lastValidatePhysicsManager_;
-    currentPlayerManager_ = lastValidatePlayerCharacter_;
+    currentPlayerManager_ = lastValidatePlayerManager_;
+
     //We simulate the frames until the new validated frame
     for(net::Frame frame = lastValidateFrame_ + 1; frame <= newValidateFrame; frame++)
     {
@@ -216,9 +222,11 @@ void RollbackManager::ValidateFrame(net::Frame newValidateFrame)
     }
     //Copy back the new validate game state to the last validated game state
     lastValidateBulletManager_ = currentBulletManager_;
-    lastValidatePlayerCharacter_ = currentPlayerManager_;
+    lastValidatePlayerManager_ = currentPlayerManager_;
     lastValidatePhysicsManager_ = currentPhysicsManager_;
 	lastValidateFrame_ = newValidateFrame;
+    createdEntities_.clear();
+    destroyedBullets_.clear();
 }
 void RollbackManager::ConfirmFrame(net::Frame newValidateFrame, const std::array<PhysicsState, maxPlayerNmb>& serverPhysicsState)
 {
@@ -276,7 +284,7 @@ void RollbackManager::SpawnPlayer(net::PlayerNumber playerNumber, Entity entity,
     playerBody.position = position;
     playerBody.rotation = rotation;
     Box playerBox;
-    playerBox.extends = Vec2f::one*0.5f;
+    playerBox.extends = Vec2f::one * 0.5f;
 
     PlayerCharacter playerCharacter;
     playerCharacter.playerNumber = playerNumber;
@@ -289,8 +297,8 @@ void RollbackManager::SpawnPlayer(net::PlayerNumber playerNumber, Entity entity,
     currentPhysicsManager_.AddBox(entity);
     currentPhysicsManager_.SetBox(entity, playerBox);
 
-    lastValidatePlayerCharacter_.AddComponent(entity);
-    lastValidatePlayerCharacter_.SetComponent(entity, playerCharacter);
+    lastValidatePlayerManager_.AddComponent(entity);
+    lastValidatePlayerManager_.SetComponent(entity, playerCharacter);
 
     lastValidatePhysicsManager_.AddBody(entity);
     lastValidatePhysicsManager_.SetBody(entity, playerBody);
@@ -355,18 +363,10 @@ void RollbackManager::SpawnBullet(net::PlayerNumber playerNumber, Entity entity,
     currentBulletManager_.AddComponent(entity);
     currentBulletManager_.SetComponent(entity, {bulletPeriod, playerNumber});
 
-    lastValidateBulletManager_.AddComponent(entity);
-    lastValidateBulletManager_.SetComponent(entity, { bulletPeriod, playerNumber });
-
     currentPhysicsManager_.AddBody(entity);
     currentPhysicsManager_.SetBody(entity, bulletBody);
     currentPhysicsManager_.AddBox(entity);
     currentPhysicsManager_.SetBox(entity, bulletBox);
-
-    lastValidatePhysicsManager_.AddBody(entity);
-    lastValidatePhysicsManager_.SetBody(entity, bulletBody);
-    lastValidatePhysicsManager_.AddBox(entity);
-    lastValidatePhysicsManager_.SetBox(entity, bulletBox);
 
     currentTransformManager_.AddComponent(entity);
     currentTransformManager_.SetPosition(entity, position);
@@ -377,8 +377,18 @@ void RollbackManager::SpawnBullet(net::PlayerNumber playerNumber, Entity entity,
 
 void RollbackManager::DestroyBullet(Entity entity)
 {
-    auto bullet = currentBulletManager_.GetComponent(entity);
-    auto body = lastValidatePhysicsManager_.GetBody(entity);
+    //we don't need to save a bullet that has been created in the time window
+    if(std::find_if(createdEntities_.begin(), createdEntities_.end(), [entity](auto newEntity)
+    {
+        return newEntity.entity == entity;
+    }) != createdEntities_.end())
+    {
+        entityManager_.DestroyEntity(entity);
+        return;
+    }
+    //We only need to save the state of bullet who were validated as created and then destroy
+    const auto& bullet = lastValidateBulletManager_.GetComponent(entity);
+    const auto& body = lastValidatePhysicsManager_.GetBody(entity);
 
     destroyedBullets_.push_back({ bullet, body, testedFrame_ });
     entityManager_.DestroyEntity(entity);

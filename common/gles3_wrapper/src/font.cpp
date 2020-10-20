@@ -175,6 +175,9 @@ void FontManager::Destroy()
 
 void FontManager::Render()
 {
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("Render Font Manager");
+#endif
     textShader_.Bind();
     textShader_.SetMat4("projection", projection_);
     for(auto& command : commands_)
