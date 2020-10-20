@@ -27,7 +27,7 @@
 #include "stb_image.h"
 #include "engine/engine.h"
 #include "utilities/file_utility.h"
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #ifdef EASY_PROFILE_USE
 #include "easy/profiler.h"

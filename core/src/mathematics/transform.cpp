@@ -214,7 +214,7 @@ Mat4f Rotate(const Mat4f& transform, const EulerAngles eulerAngles)
 
 
 
-Mat4f Perspective(radian_t fovy, float aspect, float near, float far)
+Mat4f Perspective(radian_t fovy, float aspect, float nearPlane, float farPlane)
 {
     neko_assert(fabsf(aspect - std::numeric_limits<float>::epsilon()) > 0.0f, "Aspect should not be zero");
 
@@ -223,9 +223,9 @@ Mat4f Perspective(radian_t fovy, float aspect, float near, float far)
 
     perspective[0][0] = 1.0f/ (aspect * tanHalfFovy);
     perspective[1][1] = 1.0f / (tanHalfFovy);
-    perspective[2][2] = - (far + near) / (far - near);
+    perspective[2][2] = - (farPlane + nearPlane) / (farPlane - nearPlane);
     perspective[2][3] = - 1.0f;
-    perspective[3][2] = - (2.0f * far * near) / (far - near);
+    perspective[3][2] = - (2.0f * farPlane * nearPlane) / (farPlane - nearPlane);
     return perspective;
 }
 

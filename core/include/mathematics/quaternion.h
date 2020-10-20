@@ -33,7 +33,8 @@ struct Quaternion
 {
 	union
 	{
-		struct {
+		struct
+	    {
 			float x;
 			float y;
 			float z;

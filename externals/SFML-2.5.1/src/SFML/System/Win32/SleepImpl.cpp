@@ -27,6 +27,7 @@
 ////////////////////////////////////////////////////////////
 #include <SFML/System/Win32/SleepImpl.hpp>
 #include <windows.h>
+#include <timeapi.h>
 
 
 namespace sf

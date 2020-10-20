@@ -13,6 +13,7 @@ set_target_properties (comp_net_lib PROPERTIES FOLDER Neko/Main/CompNet)
 set_target_properties(comp_net_lib PROPERTIES UNITY_BUILD ON)
 set(net_main_project_dir "main/")
 file(GLOB net_main_projects "${net_main_project_dir}/*")
+neko_lib_config(comp_net_lib)
 
 foreach(net_main_project_path ${net_main_projects} )
     # I used a simple string replace, to cut off .cpp.

@@ -32,7 +32,7 @@
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #ifdef EASY_PROFILE_USE
 #include <easy/profiler.h>
