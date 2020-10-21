@@ -30,26 +30,78 @@
 
 namespace neko::asteroid
 {
+
+class ClientApp : public SystemInterface, public DrawImGuiInterface
+{
+public:
+    void Init() override
+    {
+        Job initJob = Job([this]()
+                          {
+        const auto& config = BasicEngine::GetInstance()->config;
+        windowSize_ = config.windowSize;
+        client_.SetWindowSize(windowSize_);
+        client_.Init();
+                          });
+        BasicEngine::GetInstance()->ScheduleJob(&initJob, JobThreadType::RENDER_THREAD);
+        initJob.Join();
+
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+
+    void Update(seconds dt) override
+    {
+        const auto& config = BasicEngine::GetInstance()->config;
+        if(windowSize_ != config.windowSize)
+        {
+            client_.SetWindowSize(config.windowSize);
+            windowSize_ = config.windowSize;
+        }
+        //Checking if keys are down
+        const Uint8* keys = SDL_GetKeyboardState(nullptr);
+        net::PlayerInput clientInput1 = 0;
+        clientInput1 = clientInput1 | (keys[SDL_SCANCODE_LEFT] ? asteroid::PlayerInput::LEFT : 0u);
+        clientInput1 = clientInput1 | (keys[SDL_SCANCODE_RIGHT] ? asteroid::PlayerInput::RIGHT : 0u);
+        clientInput1 = clientInput1 | (keys[SDL_SCANCODE_UP] ? asteroid::PlayerInput::UP : 0u);
+        clientInput1 = clientInput1 | (keys[SDL_SCANCODE_DOWN] ? asteroid::PlayerInput::DOWN : 0u);
+        clientInput1 = clientInput1 | (keys[SDL_SCANCODE_RCTRL] ? asteroid::PlayerInput::SHOOT : 0u);
+
+        client_.SetPlayerInput(clientInput1);
+        client_.Update(dt);
+
+        RendererLocator::get().Render(&client_);
+    }
+
+    void Destroy() override
+    {
+        client_.Destroy();
+    }
+
+    void DrawImGui() override
+    {
+        client_.DrawImGui();
+    }
+
+private:
+    Vec2u windowSize_;
+    net::ClientNetworkManager client_;
+};
+
 class ClientEngine : public sdl::SdlEngine
 {
 public:
-    explicit ClientEngine(Configuration* config = nullptr) : sdl::SdlEngine(config), client_()
+    explicit ClientEngine(Configuration* config = nullptr) : sdl::SdlEngine(config)
     {
-        RegisterOnDrawUi(client_);
-        RegisterSystem(client_);
-    }
-	void Init() override
-    {
-        SdlEngine::Init();
-        const auto& config = BasicEngine::GetInstance()->config;
-        client_.SetWindowSize(config.windowSize);
+        RegisterOnDrawUi(app_);
+        RegisterSystem(app_);
     }
 private:
-    net::ClientNetworkManager client_;
+    ClientApp app_;
 };
 }
 
-int main(int argc, char** argv)
+int main([[maybe_unused]]int argc, [[maybe_unused]]char** argv)
 {
     neko::asteroid::ClientEngine engine;
 
