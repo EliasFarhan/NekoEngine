@@ -25,7 +25,7 @@
 #include "05_hello_camera/camera_program.h"
 
 #include <sstream>
-#include <fmt/core.h>
+#include <fmt/format.h>
 #include "imgui.h"
 
 namespace neko

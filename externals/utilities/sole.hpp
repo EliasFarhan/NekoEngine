@@ -159,7 +159,7 @@ namespace std {
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wdollar-in-identifier-extension"
 #   define $osx $yes
-#elif defined(__linux__)
+#elif defined(__linux__) || defined(EMSCRIPTEN)
 #   include <arpa/inet.h>
 #   include <net/if.h>
 #   include <netinet/in.h>
