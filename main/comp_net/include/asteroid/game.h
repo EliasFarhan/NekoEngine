@@ -32,7 +32,7 @@ namespace neko::asteroid
 {
 
 const std::uint32_t maxPlayerNmb = 2;
-const short playerHealth = 20;
+const short playerHealth = 5;
 const float playerSpeed = 1.0f;
 const degree_t playerAngularSpeed = degree_t(90.0f);
 const float playerShootingPeriod = 0.3f;

@@ -42,6 +42,7 @@ enum class PacketType : std::uint8_t
     VALIDATE_STATE,
     START_GAME,
     JOIN_ACK,
+    WIN_GAME,
     NONE,
 };
 
@@ -209,6 +210,21 @@ inline sf::Packet& operator>>(sf::Packet& packet, ValidateFramePacket& ValidateF
     return packet >> ValidateFramePacket.newValidateFrame >> ValidateFramePacket.physicsState;
 }
 
+struct WinGamePacket : TypedPacket<PacketType::WIN_GAME>
+{
+    net::PlayerNumber winner = net::INVALID_PLAYER;
+};
+
+inline sf::Packet& operator<<(sf::Packet& packet, const WinGamePacket& winGamePacket)
+{
+    return packet << winGamePacket.winner;
+}
+
+inline sf::Packet& operator>>(sf::Packet& packet, WinGamePacket& winGamePacket)
+{
+    return packet >> winGamePacket.winner;
+}
+
 inline void GeneratePacket(sf::Packet& packet, asteroid::Packet& sendingPacket)
 {
     packet << sendingPacket;
@@ -250,6 +266,13 @@ inline void GeneratePacket(sf::Packet& packet, asteroid::Packet& sendingPacket)
         packet << packetTmp;
         break;
     }
+    case PacketType::WIN_GAME:
+    {
+        auto& packetTmp = static_cast<WinGamePacket&>(sendingPacket);
+        packet << packetTmp;
+        break;
+    }
+
 	default: ;
 	}
 }
@@ -300,6 +323,13 @@ inline std::unique_ptr<Packet> GenerateReceivedPacket(sf::Packet& packet)
         joinAckPacket->packetType = packetTmp.packetType;
         packet >> *joinAckPacket;
         return joinAckPacket;
+    }
+    case PacketType::WIN_GAME:
+    {
+        auto winGamePacket = std::make_unique<WinGamePacket>();
+        winGamePacket->packetType = packetTmp.packetType;
+        packet >> *winGamePacket;
+        return winGamePacket;
     }
     default: ;
     }

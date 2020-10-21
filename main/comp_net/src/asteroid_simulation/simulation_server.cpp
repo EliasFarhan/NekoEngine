@@ -30,6 +30,8 @@
 #include "comp_net/packet.h"
 #include "imgui.h"
 
+#include <fmt/format.h>
+
 namespace neko::net
 {
 SimulationServer::SimulationServer(std::array<std::unique_ptr<SimulationClient>, 2>& clients) : clients_(clients)
@@ -174,7 +176,7 @@ void SimulationServer::ProcessReceivePacket(std::unique_ptr<asteroid::Packet> pa
 		//Manage internal state
 		const auto* playerInputPacket = static_cast<const asteroid::PlayerInputPacket*>(packet.get());
 		const auto playerNumber = playerInputPacket->playerNumber;
-		std::uint32_t inputFrame = ConvertFromBinary<net::Frame>(playerInputPacket->currentFrame);
+		const auto inputFrame = ConvertFromBinary<net::Frame>(playerInputPacket->currentFrame);
 
 		for (std::uint32_t i = 0; i < playerInputPacket->inputs.size(); i++)
 		{
@@ -222,6 +224,15 @@ void SimulationServer::ProcessReceivePacket(std::unique_ptr<asteroid::Packet> pa
 				}
 			}
 			SendPacket(std::move(validatePacket));
+            const auto winner = gameManager_.CheckWinner();
+            if(winner != INVALID_PLAYER)
+            {
+                logDebug(fmt::format("Server declares P{} a winner", winner+1));
+                auto winGamePacket = std::make_unique<asteroid::WinGamePacket>();
+                winGamePacket->winner = winner;
+                SendPacket(std::move(winGamePacket));
+                gameManager_.WinGame(winner);
+            }
 		}
 		
 		break;

@@ -24,6 +24,7 @@
 #include "asteroid_net/network_server.h"
 #include "engine/conversion.h"
 
+#include <fmt/format.h>
 namespace neko::net
 {
 void ServerNetworkManager::SendReliablePacket(
@@ -331,6 +332,15 @@ void ServerNetworkManager::ProcessReceivePacket(
 				}
 			}
 			SendUnreliablePacket(std::move(validatePacket));
+			const auto winner = gameManager_.CheckWinner();
+			if(winner != INVALID_PLAYER)
+            {
+			    logDebug(fmt::format("Server declares P{} a winner", winner+1));
+			    auto winGamePacket = std::make_unique<asteroid::WinGamePacket>();
+			    winGamePacket->winner = winner;
+			    SendReliablePacket(std::move(winGamePacket));
+			    gameManager_.WinGame(winner);
+            }
 		}
 		break;
 	}

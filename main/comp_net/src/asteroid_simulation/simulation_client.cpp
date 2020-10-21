@@ -221,6 +221,12 @@ void SimulationClient::ReceivePacket(const asteroid::Packet* packet)
             //logDebug("Client received validate frame " + std::to_string(newValidateFrame));
         	break;
         }
+        case asteroid::PacketType::WIN_GAME:
+        {
+            const auto* winGamePacket = static_cast<const asteroid::WinGamePacket*>(packet);
+            gameManager_.WinGame(winGamePacket->winner);
+            break;
+        }
         case asteroid::PacketType::SPAWN_BULLET: break;
         default: ;
     }

@@ -239,6 +239,13 @@ void ClientNetworkManager::ReceivePacket(sf::Packet& packet, PacketSource source
 	//	std::to_string(static_cast<int>(receivePacket->packetType)));
 	switch (receivePacket->packetType)
 	{
+    case asteroid::PacketType::WIN_GAME:
+    {
+        const auto* winGamePacket = static_cast<const asteroid::WinGamePacket*>(receivePacket.get());
+        const PlayerNumber winner = winGamePacket->winner;
+        gameManager_.WinGame(winner);
+        break;
+    }
 	case asteroid::PacketType::SPAWN_PLAYER:
 	{
 		const auto* spawnPlayerPacket = static_cast<const asteroid::SpawnPlayerPacket*>(receivePacket.get());

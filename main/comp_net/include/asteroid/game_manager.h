@@ -60,12 +60,15 @@ public:
     void Validate(net::Frame newValidateFrame);
     static constexpr float PixelPerUnit = 100.0f;
 	static constexpr float FixedPeriod = 0.02f; //50fps
+    net::PlayerNumber CheckWinner();
+    virtual void WinGame(net::PlayerNumber winner);
 protected:
 	EntityManager entityManager_;
 	Transform2dManager transformManager_;
 	RollbackManager rollbackManager_;
 	std::array<Entity, maxPlayerNmb> entityMap_{};
 	net::Frame currentFrame_ = 0;
+	net::PlayerNumber winner_ = net::INVALID_PLAYER;
 };
 
 class ClientGameManager : public GameManager, public RenderCommandInterface, public DrawImGuiInterface
@@ -93,7 +96,7 @@ public:
     void DrawImGui() override;
     void ConfirmValidateFrame(net::Frame newValidateFrame, const std::array<PhysicsState, maxPlayerNmb>& physicsStates);
 	[[nodiscard]] net::PlayerNumber GetPlayerNumber() const { return clientPlayer_; }
-
+    void WinGame(net::PlayerNumber winner) override;
     [[nodiscard]] std::uint32_t GetState() const {return state_;}
 protected:
     PacketSenderInterface& packetSenderInterface_;

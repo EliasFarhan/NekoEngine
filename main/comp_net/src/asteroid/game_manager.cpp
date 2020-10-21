@@ -113,6 +113,31 @@ void GameManager::DestroyBullet(Entity entity)
     rollbackManager_.DestroyBullet(entity);
 }
 
+net::PlayerNumber GameManager::CheckWinner()
+{
+    int alivePlayer = 0;
+    net::PlayerNumber winner = net::INVALID_PLAYER;
+    const auto& playerManager = rollbackManager_.GetPlayerCharacterManager();
+    for(Entity entity = 0; entity < entityManager_.GetEntitiesSize(); entity++)
+    {
+        if(!entityManager_.HasComponent(entity, EntityMask(ComponentType::PLAYER_CHARACTER)))
+            continue;
+        const auto& player = playerManager.GetComponent(entity);
+        if(player.health > 0)
+        {
+            alivePlayer++;
+            winner = player.playerNumber;
+        }
+    }
+
+    return alivePlayer == 1 ? winner : net::INVALID_PLAYER;
+}
+
+void GameManager::WinGame(net::PlayerNumber winner)
+{
+    winner_ = winner;
+}
+
 ClientGameManager::ClientGameManager(PacketSenderInterface& packetSenderInterface) :
     GameManager(),
     spriteManager_(entityManager_, textureManager_, transformManager_),
@@ -150,6 +175,19 @@ void ClientGameManager::Update(seconds dt)
         fixedTimer_ -= FixedPeriod;
     }
 
+    if(state_ & FINISHED)
+    {
+        if(winner_ == GetPlayerNumber())
+        {
+            const std::string winnerText = fmt::format("You won!");
+            fontManager_.RenderText(fontId_, winnerText, Vec2f::zero, TextAnchor::CENTER_LEFT, 1.0f, Color4(Color::white, 1.0f));
+        }
+        else
+        {
+            const std::string winnerText = fmt::format("You lost!");
+            fontManager_.RenderText(fontId_, winnerText, Vec2f::zero, TextAnchor::CENTER_LEFT, 1.0f, Color4(Color::white, 1.0f));
+        }
+    }
     if (!(state_ & STARTED))
     {
         if (startingTime_ != 0)
@@ -164,6 +202,17 @@ void ClientGameManager::Update(seconds dt)
                 fontManager_.RenderText(fontId_, countDownText, Vec2f::zero, TextAnchor::CENTER_LEFT, 1.0f, Color4(Color::white, 1.0f));
             }
         }
+    }
+    else
+    {
+        std::string health;
+        const auto& playerManager = rollbackManager_.GetPlayerCharacterManager();
+        for(net::PlayerNumber playerNumber = 0; playerNumber < maxPlayerNmb; playerNumber++)
+        {
+            const auto playerEntity = GetEntityFromPlayerNumber(playerNumber);
+            health += fmt::format("P{} health: {} ",playerNumber+1,playerManager.GetComponent(playerEntity).health);
+        }
+        fontManager_.RenderText(fontId_, health, Vec2f(0.0f, -40.0f), TextAnchor::TOP_LEFT, 0.75f, Color4(Color::white, 1.0f));
     }
     textureManager_.Update(dt);
     spriteManager_.Update(dt);
@@ -260,8 +309,10 @@ void ClientGameManager::FixedUpdate()
             return;
         }
     }
-
-
+    if(state_ & FINISHED)
+    {
+        return;
+    }
     rollbackManager_.SimulateToCurrentFrame();
     //Copy rollback transform position to our own
     for (Entity entity = 0; entity < entityManager_.GetEntitiesSize(); entity++)
@@ -366,6 +417,11 @@ void ClientGameManager::ConfirmValidateFrame(net::Frame newValidateFrame,
     rollbackManager_.ConfirmFrame(newValidateFrame, physicsStates);
 }
 
+void ClientGameManager::WinGame(net::PlayerNumber winner)
+{
+    GameManager::WinGame(winner);
+    state_ = state_ | FINISHED;
+}
 
 
 }
