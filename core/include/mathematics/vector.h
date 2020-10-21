@@ -204,7 +204,7 @@ struct Vec2
         return os;
     }
 
-    std::string ToString()
+    std::string ToString() const
     {
         return fmt::format("Vec2({},{})", x, y);
     }

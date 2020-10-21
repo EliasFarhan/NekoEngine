@@ -9,10 +9,10 @@
 
 namespace neko::net
 {
-class AsteroidDebugApp : public SampleProgram
+class SimulationDebugApp : public SampleProgram
 {
 public:
-    AsteroidDebugApp();
+    SimulationDebugApp();
 
     void Init() override;
 

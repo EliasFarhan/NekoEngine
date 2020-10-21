@@ -33,7 +33,7 @@
 namespace neko::net
 {
 SimulationClient::SimulationClient(SimulationServer& server) :
-	server_(server), gameManager_(*this)
+	gameManager_(*this), server_(server)
 {
 }
 

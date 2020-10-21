@@ -28,111 +28,111 @@
 
 namespace neko::net
 {
-AsteroidDebugApp::AsteroidDebugApp() : server_(clients_)
+SimulationDebugApp::SimulationDebugApp() : server_(clients_)
 {
-	for (int i = 0; i < clients_.size(); i++)
-	{
-		clients_[i] = std::make_unique<SimulationClient>(server_);
-	}
+    for (int i = 0; i < clients_.size(); i++)
+    {
+        clients_[i] = std::make_unique<SimulationClient>(server_);
+    }
 }
 
-void AsteroidDebugApp::OnEvent(const SDL_Event& event)
+void SimulationDebugApp::OnEvent(const SDL_Event& event)
 {
 }
 
-void AsteroidDebugApp::Init()
+void SimulationDebugApp::Init()
 {
-	
-	Job initJob = Job([this]()
-	{
-		quad_.Init();
-		//client shader init
-		const auto& config = BasicEngine::GetInstance()->config;
-		clientShader_.LoadFromFile(config.dataRootPath + "shaders/comp_net/client.vert",
-			config.dataRootPath + "shaders/comp_net/client.frag");
-		for (auto& client : clients_)
-		{
-			client->Init();
-		}
-		server_.Init();
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	});
-	BasicEngine::GetInstance()->ScheduleJob(&initJob, JobThreadType::RENDER_THREAD);
-	initJob.Join();
+
+    Job initJob = Job([this]()
+        {
+            quad_.Init();
+            //client shader init
+            const auto& config = BasicEngine::GetInstance()->config;
+            clientShader_.LoadFromFile(config.dataRootPath + "shaders/comp_net/client.vert",
+                config.dataRootPath + "shaders/comp_net/client.frag");
+            for (auto& client : clients_)
+            {
+                client->Init();
+            }
+            server_.Init();
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        });
+    BasicEngine::GetInstance()->ScheduleJob(&initJob, JobThreadType::RENDER_THREAD);
+    initJob.Join();
 }
 
-void AsteroidDebugApp::Update(seconds dt)
+void SimulationDebugApp::Update(seconds dt)
 {
-	//Checking if keys are down
-	const Uint8* keys = SDL_GetKeyboardState(nullptr);
-	net::PlayerInput clientInput1 = 0;
-	clientInput1 = clientInput1 | (keys[SDL_SCANCODE_LEFT] ? asteroid::PlayerInput::LEFT : 0u);
-	clientInput1 = clientInput1 | (keys[SDL_SCANCODE_RIGHT] ? asteroid::PlayerInput::RIGHT : 0u);
-	clientInput1 = clientInput1 | (keys[SDL_SCANCODE_UP] ? asteroid::PlayerInput::UP : 0u);
-	clientInput1 = clientInput1 | (keys[SDL_SCANCODE_DOWN] ? asteroid::PlayerInput::DOWN : 0u);
-	clientInput1 = clientInput1 | (keys[SDL_SCANCODE_RCTRL] ? asteroid::PlayerInput::SHOOT : 0u);
+    //Checking if keys are down
+    const Uint8* keys = SDL_GetKeyboardState(nullptr);
+    net::PlayerInput clientInput1 = 0;
+    clientInput1 = clientInput1 | (keys[SDL_SCANCODE_LEFT] ? asteroid::PlayerInput::LEFT : 0u);
+    clientInput1 = clientInput1 | (keys[SDL_SCANCODE_RIGHT] ? asteroid::PlayerInput::RIGHT : 0u);
+    clientInput1 = clientInput1 | (keys[SDL_SCANCODE_UP] ? asteroid::PlayerInput::UP : 0u);
+    clientInput1 = clientInput1 | (keys[SDL_SCANCODE_DOWN] ? asteroid::PlayerInput::DOWN : 0u);
+    clientInput1 = clientInput1 | (keys[SDL_SCANCODE_RCTRL] ? asteroid::PlayerInput::SHOOT : 0u);
 
-	clients_[0]->SetPlayerInput(clientInput1);
+    clients_[0]->SetPlayerInput(clientInput1);
 
-	net::PlayerInput clientInput2 = 0;
-	clientInput2 = clientInput2 | (keys[SDL_SCANCODE_A] ? asteroid::PlayerInput::LEFT : 0u);
-	clientInput2 = clientInput2 | (keys[SDL_SCANCODE_D] ? asteroid::PlayerInput::RIGHT : 0u);
-	clientInput2 = clientInput2 | (keys[SDL_SCANCODE_W] ? asteroid::PlayerInput::UP : 0u);
-	clientInput2 = clientInput2 | (keys[SDL_SCANCODE_S] ? asteroid::PlayerInput::DOWN : 0u);
-	clientInput2 = clientInput2 | (keys[SDL_SCANCODE_SPACE] ? asteroid::PlayerInput::SHOOT : 0u);
+    net::PlayerInput clientInput2 = 0;
+    clientInput2 = clientInput2 | (keys[SDL_SCANCODE_A] ? asteroid::PlayerInput::LEFT : 0u);
+    clientInput2 = clientInput2 | (keys[SDL_SCANCODE_D] ? asteroid::PlayerInput::RIGHT : 0u);
+    clientInput2 = clientInput2 | (keys[SDL_SCANCODE_W] ? asteroid::PlayerInput::UP : 0u);
+    clientInput2 = clientInput2 | (keys[SDL_SCANCODE_S] ? asteroid::PlayerInput::DOWN : 0u);
+    clientInput2 = clientInput2 | (keys[SDL_SCANCODE_SPACE] ? asteroid::PlayerInput::SHOOT : 0u);
 
-	clients_[1]->SetPlayerInput(clientInput2);
+    clients_[1]->SetPlayerInput(clientInput2);
     server_.Update(dt);
-	for (auto& client : clients_)
-	{
-		client->Update(dt);
-	}
-	RendererLocator::get().Render(this);
+    for (auto& client : clients_)
+    {
+        client->Update(dt);
+    }
+    RendererLocator::get().Render(this);
 }
 
-void AsteroidDebugApp::Destroy()
+void SimulationDebugApp::Destroy()
 {
-	for (auto& client : clients_)
-	{
-		client->Destroy();
-	}
-	server_.Destroy();
-	glDisable(GL_BLEND);
+    for (auto& client : clients_)
+    {
+        client->Destroy();
+    }
+    server_.Destroy();
+    glDisable(GL_BLEND);
 }
 
-void AsteroidDebugApp::DrawImGui()
+void SimulationDebugApp::DrawImGui()
 {
-	server_.DrawImGui();
-	for (auto& client : clients_)
-	{
-		client->DrawImGui();
-	}
+    server_.DrawImGui();
+    for (auto& client : clients_)
+    {
+        client->DrawImGui();
+    }
 }
 
-void AsteroidDebugApp::Render()
+void SimulationDebugApp::Render()
 {
-	const auto& config = BasicEngine::GetInstance()->config;
-	for (auto& client : clients_)
-	{
-		client->Render();
-	}
+    const auto& config = BasicEngine::GetInstance()->config;
+    for (auto& client : clients_)
+    {
+        client->Render();
+    }
 
-	glViewport(0, 0, config.windowSize.x, config.windowSize.y);
-	clientShader_.Bind();
-	auto transform = Mat4f::Identity;
-	transform = Transform3d::Scale(transform, Vec3f(0.5f, 1.0f, 1.0f));
-	transform = Transform3d::Translate(transform, Vec3f(-0.5f, 0.0f, 0.0f));
-	clientShader_.SetMat4("transform", transform);
-	clientShader_.SetTexture("texture", clients_[0]->GetFramebuffer().GetColorTexture());
-	quad_.Draw();
+    glViewport(0, 0, config.windowSize.x, config.windowSize.y);
+    clientShader_.Bind();
+    auto transform = Mat4f::Identity;
+    transform = Transform3d::Scale(transform, Vec3f(0.5f, 1.0f, 1.0f));
+    transform = Transform3d::Translate(transform, Vec3f(-0.5f, 0.0f, 0.0f));
+    clientShader_.SetMat4("transform", transform);
+    clientShader_.SetTexture("texture", clients_[0]->GetFramebuffer().GetColorTexture());
+    quad_.Draw();
 
-	transform = Mat4f::Identity;
-	transform = Transform3d::Scale(transform, Vec3f(0.5f, 1.0f, 1.0f));
-	transform = Transform3d::Translate(transform, Vec3f(0.5f, 0.0f, 0.0f));
-	clientShader_.SetMat4("transform", transform);
-	clientShader_.SetTexture("texture", clients_[1]->GetFramebuffer().GetColorTexture());
-	quad_.Draw();
+    transform = Mat4f::Identity;
+    transform = Transform3d::Scale(transform, Vec3f(0.5f, 1.0f, 1.0f));
+    transform = Transform3d::Translate(transform, Vec3f(0.5f, 0.0f, 0.0f));
+    clientShader_.SetMat4("transform", transform);
+    clientShader_.SetTexture("texture", clients_[1]->GetFramebuffer().GetColorTexture());
+    quad_.Draw();
 
 }
 }

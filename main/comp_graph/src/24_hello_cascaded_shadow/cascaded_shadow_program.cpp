@@ -247,7 +247,7 @@ Camera2D HelloCascadedShadowProgram::CalculateOrthoLight(float cascadeNear, floa
         const auto size = Vec2f((maxX - minX) / 2.0f, (maxY - minY) / 2.0f);
         //const auto lightCenter = lightView.Inverse()*Vec4f((minX+maxX)/2.0f, (minY+maxY)/2.0f, (minZ+maxZ)/2.0f, 1.0f);
         center /= 8.0f;// = Vec3f(lightCenter);
-        lightCamera.SetSize(size);
+        lightCamera.SetExtends(size);
         lightCamera.nearPlane = 0.0f;
 
         lightCamera.farPlane = (maxZ-minZ)*1.7f;
@@ -265,7 +265,7 @@ Camera2D HelloCascadedShadowProgram::CalculateOrthoLight(float cascadeNear, floa
             }
         }
         radius = std::sqrt(radius);
-        lightCamera.SetSize(Vec2f(radius, radius));
+        lightCamera.SetExtends(Vec2f(radius, radius));
         lightCamera.farPlane = 2.0f * radius;
         lightCamera.nearPlane = 0.0f;
         lightCamera.position = center + lightCamera.reverseDir * radius;

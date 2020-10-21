@@ -136,6 +136,8 @@ void RollbackManager::SetPlayerInput(net::PlayerNumber playerNumber, net::Player
 
 void RollbackManager::StartNewFrame(net::Frame newFrame)
 {
+    if (currentFrame_ > newFrame)
+        return;
 	const auto delta = newFrame - currentFrame_;
 	if(delta == 0)
 	{

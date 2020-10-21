@@ -37,7 +37,6 @@ void ClientNetworkManager::Init()
 		std::numeric_limits<ClientId>::max());
 	//JOIN packet
 	gameManager_.Init();
-	gameManager_.SetWindowSize(windowSize_ / Vec2u(2, 1));
 	tcpSocket_.setBlocking(false);
 	udpSocket_.setBlocking(true);
 	auto status = sf::Socket::Error;
@@ -120,7 +119,6 @@ void ClientNetworkManager::Update(seconds dt)
 	}
 
     gameManager_.Update(dt);
-    RendererLocator::get().Render(this);
 }
 
 void ClientNetworkManager::Destroy()
@@ -174,14 +172,7 @@ void ClientNetworkManager::DrawImGui()
 
 void ClientNetworkManager::Render()
 {
-	const auto& config = BasicEngine::GetInstance()->config;
 
-	if (config.windowSize != windowSize_)
-	{
-		windowSize_ = config.windowSize;
-		gameManager_.SetWindowSize(windowSize_ / Vec2u(2, 1));
-
-	}
 	gameManager_.Render();
 }
 

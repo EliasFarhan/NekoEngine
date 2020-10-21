@@ -102,8 +102,8 @@ protected:
 	net::PlayerNumber clientPlayer_ = net::INVALID_PLAYER;
 	gl::TextureManager textureManager_;
     gl::FontManager fontManager_;
-	gl::SpriteManager spriteManager_;
-	float fixedTimer_ = 0.0f;
+    gl::SpriteManager spriteManager_;
+    float fixedTimer_ = 0.0f;
     unsigned long long startingTime_ = 0;
 	std::uint32_t state_ = 0;
 

@@ -64,7 +64,7 @@ void HelloShadowProgram::Init()
 	glCheckFramebuffer();
 	glCheckError();
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	depthCamera_.SetSize(Vec2f::one * 4.0f);
+	depthCamera_.SetExtends(Vec2f::one * 4.0f);
 	depthCamera_.position = light_.lightPos;
 	depthCamera_.WorldLookAt(light_.lightPos+light_.lightDir);
 
@@ -136,7 +136,7 @@ void HelloShadowProgram::DrawImGui()
 	Vec2f depthCameraSize = Vec2f(depthCamera_.right, depthCamera_.top);
 	if(ImGui::InputFloat2("Depthmap Size", &depthCameraSize[0]))
 	{
-		depthCamera_.SetSize(depthCameraSize);
+		depthCamera_.SetExtends(depthCameraSize);
 	}
 	bool enablePcf = flags_ & ENABLE_PCF;
 	if(ImGui::Checkbox("Enable PCF", &enablePcf))

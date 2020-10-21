@@ -46,7 +46,7 @@ public:
     }
 
 private:
-    net::AsteroidDebugApp app_;
+    net::SimulationDebugApp app_;
 };
 }
 

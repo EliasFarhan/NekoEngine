@@ -34,26 +34,26 @@ namespace neko
 
 struct Camera
 {
-	virtual ~Camera() = default;
-	Vec3f position;
+    virtual ~Camera() = default;
+    Vec3f position;
     Vec3f reverseDir = Vec3f::back, rightDir = Vec3f::right, upDir = Vec3f::up;
-	float nearPlane = 0.1f;
-	float farPlane = 100.0f;
-	void WorldLookAt(Vec3f target, Vec3f lookUp = Vec3f::down);
+    float nearPlane = 0.1f;
+    float farPlane = 100.0f;
+    void WorldLookAt(Vec3f target, Vec3f lookUp = Vec3f::down);
 
-	[[nodiscard]] Mat4f GenerateViewMatrix() const;
+    [[nodiscard]] Mat4f GenerateViewMatrix() const;
 
-	void SetDirectionFromEuler(const EulerAngles& angles);
-	void Rotate(const EulerAngles& angles);
+    void SetDirectionFromEuler(const EulerAngles& angles);
+    void Rotate(const EulerAngles& angles);
 
-	[[nodiscard]] virtual Mat4f GenerateProjectionMatrix() const = 0;
+    [[nodiscard]] virtual Mat4f GenerateProjectionMatrix() const = 0;
 };
 
 struct Camera2D : Camera
 {
 	float right = 0.0f, left = 0.0f, top = 0.0f, bottom =0.0f;
 	[[nodiscard]] Mat4f GenerateProjectionMatrix() const override;
-	void SetSize(Vec2f size);
+	void SetExtends(Vec2f size);
 };
 
 struct Camera3D : Camera

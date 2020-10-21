@@ -181,7 +181,7 @@ void ClientGameManager::Destroy()
 void ClientGameManager::SetWindowSize(Vec2u windowsSize)
 {
     windowSize_ = windowsSize;
-    camera_.SetSize(Vec2f(windowsSize) / PixelPerUnit);
+    camera_.SetExtends(Vec2f(windowsSize) / PixelPerUnit);
     fontManager_.SetWindowSize(Vec2f(windowsSize));
 }
 
@@ -189,7 +189,7 @@ void ClientGameManager::Render()
 {
     std::lock_guard<std::mutex> lock(renderMutex_);
 #ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Game Manager Render");
+    EASY_BLOCK("Game Manager Render")
 #endif
     glViewport(0, 0, windowSize_.x, windowSize_.y);
     CameraLocator::provide(&camera_);

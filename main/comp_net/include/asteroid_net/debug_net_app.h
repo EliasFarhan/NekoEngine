@@ -9,10 +9,10 @@
 
 namespace neko::net
 {
-class DebugApp : public SampleProgram
+class NetworkDebugApp : public SampleProgram
 {
 public:
-    DebugApp();
+    NetworkDebugApp();
 
     void Init() override;
 

@@ -31,23 +31,23 @@
 
 namespace neko::asteroid
 {
-class ClientEngine : public sdl::SdlEngine
+class ClientDebugEngine : public sdl::SdlEngine
 {
 public:
-    explicit ClientEngine(Configuration* config = nullptr) : sdl::SdlEngine(config)
+    explicit ClientDebugEngine(Configuration* config = nullptr) : sdl::SdlEngine(config)
     {
         RegisterOnDrawUi(app_);
         RegisterSystem(app_);
     }
 
 private:
-    net::DebugApp app_;
+    net::NetworkDebugApp app_;
 };
 }
 
 int main(int argc, char** argv)
 {
-    neko::asteroid::ClientEngine engine;
+    neko::asteroid::ClientDebugEngine engine;
 
     neko::sdl::Gles3Window window;
     neko::gl::Gles3Renderer renderer;
