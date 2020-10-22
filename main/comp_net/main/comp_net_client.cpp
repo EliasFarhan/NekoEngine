@@ -37,23 +37,23 @@ public:
     void Init() override
     {
         Job initJob = Job([this]()
-                          {
-        const auto& config = BasicEngine::GetInstance()->config;
-        windowSize_ = config.windowSize;
-        client_.SetWindowSize(windowSize_);
-        client_.Init();
-                          });
+            {
+                const auto& config = BasicEngine::GetInstance()->config;
+                windowSize_ = config.windowSize;
+                client_.SetWindowSize(windowSize_);
+                client_.Init();
+                glEnable(GL_BLEND);
+                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            });
         BasicEngine::GetInstance()->ScheduleJob(&initJob, JobThreadType::RENDER_THREAD);
         initJob.Join();
 
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
     void Update(seconds dt) override
     {
         const auto& config = BasicEngine::GetInstance()->config;
-        if(windowSize_ != config.windowSize)
+        if (windowSize_ != config.windowSize)
         {
             client_.SetWindowSize(config.windowSize);
             windowSize_ = config.windowSize;
@@ -101,7 +101,7 @@ private:
 };
 }
 
-int main([[maybe_unused]]int argc, [[maybe_unused]]char** argv)
+int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 {
     neko::asteroid::ClientEngine engine;
 

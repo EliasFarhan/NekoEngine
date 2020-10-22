@@ -182,10 +182,15 @@ void ClientGameManager::Update(seconds dt)
             const std::string winnerText = fmt::format("You won!");
             fontManager_.RenderText(fontId_, winnerText, Vec2f::zero, TextAnchor::CENTER_LEFT, 1.0f, Color4(Color::white, 1.0f));
         }
+        else if(winner_ != net::INVALID_PLAYER)
+        {
+            const std::string winnerText = fmt::format("P{} won!", winner_+1);
+            fontManager_.RenderText(fontId_, winnerText, Vec2f::zero, TextAnchor::CENTER_LEFT, 1.0f, Color4(Color::white, 1.0f));
+        }
         else
         {
-            const std::string winnerText = fmt::format("You lost!");
-            fontManager_.RenderText(fontId_, winnerText, Vec2f::zero, TextAnchor::CENTER_LEFT, 1.0f, Color4(Color::white, 1.0f));
+            const std::string errorMessage = fmt::format("Error with other players");
+            fontManager_.RenderText(fontId_, errorMessage, Vec2f::zero, TextAnchor::CENTER_LEFT, 1.0f, Color4(Color::white, 1.0f));
         }
     }
     if (!(state_ & STARTED))

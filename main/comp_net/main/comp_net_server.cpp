@@ -42,16 +42,12 @@ int main(int argc, char** argv)
     }
     server.Init();
     auto clock = std::chrono::system_clock::now();
-    while(true)
+    while(server.IsOpen())
     {
         const auto start = std::chrono::system_clock::now();
         const auto dt = std::chrono::duration_cast<neko::seconds>(start - clock);
         clock = start;
         server.Update(dt);
-    	/*
-        using namespace std::chrono_literals;
-        std::this_thread::sleep_for(10ms);
-        */
     }
     return 0;
 }

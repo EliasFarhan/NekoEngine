@@ -37,6 +37,8 @@ public:
 
     void SetTcpPort(unsigned short i);
 
+    bool IsOpen();
+
 private:
     void ProcessReceivePacket(std::unique_ptr<asteroid::Packet> packet, 
         PacketSocketSource packetSource, 
@@ -45,7 +47,12 @@ private:
     void ReceivePacket(sf::Packet& packet, PacketSocketSource packetSource,
         sf::IpAddress address = "localhost",
         unsigned short port = 0);
-
+    enum ServerStatus
+    {
+        OPEN = 1u << 0u,
+        STARTED = 1u << 1u,
+        FIRST_PLAYER_CONNECT = 1u << 2u,
+    };
     sf::UdpSocket udpSocket_;
     sf::TcpListener tcpListener_;
     std::array<sf::TcpSocket, asteroid::maxPlayerNmb> tcpSockets_;
@@ -58,5 +65,6 @@ private:
     unsigned short udpPort_ = 12345;
     Index lastSocketIndex_ = 0;
     PlayerNumber lastPlayerNumber_ = 0;
+    std::uint8_t status_ = 0;
 };
 }

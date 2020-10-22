@@ -42,10 +42,16 @@ void ServerNetworkManager::SendReliablePacket(
 		while (status == sf::Socket::Partial)
 		{
 			status = tcpSockets_[playerNumber].send(sendingPacket);
-			if (status == sf::Socket::NotReady)
+			switch(status)
 			{
-				logDebug("[Server] Error trying to send packet to Player: " +
-					std::to_string(playerNumber) + " socket is not ready");
+			case sf::Socket::NotReady:
+				logDebug(fmt::format(
+					"[Server] Error trying to send packet to Player: {} socket is not ready",
+					playerNumber));
+				break;
+			case sf::Socket::Disconnected:
+
+				break;
 			}
 		}
 	}
@@ -110,9 +116,7 @@ void ServerNetworkManager::Init()
 	{
 		socket.setBlocking(false);
 	}
-	std::string log = "[Server] Tcp Socket on port: ";
-	log += std::to_string(tcpPort_);
-	logDebug(log);
+	logDebug(fmt::format("[Server] Tcp Socket on port: {}", tcpPort_));
 
 	status = sf::Socket::Error;
 	while (status != sf::Socket::Done)
@@ -124,10 +128,10 @@ void ServerNetworkManager::Init()
 		}
 	}
 	udpSocket_.setBlocking(false);
-	log = "[Server] Udp Socket on port: ";
-	log += std::to_string(udpPort_);
-	logDebug(log);
+	logDebug(fmt::format("[Server] Udp Socket on port: {}", udpPort_));
 	gameManager_.Init();
+	status_ = status_ | OPEN;
+
 }
 
 void ServerNetworkManager::Update(seconds dt)
@@ -140,12 +144,10 @@ void ServerNetworkManager::Update(seconds dt)
 		{
 			const auto remoteAddress = tcpSockets_[lastSocketIndex_].
 				getRemoteAddress();
-			const auto port = std::to_string(
-				tcpSockets_[lastSocketIndex_].getRemotePort());
-			const std::string log = "[Server] New player connection with address: " +
-				remoteAddress.toString() + " and port: " + port;
-			logDebug(log);
-			lastSocketIndex_++;
+			logDebug(fmt::format("[Server] New player connection with address: {} and port: {}", 
+				remoteAddress.toString(), tcpSockets_[lastSocketIndex_].getRemotePort()));
+			status_ = status_ | (FIRST_PLAYER_CONNECT << lastSocketIndex_);
+		    lastSocketIndex_++;
 		}
 	}
 
@@ -155,9 +157,23 @@ void ServerNetworkManager::Update(seconds dt)
 		sf::Packet tcpPacket;
 		const auto status = tcpSockets_[playerNumber].receive(
 			tcpPacket);
-		if (status == sf::Socket::Done)
+		switch(status)
 		{
+		case sf::Socket::Done:
 			ReceivePacket(tcpPacket, PacketSocketSource::TCP);
+			break;
+		case sf::Socket::Disconnected:
+		{
+			logDebug(fmt::format(
+				"[Error] Player Number {} is disconnected when receiving",
+				playerNumber + 1));
+			status_ = status_ & ~(FIRST_PLAYER_CONNECT << playerNumber);
+			auto endGame = std::make_unique<asteroid::WinGamePacket>();
+			SendReliablePacket(std::move(endGame));
+			status_ = status_ & ~OPEN; //Close the server
+			break;
+		}
+		default: break;
 		}
 	}
 	sf::Packet udpPacket;
@@ -181,6 +197,11 @@ void ServerNetworkManager::SetTcpPort(unsigned short i)
 	tcpPort_ = i;
 }
 
+bool ServerNetworkManager::IsOpen()
+{
+	return status_& OPEN;
+}
+
 void ServerNetworkManager::ProcessReceivePacket(
 	std::unique_ptr<asteroid::Packet> packet,
 	PacketSocketSource packetSource,
@@ -194,8 +215,8 @@ void ServerNetworkManager::ProcessReceivePacket(
 	{
 		const auto* joinPacket = static_cast<asteroid::JoinPacket*>(packet.get());
 		auto clientId = ConvertFromBinary<ClientId>(joinPacket->clientId);
-		logDebug("[Server] Received Join Packet from: " + std::to_string(clientId) +
-			(packetSource == PacketSocketSource::UDP ? " UDP with port: " + std::to_string(port) : " TCP"));
+		logDebug(fmt::format("[Server] Received Join Packet from: {} {}", clientId, 
+			(packetSource == PacketSocketSource::UDP ? fmt::format(" UDP with port: {}", port) : " TCP")));
 		const auto it = std::find_if(clientMap_.begin(), clientMap_.end(),
 			[&clientId](const auto& clientInfo)
 			{
@@ -235,7 +256,7 @@ void ServerNetworkManager::ProcessReceivePacket(
 		const auto clientTime = ConvertFromBinary<unsigned long>(joinPacket->startTime);
         using namespace std::chrono;
 		const unsigned long deltaTime = (duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count()) - clientTime;
-		logDebug("Client Server deltaTime: "+std::to_string(deltaTime));
+		logDebug(fmt::format("Client Server deltaTime: ", deltaTime));
 		clientMap_[lastPlayerNumber_] = {
 			clientId,
 			deltaTime,
@@ -260,7 +281,7 @@ void ServerNetworkManager::ProcessReceivePacket(
 		}
 		
 		lastPlayerNumber_++;
-
+		//Starting the game when both players are connected
 		if (lastPlayerNumber_ == asteroid::maxPlayerNmb)
 		{
 			auto startGamePacket = std::make_unique<asteroid::StartGamePacket>();
@@ -272,6 +293,7 @@ void ServerNetworkManager::ProcessReceivePacket(
 
 			startGamePacket->startTime = ConvertToBinary(ms);
 			SendReliablePacket(std::move(startGamePacket));
+			status_ = status_ | STARTED;
 		}
 
 		break;
@@ -340,6 +362,7 @@ void ServerNetworkManager::ProcessReceivePacket(
 			    winGamePacket->winner = winner;
 			    SendReliablePacket(std::move(winGamePacket));
 			    gameManager_.WinGame(winner);
+				status_ = status_ & ~OPEN; // close the server
             }
 		}
 		break;
