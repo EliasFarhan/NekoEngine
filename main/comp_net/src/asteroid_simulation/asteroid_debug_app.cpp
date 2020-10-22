@@ -50,6 +50,16 @@ void SimulationDebugApp::Init()
             const auto& config = BasicEngine::GetInstance()->config;
             clientShader_.LoadFromFile(config.dataRootPath + "shaders/comp_net/client.vert",
                 config.dataRootPath + "shaders/comp_net/client.frag");
+            windowSize_ = config.windowSize;
+            for (auto& framebuffer : clientsFramebuffer_)
+            {
+                framebuffer.SetSize(windowSize_ / Vec2u(2, 1));
+                framebuffer.Create();
+            }
+            for (auto& client : clients_)
+            {
+                client->SetWindowSize(windowSize_ / Vec2u(2, 1));
+            }
             for (auto& client : clients_)
             {
                 client->Init();
@@ -113,25 +123,44 @@ void SimulationDebugApp::DrawImGui()
 void SimulationDebugApp::Render()
 {
     const auto& config = BasicEngine::GetInstance()->config;
-    for (auto& client : clients_)
+    if (config.windowSize != windowSize_)
     {
-        client->Render();
+        logDebug(fmt::format(
+            "Resize Simulation Debug App Window framebuffers! with new resolution {}", config.windowSize.ToString()));
+        for (auto& framebuffer : clientsFramebuffer_)
+        {
+            framebuffer.SetSize(config.windowSize / Vec2u(2, 1));
+            framebuffer.Reload();
+        }
+
+        for (auto& client : clients_)
+        {
+            client->SetWindowSize(config.windowSize / Vec2u(2, 1));
+        }
+        windowSize_ = config.windowSize;
+    }
+    for (PlayerNumber playerNumber = 0; playerNumber < asteroid::maxPlayerNmb; playerNumber++)
+    {
+        clientsFramebuffer_[playerNumber].Bind();
+        clientsFramebuffer_[playerNumber].Clear(Color::black);
+        clients_[playerNumber]->Render();
     }
 
-    glViewport(0, 0, config.windowSize.x, config.windowSize.y);
+    gl::Framebuffer::Unbind();
+    glViewport(0, 0, windowSize_.x, windowSize_.y);
     clientShader_.Bind();
     auto transform = Mat4f::Identity;
     transform = Transform3d::Scale(transform, Vec3f(0.5f, 1.0f, 1.0f));
     transform = Transform3d::Translate(transform, Vec3f(-0.5f, 0.0f, 0.0f));
     clientShader_.SetMat4("transform", transform);
-    clientShader_.SetTexture("texture", clients_[0]->GetFramebuffer().GetColorTexture());
+    clientShader_.SetTexture("texture", clientsFramebuffer_[0].GetColorTexture());
     quad_.Draw();
 
     transform = Mat4f::Identity;
     transform = Transform3d::Scale(transform, Vec3f(0.5f, 1.0f, 1.0f));
     transform = Transform3d::Translate(transform, Vec3f(0.5f, 0.0f, 0.0f));
     clientShader_.SetMat4("transform", transform);
-    clientShader_.SetTexture("texture", clients_[1]->GetFramebuffer().GetColorTexture());
+    clientShader_.SetTexture("texture", clientsFramebuffer_[1].GetColorTexture());
     quad_.Draw();
 
 }

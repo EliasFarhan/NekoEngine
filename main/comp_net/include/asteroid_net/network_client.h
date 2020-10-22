@@ -5,11 +5,12 @@
 #include "SFML/Network.hpp"
 #include "asteroid/game.h"
 #include "asteroid/packet_type.h"
+#include "asteroid/client.h"
 
 namespace neko::net
 {
 
-class ClientNetworkManager : public RenderProgram, public DrawImGuiInterface, public asteroid::PacketSenderInterface
+class ClientNetworkManager : public Client
 {
 public:
 	enum class State
@@ -26,7 +27,6 @@ public:
 		TCP,
 		UDP
 	};
-    ClientNetworkManager();
     void Init() override;
 
     void Update(seconds dt) override;
@@ -42,7 +42,7 @@ public:
     void SendUnreliablePacket(std::unique_ptr<asteroid::Packet> packet) override;
 	void SetPlayerInput(PlayerInput input);
 
-    void SetWindowSize(Vec2u windowSize);
+
 private:
     void ReceivePacket(sf::Packet& packet, PacketSource source);
     sf::UdpSocket udpSocket_;
@@ -52,9 +52,7 @@ private:
     unsigned short serverTcpPort_ = 12345;
     unsigned short serverUdpPort_ = 0;
 
-    asteroid::ClientGameManager gameManager_;
-    Vec2u windowSize_;
-    ClientId clientId_ = 0;
+
     State currentState_ = State::NONE;
 };
 

@@ -168,12 +168,54 @@ void ClientGameManager::Update(seconds dt)
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("Game Manager Update");
 #endif
+    if (state_ & STARTED)
+    {
+        rollbackManager_.SimulateToCurrentFrame();
+        //Copy rollback transform position to our own
+        for (Entity entity = 0; entity < entityManager_.GetEntitiesSize(); entity++)
+        {
+            if (entityManager_.HasComponent(entity,
+                EntityMask(ComponentType::PLAYER_CHARACTER) |
+                EntityMask(neko::ComponentType::SPRITE2D)))
+            {
+                const auto& player = rollbackManager_.GetPlayerCharacterManager().GetComponent(entity);
+                auto sprite = spriteManager_.GetComponent(entity);
+                if (player.invincibilityTime > 0.0f)
+                {
+                    auto leftV = std::fmod(player.invincibilityTime, invincibilityFlashPeriod);
+                    auto rightV = invincibilityFlashPeriod / 2.0f;
+                    //logDebug(fmt::format("Comparing {} and {} with time: {}", leftV, rightV, player.invincibilityTime));
+                }
+                if (player.invincibilityTime > 0.0f &&
+                    std::fmod(player.invincibilityTime, invincibilityFlashPeriod)
+                    > invincibilityFlashPeriod / 2.0f)
+                {
+                    sprite.color = Color4(Color::black, 1.0f);
+                }
+                else
+                {
+                    sprite.color = playerColors[player.playerNumber];
+                }
+                spriteManager_.SetComponent(entity, sprite);
+            }
+
+            if (entityManager_.HasComponent(entity, EntityMask(neko::ComponentType::TRANSFORM2D)))
+            {
+                transformManager_.SetPosition(entity, rollbackManager_.GetTransformManager().GetPosition(entity));
+                transformManager_.SetScale(entity, rollbackManager_.GetTransformManager().GetScale(entity));
+                transformManager_.SetRotation(entity, rollbackManager_.GetTransformManager().GetRotation(entity));
+                transformManager_.UpdateDirtyComponent(entity);
+            }
+        }
+    }
     fixedTimer_ += dt.count();
     while (fixedTimer_ > FixedPeriod)
     {
         FixedUpdate();
         fixedTimer_ -= FixedPeriod;
+
     }
+
 
     if(state_ & FINISHED)
     {
@@ -318,43 +360,7 @@ void ClientGameManager::FixedUpdate()
     {
         return;
     }
-    rollbackManager_.SimulateToCurrentFrame();
-    //Copy rollback transform position to our own
-    for (Entity entity = 0; entity < entityManager_.GetEntitiesSize(); entity++)
-    {
-        if (entityManager_.HasComponent(entity,
-            EntityMask(ComponentType::PLAYER_CHARACTER) |
-            EntityMask(neko::ComponentType::SPRITE2D)))
-        {
-            const auto& player = rollbackManager_.GetPlayerCharacterManager().GetComponent(entity);
-            auto sprite = spriteManager_.GetComponent(entity);
-            if (player.invincibilityTime > 0.0f)
-            {
-                auto leftV = std::fmod(player.invincibilityTime, invincibilityFlashPeriod);
-                auto rightV = invincibilityFlashPeriod / 2.0f;
-                //logDebug(fmt::format("Comparing {} and {} with time: {}", leftV, rightV, player.invincibilityTime));
-            }
-            if (player.invincibilityTime > 0.0f &&
-                std::fmod(player.invincibilityTime, invincibilityFlashPeriod)
-                    > invincibilityFlashPeriod / 2.0f)
-            {
-                sprite.color = Color4(Color::black, 1.0f);
-            }
-            else
-            {
-                sprite.color = playerColors[player.playerNumber];
-            }
-            spriteManager_.SetComponent(entity, sprite);
-        }
-
-        if (entityManager_.HasComponent(entity, EntityMask(neko::ComponentType::TRANSFORM2D)))
-        {
-            transformManager_.SetPosition(entity, rollbackManager_.GetTransformManager().GetPosition(entity));
-            transformManager_.SetScale(entity, rollbackManager_.GetTransformManager().GetScale(entity));
-            transformManager_.SetRotation(entity, rollbackManager_.GetTransformManager().GetRotation(entity));
-            transformManager_.UpdateDirtyComponent(entity);
-        }
-    }
+    
     //We send the player inputs when the game started
 
     const auto& inputs = rollbackManager_.GetInputs(GetPlayerNumber());

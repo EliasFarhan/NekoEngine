@@ -26,10 +26,12 @@ public:
 
     void OnEvent(const SDL_Event& event) override;
 private:
-    std::array<std::unique_ptr<SimulationClient>, 2> clients_;
+    std::array<std::unique_ptr<SimulationClient>, asteroid::maxPlayerNmb> clients_;
+    std::array<gl::Framebuffer, asteroid::maxPlayerNmb> clientsFramebuffer_;
     SimulationServer server_;
     gl::RenderQuad quad_{ Vec3f::zero, Vec2f(2.0f) };
     gl::Shader clientShader_;
+    Vec2u windowSize_;
 };
 
 

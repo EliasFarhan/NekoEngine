@@ -172,7 +172,6 @@ void ClientNetworkManager::DrawImGui()
 
 void ClientNetworkManager::Render()
 {
-
 	gameManager_.Render();
 }
 
@@ -225,11 +224,6 @@ void ClientNetworkManager::SetPlayerInput(PlayerInput input)
 		gameManager_.GetPlayerNumber(),
 		input,
 		currentFrame);
-}
-
-void ClientNetworkManager::SetWindowSize(Vec2u windowSize)
-{
-	gameManager_.SetWindowSize(windowSize);
 }
 
 void ClientNetworkManager::ReceivePacket(sf::Packet& packet, PacketSource source)
@@ -359,11 +353,5 @@ void ClientNetworkManager::ReceivePacket(sf::Packet& packet, PacketSource source
 	default:
 		break;
 	}
-}
-
-
-ClientNetworkManager::ClientNetworkManager() : gameManager_(*this)
-{
-
 }
 }

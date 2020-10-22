@@ -33,17 +33,13 @@
 namespace neko::net
 {
 SimulationClient::SimulationClient(SimulationServer& server) :
-	gameManager_(*this), server_(server)
+	server_(server)
 {
 }
 
 void SimulationClient::Init()
 {
 	const auto& config = BasicEngine::GetInstance()->config;
-	windowSize_ = config.windowSize;
-	gameManager_.SetWindowSize(windowSize_ / Vec2u(2, 1));
-	framebuffer_.SetSize(windowSize_ / Vec2u(2, 1));
-	framebuffer_.Create();
 
 	clientId_ = RandomRange(std::numeric_limits<ClientId>::lowest(),
 		std::numeric_limits<ClientId>::max());
@@ -62,41 +58,29 @@ void SimulationClient::Update(seconds dt)
 
 void SimulationClient::Destroy()
 {
-	framebuffer_.Destroy();
 	gameManager_.Destroy();
 
 }
 
 void SimulationClient::Render()
 {
-	const auto& config = BasicEngine::GetInstance()->config;
-
-	if (config.windowSize != windowSize_)
-	{
-		windowSize_ = config.windowSize;
-		framebuffer_.SetSize(windowSize_ / Vec2u(2, 1));
-		framebuffer_.Reload();
-		gameManager_.SetWindowSize(windowSize_ / Vec2u(2, 1));
-
-	}
-
-	framebuffer_.Bind();
-	framebuffer_.Clear(Vec3f(0.0f));
 	gameManager_.Render();
-	gl::Framebuffer::Unbind();
-
-
 }
 
 
 void SimulationClient::SetPlayerInput(net::PlayerInput playerInput)
 {
-    auto currentFrame = gameManager_.GetCurrentFrame();
+    const auto currentFrame = gameManager_.GetCurrentFrame();
 	gameManager_.SetPlayerInput(
 		gameManager_.GetPlayerNumber(),
 		playerInput, 
 		currentFrame);
 
+}
+
+void SimulationClient::SetWindowSize(Vec2u windowSize)
+{
+    gameManager_.SetWindowSize(windowSize);
 }
 
 void SimulationClient::DrawImGui()
