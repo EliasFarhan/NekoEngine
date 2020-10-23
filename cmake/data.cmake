@@ -22,6 +22,11 @@ file(GLOB_RECURSE MODEL_FILES
 file(GLOB_RECURSE SHADER_FILES
         "${PROJECT_SOURCE_DIR}/data/*.vert"
         "${PROJECT_SOURCE_DIR}/data/*.frag"
+        "${PROJECT_SOURCE_DIR}/data/*.glsl"
+        "${PROJECT_SOURCE_DIR}/data/*.geom"
+        "${PROJECT_SOURCE_DIR}/data/*.comp"
+        "${PROJECT_SOURCE_DIR}/data/*.tesc"
+        "${PROJECT_SOURCE_DIR}/data/*.tese"
         )
 file(GLOB_RECURSE IMG_FILES
         "${PROJECT_SOURCE_DIR}/data/*.jpg"
@@ -45,6 +50,8 @@ file(GLOB_RECURSE SND_FILES
 file(GLOB_RECURSE FONT_FILES
         "${PROJECT_SOURCE_DIR}/data/*.ttf"
         )
+file(GLOB_RECURSE MATERIAL_FILES
+        "${PROJECT_SOURCE_DIR}/data/*.mat")
 
 
 source_group("Scripts"				FILES ${SCRIPT_FILES})
@@ -54,7 +61,8 @@ source_group("Data/Img"            FILES ${IMG_FILES})
 source_group("Data/Snd"			FILES ${SND_FILES})
 source_group("Shaders"		FILES ${SHADER_FILES})
 source_group("Data/Model" FILES ${MODEL_FILES})
-LIST(APPEND DATA_FILES ${IMG_FILES} ${MODEL_FILES} ${SND_FILES} ${TEXT_FILES} ${SHADER_FILES} ${FONT_FILES})
+source_group("Data/Materials" FILES ${MATERIALS_FILES})
+LIST(APPEND DATA_FILES ${IMG_FILES} ${MODEL_FILES} ${SND_FILES} ${TEXT_FILES} ${SHADER_FILES} ${MATERIAL_FILES} ${FONT_FILES})
 
 foreach(DATA ${DATA_FILES})
     get_filename_component(FILE_NAME ${DATA} NAME)
