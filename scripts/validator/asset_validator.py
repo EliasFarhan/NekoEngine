@@ -58,7 +58,7 @@ def define_asset_type(filename) -> AssetType:
     extension = path.suffix.lower()
     if extension in img_extension:
         return AssetType.TEXTURE
-    if extension == '.mtl':
+    if extension == '.mtl' or extension == '.mat':
         return AssetType.MTL
     if extension == '.obj':
         return AssetType.OBJ
@@ -87,7 +87,7 @@ def validate_asset(src="", out=""):
     if asset_type == AssetType.TEXTURE:
         validate_texture(data_src, data_out, meta_content)
     if asset_type == AssetType.VERT_SHADER or asset_type == AssetType.FRAG_SHADER:
-        validate_shader(data_src, meta_content)
+        validate_shader(data_src, data_out, meta_content)
 
     if asset_type != AssetType.UNKNOWN:
         if not os.path.isfile(data_out + ".meta"):

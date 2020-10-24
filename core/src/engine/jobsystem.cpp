@@ -248,15 +248,17 @@ Job& Job::operator=(Job&& job) noexcept
     status_ = job.status_;
     return *this;
 }
-#ifndef NEKO_SAMETHREAD
+
 void Job::Join() const
 {
+#ifndef NEKO_SAMETHREAD
     if(!IsDone())
     {
         taskDoneFuture_.get();
     }
-}
 #endif
+}
+
 
 void Job::Execute()
 {

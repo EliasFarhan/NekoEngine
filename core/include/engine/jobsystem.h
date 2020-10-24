@@ -65,14 +65,14 @@ public:
     Job(Job&& job) noexcept;
     Job& operator=(Job&& job) noexcept;
 
-#ifndef NEKO_SAMETHREAD
+
     /**
      * \brief Wait for the Job to be done,
      * used when dependencies are not done
      * useful when dependencies are on other threads
      */
     void Join() const;
-#endif
+
     /**
      * \brief Execute is called by the JobSystem
      */
