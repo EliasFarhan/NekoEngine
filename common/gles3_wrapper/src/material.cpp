@@ -202,7 +202,7 @@ void Material::FillContent(json& content)
 {
     if(CheckJsonExists(content, "uniforms"))
     {
-        for(auto& uniform : content['uniforms'])
+        for(auto& uniform : content["uniforms"])
         {
             uniformsMap_[uniform["name"]] = INVALID_UNIFORM_ID;
         }

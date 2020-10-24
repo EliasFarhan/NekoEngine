@@ -26,7 +26,7 @@
 #include <string>
 #include <mathematics/vector.h>
 #include <mathematics/matrix.h>
-#include <graphics/texture.h>
+#include <gl/texture.h>
 #include "gl/shader.h"
 #include "utilities/json_utility.h"
 
