@@ -5,6 +5,7 @@ import sys
 import os
 from shader_validator import validate_shader
 from texture_validator import validate_texture
+from material_validator import validate_material
 from pathlib import Path
 from enum import Enum
 import os.path
@@ -78,7 +79,7 @@ def validate_asset(src="", out=""):
         data_out = out
     meta_content = {}
     asset_type = define_asset_type(data_src)
-
+    # load meta data
     if asset_type != AssetType.UNKNOWN:
         if os.path.isfile(data_out + ".meta"):
             with open(data_out + ".meta", "r") as meta_file:
@@ -88,14 +89,15 @@ def validate_asset(src="", out=""):
         validate_texture(data_src, data_out, meta_content)
     if asset_type == AssetType.VERT_SHADER or asset_type == AssetType.FRAG_SHADER:
         validate_shader(data_src, data_out, meta_content)
-
+    if asset_type == AssetType.MTL:
+        validate_material(data_src, data_out, meta_content)
+    # write new meta content to meta file
     if asset_type != AssetType.UNKNOWN:
         if not os.path.isfile(data_out + ".meta"):
             # We generate the meta file
             meta_content["uuid"] = str(uuid.uuid1())
-        meta_json = json.dumps(meta_content)
         with open(data_out + ".meta", "w") as meta_file:
-            meta_file.write(meta_json)
+            json.dump(meta_content, meta_file, indent=4)
 
 
 if __name__ == "__main__":

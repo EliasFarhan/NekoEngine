@@ -16,7 +16,6 @@ file(GLOB_RECURSE TEXT_FILES
         )
 file(GLOB_RECURSE MODEL_FILES
     "${PROJECT_SOURCE_DIR}/data/*.obj"
-    "${PROJECT_SOURCE_DIR}/data/*.mtl"
     "${PROJECT_SOURCE_DIR}/data/*.fbx"
     )
 file(GLOB_RECURSE SHADER_FILES
@@ -51,7 +50,8 @@ file(GLOB_RECURSE FONT_FILES
         "${PROJECT_SOURCE_DIR}/data/*.ttf"
         )
 file(GLOB_RECURSE MATERIAL_FILES
-        "${PROJECT_SOURCE_DIR}/data/*.mat")
+        "${PROJECT_SOURCE_DIR}/data/*.mat"
+        "${PROJECT_SOURCE_DIR}/data/*.mtl")
 
 
 source_group("Scripts"				FILES ${SCRIPT_FILES})
@@ -85,7 +85,7 @@ foreach(DATA ${DATA_FILES})
             DEPENDS ${DATA}
             DEPENDS
             COMMAND ${CMAKE_COMMAND} -E copy ${DATA} "${PROJECT_BINARY_DIR}/${PATH_NAME}/${FILE_NAME}"
-            COMMAND ${CMAKE_COMMAND} -E env TOKTX_EXE=$<TARGET_FILE:toktx> "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/scripts/validator/asset_validator.py"  "${DATA}" "${DATA_OUTPUT}"
+            COMMAND ${CMAKE_COMMAND} -E env TOKTX_EXE=$<TARGET_FILE:toktx> BINARY_FOLDER=${CMAKE_BINARY_DIR} "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/scripts/validator/asset_validator.py"  "${DATA}" "${DATA_OUTPUT}"
 
     )
     endif()

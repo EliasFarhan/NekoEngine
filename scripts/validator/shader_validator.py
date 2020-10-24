@@ -53,18 +53,46 @@ def validate_shader(data_src, data_out, meta_content):
     meta_content["shader_type"] = shader_type.value
 
     uniforms = []
+    in_attributes = []
+    out_attributes = []
     with open(path, 'r') as shader_file:
         lines = shader_file.readlines()
         for line in lines:
             line = line.replace('\n', '')
             line = line.replace(';', '')
-            if "uniform" in line:
-                uniform = line.split(' ')
+            split_line = line.split(' ')
+            if "uniform" in split_line:
                 uniform_obj = {}
-                uniform_obj["type"] = uniform[1]
-                uniform_obj["name"] = uniform[2]
+                uniform_obj["type"] = split_line[1]
+                uniform_obj["name"] = split_line[2]
                 uniforms.append(uniform_obj)
+            if "in" in split_line:
+                comment_index = len(split_line)
+                if '//' in split_line:
+                    comment_index = split_line.index('//')
+                index = split_line.index('in')
+                if index > comment_index:
+                    continue
+                in_variable = {}
+                in_variable["type"] = split_line[index+1]
+                in_variable["name"] = split_line[index+2]
+                in_attributes.append(in_variable)
+            if "out" in split_line:
+                comment_index = len(split_line)
+                if '//' in split_line:
+                    comment_index = split_line.index('//')
+                index = split_line.index('out')
+                if index > comment_index:
+                    continue
+                index = split_line.index('out')
+                out_variable = {}
+                out_variable["type"] = split_line[index+1]
+                out_variable["name"] = split_line[index+2]
+                out_attributes.append(out_variable)
     meta_content["uniforms"] = uniforms
+    meta_content["in_attributes"] = in_attributes
+    meta_content["out_attributes"] = out_attributes
+
 
 
 
