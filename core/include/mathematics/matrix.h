@@ -497,8 +497,7 @@ inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
 }
 #endif
 
-#if defined(EMSCRIPTEN) || defined(__arm__) || defined(__ANDROID__)
-#pragma message "Compiling GNU extensions Mutliply Intrinsics used in ARM, EMSCRIPTEN and ANDROID"
+#if defined(EMSCRIPTEN) || defined(__arm__) || defined(__ANDROID__) || defined(__aarch64__)
 template<>
 inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept;
 {
