@@ -31,14 +31,13 @@ matrix:
       addons:
         apt:
           packages:
-            - clang-8
-            - libc++8-dev
+            - clang
             - libsdl2-dev
             - python3-dev
             - glslang-tools
             - libzstd-dev
       before_install:
-        - eval "CC=clang-8 && CXX=clang++-8"
+        - eval "CC=clang && CXX=clang++"
       script:
         - mkdir build
         - cd build
