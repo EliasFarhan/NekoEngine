@@ -1,9 +1,5 @@
 sudo: false
 language: cpp
-dist: focal
-
-
-
 
 matrix:
   include:
@@ -20,7 +16,6 @@ matrix:
             - python3-dev
             - glslang-tools
             - libzstd-dev
-
       before_install:
         - eval "CC=clang-8 && CXX=clang++-8"
       script:
@@ -41,7 +36,6 @@ matrix:
             - python3-dev
             - glslang-tools
             - libzstd-dev
-
       before_install:
         - eval "CC=clang-8 && CXX=clang++-8"
       script:
