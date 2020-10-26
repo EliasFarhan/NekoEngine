@@ -1050,6 +1050,7 @@ using EightVec4f = NVec4<float, 8>;
 // NVec4 Implementations
 //-----------------------------------------------------------------------------
 #if defined(__arm__)
+#pragma message "Compiling GNU extensions MagnitudeIntrinsics used in ARM"
 template<>
 inline std::array<float, 4> FourVec4f::MagnitudeIntrinsics() const
 {

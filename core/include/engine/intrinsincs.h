@@ -39,6 +39,7 @@ typedef float v4f __attribute__ ((vector_size (16)));
 #endif
 
 #if defined(__arm__) || defined(__ANDROID__)
+#pragma message "Adding ARM intrinsics GNU attribute"
 typedef float v4f __attribute__ ((vector_size (16)));
 #endif
 

@@ -498,8 +498,9 @@ inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
 #endif
 
 #if defined(EMSCRIPTEN) || defined(__arm__) || defined(__ANDROID__)
+#pragma message "Compiling GNU extensions Mutliply Intrinsics used in ARM, EMSCRIPTEN and ANDROID"
 template<>
-inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
+inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept;
 {
 	std::array<Vec4f, 4> v;
 	v4f c1 = *(v4f*)(&this->columns_[0][0]);
