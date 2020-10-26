@@ -32,6 +32,7 @@ matrix:
         apt:
           packages:
             - clang-8
+            - libc++8-dev
             - libsdl2-dev
             - python3-dev
             - glslang-tools
