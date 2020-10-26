@@ -214,7 +214,7 @@ static void BM_Vec4MagnitudeAoSoA8(benchmark::State& state)
 }
 
 BENCHMARK(BM_Vec4MagnitudeAoSoA8)->Range(fromRange, toRange);
-
+/*
 static void BM_Vec4MagnitudeAoSoA8Intrinsincs(benchmark::State& state)
 {
     std::vector<neko::Vec4f> local_numbers(state.range(0));
@@ -245,7 +245,7 @@ static void BM_Vec4MagnitudeAoSoA8Intrinsincs(benchmark::State& state)
 }
 
 BENCHMARK(BM_Vec4MagnitudeAoSoA8Intrinsincs)->Range(fromRange, toRange);
-
+*/
 int main(int argc, char** argv)
 {
     /*

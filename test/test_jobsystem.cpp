@@ -9,7 +9,7 @@ namespace neko
 
 static void Task(std::atomic<unsigned int>& currentDoneTasks)
 {
-    const auto TASK_WORK_TIME = std::chrono::seconds(1);
+    const auto TASK_WORK_TIME = std::chrono::milliseconds(100);
 
 #ifdef USING_EASY_PROFILER
     EASY_BLOCK("JOBSYSTEM_DO_NOTHING");
