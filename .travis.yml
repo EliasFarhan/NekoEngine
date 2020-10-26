@@ -7,8 +7,9 @@ dist: focal
 
 matrix:
   include:
-    - name: "Linux Clang"
+    - name: "Linux AMD64 Clang"
       os: linux
+      arch: amd64
       dist: focal
       compiler: clang
       addons:
@@ -27,7 +28,28 @@ matrix:
         - cd build
         - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. && make
         - ./test/Neko_TEST
-    - name: "Windows"
+    - name: "Linux ARM64 Clang"
+      os: linux
+      arch: arm64
+      dist: focal
+      compiler: clang
+      addons:
+        apt:
+          packages:
+            - clang-8
+            - libsdl2-dev
+            - python3-dev
+            - glslang-tools
+            - libzstd-dev
+
+      before_install:
+        - eval "CC=clang-8 && CXX=clang++-8"
+      script:
+        - mkdir build
+        - cd build
+        - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. && make
+        - ./test/Neko_TEST
+    - name: "Windows MSVC"
       os: windows
       env:
         - CMAKE_PATH="/c/Program Files/CMake/bin"
