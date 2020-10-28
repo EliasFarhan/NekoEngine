@@ -1,5 +1,6 @@
 sudo: false
 language: cpp
+dist: focal
 
 matrix:
   include:
@@ -21,7 +22,7 @@ matrix:
       script:
         - mkdir build
         - cd build
-        - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. && make
+        - cmake .. && make
         - ./test/Neko_TEST
     - name: "Linux ARM64 Clang"
       os: linux
@@ -45,6 +46,34 @@ matrix:
         - cd build
         - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. && make
         - ./test/Neko_TEST
+    - name: "Emscripten"
+      os: linux
+      arch: amd64
+      dist: focal
+      compiler: clang
+      addons:
+        apt:
+          packages:
+            - python3-dev
+            - glslang-tools
+            - libzstd-dev
+      before_script:
+        - cd externals/KTX-Software
+        - mkdir build && cd build
+        - cmake -DCMAKE_BUILD_TYPE=Release .. && make toktx
+        - export TOKTX_EXE="$PWD/tools/toktx/toktx"
+        - cd ../../..
+        - git clone https://github.com/emscripten-core/emsdk.git
+        - cd emsdk
+        - ./emsdk install latest
+        - ./emsdk activate latest
+        - source ./emsdk_env.sh
+      script:
+        - ls
+        - mkdir build
+        - cd build
+        - emcmake cmake .. || true
+        - emcmake cmake .. && make comp_graph
     - name: "Windows MSVC"
       os: windows
       env:
