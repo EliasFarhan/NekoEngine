@@ -60,7 +60,7 @@ matrix:
       before_script:
         - cd externals/KTX-Software
         - mkdir build && cd build
-        - cmake -DCMAKE_BUILD_TYPE=Release -DKTX_FULL_VERSION="v4.0.0-beta4" .. && make toktx
+        - cmake -DCMAKE_BUILD_TYPE=Release -DKTX_VERSION_FULL="v4.0.0-beta4" .. && make toktx
         - export TOKTX_EXE="$PWD/tools/toktx/toktx"
         - cd ../../..
         - git clone https://github.com/emscripten-core/emsdk.git
