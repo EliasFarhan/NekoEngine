@@ -83,6 +83,17 @@ public:
 
     void SetMat4(std::string_view name, const Mat4f& mat);
     /**
+     * \brief Set the texture for the specified type given
+     * (should be called before the LoadFromFile function)
+     */
+    void SetTexture(std::string_view texturePath, TextureType textureType);
+    /**
+     * \brief Set the texture for the specified type given
+     * (should be called before the LoadFromFile function if material has to load the texture)
+     */
+    void SetTexture(TextureId textureId, TextureType textureType);
+
+    /**
      * \brief Get the uniform location from the uniform name in cache map, otherwise it will get it from OpenGL and
      * put it in the cache
      */
@@ -97,6 +108,17 @@ protected:
     gl::Shader shader_;
     std::map<std::string, UniformId> uniformsMap_;
     std::array<TextureId, size_t(TextureType::LENGTH)> textureIds_;
+    const std::map<TextureType, std::string> textureUniformNames{
+            {TextureType::DIFFUSE, "diffuseMap"},
+            {TextureType::AMBIENT, "ambientMap"},
+            {TextureType::SPECULAR, "specularMap"},
+            {TextureType::ALPHA, "alphaMap"},
+            {TextureType::NORMAL, "normalMap"},
+            {TextureType::ALBEDO, "albedoMap"},
+            {TextureType::METALLIC, "metallicMap"},
+            {TextureType::ROUGHNESS, "roughnessMap"},
+            {TextureType::AO, "aoMap"}
+    };
     Job loadingMaterialContentJob_;
     ResourceJob loadMaterialJsonJob_;
 };

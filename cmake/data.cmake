@@ -77,8 +77,7 @@ foreach(DATA ${DATA_FILES})
         DEPENDS
         COMMAND ${CMAKE_COMMAND} -E copy ${DATA} "${PROJECT_BINARY_DIR}/${PATH_NAME}/${FILE_NAME}"
         COMMAND ${CMAKE_COMMAND} -E env BINARY_FOLDER=${CMAKE_BINARY_DIR}  "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/scripts/validator/asset_validator.py"  "${DATA}" "${DATA_OUTPUT}"
-
-)
+    )
     else()
     add_custom_command(
             OUTPUT ${DATA_OUTPUT}

@@ -31,6 +31,27 @@
 
 namespace neko::gl
 {
+const GLuint INVALID_SHADER = 0;
+/**
+ * Load shader with given shader type
+ * (GL_COMPUTE_SHADER, GL_VERTEX_SHADER, GL_TESS_CONTROL_SHADER,
+ * GL_TESS_EVALUATION_SHADER, GL_GEOMETRY_SHADER or GL_FRAGMENT_SHADER)
+ */
+GLuint LoadShader(const BufferFile& shaderfile, GLenum shaderType);
+GLuint LoadShader(char* shaderContent, GLenum shaderType);
+/**
+ * Link shaders together in a program
+ */
+GLuint CreateShaderProgram(
+        GLuint vertexShader,
+        GLuint fragmentShader,
+        GLuint computeShader = INVALID_SHADER,
+        GLuint geometryShader = INVALID_SHADER,
+        GLuint tesselationControlShader = INVALID_SHADER,
+        GLuint tesselationEvaluationShader = INVALID_SHADER);
+
+void DeleteShader(GLuint shader);
+
 class Shader : public neko::Shader
 {
 public:
@@ -43,7 +64,7 @@ public:
 
     void Destroy() override;
 
-    GLuint GetProgram();
+    GLuint GetProgram() const;
 
     void SetBool(const std::string_view attributeName, bool value) const;
 
