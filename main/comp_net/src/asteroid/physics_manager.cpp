@@ -56,7 +56,7 @@ void PhysicsManager::FixedUpdate(seconds dt)
         if(!entityManager_.get().HasComponent(entity, 
             EntityMask(neko::ComponentType::BODY2D)|EntityMask(neko::ComponentType::BOX_COLLIDER2D)))
             continue;
-        for (Entity otherEntity = 0; otherEntity < entityManager_.get().GetEntitiesSize(); otherEntity++)
+        for (Entity otherEntity = entity; otherEntity < entityManager_.get().GetEntitiesSize(); otherEntity++)
         {
             if(entity == otherEntity)
                 continue;
