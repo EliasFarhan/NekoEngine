@@ -4,6 +4,7 @@ import os.path
 from pathlib import Path
 
 binary_path = os.getenv("BINARY_FOLDER")
+print("Binary path: {}".format(binary_path))
 
 
 def get_texture_id(texture_path):
