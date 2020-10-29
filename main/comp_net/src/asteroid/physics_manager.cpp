@@ -22,6 +22,7 @@
  SOFTWARE.
  */
 #include "asteroid/physics_manager.h"
+#include "asteroid/game.h"
 
 namespace neko::asteroid
 {
@@ -54,14 +55,16 @@ void PhysicsManager::FixedUpdate(seconds dt)
     for (Entity entity = 0; entity < entityManager_.get().GetEntitiesSize(); entity++)
     {
         if(!entityManager_.get().HasComponent(entity, 
-            EntityMask(neko::ComponentType::BODY2D)|EntityMask(neko::ComponentType::BOX_COLLIDER2D)))
+            EntityMask(neko::ComponentType::BODY2D)|EntityMask(neko::ComponentType::BOX_COLLIDER2D)) ||
+            entityManager_.get().HasComponent(entity, EntityMask(neko::asteroid::ComponentType::DESTROYED)))
             continue;
         for (Entity otherEntity = entity; otherEntity < entityManager_.get().GetEntitiesSize(); otherEntity++)
         {
             if(entity == otherEntity)
                 continue;
             if (!entityManager_.get().HasComponent(otherEntity,
-                EntityMask(neko::ComponentType::BODY2D) | EntityMask(neko::ComponentType::BOX_COLLIDER2D)))
+                EntityMask(neko::ComponentType::BODY2D) | EntityMask(neko::ComponentType::BOX_COLLIDER2D)) ||
+                entityManager_.get().HasComponent(entity, EntityMask(neko::asteroid::ComponentType::DESTROYED)))
                 continue;
             const Body& body1 = bodyManager_.GetComponent(entity);
             const Box& box1 = boxManager_.GetComponent(entity);

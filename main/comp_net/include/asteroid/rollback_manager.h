@@ -73,7 +73,10 @@ public:
     [[nodiscard]] const PlayerCharacterManager& GetPlayerCharacterManager() const { return currentPlayerManager_; }
     void SpawnPlayer(net::PlayerNumber playerNumber, Entity entity, Vec2f position, degree_t rotation);
     void SpawnBullet(net::PlayerNumber playerNumber, Entity entity, Vec2f position, Vec2f velocity);
-    void DestroyBullet(Entity entity);
+    /**
+     * \brief This function does not destroy the entity definitely, but puts the DESTROY flag
+     */
+    void DestroyEntity(Entity entity);
 
     void OnCollision(Entity entity1, Entity entity2) override;
 private:
@@ -100,7 +103,6 @@ private:
     std::array<std::uint32_t, maxPlayerNmb> lastReceivedFrame_{};
     std::array<std::array<net::PlayerInput, windowBufferSize>, maxPlayerNmb> inputs_{};
     std::vector<CreatedEntity> createdEntities_;
-    std::vector<DestroyedBullet> destroyedBullets_;
 public:
     [[nodiscard]] const std::array<net::PlayerInput, windowBufferSize>& GetInputs(net::PlayerNumber playerNumber) const
     {
