@@ -9,7 +9,7 @@ class Server : public asteroid::PacketSenderInterface, public SystemInterface
 {
 protected:
     virtual void SpawnNewPlayer(ClientId clientId, PlayerNumber playerNumber) = 0;
-    virtual void ReceivePacket(const asteroid::Packet* packet);
+    virtual void ReceivePacket(std::unique_ptr<asteroid::Packet> packet);
 
     //Server game manager
     asteroid::GameManager gameManager_;

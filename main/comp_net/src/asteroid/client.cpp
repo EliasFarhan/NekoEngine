@@ -83,10 +83,8 @@ void Client::ReceivePacket(const asteroid::Packet* packet)
     }
     case asteroid::PacketType::VALIDATE_STATE:
     {
-
         const auto* validateFramePacket = static_cast<const asteroid::ValidateFramePacket*>(packet);
         const auto newValidateFrame = ConvertFromBinary<Frame>(validateFramePacket->newValidateFrame);
-
         std::array<asteroid::PhysicsState, asteroid::maxPlayerNmb> physicsStates{};
         for (size_t i = 0; i < validateFramePacket->physicsState.size(); i++)
         {

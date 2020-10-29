@@ -16,7 +16,7 @@ public:
     {
         gameManager_.SetWindowSize(windowSize);
     }
-    virtual void ReceivePacket(const asteroid::Packet* packet);
+    virtual void ReceivePacket(const asteroid::Packet *packet);
 protected:
 
     asteroid::ClientGameManager gameManager_;

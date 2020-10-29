@@ -416,12 +416,18 @@ void ClientGameManager::ConfirmValidateFrame(net::Frame newValidateFrame,
 {
     if (newValidateFrame < rollbackManager_.GetLastValidateFrame())
     {
+        logDebug(fmt::format("[Warning] New validate frame is too old"));
         return;
     }
     for (net::PlayerNumber playerNumber = 0; playerNumber < maxPlayerNmb; playerNumber++)
     {
         if (rollbackManager_.GetLastReceivedFrame(playerNumber) < newValidateFrame)
         {
+            logDebug(fmt::format("[Warning] Trying to validate frame {} while playerNumber {} is at input frame {}, client player {}",
+                newValidateFrame,
+                playerNumber + 1,
+                rollbackManager_.GetLastReceivedFrame(playerNumber),
+                GetPlayerNumber()+1));
             return;
         }
     }
