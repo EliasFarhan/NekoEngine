@@ -314,6 +314,8 @@ void RollbackManager::SpawnPlayer(net::PlayerNumber playerNumber, Entity entity,
 
 net::PlayerInput RollbackManager::GetInputAtFrame(net::PlayerNumber playerNumber, net::Frame frame)
 {
+    neko_assert(currentFrame_ - frame <= inputs_[playerNumber].size(), 
+        "Trying to get input too far in the past");
 	return inputs_[playerNumber][currentFrame_ - frame];
 }
 

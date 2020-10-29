@@ -12,7 +12,7 @@ void Client::ReceivePacket(const asteroid::Packet* packet)
     case asteroid::PacketType::SPAWN_PLAYER:
     {
         const auto* spawnPlayerPacket = static_cast<const asteroid::SpawnPlayerPacket*>(packet);
-        const ClientId clientId = ConvertFromBinary<ClientId>(spawnPlayerPacket->clientId);
+        const auto clientId = ConvertFromBinary<ClientId>(spawnPlayerPacket->clientId);
 
         const PlayerNumber playerNumber = spawnPlayerPacket->playerNumber;
         if (clientId == clientId_)
@@ -20,9 +20,8 @@ void Client::ReceivePacket(const asteroid::Packet* packet)
             gameManager_.SetClientPlayer(playerNumber);
         }
 
-        const Vec2f pos = ConvertFromBinary<Vec2f>(spawnPlayerPacket->pos);
-
-        const degree_t rotation = ConvertFromBinary<degree_t>(spawnPlayerPacket->angle);
+        const auto pos = ConvertFromBinary<Vec2f>(spawnPlayerPacket->pos);
+        const auto rotation = ConvertFromBinary<degree_t>(spawnPlayerPacket->angle);
 
         gameManager_.SpawnPlayer(playerNumber, pos, rotation);
         break;

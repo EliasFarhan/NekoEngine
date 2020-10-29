@@ -364,7 +364,7 @@ void ClientGameManager::FixedUpdate()
     //We send the player inputs when the game started
 
     const auto& inputs = rollbackManager_.GetInputs(GetPlayerNumber());
-    std::unique_ptr<asteroid::PlayerInputPacket> playerInputPacket = std::make_unique<asteroid::PlayerInputPacket>();
+    auto playerInputPacket = std::make_unique<PlayerInputPacket>();
     playerInputPacket->playerNumber = GetPlayerNumber();
     playerInputPacket->currentFrame = ConvertToBinary(currentFrame_);
     for (size_t i = 0; i < playerInputPacket->inputs.size(); i++)

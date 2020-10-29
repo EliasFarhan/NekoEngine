@@ -64,8 +64,10 @@ void ServerNetworkManager::SendUnreliablePacket(
 		playerNumber++)
 	{
 		if (clientInfoMap_[playerNumber].udpRemotePort == 0)
+		{
+			logDebug(fmt::format("[Warning] Trying to send UDP packet, but missing port!"));
 			continue;
-
+		}
 
 		sf::Packet sendingPacket;
 		GeneratePacket(sendingPacket, *packet);
@@ -197,7 +199,7 @@ void ServerNetworkManager::SetTcpPort(unsigned short i)
 	tcpPort_ = i;
 }
 
-bool ServerNetworkManager::IsOpen()
+bool ServerNetworkManager::IsOpen() const
 {
 	return status_& OPEN;
 }
@@ -208,8 +210,7 @@ void ServerNetworkManager::SpawnNewPlayer(ClientId clientId, PlayerNumber player
 	for (PlayerNumber p = 0; p <= lastPlayerNumber_; p++)
 	{
 		auto spawnPlayer = std::make_unique<asteroid::SpawnPlayerPacket>();
-		spawnPlayer->packetType = asteroid::PacketType::SPAWN_PLAYER;
-		spawnPlayer->clientId = ConvertToBinary(clientInfoMap_[p].clientId);
+		spawnPlayer->clientId = ConvertToBinary(clientMap_[p]);
 		spawnPlayer->playerNumber = p;
 
 		const auto pos = asteroid::spawnPositions[p] * 3.0f;
@@ -246,8 +247,6 @@ void ServerNetworkManager::ProcessReceivePacket(
 		{
 			playerNumber = std::distance(clientMap_.begin(), it);
 			clientInfoMap_[playerNumber].clientId = clientId;
-			clientInfoMap_[playerNumber].udpRemoteAddress = address;
-			clientInfoMap_[playerNumber].udpRemotePort = port;
 		}
 		else
 		{
@@ -267,19 +266,13 @@ void ServerNetworkManager::ProcessReceivePacket(
 		else
 		{
 			SendReliablePacket(std::move(joinAckPacket));
+			//Calculate time difference
+			const auto clientTime = ConvertFromBinary<unsigned long>(joinPacket->startTime);
+			using namespace std::chrono;
+			const unsigned long deltaTime = (duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count()) - clientTime;
+			logDebug(fmt::format("[Server] Client Server deltaTime: {}", deltaTime));
+			clientInfoMap_[playerNumber].timeDifference = deltaTime;
 		}
-		
-		//Calculate time difference
-		const auto clientTime = ConvertFromBinary<unsigned long>(joinPacket->startTime);
-        using namespace std::chrono;
-		const unsigned long deltaTime = (duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count()) - clientTime;
-		logDebug(fmt::format("Client Server deltaTime: ", deltaTime));
-		clientInfoMap_[lastPlayerNumber_] = {
-			clientId,
-			deltaTime,
-			"",
-			static_cast<unsigned short>(0u) };
-
 		break;
 	}
 	case asteroid::PacketType::INPUT:
@@ -288,7 +281,8 @@ void ServerNetworkManager::ProcessReceivePacket(
 		SendUnreliablePacket(std::move(packet));
 		break;
 	}
-	default:;
+	default:
+		break;
 	}
 }
 
