@@ -103,12 +103,12 @@ void SimulationClient::DrawImGui()
 
 void SimulationClient::SendUnreliablePacket(std::unique_ptr<asteroid::Packet> packet)
 {
-    server_.ReceivePacket(std::move(packet));
+    server_.PutPacketInReceiveQueue(std::move(packet));
 }
 
 void SimulationClient::SendReliablePacket(std::unique_ptr<asteroid::Packet> packet)
 {
-    server_.ReceivePacket(std::move(packet));
+    server_.PutPacketInReceiveQueue(std::move(packet));
 }
 
 }

@@ -74,6 +74,8 @@ public:
     void SpawnPlayer(net::PlayerNumber playerNumber, Entity entity, Vec2f position, degree_t rotation);
 	void SpawnBullet(net::PlayerNumber playerNumber, Entity entity, Vec2f position, Vec2f velocity);
     void DestroyBullet(Entity entity);
+
+	void OnCollision(Entity entity1, Entity entity2) override;
 private:
 	net::PlayerInput GetInputAtFrame(net::PlayerNumber playerNumber, net::Frame frame);
 	GameManager& gameManager_;
@@ -105,6 +107,5 @@ public:
 		return inputs_[playerNumber];
 	}
 
-    void OnCollision(Entity entity1, Entity entity2) override;
 };
 }

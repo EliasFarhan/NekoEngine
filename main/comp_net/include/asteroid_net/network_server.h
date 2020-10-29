@@ -5,6 +5,7 @@
 #include "asteroid/game.h"
 #include "asteroid/packet_type.h"
 #include "asteroid/game_manager.h"
+#include "asteroid/server.h"
 
 namespace neko::net
 {
@@ -17,7 +18,7 @@ struct ClientInfo
 
 
 };
-class ServerNetworkManager : public asteroid::PacketSenderInterface, public SystemInterface
+class ServerNetworkManager : public Server
 {
 public:
     enum class PacketSocketSource
@@ -38,6 +39,8 @@ public:
     void SetTcpPort(unsigned short i);
 
     bool IsOpen();
+protected:
+    void SpawnNewPlayer(ClientId clientId, PlayerNumber playerNumber) override;
 
 private:
     void ProcessReceivePacket(std::unique_ptr<asteroid::Packet> packet, 
@@ -47,6 +50,7 @@ private:
     void ReceivePacket(sf::Packet& packet, PacketSocketSource packetSource,
         sf::IpAddress address = "localhost",
         unsigned short port = 0);
+
     enum ServerStatus
     {
         OPEN = 1u << 0u,
@@ -57,14 +61,12 @@ private:
     sf::TcpListener tcpListener_;
     std::array<sf::TcpSocket, asteroid::maxPlayerNmb> tcpSockets_;
 
-    std::array<ClientInfo, asteroid::maxPlayerNmb> clientMap_{};
-    //Server game manager
-    asteroid::GameManager gameManager_;
+    std::array<ClientInfo, asteroid::maxPlayerNmb> clientInfoMap_{};
+
 
     unsigned short tcpPort_ = 12345;
     unsigned short udpPort_ = 12345;
     Index lastSocketIndex_ = 0;
-    PlayerNumber lastPlayerNumber_ = 0;
     std::uint8_t status_ = 0;
 };
 }

@@ -71,13 +71,13 @@ void PlayerCharacterManager::FixedUpdate(seconds dt)
             playerCharacter.invincibilityTime -= dt.count();
             SetComponent(playerEntity, playerCharacter);
         }
-
+        //Check if cannot shoot, and increase shootingTime
         if(playerCharacter.shootingTime < playerShootingPeriod)
         {
             playerCharacter.shootingTime += dt.count();
             SetComponent(playerEntity, playerCharacter);
         }
-
+        //Shooting mechanism
         if (playerCharacter.shootingTime >= playerShootingPeriod)
         {
             if(input & PlayerInput::SHOOT)

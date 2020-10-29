@@ -113,7 +113,7 @@ void GameManager::DestroyBullet(Entity entity)
     rollbackManager_.DestroyBullet(entity);
 }
 
-net::PlayerNumber GameManager::CheckWinner()
+net::PlayerNumber GameManager::CheckWinner() const
 {
     int alivePlayer = 0;
     net::PlayerNumber winner = net::INVALID_PLAYER;

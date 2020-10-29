@@ -73,7 +73,7 @@ enum class ComponentType : EntityMask
     BULLET = static_cast<EntityMask>(neko::ComponentType::OTHER_TYPE) << 1u,
     ASTEROID = static_cast<EntityMask>(neko::ComponentType::OTHER_TYPE) << 2u,
     PLAYER_INPUT = static_cast<EntityMask>(neko::ComponentType::OTHER_TYPE) << 3u,
-
+    DESTROYED = static_cast<EntityMask>(neko::ComponentType::OTHER_TYPE) << 4u,
 };
 
 namespace PlayerInput

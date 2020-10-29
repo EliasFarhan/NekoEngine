@@ -37,6 +37,7 @@
 
 namespace neko::asteroid
 {
+
 class GameManager : public SystemInterface
 {
 public:
@@ -60,7 +61,7 @@ public:
     void Validate(net::Frame newValidateFrame);
     static constexpr float PixelPerUnit = 100.0f;
 	static constexpr float FixedPeriod = 0.02f; //50fps
-    net::PlayerNumber CheckWinner();
+    net::PlayerNumber CheckWinner() const;
     virtual void WinGame(net::PlayerNumber winner);
 protected:
 	EntityManager entityManager_;
@@ -71,7 +72,8 @@ protected:
 	net::PlayerNumber winner_ = net::INVALID_PLAYER;
 };
 
-class ClientGameManager : public GameManager, public RenderCommandInterface, public DrawImGuiInterface
+class ClientGameManager : public GameManager,
+    public RenderCommandInterface, public DrawImGuiInterface
 {
 public:
     enum State : std::uint32_t

@@ -6,6 +6,7 @@
 
 #include "asteroid/game.h"
 #include "asteroid/game_manager.h"
+#include "asteroid/server.h"
 
 namespace neko::net
 {
@@ -16,7 +17,7 @@ struct DelayPacket
 	std::unique_ptr<asteroid::Packet> packet = nullptr;
 };
 class SimulationClient;
-class SimulationServer : public SystemInterface, public DrawImGuiInterface
+class SimulationServer : public Server, public DrawImGuiInterface
 {
 public:
 	explicit SimulationServer(std::array<std::unique_ptr<SimulationClient>, 2>& clients);
@@ -24,20 +25,18 @@ public:
 	void Update(seconds dt) override;
 	void Destroy() override;
 	void DrawImGui() override;
-    void ReceivePacket(std::unique_ptr<asteroid::Packet> packet);
+    void PutPacketInReceiveQueue(std::unique_ptr<asteroid::Packet> packet);
+	void SendReliablePacket(std::unique_ptr<asteroid::Packet> packet) override;
+	void SendUnreliablePacket(std::unique_ptr<asteroid::Packet> packet) override;
 private:
-    void SendPacket(std::unique_ptr<asteroid::Packet> packet);
+    void PutPacketInSendingQueue(std::unique_ptr<asteroid::Packet> packet);
 	void ProcessReceivePacket(std::unique_ptr<asteroid::Packet> packet);
-
-
+	
+	void SpawnNewPlayer(ClientId clientId, PlayerNumber playerNumber) override;
 
     std::vector<DelayPacket> receivedPackets_;
 	std::vector<DelayPacket> sentPackets_;
 	std::array<std::unique_ptr<SimulationClient>, asteroid::maxPlayerNmb>& clients_;
-    std::array<ClientId, asteroid::maxPlayerNmb> clientMap_{};
-	//Server game manager
-	asteroid::GameManager gameManager_;
-	PlayerNumber lastPlayerNumber_ = 0;
 	
 
 	float avgDelay_ = 0.25f;

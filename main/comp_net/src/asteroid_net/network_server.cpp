@@ -63,14 +63,14 @@ void ServerNetworkManager::SendUnreliablePacket(
 	for (PlayerNumber playerNumber = 0; playerNumber < asteroid::maxPlayerNmb;
 		playerNumber++)
 	{
-		if (clientMap_[playerNumber].udpRemotePort == 0)
+		if (clientInfoMap_[playerNumber].udpRemotePort == 0)
 			continue;
 
 
 		sf::Packet sendingPacket;
 		GeneratePacket(sendingPacket, *packet);
-		const auto status = udpSocket_.send(sendingPacket, clientMap_[playerNumber].udpRemoteAddress,
-			clientMap_[playerNumber].udpRemotePort);
+		const auto status = udpSocket_.send(sendingPacket, clientInfoMap_[playerNumber].udpRemoteAddress,
+			clientInfoMap_[playerNumber].udpRemotePort);
 		switch (status)
 		{
 		case sf::Socket::Done:
@@ -202,12 +202,35 @@ bool ServerNetworkManager::IsOpen()
 	return status_& OPEN;
 }
 
+void ServerNetworkManager::SpawnNewPlayer(ClientId clientId, PlayerNumber playerNumber)
+{
+	//Spawning the new player in the arena
+	for (PlayerNumber p = 0; p <= lastPlayerNumber_; p++)
+	{
+		auto spawnPlayer = std::make_unique<asteroid::SpawnPlayerPacket>();
+		spawnPlayer->packetType = asteroid::PacketType::SPAWN_PLAYER;
+		spawnPlayer->clientId = ConvertToBinary(clientInfoMap_[p].clientId);
+		spawnPlayer->playerNumber = p;
+
+		const auto pos = asteroid::spawnPositions[p] * 3.0f;
+		spawnPlayer->pos = ConvertToBinary(pos);
+
+		const auto rotation = asteroid::spawnRotations[p];
+		spawnPlayer->angle = ConvertToBinary(rotation);
+		gameManager_.SpawnPlayer(p, pos, rotation);
+
+		SendReliablePacket(std::move(spawnPlayer));
+	}
+}
+
+
 void ServerNetworkManager::ProcessReceivePacket(
 	std::unique_ptr<asteroid::Packet> packet,
 	PacketSocketSource packetSource,
 	sf::IpAddress address,
 	unsigned short port)
 {
+	Server::ReceivePacket(packet.get());
 	const auto packetType = static_cast<asteroid::PacketType>(packet->packetType);
 	switch (packetType)
 	{
@@ -217,28 +240,26 @@ void ServerNetworkManager::ProcessReceivePacket(
 		auto clientId = ConvertFromBinary<ClientId>(joinPacket->clientId);
 		logDebug(fmt::format("[Server] Received Join Packet from: {} {}", clientId, 
 			(packetSource == PacketSocketSource::UDP ? fmt::format(" UDP with port: {}", port) : " TCP")));
-		const auto it = std::find_if(clientMap_.begin(), clientMap_.end(),
-			[&clientId](const auto& clientInfo)
-			{
-				return clientInfo.clientId == clientId;
-			});
+		const auto it = std::find(clientMap_.begin(), clientMap_.end(), clientId);
 		PlayerNumber playerNumber;
 		if (it != clientMap_.end())
 		{
 			playerNumber = std::distance(clientMap_.begin(), it);
-			clientMap_[playerNumber].udpRemoteAddress = address;
-			clientMap_[playerNumber].udpRemotePort = port;
+			clientInfoMap_[playerNumber].clientId = clientId;
+			clientInfoMap_[playerNumber].udpRemoteAddress = address;
+			clientInfoMap_[playerNumber].udpRemotePort = port;
 		}
 		else
 		{
-			playerNumber = lastPlayerNumber_;
+		    neko_assert(false, "Player Number is supposed to be already set!")
 		}
+
 		auto joinAckPacket = std::make_unique<asteroid::JoinAckPacket>();
 		joinAckPacket->clientId = ConvertToBinary(clientId);
 		joinAckPacket->udpPort = ConvertToBinary(udpPort_);
 		if (packetSource == PacketSocketSource::UDP)
 		{
-		    auto& clientInfo = clientMap_[playerNumber];
+		    auto& clientInfo = clientInfoMap_[playerNumber];
 			clientInfo.udpRemoteAddress = address;
 			clientInfo.udpRemotePort = port;
 			SendUnreliablePacket(std::move(joinAckPacket));
@@ -247,133 +268,26 @@ void ServerNetworkManager::ProcessReceivePacket(
 		{
 			SendReliablePacket(std::move(joinAckPacket));
 		}
-		if (it != clientMap_.end())
-		{
-			//Player joined twice!
-			return;
-		}
+		
 		//Calculate time difference
 		const auto clientTime = ConvertFromBinary<unsigned long>(joinPacket->startTime);
         using namespace std::chrono;
 		const unsigned long deltaTime = (duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count()) - clientTime;
 		logDebug(fmt::format("Client Server deltaTime: ", deltaTime));
-		clientMap_[lastPlayerNumber_] = {
+		clientInfoMap_[lastPlayerNumber_] = {
 			clientId,
 			deltaTime,
 			"",
 			static_cast<unsigned short>(0u) };
-		//Spawning the new player in the arena
-		for (PlayerNumber p = 0; p <= lastPlayerNumber_; p++)
-		{
-			auto spawnPlayer = std::make_unique<asteroid::SpawnPlayerPacket>();
-			spawnPlayer->packetType = asteroid::PacketType::SPAWN_PLAYER;
-			spawnPlayer->clientId = ConvertToBinary(clientMap_[p].clientId);
-			spawnPlayer->playerNumber = p;
-
-			const auto pos = asteroid::spawnPositions[p] * 3.0f;
-			spawnPlayer->pos = ConvertToBinary(pos);
-
-			const auto rotation = asteroid::spawnRotations[p];
-			spawnPlayer->angle = ConvertToBinary(rotation);
-			gameManager_.SpawnPlayer(p, pos, rotation);
-
-			SendReliablePacket(std::move(spawnPlayer));
-		}
-		
-		lastPlayerNumber_++;
-		//Starting the game when both players are connected
-		if (lastPlayerNumber_ == asteroid::maxPlayerNmb)
-		{
-			auto startGamePacket = std::make_unique<asteroid::StartGamePacket>();
-			startGamePacket->packetType = asteroid::PacketType::START_GAME;
-			using namespace std::chrono;
-			const unsigned long ms = (duration_cast<milliseconds>(
-				system_clock::now().time_since_epoch()
-				) + milliseconds(3000)).count();
-
-			startGamePacket->startTime = ConvertToBinary(ms);
-			SendReliablePacket(std::move(startGamePacket));
-			status_ = status_ | STARTED;
-		}
 
 		break;
 	}
-	case asteroid::PacketType::SPAWN_PLAYER:
-		break;
 	case asteroid::PacketType::INPUT:
 	{
-		//Manage internal state
-		const auto* playerInputPacket = static_cast<const
-			asteroid::PlayerInputPacket*>(packet.get());
-		const auto playerNumber = playerInputPacket->playerNumber;
-		const auto inputFrame = ConvertFromBinary<Frame>(playerInputPacket->currentFrame);
-		for (Frame i = 0; i < playerInputPacket->inputs.size(); i++)
-		{
-			gameManager_.SetPlayerInput(playerNumber,
-				playerInputPacket->inputs[i],
-				inputFrame - i);
-			if (inputFrame - i == 0)
-			{
-				break;
-			}
-		}
 		//Send input packet to everyone
 		SendUnreliablePacket(std::move(packet));
-
-		//Validate new frame if needed
-		Frame lastReceiveFrame = gameManager_.GetRollbackManager().
-			GetLastReceivedFrame(0);
-		for (PlayerNumber i = 1; i < asteroid::maxPlayerNmb; i++)
-		{
-			const auto playerLastFrame = gameManager_.GetRollbackManager().
-				GetLastReceivedFrame(i);
-			if (playerLastFrame < lastReceiveFrame)
-			{
-				lastReceiveFrame = playerLastFrame;
-			}
-		}
-		if (lastReceiveFrame > gameManager_.GetLastValidateFrame())
-		{
-			//Validate frame
-			gameManager_.Validate(lastReceiveFrame);
-
-			auto validatePacket = std::make_unique<asteroid::ValidateFramePacket>();
-			validatePacket->newValidateFrame = ConvertToBinary(lastReceiveFrame);
-			
-			//copy physics state
-			for (PlayerNumber i = 0; i < asteroid::maxPlayerNmb; i++)
-			{
-				auto physicsState = gameManager_.GetRollbackManager().
-					GetValidatePhysicsState(i);
-				const auto* statePtr = reinterpret_cast<const std::uint8_t*>(&
-					physicsState);
-				for (size_t j = 0; j < sizeof(asteroid::PhysicsState); j++)
-				{
-					validatePacket->physicsState[i * sizeof(asteroid::PhysicsState) + j] =
-						statePtr[j];
-				}
-			}
-			SendUnreliablePacket(std::move(validatePacket));
-			const auto winner = gameManager_.CheckWinner();
-			if(winner != INVALID_PLAYER)
-            {
-			    logDebug(fmt::format("Server declares P{} a winner", winner+1));
-			    auto winGamePacket = std::make_unique<asteroid::WinGamePacket>();
-			    winGamePacket->winner = winner;
-			    SendReliablePacket(std::move(winGamePacket));
-			    gameManager_.WinGame(winner);
-				status_ = status_ & ~OPEN; // close the server
-            }
-		}
 		break;
 	}
-
-	case asteroid::PacketType::SPAWN_BULLET:
-		break;
-	case asteroid::PacketType::VALIDATE_STATE:
-		break;
-	case asteroid::PacketType::START_GAME:
-		break;
 	default:;
 	}
 }
