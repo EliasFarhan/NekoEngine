@@ -21,7 +21,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-
+#ifdef NEKO_GLES3
 #include "gl/model.h"
 #include "gl/texture.h"
 
@@ -172,3 +172,4 @@ void Model::Destroy()
 	}
 
 }
+#endif

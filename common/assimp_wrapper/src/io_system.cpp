@@ -30,7 +30,7 @@ namespace neko
 Assimp::IOStream* NekoIOSystem::Open(const char* pFile, [[maybe_unused]] const char* pMode)
 {
     const std::string mode = pMode;
-    if(mode == "r+" or mode == "w" or mode == "w+" or mode == "a" or mode == "a+")
+    if(mode == "r+" || mode == "w" || mode == "w+" || mode == "a" || mode == "a+")
     {
         return nullptr;
     }

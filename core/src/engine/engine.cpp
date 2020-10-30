@@ -200,10 +200,8 @@ void BasicEngine::GenerateUiFrame()
 	ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_FirstUseEver);
 	ImGui::Begin("Neko Window");
 
-	std::ostringstream oss;
-	oss << "App FPS: " << 1.0f / dt_ << '\n'
-		<< '\n';
-	ImGui::Text("%s", oss.str().c_str());
+    const auto fpsText = fmt::format("App FPS: {}", 1.0f / dt_);
+	ImGui::Text("%s", fpsText.c_str());
 	ImGui::End();
 	drawImGuiAction_.Execute();
 }

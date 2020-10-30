@@ -3,7 +3,7 @@
 import json
 import sys
 import os
-from shader_validator import validate_shader
+from shader_validator import validate_glsl_shader
 from texture_validator import validate_texture
 from material_validator import validate_material
 from pathlib import Path
@@ -81,14 +81,17 @@ def validate_asset(src="", out=""):
     asset_type = define_asset_type(data_src)
     # load meta data
     if asset_type != AssetType.UNKNOWN:
-        if os.path.isfile(data_out + ".meta"):
+        if os.path.isfile(data_src + ".meta"):
+            with open(data_src + ".meta", "r") as meta_file:
+                meta_content = json.load(meta_file)
+        elif os.path.isfile(data_out+".meta"):
             with open(data_out + ".meta", "r") as meta_file:
-                meta_content = json.loads(meta_file.read())
+                meta_content = json.load(meta_file)
 
     if asset_type == AssetType.TEXTURE:
         validate_texture(data_src, data_out, meta_content)
     if asset_type == AssetType.VERT_SHADER or asset_type == AssetType.FRAG_SHADER:
-        validate_shader(data_src, data_out, meta_content)
+        validate_glsl_shader(data_src, data_out, meta_content)
     if asset_type == AssetType.MTL:
         validate_material(data_src, data_out, meta_content)
     # write new meta content to meta file

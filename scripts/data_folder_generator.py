@@ -4,6 +4,7 @@ import validator.asset_validator
 import sys
 import os
 import shutil
+from pathlib import Path
 
 
 def iterate_over_folder(path):
@@ -21,13 +22,17 @@ def iterate_over_folder(path):
         elif os.path.isfile(filepath):
             out_file = os.path.join(out_path, filename)
             shutil.copy(filepath, out_file)
-            validator.asset_validator.validate_asset(filepath, out_file)
+            try:
+                validator.asset_validator.validate_asset(filepath, out_file)
+            except SystemExit:
+                pass
 
 
 if __name__ == "__main__":
     if len(sys.argv) >= 3:
         data_dir = sys.argv[1]
         data_out_dir = sys.argv[2]
+        os.environ["BINARY_FOLDER"] = str(Path(data_out_dir))
     else:
         data_dir = "../data/"
         data_out_dir = "../data_out/"

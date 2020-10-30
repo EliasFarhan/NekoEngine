@@ -3,9 +3,6 @@ import os.path
 
 from pathlib import Path
 
-binary_path = os.getenv("BINARY_FOLDER")
-print("Binary path: {}".format(binary_path))
-
 
 def get_texture_id(texture_path):
     # check if texture meta exists
@@ -20,6 +17,8 @@ def get_texture_id(texture_path):
 
 
 def validate_mat_json_file(data_src, data_out, meta_content):
+    binary_path = os.getenv("BINARY_FOLDER")
+    print("Binary path: {}".format(binary_path))
     with open(data_src, 'r') as mat_file:
         mat_content = json.load(mat_file)
         mat_keys = mat_content.keys()
@@ -28,13 +27,16 @@ def validate_mat_json_file(data_src, data_out, meta_content):
         for key in mat_keys:
             # Putting texture uuid
             if "map_path" in key:
+                path = mat_content[key]
                 key_id = key.replace('path', 'id')
                 if key_id not in mat_keys:
-                    id = get_texture_id(os.path.join(os.path.join(binary_path, 'data'), mat_content[key]))
-                    new_content[key_id] = id
+                    if binary_path is not None:
+                        texture_path = os.path.join(binary_path, mat_content[key])
+                        id = get_texture_id(texture_path)
+                        new_content[key_id] = id
             # Loading shader content to material
             if "shader_path" in key:
-                shader_path = os.path.join(os.path.join(binary_path, 'data'), mat_content[key])
+                shader_path = os.path.join(binary_path, mat_content[key])
                 with open(shader_path, 'r') as shader_content:
                     new_key = key.replace('path', 'content')
                     new_content[new_key] = shader_content.read()
@@ -59,9 +61,10 @@ def validate_mat_json_file(data_src, data_out, meta_content):
 
 
 def insert_map_in_mat(map_type, dir_out, texture_name, current_material):
+    binary_path = os.getenv("BINARY_FOLDER")
     texture_path = dir_out.joinpath(Path(texture_name))
     texture_id = get_texture_id(texture_path)
-    current_material[map_type+"_path"] = str(texture_path.relative_to(os.path.join(binary_path, "data")))
+    current_material[map_type+"_path"] = str(texture_path.relative_to(binary_path))
     current_material[map_type+"_id"] = texture_id
 
 

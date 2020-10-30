@@ -3,9 +3,15 @@
 #include <optional>
 
 
+
 #ifdef NEKO_VULKAN
 #include <sdl_engine/sdl_window.h>
 #include <vulkan/vulkan.h>
+#include <utilities/file_utility.h>
+namespace neko {
+struct BufferFile;
+}
+
 namespace neko::sdl
 {
 
@@ -44,7 +50,12 @@ protected:
 	void CreateSwapChain();
 	void CreateImageViews();
 	void CreateGraphicsPipeline();
-	
+	void CreateRenderPass();
+	void CreateFramebuffers();
+	void CreateCommandPool();
+	void CreateCommandBuffers();
+	void CreateDescriptorPool();
+
 	//Vulkan utility methods
 	std::vector<const char*> GetRequiredExtensions();
 	bool CheckValidationLayerSupport() const;
@@ -55,6 +66,7 @@ protected:
 	static VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
 	VkPresentModeKHR ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
 	VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
+	VkShaderModule CreateShaderModule(const BufferFile& shaderFile);
 	//Vulkan members
 	VkInstance instance_;
 	VkPhysicalDevice physicalDevice_ = VK_NULL_HANDLE;
@@ -67,8 +79,13 @@ protected:
 	VkFormat swapChainImageFormat_;
 	VkExtent2D swapChainExtent_;
 	std::vector<VkImageView> swapChainImageViews_;
-
-
+	VkPipelineLayout pipelineLayout_;
+	VkRenderPass renderPass_;
+	VkPipeline graphicsPipeline_;
+	std::vector<VkFramebuffer> swapChainFramebuffers_;
+	VkCommandPool commandPool_;
+	std::vector<VkCommandBuffer> commandBuffers_;
+	VkDescriptorPool descriptorPool_;
 	//Vulkan debug members
 	VkDebugUtilsMessengerEXT debugMessenger_;
 	const std::vector<const char*> validationLayers_ = 
@@ -80,9 +97,10 @@ protected:
 		VK_KHR_SWAPCHAIN_EXTENSION_NAME
 	};
 
-
+	uint32_t imageCount_ = 0;
 #ifdef NEKO_VALIDATION_LAYERS
 	const bool enableValidationLayers = true;
+    
 #else
 	const bool enableValidationLayers = false;
 #endif
