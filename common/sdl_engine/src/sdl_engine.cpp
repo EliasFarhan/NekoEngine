@@ -1,7 +1,7 @@
 /*
  MIT License
 
- Copyright (c) 2017 SAE Institute Switzerland AG
+ Copyright (c) 2020 SAE Institute Switzerland AG
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -28,6 +28,8 @@
 
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
+
+#include <fmt/format.h>
 
 #ifdef NEKO_GLES3
 #include "gl/gles3_window.h"
@@ -58,8 +60,6 @@ void SdlEngine::Init()
 void SdlEngine::Destroy()
 {
     BasicEngine::Destroy();
-    destroyAction_.Execute();
-    window_->Destroy();
 
     // Shutdown SDL 2
     SDL_Quit();
@@ -80,17 +80,18 @@ void SdlEngine::ManageEvent()
             isRunning_ = false;
         }
 
-        auto& config = BasicEngine::GetInstance()->config;
         if (event.type == SDL_WINDOWEVENT)
         {
             if (event.window.event == SDL_WINDOWEVENT_RESIZED)
             {
+                logDebug(fmt::format("Windows resized with new size: ({},{})", 
+                    event.window.data1, event.window.data2));
                 config.windowSize = Vec2u(event.window.data1, event.window.data2);
                 window_->OnResize(config.windowSize);
             }
         }
+        onEventAction_.Execute(event);
     }
-    onEventAction_.Execute(event);
 }
 
 void SdlEngine::GenerateUiFrame()

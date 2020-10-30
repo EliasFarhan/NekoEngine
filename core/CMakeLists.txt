@@ -29,6 +29,7 @@ set(TASKFLOW_DIR ${EXTERNAL_DIR}/taskflow-2.2)
 include_directories(${TASKFLOW_DIR})
 
 add_library(Neko_Core STATIC ${Neko_SRC})
+target_link_libraries(Neko_Core PUBLIC imgui)
 if (APPLE)
     target_link_libraries(Neko_Core PUBLIC ${Boost_LIBRARIES})
 endif(APPLE)
@@ -46,7 +47,7 @@ target_compile_definitions(Neko_Core PUBLIC $<$<CONFIG:Debug>:__neko_dbg__>)
 target_compile_definitions(Neko_Core PUBLIC $<$<CONFIG:RelWithDebInfo>:__neko_dbg__>)
 target_compile_definitions(Neko_Core PUBLIC SOURCE_PATH="${CMAKE_SOURCE_DIR}")
 
-set_target_properties (Neko_Core PROPERTIES FOLDER Neko)
+set_target_properties (Neko_Core PROPERTIES FOLDER Neko/Core)
 
 target_include_directories(Neko_Core PUBLIC "${IMGUI_ROOT}")
 target_include_directories(Neko_Core PUBLIC include/)

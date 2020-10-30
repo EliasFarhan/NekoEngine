@@ -26,9 +26,11 @@
 #include <ostream>
 #include <array>
 #include "mathematics/const.h"
-#include <mathematics/intrinsincs.h>
+#include <engine/intrinsincs.h>
 #include "mathematics/angle.h"
-#include "trigo.h"
+#include "mathematics/trigo.h"
+
+#include <fmt/format.h>
 
 namespace neko
 {
@@ -58,6 +60,12 @@ struct Vec2
             T y; ///< Y coordinate of the vector
 
         };
+        struct
+        {
+            T u; ///< X coordinate of the vector
+            T v; ///< Y coordinate of the vector
+
+        };
         T coord[2];
     };
 
@@ -71,12 +79,12 @@ struct Vec2
     //-----------------------------------------------------------------------------
     // Constructors
     //-----------------------------------------------------------------------------
-    Vec2()
+    Vec2() noexcept
             : x(0), y(0)
     {
     }
 
-    explicit Vec2(T same)
+    explicit Vec2(T same) noexcept
             : x(same), y(same)
     {
     }
@@ -87,21 +95,21 @@ struct Vec2
     }
 
     template<typename U>
-    explicit Vec2(const Vec2<U>& vector)
+    explicit Vec2(const Vec2<U>& vector)  noexcept
             : x(static_cast<T>(vector.x)),
               y(static_cast<T>(vector.y))
     {
     }
 
     template<typename U>
-    explicit Vec2(const Vec3<U>& vec3)
+    explicit Vec2(const Vec3<U>& vec3)  noexcept
             : x(static_cast<T>(vec3.x)),
               y(static_cast<T>(vec3.y))
     {
     }
 
     template<typename U>
-    explicit Vec2(const Vec4<U>& vec4)
+    explicit Vec2(const Vec4<U>& vec4)  noexcept
             : x(static_cast<T>(vec4.x)),
               y(static_cast<T>(vec4.y))
     {
@@ -144,6 +152,11 @@ struct Vec2
         return Vec2<T>(x * rhs.x, y * rhs.y);
     }
 
+    Vec2<T> operator/(const Vec2<T>& rhs) const
+    {
+        return Vec2<T>(x / rhs.x, y / rhs.y);
+    }
+
     Vec2<T>& operator*=(T rhs)
     {
         this->x *= rhs;
@@ -163,14 +176,14 @@ struct Vec2
         return *this;
     }
 
-    bool operator==(const Vec2<T>& right)
+    bool operator==(const Vec2<T>& other) const
     {
-        return x == right.x && y == right.y;
+        return x == other.x && y == other.y;
     }
 
-    bool operator!=(const Vec2<T>& right)
+    bool operator!=(const Vec2<T>& other) const
     {
-        return !(*this == right);
+        return !(*this == other);
     }
 
     const T& operator[](size_t p_axis) const
@@ -189,6 +202,11 @@ struct Vec2
     {
         os << "Vec2(" << dt.x << "," << dt.y << ")";
         return os;
+    }
+
+    std::string ToString() const
+    {
+        return fmt::format("Vec2({},{})", x, y);
     }
 
     //Used to specialize in case of other kind of vector
@@ -318,6 +336,13 @@ public:
             T y; ///< Y coordinate of the vector
             T z;
         };
+        //For color
+        struct
+        {
+            T r; ///< X coordinate of the vector
+            T g; ///< Y coordinate of the vector
+            T b;
+        };
         T coord[3];
     };
 
@@ -333,24 +358,50 @@ public:
     //-----------------------------------------------------------------------------
     // Constructors
     //-----------------------------------------------------------------------------
-    Vec3() : x(0), y(0), z(0)
+    Vec3()  noexcept : x(0), y(0), z(0)
     {
     }
 
-    explicit Vec3(T same)
+    explicit Vec3(T same)  noexcept
             : x(same), y(same), z(same)
     {
 
     }
 
-    Vec3(T X, T Y, T Z)
+    Vec3(T X, T Y, T Z)  noexcept
             : x(X), y(Y), z(Z)
     {
 
     }
 
+	explicit Vec3(Vec2<T> v)  noexcept : x(v.x), y(v.y),z(0)
+    {
+	    
+    }
+    explicit Vec3(Vec2<T> v, T z)  noexcept : x(v.x), y(v.y), z(z)
+    {
+
+    }
+	explicit Vec3(Vec4<T> v)  noexcept : x(v.x), y(v.y), z(v.z)
+    {
+	    
+    }
+    /**
+     * \brief Adding explicit constructor for vector-like type
+     */
+	template<class U>
+	explicit Vec3(U u) noexcept : x(u.x), y(u.y), z(u.z)
+    {
+	    
+    }
+
+	explicit Vec3(const T* ptr) noexcept : x(ptr[0]), y(ptr[1]), z(ptr[2])
+    {
+	    
+    }
+
     template<typename U>
-    explicit Vec3(const Vec2<U>& vec2)
+    explicit Vec3(const Vec2<U>& vec2)  noexcept
             : x(static_cast<T>(vec2.x)),
               y(static_cast<T>(vec2.y)),
               z(static_cast<T>(0))
@@ -360,7 +411,7 @@ public:
 
     template<typename U>
     explicit
-    Vec3(const Vec3<U>& vector)
+    Vec3(const Vec3<U>& vector)  noexcept
             : x(static_cast<T>(vector.x)),
               y(static_cast<T>(vector.y)),
               z(static_cast<T>(vector.z))
@@ -408,6 +459,11 @@ public:
         return Vec3<T>(x - rhs.x, y - rhs.y, z - rhs.z);
     }
 
+	Vec3<T> operator-() const
+    {
+	    return Vec3<T>(-x, -y , -z );
+    }
+
     Vec3<T>& operator-=(const Vec3<T>& rhs)
     {
         this->x -= rhs.x;
@@ -445,14 +501,14 @@ public:
         return *this;
     }
 
-    bool operator==(const Vec3<T>& right) const
+    bool operator==(const Vec3<T>& other) const
     {
-        return x == right.x && y == right.y && z == right.z;
+        return x == other.x && y == other.y && z == other.z;
     }
 
-    bool operator!=(const Vec3<T>& right) const
+    bool operator!=(const Vec3<T>& other) const
     {
-        return !(*this == right);
+        return !(*this == other);
     }
 
     friend std::ostream& operator<<(std::ostream& os, const Vec3<T>& dt)
@@ -460,7 +516,10 @@ public:
         os << "Vec3(" << dt.x << "," << dt.y << "," << dt.z << ")";
         return os;
     }
-
+    std::string ToString()
+    {
+        return fmt::format("Vec3({},{},{})", x, y, z);
+    }
 
     //-----------------------------------------------------------------------------
     // Formulas
@@ -514,6 +573,20 @@ public:
         return inVec - normalized * 2 * Dot(inVec, normalized);
     }
 
+	static Vec3<T> Refract(const Vec3<T>& inVec, const Vec3<T>& normal, const T eta)
+    {
+        Vec3<T> N = normal.Normalized();
+    	const T k = 1 - eta * eta * (1.0 - Dot(N, inVec) * Dot(N, inVec));
+    	if(k < 0)
+    	{
+            return Vec3<T>::zero;
+    	}
+        else
+        {
+	        return eta * inVec - (eta * Dot(N, inVec) + std::sqrt(k)) * N;
+        }
+    }
+
     /// \brief Project v1 on v2 (doesn't need to be normalized).
     /// \param v1 the vector to project.
     /// \param v2 the vector to project on.
@@ -527,6 +600,7 @@ public:
     }
 
     static neko::radian_t AngleBetween(const Vec3& v1, const Vec3& v2);
+
 };
 //-----------------------------------------------------------------------------
 // Vec3 Aliases
@@ -566,6 +640,12 @@ neko::radian_t Vec3<T>::AngleBetween(const Vec3& v1, const Vec3& v2)
     return angle;
 }
 
+template<typename T>
+Vec3<T> operator*(T lhs, const Vec3<T>& rhs)
+{
+    return Vec3<T>(rhs.x * lhs, rhs.y * lhs, rhs.z * lhs);
+}
+
 //-----------------------------------------------------------------------------
 // Vec4
 //-----------------------------------------------------------------------------
@@ -597,13 +677,13 @@ public:
     {
     }
 
-    explicit Vec4(T same)
+    explicit Vec4(T same)  noexcept
             : x(same), y(same), z(same), w(same)
     {
 
     }
 
-    explicit Vec4(std::array<T, 4> v)
+    explicit Vec4(std::array<T, 4> v)  noexcept
     {
         for (int i = 0; i < 4; i++)
         {
@@ -611,14 +691,14 @@ public:
         }
     }
 
-    Vec4(T X, T Y, T Z, T W)
+    Vec4(T X, T Y, T Z, T W)  noexcept
             : x(X), y(Y), z(Z), w(W)
     {
 
     }
 
     template<typename U>
-    explicit Vec4(const Vec2<U>& vec2)
+    explicit Vec4(const Vec2<U>& vec2)  noexcept
             : x(static_cast<T>(vec2.x)),
               y(static_cast<T>(vec2.y)),
               z(static_cast<T>(0)),
@@ -627,7 +707,7 @@ public:
     }
 
     template<typename U>
-    explicit Vec4(const Vec3<U>& vec3)
+    explicit Vec4(const Vec3<U>& vec3)  noexcept
             : x(static_cast<T>(vec3.x)),
               y(static_cast<T>(vec3.y)),
               z(static_cast<T>(vec3.z)),
@@ -636,7 +716,16 @@ public:
     }
 
     template<typename U>
-    explicit Vec4(const Vec4<U>& vector)
+    explicit Vec4(const Vec3<U>& vec3, U w)  noexcept
+            : x(static_cast<T>(vec3.x)),
+              y(static_cast<T>(vec3.y)),
+              z(static_cast<T>(vec3.z)),
+              w(static_cast<T>(w))
+    {
+    }
+
+    template<typename U>
+    explicit Vec4(const Vec4<U>& vector)  noexcept
             : x(static_cast<T>(vector.x)),
               y(static_cast<T>(vector.y)),
               z(static_cast<T>(vector.z)),
@@ -705,14 +794,14 @@ public:
         return *this;
     }
 
-    bool operator==(const Vec4<T>& right) const
+    bool operator==(const Vec4<T>& other) const
     {
-        return x == right.x && y == right.y && z == right.z && w == right.w;
+        return x == other.x && y == other.y && z == other.z && w == other.w;
     }
 
-    bool operator!=(const Vec4<T>& right) const
+    bool operator!=(const Vec4<T>& other) const
     {
-        return !(*this == right);
+        return !(*this == other);
     }
 
     const T& operator[](size_t p_axis) const
@@ -730,6 +819,11 @@ public:
     {
         os << "Vec4(" << dt.x << "," << dt.y << "," << dt.z << "," << dt.w << ")";
         return os;
+    }
+
+    std::string ToString()
+    {
+        return fmt::format("Vec4({},{},{},{})", x, y, z, w);
     }
 
     //-----------------------------------------------------------------------------

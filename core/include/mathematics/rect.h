@@ -2,7 +2,7 @@
 /*
  MIT License
 
- Copyright (c) 2019 SAE Institute Switzerland AG
+ Copyright (c) 2020 SAE Institute Switzerland AG
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -30,10 +30,8 @@ namespace neko
 template<class T = Vec2f>
 struct Rect
 {
-    explicit Rect(T Center, T HalfSize) : center(Center), halfSize(HalfSize)
-    {
-
-    }
+    Rect() : center(T()), halfSize(T()) { }
+    explicit Rect(T Center, T HalfSize) : center(Center), halfSize(HalfSize) { }
 
     template<typename U = float>
     U GetRadius()

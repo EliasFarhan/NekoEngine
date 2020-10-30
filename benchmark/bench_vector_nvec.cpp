@@ -37,7 +37,7 @@ static void BM_SquareMagnitude(benchmark::State& state)
 }
 
 BENCHMARK(BM_SquareMagnitude);
-
+/*
 static void BM_SquareMagnitudeIntrinsics(benchmark::State& state)
 {
     std::array<neko::Vec4f, 8> array;
@@ -54,8 +54,9 @@ static void BM_SquareMagnitudeIntrinsics(benchmark::State& state)
     }
 }
 
-BENCHMARK(BM_SquareMagnitudeIntrinsics);
 
+BENCHMARK(BM_SquareMagnitudeIntrinsics);
+*/
 static void BM_MagnitudeSimple(benchmark::State& state)
 {
     std::array<neko::Vec4f, 8> array;
@@ -92,7 +93,7 @@ static void BM_Magnitude(benchmark::State& state)
 }
 
 BENCHMARK(BM_Magnitude);
-
+/*
 static void BM_MagnitudeIntrinsics(benchmark::State& state)
 {
     std::array<neko::Vec4f, 8> array;
@@ -111,7 +112,7 @@ static void BM_MagnitudeIntrinsics(benchmark::State& state)
 }
 
 BENCHMARK(BM_MagnitudeIntrinsics);
-
+*/
 static void BM_DotSimple(benchmark::State& state)
 {
     std::array<neko::Vec4f, 8> array1;
@@ -160,7 +161,7 @@ static void BM_Dot(benchmark::State& state)
 }
 
 BENCHMARK(BM_Dot);
-
+/*
 static void BM_DotIntrinsics(benchmark::State& state)
 {
     std::array<neko::Vec4f, 8> array1;
@@ -184,7 +185,7 @@ static void BM_DotIntrinsics(benchmark::State& state)
 }
 
 BENCHMARK(BM_DotIntrinsics);
-
+*/
 static void BM_ReflectSimple(benchmark::State& state)
 {
     std::array<neko::Vec3f, 8> array1;
@@ -233,7 +234,7 @@ static void BM_Reflect(benchmark::State& state)
 }
 
 BENCHMARK(BM_Reflect);
-
+/*
 static void BM_ReflectIntrinsics(benchmark::State& state)
 {
     std::array<neko::Vec3f, 8> array1;
@@ -257,5 +258,5 @@ static void BM_ReflectIntrinsics(benchmark::State& state)
 }
 
 BENCHMARK(BM_ReflectIntrinsics);
-
+*/
 BENCHMARK_MAIN();

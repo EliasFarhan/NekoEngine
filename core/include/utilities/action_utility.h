@@ -1,11 +1,8 @@
 #pragma once
-#include <vector>
-#include <functional>
-
 /*
  MIT License
 
- Copyright (c) 2017 SAE Institute Switzerland AG
+ Copyright (c) 2020 SAE Institute Switzerland AG
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +22,8 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
+#include <vector>
+#include <functional>
 
 namespace neko
 {
@@ -33,14 +32,14 @@ template<class ... Ts>
 class Action
 {
 public:
-	Action() = default;
-	virtual ~Action() = default;
+    Action() = default;
+    virtual ~Action() = default;
 
-	void RegisterCallback(const std::function<void(Ts ...)>& callback)
-	{
-		callbacks_.push_back(callback);
-		
-	}
+    void RegisterCallback(const std::function<void(Ts ...)>& callback)
+    {
+	callbacks_.push_back(callback);
+	    
+    }
     /*
     void UnregisterCallback(const std::function<void(Ts ...)>& callback)
     {
@@ -48,13 +47,13 @@ public:
     }
     */
 
-	void Execute(Ts ... args)
+    void Execute(Ts ... args)
+    {
+	for(auto& callback : callbacks_)
 	{
-		for(auto& callback : callbacks_)
-		{
-			callback(args...);
-		}
+	    callback(args...);
 	}
+    }
 
 private:
 	std::vector<std::function<void(Ts...)>> callbacks_;

@@ -20,5 +20,5 @@ int main(int argc, char** argv)
 
     engine.Init();
     engine.EngineLoop();
-    return 0;
+    return EXIT_SUCCESS;
 }

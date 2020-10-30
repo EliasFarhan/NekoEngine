@@ -2,7 +2,7 @@
 /*
  MIT License
 
- Copyright (c) 2017 SAE Institute Switzerland AG
+ Copyright (c) 2020 SAE Institute Switzerland AG
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -24,12 +24,20 @@
  */
 #include "engine/system.h"
 #include "mathematics/vector.h"
+#include "engine/jobsystem.h"
 
 namespace neko
 {
 class Window : public SystemInterface
 {
 public:
+    Window() : swapBufferJob_([this]
+    {
+        SwapBuffer();
+    })
+    {
+	    
+    }
     virtual void GenerateUiFrame() = 0;
     /**
      * \brief Called at the end of a graphics frame to switch the double
@@ -40,11 +48,16 @@ public:
      */
     virtual void RenderUi() = 0;
     virtual void OnResize(Vec2u newWindowSize) = 0;
-    /**
-     * \brief Called by a render thread to take ownership of the context, typically used in OpenGL
-     */
 
-    virtual void MakeCurrentContext() {};
-    virtual void LeaveCurrentContext() {};
+    Job* GetSwapBufferJob() { return &swapBufferJob_; }
+
+    void ResetJobs() { swapBufferJob_.Reset(); }
+
+    virtual void BeforeRenderLoop() {}
+    virtual void AfterRenderLoop() {}
+protected:
+    Job swapBufferJob_;
 };
+
+
 }

@@ -16,11 +16,16 @@ file(GLOB_RECURSE TEXT_FILES
         )
 file(GLOB_RECURSE MODEL_FILES
     "${PROJECT_SOURCE_DIR}/data/*.obj"
-    "${PROJECT_SOURCE_DIR}/data/*.mtl"
+    "${PROJECT_SOURCE_DIR}/data/*.fbx"
     )
 file(GLOB_RECURSE SHADER_FILES
         "${PROJECT_SOURCE_DIR}/data/*.vert"
         "${PROJECT_SOURCE_DIR}/data/*.frag"
+        "${PROJECT_SOURCE_DIR}/data/*.glsl"
+        "${PROJECT_SOURCE_DIR}/data/*.geom"
+        "${PROJECT_SOURCE_DIR}/data/*.comp"
+        "${PROJECT_SOURCE_DIR}/data/*.tesc"
+        "${PROJECT_SOURCE_DIR}/data/*.tese"
         )
 file(GLOB_RECURSE IMG_FILES
         "${PROJECT_SOURCE_DIR}/data/*.jpg"
@@ -33,21 +38,31 @@ file(GLOB_RECURSE IMG_FILES
         "${PROJECT_SOURCE_DIR}/data/*.psd"
         "${PROJECT_SOURCE_DIR}/data/*.hdr"
         "${PROJECT_SOURCE_DIR}/data/*.pic"
+        "${PROJECT_SOURCE_DIR}/data/*.dds"
+        "${PROJECT_SOURCE_DIR}/data/*.ktx"
         )
 file(GLOB_RECURSE SND_FILES
         "${PROJECT_SOURCE_DIR}/data/*.wav"
         "${PROJECT_SOURCE_DIR}/data/*.ogg"
         )
 
+file(GLOB_RECURSE FONT_FILES
+        "${PROJECT_SOURCE_DIR}/data/*.ttf"
+        )
+file(GLOB_RECURSE MATERIAL_FILES
+        "${PROJECT_SOURCE_DIR}/data/*.mat"
+        "${PROJECT_SOURCE_DIR}/data/*.mtl")
+
 
 source_group("Scripts"				FILES ${SCRIPT_FILES})
-source_group("Shader" FILES ${SHADER_FILES})
-source_group("Data\\Text"           FILES ${TEXT_FILES})
-source_group("Data\\Img"            FILES ${IMG_FILES})
-source_group("Data\\Snd"			FILES ${SND_FILES})
-source_group("Data\\Shaders"		FILES ${SHADER_FILES})
-source_group("DATA\\Model" FILES ${MODEL_FILES})
-LIST(APPEND DATA_FILES ${IMG_FILES} ${MODEL_FILES} ${SND_FILES} ${TEXT_FILES} ${SHADER_FILES})
+source_group("Data/Font"           FILES ${FONT_FILES})
+source_group("Data/Text"           FILES ${TEXT_FILES})
+source_group("Data/Img"            FILES ${IMG_FILES})
+source_group("Data/Snd"			FILES ${SND_FILES})
+source_group("Shaders"		FILES ${SHADER_FILES})
+source_group("Data/Model" FILES ${MODEL_FILES})
+source_group("Data/Materials" FILES ${MATERIALS_FILES})
+LIST(APPEND DATA_FILES ${IMG_FILES} ${MODEL_FILES} ${SND_FILES} ${TEXT_FILES} ${SHADER_FILES} ${MATERIAL_FILES} ${FONT_FILES})
 
 foreach(DATA ${DATA_FILES})
     get_filename_component(FILE_NAME ${DATA} NAME)
@@ -55,22 +70,35 @@ foreach(DATA ${DATA_FILES})
     get_filename_component(EXTENSION ${DATA} EXT)
     file(RELATIVE_PATH PATH_NAME "${PROJECT_SOURCE_DIR}" ${PATH_NAME})
     set(DATA_OUTPUT "${PROJECT_BINARY_DIR}/${PATH_NAME}/${FILE_NAME}")
-
+    if(Emscripten)
+    add_custom_command(
+        OUTPUT ${DATA_OUTPUT}
+        DEPENDS ${DATA}
+        DEPENDS
+        COMMAND ${CMAKE_COMMAND} -E copy ${DATA} "${PROJECT_BINARY_DIR}/${PATH_NAME}/${FILE_NAME}"
+        COMMAND ${CMAKE_COMMAND} -E env BINARY_FOLDER=${CMAKE_BINARY_DIR}  "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/scripts/validator/asset_validator.py"  "${DATA}" "${DATA_OUTPUT}"
+    )
+    else()
     add_custom_command(
             OUTPUT ${DATA_OUTPUT}
             DEPENDS ${DATA}
-            DEPENDS 
-            COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/scripts/validator/asset_validator.py"  "${DATA}" "${DATA_OUTPUT}"
+            DEPENDS
             COMMAND ${CMAKE_COMMAND} -E copy ${DATA} "${PROJECT_BINARY_DIR}/${PATH_NAME}/${FILE_NAME}"
+            COMMAND ${CMAKE_COMMAND} -E env TOKTX_EXE=$<TARGET_FILE:toktx> BINARY_FOLDER=${CMAKE_BINARY_DIR} "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/scripts/validator/asset_validator.py"  "${DATA}" "${DATA_OUTPUT}"
+
     )
+    endif()
     list(APPEND DATA_BINARY_FILES ${DATA_OUTPUT})
 endforeach(DATA)
 
 add_custom_target(
         DataTarget
         DEPENDS ${DATA_BINARY_FILES} ${DATA_FILES})
-
-set_target_properties (DataTarget PROPERTIES FOLDER Neko)
+if(Neko_KTX AND NOT Emscripten) 
+    add_dependencies(DataTarget mkvk)
+    add_dependencies(DataTarget toktx)
+endif()
+set_target_properties (DataTarget PROPERTIES FOLDER Neko/Core)
 
 if(MSVC)
     if (${CMAKE_HOST_SYSTEM_PROCESSOR} STREQUAL "AMD64")

@@ -1,10 +1,8 @@
 #pragma once
-
-
 /*
  MIT License
 
- Copyright (c) 2017 SAE Institute Switzerland AG
+ Copyright (c) 2020 SAE Institute Switzerland AG
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -61,61 +59,131 @@ struct Component
     ComponentType componentType = ComponentType::EMPTY;
 };
 
-template<typename T, ComponentType componentType>
+/**
+ * \brief The Component Manager connects data to entity
+ */
+
+template<typename T, EntityMask componentType>
 class ComponentManager
 {
 public:
     explicit ComponentManager(EntityManager& entityManager) :
         entityManager_(entityManager)
     {
-		entityManager_.RegisterComponentManager(*this);
+		entityManager_.get().RegisterComponentManager(*this);
         ResizeIfNecessary(components_, INIT_ENTITY_NMB - 1, T{});
     }
 
     virtual ~ComponentManager()
     {};
 
-    virtual Index AddComponent(Entity entity);
-
+    /**
+     * \brief Add the component type to the entity manager (Warning! it does not set a default value for the component) 
+     */
+    virtual void AddComponent(Entity entity);
+    /**
+     * \brief Remove the component type to the entity manager
+     */
     virtual void DestroyComponent(Entity entity);
+    /**
+     * Copy the value component to the component manager (Warning! it does not register the component type to the entity manager)
+     */
+    virtual void SetComponent(Entity entity, const T& component);
 
-	virtual void SetComponent(Entity entity, const T& component);
-
-    const T& GetComponent(Entity entity) const
+    [[nodiscard]] const T& GetComponent(Entity entity) const
     { return components_[entity]; }
 
 
-    const T* GetComponentPtr(Entity entity) const
+    [[nodiscard]] const T* GetComponentPtr(Entity entity) const
     { return &components_[entity]; }
 
 
-    const std::vector<T>& GetComponentsVector() const
+    [[nodiscard]] const std::vector<T>& GetComponentsVector() const
     { return components_; }
 
-    virtual void UpdateComponent([[maybe_unused]]Entity entity){};
+    virtual void UpdateDirtyComponent([[maybe_unused]]Entity entity){};
 protected:
     std::vector<T> components_;
-    EntityManager& entityManager_;
+    std::reference_wrapper<EntityManager> entityManager_;
 };
 
-template<typename T, ComponentType componentType>
-Index ComponentManager<T, componentType>::AddComponent(Entity entity)
+template<typename T, EntityMask componentType>
+void ComponentManager<T, componentType>::AddComponent(Entity entity)
 {
     ResizeIfNecessary(components_, entity, T{});
-    entityManager_.AddComponentType(entity, static_cast<EntityMask>(componentType));
-    return entity;
+    entityManager_.get().AddComponentType(entity, componentType);
 }
 
-template<typename T, ComponentType componentType>
+template<typename T, EntityMask componentType>
 void ComponentManager<T, componentType>::DestroyComponent(Entity entity)
 {
-    entityManager_.RemoveComponentType(entity, static_cast<EntityMask>(componentType));
+    entityManager_.get().RemoveComponentType(entity, static_cast<EntityMask>(componentType));
 }
 
-template <typename T, ComponentType componentType>
+template <typename T, EntityMask componentType>
 void ComponentManager<T, componentType>::SetComponent(Entity entity, const T& component)
 {
 	components_[entity] = component;
-	entityManager_.AddDirtyEntity(entity);
 }
+
+
+/**
+ * \brief Sync Buffers is typically called on the render thread before the Main thread update and rendering
+ */
+class SyncBuffersInterface
+{
+public:
+    virtual ~SyncBuffersInterface() = default;
+    virtual void SyncBuffers() = 0;
+};
+/**
+ * \brief Double Buffer Component Manager allows for component to be share between two threads by
+ * using two buffers instead of one. It can be used for example for component that are modified by the
+ * main thread and rendered by the render thread.
+ */
+template<typename  T, EntityMask  componentType>
+class DoubleBufferComponentManager :
+	public ComponentManager<T, componentType>,
+    public SyncBuffersInterface
+{
+public:
+	explicit DoubleBufferComponentManager(EntityManager& entityManager):
+		ComponentManager<T, componentType>(entityManager)
+	{
+	}
+
+	[[nodiscard]] const T& GetCurrentComponent(Entity entity) const
+    {
+        return currentComponents_[entity];
+    }
+
+
+    [[nodiscard]] const T* GetCurrentComponentPtr(Entity entity) const
+    {
+        return &currentComponents_[entity];
+    }
+
+
+    [[nodiscard]] const std::vector<T>& GetCurrentComponentsVector() const
+    {
+        return currentComponents_;
+    }
+
+	void SyncBuffers() override
+	{
+        const auto newSize = this->components_.size();
+        ResizeIfNecessary(currentComponents_, newSize - 1, {});
+		for(size_t i = 0; i < newSize; i++)
+		{
+			if(this->entityManager_.get().HasComponent(i, EntityMask(componentType)))
+			{
+                currentComponents_[i] = this->components_[i];
+			}
+		}
+        std::swap(this->components_, currentComponents_);
+	}
+	
+protected:
+    std::vector<T> currentComponents_;
+};
 }

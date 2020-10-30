@@ -37,8 +37,6 @@ def plot(bench_dict):
     plt.show()
 
 
-
-
 # read and parse the data from json
 # plot them to matplotlib
 def main():

@@ -1,9 +1,8 @@
 #pragma once
-
 /*
  MIT License
 
- Copyright (c) 2017 SAE Institute Switzerland AG
+ Copyright (c) 2020 SAE Institute Switzerland AG
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -28,6 +27,7 @@
 #include <engine/entity.h>
 #include <mathematics/matrix.h>
 #include "engine/component.h"
+#include "graphics/graphics.h"
 #include "mathematics/vector.h"
 #include "mathematics/quaternion.h"
 
@@ -35,60 +35,121 @@ namespace neko
 {
 
 
-class Position2dManager : public ComponentManager<Vec2f, ComponentType::POSITION2D>
+class Position2dManager : public ComponentManager<Vec2f, EntityMask(ComponentType::POSITION2D)>
 {
+    using ComponentManager::ComponentManager;
 };
 
-class Scale2dManager : public ComponentManager<Vec2f, ComponentType::SCALE2D>
+class Scale2dManager : public ComponentManager<Vec2f, EntityMask(ComponentType::SCALE2D)>
 {
 public:
     using ComponentManager::ComponentManager;
-    Index AddComponent(Entity entity) override;
+    void AddComponent(Entity entity) override;
 
 };
 
-class Rotation2dManager : public ComponentManager<float, ComponentType::ROTATION2D>
+class Rotation2dManager : public ComponentManager<degree_t, EntityMask(ComponentType::ROTATION2D)>
 {
-
+    using ComponentManager::ComponentManager;
 };
 
 
-class Position3dManager : public ComponentManager<Vec3f, ComponentType::POSITION3D>
+class Position3dManager : public ComponentManager<Vec3f, EntityMask(ComponentType::POSITION3D)>
 {
-
+    using ComponentManager::ComponentManager;
 };
 
 
-class Rotation3dManager : public ComponentManager<Quaternion, ComponentType::ROTATION3D>
+class Rotation3dManager : public ComponentManager<EulerAngles, EntityMask(ComponentType::ROTATION3D)>
 {
-
+    using ComponentManager::ComponentManager;
 };
 
-class Scale3dManager : public ComponentManager<Vec3f, ComponentType::SCALE3D>
+class Scale3dManager : public ComponentManager<Vec3f, EntityMask(ComponentType::SCALE3D)>
 {
 public:
     using ComponentManager::ComponentManager;
-    Index AddComponent(Entity entity) override;
+    void AddComponent(Entity entity) override;
 
 };
 
-class Transform2dManager : public ComponentManager<Mat3f, ComponentType::TRANSFORM2D>
+class TransformManagerInterface :
+        public OnChangeParentInterface
 {
 public:
+    virtual void UpdateDirtyComponent(Entity entity) = 0;
+    virtual void Update() = 0;
 protected:
-
+    virtual void UpdateTransform(Entity entity) = 0;
 };
 
-class Transform3dManager : public ComponentManager<Mat4f, ComponentType::TRANSFORM3D>
+class Transform2dManager :
+        public ComponentManager<Mat4f, EntityMask(ComponentType::TRANSFORM2D)>,
+        public TransformManagerInterface
 {
 public:
-	using ComponentManager::ComponentManager;
-	void UpdateTransform(Entity entity);
+    explicit Transform2dManager(EntityManager& entityManager);
+    void SetPosition(Entity entity, Vec2f position);
+    void SetScale(Entity entity, Vec2f scale);
+    void SetRotation(Entity entity, degree_t angles);
+    [[nodiscard]] Vec2f GetPosition(Entity entity) const;
+    [[nodiscard]] Vec2f GetScale(Entity entity) const;
+    [[nodiscard]] degree_t GetRotation(Entity entity) const;
+    void OnChangeParent(Entity entity, Entity newParent, Entity oldParent) override;
+    void UpdateDirtyComponent(Entity entity) override;
+    void Update() override;
+    void AddComponent(Entity entity) override;
 protected:
+    void UpdateTransform(Entity entity) override;
+
+    Position2dManager positionManager_;
+    Scale2dManager scaleManager_;
+    Rotation2dManager rotationManager_;
+    DirtyManager dirtyManager_;
+};
+
+class Transform3dManager :
+        public DoubleBufferComponentManager<Mat4f, EntityMask(ComponentType::TRANSFORM3D)>,
+        public TransformManagerInterface
+
+{
+public:
+    explicit Transform3dManager(EntityManager& entityManager);
+    void Init();
+    void SetPosition(Entity entity, Vec3f position);
+    void SetScale(Entity entity, Vec3f scale);
+    void SetRotation(Entity entity, EulerAngles angles);
+    [[nodiscard]]Vec3f GetPosition(Entity entity) const;
+    [[nodiscard]] Vec3f GetScale(Entity entity) const;
+    [[nodiscard]] EulerAngles GetAngles(Entity entity) const;
+    void OnChangeParent(Entity entity, Entity newParent, Entity oldParent) override;
+	/**
+	 * \brief This function is called by the Dirty Manager
+	 */
+    void UpdateDirtyComponent(Entity entity) override;
+    void Update() override;
+    void AddComponent(Entity entity) override;
+protected:
+
+    void UpdateTransform(Entity entity) override;
     Position3dManager position3DManager_;
     Scale3dManager scale3DManager_;
     Rotation3dManager rotation3DManager_;
+    DirtyManager dirtyManager_;
 };
+
+class Transform3dViewer : public DrawImGuiInterface
+{
+public:
+    explicit Transform3dViewer(EntityManager& entityManager, Transform3dManager& transform3dManager);
+	void DrawImGui() override;
+    void SetSelectedEntity(Entity selectedEntity) { selectedEntity_ = selectedEntity; };
+protected:
+    Entity selectedEntity_ = INVALID_ENTITY;
+    EntityManager& entityManager_;
+    Transform3dManager& transform3dManager_;
+};
+
 
 
 

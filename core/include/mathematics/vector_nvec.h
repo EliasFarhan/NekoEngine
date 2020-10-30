@@ -24,7 +24,7 @@
  */
 
 #include <mathematics/vector.h>
-#include "mathematics/intrinsincs.h"
+#include "engine/intrinsincs.h"
 namespace neko
 {
 //-----------------------------------------------------------------------------
@@ -1049,6 +1049,33 @@ using EightVec4f = NVec4<float, 8>;
 //-----------------------------------------------------------------------------
 // NVec4 Implementations
 //-----------------------------------------------------------------------------
+#if defined(__arm__) || defined(__aarch64__)
+template<>
+inline std::array<float, 4> FourVec4f::MagnitudeIntrinsics() const
+{
+    alignas(4 * sizeof(float))
+    std::array<float, 4> result;
+    v4f x = *(v4f*)(xs.data());
+    v4f y = *(v4f*)(ys.data());
+    v4f z = *(v4f*)(zs.data());
+    v4f w = *(v4f*)(ws.data());
+
+    x = x*x;
+    y = y*y;
+    z = z*z;
+    w = w*w;
+
+    x = x+y;
+    z = z+w;
+    x = x+z;
+    for(int i = 0; i < 4; i++)
+    {
+        x[i] = std::sqrt(x[i]);
+    }
+    *(v4f*)(result.data()) = x; 
+    return result;
+}
+#endif
 #ifdef __SSE__
 template <>
 inline std::array<float, 4> FourVec4f::DotIntrinsics(FourVec4f v1, FourVec4f v2)

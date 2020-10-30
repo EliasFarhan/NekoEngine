@@ -1,9 +1,8 @@
 #pragma once
-
 /*
  MIT License
 
- Copyright (c) 2017 SAE Institute Switzerland AG
+ Copyright (c) 2020 SAE Institute Switzerland AG
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -30,19 +29,51 @@
 #include <string_view>
 #include <fstream>
 
+#include "engine/jobsystem.h"
+
+
+#if defined(__ANDROID__)
+#include <jni.h>
+extern "C"
+{
+JNIEXPORT void JNICALL
+Java_swiss_sae_gpr5300_MainActivity_load(JNIEnv *env, [[maybe_unused]] jclass clazz, jobject mgr);
+}
+#endif
 
 namespace neko
 {
+/**
+ * \brief Non RAII structure, please Destroy it
+ */
+struct BufferFile
+{
+    BufferFile() = default;
+    ~BufferFile();
+    BufferFile(BufferFile&& bufferFile) noexcept;
+    BufferFile& operator=(BufferFile&& bufferFile) noexcept;
+    BufferFile(const BufferFile&) = delete;
+    BufferFile& operator= (const BufferFile&) = delete;
 
-	struct BufferFile
-	{
-        char* dataBuffer = nullptr;
-        size_t dataLength = 0;
+    unsigned char* dataBuffer = nullptr;
+    size_t dataLength = 0;
 
-        void Load(std::string_view path);
-        void Destroy();
-		
-	};
+    void Load(std::string_view path);
+    void Destroy();
+
+};
+class ResourceJob : public Job
+{
+public:
+    ResourceJob();
+    void SetFilePath(std::string_view path);
+    std::string GetFilePath() const {return filePath_; }
+    const BufferFile& GetBufferFile() const {return bufferFile_;}
+    void Reset() override;
+private:
+    std::string filePath_;
+    BufferFile bufferFile_;
+};
 
 bool FileExists(const std::string_view filename);
 
@@ -52,7 +83,7 @@ bool IsDirectory(const std::string_view filename);
 
 void IterateDirectory(const std::string_view dirname, std::function<void(const std::string_view)> func, bool recursive=false);
 
-	size_t CalculateFileSize(const std::string& filename);
+size_t CalculateFileSize(const std::string& filename);
 
 std::string GetCurrentPath();
 

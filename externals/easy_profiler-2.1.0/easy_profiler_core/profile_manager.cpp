@@ -73,9 +73,9 @@
 # include <mach/clock.h>
 # include <mach/mach.h>
 #endif
-
 #if EASY_OPTION_LOG_ENABLED != 0
-# include <iostream>
+
+#include <iostream>
 
 # ifndef EASY_ERRORLOG
 #  define EASY_ERRORLOG std::cerr

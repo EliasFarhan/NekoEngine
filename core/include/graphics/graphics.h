@@ -1,9 +1,8 @@
 #pragma once
-
 /*
  MIT License
 
- Copyright (c) 2017 SAE Institute Switzerland AG
+ Copyright (c) 2020 SAE Institute Switzerland AG
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -28,15 +27,18 @@
 #include <array>
 #include <vector>
 #include <thread>
-#include <atomic>
 #include <utilities/service_locator.h>
 
 #include "engine/system.h"
 #include "engine/log.h"
+#include "engine/jobsystem.h"
+#include "utilities/action_utility.h"
 
 namespace neko
 {
-class Window;
+class SyncBuffersInterface;
+class Job;
+	class Window;
 const size_t MAX_COMMAND_NMB = 8'192;
 
 
@@ -60,10 +62,13 @@ class RenderProgram : public RenderCommandInterface, public SystemInterface
 {
 };
 
+
 class RendererInterface
 {
 public:
     virtual void Render(RenderCommandInterface* command) = 0;
+    virtual void AddPreRenderJob(Job* job) = 0;
+    virtual void RegisterSyncBuffersFunction(SyncBuffersInterface* syncBuffersInterface) = 0;
 };
 
 class NullRenderer final : public RendererInterface
@@ -71,6 +76,9 @@ class NullRenderer final : public RendererInterface
 public:
     void Render([[maybe_unused]]RenderCommandInterface* command) override
     {};
+	void AddPreRenderJob([[maybe_unused]] Job* job) override {}
+    void RegisterSyncBuffersFunction([[maybe_unused]] SyncBuffersInterface* syncBuffersInterface) override {}
+
 };
 
 class Renderer : public RendererInterface
@@ -90,44 +98,55 @@ public:
 
     /**
      * \brief Send the RenderCommand to the queue for next frame
-     * @param command
      */
     void Render(RenderCommandInterface* command) override;
 
-    /**
-     * \brief Called from Engine Loop to sync with the Render Loop
-     */
-    void Sync();
 
-    virtual void Update();
-    void RenderLoop();
 
     void Destroy();
 
     void SetFlag(RendererFlag flag);
+    std::uint8_t GetFlag() const;
     void SetWindow(Window* window);
-    float GetDeltaTime() const { return dt_; }
-protected:
+
+	void AddPreRenderJob(Job* job) override;
+
     virtual void ClearScreen() = 0;
 
-    virtual void RenderAll();
 
+    void ResetJobs();
+    Job* GetSyncJob() { return &syncJob_; }
+    Job* GetRenderAllJob() { return &renderAllJob_; }
+    void ScheduleJobs();
+    void RegisterSyncBuffersFunction([[maybe_unused]] SyncBuffersInterface* syncBuffersInterface) override;
+protected:
+    /**
+	 * \brief Called from Engine Loop to sync with the Render Loop
+	 */
+    void SyncBuffers();
+	/**
+	 * \brief Run the first job in the queue
+	 */
+    void PreRender();
+    virtual void RenderAll();
     virtual void BeforeRenderLoop();
+
     virtual void AfterRenderLoop();
 
+    Action<> syncBuffersAction_;
+	
+    Job renderAllJob_;
+    Job syncJob_{ [this] {SyncBuffers(); } };
+
+    std::mutex preRenderJobsMutex_;
+    std::vector<Job*> preRenderJobs_;
+
+
     Window* window_ = nullptr;
-    std::thread renderThread_;
 
-    //Used to synchronize the EngineLoop with the RenderLoop
-#ifndef EMSCRIPTEN
-    std::mutex renderMutex_;
-
-    std::condition_variable cv_;
-#endif
-
-    std::atomic<std::uint8_t> flags_{IS_RENDERING_UI};
-    std::atomic<float> dt_{0.0f};
-
+    mutable std::mutex statusMutex_;
+    std::uint8_t flags_{IS_RENDERING_UI};
+	
     std::vector<RenderCommandInterface*> currentCommandBuffer_ = {};
     std::vector<RenderCommandInterface*> nextCommandBuffer_ = {};
 };

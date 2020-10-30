@@ -4,8 +4,6 @@ set_target_properties (benchmark benchmark_main PROPERTIES
 
 SET(BENCH_DIR ${CMAKE_SOURCE_DIR}/benchmark)
 file(GLOB BENCH_FILES ${BENCH_DIR}/*.cpp)
-neko_lib_config(benchmark)
-neko_lib_config(benchmark_main)
 include_directories("include/")
 foreach(bench_file ${BENCH_FILES} )
     # I used a simple string replace, to cut off .cpp.
@@ -21,7 +19,7 @@ foreach(bench_file ${BENCH_FILES} )
         set_property(TARGET ${bench_name} APPEND_STRING PROPERTY COMPILE_FLAGS " -fno-omit-frame-pointer -save-temps ")
     ENDIF(MSVC)
     set_target_properties (${bench_name} PROPERTIES
-            FOLDER Benchmark)
+            FOLDER Neko/Benchmark)
     IF(APPLE)
         set_target_properties(${bench_name} PROPERTIES
                 RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}

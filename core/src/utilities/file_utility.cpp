@@ -1,7 +1,7 @@
 /*
  MIT License
 
- Copyright (c) 2019 SAE Institute Switzerland AG
+ Copyright (c) 2020 SAE Institute Switzerland AG
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,15 @@
 #include <functional>
 #include "engine/log.h"
 
+#include <fmt/format.h>
+
+
+#ifdef EASY_PROFILE_USE
+#include "easy/profiler.h"
+#endif
+
 #if defined(__ANDROID__)
+#include <jni.h>
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>
 
@@ -34,14 +42,23 @@
 static AAssetManager* assetManager = nullptr;
 
 extern "C"
+{
 JNIEXPORT void JNICALL
-Java_swiss_sae_gpr5300_MainActivity_load(JNIEnv * env, jclass clazz, jobject mgr) {
-	// TODO: implement load()
+Java_swiss_sae_gpr5300_MainActivity_load(JNIEnv *env, [[maybe_unused]] jclass clazz, jobject mgr) {
 	assetManager = AAssetManager_fromJava(env, mgr);
 	logDebug("Asset Manager from JNI loaded!");
 }
+}
 namespace neko
 {
+ResourceJob::ResourceJob() : Job([this]{bufferFile_.Load(filePath_);})
+{
+}
+void ResourceJob::SetFilePath(std::string_view path)
+{
+    filePath_ = path;
+}
+
 bool FileExists(const std::string_view path)
 {
 	{
@@ -94,7 +111,7 @@ void BufferFile::Load(std::string_view path)
 	dataLength = static_cast<const size_t>(AAsset_getLength64(file));
 
 	// Allocate memory to read your file
-	dataBuffer = new char[dataLength + 1];
+	dataBuffer = new unsigned char[dataLength + 1];
 	dataBuffer[dataLength] = '\0';
 
 	// Read your file
@@ -107,6 +124,18 @@ void BufferFile::Destroy()
 	delete[] dataBuffer;
 	dataBuffer = nullptr;
 	dataLength = 0;
+}
+
+
+BufferFile::~BufferFile()
+{
+	Destroy();
+}
+
+void ResourceJob::Reset()
+{
+	Job::Reset();
+	bufferFile_.Destroy();
 }
 }
 
@@ -130,33 +159,84 @@ namespace fs = std::filesystem;
 
 namespace neko
 {
+ResourceJob::ResourceJob() : Job([this]
+{
+#ifdef EASY_PROFILE_USE
+		EASY_BLOCK("Load Resource");
+#endif
+    bufferFile_.Destroy();
+    bufferFile_.Load(filePath_);
+})
+{
+}
+
+void ResourceJob::SetFilePath(std::string_view path)
+{
+    filePath_ = path;
+}
+
+void ResourceJob::Reset()
+{
+    Job::Reset();
+    bufferFile_.Destroy();
+}
+
+
 void BufferFile::Load(std::string_view path)
 {
-	std::ifstream is(path.data(),std::ifstream::binary);
-	if(!is)
-	{
-		std::ostringstream oss;
-		oss << "[Error] Could not open file: " << path << " for BufferFile";
-		logDebug(oss.str());
-		return;
-	}
-	if(is)
-	{
-		is.seekg(0, is.end);
-		dataLength = is.tellg();
-		is.seekg(0, is.beg);
-		dataBuffer = new char[dataLength+1];
-		dataBuffer[dataLength] = 0;
-		is.read(dataBuffer, dataLength);
-		is.close();
-	}
+    if(dataBuffer != nullptr)
+    {
+        Destroy();
+    }
+    std::ifstream is(path.data(),std::ifstream::binary);
+    if(!is)
+    {
+        logDebug(fmt::format("[Error] Could not open file: {}  for BufferFile", path));
+        dataLength = 0;
+        dataBuffer = nullptr;
+    }
+    else
+    {
+        is.seekg(0, is.end);
+        dataLength = is.tellg();
+        is.seekg(0, is.beg);
+        dataBuffer = new unsigned char[dataLength+1];
+        dataBuffer[dataLength] = 0;
+        is.read(reinterpret_cast<char*>(dataBuffer), dataLength);
+        is.close();
+    }
 }
 
 void BufferFile::Destroy()
 {
-	delete[] dataBuffer;
-	dataBuffer = nullptr;
-	dataLength = 0;
+    if(dataBuffer != nullptr)
+    {
+        delete[] dataBuffer;
+        dataBuffer = nullptr;
+        dataLength = 0;
+    }
+}
+
+BufferFile::~BufferFile()
+{
+    Destroy();
+}
+
+BufferFile::BufferFile(BufferFile&& bufferFile) noexcept
+{
+    this->dataBuffer = bufferFile.dataBuffer;
+    this->dataLength = bufferFile.dataLength;
+    bufferFile.dataBuffer = nullptr;
+    bufferFile.dataLength = 0;
+}
+
+BufferFile& BufferFile::operator=(BufferFile&& bufferFile) noexcept
+{
+    this->dataBuffer = bufferFile.dataBuffer;
+    this->dataLength = bufferFile.dataLength;
+    bufferFile.dataBuffer = nullptr;
+    bufferFile.dataLength = 0;
+    return *this;
 }
 
 bool FileExists(const std::string_view filename)
@@ -210,6 +290,10 @@ void IterateDirectory(const std::string_view dirname, std::function<void(const s
 				IterateDirectory(p.path().generic_string(), func, recursive);
 			}
 		}
+	}
+	else
+	{
+		logDebug(fmt::format("[Error] Path: {}  is not a directory!", dirname));
 	}
 }
 
@@ -326,6 +410,8 @@ const std::string LoadFile(const std::string& path)
 		std::istreambuf_iterator<char>());
 	return str;
 }
+
+
 }
 #endif
 

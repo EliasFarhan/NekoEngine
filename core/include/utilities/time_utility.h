@@ -1,9 +1,8 @@
 #pragma once
-
 /*
  MIT License
 
- Copyright (c) 2017 SAE Institute Switzerland AG
+ Copyright (c) 2020 SAE Institute Switzerland AG
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -31,6 +30,7 @@ namespace neko
 {
     using seconds = std::chrono::duration<float, std::ratio<1,1>>;
     using milliseconds = std::chrono::duration<std::uint32_t, std::ratio<1,1000>>;
+	using microseconds = std::chrono::duration<std::uint32_t, std::ratio<1, 1'000'000>>;
 
 /**
  * \brief simple timer class in second, that needs to be updated with the current delta time of the frame

@@ -1,7 +1,7 @@
 /*
  MIT License
 
- Copyright (c) 2019 SAE Institute Switzerland AG
+ Copyright (c) 2020 SAE Institute Switzerland AG
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,7 @@
 #include <engine/window.h>
 #include <engine/engine.h>
 #include "engine/log.h"
+#include "engine/component.h"
 
 #ifdef EASY_PROFILE_USE
 #include "easy/profiler.h"
@@ -36,166 +37,148 @@
 
 namespace neko
 {
-Renderer::Renderer()
+Renderer::Renderer() :
+    renderAllJob_([this]
+        {
+            auto* engine = BasicEngine::GetInstance();
+            PreRender();
+            ClearScreen();
+            engine->GenerateUiFrame();
+            RenderAll();
+            window_->RenderUi();
+        }),
+    syncJob_([this] { SyncBuffers(); })
 {
-	currentCommandBuffer_.reserve(MAX_COMMAND_NMB);
-	nextCommandBuffer_.reserve(MAX_COMMAND_NMB);
+    currentCommandBuffer_.reserve(MAX_COMMAND_NMB);
+    nextCommandBuffer_.reserve(MAX_COMMAND_NMB);
 }
 
 
 void Renderer::Render(RenderCommandInterface* command)
 {
-	nextCommandBuffer_.push_back(command);
+    nextCommandBuffer_.push_back(command);
 }
 
 void Renderer::RenderAll()
 {
 #ifdef EASY_PROFILE_USE
-	EASY_BLOCK("RenderAllCPU");
+    EASY_BLOCK("RenderAllCPU");
 #endif
-	for (auto* renderCommand : currentCommandBuffer_)
-	{
-		renderCommand->Render();
-	}
+    for (auto* renderCommand : currentCommandBuffer_)
+    {
+        renderCommand->Render();
+    }
 }
 
-void Renderer::Sync()
+void Renderer::BeforeRenderLoop()
 {
-#if !defined(NEKO_SAMETHREAD)
-#ifdef EASY_PROFILE_USE
-	EASY_BLOCK("EngineRenderSync");
-	EASY_BLOCK("EngineAppWaiting");
-	EASY_BLOCK("AcquireRenderLock");
-#endif
-	std::unique_lock lock(renderMutex_);
-#ifdef EASY_PROFILE_USE
-	EASY_END_BLOCK;
-#endif
-	flags_ |= IS_APP_WAITING;
-#ifdef EASY_PROFILE_USE
-	EASY_BLOCK("WaitForRenderSignal");
-#endif
-	cv_.wait(lock);
-#ifdef EASY_PROFILE_USE
-	EASY_END_BLOCK;
-	EASY_END_BLOCK;
-	EASY_BLOCK("SwapRenderCommand");
-#endif
-#endif
-	std::swap(currentCommandBuffer_, nextCommandBuffer_);
-	nextCommandBuffer_.clear();
-	//TODO copy all the new transform3d?
-	auto* engine = BasicEngine::GetInstance();
-	engine->ManageEvent();
-	flags_ &= ~IS_APP_WAITING;
+    window_->BeforeRenderLoop();
 }
 
-void Renderer::RenderLoop()
+void Renderer::AfterRenderLoop()
 {
-#if !defined(NEKO_SAMETHREAD)
-	flags_ |= IS_RUNNING;
-	window_->LeaveCurrentContext();
-	renderThread_ = std::thread([this] {
-		BeforeRenderLoop();
+    window_->AfterRenderLoop();
+}
 
-		std::chrono::time_point<std::chrono::system_clock> clock = std::chrono::system_clock::now();
-		while (flags_ & IS_RUNNING)
-		{
-			const auto start = std::chrono::system_clock::now();
-			const auto dt = std::chrono::duration_cast<seconds>(start - clock);
-			dt_ = dt.count();
-			clock = start;
+void Renderer::ScheduleJobs()
+{
+    auto* engine = BasicEngine::GetInstance();
+    engine->ScheduleJob(&syncJob_, JobThreadType::RENDER_THREAD);
+    engine->ScheduleJob(&renderAllJob_, JobThreadType::RENDER_THREAD);
+}
 
-			Update();
-		}
-		AfterRenderLoop();
-		});
+void Renderer::RegisterSyncBuffersFunction(SyncBuffersInterface* syncBuffersInterface)
+{
+    syncBuffersAction_.RegisterCallback([syncBuffersInterface]
+        {
+            syncBuffersInterface->SyncBuffers();
+        });
+}
+
+void Renderer::SyncBuffers()
+{
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("Swapping Render Command");
 #endif
+    std::swap(currentCommandBuffer_, nextCommandBuffer_);
+    nextCommandBuffer_.clear();
+    syncBuffersAction_.Execute();
+
+}
+
+void Renderer::PreRender()
+{
+    using namespace std::chrono_literals;
+    microseconds availableLoadingTime(8000);
+    while (availableLoadingTime < 8001us)
+    {
+        std::chrono::time_point<std::chrono::system_clock> start =
+            std::chrono::system_clock::now();
+
+
+        Job* job = nullptr;
+        {
+            std::lock_guard<std::mutex> lock(preRenderJobsMutex_);
+            if (!preRenderJobs_.empty())
+            {
+                job = preRenderJobs_.front();
+                preRenderJobs_.erase(preRenderJobs_.begin());
+            }
+        }
+
+        if (job != nullptr && job->CheckDependenciesStarted())
+        {
+            job->Execute();
+        }
+        else
+        {
+            break;
+        }
+
+        std::chrono::time_point<std::chrono::system_clock> end = std::chrono::system_clock::now();
+        const auto duration = std::chrono::duration_cast<microseconds>(end - start);
+        availableLoadingTime -= duration;
+    }
 }
 
 void Renderer::Destroy()
 {
 #ifdef EASY_PROFILE_USE
-	EASY_BLOCK("ClosingFromEngine");
+    EASY_BLOCK("ClosingFromEngine");
 #endif
-	flags_ &= ~IS_RUNNING;
-#if !defined(NEKO_SAMETHREAD)
-	renderThread_.join();
-#endif
+
+    std::lock_guard<std::mutex> lock(statusMutex_);
+    flags_ &= ~IS_RUNNING;
 }
 
 void Renderer::SetFlag(Renderer::RendererFlag flag)
 {
-	flags_ |= flag;
+    std::lock_guard<std::mutex> lock(statusMutex_);
+    flags_ |= flag;
 }
 
 void Renderer::SetWindow(Window* window)
 {
-	window_ = window;
+    window_ = window;
 }
 
-void Renderer::Update()
+void Renderer::AddPreRenderJob(Job* job)
 {
-#ifdef EASY_PROFILE_USE
-	EASY_BLOCK("RenderFullUpdateCPU");
-#endif
-
-
-	auto* engine = BasicEngine::GetInstance();
-	{
-#if !defined(NEKO_SAMETHREAD)
-		std::unique_lock<std::mutex> lock(renderMutex_);
-#endif
-#ifdef EASY_PROFILE_USE
-		EASY_BLOCK("RenderUpdateCPU");
-#endif
-		ClearScreen();
-		engine->GenerateUiFrame();
-		RenderAll();
-#if !defined(NEKO_SAMETHREAD)
-		lock.unlock();
-#endif
-		window_->RenderUi();
-	}
-	{
-#if !defined(NEKO_SAMETHREAD)
-		std::unique_lock<std::mutex> lock(renderMutex_);
-#endif
-#ifdef EASY_PROFILE_USE
-		EASY_BLOCK("RenderSwapBufferCPU");
-#endif
-		window_->SwapBuffer();
-	}
-	{
-#ifdef EASY_PROFILE_USE
-		EASY_BLOCK("WaitForAppCPU");
-#endif
-#if !defined(NEKO_SAMETHREAD)
-		while (!(flags_ & IS_APP_WAITING) && (flags_ & IS_RUNNING))
-		{
-			cv_.notify_one();
-		}
-
-		{
-			cv_.notify_one();
-		}
-#endif
-
-	}
+    std::lock_guard<std::mutex> lock(preRenderJobsMutex_);
+    preRenderJobs_.push_back(job);
 }
-void Renderer::BeforeRenderLoop()
+
+void Renderer::ResetJobs()
 {
-#if !defined(NEKO_SAMETHREAD)
-	window_->MakeCurrentContext();
-#endif
-}
-void Renderer::AfterRenderLoop()
-{
-#if !defined(NEKO_SAMETHREAD)
-	window_->LeaveCurrentContext();
-#endif
+    syncJob_.Reset();
+    renderAllJob_.Reset();
 }
 
+std::uint8_t Renderer::GetFlag() const
+{
+    std::lock_guard<std::mutex> lock(statusMutex_);
+    return flags_;
+}
 
 
 }

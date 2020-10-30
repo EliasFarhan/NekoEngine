@@ -1,9 +1,8 @@
 #pragma once
-
 /*
  MIT License
 
- Copyright (c) 2017 SAE Institute Switzerland AG
+ Copyright (c) 2020 SAE Institute Switzerland AG
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +29,8 @@
 #include <graphics/color.h>
 #include <utilities/time_utility.h>
 #include <mathematics/vector.h>
-#include <atomic>
+
+#include "jobsystem.h"
 
 
 namespace neko
@@ -47,14 +47,14 @@ struct Configuration
     Vec2u windowSize = Vec2u(1024, 1024);
     Vec2u gameWindowSize{1280, 720};
     bool fullscreen = false;
-    bool vSync = false;
+    bool vSync = true;
     unsigned int framerateLimit = 0u;
 #if defined(EMSCRIPTEN)
     std::string dataRootPath = "./";
 #elif defined(__ANDROID__)
-    std::string dataRootPath = "";
+    std::string dataRootPath = "data/";
 #else
-    std::string dataRootPath = "../../";
+    std::string dataRootPath = "../../data/";
 #endif
 };
 
@@ -86,17 +86,19 @@ public:
     void RegisterOnDrawUi(DrawImGuiInterface& drawUi);
 
     float GetDeltaTime() const { return dt_; };
-	
+
     static BasicEngine* GetInstance(){return instance_;}
 
+    void ScheduleJob(Job* job, JobThreadType threadType);
     //template <typename T = BasicEngine>
     //static T* GetInstance(){ return dynamic_cast<T*>(instance_);};
 protected:
     static BasicEngine* instance_;
     Renderer* renderer_ = nullptr;
     Window* window_ = nullptr;
+    JobSystem jobSystem_;
 	bool isRunning_;
-    std::atomic<float> dt_;
+    float dt_ = 0.0f;
     Action<> initAction_;
     Action<seconds> updateAction_;
     Action<> drawImGuiAction_;

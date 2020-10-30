@@ -1,6 +1,26 @@
-//
-// Created by efarhan on 01.03.20.
-//
+/*
+ MIT License
+
+ Copyright (c) 2020 SAE Institute Switzerland AG
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
+ */
 
 #include "engine/custom_allocator.h"
 
@@ -62,8 +82,8 @@ void* StackAllocator::Allocate(size_t allocatedSize, size_t alignment)
 
 	void* alignedAddress = (void*)((std::uint64_t) currentPos_ + adjustment);
 
-	auto* header = (AllocationHeader*)((std::uint64_t) alignedAddress - sizeof(AllocationHeader));
-	header->adjustment = adjustment;
+	auto* header = reinterpret_cast<AllocationHeader*>(std::uint64_t(alignedAddress) - sizeof(AllocationHeader));
+	header->adjustment = static_cast<std::uint8_t>(adjustment);
 #if defined(NEKO_ASSERT)
 	header->prevPos = prevPos_;
 	prevPos_ = alignedAddress;

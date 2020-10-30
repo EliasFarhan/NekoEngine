@@ -2,7 +2,7 @@
 /*
  MIT License
 
- Copyright (c) 2019 SAE Institute Switzerland AG
+ Copyright (c) 2020 SAE Institute Switzerland AG
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -32,82 +32,97 @@ namespace neko
 class HelloTriangleProgram : public SampleProgram
 {
 public:
-    enum class RenderType
-    {
-        VaoProgram,
-        EboProgram,
-        NekoQuad,
-        NekoCircle,
-        Length
-    };
+	enum class RenderType
+	{
+		Triangle,
+		VaoProgram,
+		EboProgram,
+		NekoQuad,
+		NekoCircle,
+		Length
+	};
 
-    void Init() override;
+	void Init() override;
 
-    void Update(seconds dt) override;
+	void Update(seconds dt) override;
 
-    void Destroy() override;
+	void Destroy() override;
 
-    void Render() override;
+	void Render() override;
 
-    void DrawImGui() override;
+	void DrawImGui() override;
 
-    void OnEvent(const SDL_Event& event) override;
+	void OnEvent(const SDL_Event& event) override;
 
 private:
-    RenderType renderType_ = RenderType::VaoProgram;
-    struct VaoProgram
-    {
-        float vertices[18] = {
-                0.5f, 0.5f, 0.0f,  // top right
-                0.5f, -0.5f, 0.0f,  // bottom right
-                -0.5f, 0.5f, 0.0f,   // top left
-                0.5f, -0.5f, 0.0f,  // bottom right
-                -0.5f, -0.5f, 0.0f,  // bottom left
-                -0.5f, 0.5f, 0.0f   // top left
-        };
-        float colors[18] = {
-                1.0f, 0.0f, 1.0f,// top right
-                0.0f, 1.0f, 0.0f, // bottom right
-                0.5f, 0.0f, 0.5f,// top left
-                0.0f, 1.0f, 0.0f, // bottom right
-                0.0f, 0.0f, 1.0f,// bottom left
-                0.5f, 0.0f, 0.5f,// top left
-        };
+	RenderType renderType_ = RenderType::Triangle;
+	struct TriangleProgram
+	{
+		float vertices[9] = {
+			-0.5f, -0.5f, 0.0f,
+			 0.5f, -0.5f, 0.0f,
+			 0.0f,  0.5f, 0.0f
+		};
+		unsigned int VBO = 0;
+		unsigned int VAO = 0;
 
-        unsigned int VBO[2] = {}; //Vertex Buffer Object
-        unsigned int VAO = 0; //Vertex Array Object
-    };
-    VaoProgram vaoProgam_;
-    struct EboProgram
-    {
-        float vertices[12] = {
-                0.5f, 0.5f, 0.0f,  // top right
-                0.5f, -0.5f, 0.0f,  // bottom right
-                -0.5f, -0.5f, 0.0f,  // bottom left
-                -0.5f, 0.5f, 0.0f   // top left
-        };
-        float colors[12] = {
-                1.0f, 0.0f, 1.0f,
-                0.0f, 1.0f, 0.0f,
-                0.0f, 0.0f, 1.0f,
-                0.5f, 0.0f, 0.5f
-        };
-        unsigned int indices[6] = {
-                // note that we start from 0!
-                0, 1, 3,   // first triangle
-                1, 2, 3    // second triangle
-        };
+		gl::Shader shader;
+	};
+	TriangleProgram triangleProgram_;
+	struct VaoProgram
+	{
+		float vertexData[36] =
+		{
+			//vertex position
+			0.5f, 0.5f, 0.0f,    
+			0.5f, -0.5f, 0.0f,	 
+			-0.5f, 0.5f, 0.0f,	 
+			0.5f, -0.5f, 0.0f,	 
+			-0.5f, -0.5f, 0.0f,	 
+			-0.5f, 0.5f, 0.0f,
+			//colors
+			1.0f, 0.0f, 1.0f,
+			0.0f, 1.0f, 0.0f,
+			0.5f, 0.0f, 0.5f,
+			0.0f, 1.0f, 0.0f,
+			0.0f, 0.0f, 1.0f,
+			0.5f, 0.0f, 0.5f
+		};
 
-        unsigned int EBO = 0; // Element Buffer Object
-        unsigned int VBO[2] = {}; //Vertex Buffer Object
-        unsigned int VAO = 0; //Vertex Array Object
-    };
-    EboProgram eboProgram_;
+		unsigned int VBO = 0; //Vertex Buffer Object
+		unsigned int VAO = 0; //Vertex Array Object
+	};
+	VaoProgram vaoProgam_;
+	struct EboProgram
+	{
+		float vertices[12] = {
+				0.5f, 0.5f, 0.0f,  // top right
+				0.5f, -0.5f, 0.0f,  // bottom right
+				-0.5f, -0.5f, 0.0f,  // bottom left
+				-0.5f, 0.5f, 0.0f   // top left
+		};
+		float colors[12] = {
+				1.0f, 0.0f, 1.0f,
+				0.0f, 1.0f, 0.0f,
+				0.0f, 0.0f, 1.0f,
+				0.5f, 0.0f, 0.5f
+		};
+		unsigned int indices[6] = {
+			// note that we start from 0!
+			0, 1, 3,   // first triangle
+			1, 2, 3    // second triangle
+		};
 
-    gl::RenderQuad quad_{Vec3f::zero, Vec2f::one};
-    gl::RenderCircle circle_{Vec3f::zero, 0.5f};
-    seconds timeSinceInit_ = seconds(0.0f);
-    gl::Shader shader_;
-    gl::Shader nekoShader_;
+		unsigned int EBO = 0; // Element Buffer Object
+		unsigned int VBO[2] = {}; //Vertex Buffer Object
+		unsigned int VAO = 0; //Vertex Array Object
+	};
+	EboProgram eboProgram_;
+
+	gl::RenderQuad quad_{ Vec3f::zero, Vec2f::one };
+	gl::RenderCircle circle_{ Vec3f::zero, 0.5f };
+	seconds timeSinceInit_ = seconds(0.0f);
+	gl::Shader shader_;
+	gl::Shader nekoShader_;
 };
 }

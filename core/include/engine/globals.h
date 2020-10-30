@@ -1,9 +1,8 @@
 #pragma once
-
 /*
  MIT License
 
- Copyright (c) 2017 SAE Institute Switzerland AG
+ Copyright (c) 2020 SAE Institute Switzerland AG
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -28,12 +27,11 @@
 #include <cstdlib>
 #include <limits>
 
-namespace neko 
+namespace neko
 {
 
-	const size_t INIT_ENTITY_NMB = 128;
-	using Index = uint32_t;
-	const Index INVALID_INDEX = std::numeric_limits<uint32_t>::max();
-
+const size_t INIT_ENTITY_NMB = 16;
+using Index = uint32_t;
+const Index INVALID_INDEX = std::numeric_limits<uint32_t>::max();
 
 } // end namespace neko
