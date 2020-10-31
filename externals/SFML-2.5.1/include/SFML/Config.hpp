@@ -76,7 +76,7 @@
         // Android
         #define SFML_SYSTEM_ANDROID
 
-    #elif defined(__linux__)
+    #elif defined(__linux__) || defined(EMSCRIPTEN)
 
          // Linux
         #define SFML_SYSTEM_LINUX

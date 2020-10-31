@@ -31,7 +31,7 @@ SOFTWARE.
 
 TEST(Engine, TestUUIDToStringToUUID)
 {
-	const sole::uuid id = sole::uuid0();
+	const sole::uuid id = sole::uuid4();
 	const auto idStr = id.str();
 	const auto convertId = sole::rebuild(idStr);
 	EXPECT_TRUE(id == convertId);

@@ -1049,7 +1049,7 @@ using EightVec4f = NVec4<float, 8>;
 //-----------------------------------------------------------------------------
 // NVec4 Implementations
 //-----------------------------------------------------------------------------
-#if defined(__arm__) || defined(__aarch64__)
+#if defined(__arm__) || defined(__aarch64__) || defined(EMSCRIPTEN)
 template<>
 inline std::array<float, 4> FourVec4f::MagnitudeIntrinsics() const
 {

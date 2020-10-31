@@ -39,6 +39,7 @@ matrix:
             - python3-dev
             - glslang-tools
             - libzstd-dev
+            - nodejs
       before_install:
         - eval "CC=clang && CXX=clang++"
       script:
@@ -74,7 +75,8 @@ matrix:
         - mkdir build
         - cd build
         - emcmake cmake .. || true
-        - emcmake cmake .. && make comp_graph
+        - emcmake cmake .. && make comp_graph Neko_TEST
+        - node test/Neko_TEST.js
     - name: "Windows MSVC"
       os: windows
       env:

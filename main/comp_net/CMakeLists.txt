@@ -28,7 +28,9 @@ foreach(net_main_project_path ${net_main_projects} )
     if(EMSCRIPTEN)
         get_target_property(bin_link_flags ${net_main_project_name} LINK_FLAGS)
         set_target_properties(${net_main_project_name} PROPERTIES LINK_FLAGS
-                "${bin_link_flags} -s USE_SDL=2 -s USE_WEBGL2=1 -s MIN_WEBGL_VERSION=2 -s MAX_WEBGL_VERSION=2")
+                "${bin_link_flags} -s USE_SDL=2 -s USE_WEBGL2=1 -s MIN_WEBGL_VERSION=2 -s MAX_WEBGL_VERSION=2
+                -lwebsocket.js -s PROXY_POSIX_SOCKETS=1 -s USE_PTHREADS=1 -s PROXY_TO_PTHREAD=1 --preload-file ${CMAKE_BINARY_DIR}/data/@ ")
+        set_target_properties(${net_main_project_name} PROPERTIES SUFFIX ".html")
     endif()
     set_target_properties(${net_main_project_name} PROPERTIES UNITY_BUILD ON)
     if(NOT Emscripten)

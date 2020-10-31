@@ -17,8 +17,8 @@ function(neko_bin_config binary)
                 "  -O3 -fno-rtti -fno-exceptions -s ASSERTIONS=1 ")
         endif()
         set_target_properties(${binary} PROPERTIES  LINK_FLAGS
-                " -flto  --emrun -s ASSERTIONS=1 -s EXPORT_ALL=1 -s TOTAL_MEMORY=512MB --preload-file ${CMAKE_BINARY_DIR}/data/@ ")
-        set_target_properties(${binary} PROPERTIES SUFFIX ".html")
+                " -flto  --emrun -s ASSERTIONS=1 -s EXPORT_ALL=1 -s TOTAL_MEMORY=512MB ")
+
     elseif(MSVC)
             set_target_properties(${binary} PROPERTIES COMPILE_FLAGS " /arch:AVX2 /Oi /GR- ")
     elseif(UNIX)

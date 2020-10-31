@@ -12,4 +12,8 @@ if(UNIX)
 #target_compile_options(Neko_TEST PUBLIC "--coverage")
 #target_link_options(Neko_TEST PUBLIC "--coverage")
 endif()
+
+if(EMSCRIPTEN)
+    set_target_properties(Neko_TEST PROPERTIES SUFFIX ".js")
+endif()
 set_target_properties (Neko_TEST PROPERTIES FOLDER Neko/Core)
