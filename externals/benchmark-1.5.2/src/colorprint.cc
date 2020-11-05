@@ -156,7 +156,7 @@ void ColorPrintf(std::ostream& out, LogColor color, const char* fmt,
 }
 
 bool IsColorTerminal() {
-#if BENCHMARK_OS_WINDOWS
+#if defined(BENCHMARK_OS_WINDOWS)
   // On Windows the TERM variable is usually not set, but the
   // console there does support colors.
   return 0 != _isatty(_fileno(stdout));

@@ -288,7 +288,7 @@ std::vector<CPUInfo::CacheInfo> GetCacheSizesFromKVFS() {
   return res;
 }
 
-#ifdef BENCHMARK_OS_MACOSX
+#if defined(BENCHMARK_OS_MACOSX)
 std::vector<CPUInfo::CacheInfo> GetCacheSizesMacOSX() {
   std::vector<CPUInfo::CacheInfo> res;
   std::array<uint64_t, 4> CacheCounts{{0, 0, 0, 0}};
@@ -364,7 +364,7 @@ std::vector<CPUInfo::CacheInfo> GetCacheSizesWindows() {
   }
   return res;
 }
-#elif BENCHMARK_OS_QNX
+#elif defined(BENCHMARK_OS_QNX)
 std::vector<CPUInfo::CacheInfo> GetCacheSizesQNX() {
   std::vector<CPUInfo::CacheInfo> res;
   struct cacheattr_entry *cache = SYSPAGE_ENTRY(cacheattr);
@@ -403,7 +403,7 @@ std::vector<CPUInfo::CacheInfo> GetCacheSizesQNX() {
 #endif
 
 std::vector<CPUInfo::CacheInfo> GetCacheSizes() {
-#ifdef BENCHMARK_OS_MACOSX
+#if defined(BENCHMARK_OS_MACOSX)
   return GetCacheSizesMacOSX();
 #elif defined(BENCHMARK_OS_WINDOWS)
   return GetCacheSizesWindows();
