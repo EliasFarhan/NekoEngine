@@ -1,10 +1,15 @@
 import json
 import os.path
+import subprocess
 
 from pathlib import Path
 
 binary_path = os.getenv("BINARY_FOLDER")
 print("Binary path: {}".format(binary_path))
+
+validator_path = os.getenv("VALIDATOR_FOLDER")
+validator_exe = os.getenv("VALIDATE_JSON_EXE")
+print("Validator exe: {} with validator folder: {}".format(validator_exe, validator_path))
 
 
 def get_texture_id(texture_path):
@@ -20,6 +25,9 @@ def get_texture_id(texture_path):
 
 
 def validate_mat_json_file(data_src, data_out, meta_content):
+    status = subprocess.run([validator_exe, data_src, validator_path+"material_validator.json"])
+    if status.returncode != 0:
+        exit(1)
     with open(data_src, 'r') as mat_file:
         mat_content = json.load(mat_file)
         mat_keys = mat_content.keys()

@@ -6,6 +6,7 @@ import os
 from shader_validator import validate_shader
 from texture_validator import validate_texture
 from material_validator import validate_material
+from skybox_validator import validate_skybox
 from pathlib import Path
 from enum import Enum
 import os.path
@@ -37,6 +38,7 @@ class AssetType(Enum):
     VERT_SHADER = 4
     FRAG_SHADER = 5
     FONT = 6
+    SKYBOX = 7
 
 
 img_extension = [
@@ -69,6 +71,8 @@ def define_asset_type(filename) -> AssetType:
         return AssetType.FRAG_SHADER
     if extension == '.ttf':
         return AssetType.FONT
+    if extension == '.skybox':
+        return AssetType.SKYBOX
     return AssetType.UNKNOWN
 
 
@@ -91,6 +95,8 @@ def validate_asset(src="", out=""):
         validate_shader(data_src, data_out, meta_content)
     if asset_type == AssetType.MTL:
         validate_material(data_src, data_out, meta_content)
+    if asset_type == AssetType.SKYBOX:
+        validate_skybox(data_src, data_out, meta_content)
     # write new meta content to meta file
     if asset_type != AssetType.UNKNOWN:
         if not os.path.isfile(data_out + ".meta"):

@@ -41,6 +41,8 @@ file(GLOB_RECURSE IMG_FILES
         "${PROJECT_SOURCE_DIR}/data/*.dds"
         "${PROJECT_SOURCE_DIR}/data/*.ktx"
         )
+file(GLOB_RECURSE SKY_FILES
+        "${PROJECT_SOURCE_DIR}/data/*.skybox")
 file(GLOB_RECURSE SND_FILES
         "${PROJECT_SOURCE_DIR}/data/*.wav"
         "${PROJECT_SOURCE_DIR}/data/*.ogg"
@@ -59,10 +61,11 @@ source_group("Data/Font"           FILES ${FONT_FILES})
 source_group("Data/Text"           FILES ${TEXT_FILES})
 source_group("Data/Img"            FILES ${IMG_FILES})
 source_group("Data/Snd"			FILES ${SND_FILES})
+source_group("Data/Skybox"			FILES ${SKY_FILES})
 source_group("Shaders"		FILES ${SHADER_FILES})
 source_group("Data/Model" FILES ${MODEL_FILES})
 source_group("Data/Materials" FILES ${MATERIALS_FILES})
-LIST(APPEND DATA_FILES ${IMG_FILES} ${MODEL_FILES} ${SND_FILES} ${TEXT_FILES} ${SHADER_FILES} ${MATERIAL_FILES} ${FONT_FILES})
+LIST(APPEND DATA_FILES ${IMG_FILES} ${SKY_FILES} ${MODEL_FILES} ${SND_FILES} ${TEXT_FILES} ${SHADER_FILES} ${MATERIAL_FILES} ${FONT_FILES})
 
 foreach(DATA ${DATA_FILES})
     get_filename_component(FILE_NAME ${DATA} NAME)
@@ -70,24 +73,15 @@ foreach(DATA ${DATA_FILES})
     get_filename_component(EXTENSION ${DATA} EXT)
     file(RELATIVE_PATH PATH_NAME "${PROJECT_SOURCE_DIR}" ${PATH_NAME})
     set(DATA_OUTPUT "${PROJECT_BINARY_DIR}/${PATH_NAME}/${FILE_NAME}")
-    if(Emscripten)
-    add_custom_command(
-        OUTPUT ${DATA_OUTPUT}
-        DEPENDS ${DATA}
-        DEPENDS
-        COMMAND ${CMAKE_COMMAND} -E copy ${DATA} "${PROJECT_BINARY_DIR}/${PATH_NAME}/${FILE_NAME}"
-        COMMAND ${CMAKE_COMMAND} -E env BINARY_FOLDER=${CMAKE_BINARY_DIR}  "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/scripts/validator/asset_validator.py"  "${DATA}" "${DATA_OUTPUT}"
-    )
-    else()
+
     add_custom_command(
             OUTPUT ${DATA_OUTPUT}
             DEPENDS ${DATA}
             DEPENDS
             COMMAND ${CMAKE_COMMAND} -E copy ${DATA} "${PROJECT_BINARY_DIR}/${PATH_NAME}/${FILE_NAME}"
-            COMMAND ${CMAKE_COMMAND} -E env TOKTX_EXE=$<TARGET_FILE:toktx> BINARY_FOLDER=${CMAKE_BINARY_DIR} "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/scripts/validator/asset_validator.py"  "${DATA}" "${DATA_OUTPUT}"
+            COMMAND ${CMAKE_COMMAND} -E env VALIDATE_JSON_EXE=$<TARGET_FILE:validate_json> VALIDATOR_FOLDER=${CMAKE_SOURCE_DIR}/validator/ TOKTX_EXE=$<TARGET_FILE:toktx> BINARY_FOLDER=${CMAKE_BINARY_DIR} "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/scripts/validator/asset_validator.py"  "${DATA}" "${DATA_OUTPUT}"
 
     )
-    endif()
     list(APPEND DATA_BINARY_FILES ${DATA_OUTPUT})
 endforeach(DATA)
 
