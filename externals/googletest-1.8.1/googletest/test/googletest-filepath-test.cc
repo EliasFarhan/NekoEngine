@@ -27,7 +27,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-// Google Test filepath utilities
+// Google Test filepath utils
 //
 // This file tests classes and functions used internally by
 // Google Test.  They are subject to change without notice.

@@ -23,7 +23,7 @@
  */
 
 #include <engine/scene.h>
-#include <utilities/file_utility.h>
+#include <utils/file_utility.h>
 #include <engine/log.h>
 
 #include <fmt/format.h>

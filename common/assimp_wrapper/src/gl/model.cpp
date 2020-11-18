@@ -70,11 +70,7 @@ void Model::Destroy()
 		path_ = path;
 		directory_ = path.substr(0, path.find_last_of('/'));
 		logDebug(fmt::format("ASSIMP: Loading model: {}",path_));
-#ifdef NEKO_SAMETHREAD
-		processModelJob_.Execute();
-#else
 		BasicEngine::GetInstance()->ScheduleJob(&processModelJob_, JobThreadType::OTHER_THREAD);
-#endif
 	}
 
 	bool Model::IsLoaded() const
@@ -101,15 +97,7 @@ void Model::Destroy()
 #endif
 		Assimp::Importer import;
 		const aiScene* scene = nullptr;
-#ifdef NEKO_SAMETHREAD
-        //assimp delete automatically the IO System
-        NekoIOSystem* ioSystem = new NekoIOSystem();
-        import.SetIOHandler(ioSystem);
 
-        scene = import.ReadFile(path_.data(),
-                                aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals |
-                                aiProcess_CalcTangentSpace);
-#else
 		Job loadingModelJob = Job([this, &import, &scene]
 		{
 #ifdef EASY_PROFILE_USE
@@ -124,10 +112,9 @@ void Model::Destroy()
 				aiProcess_CalcTangentSpace);
 		});
 		BasicEngine::GetInstance()->ScheduleJob(&loadingModelJob, JobThreadType::RESOURCE_THREAD);
-#endif
-#ifndef NEKO_SAMETHREAD
+
 		loadingModelJob.Join();
-#endif
+
 #ifdef EASY_PROFILE_USE
 		EASY_END_BLOCK;
 #endif

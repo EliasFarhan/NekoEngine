@@ -42,11 +42,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /**  @file  qnan.h
- *   @brief Some utilities for our dealings with qnans.
+ *   @brief Some utils for our dealings with qnans.
  *
  *   @note Some loaders use qnans to mark invalid values tempoarily, also
  *     Assimp explicitly enforces undefined normals to be set to qnan.
- *     qnan utilities are available in standard libraries (C99 for example)
+ *     qnan utils are available in standard libraries (C99 for example)
  *     but last time I checked compiler coverage was so bad that I decided
  *     to reinvent the wheel.
  */

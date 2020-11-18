@@ -26,7 +26,7 @@
 
 #include "engine/window.h"
 #include <SDL.h>
-#include <utilities/time_utility.h>
+#include <utils/time_utility.h>
 
 namespace neko::sdl
 {

@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <memory>
 
-// utilities
+// utils
 #include <assimp/fast_atof.h>
 
 using namespace Assimp;

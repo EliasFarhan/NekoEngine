@@ -22,8 +22,8 @@
  SOFTWARE.
  */
 
-#include <utilities/json_utility.h>
-#include <utilities/file_utility.h>
+#include <utils/json_utility.h>
+#include <utils/file_utility.h>
 #include <fstream>
 #include <string>
 #include "engine/log.h"

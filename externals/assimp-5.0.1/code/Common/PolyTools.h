@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ----------------------------------------------------------------------
 */
 
-/** @file PolyTools.h, various utilities for our dealings with arbitrary polygons */
+/** @file PolyTools.h, various utils for our dealings with arbitrary polygons */
 
 #ifndef AI_POLYTOOLS_H_INCLUDED
 #define AI_POLYTOOLS_H_INCLUDED

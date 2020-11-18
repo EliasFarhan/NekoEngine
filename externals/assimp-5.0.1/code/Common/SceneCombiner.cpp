@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /** 
   * @file Implements Assimp::SceneCombiner. This is a smart utility
   *       class that combines multiple scenes, meshes, ... into one. Currently
-  *       these utilities are used by the IRR and LWS loaders and the
+  *       these utils are used by the IRR and LWS loaders and the
   *       OptimizeGraph step.
   */
 // ----------------------------------------------------------------------------

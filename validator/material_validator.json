@@ -1,0 +1,25 @@
+{
+    "$schema": "http://json-schema.org/schema#",
+    "type": "object",
+    "properties": 
+    {
+        "material_name": { "type": "string" },
+        "uuid": {"type":"string"},
+        "ambient": {"type": "array", "items": { "type": "number"}, "minItems": 3,"maxItems": 4},
+        "diffuse": {"type": "array", "items": { "type": "number"}, "minItems": 3,"maxItems": 4},
+        "specular": {"type": "array", "items": { "type": "number"}, "minItems": 3,"maxItems": 4},
+        "specular_exponent": {"type": "number"},
+        "alpha": {"type":"number"},
+        "refraction": {"type":"number"},
+        "ambient_map_path":{"type":"string"},
+        "ambient_map_id":{"type": "string"},
+        "diffuse_map_path":{"type":"string"},
+        "diffuse_map_id":{"type": "string"},
+        "specular_map_path":{"type":"string"},
+        "specular_map_id":{"type": "string"},
+        "alpha_map_path":{"type":"string"},
+        "alpha_map_id":{"type": "string"},
+        "bump_map_path":{"type":"string"},
+        "bump_map_id":{"type": "string"}
+    }
+}

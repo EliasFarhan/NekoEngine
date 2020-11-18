@@ -1,7 +1,7 @@
 
 
 /** @file  IRRShared.h
-  * @brief Shared utilities for the IRR and IRRMESH loaders
+  * @brief Shared utils for the IRR and IRRMESH loaders
   */
 
 #ifndef INCLUDED_AI_IRRSHARED_H
@@ -55,7 +55,7 @@ extern const aiMatrix4x4 AI_TO_IRR_MATRIX;
 // ---------------------------------------------------------------------------
 /** Base class for the Irr and IrrMesh importers.
  *
- *  Declares some irrlight-related xml parsing utilities and provides tools
+ *  Declares some irrlight-related xml parsing utils and provides tools
  *  to load materials from IRR and IRRMESH files.
  */
 class IrrlichtBase

@@ -29,7 +29,7 @@
 //
 // Authors: vladl@google.com (Vlad Losev), wan@google.com (Zhanyong Wan)
 //
-// This file tests the internal cross-platform support utilities.
+// This file tests the internal cross-platform support utils.
 
 #include "gtest/internal/gtest-port.h"
 

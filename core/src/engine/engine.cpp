@@ -21,16 +21,14 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-#ifdef __EMSCRIPTEN__
-#include <emscripten.h>
-#endif
+
 
 #include <chrono>
 #include <sstream>
 
 #include <engine/engine.h>
 #include <engine/log.h>
-#include <utilities/file_utility.h>
+#include <utils/file_utility.h>
 #include "graphics/graphics.h"
 #include <engine/window.h>
 #include "imgui.h"
@@ -137,11 +135,7 @@ void BasicEngine::Update(seconds dt)
     jobSystem_.ScheduleJob(swapBufferJob, JobThreadType::RENDER_THREAD);
     jobSystem_.ScheduleJob(&eventJob, JobThreadType::MAIN_THREAD);
     jobSystem_.ScheduleJob(&updateJob, JobThreadType::MAIN_THREAD);
-#ifndef NEKO_SAMETHREAD
     swapBufferJob->Join();
-#else
-    jobSystem_.KickJobs();
-#endif
 }
 
 void BasicEngine::Destroy()
@@ -154,25 +148,13 @@ void BasicEngine::Destroy()
 }
 
 static std::chrono::time_point<std::chrono::system_clock> clock;
-#ifdef EMSCRIPTEN
-void EmLoop(void* arg)
-{
-	BasicEngine* engine = static_cast<BasicEngine*>(arg);
-	const auto start = std::chrono::system_clock::now();
-	const auto dt = std::chrono::duration_cast<seconds>(start - clock);
-	clock = start;
-	(engine)->Update(dt);
-}
-#endif
+
 
 void BasicEngine::EngineLoop()
 {
 	isRunning_ = true;
 	clock = std::chrono::system_clock::now();
-#ifdef EMSCRIPTEN
-	// void emscripten_set_main_loop(em_callback_func func, int fps, int simulate_infinite_loop);
-	emscripten_set_main_loop_arg(&EmLoop, this, 0, 1);
-#else
+
 	while (isRunning_)
 	{
 		const auto start = std::chrono::system_clock::now();
@@ -180,7 +162,6 @@ void BasicEngine::EngineLoop()
 		clock = start;
 		Update(dt);
 	}
-#endif
 	Destroy();
 }
 

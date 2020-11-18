@@ -195,7 +195,7 @@ namespace STEP {
                 return dynamic_cast<T*>(this);
             }
 
-            // utilities to deal with SELECT entities, which currently lack automatic
+            // utils to deal with SELECT entities, which currently lack automatic
             // conversion support.
             template <typename T>
             const T& ResolveSelect(const DB& db) const {
@@ -458,7 +458,7 @@ namespace STEP {
             // empty
         }
 
-        // utilities to simplify casting to concrete types
+        // utils to simplify casting to concrete types
         template <typename T>
         const T& To() const {
             return dynamic_cast<const T&>(*this);

@@ -22,7 +22,7 @@
  SOFTWARE.
  */
 #include "gl/shader.h"
-#include <utilities/file_utility.h>
+#include <utils/file_utility.h>
 #include <sstream>
 #include <engine/log.h>
 #include <fmt/format.h>

@@ -24,12 +24,11 @@
  */
 
 #include <functional>
-#ifndef NEKO_SAMETHREAD
 #include <thread>
 #include <future>
 #include <condition_variable>
-#endif
-#include <queue>
+
+#include <vector>
 #include "engine/system.h"
 
 namespace neko
@@ -93,22 +92,18 @@ public:
 protected:
     std::vector<const Job*> dependencies_;
     std::function<void()> task_;
-#ifndef NEKO_SAMETHREAD
     mutable std::promise<void> promise_;
     mutable std::shared_future<void> taskDoneFuture_;
     mutable std::mutex statusLock_;
-#endif
     std::uint8_t status_;
 
 };
 
 struct JobQueue
 {
-#ifndef NEKO_SAMETHREAD
     std::mutex mutex_;
     std::condition_variable cv_;
-#endif
-    std::queue<Job*> jobs_;
+    std::vector<Job*> jobs_;
 };
 
 class JobSystem : SystemInterface
@@ -129,9 +124,6 @@ public:
 
     void Destroy() override;
 
-#ifdef NEKO_SAMETHREAD
-    void KickJobs();
-#endif
 private:
 	void Work(JobQueue& jobQueue);
 
@@ -141,13 +133,11 @@ private:
     JobQueue jobs_; // Managed via mutex. // TODO: replace with custom queue when those are implemented.
     JobQueue renderJobs_; // Managed via mutex. // TODO: replace with custom queue when those are implemented.
     JobQueue resourceJobs_; // Managed via mutex. // TODO: replace with custom queue when those are implemented.
-#ifndef NEKO_SAMETHREAD
     std::uint8_t workersStarted_ = 0;
     [[nodiscard]] std::uint8_t CountStartedWorkers();
     std::uint8_t numberOfWorkers;
     std::vector<std::thread> workers_; // TODO: replace with fixed vector when those are implemented.
     mutable std::mutex statusMutex_;
-#endif
 };
 
 }

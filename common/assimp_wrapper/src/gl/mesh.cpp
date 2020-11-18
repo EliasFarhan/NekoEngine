@@ -47,19 +47,12 @@ Mesh::Mesh() : loadMeshToGpu([this]
 
 void Mesh::Init()
 {
-#ifdef NEKO_SAMETHREAD
-    loadMeshToGpu.Execute();
-    const TextureManagerInterface& textureManager = TextureManagerLocator::get();
-    for (auto& texture : textures_)
-    {
-        texture.textureName = textureManager.GetTexture(texture.textureId).name;
-    }
 
-#else
     RendererLocator::get().AddPreRenderJob(&loadMeshToGpu);
     const TextureManagerInterface& textureManager = TextureManagerLocator::get();
     for (auto& texture : textures_)
     {
+        // TODO: Refactor this thing that is locking a whole thread
     	//Waiting for texture to be loaded
     	while(!textureManager.IsTextureLoaded(texture.textureId))
     	{
@@ -67,7 +60,6 @@ void Mesh::Init()
     	}
         texture.textureName = textureManager.GetTexture(texture.textureId).name;
     }
-#endif
 }
 
 

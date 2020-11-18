@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /** @file Declares a helper class, "SceneCombiner" providing various
- *  utilities to merge scenes.
+ *  utils to merge scenes.
  */
 #ifndef AI_SCENE_COMBINER_H_INC
 #define AI_SCENE_COMBINER_H_INC
@@ -192,7 +192,7 @@ struct SceneHelper
 };
 
 // ---------------------------------------------------------------------------
-/** \brief Static helper class providing various utilities to merge two
+/** \brief Static helper class providing various utils to merge two
  *    scenes. It is intended as internal utility and NOT for use by
  *    applications.
  *

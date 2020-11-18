@@ -277,7 +277,7 @@ protected:
         IOSystem* pIOHandler
         ) = 0;
 
-public: // static utilities
+public: // static utils
 
     // -------------------------------------------------------------------
     /** A utility for CanRead().

@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /** @file  FBXDocumentUtil.h
- *  @brief FBX internal utilities used by the DOM reading code
+ *  @brief FBX internal utils used by the DOM reading code
  */
 #ifndef INCLUDED_AI_FBX_DOCUMENT_UTIL_H
 #define INCLUDED_AI_FBX_DOCUMENT_UTIL_H

@@ -153,7 +153,7 @@
 
 namespace basisu
 {
-	// Types/utilities
+	// Types/utils
 
 #ifdef _WIN32
 	const char BASISU_PATH_SEPERATOR_CHAR = '\\';

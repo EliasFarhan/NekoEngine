@@ -26,7 +26,7 @@ SOFTWARE.
 #include <xxhash.hpp>
 #include <sole.hpp>
 #include <gtest/gtest.h>
-#include "utilities/file_utility.h"
+#include "utils/file_utility.h"
 #include "engine/engine.h"
 
 TEST(Engine, TestUUIDToStringToUUID)

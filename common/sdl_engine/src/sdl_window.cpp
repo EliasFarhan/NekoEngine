@@ -24,7 +24,7 @@
 
 #include <sstream>
 
-#include <utilities/service_locator.h>
+#include <utils/service_locator.h>
 #include <engine/log.h>
 #include "sdl_engine/sdl_window.h"
 #include "engine/engine.h"

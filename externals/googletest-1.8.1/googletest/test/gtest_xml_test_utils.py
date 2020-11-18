@@ -27,7 +27,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Unit test utilities for gtest_xml_output"""
+"""Unit test utils for gtest_xml_output"""
 
 import re
 from xml.dom import minidom, Node

@@ -1,7 +1,7 @@
 #source files
 file(GLOB_RECURSE Neko_ENGINE_SRC src/engine/*.cpp include/engine/*.h)
 file(GLOB_RECURSE Neko_GRAPHICS_SRC src/graphics/*.cpp include/graphics/*.h)
-file(GLOB_RECURSE Neko_UTILITY_SRC src/utilities/*.cpp include/utilities/*.h)
+file(GLOB_RECURSE Neko_UTILITY_SRC src/utils/*.cpp include/utils/*.h)
 file(GLOB_RECURSE Neko_PHYSICS_SRC src/physics/*.cpp include/physics/*.h)
 file(GLOB_RECURSE Neko_SOUND_SRC src/sound/*.cpp include/sound/*.h)
 file(GLOB_RECURSE Neko_MATH_SRC src/mathematics/*.cpp include/mathematics/*.h)
@@ -54,3 +54,6 @@ target_include_directories(Neko_Core PUBLIC include/)
 target_include_directories(Neko_Core PUBLIC ${UTILITIES_DIR})
 neko_lib_config(Neko_Core)
 
+if(Neko_Test)
+    add_test(Neko_Core)
+endif()

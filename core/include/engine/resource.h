@@ -26,8 +26,8 @@
 
 #include <map>
 #include "sole.hpp"
-#include "utilities/json_utility.h"
-#include "utilities/file_utility.h"
+#include "utils/json_utility.h"
+#include "utils/file_utility.h"
 
 namespace neko
 {

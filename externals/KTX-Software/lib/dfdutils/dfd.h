@@ -8,7 +8,7 @@
 /**
  * @file
  * @~English
- * @brief Header file defining the data format descriptor utilities API.
+ * @brief Header file defining the data format descriptor utils API.
  */
 
 /*

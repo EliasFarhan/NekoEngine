@@ -750,7 +750,7 @@ TEST(RandomTest, RepeatsWhenReseeded) {
   }
 }
 
-// Tests STL container utilities.
+// Tests STL container utils.
 
 // Tests CountIf().
 
@@ -7345,7 +7345,7 @@ GTEST_TEST(AlternativeNameTest, Works) {  // GTEST_TEST is the same as TEST.
                        "An expected failure");
 }
 
-// Tests for internal utilities necessary for implementation of the universal
+// Tests for internal utils necessary for implementation of the universal
 // printing.
 // TODO(vladl@google.com): Find a better home for them.
 

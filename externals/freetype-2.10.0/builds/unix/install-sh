@@ -142,7 +142,7 @@ while test $# -ne 0; do
     -t)
         is_target_a_directory=always
         dst_arg=$2
-        # Protect names problematic for 'test' and other utilities.
+        # Protect names problematic for 'test' and other utils.
         case $dst_arg in
           -* | [=\(\)!]) dst_arg=./$dst_arg;;
         esac
@@ -186,7 +186,7 @@ if test $# -ne 0 && test -z "$dir_arg$dst_arg"; then
     fi
     shift # arg
     dst_arg=$arg
-    # Protect names problematic for 'test' and other utilities.
+    # Protect names problematic for 'test' and other utils.
     case $dst_arg in
       -* | [=\(\)!]) dst_arg=./$dst_arg;;
     esac
@@ -245,7 +245,7 @@ fi
 
 for src
 do
-  # Protect names problematic for 'test' and other utilities.
+  # Protect names problematic for 'test' and other utils.
   case $src in
     -* | [=\(\)!]) src=./$src;;
   esac

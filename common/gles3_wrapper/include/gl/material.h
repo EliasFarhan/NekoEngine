@@ -28,7 +28,7 @@
 #include <mathematics/matrix.h>
 #include <gl/texture.h>
 #include "gl/shader.h"
-#include "utilities/json_utility.h"
+#include "utils/json_utility.h"
 
 namespace neko::gl
 {

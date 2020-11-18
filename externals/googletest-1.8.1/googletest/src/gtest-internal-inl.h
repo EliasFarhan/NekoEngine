@@ -271,7 +271,7 @@ GTEST_API_ Int32 Int32FromEnvOrDie(const char* env_var, Int32 default_val);
 GTEST_API_ bool ShouldRunTestOnShard(
     int total_shards, int shard_index, int test_id);
 
-// STL container utilities.
+// STL container utils.
 
 // Returns the number of elements in the given container that satisfy
 // the given predicate.

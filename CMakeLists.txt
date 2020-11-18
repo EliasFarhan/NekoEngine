@@ -20,20 +20,8 @@ set(Neko_Benchmark ON CACHE BOOL "Activate Benchmark")
 set(Neko_Assimp ON CACHE BOOL "Activate Assimp Wrapper")
 set(Neko_SFML_NET ON CACHE BOOL "Activate SFML Net Wrapper")
 set(Neko_KTX ON CACHE BOOL "Activate SFML Net Wrapper")
-set(Neko_SameThread OFF CACHE BOOL "Activate Same Thread Rendering and Resource Loading")
 
 MESSAGE("CMAKE SYSTEM NAME: ${CMAKE_SYSTEM_NAME}")
-
-if ("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
-    include(cmake/platforms/emscripten.cmake)
-    set(CMAKE_EXECUTABLE_SUFFIX ".html")
-    set(CMAKE_STATIC_LIBRARY_SUFFIX ".a")
-    set(Neko_SameThread ON CACHE BOOL "")
-    mark_as_advanced(Neko_SameThread)
-    #We currently disable SFML Net
-    set(Neko_SFML_NET OFF CACHE BOOL "")
-    mark_as_advanced(Neko_SFML_NET)
-endif()
 
 if(UNIX)
     EXECUTE_PROCESS(COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE)
@@ -59,8 +47,15 @@ if(Neko_Assert)
     add_compile_definitions("NEKO_ASSERT=1")
 endif()
 
-if(Neko_SameThread)
-    add_compile_definitions("NEKO_SAMETHREAD=1")
+if(Neko_Test)
+    enable_testing()
+    set(GOOGLE_TEST_DIR ${EXTERNAL_DIR}/googletest-1.8.1)
+    set(BUILD_GMOCK OFF CACHE INTERNAL "")
+    set(INSTALL_GTEST OFF CACHE INTERNAL "")
+    add_subdirectory(${GOOGLE_TEST_DIR})
+    include(cmake/test.cmake)
+    set_target_properties (gtest PROPERTIES FOLDER Externals/GTest)
+    set_target_properties(gtest_main PROPERTIES FOLDER Externals/GTest)
 endif()
 
 if(Neko_KTX)
@@ -86,12 +81,28 @@ if(Neko_Profile)
 
 endif()
 
+set(tools_project_dir "tools/")
+file(GLOB tools_projects "${tools_project_dir}/*")
+
+foreach(tools_project_path ${tools_projects} )
+    # I used a simple string replace, to cut off .cpp.
+    get_filename_component(tools_project_name ${tools_project_path} NAME )
+
+    message("Tools project path: ${tools_project_path} and name: ${tools_project_name}")
+    set(${tools_project_name} ON CACHE BOOL "")
+
+    if(${tools_project_name})
+        add_subdirectory(${tools_project_path})
+    endif()
+endforeach()
+
+
 include("cmake/data.cmake")
 set(NEKO_CORE_DIR "${CMAKE_SOURCE_DIR}/core/" CACHE INTERNAL "")
 add_subdirectory(${NEKO_CORE_DIR})
-if(NOT Emscripten)
+
 target_precompile_headers(Neko_Core PRIVATE "${NEKO_CORE_DIR}/include/core_pch.h")
-endif()
+
 #imgui
 set(IMGUI_VERSION "1.74" CACHE INTERNAL "")
 set(IMGUI_ROOT "${EXTERNAL_DIR}/imgui-${IMGUI_VERSION}" CACHE STRING "")
@@ -102,9 +113,7 @@ set_target_properties(imgui PROPERTIES UNITY_BUILD ON)
 
 if(Neko_GLES3)
     add_compile_definitions("NEKO_GLES3=1")
-    if(NOT Emscripten)
     add_subdirectory("${EXTERNAL_DIR}/glad")
-    endif()
     set(GLES3_WRAPPER_DIR "common/gles3_wrapper" CACHE INTERNAL "")
     add_subdirectory(${GLES3_WRAPPER_DIR})
 endif()
@@ -116,15 +125,12 @@ if(Neko_SDL2)
     set(SDL_STATIC ON CACHE INTERNAL "")
     set(SDL_SHARED OFF CACHE INTERNAL "")
     set(SDL_ENGINE_DIR ON CACHE INTERNAL "")
-    if(NOT Emscripten)
-        add_subdirectory(${SDL_DIR})
-    ENDIF()
+    add_subdirectory(${SDL_DIR})
     include_directories(${SDL_DIR}/include ${SDL_DIR}/src)
 
     add_subdirectory("common/sdl_engine")
-    if(NOT Emscripten)
-        target_precompile_headers(sdl_engine PRIVATE "common/sdl_engine/include/sdl_wrapper_pch.h")
-    endif()
+    target_precompile_headers(sdl_engine PRIVATE "common/sdl_engine/include/sdl_wrapper_pch.h")
+
 endif()
 
 if(Neko_Assimp)
@@ -164,18 +170,6 @@ if(Neko_Freetype)
     include_directories("${FREETYPE_DIR}")
     add_subdirectory("${FREETYPE_DIR}")
     set_target_properties (freetype PROPERTIES FOLDER Externals)
-endif()
-
-if(Neko_Test)
-    enable_testing()
-    set(GOOGLE_TEST_DIR ${EXTERNAL_DIR}/googletest-1.8.1)
-    set(BUILD_GMOCK OFF CACHE INTERNAL "")
-    set(INSTALL_GTEST OFF CACHE INTERNAL "")
-    add_subdirectory(${GOOGLE_TEST_DIR})
-    include_directories(${GOOGLE_TEST_DIR}/include)
-    add_subdirectory("test/")
-    set_target_properties (gtest PROPERTIES FOLDER Externals/GTest)
-    set_target_properties(gtest_main PROPERTIES FOLDER Externals/GTest)
 endif()
 
 if(Neko_Benchmark)

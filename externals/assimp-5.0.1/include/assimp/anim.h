@@ -494,7 +494,7 @@ struct aiAnimation {
 
 }
 
-/// @brief  Some C++ utilities for inter- and extrapolation
+/// @brief  Some C++ utils for inter- and extrapolation
 namespace Assimp {
 
 // ---------------------------------------------------------------------------

@@ -1529,7 +1529,7 @@ generateMipmaps(ktxVulkanTexture* vkTexture, ktxVulkanDeviceInfo* vdi,
 }
 
 //======================================================================
-//  ktxVulkanTexture utilities
+//  ktxVulkanTexture utils
 //======================================================================
 
 /**

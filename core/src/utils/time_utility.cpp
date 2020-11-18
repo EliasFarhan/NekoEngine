@@ -24,7 +24,7 @@
 
 #include <thread>
 #include <chrono>
-#include <utilities/time_utility.h>
+#include <utils/time_utility.h>
 
 namespace neko
 {

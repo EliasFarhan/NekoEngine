@@ -25,7 +25,7 @@
 
 #include <vector>
 #include <engine/globals.h>
-#include <utilities/json_utility.h>
+#include <utils/json_utility.h>
 #include "entity.h"
 #include <sole.hpp>
 #include "component.h"

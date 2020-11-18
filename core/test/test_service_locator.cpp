@@ -2,7 +2,7 @@
 // Created by efarhan on 25.01.20.
 //
 #include <gtest/gtest.h>
-#include "utilities/service_locator.h"
+#include "utils/service_locator.h"
 
 class ProutInterface
 {

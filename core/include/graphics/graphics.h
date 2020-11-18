@@ -27,12 +27,12 @@
 #include <array>
 #include <vector>
 #include <thread>
-#include <utilities/service_locator.h>
+#include <utils/service_locator.h>
 
 #include "engine/system.h"
 #include "engine/log.h"
 #include "engine/jobsystem.h"
-#include "utilities/action_utility.h"
+#include "utils/action_utility.h"
 
 namespace neko
 {

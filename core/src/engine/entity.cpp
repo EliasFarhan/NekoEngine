@@ -24,7 +24,7 @@
 #include <engine/entity.h>
 #include "engine/globals.h"
 #include <algorithm>
-#include <utilities/vector_utility.h>
+#include <utils/vector_utility.h>
 #include <engine/component.h>
 #include <sstream>
 #include <engine/log.h>

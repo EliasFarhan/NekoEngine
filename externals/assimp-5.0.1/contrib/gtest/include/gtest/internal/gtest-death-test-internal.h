@@ -31,7 +31,7 @@
 //
 // The Google C++ Testing Framework (Google Test)
 //
-// This header file defines internal utilities needed for implementing
+// This header file defines internal utils needed for implementing
 // death tests.  They are subject to change without notice.
 
 #ifndef GTEST_INCLUDE_GTEST_INTERNAL_GTEST_DEATH_TEST_INTERNAL_H_

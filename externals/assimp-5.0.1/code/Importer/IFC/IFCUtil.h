@@ -87,7 +87,7 @@ struct TempMesh {
     std::vector<IfcVector3> mVerts;
     std::vector<unsigned int> mVertcnt;
 
-    // utilities
+    // utils
     aiMesh* ToMesh();
     void Clear();
     void Transform(const IfcMatrix4& mat);

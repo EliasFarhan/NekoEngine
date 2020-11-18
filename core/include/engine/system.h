@@ -22,7 +22,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-#include <utilities/time_utility.h>
+#include <utils/time_utility.h>
 
 namespace neko
 {

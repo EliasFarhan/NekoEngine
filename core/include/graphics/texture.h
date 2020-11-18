@@ -29,7 +29,7 @@
 #include <engine/resource.h>
 #include <xxhash.hpp>
 #include <sole.hpp>
-#include <utilities/service_locator.h>
+#include <utils/service_locator.h>
 
 namespace neko
 {

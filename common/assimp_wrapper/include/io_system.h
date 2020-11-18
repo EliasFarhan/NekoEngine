@@ -25,7 +25,7 @@
  */
 
 #include <assimp/IOSystem.hpp>
-#include <utilities/file_utility.h>
+#include <utils/file_utility.h>
 
 #include <assimp/IOStream.hpp>
 

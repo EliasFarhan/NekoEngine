@@ -1,0 +1,11 @@
+{
+    "$schema": "http://json-schema.org/schema#",
+    "type": "object",
+    "properties": 
+    {
+        "scene_name": { "type": "string" },
+        "uuid": { "type": "string" }
+      },
+      "additionalProperties": false,
+      "required": ["uuid"]
+}

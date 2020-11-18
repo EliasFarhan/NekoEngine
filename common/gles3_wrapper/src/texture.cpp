@@ -25,7 +25,7 @@
 #include "gl/texture.h"
 #include "gl/gles3_include.h"
 
-#include "utilities/file_utility.h"
+#include "utils/file_utility.h"
 
 #include <sstream>
 #include <engine/log.h>

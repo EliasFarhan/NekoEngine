@@ -23,7 +23,7 @@
  SOFTWARE.
  */
 
-#include <utilities/json_utility.h>
+#include <utils/json_utility.h>
 #include "entity.h"
 #include <engine/component.h>
 #include "graphics/color.h"

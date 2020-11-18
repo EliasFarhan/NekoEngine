@@ -99,7 +99,6 @@ void Gles3Window::Init()
     glCheckError();
 	InitImGui();
     glCheckError();
-#ifndef NEKO_SAMETHREAD
     LeaveCurrentContext();
 	
 	Job initRenderJob([this] { MakeCurrentContext(); });
@@ -107,7 +106,6 @@ void Gles3Window::Init()
 	engine->ScheduleJob(&initRenderJob, JobThreadType::RENDER_THREAD);
 
 	initRenderJob.Join();
-#endif
 	
 }
 
@@ -150,14 +148,12 @@ void Gles3Window::Destroy()
 #ifdef EASY_PROFILE_USE
 	EASY_BLOCK("DestroyWindow");
 #endif
-#ifndef NEKO_SAMETHREAD
 	Job leaveContext([this]
 	{
 	    LeaveCurrentContext();
 	});
 	BasicEngine::GetInstance()->ScheduleJob(&leaveContext, JobThreadType::RENDER_THREAD);
 	leaveContext.Join();
-#endif
 	MakeCurrentContext();
 	ImGui_ImplOpenGL3_Shutdown();
 	// Delete our OpengL context
@@ -198,7 +194,6 @@ void Gles3Window::AfterRenderLoop()
 void Gles3Window::MakeCurrentContext()
 {
 	SDL_GL_MakeCurrent(window_, glRenderContext_);
-#ifndef EMSCRIPTEN
 	const auto currentContext = SDL_GL_GetCurrentContext();
 	std::ostringstream oss;
 	oss << "Current Context: " << currentContext << " Render Context: " << glRenderContext_ << " from Thread: " << std::this_thread::get_id();
@@ -207,13 +202,12 @@ void Gles3Window::MakeCurrentContext()
 		oss << "\nSDL Error: " << SDL_GetError();
 	}
 	logDebug(oss.str());
-#endif
+
 }
 
 void Gles3Window::LeaveCurrentContext()
 {
 	SDL_GL_MakeCurrent(window_, nullptr);
-#ifndef EMSCRIPTEN
 	const auto currentContext = SDL_GL_GetCurrentContext();
 
 	std::ostringstream oss;
@@ -223,7 +217,7 @@ void Gles3Window::LeaveCurrentContext()
 		oss << "[Error] After Leave Current Context, context: " << currentContext;
 	}
 	logDebug(oss.str());
-#endif
+
 }
 }
 

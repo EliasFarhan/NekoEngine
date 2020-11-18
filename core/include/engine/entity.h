@@ -27,7 +27,7 @@
 #include <vector>
 #include <engine/globals.h>
 #include <xxhash.hpp>
-#include "utilities/action_utility.h"
+#include "utils/action_utility.h"
 #include "engine/system.h"
 
 namespace neko

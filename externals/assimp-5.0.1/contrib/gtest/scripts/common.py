@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Shared utilities for writing scripts for Google Test/Mock."""
+"""Shared utils for writing scripts for Google Test/Mock."""
 
 __author__ = 'wan@google.com (Zhanyong Wan)'
 

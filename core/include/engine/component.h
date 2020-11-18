@@ -25,8 +25,8 @@
 
 #include <engine/entity.h>
 #include <engine/globals.h>
-#include <utilities/vector_utility.h>
-#include <utilities/json_utility.h>
+#include <utils/vector_utility.h>
+#include <utils/json_utility.h>
 
 
 namespace neko

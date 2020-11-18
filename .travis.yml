@@ -23,7 +23,7 @@ matrix:
         - mkdir build
         - cd build
         - cmake .. && make
-        - ./test/Neko_TEST
+        - ./core/Neko_TEST
     - name: "Linux ARM64 Clang"
       os: linux
       arch: arm64
@@ -46,37 +46,7 @@ matrix:
         - mkdir build
         - cd build
         - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. && make
-        - ./test/Neko_TEST
-    - name: "Emscripten"
-      os: linux
-      arch: amd64
-      dist: focal
-      compiler: clang
-      addons:
-        apt:
-          packages:
-            - python3-dev
-            - glslang-tools
-            - libzstd-dev
-      before_script:
-        - cd externals/KTX-Software
-        - mkdir build && cd build
-        - cmake -DCMAKE_BUILD_TYPE=Release -DKTX_VERSION_FULL="v4.0.0-beta4" .. && make mkvk toktx
-        - export TOKTX_EXE="$PWD/tools/toktx/toktx"
-        - cd ../../..
-        - git clone https://github.com/emscripten-core/emsdk.git
-        - cd emsdk
-        - ./emsdk install latest
-        - ./emsdk activate latest
-        - source ./emsdk_env.sh
-        - cd ..
-      script:
-        - ls
-        - mkdir build
-        - cd build
-        - emcmake cmake .. || true
-        - emcmake cmake .. && make comp_graph Neko_TEST
-        - node test/Neko_TEST.js
+        - ./core/Neko_TEST
     - name: "Windows MSVC"
       os: windows
       env:
@@ -93,7 +63,7 @@ matrix:
         - mkdir build && cd build
         - cmake -G "Visual Studio 16 2019" ..
         - cmake --build .
-        - ./test/Debug/Neko_TEST.exe
+        - ./core/Debug/Neko_TEST.exe
 
 # Don't send notifications on success
 notifications:

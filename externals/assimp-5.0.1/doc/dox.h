@@ -1533,7 +1533,7 @@ But the general rule of thumb is <i>be strict in what you write and tolerant in 
 <ul>
 <li>
 Take care of endianness issues! Assimp importers mostly support big-endian platforms, which define the <tt>AI_BUILD_BIG_ENDIAN</tt> constant.
-See the next section for a list of utilities to simplify this task.
+See the next section for a list of utils to simplify this task.
 </li>
 <li>
 Don't trust the input data! Check all offsets!
@@ -1594,7 +1594,7 @@ bool xxxxImporter::CanRead( const std::string& pFile, IOSystem* pIOHandler,
 		// no extension given, or we're called a second time because no
 		// suitable loader was found yet. This means, we're trying to open
 		// the file and look for and hints to identify the file format.
-		// #Assimp::BaseImporter provides some utilities:
+		// #Assimp::BaseImporter provides some utils:
 		//
 		// #Assimp::BaseImporter::SearchFileHeaderForToken - for text files.
 		// It reads the first lines of the file and does a substring check

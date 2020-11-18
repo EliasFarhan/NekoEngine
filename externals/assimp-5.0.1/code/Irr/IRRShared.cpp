@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /** @file  IRRShared.cpp
- *  @brief Shared utilities for the IRR and IRRMESH loaders
+ *  @brief Shared utils for the IRR and IRRMESH loaders
  */
 
 

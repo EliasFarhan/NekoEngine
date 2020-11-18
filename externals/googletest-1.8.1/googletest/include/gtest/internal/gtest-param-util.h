@@ -28,7 +28,7 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-// Type and function utilities for implementing parameterized tests.
+// Type and function utils for implementing parameterized tests.
 
 // GOOGLETEST_CM0001 DO NOT DELETE
 

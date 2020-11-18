@@ -3,7 +3,7 @@
 
 #include "io_system.h"
 #include "assimp/postprocess.h"
-#include "utilities/file_utility.h"
+#include "utils/file_utility.h"
 #include "engine/engine.h"
 #include "gl/model.h"
 

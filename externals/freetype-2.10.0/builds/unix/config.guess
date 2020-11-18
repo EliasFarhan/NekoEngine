@@ -205,7 +205,7 @@ case "$UNAME_MACHINE:$UNAME_SYSTEM:$UNAME_RELEASE:$UNAME_VERSION" in
 		if echo __ELF__ | $CC_FOR_BUILD -E - 2>/dev/null \
 			| grep -q __ELF__
 		then
-		    # Once all utilities can be ECOFF (netbsdecoff) or a.out (netbsdaout).
+		    # Once all utils can be ECOFF (netbsdecoff) or a.out (netbsdaout).
 		    # Return netbsd for either.  FIX?
 		    os=netbsd
 		else

@@ -208,7 +208,7 @@ namespace astc
 using std::vector;
 namespace
 {
-// Common utilities
+// Common utils
 enum
 {
 	MAX_BLOCK_WIDTH		= 12,
@@ -328,7 +328,7 @@ inline int computeNumColorEndpointValues (deUint32 endpointMode)
 	DE_ASSERT(endpointMode < 16);
 	return (endpointMode/4 + 1) * 2;
 }
-// Decompression utilities
+// Decompression utils
 enum DecompressResult
 {
 	DECOMPRESS_RESULT_VALID_BLOCK	= 0,	//!< Decompressed valid block

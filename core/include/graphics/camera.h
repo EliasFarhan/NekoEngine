@@ -27,7 +27,7 @@
 #include <mathematics/vector.h>
 #include <mathematics/matrix.h>
 #include "mathematics/transform.h"
-#include "utilities/service_locator.h"
+#include "utils/service_locator.h"
 
 namespace neko
 {

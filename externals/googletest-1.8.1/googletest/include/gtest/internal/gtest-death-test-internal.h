@@ -29,7 +29,7 @@
 //
 // The Google C++ Testing and Mocking Framework (Google Test)
 //
-// This header file defines internal utilities needed for implementing
+// This header file defines internal utils needed for implementing
 // death tests.  They are subject to change without notice.
 // GOOGLETEST_CM0001 DO NOT DELETE
 

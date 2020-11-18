@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /** @file  DXFHelper.h
- *  @brief Internal utilities for the DXF loader.
+ *  @brief Internal utils for the DXF loader.
  */
 
 #ifndef INCLUDED_DXFHELPER_H
@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace Assimp {
 namespace DXF {
 
-// read pairs of lines, parse group code and value and provide utilities
+// read pairs of lines, parse group code and value and provide utils
 // to convert the data to the target data type.
 // do NOT skip empty lines. In DXF files, they count as valid data.
 class LineReader {

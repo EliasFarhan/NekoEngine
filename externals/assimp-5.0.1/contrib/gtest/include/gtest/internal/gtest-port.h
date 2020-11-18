@@ -29,7 +29,7 @@
 //
 // Authors: wan@google.com (Zhanyong Wan)
 //
-// Low-level types and utilities for porting Google Test to various
+// Low-level types and utils for porting Google Test to various
 // platforms.  All macros ending with _ and symbols defined in an
 // internal namespace are subject to change without notice.  Code
 // outside Google Test MUST NOT USE THEM DIRECTLY.  Macros that don't
@@ -186,10 +186,10 @@
 //   GTEST_FLAG(flag_name)  - references the variable corresponding to
 //                            the given Google Test flag.
 
-// Internal utilities
+// Internal utils
 // ------------------
 //
-// The following macros and utilities are for Google Test's INTERNAL
+// The following macros and utils are for Google Test's INTERNAL
 // use only.  Code outside Google Test MUST NOT USE THEM DIRECTLY.
 //
 // Macros for basic C++ coding:
@@ -245,12 +245,12 @@
 //                  - integers of known sizes.
 //   BiggestInt     - the biggest signed integer type.
 //
-// Command-line utilities:
+// Command-line utils:
 //   GTEST_DECLARE_*()  - declares a flag.
 //   GTEST_DEFINE_*()   - defines a flag.
 //   GetInjectableArgvs() - returns the command line as a vector of strings.
 //
-// Environment variable utilities:
+// Environment variable utils:
 //   GetEnv()             - gets the value of an environment variable.
 //   BoolFromGTestEnv()   - parses a bool environment variable.
 //   Int32FromGTestEnv()  - parses an Int32 environment variable.
@@ -1235,7 +1235,7 @@ GTEST_API_ ::std::string FormatFileLocation(const char* file, int line);
 GTEST_API_ ::std::string FormatCompilerIndependentFileLocation(const char* file,
                                                                int line);
 
-// Defines logging utilities:
+// Defines logging utils:
 //   GTEST_LOG_(severity) - logs messages at the specified severity level. The
 //                          message itself is streamed into the macro.
 //   LogToStderr()  - directs all log messages to stderr.

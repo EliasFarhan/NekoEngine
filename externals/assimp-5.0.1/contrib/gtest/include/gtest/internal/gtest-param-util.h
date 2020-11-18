@@ -29,7 +29,7 @@
 //
 // Author: vladl@google.com (Vlad Losev)
 
-// Type and function utilities for implementing parameterized tests.
+// Type and function utils for implementing parameterized tests.
 
 #ifndef GTEST_INCLUDE_GTEST_INTERNAL_GTEST_PARAM_UTIL_H_
 #define GTEST_INCLUDE_GTEST_INTERNAL_GTEST_PARAM_UTIL_H_
