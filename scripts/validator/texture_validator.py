@@ -3,22 +3,30 @@ import sys
 import os
 from os import environ
 from pathlib import Path
+import subprocess
+
+src_path = environ.get("SRC_FOLDER")
+basisu_exe = environ.get("BASISU_EXE")
+if basisu_exe is None:
+    exit(1)
 
 ktxable_texture_ext = [
     ".jpeg",
     ".jpg",
     ".png",
-    ".pam",
-    ".ppm",
-    ".pgm"
+    ".bmp",
+    ".tga"
+]
+
+compression_types = [
+    "uastc",
 ]
 
 
 def convert_to_ktx(img, img_out, meta_data):
-    toktx_exe = environ.get("TOKTX_EXE")
-    if toktx_exe is None:
-        return 1
-    arg = ""
+    # TODO select the format accroding to format DXT1 (TGB) DXT5 (RGBA)
+    return 0
+    arg = []
 
     if "linear" in meta_data:
         linear = meta_data["linear"]
@@ -26,17 +34,8 @@ def convert_to_ktx(img, img_out, meta_data):
         linear = True
         meta_data["linear"] = linear
     if linear:
-        arg += " --linear "
-    else:
-        arg += " --srgb "
+        arg.append("-linear")
 
-    if "ktx2" in meta_data:
-        ktx2 = meta_data["ktx2"]
-    else:
-        ktx2 = True
-        meta_data["ktx2"] = ktx2
-    if ktx2:
-        arg += " --t2 "
 
     if "genmipmap" in meta_data:
         genmipmap = meta_data["genmipmap"]
@@ -44,28 +43,51 @@ def convert_to_ktx(img, img_out, meta_data):
         genmipmap = True
         meta_data["genmipmap"] = genmipmap
     if genmipmap:
-        arg += " --genmipmap "
+        arg.append("-mipmap")
 
     if "compression" in meta_data:
         compression = meta_data["compression"]
     else:
-        compression = "zcmp"
+        compression = "none"
         meta_data["compression"] = compression
-    if compression == "bcmp":
-        arg += " --bcmp "
-    elif compression == "zcmp":
-        if "zcmp_level" in meta_data:
-            zcmp_level = meta_data["zcmp_level"]
+
+    if compression == "uastc":
+        if "uastc_level" in meta_data:
+            uastc_level = meta_data["uastc_level"]
         else:
-            zcmp_level = 3
-            meta_data["zcmp_level"] = zcmp_level
-        arg += " --zcmp {} ".format(zcmp_level)
+            uastc_level = 2
+            meta_data["uastc_level"] = uastc_level
+        arg.append("-uastc")
+        arg.append("-uastc_level")
+        arg.append(str(uastc_level))
 
     if os.path.isfile(img_out):
         os.remove(img_out)
-    command = "{} {} {} {}".format(toktx_exe, arg, img_out, img)
+    
+    tmp_folder = os.path.join(src_path, "tmp")
+    if not os.path.isdir(tmp_folder):
+        try:
+            os.mkdir(tmp_folder)
+        except OSError:
+            sys.stderr.write("Error while creating folder {}".format(tmp_folder))
+
+    img_name = Path(img).stem+".basis"
+    basis_path =  os.path.join(tmp_folder, img_name)
+    command = [basisu_exe, "-file", img, "-output_file", basis_path]
+    command.extend(arg)
     print(command)
-    return os.system(command)
+    status = subprocess.run(command)
+    if status.returncode != 0:
+        sys.stderr.write("[Error] Could not generate basis file\n")
+        return status.returncode
+    command = [basisu_exe, "-file", basis_path, "-unpack", "-output_path", tmp_folder+"/"]
+    print(command)
+    status = subprocess.run(command)
+    if status.returncode != 0:
+        sys.stderr.write("[Error] Could not generate ktx file\n")
+        return status.returncode
+    
+    return 0
 
 
 def validate_texture(img_src, img_out, meta_data):

@@ -23,7 +23,7 @@ matrix:
         - mkdir build
         - cd build
         - cmake .. && make
-        - ./core/Neko_TEST
+        - ./core/Neko_Core_Test
     - name: "Linux ARM64 Clang"
       os: linux
       arch: arm64
@@ -46,7 +46,7 @@ matrix:
         - mkdir build
         - cd build
         - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. && make
-        - ./core/Neko_TEST
+        - ./core/Neko_Core_Test
     - name: "Windows MSVC"
       os: windows
       env:
@@ -63,7 +63,7 @@ matrix:
         - mkdir build && cd build
         - cmake -G "Visual Studio 16 2019" ..
         - cmake --build .
-        - ./core/Debug/Neko_TEST.exe
+        - ./core/Debug/Neko_Core_Test.exe
 
 # Don't send notifications on success
 notifications:

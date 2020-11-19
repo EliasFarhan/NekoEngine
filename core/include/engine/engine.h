@@ -43,7 +43,7 @@ class Window;
  */
 struct Configuration
 {
-	std::string windowName = "NekoEngine 0.1";
+    std::string windowName = "NekoEngine 0.1";
     Vec2u windowSize = Vec2u(1024, 1024);
     Vec2u gameWindowSize{1280, 720};
     bool fullscreen = false;

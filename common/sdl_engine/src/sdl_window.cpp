@@ -46,7 +46,7 @@ void sdl::SdlWindow::Init()
     auto& config = BasicEngine::GetInstance()->config;
 
 
-    auto flags = SDL_WINDOW_RESIZABLE |
+    flags_ = SDL_WINDOW_RESIZABLE |
 #ifdef NEKO_GLES3
         SDL_WINDOW_OPENGL
 #endif
@@ -56,30 +56,30 @@ void sdl::SdlWindow::Init()
     config.windowSize = Vec2u(1280, 720);
     config.fullscreen = true;
 #endif
-                    ;
+    ;
     auto windowSize = config.windowSize;
     if (config.fullscreen)
     {
         windowSize = Vec2u::zero;
-        flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+        flags_ |= SDL_WINDOW_FULLSCREEN_DESKTOP;
     }
     window_ = SDL_CreateWindow(
-            config.windowName.c_str(),
-            SDL_WINDOWPOS_UNDEFINED,
-            SDL_WINDOWPOS_UNDEFINED,
-            windowSize.x,
-            windowSize.y,
-            flags
+        config.windowName.c_str(),
+        SDL_WINDOWPOS_UNDEFINED,
+        SDL_WINDOWPOS_UNDEFINED,
+        windowSize.x,
+        windowSize.y,
+        flags_
     );
-	if(config.fullscreen)
-	{
+    if (config.fullscreen)
+    {
         int windowSizeW = 0;
         int windowSizeH = 0;
         SDL_GetWindowSize(window_, &windowSizeW, &windowSizeH);
         windowSize.x = windowSizeW;
         windowSize.y = windowSizeH;
         config.windowSize = windowSize;
-	}
+    }
     // Check that everything worked out okay
     if (window_ == nullptr)
     {
@@ -93,12 +93,12 @@ void sdl::SdlWindow::InitImGui()
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("InitSdlImGui");
 #endif
-// Setup Dear ImGui context
+    // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
-    (void) io;
-	
+    (void)io;
+
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Keyboard Gamepad
 

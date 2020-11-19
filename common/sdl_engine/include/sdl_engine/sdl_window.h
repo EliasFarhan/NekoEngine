@@ -47,5 +47,7 @@ protected:
 
     virtual void InitImGui();
     SDL_Window* window_ = nullptr;
+
+    int flags_ = 0;
 };
 }

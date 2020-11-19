@@ -56,11 +56,11 @@ void Gles3Window::Init()
 #ifdef WIN32
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6);
 #else
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 #endif
 
 
@@ -96,10 +96,10 @@ void Gles3Window::Init()
 #else
 	SDL_GL_SetSwapInterval(false);
 #endif
-    glCheckError();
-	InitImGui();
-    glCheckError();
-    LeaveCurrentContext();
+        glCheckError();
+        InitImGui();
+        glCheckError();
+        LeaveCurrentContext();
 	
 	Job initRenderJob([this] { MakeCurrentContext(); });
 	auto* engine = BasicEngine::GetInstance();

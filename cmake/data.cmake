@@ -79,7 +79,9 @@ foreach(DATA ${DATA_FILES})
             DEPENDS ${DATA}
             DEPENDS
             COMMAND ${CMAKE_COMMAND} -E copy ${DATA} "${PROJECT_BINARY_DIR}/${PATH_NAME}/${FILE_NAME}"
-            COMMAND ${CMAKE_COMMAND} -E env VALIDATE_JSON_EXE=$<TARGET_FILE:validate_json> VALIDATOR_FOLDER=${CMAKE_SOURCE_DIR}/validator/ TOKTX_EXE=$<TARGET_FILE:toktx> BINARY_FOLDER=${CMAKE_BINARY_DIR} "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/scripts/validator/asset_validator.py"  "${DATA}" "${DATA_OUTPUT}"
+            COMMAND ${CMAKE_COMMAND} -E env VALIDATE_JSON_EXE=$<TARGET_FILE:validate_json> VALIDATOR_FOLDER=${CMAKE_SOURCE_DIR}/validator/ 
+            BASISU_EXE=$<TARGET_FILE:basisu> SRC_FOLDER=${CMAKE_SOURCE_DIR} BINARY_FOLDER=${CMAKE_BINARY_DIR} 
+            "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/scripts/validator/asset_validator.py"  "${DATA}" "${DATA_OUTPUT}"
 
     )
     list(APPEND DATA_BINARY_FILES ${DATA_OUTPUT})
@@ -89,8 +91,7 @@ add_custom_target(
         DataTarget
         DEPENDS ${DATA_BINARY_FILES} ${DATA_FILES})
 if(Neko_KTX)
-    add_dependencies(DataTarget mkvk)
-    add_dependencies(DataTarget toktx)
+    add_dependencies(DataTarget basisu)
 endif()
 add_dependencies(DataTarget validate_json)
 

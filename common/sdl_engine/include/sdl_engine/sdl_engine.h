@@ -55,7 +55,6 @@ public:
 protected:
     Action<const SDL_Event&> onEventAction_;
 
-
 };
 
 }
