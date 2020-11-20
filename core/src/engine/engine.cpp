@@ -150,9 +150,13 @@ void BasicEngine::Destroy()
 {
 	destroyAction_.Execute();
     if (renderer_)
+    {
         renderer_->Destroy();
-    if(window_)
+    }
+    if (window_)
+    {
         window_->Destroy();
+    }
 	jobSystem_.Destroy();
 	instance_ = nullptr;
 }

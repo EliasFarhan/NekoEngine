@@ -57,7 +57,7 @@ public:
 protected:
     const std::string_view resourceMetafile_ = ".meta";
 
-
+    Resource currentLoadedResource_ {};
     std::map<ResourceId, BufferFile> resourceMap_;
     std::map<ResourceId, std::string> resourcePathMap_;
     std::vector<Resource> resourceQueue_;

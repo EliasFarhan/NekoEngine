@@ -40,15 +40,12 @@ ResourceManager::ResourceManager(): resourceJob_([this]()
 #ifdef EASY_PROFILE_USE
         EASY_BLOCK("Loading Resource");
 #endif
-    neko_assert(!resourceQueue_.empty(), "Queue should not be empty");
-    auto& resource = resourceQueue_.front();
     BufferFile newFile;
-    newFile.Load(resource.assetPath);
+    newFile.Load(currentLoadedResource_.assetPath);
     {
         std::lock_guard<std::mutex> lock(resourceMapMutex_);
-        resourceMap_[resource.resourceId] = std::move(newFile);
+        resourceMap_[currentLoadedResource_.resourceId] = std::move(newFile);
     }
-    resourceQueue_.erase(resourceQueue_.cbegin());
 })
 {
 }
@@ -76,6 +73,7 @@ ResourceId ResourceManager::LoadResource(const std::string_view assetPath)
     else
     {
         logDebug("[Error] Resource does not have an uuid in its meta file");
+        return resourceId;
     }
 
     const auto it = resourcePathMap_.find(resourceId);
@@ -98,6 +96,8 @@ void ResourceManager::Update([[maybe_unused]]seconds dt)
     {
         if(!resourceJob_.HasStarted() || resourceJob_.IsDone())
         {
+            currentLoadedResource_ = resourceQueue_.front();
+            resourceQueue_.erase(resourceQueue_.cbegin());
             resourceJob_.Reset();
             BasicEngine::GetInstance()->ScheduleJob(
                 &resourceJob_, 
