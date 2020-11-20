@@ -1,0 +1,16 @@
+{
+    "$schema": "http://json-schema.org/schema",
+    "type":"object",
+    "properties": {
+        "windowName" : {"type":"string"},
+        "windowSize":{"type":"array", "items": {"type":"number"}, "minProperties":2, "maxProperties": 2},
+        "fullscreen": {"type":"boolean"},
+        "vsync": {"type": "boolean"},
+        "framerateLimit":{"type":"number"},
+        "dataRootPath":{"type":"string"},
+        "depthTest":{"type":"boolean"},
+        "depthSize":{"type":"number"},
+        "stencilSize":{"type":"number"},
+        "stencilTest":{"type":"boolean"}
+    }
+}

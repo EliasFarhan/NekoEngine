@@ -101,7 +101,8 @@ void BasicEngine::Init()
 #endif
 	instance_ = this;
 	logDebug("Current path: " + GetCurrentPath());
-	jobSystem_.Init();
+    jobSystem_.Init();
+    initAction_.Execute();
 }
 
 void BasicEngine::Update(seconds dt)
@@ -110,39 +111,48 @@ void BasicEngine::Update(seconds dt)
 #ifdef EASY_PROFILE_USE
 	EASY_BLOCK("Basic Engine Update");
 #endif
-
-    renderer_->ResetJobs();
-    window_->ResetJobs();
+    if(renderer_)
+        renderer_->ResetJobs();
+    if(window_)
+        window_->ResetJobs();
 	
     Job eventJob([this]
     {
 	    ManageEvent();
     });
+    Job* swapBufferJob = nullptr;
     Job updateJob([this, &dt]{updateAction_.Execute(dt);});
     updateJob.AddDependency(&eventJob);
+    if (renderer_)
+    {
+        Job* rendererSyncJob = renderer_->GetSyncJob();
+        updateJob.AddDependency(rendererSyncJob);
 
-    Job* rendererSyncJob = renderer_->GetSyncJob();
-    updateJob.AddDependency(rendererSyncJob);
+        Job* renderJob = renderer_->GetRenderAllJob();
+        renderJob->AddDependency(&eventJob);
 
-    Job* renderJob = renderer_->GetRenderAllJob();
-    renderJob->AddDependency(&eventJob);
+        swapBufferJob = window_->GetSwapBufferJob();
+        swapBufferJob->AddDependency(renderJob);
+        swapBufferJob->AddDependency(&updateJob);
 
-    Job* swapBufferJob = window_->GetSwapBufferJob();
-    swapBufferJob->AddDependency(renderJob);
-    swapBufferJob->AddDependency(&updateJob);
+        renderer_->ScheduleJobs();
+        jobSystem_.ScheduleJob(swapBufferJob, JobThreadType::RENDER_THREAD);
 
-    renderer_->ScheduleJobs();
-    jobSystem_.ScheduleJob(swapBufferJob, JobThreadType::RENDER_THREAD);
+
+    }
     jobSystem_.ScheduleJob(&eventJob, JobThreadType::MAIN_THREAD);
     jobSystem_.ScheduleJob(&updateJob, JobThreadType::MAIN_THREAD);
-    swapBufferJob->Join();
+    if(swapBufferJob)
+        swapBufferJob->Join();
 }
 
 void BasicEngine::Destroy()
 {
 	destroyAction_.Execute();
-    renderer_->Destroy();
-	window_->Destroy();
+    if (renderer_)
+        renderer_->Destroy();
+    if(window_)
+        window_->Destroy();
 	jobSystem_.Destroy();
 	instance_ = nullptr;
 }

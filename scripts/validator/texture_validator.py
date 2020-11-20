@@ -80,20 +80,54 @@ def convert_to_ktx(img, img_out, meta_data):
         return status.returncode
     img_format_json = json.loads(status.stdout)
     channel_count = img_format_json["channelCount"]
+    transcoder = ""
+    if "transcoder" in meta_data:
+        transcoder = meta_data["transcoder"]
+    
+        
     output_format = []
+    # RGB
     if channel_count == 3:
         output_format.append("-format")
-        output_format.append("BC1")
+        # default format is bc1
+        if not transcoder:
+            transcoder = "bc1"
+
+        if transcoder == "bc1":
+            output_format.append("BC1")
+        elif transcoder == "bc7":
+            output_format.append("BC7")
+        elif transcoder == "etc1":
+            output_format.append("ETC1")
+        else:
+            sys.stderr.write("Warning trying to add a non supported format for RGB")
+            output_format.append("BC1")
+            transcoder = "bc1"
+        meta_data["transcoder"] = transcoder
+    # RGBA
     elif channel_count == 4:
         output_format.append("-format")
-        output_format.append("BC3")
+        if not transcoder:
+            transcoder = "bc3"
+        if transcoder == "bc3":
+            output_format.append("BC3")
+        elif transcoder == "bc7":
+            output_format.append("BC7")
+        elif transcoder == "etc2":
+            output_format.append("ETC2")
+        else:
+            sys.stderr.write("Warning trying to add a non supported format for RGBA")
+            output_format.append("BC3")
+            transcoder = "bc3"
+        meta_data["transcoder"] = transcoder
     elif channel_count == 1:
         output_format.append("-format")
         output_format.append("BC4")
+        meta_data["transcoder"] = "bc4"
     elif channel_count == 2:
         output_format.append("-format")
         output_format.append("BC5")
-
+        meta_data["transcoder"] = "bc5"
     # convert to basis in tmp folder
     img_name = Path(img).stem+".basis"
     basis_path = os.path.join(tmp_folder, img_name)
@@ -113,7 +147,7 @@ def convert_to_ktx(img, img_out, meta_data):
     if status.returncode != 0:
         sys.stderr.write("[Error] Could not generate ktx file\n")
         return status.returncode
-    
+    meta_data["ktx_path"] = img_out
     return 0
 
 
