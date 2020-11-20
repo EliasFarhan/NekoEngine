@@ -81,6 +81,7 @@ foreach(DATA ${DATA_FILES})
             COMMAND ${CMAKE_COMMAND} -E copy ${DATA} "${PROJECT_BINARY_DIR}/${PATH_NAME}/${FILE_NAME}"
             COMMAND ${CMAKE_COMMAND} -E env VALIDATE_JSON_EXE=$<TARGET_FILE:validate_json> VALIDATOR_FOLDER=${CMAKE_SOURCE_DIR}/validator/ 
             BASISU_EXE=$<TARGET_FILE:basisu> SRC_FOLDER=${CMAKE_SOURCE_DIR} BINARY_FOLDER=${CMAKE_BINARY_DIR} 
+            IMAGE_FORMAT_EXE=$<TARGET_FILE:image_format>
             "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/scripts/validator/asset_validator.py"  "${DATA}" "${DATA_OUTPUT}"
 
     )
@@ -88,14 +89,14 @@ foreach(DATA ${DATA_FILES})
 endforeach(DATA)
 
 add_custom_target(
-        DataTarget
+        GenerateData
         DEPENDS ${DATA_BINARY_FILES} ${DATA_FILES})
 if(Neko_KTX)
-    add_dependencies(DataTarget basisu)
+    add_dependencies(GenerateData basisu image_format)
 endif()
-add_dependencies(DataTarget validate_json)
+add_dependencies(GenerateData validate_json)
 
-set_target_properties (DataTarget PROPERTIES FOLDER Neko/Core)
+set_target_properties (GenerateData PROPERTIES FOLDER Neko/Core)
 
 if(MSVC)
     if (${CMAKE_HOST_SYSTEM_PROCESSOR} STREQUAL "AMD64")
