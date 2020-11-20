@@ -24,29 +24,6 @@ matrix:
         - cd build
         - cmake .. && make
         - ./core/Neko_Core_Test
-    - name: "Linux ARM64 Clang"
-      os: linux
-      arch: arm64
-      dist: focal
-      compiler: clang
-      addons:
-        apt:
-          packages:
-            - clang
-            - libc++-dev
-            - libc++abi-dev
-            - libsdl2-dev
-            - python3-dev
-            - glslang-tools
-            - libzstd-dev
-            - nodejs
-      before_install:
-        - eval "CC=clang && CXX=clang++"
-      script:
-        - mkdir build
-        - cd build
-        - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. && make
-        - ./core/Neko_Core_Test
     - name: "Windows MSVC"
       os: windows
       env:

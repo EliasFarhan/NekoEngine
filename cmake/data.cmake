@@ -1,9 +1,7 @@
 
-if(CMAKE_MINOR_VERSION LESS 11)
-find_package(PythonInterp)
-else()
+
 find_package (Python3 REQUIRED COMPONENTS Interpreter)
-endif()
+
 MESSAGE("Python Interpreter: ${Python3_EXECUTABLE}")
 
 file(GLOB_RECURSE SCRIPT_FILES scripts/*.py)

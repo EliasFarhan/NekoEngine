@@ -137,7 +137,7 @@ endif()
 
 if(Neko_SDL2)
     #sdl2
-    set(SDL_VERSION 2.0.9)
+    set(SDL_VERSION 2.0.12)
     set(SDL_DIR ${EXTERNAL_DIR}/SDL2-${SDL_VERSION}/)
     set(SDL_STATIC ON CACHE INTERNAL "")
     set(SDL_SHARED OFF CACHE INTERNAL "")

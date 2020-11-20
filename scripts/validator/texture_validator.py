@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import sys
 import os
+import json
 from os import environ
 from pathlib import Path
 import subprocess
@@ -8,6 +9,9 @@ import subprocess
 src_path = environ.get("SRC_FOLDER")
 basisu_exe = environ.get("BASISU_EXE")
 if basisu_exe is None:
+    exit(1)
+img_format_exe = environ.get("IMAGE_FORMAT_EXE")
+if img_format_exe is None:
     exit(1)
 
 ktxable_texture_ext = [
@@ -24,8 +28,6 @@ compression_types = [
 
 
 def convert_to_ktx(img, img_out, meta_data):
-    # TODO select the format accroding to format DXT1 (TGB) DXT5 (RGBA)
-    return 0
     arg = []
 
     if "linear" in meta_data:
@@ -35,7 +37,6 @@ def convert_to_ktx(img, img_out, meta_data):
         meta_data["linear"] = linear
     if linear:
         arg.append("-linear")
-
 
     if "genmipmap" in meta_data:
         genmipmap = meta_data["genmipmap"]
@@ -71,8 +72,31 @@ def convert_to_ktx(img, img_out, meta_data):
         except OSError:
             sys.stderr.write("Error while creating folder {}".format(tmp_folder))
 
+    # get image format
+    command = [img_format_exe, img]
+    status = subprocess.run(command, capture_output=True)
+    if(status.returncode != 0):
+        sys.stderr.write("Error while read image format file\n")
+        return status.returncode
+    img_format_json = json.loads(status.stdout)
+    channel_count = img_format_json["channelCount"]
+    output_format = []
+    if channel_count == 3:
+        output_format.append("-format")
+        output_format.append("BC1")
+    elif channel_count == 4:
+        output_format.append("-format")
+        output_format.append("BC3")
+    elif channel_count == 1:
+        output_format.append("-format")
+        output_format.append("BC4")
+    elif channel_count == 2:
+        output_format.append("-format")
+        output_format.append("BC5")
+
+    # convert to basis in tmp folder
     img_name = Path(img).stem+".basis"
-    basis_path =  os.path.join(tmp_folder, img_name)
+    basis_path = os.path.join(tmp_folder, img_name)
     command = [basisu_exe, "-file", img, "-output_file", basis_path]
     command.extend(arg)
     print(command)
@@ -80,7 +104,10 @@ def convert_to_ktx(img, img_out, meta_data):
     if status.returncode != 0:
         sys.stderr.write("[Error] Could not generate basis file\n")
         return status.returncode
-    command = [basisu_exe, "-file", basis_path, "-unpack", "-output_path", tmp_folder+"/"]
+    # convert to final ktx BC1 if RGB, BC3 if RGBA
+    # command = [basisu_exe, "-file", basis_path, "-unpack", "-no_png", "-output_path", tmp_folder+"/"]
+    command = [basisu_exe, "-file", basis_path, "-unpack", "-no_png", "-output_file", img_out]
+    command.extend(output_format)
     print(command)
     status = subprocess.run(command)
     if status.returncode != 0:
