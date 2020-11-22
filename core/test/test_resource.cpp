@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "engine/Asset.h"
+#include "engine/asset.h"
 #include "engine/engine.h"
 
 class Engine : public neko::BasicEngine

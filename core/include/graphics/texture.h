@@ -26,7 +26,7 @@
 #include <map>
 #include "engine/assert.h"
 #include <engine/log.h>
-#include <engine/Asset.h>
+#include <engine/asset.h>
 #include <xxhash.hpp>
 #include <sole.hpp>
 #include <utils/service_locator.h>

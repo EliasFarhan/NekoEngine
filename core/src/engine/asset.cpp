@@ -24,7 +24,7 @@
  */
 
 #include "engine/log.h"
-#include "engine/Asset.h"
+#include "engine/asset.h"
 #include "engine/engine.h"
 #include "utils/json_utility.h"
 #include "engine/assert.h"
