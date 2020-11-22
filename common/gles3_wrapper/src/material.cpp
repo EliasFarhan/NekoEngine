@@ -27,7 +27,8 @@
 namespace neko::gl
 {
 
-Material::Material(TextureManager& textureManager) :
+Material::Material(TextureManager& textureManager, const FilesystemInterface& filesystem) :
+        filesystem_(filesystem),
         textureManager_(textureManager),
         loadingMaterialContentJob_([this]()
         {
@@ -35,7 +36,9 @@ Material::Material(TextureManager& textureManager) :
             FillContent(matJson);
             LoadShader();
             LoadTextures();
-        })
+        }),
+        loadMaterialJsonJob_(filesystem),
+        shader_(filesystem)
 {
 
 }

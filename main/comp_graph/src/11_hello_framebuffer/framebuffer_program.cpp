@@ -31,7 +31,14 @@ namespace neko
 
 
 HelloFramebufferProgram::HelloFramebufferProgram() :
-screenFrame_(gl::RenderQuad(Vec3f::zero, Vec2f(2.0f,2.0f)))
+    screenFrame_(gl::RenderQuad(Vec3f::zero, Vec2f(2.0f,2.0f))),
+    screenBlurShader_(BasicEngine::GetInstance()->GetFilesystem()),
+    screenEdgeDetectionShader_(BasicEngine::GetInstance()->GetFilesystem()),
+    screenGrayscaleShader_(BasicEngine::GetInstance()->GetFilesystem()),
+    modelShader_(BasicEngine::GetInstance()->GetFilesystem()),
+    screenInverseShader_(BasicEngine::GetInstance()->GetFilesystem()),
+    screenShader_(BasicEngine::GetInstance()->GetFilesystem()),
+    textureManager_(BasicEngine::GetInstance()->GetFilesystem())
 {
 
 }
@@ -39,7 +46,7 @@ screenFrame_(gl::RenderQuad(Vec3f::zero, Vec2f(2.0f,2.0f)))
 void HelloFramebufferProgram::Init()
 {
     textureManager_.Init();
-    const auto& config = BasicEngine::GetInstance()->config;
+    const auto& config = BasicEngine::GetInstance()->GetConfig();
     screenFrame_.Init();
     cube_.Init();
 	//Create Screen FBO
@@ -82,7 +89,7 @@ void HelloFramebufferProgram::Init()
     screenEdgeDetectionShader_.LoadFromFile(
             config.dataRootPath + "shaders/11_hello_framebuffer/screen.vert",
             config.dataRootPath + "shaders/11_hello_framebuffer/screen_edge_detection.frag");
-    containerTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/container.jpg");
+    containerTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/container.jpg", Texture::DEFAULT);
 
 
     modelShader_.LoadFromFile(config.dataRootPath + "shaders/11_hello_framebuffer/model.vert",
@@ -94,7 +101,7 @@ void HelloFramebufferProgram::Init()
 void HelloFramebufferProgram::Update(seconds dt)
 {
     std::lock_guard<std::mutex> lock(updateMutex_);
-    const auto& config = BasicEngine::GetInstance()->config;
+    const auto& config = BasicEngine::GetInstance()->GetConfig();
     camera_.SetAspect(config.windowSize.x, config.windowSize.y);
     camera_.Update(dt);	textureManager_.Update(dt);
 }
@@ -142,7 +149,7 @@ void HelloFramebufferProgram::Render()
 
     if (containerTexture_ == INVALID_TEXTURE_NAME)
     {
-        containerTexture_ = textureManager_.GetTexture(containerTextureId_).name;
+        containerTexture_ = textureManager_.GetTexture(containerTextureId_)->name;
         return;
     }
     std::lock_guard<std::mutex> lock(updateMutex_);
@@ -153,7 +160,7 @@ void HelloFramebufferProgram::Render()
         glDeleteTextures(1, &fboColorBufferTexture_);
         glDeleteRenderbuffers(1, &rbo_);
 
-        const auto& config = BasicEngine::GetInstance()->config;
+        const auto& config = BasicEngine::GetInstance()->GetConfig();
         glGenFramebuffers(1, &fbo_);
         glBindFramebuffer(GL_FRAMEBUFFER, fbo_);
 

@@ -30,16 +30,16 @@ namespace neko
 void HelloCubemapsProgram::Init()
 {
 	textureManager_.Init();
-	const auto& config = BasicEngine::GetInstance()->config;
+	const auto& config = BasicEngine::GetInstance()->GetConfig();
 	skyboxCube_.Init();
 	skyboxTexture_ = gl::LoadCubemap({
-        config.dataRootPath+"sprites/skybox/right.jpg",
-		config.dataRootPath+"sprites/skybox/left.jpg",
-		config.dataRootPath+"sprites/skybox/top.jpg",
-		config.dataRootPath+"sprites/skybox/bottom.jpg",
-		config.dataRootPath+"sprites/skybox/front.jpg",
-		config.dataRootPath+"sprites/skybox/back.jpg"
-	});
+                                             config.dataRootPath + "sprites/skybox/right.jpg",
+                                             config.dataRootPath + "sprites/skybox/left.jpg",
+                                             config.dataRootPath + "sprites/skybox/top.jpg",
+                                             config.dataRootPath + "sprites/skybox/bottom.jpg",
+                                             config.dataRootPath + "sprites/skybox/front.jpg",
+                                             config.dataRootPath + "sprites/skybox/back.jpg"
+                                     }, BasicEngine::GetInstance()->GetFilesystem());
     skyboxShader_.LoadFromFile(
             config.dataRootPath + "shaders/15_hello_cubemaps/skybox.vert",
             config.dataRootPath + "shaders/15_hello_cubemaps/skybox.frag");
@@ -53,14 +53,14 @@ void HelloCubemapsProgram::Init()
 	camera_.position = Vec3f(0, 3, 3);
 	camera_.WorldLookAt(Vec3f::zero);
 	cube_.Init();
-	cubeTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/container.jpg");
+	cubeTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/container.jpg", Texture::DEFAULT);
 
 }
 
 void HelloCubemapsProgram::Update(seconds dt)
 {
 	std::lock_guard<std::mutex> lock(updateMutex_);
-	const auto& config = BasicEngine::GetInstance()->config;
+	const auto& config = BasicEngine::GetInstance()->GetConfig();
 	camera_.SetAspect(config.windowSize.x, config.windowSize.y);
 	camera_.Update(dt);	textureManager_.Update(dt);
 }
@@ -115,7 +115,7 @@ void HelloCubemapsProgram::Render()
 	}
 	if(cubeTexture_ == INVALID_TEXTURE_NAME)
 	{
-		cubeTexture_ = textureManager_.GetTexture(cubeTextureId_).name;
+		cubeTexture_ = textureManager_.GetTexture(cubeTextureId_)->name;
 		return;
 	}
 	std::lock_guard<std::mutex> lock(updateMutex_);

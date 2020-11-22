@@ -48,7 +48,7 @@ void BufferFile::Destroy()
         dataLength = 0;
     }
 }
-LoadingAssetJob::LoadingAssetJob(FilesystemInterface & filesystem) : Job(
+LoadingAssetJob::LoadingAssetJob(const FilesystemInterface & filesystem) : Job(
         [this] {
 #ifdef EASY_PROFILE_USE
             EASY_BLOCK("Load File in AssetJob");

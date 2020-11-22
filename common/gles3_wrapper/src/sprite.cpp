@@ -39,7 +39,7 @@ namespace neko::gl
 
 void SpriteManager::Init()
 {
-    const auto& config = BasicEngine::GetInstance()->config;
+    const auto& config = BasicEngine::GetInstance()->GetConfig();
     spriteShader_.LoadFromFile(config.dataRootPath + "shaders/engine/sprite.vert",
         config.dataRootPath + "shaders/engine/sprite.frag");
     spriteQuad_.Init();
@@ -85,6 +85,14 @@ void SpriteManager::Render()
             spriteQuad_.Draw();
         }
     }
+}
+
+SpriteManager::SpriteManager(EntityManager& entityManager, TextureManagerInterface& textureManager,
+                             Transform2dManager& transformManager) :
+    neko::SpriteManager(entityManager, textureManager,transformManager),
+    spriteShader_(BasicEngine::GetInstance()->GetFilesystem())
+{
+
 }
 }
 

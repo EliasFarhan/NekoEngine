@@ -30,9 +30,9 @@ namespace neko
 void HelloOutlineProgram::Init()
 {
 	textureManager_.Init();
-	const auto& config = BasicEngine::GetInstance()->config;
+	const auto& config = BasicEngine::GetInstance()->GetConfig();
 	cube_.Init();
-	cubeTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/container.jpg");
+	cubeTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/container.jpg", Texture::DEFAULT);
 
 
     modelShader_.LoadFromFile(config.dataRootPath + "shaders/14_hello_outline/model.vert",
@@ -46,7 +46,7 @@ void HelloOutlineProgram::Init()
 void HelloOutlineProgram::Update(seconds dt)
 {
 	std::lock_guard<std::mutex> lock(updateMutex_);
-	const auto& config = BasicEngine::GetInstance()->config;
+	const auto& config = BasicEngine::GetInstance()->GetConfig();
 	camera_.SetAspect(config.windowSize.x, config.windowSize.y);
 	camera_.Update(dt);	textureManager_.Update(dt);
 }
@@ -82,7 +82,7 @@ void HelloOutlineProgram::Render()
 {
 	if (cubeTexture_ == INVALID_TEXTURE_NAME)
 	{
-		cubeTexture_ = textureManager_.GetTexture(cubeTextureId_).name;
+		cubeTexture_ = textureManager_.GetTexture(cubeTextureId_)->name;
 		return;
 	}
 

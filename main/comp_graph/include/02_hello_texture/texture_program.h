@@ -33,6 +33,7 @@ namespace neko
 class HelloTextureProgram : public SampleProgram
 {
 public:
+    HelloTextureProgram();
     void Init() override;
 
     void Update(seconds dt) override;

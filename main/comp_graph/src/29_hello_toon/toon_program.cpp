@@ -30,7 +30,7 @@ namespace neko
 void HelloToonShadingProgram::Init()
 {
 
-	const auto& config = BasicEngine::GetInstance()->config;
+	const auto& config = BasicEngine::GetInstance()->GetConfig();
 	const std::string path = config.dataRootPath + "model/nanosuit2/nanosuit.obj";
 	glCheckError();
 	model_.LoadModel(path);
@@ -45,7 +45,7 @@ void HelloToonShadingProgram::Init()
 void HelloToonShadingProgram::Update(seconds dt)
 {
 	std::lock_guard<std::mutex> lock(updateMutex_);
-	const auto& config = BasicEngine::GetInstance()->config;
+	const auto& config = BasicEngine::GetInstance()->GetConfig();
 	camera_.SetAspect(config.windowSize.x, config.windowSize.y);
 	camera_.Update(dt);
 	dt_ += dt.count();

@@ -37,7 +37,7 @@ namespace neko
 class NekoIOStream : public Assimp::IOStream
 {
 public:
-
+    explicit NekoIOStream(const FilesystemInterface&);
     size_t Read(void* pvBuffer, size_t pSize, size_t pCount) override;
 
     size_t Write(const void* pvBuffer, size_t pSize, size_t pCount) override;
@@ -53,6 +53,7 @@ public:
     void LoadFromFile(std::string_view path);
     void Destroy();
 private:
+    const FilesystemInterface& filesystem_;
     BufferFile bufferFile_;
     size_t cursorIndex_ = 0;
 };
@@ -61,9 +62,10 @@ private:
 class NekoIOSystem : public Assimp::IOSystem
 {
 public:
+    explicit NekoIOSystem(const FilesystemInterface&);
 	bool Exists(const char* pFile) const override
 	{
-		return FileExists(pFile);
+		return filesystem_.FileExists(pFile);
 	}
 
 	char getOsSeparator() const override {
@@ -75,5 +77,8 @@ public:
 	};
 	Assimp::IOStream* Open(const char* pFile, const char* pMode) override;
 	void Close(Assimp::IOStream* pFile) override;
+
+protected:
+    const FilesystemInterface& filesystem_;
 };
 }

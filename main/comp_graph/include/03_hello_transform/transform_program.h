@@ -34,6 +34,7 @@ namespace neko
 class HelloTransformProgram : public SampleProgram
 {
 public:
+    HelloTransformProgram();
     void Init() override;
     void Update(seconds) override;
     void Render() override;

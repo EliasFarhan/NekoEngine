@@ -29,7 +29,7 @@ namespace neko
 {
 void HelloBlinnProgram::Init()
 {
-	const auto& config = BasicEngine::GetInstance()->config;
+	const auto& config = BasicEngine::GetInstance()->GetConfig();
     modelShader_.LoadFromFile(config.dataRootPath + "shaders/22_hello_blinn/model.vert",
                               config.dataRootPath + "shaders/22_hello_blinn/model.frag");
     blinnShader_.LoadFromFile(config.dataRootPath + "shaders/22_hello_blinn/model.vert",
@@ -49,7 +49,7 @@ void HelloBlinnProgram::Init()
 void HelloBlinnProgram::Update(seconds dt)
 {
 	std::lock_guard<std::mutex> lock(updateMutex_);
-	const auto& config = BasicEngine::GetInstance()->config;
+	const auto& config = BasicEngine::GetInstance()->GetConfig();
 	camera_.SetAspect(config.windowSize.x, config.windowSize.y);
 	camera_.Update(dt);
 	dt_ += dt.count();
@@ -91,7 +91,7 @@ void HelloBlinnProgram::Render()
 		return;
 	if (floorTexture_ == INVALID_TEXTURE_NAME)
 	{
-		floorTexture_ = textureManager_.GetTexture(floorTextureId_).name;
+		floorTexture_ = textureManager_.GetTexture(floorTextureId_)->name;
 		return;
 	}
 	std::lock_guard<std::mutex> lock(updateMutex_);

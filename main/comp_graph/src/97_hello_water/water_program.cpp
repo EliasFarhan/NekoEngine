@@ -29,16 +29,16 @@ namespace neko
 void HelloWaterProgram::Init()
 {
 	textureManager_.Init();
-	const auto& config = BasicEngine::GetInstance()->config;
+	const auto& config = BasicEngine::GetInstance()->GetConfig();
 	skyboxCube_.Init();
 	skyboxTexture_ = gl::LoadCubemap({
-		config.dataRootPath + "sprites/skybox/right.jpg",
-		config.dataRootPath + "sprites/skybox/left.jpg",
-		config.dataRootPath + "sprites/skybox/top.jpg",
-		config.dataRootPath + "sprites/skybox/bottom.jpg",
-		config.dataRootPath + "sprites/skybox/front.jpg",
-		config.dataRootPath + "sprites/skybox/back.jpg"
-		});
+                                             config.dataRootPath + "sprites/skybox/right.jpg",
+                                             config.dataRootPath + "sprites/skybox/left.jpg",
+                                             config.dataRootPath + "sprites/skybox/top.jpg",
+                                             config.dataRootPath + "sprites/skybox/bottom.jpg",
+                                             config.dataRootPath + "sprites/skybox/front.jpg",
+                                             config.dataRootPath + "sprites/skybox/back.jpg"
+                                     }, BasicEngine::GetInstance()->GetFilesystem());
 
 	quad_.Init();
 	skyboxShader_.LoadFromFile(
@@ -53,8 +53,9 @@ void HelloWaterProgram::Init()
 		config.dataRootPath + "shaders/97_hello_water/water.frag");
 
 	dudvTexturerId_ = textureManager_.LoadTexture(
-		config.dataRootPath + "sprites/water/waveDUDV.png");
-	normalMapId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/water/waveNM.png");
+		config.dataRootPath + "sprites/water/waveDUDV.png", Texture::DEFAULT);
+	normalMapId_ = textureManager_.LoadTexture(
+	        config.dataRootPath + "sprites/water/waveNM.png", Texture::DEFAULT);
 	
 	CreateFramebuffer();
 	CreateDepthbuffer();
@@ -64,7 +65,7 @@ void HelloWaterProgram::Init()
 void HelloWaterProgram::Update(seconds dt)
 {
 	std::lock_guard<std::mutex> lock(updateMutex_);
-	const auto& config = BasicEngine::GetInstance()->config;
+	const auto& config = BasicEngine::GetInstance()->GetConfig();
 	camera_.SetAspect(config.windowSize.x, config.windowSize.y);
 	camera_.Update(dt);
 	textureManager_.Update(dt);
@@ -104,13 +105,13 @@ void HelloWaterProgram::Render()
 	}
 	if (dudvTexturer_ == INVALID_TEXTURE_NAME)
 	{
-		dudvTexturer_ = textureManager_.GetTexture(dudvTexturerId_).name;
+		dudvTexturer_ = textureManager_.GetTexture(dudvTexturerId_)->name;
 		if (dudvTexturer_ == INVALID_TEXTURE_NAME)
 			return;
 	}
 	if (normalMap_ == INVALID_TEXTURE_NAME)
 	{
-		normalMap_ = textureManager_.GetTexture(normalMapId_).name;
+		normalMap_ = textureManager_.GetTexture(normalMapId_)->name;
 		if (normalMap_ == INVALID_TEXTURE_NAME)
 			return;
 	}
@@ -167,7 +168,7 @@ void HelloWaterProgram::Render()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	renderScene(2, view, projection);
 	//Render Scene
-	const auto& config = BasicEngine::GetInstance()->config;
+	const auto& config = BasicEngine::GetInstance()->GetConfig();
 	glViewport(0, 0, config.windowSize.x, config.windowSize.y);
 	//Depth pass
 	glBindFramebuffer(GL_FRAMEBUFFER, depthFramebuffer_);
@@ -261,7 +262,7 @@ void HelloWaterProgram::CreateFramebuffer()
 
 void HelloWaterProgram::CreateDepthbuffer()
 {
-	const auto& config = BasicEngine::GetInstance()->config;
+	const auto& config = BasicEngine::GetInstance()->GetConfig();
 	glGenFramebuffers(1, &depthFramebuffer_);
 	glGenTextures(1, &depthBuffer_);
 	glBindTexture(GL_TEXTURE_2D, depthBuffer_);

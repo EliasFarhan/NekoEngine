@@ -32,6 +32,7 @@
 #include <utils/time_utility.h>
 #include <engine/configuration.h>
 #include <engine/jobsystem.h>
+#include "engine/filesystem.h"
 
 
 namespace neko
@@ -47,7 +48,7 @@ class Window;
 class BasicEngine : public SystemInterface
 {
 public:
-    explicit BasicEngine(std::optional<Configuration> config);
+    explicit BasicEngine(const FilesystemInterface&,std::optional<Configuration> config = std::nullopt);
 	BasicEngine() = delete;
     ~BasicEngine() override;
     void Init() override;
@@ -63,6 +64,7 @@ public:
     void SetWindowAndRenderer(Window* window, Renderer* renderer);
 
     const Configuration& GetConfig();
+    const FilesystemInterface& GetFilesystem();
 
     void RegisterSystem(SystemInterface& system);
     void RegisterOnDrawUi(DrawImGuiInterface& drawUi);
@@ -76,6 +78,7 @@ public:
     //static T* GetInstance(){ return dynamic_cast<T*>(instance_);};
 protected:
     static BasicEngine* instance_;
+    const FilesystemInterface& filesystem_;
     Configuration config_;
     Renderer* renderer_ = nullptr;
     Window* window_ = nullptr;

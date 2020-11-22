@@ -10,7 +10,7 @@ namespace neko
 
 void HelloMaterialProgram::Init()
 {
-    const auto& config = BasicEngine::GetInstance()->config;
+    const auto& config = BasicEngine::GetInstance()->GetConfig();
     quad_.Init();
     material_.LoadFromFile(config.dataRootPath+"material/test.mat");
 }

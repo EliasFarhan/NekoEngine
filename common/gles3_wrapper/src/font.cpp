@@ -31,9 +31,15 @@
 namespace neko::gl
 {
 
+FontManager::FontManager(const FilesystemInterface& filesystem) :
+        filesystem_(filesystem), textShader_(filesystem)
+{
+
+}
+
 void FontManager::Init()
 {
-    const auto& config = BasicEngine::GetInstance()->config;
+    const auto& config = BasicEngine::GetInstance()->GetConfig();
     textShader_.LoadFromFile(config.dataRootPath + "shaders/engine/text.vert",
                              config.dataRootPath + "shaders/engine/text.frag");
 
@@ -87,8 +93,7 @@ FontId FontManager::LoadFont(std::string_view fontName, int pixelHeight)
         return INVALID_FONT_ID;
     }
     FT_Face face;
-    BufferFile fontFile;
-    fontFile.Load(fontName);
+    BufferFile fontFile = filesystem_.LoadFile(fontName);
     if (FT_New_Memory_Face(ft,
                            fontFile.dataBuffer,
                            fontFile.dataLength,
@@ -275,4 +280,6 @@ void FontManager::SetWindowSize(const Vec2f& windowSize)
     windowSize_ = windowSize;
     projection_ = Transform3d::Orthographic(0.0f, windowSize.x, 0.0f, windowSize.y);
 }
+
+
 }

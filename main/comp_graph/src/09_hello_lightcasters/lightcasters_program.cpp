@@ -39,9 +39,12 @@ void HelloLightCastersProgram::Init()
 		);
 	}
 
-	const auto& config = BasicEngine::GetInstance()->config;
-	containerDiffuse_ = gl::stbCreateTexture(config.dataRootPath + "material/container2.png");
-	containerSpecular_ = gl::stbCreateTexture(config.dataRootPath + "material/container2_specular.png");
+	const auto& config = BasicEngine::GetInstance()->GetConfig();
+	const auto& filesystem = BasicEngine::GetInstance()->GetFilesystem();
+	containerDiffuse_ = gl::StbCreateTexture(config.dataRootPath + "material/container2.png",
+                                          filesystem);
+	containerSpecular_ = gl::StbCreateTexture(config.dataRootPath + "material/container2_specular.png",
+                                              filesystem);
     containerShaders_[0].LoadFromFile(
             config.dataRootPath + "shaders/09_hello_lightcasters/container.vert",
             config.dataRootPath + "shaders/09_hello_lightcasters/container_directional.frag");
@@ -73,7 +76,7 @@ void HelloLightCastersProgram::Update(seconds dt)
 		Cos(radian_t(time_)),
 		0.0f,
 		Sin(radian_t(time_))) * lightDist_;
-	const auto& config = BasicEngine::GetInstance()->config;
+	const auto& config = BasicEngine::GetInstance()->GetConfig();
 	camera_.SetAspect(config.windowSize.x, config.windowSize.y);;
 	camera_.Update(dt);
 }

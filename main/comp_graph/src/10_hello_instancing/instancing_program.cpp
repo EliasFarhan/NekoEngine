@@ -53,7 +53,7 @@ void HelloInstancingProgram::Init()
 #ifdef EASY_PROFILE_USE
     EASY_END_BLOCK;
 #endif
-    const auto& config = BasicEngine::GetInstance()->config;
+    const auto& config = BasicEngine::GetInstance()->GetConfig();
     model_.LoadModel(config.dataRootPath + "model/rock/rock.obj");
 
     singleDrawShader_.LoadFromFile(config.dataRootPath + "shaders/10_hello_instancing/asteroid_single.vert",
@@ -93,7 +93,7 @@ void HelloInstancingProgram::Update(seconds dt)
     EASY_END_BLOCK;
 #endif
 
-    const auto& config = BasicEngine::GetInstance()->config;
+    const auto& config = BasicEngine::GetInstance()->GetConfig();
     camera_.SetAspect(config.windowSize.x, config.windowSize.y);
     camera_.Update(dt);
 }

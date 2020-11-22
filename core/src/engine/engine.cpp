@@ -27,11 +27,14 @@
 #include <sstream>
 
 #include <engine/engine.h>
+
+#include "imgui.h"
+
+#include "engine/filesystem.h"
 #include <engine/log.h>
 #include <utils/file_utility.h>
 #include "graphics/graphics.h"
 #include <engine/window.h>
-#include "imgui.h"
 #ifdef EASY_PROFILE_USE
 #include <easy/profiler.h>
 #endif
@@ -40,7 +43,8 @@ namespace neko
 {
 BasicEngine* BasicEngine::instance_ = nullptr;
 
-BasicEngine::BasicEngine(std::optional<Configuration> config)
+BasicEngine::BasicEngine(const FilesystemInterface& filesystem, std::optional<Configuration> config) :
+    filesystem_(filesystem)
 {
 	if (config.has_value())
 	{
@@ -223,6 +227,11 @@ void BasicEngine::ScheduleJob(Job* job, JobThreadType threadType)
 const Configuration& BasicEngine::GetConfig()
 {
     return config_;
+}
+
+const FilesystemInterface& BasicEngine::GetFilesystem()
+{
+    return filesystem_;
 }
 
 

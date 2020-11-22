@@ -29,7 +29,7 @@ namespace neko
 void HelloPbrTextureProgram::Init()
 {
 	textureManager_.Init();
-	const auto& config = BasicEngine::GetInstance()->config;
+	const auto& config = BasicEngine::GetInstance()->GetConfig();
 	sphere_.Init();
 	pbrShader_.LoadFromFile(
 		config.dataRootPath + "shaders/31_hello_pbr_texture/pbr.vert",
@@ -56,20 +56,20 @@ void HelloPbrTextureProgram::Init()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glCheckError();
 
-	albedoId_ = textureManager_.LoadTexture(config.dataRootPath + "textures/rustediron2/rustediron2_basecolor.png");
+	albedoId_ = textureManager_.LoadTexture(config.dataRootPath + "textures/rustediron2/rustediron2_basecolor.png", Texture::DEFAULT);
 	
-	normalId_ = textureManager_.LoadTexture(config.dataRootPath + "textures/rustediron2/rustediron2_normal.png");
+	normalId_ = textureManager_.LoadTexture(config.dataRootPath + "textures/rustediron2/rustediron2_normal.png", Texture::DEFAULT);
 	
-	metallicId_ = textureManager_.LoadTexture(config.dataRootPath + "textures/rustediron2/rustediron2_metallic.png");
+	metallicId_ = textureManager_.LoadTexture(config.dataRootPath + "textures/rustediron2/rustediron2_metallic.png", Texture::DEFAULT);
 	
-	roughnessId_ = textureManager_.LoadTexture(config.dataRootPath + "textures/rustediron2/rustediron2_roughness.png");
+	roughnessId_ = textureManager_.LoadTexture(config.dataRootPath + "textures/rustediron2/rustediron2_roughness.png", Texture::DEFAULT);
 	
 }
 
 void HelloPbrTextureProgram::Update(seconds dt)
 {
 	std::lock_guard<std::mutex> lock(updateMutex_);
-	const auto& config = BasicEngine::GetInstance()->config;
+	const auto& config = BasicEngine::GetInstance()->GetConfig();
 	camera_.SetAspect(config.windowSize.x, config.windowSize.y);
 	camera_.Update(dt);	textureManager_.Update(dt);
 }
@@ -91,25 +91,25 @@ void HelloPbrTextureProgram::Render()
 	std::lock_guard<std::mutex> lock(updateMutex_);
 	if(albedo_ == INVALID_TEXTURE_NAME )
 	{
-		albedo_ = textureManager_.GetTexture(albedoId_).name;
+		albedo_ = textureManager_.GetTexture(albedoId_)->name;
 		if (albedo_ == INVALID_TEXTURE_NAME)
 			return;
 	}
 	if (normal_ == INVALID_TEXTURE_NAME)
 	{
-		normal_ = textureManager_.GetTexture(normalId_).name;
+		normal_ = textureManager_.GetTexture(normalId_)->name;
 		if (normal_ == INVALID_TEXTURE_NAME)
 			return;
 	}
 	if (metallic_ == INVALID_TEXTURE_NAME)
 	{
-		metallic_ = textureManager_.GetTexture(metallicId_).name;
+		metallic_ = textureManager_.GetTexture(metallicId_)->name;
 		if (metallic_ == INVALID_TEXTURE_NAME)
 			return;
 	}
 	if (roughness_ == INVALID_TEXTURE_NAME)
 	{
-		roughness_ = textureManager_.GetTexture(roughnessId_).name;
+		roughness_ = textureManager_.GetTexture(roughnessId_)->name;
 		if (roughness_ == INVALID_TEXTURE_NAME)
 			return;
 	}

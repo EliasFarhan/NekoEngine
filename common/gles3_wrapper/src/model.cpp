@@ -44,118 +44,150 @@ namespace neko::assimp
 
 void Model::Draw(const gl::Shader& shader)
 {
-	for (auto& mesh : meshes_)
-		mesh.Draw(shader);
+    for (auto& mesh : meshes_)
+        mesh.Draw(shader);
 }
 
 void Model::Destroy()
 {
-	for (auto& mesh : meshes_)
-		mesh.Destroy();
-	meshes_.clear();
-	processModelJob_.Reset();
+    for (auto& mesh : meshes_)
+        mesh.Destroy();
+    meshes_.clear();
+    processModelJob_.Reset();
 }
 
 
+Model::Model() : processModelJob_([this] {
+    ProcessModel();
+})
+{
+}
 
-	Model::Model() : processModelJob_([this]
-	{
-		ProcessModel();
-	})
-	{
-	}
+void Model::LoadModel(std::string_view path)
+{
+    path_ = path;
+    directory_ = path.substr(0, path.find_last_of('/'));
+    logDebug(fmt::format("ASSIMP: Loading model: {}", path_));
+    BasicEngine::GetInstance()->ScheduleJob(&processModelJob_, JobThreadType::OTHER_THREAD);
+}
 
-	void Model::LoadModel(std::string_view path)
-	{
-		path_ = path;
-		directory_ = path.substr(0, path.find_last_of('/'));
-		logDebug(fmt::format("ASSIMP: Loading model: {}",path_));
-		BasicEngine::GetInstance()->ScheduleJob(&processModelJob_, JobThreadType::OTHER_THREAD);
-	}
+bool Model::IsLoaded() const
+{
 
-	bool Model::IsLoaded() const
-	{
-		
-		if(!processModelJob_.IsDone())
-		{
-			return false;
-		}
-		for(const auto& mesh : meshes_)
-		{
-			if (!mesh.IsLoaded())
-				return false;
-		}
-		
-		return true;
-	}
+    if (!processModelJob_.IsDone())
+    {
+        return false;
+    }
+    for (const auto& mesh : meshes_)
+    {
+        if (!mesh.IsLoaded())
+            return false;
+    }
 
-	void Model::ProcessModel()
-	{
+    return true;
+}
+
+void Model::ProcessModel()
+{
+    /*
 #ifdef EASY_PROFILE_USE
-		EASY_BLOCK("Process 3d Model");
-		EASY_BLOCK("Load 3d Model");
+    EASY_BLOCK("Process 3d Model");
+    EASY_BLOCK("Load 3d Model");
 #endif
-		Assimp::Importer import;
-		const aiScene* scene = nullptr;
+    Assimp::Importer import;
+    const aiScene* scene = nullptr;
 
-		Job loadingModelJob = Job([this, &import, &scene]
-		{
+    Job loadingModelJob = Job([this, &import, &scene] {
 #ifdef EASY_PROFILE_USE
-		EASY_BLOCK("Model Disk Load");
+        EASY_BLOCK("Model Disk Load");
 #endif
-				//assimp delete automatically the IO System
-			NekoIOSystem* ioSystem = new NekoIOSystem();
-			import.SetIOHandler(ioSystem);
+        //assimp delete automatically the IO System
+        NekoIOSystem* ioSystem = new NekoIOSystem();
+        import.SetIOHandler(ioSystem);
 
-			scene = import.ReadFile(path_.data(),
-			aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals |
-				aiProcess_CalcTangentSpace);
-		});
-		BasicEngine::GetInstance()->ScheduleJob(&loadingModelJob, JobThreadType::RESOURCE_THREAD);
+        scene = import.ReadFile(path_.data(),
+                                aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals |
+                                aiProcess_CalcTangentSpace);
+    });
+    BasicEngine::GetInstance()->ScheduleJob(&loadingModelJob, JobThreadType::RESOURCE_THREAD);
 
-		loadingModelJob.Join();
+    loadingModelJob.Join();
 
 #ifdef EASY_PROFILE_USE
-		EASY_END_BLOCK;
+    EASY_END_BLOCK;
 #endif
-		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
-		{
-			logDebug(fmt::format("[ERROR] ASSIMP {}", import.GetErrorString()));
-			return;
-		}
-		meshes_.reserve(scene->mNumMeshes);
+    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+    {
+        logDebug(fmt::format("[ERROR] ASSIMP {}", import.GetErrorString()));
+        return;
+    }
+    meshes_.reserve(scene->mNumMeshes);
 #ifdef EASY_PROFILE_USE
-		EASY_BLOCK("Process Nodes");
+    EASY_BLOCK("Process Nodes");
 #endif
-		ProcessNode(scene->mRootNode, scene);
+    ProcessNode(scene->mRootNode, scene);
 #ifdef EASY_PROFILE_USE
-		EASY_END_BLOCK;
+    EASY_END_BLOCK;
+    EASY_BLOCK("Schedule Mesh Job");
 #endif
-#ifdef EASY_PROFILE_USE
-		EASY_BLOCK("Schedule Mesh Job");
-#endif
-		for(auto& mesh : meshes_)
-		{
-			mesh.Init();
-		}
-	}
+    for (auto& mesh : meshes_)
+    {
+        mesh.Init();
+    }
+     */
+}
 
-	void Model::ProcessNode(aiNode* node, const aiScene* scene)
-	{
-		// process all the node's meshes (if any)
-		for (unsigned int i = 0; i < node->mNumMeshes; i++)
-		{
-			meshes_.emplace_back();
-			auto& mesh = meshes_.back();
+void Model::ProcessNode(aiNode* node, const aiScene* scene)
+{
+    // process all the node's meshes (if any)
+    for (unsigned int i = 0; i < node->mNumMeshes; i++)
+    {
+        meshes_.emplace_back();
+        auto& mesh = meshes_.back();
 
-			aiMesh* assMesh = scene->mMeshes[node->mMeshes[i]];
-			mesh.ProcessMesh(assMesh, scene, directory_);
-		}
-		// then do the same for each of its children
-		for (unsigned int i = 0; i < node->mNumChildren; i++)
-		{
-			ProcessNode(node->mChildren[i], scene);
-		}
-	}
+        aiMesh* assMesh = scene->mMeshes[node->mMeshes[i]];
+        mesh.ProcessMesh(assMesh, scene, directory_);
+    }
+    // then do the same for each of its children
+    for (unsigned int i = 0; i < node->mNumChildren; i++)
+    {
+        ProcessNode(node->mChildren[i], scene);
+    }
+}
 
+void ModelManager::Init()
+{
+
+}
+
+void ModelManager::Update(seconds dt)
+{
+
+}
+
+void ModelManager::Destroy()
+{
+
+}
+
+ModelManager::ModelManager(const FilesystemInterface& filesystem):
+    filesystem_(filesystem)
+{
+
+}
+
+ModelId ModelManager::LoadModel(std::string_view path)
+{
+    return neko::assimp::ModelId();
+}
+
+const Model* ModelManager::GetModel(ModelId)
+{
+    return nullptr;
+}
+
+bool ModelManager::IsLoaded(ModelId)
+{
+    return false;
+}
 }

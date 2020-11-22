@@ -43,7 +43,7 @@ void sdl::SdlWindow::Init()
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("InitSdlWindow");
 #endif
-    auto& config = BasicEngine::GetInstance()->config;
+    const auto& config = BasicEngine::GetInstance()->GetConfig();
 
 
     flags_ = SDL_WINDOW_RESIZABLE |
@@ -58,7 +58,7 @@ void sdl::SdlWindow::Init()
 #endif
     ;
     auto windowSize = config.windowSize;
-    if (config.fullscreen)
+    if (config.flags & Configuration::FULLSCREEN)
     {
         windowSize = Vec2u::zero;
         flags_ |= SDL_WINDOW_FULLSCREEN_DESKTOP;
@@ -71,14 +71,14 @@ void sdl::SdlWindow::Init()
         windowSize.y,
         flags_
     );
-    if (config.fullscreen)
+    if (config.flags & Configuration::FULLSCREEN)
     {
         int windowSizeW = 0;
         int windowSizeH = 0;
         SDL_GetWindowSize(window_, &windowSizeW, &windowSizeH);
         windowSize.x = windowSizeW;
         windowSize.y = windowSizeH;
-        config.windowSize = windowSize;
+        //config.windowSize = windowSize;
     }
     // Check that everything worked out okay
     if (window_ == nullptr)

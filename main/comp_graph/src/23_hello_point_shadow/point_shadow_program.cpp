@@ -32,7 +32,7 @@ void HelloPointShadowProgram::Init()
 {
 
 	textureManager_.Init();
-	const auto& config = BasicEngine::GetInstance()->config;
+	const auto& config = BasicEngine::GetInstance()->GetConfig();
 	cube_.Init();
 
 	simpleDepthShader_.LoadFromFile(
@@ -43,7 +43,8 @@ void HelloPointShadowProgram::Init()
 	lightCubeShader_.LoadFromFile(config.dataRootPath + "shaders/23_hello_point_shadow/lamp.vert",
 		config.dataRootPath + "shaders/23_hello_point_shadow/lamp.frag");
 
-	cubeTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/brickwall/brickwall.jpg");
+	cubeTextureId_ = textureManager_.LoadTexture(
+	        config.dataRootPath + "sprites/brickwall/brickwall.jpg", Texture::DEFAULT);
 
 	glGenFramebuffers(1, &depthMapFbo_);
 	// create depth cubemap texture
@@ -84,7 +85,7 @@ void HelloPointShadowProgram::Init()
 void HelloPointShadowProgram::Update(seconds dt)
 {
 	std::lock_guard<std::mutex> lock(updateMutex_);
-	const auto& config = BasicEngine::GetInstance()->config;
+	const auto& config = BasicEngine::GetInstance()->GetConfig();
 	camera3D_.SetAspect(config.windowSize.x, config.windowSize.y);
 	camera3D_.Update(dt);
 	dt_ += dt.count();
@@ -116,7 +117,7 @@ void HelloPointShadowProgram::Render()
 {
 	if (cubeTexture_ == INVALID_TEXTURE_NAME)
 	{
-		cubeTexture_ = textureManager_.GetTexture(cubeTextureId_).name;
+		cubeTexture_ = textureManager_.GetTexture(cubeTextureId_)->name;
 		return;
 	}
 	std::lock_guard<std::mutex> lock(updateMutex_);
@@ -157,7 +158,7 @@ void HelloPointShadowProgram::Render()
 		RenderScene(simpleDepthShader_);
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	const auto& config = BasicEngine::GetInstance()->config;
+	const auto& config = BasicEngine::GetInstance()->GetConfig();
 	glViewport(0, 0, config.windowSize.x, config.windowSize.y);
 	cubeShader_.Bind();
 	const auto view = camera3D_.GenerateViewMatrix();

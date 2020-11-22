@@ -32,7 +32,7 @@ namespace neko
 void HelloHdrProgram::Init()
 {
     textureManager_.Init();
-    const auto& config = BasicEngine::GetInstance()->config;
+    const auto& config = BasicEngine::GetInstance()->GetConfig();
     cube_.Init();
     cubeShader_.LoadFromFile(
             config.dataRootPath + "shaders/19_hello_hdr/tunnel.vert",
@@ -57,7 +57,7 @@ void HelloHdrProgram::Init()
 void HelloHdrProgram::Update(seconds dt)
 {
     std::lock_guard<std::mutex> lock(updateMutex_);
-    const auto& config = BasicEngine::GetInstance()->config;
+    const auto& config = BasicEngine::GetInstance()->GetConfig();
     camera_.SetAspect(config.windowSize.x, config.windowSize.y);
     camera_.Update(dt);	textureManager_.Update(dt);
 }
@@ -89,7 +89,7 @@ void HelloHdrProgram::Render()
 {
     if (cubeTexture_ == INVALID_TEXTURE_NAME)
     {
-        cubeTexture_ = textureManager_.GetTexture(cubeTextureId_).name;
+        cubeTexture_ = textureManager_.GetTexture(cubeTextureId_)->name;
         return;
     }
 	if(flags_ & RESIZE_FRAMEBUFFER)
@@ -147,7 +147,7 @@ void HelloHdrProgram::OnEvent(const SDL_Event& event)
 
 void HelloHdrProgram::CreateFramebuffer()
 {
-    const auto& config = BasicEngine::GetInstance()->config;
+    const auto& config = BasicEngine::GetInstance()->GetConfig();
     glGenFramebuffers(1, &hdrFbo_);
     // create floating point color buffer
     glGenTextures(1, &hdrColorBuffer_);

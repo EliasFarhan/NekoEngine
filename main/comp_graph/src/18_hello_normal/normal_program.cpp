@@ -31,10 +31,10 @@ namespace neko
 void HelloNormalProgram::Init()
 {
 	textureManager_.Init();
-	const auto& config = BasicEngine::GetInstance()->config;
-	diffuseTexId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/brickwall/brickwall.jpg");
+	const auto& config = BasicEngine::GetInstance()->GetConfig();
+	diffuseTexId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/brickwall/brickwall.jpg", Texture::DEFAULT);
 
-	normalTexId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/brickwall/brickwall_normal.jpg");
+	normalTexId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/brickwall/brickwall_normal.jpg", Texture::DEFAULT);
 	
 
     normalShader_.LoadFromFile(
@@ -55,7 +55,7 @@ void HelloNormalProgram::Init()
 void HelloNormalProgram::Update(seconds dt)
 {
 	std::lock_guard<std::mutex> lock(updateMutex_);
-	const auto& config = BasicEngine::GetInstance()->config;
+	const auto& config = BasicEngine::GetInstance()->GetConfig();
 	dt_ += dt.count();
 	lightPos_ = Vec3f(Cos(radian_t(dt_)), 1.0f, Sin(radian_t(dt_))) * 3.0f;
 	camera_.SetAspect(config.windowSize.x, config.windowSize.y);
@@ -111,12 +111,12 @@ void HelloNormalProgram::Render()
 		return;
 	if (normalTex_ == INVALID_TEXTURE_NAME)
 	{
-		normalTex_ = textureManager_.GetTexture(normalTexId_).name;
+		normalTex_ = textureManager_.GetTexture(normalTexId_)->name;
 		return;
 	}
 	if (diffuseTex_ == INVALID_TEXTURE_NAME)
 	{
-		diffuseTex_ = textureManager_.GetTexture(diffuseTexId_).name;
+		diffuseTex_ = textureManager_.GetTexture(diffuseTexId_)->name;
 		return;
 	}
 	std::lock_guard<std::mutex> lock(updateMutex_);

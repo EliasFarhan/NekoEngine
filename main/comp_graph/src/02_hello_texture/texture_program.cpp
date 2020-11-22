@@ -31,14 +31,14 @@ namespace neko
 void HelloTextureProgram::Init()
 {
     textureManager_.Init();
-    const auto& config = BasicEngine::GetInstance()->config;
+    const auto& config = BasicEngine::GetInstance()->GetConfig();
     shader_.LoadFromFile(
             config.dataRootPath + "shaders/02_hello_texture/texture.vert",
             config.dataRootPath + "shaders/02_hello_texture/texture.frag");
     quad_.Init();
 
     const auto texturePath = config.dataRootPath + "sprites/wall.jpg";
-    textureId_ = textureManager_.LoadTexture(texturePath);
+    textureId_ = textureManager_.LoadTexture(texturePath, Texture::DEFAULT);
     textureKtx_ = gl::CreateTextureFromKTX(
         config.dataRootPath + "sprites/wall.jpg.ktx");
 	//textureId_ = neko::gl::stbCreateTexture(texturePath);
@@ -67,7 +67,7 @@ void HelloTextureProgram::Render()
     }
 	if (texture_ == INVALID_TEXTURE_NAME)
 	{
-        texture_ = textureManager_.GetTexture(textureId_).name;
+        texture_ = textureManager_.GetTexture(textureId_)->name;
         return;
 	}
     shader_.Bind();
@@ -108,6 +108,12 @@ void HelloTextureProgram::DrawImGui()
 }
 
 void HelloTextureProgram::OnEvent(const SDL_Event& event)
+{
+
+}
+
+HelloTextureProgram::HelloTextureProgram() :
+    shader_(BasicEngine::GetInstance()->GetFilesystem())
 {
 
 }

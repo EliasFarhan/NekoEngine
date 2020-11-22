@@ -58,7 +58,7 @@ void Mesh::Init()
     	{
     		
     	}
-        texture.textureName = textureManager.GetTexture(texture.textureId).name;
+        texture.textureName = textureManager.GetTexture(texture.textureId)->name;
     }
 }
 

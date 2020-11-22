@@ -32,14 +32,15 @@ namespace neko
 void HelloShadowProgram::Init()
 {
 	textureManager_.Init();
-	const auto& config = BasicEngine::GetInstance()->config;
+	const auto& config = BasicEngine::GetInstance()->GetConfig();
 	glCheckError();
 	cube_.Init();
 	floor_.Init();
 
 	model_.LoadModel(config.dataRootPath + "model/nanosuit2/nanosuit.obj");
 
-	floorTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/brickwall/brickwall.jpg");
+	floorTextureId_ = textureManager_.LoadTexture(
+	        config.dataRootPath + "sprites/brickwall/brickwall.jpg", Texture::DEFAULT);
 
 	glGenFramebuffers(1, &depthMapFbo_);
 	glGenTextures(1, &depthMap_);
@@ -82,7 +83,7 @@ void HelloShadowProgram::Init()
 void HelloShadowProgram::Update(seconds dt)
 {
 	std::lock_guard<std::mutex> lock(updateMutex_);
-	const auto& config = BasicEngine::GetInstance()->config;
+	const auto& config = BasicEngine::GetInstance()->GetConfig();
 	camera_.SetAspect(config.windowSize.x, config.windowSize.y);
 	camera_.Update(dt);	textureManager_.Update(dt);
 }
@@ -155,14 +156,14 @@ void HelloShadowProgram::Render()
 	}
 	if(floorTexture_ == INVALID_TEXTURE_NAME)
 	{
-		floorTexture_ = textureManager_.GetTexture(floorTextureId_).name;
+		floorTexture_ = textureManager_.GetTexture(floorTextureId_)->name;
 		return;
 	}
 	std::lock_guard<std::mutex> lock(updateMutex_);
 	glCheckError();
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
-	const auto& config = BasicEngine::GetInstance()->config;
+	const auto& config = BasicEngine::GetInstance()->GetConfig();
 	const auto lightView = depthCamera_.GenerateViewMatrix();
 	const auto lightProjection = depthCamera_.GenerateProjectionMatrix();
 	const auto lightSpaceMatrix = lightProjection * lightView;

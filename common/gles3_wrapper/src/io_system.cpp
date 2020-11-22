@@ -34,7 +34,7 @@ Assimp::IOStream* NekoIOSystem::Open(const char* pFile, [[maybe_unused]] const c
     {
         return nullptr;
     }
-    auto* ioStream = new NekoIOStream();
+    auto* ioStream = new NekoIOStream(filesystem_);
     ioStream->LoadFromFile(pFile);
 	return ioStream;
 }
@@ -43,6 +43,12 @@ void NekoIOSystem::Close(Assimp::IOStream* pFile)
 {
     auto* ioStream = static_cast<NekoIOStream*>(pFile);
     ioStream->Destroy();
+}
+
+NekoIOSystem::NekoIOSystem(const FilesystemInterface& filesystem):
+    filesystem_(filesystem)
+{
+
 }
 
 size_t NekoIOStream::Read(void* pvBuffer, size_t pSize, size_t pCount)
@@ -100,13 +106,19 @@ void NekoIOStream::Flush()
 
 void NekoIOStream::LoadFromFile(std::string_view path)
 {
-    bufferFile_.Load(path);
+    bufferFile_ = filesystem_.LoadFile(path);
     cursorIndex_ = 0;
 }
 
 void NekoIOStream::Destroy()
 {
     bufferFile_.Destroy();
+}
+
+NekoIOStream::NekoIOStream(const FilesystemInterface& filesystem) :
+    filesystem_(filesystem)
+{
+
 }
 }
 

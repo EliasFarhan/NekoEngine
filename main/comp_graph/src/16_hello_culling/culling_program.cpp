@@ -30,7 +30,7 @@ namespace neko
 void HelloCullingProgram::Init()
 {
 	textureManager_.Init();
-	const auto& config = BasicEngine::GetInstance()->config;
+	const auto& config = BasicEngine::GetInstance()->GetConfig();
 
 	model_.LoadModel(config.dataRootPath + "model/nanosuit2/nanosuit.obj");
     modelShader_.LoadFromFile(
@@ -39,14 +39,14 @@ void HelloCullingProgram::Init()
 	camera_.position = Vec3f(0, 3, 3);
 	camera_.WorldLookAt(Vec3f::zero);
 	cube_.Init();
-	cubeTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/container.jpg");
+	cubeTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/container.jpg", Texture::DEFAULT);
 
 }
 
 void HelloCullingProgram::Update(seconds dt)
 {
 	std::lock_guard<std::mutex> lock(updateMutex_);
-	const auto& config = BasicEngine::GetInstance()->config;
+	const auto& config = BasicEngine::GetInstance()->GetConfig();
 	camera_.SetAspect(config.windowSize.x, config.windowSize.y);
 	camera_.Update(dt);	textureManager_.Update(dt);
 }
@@ -89,7 +89,7 @@ void HelloCullingProgram::Render()
 	}
 	if (cubeTexture_ == INVALID_TEXTURE_NAME)
 	{
-		cubeTexture_ = textureManager_.GetTexture(cubeTextureId_).name;
+		cubeTexture_ = textureManager_.GetTexture(cubeTextureId_)->name;
 		return;
 	}
 	std::lock_guard<std::mutex> lock(updateMutex_);

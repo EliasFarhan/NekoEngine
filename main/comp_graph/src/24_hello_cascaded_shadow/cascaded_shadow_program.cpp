@@ -32,7 +32,7 @@ namespace neko
 void HelloCascadedShadowProgram::Init()
 {
     textureManager_.Init();
-    const auto& config = BasicEngine::GetInstance()->config;
+    const auto& config = BasicEngine::GetInstance()->GetConfig();
     glCheckError();
     plane_.Init();
     // Create the FBO
@@ -73,7 +73,8 @@ void HelloCascadedShadowProgram::Init()
             config.dataRootPath + "shaders/24_hello_cascaded_shadow/shadow.vert",
             config.dataRootPath + "shaders/24_hello_cascaded_shadow/shadow.frag"
     );
-    brickWallId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/brickwall/brickwall.jpg");
+    brickWallId_ = textureManager_.LoadTexture
+            (config.dataRootPath + "sprites/brickwall/brickwall.jpg", Texture::DEFAULT);
 
     dragonModel_.LoadModel(config.dataRootPath + "model/dragon/dragon.obj");
     glGenTextures(1, &whiteTexture_);
@@ -94,7 +95,7 @@ void HelloCascadedShadowProgram::Init()
 void HelloCascadedShadowProgram::Update(seconds dt)
 {
     std::lock_guard<std::mutex> lock(updateMutex_);
-    const auto& config = BasicEngine::GetInstance()->config;
+    const auto& config = BasicEngine::GetInstance()->GetConfig();
     camera_.SetAspect(config.windowSize.x, config.windowSize.y);
     camera_.Update(dt);	textureManager_.Update(dt);
 }
@@ -141,7 +142,7 @@ void HelloCascadedShadowProgram::Render()
     }
     if (brickWall_ == INVALID_TEXTURE_NAME)
     {
-        brickWall_ = textureManager_.GetTexture(brickWallId_).name;
+        brickWall_ = textureManager_.GetTexture(brickWallId_)->name;
         return;
     }
     std::lock_guard<std::mutex> lock(updateMutex_);
@@ -155,7 +156,7 @@ void HelloCascadedShadowProgram::Render()
         ShadowPass(i);
     }
     //Render scene from camera
-    const auto& config = BasicEngine::GetInstance()->config;
+    const auto& config = BasicEngine::GetInstance()->GetConfig();
     glViewport(0, 0, config.windowSize.x, config.windowSize.y);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     shadowShader_.Bind();

@@ -51,7 +51,7 @@ void Gles3Window::Init()
 #ifdef EASY_PROFILE_USE
 	EASY_BLOCK("GLES3WindowInit");
 #endif
-	const auto& config = BasicEngine::GetInstance()->config;
+	const auto& config = BasicEngine::GetInstance()->GetConfig();
 	// Set our OpenGL version.
 #ifdef WIN32
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -86,7 +86,7 @@ void Gles3Window::Init()
 	glRenderContext_ = SDL_GL_CreateContext(window_);
 	MakeCurrentContext();
 #ifndef __EMSCRIPTEN__
-	SDL_GL_SetSwapInterval(config.vSync);
+	SDL_GL_SetSwapInterval(config.flags & Configuration::VSYNC);
 
 	if (!gladLoadGLES2Loader(static_cast<GLADloadproc>(SDL_GL_GetProcAddress)))
 	{

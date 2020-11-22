@@ -29,7 +29,7 @@ namespace neko
 {
 void HelloDepthProgram::Init()
 {
-	const auto& config = BasicEngine::GetInstance()->config;
+	const auto& config = BasicEngine::GetInstance()->GetConfig();
 	cube_.Init();
 	floor_.Init();
 	screenPlane_.Init();

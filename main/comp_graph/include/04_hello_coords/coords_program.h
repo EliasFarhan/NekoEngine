@@ -33,6 +33,7 @@ namespace neko
 class HelloCoordsProgram : public SampleProgram
 {
 public:
+    HelloCoordsProgram();
     void Init() override;
 
     void Update(seconds) override;

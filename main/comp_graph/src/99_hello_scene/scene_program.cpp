@@ -31,7 +31,8 @@ HelloSceneProgram::HelloSceneProgram() :
 	entityHierarchy_(entityManager_),
 	transform3dManager_(entityManager_),
 	entityViewer_(entityManager_, entityHierarchy_),
-	transformViewer_(entityManager_, transform3dManager_)
+	transformViewer_(entityManager_, transform3dManager_),
+	shader_(BasicEngine::GetInstance()->GetFilesystem())
 {
 }
 
@@ -55,7 +56,7 @@ void HelloSceneProgram::Init()
 			degree_t(RandomRange(0.0f, 90.0f))
 		));
 	}
-	const auto& config = BasicEngine::GetInstance()->config;
+	const auto& config = BasicEngine::GetInstance()->GetConfig();
     shader_.LoadFromFile(config.dataRootPath + "shaders/99_hello_scene/shadow.vert",
                          config.dataRootPath + "shaders/99_hello_scene/cube.frag");
 	cube_.Init();
@@ -65,7 +66,7 @@ void HelloSceneProgram::Update(seconds dt)
 {
 	std::lock_guard<std::mutex> lock(updateMutex_);
 	transform3dManager_.Update();
-	const auto& config = BasicEngine::GetInstance()->config;
+	const auto& config = BasicEngine::GetInstance()->GetConfig();
 	camera_.SetAspect(config.windowSize.x, config.windowSize.y);
 	camera_.Update(dt);
 }

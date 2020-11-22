@@ -30,9 +30,11 @@ namespace neko
 {
 void HelloLightMapsProgram::Init()
 {
-	const auto& config = BasicEngine::GetInstance()->config;
-	containerDiffuse_ = gl::stbCreateTexture(config.dataRootPath + "material/container2.png");
-	containerSpecular_ = gl::stbCreateTexture(config.dataRootPath + "material/container2_specular.png");
+	const auto& config = BasicEngine::GetInstance()->GetConfig();
+	containerDiffuse_ = gl::StbCreateTexture(config.dataRootPath + "material/container2.png",
+                                          BasicEngine::GetInstance()->GetFilesystem());
+	containerSpecular_ = gl::StbCreateTexture(config.dataRootPath + "material/container2_specular.png",
+                                              BasicEngine::GetInstance()->GetFilesystem());
     containerShader_.LoadFromFile(
             config.dataRootPath + "shaders/08_hello_lightmaps/container.vert",
             config.dataRootPath + "shaders/08_hello_lightmaps/container.frag");
@@ -51,7 +53,7 @@ void HelloLightMapsProgram::Update(seconds dt)
 		Cos(radian_t(time_)),
 		0.0f,
 		Sin(radian_t(time_))) * lightDist_;
-	const auto& config = BasicEngine::GetInstance()->config;
+	const auto& config = BasicEngine::GetInstance()->GetConfig();
 	camera_.SetAspect(config.windowSize.x, config.windowSize.y);;
 	camera_.Update(dt);
 }

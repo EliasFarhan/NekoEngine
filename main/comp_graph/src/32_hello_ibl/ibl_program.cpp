@@ -33,7 +33,7 @@ namespace neko
 void HelloIblProgram::Init()
 {
 	textureManager_.Init();
-	const auto& config = BasicEngine::GetInstance()->config;
+	const auto& config = BasicEngine::GetInstance()->GetConfig();
 	sphere_.Init();
 	quad_.Init();
 	skybox_.Init();
@@ -86,7 +86,7 @@ void HelloIblProgram::Init()
 void HelloIblProgram::Update(seconds dt)
 {
 	std::lock_guard<std::mutex> lock(updateMutex_);
-	const auto& config = BasicEngine::GetInstance()->config;
+	const auto& config = BasicEngine::GetInstance()->GetConfig();
 	camera_.SetAspect(config.windowSize.x, config.windowSize.y);
 	camera_.Update(dt);	textureManager_.Update(dt);
 }
@@ -154,7 +154,7 @@ void HelloIblProgram::Render()
 	std::lock_guard<std::mutex> lock(updateMutex_);
 	if (hdrTexture_ == INVALID_TEXTURE_NAME)
 	{
-		hdrTexture_ = textureManager_.GetTexture(hdrTextureId_).name;
+		hdrTexture_ = textureManager_.GetTexture(hdrTextureId_)->name;
 		if (hdrTexture_ == INVALID_TEXTURE_NAME)
 			return;
 	}
@@ -169,7 +169,7 @@ void HelloIblProgram::Render()
 		GeneratePrefilter();
 		GenerateLUT();
 		glDepthFunc(GL_LESS);
-		const auto& config = BasicEngine::GetInstance()->config;
+		const auto& config = BasicEngine::GetInstance()->GetConfig();
 		glViewport(0, 0, config.windowSize.x, config.windowSize.y);
 		flags_ = flags_ & ~FIRST_FRAME;
 	}

@@ -44,13 +44,13 @@ public:
 class LoadingAssetJob : public Job
 {
 public:
-    explicit LoadingAssetJob(FilesystemInterface&);
+    explicit LoadingAssetJob(const FilesystemInterface&);
     void SetFilePath(std::string_view path);
     std::string GetFilePath() const {return filePath_; }
     const BufferFile& GetBufferFile() const {return bufferFile_;}
     void Reset() override;
 private:
-    FilesystemInterface& filesystem_;
+    const FilesystemInterface& filesystem_;
     std::string filePath_;
     BufferFile bufferFile_;
 };

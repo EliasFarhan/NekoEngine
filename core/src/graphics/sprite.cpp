@@ -8,10 +8,10 @@ namespace neko
 {
 void SpriteManager::SetTexture(neko::Entity entity, neko::TextureId textureId)
 {
-    const auto& texture = textureManager_.GetTexture(textureId);
+    const auto* texture = textureManager_.GetTexture(textureId);
     auto& sprite = components_[entity];
     sprite.textureId = textureId;
-    sprite.texture = texture;
+    sprite.texture = *texture;
 }
 
 void SpriteManager::Update([[maybe_unused]]neko::seconds dt)
@@ -24,7 +24,7 @@ void SpriteManager::Update([[maybe_unused]]neko::seconds dt)
             auto& sprite = components_[entity];
             if(sprite.textureId != INVALID_TEXTURE_ID && sprite.texture.name == INVALID_TEXTURE_NAME)
             {
-                sprite.texture = textureManager_.GetTexture(sprite.textureId);
+                sprite.texture = *textureManager_.GetTexture(sprite.textureId);
             }
         }
     }

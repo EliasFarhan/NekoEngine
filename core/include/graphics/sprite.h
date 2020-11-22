@@ -49,7 +49,7 @@ class SpriteManager :
 public:
     explicit SpriteManager(
         EntityManager& entityManager,
-        TextureManager& textureManager, 
+        TextureManagerInterface& textureManager,
         Transform2dManager& transformManager) :
     ComponentManager(entityManager),
 	textureManager_(textureManager),
@@ -59,7 +59,7 @@ public:
 	void Update(seconds dt) override;
 	void SetTexture(Entity entity, TextureId textureId);
 protected:
-    TextureManager& textureManager_;
+    TextureManagerInterface& textureManager_;
     Transform2dManager& transformManager_;
 };
 }

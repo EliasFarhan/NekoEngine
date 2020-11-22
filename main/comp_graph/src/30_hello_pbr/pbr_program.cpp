@@ -30,7 +30,7 @@ namespace neko
 {
 void HelloPbrProgram::Init()
 {
-	const auto& config = BasicEngine::GetInstance()->config;
+	const auto& config = BasicEngine::GetInstance()->GetConfig();
 	sphere_.Init();
 	pbrShader_.LoadFromFile(
 		config.dataRootPath + "shaders/30_hello_pbr/pbr.vert",
@@ -51,7 +51,7 @@ void HelloPbrProgram::Init()
 void HelloPbrProgram::Update(seconds dt)
 {
 	std::lock_guard<std::mutex> lock(updateMutex_);
-	const auto& config = BasicEngine::GetInstance()->config;
+	const auto& config = BasicEngine::GetInstance()->GetConfig();
 	camera_.SetAspect(config.windowSize.x, config.windowSize.y);
 	camera_.Update(dt);
 }

@@ -44,7 +44,7 @@ void LineRenderer::Init()
 	glEnableVertexAttribArray(1);
 	glBindVertexArray(0);
 
-	const auto& config = BasicEngine::GetInstance()->config;
+	const auto& config = BasicEngine::GetInstance()->GetConfig();
     lineShader_.LoadFromFile(
             config.dataRootPath + "shaders/engine/line.vert",
             config.dataRootPath + "shaders/engine/line.frag");

@@ -43,9 +43,6 @@
 
 namespace neko::sdl
 {
-SdlEngine::SdlEngine(Configuration* config) : BasicEngine(config)
-{
-}
 
 void SdlEngine::Init()
 {
@@ -92,8 +89,8 @@ void SdlEngine::ManageEvent()
             {
                 logDebug(fmt::format("Windows resized with new size: ({},{})", 
                     event.window.data1, event.window.data2));
-                config.windowSize = Vec2u(event.window.data1, event.window.data2);
-                window_->OnResize(config.windowSize);
+                config_.windowSize = Vec2u(event.window.data1, event.window.data2);
+                window_->OnResize(config_.windowSize);
             }
         }
         onEventAction_.Execute(event);

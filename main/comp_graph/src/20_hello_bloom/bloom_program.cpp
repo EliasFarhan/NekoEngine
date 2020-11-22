@@ -32,7 +32,7 @@ namespace neko
 void HelloBloomProgram::Init()
 {
     textureManager_.Init();
-	const auto& config = BasicEngine::GetInstance()->config;
+	const auto& config = BasicEngine::GetInstance()->GetConfig();
     cubeShader_.LoadFromFile(
             config.dataRootPath + "shaders/20_hello_bloom/cube.vert",
             config.dataRootPath + "shaders/20_hello_bloom/cube.frag");
@@ -63,7 +63,7 @@ void HelloBloomProgram::Init()
 void HelloBloomProgram::Update(seconds dt)
 {
 	std::lock_guard<std::mutex> lock(updateMutex_);
-	const auto& config = BasicEngine::GetInstance()->config;
+	const auto& config = BasicEngine::GetInstance()->GetConfig();
 	camera_.SetAspect(config.windowSize.x, config.windowSize.y);
 	camera_.Update(dt);
 	textureManager_.Update(dt);
@@ -105,7 +105,7 @@ void HelloBloomProgram::Render()
 {
 	if(cubeTexture_ == INVALID_TEXTURE_NAME)
 	{
-        cubeTexture_ = textureManager_.GetTexture(cubeTextureId_).name;
+        cubeTexture_ = textureManager_.GetTexture(cubeTextureId_)->name;
         return;
 	}
 	if(flags_ & RESIZE_FRAMEBUFFER)
@@ -195,7 +195,7 @@ void HelloBloomProgram::Render()
 
 void HelloBloomProgram::CreateFramebuffer()
 {
-    const auto& config = BasicEngine::GetInstance()->config;
+    const auto& config = BasicEngine::GetInstance()->GetConfig();
     // configure (floating point) framebuffers
     // ---------------------------------------
 

@@ -34,7 +34,7 @@ void HelloSsaoProgram::Init()
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("Init SSAO Program");
 #endif
-    const auto& config = BasicEngine::GetInstance()->config;
+    const auto& config = BasicEngine::GetInstance()->GetConfig();
     glCheckError();
     CreateFramebuffer();
 	//Crate white texture
@@ -104,7 +104,7 @@ void HelloSsaoProgram::Init()
 void HelloSsaoProgram::Update(seconds dt)
 {
     std::lock_guard<std::mutex> lock(updateMutex_);
-    const auto& config = BasicEngine::GetInstance()->config;
+    const auto& config = BasicEngine::GetInstance()->GetConfig();
     camera_.SetAspect(config.windowSize.x, config.windowSize.y);
     camera_.Update(dt);
 }
@@ -255,7 +255,7 @@ void HelloSsaoProgram::DestroyFramebuffer()
 
 void HelloSsaoProgram::CreateFramebuffer()
 {
-    const auto& config = BasicEngine::GetInstance()->config;
+    const auto& config = BasicEngine::GetInstance()->GetConfig();
     glCheckError();
     glGenFramebuffers(1, &gBuffer_);
     glBindFramebuffer(GL_FRAMEBUFFER, gBuffer_);

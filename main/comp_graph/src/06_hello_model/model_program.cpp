@@ -32,7 +32,7 @@ namespace neko
 void HelloModelProgram::Init()
 {
 	textureManager_.Init();
-	const auto& config = BasicEngine::GetInstance()->config;
+	const auto& config = BasicEngine::GetInstance()->GetConfig();
 
 	const std::string path = config.dataRootPath + "model/nanosuit2/nanosuit.obj";
     glCheckError();
@@ -51,7 +51,7 @@ void HelloModelProgram::Update(seconds dt)
 	std::lock_guard<std::mutex> lock(updateMutex_);
 
 	camera_.Update(dt);
-	const auto& config = BasicEngine::GetInstance()->config;
+	const auto& config = BasicEngine::GetInstance()->GetConfig();
 
 	projection_ = Transform3d::Perspective(
 		degree_t(45.0f),

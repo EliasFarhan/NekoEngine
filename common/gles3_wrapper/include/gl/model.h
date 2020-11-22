@@ -29,6 +29,9 @@
 
 namespace neko::assimp
 {
+using ModelId = sole::uuid;
+const ModelId INVALID_MODEL_ID = sole::uuid();
+
 
 class Model
 {
@@ -55,5 +58,34 @@ private:
 	
     void ProcessModel();
     void ProcessNode(aiNode* node, const aiScene* scene);
+};
+
+class ModelLoader
+{
+public:
+    explicit ModelLoader(const FilesystemInterface&);
+    [[nodiscard]] bool IsDone();
+private:
+    const FilesystemInterface& filesystem_;
+};
+class ModelManager : public SystemInterface
+{
+public:
+    explicit ModelManager(const FilesystemInterface&);
+    ModelId LoadModel(std::string_view path);
+    [[nodiscard]] const Model* GetModel(ModelId);
+    [[nodiscard]] bool IsLoaded(ModelId);
+
+    void Init() override;
+
+    void Update(seconds dt) override;
+
+    void Destroy() override;
+
+private:
+    const FilesystemInterface& filesystem_;
+    std::map<ModelId, std::string> modelPathMap_;
+    std::map<ModelId, Model> modelMap_;
+    std::queue<ModelLoader> modelLoaders_;
 };
 }

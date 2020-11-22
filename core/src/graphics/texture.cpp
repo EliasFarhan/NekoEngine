@@ -58,7 +58,7 @@ Image StbImageConvert(const BufferFile& imageFile, bool flipY, bool hdr)
     }
 	return image;
 }
-
+/*
 TextureLoader::TextureLoader(TextureManager& textureManager) :
 	filesystem_(textureManager.filesystem_),
     textureManager_(textureManager),
@@ -100,11 +100,9 @@ void TextureLoader::Reset()
 
 
 TextureManager::TextureManager(FilesystemInterface& filesystem) :
-    textureLoader_(*this),
     uploadToGpuJob_([this]()
 {
 	CreateTexture();
-	currentUploadedTexture_.textureId = INVALID_TEXTURE_ID;
 }),
     filesystem_(filesystem)
 {
@@ -218,7 +216,7 @@ bool TextureManager::IsTextureLoaded(TextureId textureId) const
 {
     return textureMap_.find(textureId) != textureMap_.end();
 }
-
+*/
 
 Image::Image(Image&& image) noexcept
 {

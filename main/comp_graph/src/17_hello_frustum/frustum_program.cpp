@@ -54,7 +54,7 @@ void HelloFrustumProgram::Init()
 #ifdef EASY_PROFILE_USE
     EASY_END_BLOCK;
 #endif
-    const auto& config = BasicEngine::GetInstance()->config;
+    const auto& config = BasicEngine::GetInstance()->GetConfig();
     model_.LoadModel(config.dataRootPath + "model/rock/rock.obj");
 
 
@@ -112,7 +112,7 @@ void HelloFrustumProgram::Update(seconds dt)
     std::lock_guard<std::mutex> lock(updateMutex_);
     dt_ = dt.count();
     auto* engine = BasicEngine::GetInstance();
-    const auto& config = BasicEngine::GetInstance()->config;
+    const auto& config = BasicEngine::GetInstance()->GetConfig();
     camera_.SetAspect(config.windowSize.x, config.windowSize.y);
     camera_.Update(dt);
     //Kicking the velocity calculus for force and velocities
@@ -231,7 +231,7 @@ void HelloFrustumProgram::Render()
 	//Draw the true astroids view
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    const auto& config = BasicEngine::GetInstance()->config;
+    const auto& config = BasicEngine::GetInstance()->GetConfig();
     glViewport(0, 0, config.windowSize.x, config.windowSize.y);
     vertexInstancingDrawShader_.SetMat4("view", camera_.GenerateViewMatrix());
     vertexInstancingDrawShader_.SetMat4("projection", camera_.GenerateProjectionMatrix());
