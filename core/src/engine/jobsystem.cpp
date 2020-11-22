@@ -47,7 +47,7 @@ void JobSystem::ScheduleJob(Job* func, JobThreadType threadType)
 {
     auto scheduleJobFunc = [&func](JobQueue& jobQueue)
     {
-        std::unique_lock<std::mutex> lock(jobQueue.mutex_);
+        std::lock_guard<std::mutex> lock(jobQueue.mutex_);
         jobQueue.jobs_.push_back(func);
         jobQueue.cv_.notify_one();
     };
@@ -94,8 +94,10 @@ void JobSystem::Work(JobQueue& jobQueue)
             {
                 job = jobQueue.jobs_.front();
                 jobQueue.jobs_.erase(jobQueue.jobs_.cbegin());
+                lock.unlock();
                 if (!job->CheckDependenciesStarted())
                 {
+                    lock.lock();
                 	if(jobQueue.jobs_.empty())
                 	{
 #ifdef EASY_PROFILE_USE
@@ -156,7 +158,7 @@ void JobSystem::Init()
 
 void JobSystem::Destroy()
 {
-// Spin-lock waiting for all threads to become ready for shutdown.
+    // Spin-lock waiting for all threads to become ready for shutdown.
     std::function<bool()> checkFunc = [this]()
     {
         std::lock_guard<std::mutex> lock(statusMutex_);
@@ -180,12 +182,12 @@ void JobSystem::Destroy()
     }
 }
 
-bool JobSystem::IsRunning()
+bool JobSystem::IsRunning() const
 {
     std::lock_guard<std::mutex> lock(statusMutex_);
     return status_ & Status::RUNNING;
 }
-std::uint8_t JobSystem::CountStartedWorkers()
+std::uint8_t JobSystem::CountStartedWorkers() const
 {
     std::lock_guard<std::mutex> lock(statusMutex_);
     return workersStarted_;
@@ -249,7 +251,9 @@ void Job::Execute()
 
 bool Job::CheckDependenciesStarted() const
 {
-	for(auto& dep : dependencies_)
+    if (dependencies_.empty())
+        return true;
+	for(const auto& dep : dependencies_)
 	{
 		if(!dep->HasStarted())
             return false;
@@ -278,7 +282,7 @@ void Job::AddDependency(const Job* dependentJob)
 	//Also check if the dependencies is not already in the dependency tree
     std::function<bool(const std::vector<const Job*>&, const Job*)> checkDependencies =
             [&checkDependencies, dependentJob](const std::vector<const Job*>& dependencies, const Job* job) {
-                for(auto& dep : dependencies)
+                for(const auto& dep : dependencies)
                 {
                     if(dep == job || dep == dependentJob)
                         return false;
@@ -298,7 +302,7 @@ void Job::Reset()
 {
     promise_ = std::promise<void>();
     taskDoneFuture_ = promise_.get_future();
-    status_ = 0;
+    status_ = NONE;
     dependencies_.clear();
 }
 

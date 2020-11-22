@@ -94,7 +94,7 @@ if(Neko_KTX)
 endif()
 add_dependencies(GenerateData validate_json)
 
-set_target_properties (GenerateData PROPERTIES FOLDER Neko/Core)
+set_target_properties (GenerateData PROPERTIES FOLDER __DO_THAT_FIRST_IN_RELEASE)
 
 if(MSVC)
     if (${CMAKE_HOST_SYSTEM_PROCESSOR} STREQUAL "AMD64")

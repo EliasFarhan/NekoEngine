@@ -32,37 +32,52 @@
 namespace neko
 {
 
-using ResourceId = sole::uuid;
-const ResourceId INVALID_RESOURCE_ID = sole::uuid();
+using AssetId = sole::uuid;
+const AssetId INVALID_ASSET_ID = sole::uuid();
 
-struct Resource
-{
-    ResourceId resourceId = INVALID_RESOURCE_ID;
-    std::string assetPath;
-};
 
-class ResourceManager : public SystemInterface
+/*
+ * \brief The Asset Manager stores the BufferFile using the Asset Id.
+ * It will load one after another asset on the Resource thread.
+ * 
+ */
+class AssetManager : public SystemInterface
 {
 public:
-    ResourceManager();
-
-    const BufferFile* GetResource(ResourceId resourceId);
-
-    ResourceId LoadResource(const std::string_view assetPath);
+    AssetManager();
+    /**
+     * \brief Return the non-owning pointer to the BufferFile
+     * \return Non owning pointer to the Buffer file, nullptr if not yet loaded
+     */
+    const BufferFile* GetResource(AssetId resourceId);
+    /**
+     * \brief This function will get the asset id from the meta file
+     * and will return it. If the asset was not yet loaded, it will put it
+     * in the asset loading queue.
+     */
+    AssetId LoadAsset(const std::string_view assetPath);
     void Init() override;
     void Update(seconds dt) override;
     void Destroy() override;
-    void RemoveResource(ResourceId resourceId);
+    /**
+     * \brief Remove the asset content from our internal storage
+     */
+    void RemoveAsset(AssetId resourceId);
 
 protected:
+    struct Asset
+    {
+        AssetId assetId = INVALID_ASSET_ID;
+        std::string assetPath;
+    };
     const std::string_view resourceMetafile_ = ".meta";
 
-    Resource currentLoadedResource_ {};
-    std::map<ResourceId, BufferFile> resourceMap_;
-    std::map<ResourceId, std::string> resourcePathMap_;
-    std::vector<Resource> resourceQueue_;
-    Job resourceJob_;
-    std::mutex resourceMapMutex_;
+    Asset currentLoadedAsset_ {};
+    std::map<AssetId, BufferFile> assetMap_;
+    std::map<AssetId, std::string> assetPathMap_;
+    std::vector<Asset> assetLoadingQueue_;
+    Job assetLoadingJob_;
+    std::mutex assetMapMutex_;
 
 };
 

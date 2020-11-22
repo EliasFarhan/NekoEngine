@@ -53,6 +53,7 @@ public:
     };
     enum JobStatus : std::uint8_t
     {
+        NONE = 0u,
         STARTED = 1u << 0u,
         DONE = 1u << 1u
     };
@@ -95,7 +96,7 @@ protected:
     mutable std::promise<void> promise_;
     mutable std::shared_future<void> taskDoneFuture_;
     mutable std::mutex statusLock_;
-    std::uint8_t status_;
+    std::uint8_t status_= NONE;
 
 };
 
@@ -108,7 +109,7 @@ struct JobQueue
 
 class JobSystem : SystemInterface
 {
-    enum Status : uint8_t
+    enum Status : std::uint8_t
     {
         NONE = 0u,
         RUNNING = 1u
@@ -127,14 +128,14 @@ public:
 private:
 	void Work(JobQueue& jobQueue);
 
-    [[nodiscard]] bool IsRunning();
+    [[nodiscard]] bool IsRunning() const;
 
     Status status_ = NONE;
     JobQueue jobs_; // Managed via mutex. // TODO: replace with custom queue when those are implemented.
     JobQueue renderJobs_; // Managed via mutex. // TODO: replace with custom queue when those are implemented.
     JobQueue resourceJobs_; // Managed via mutex. // TODO: replace with custom queue when those are implemented.
     std::uint8_t workersStarted_ = 0;
-    [[nodiscard]] std::uint8_t CountStartedWorkers();
+    [[nodiscard]] std::uint8_t CountStartedWorkers() const;
     std::uint8_t numberOfWorkers;
     std::vector<std::thread> workers_; // TODO: replace with fixed vector when those are implemented.
     mutable std::mutex statusMutex_;

@@ -24,7 +24,7 @@
  */
 
 #include "engine/log.h"
-#include "engine/resource.h"
+#include "engine/Asset.h"
 #include "engine/engine.h"
 #include "utils/json_utility.h"
 #include "engine/assert.h"
@@ -35,37 +35,38 @@
 
 namespace neko
 {
-ResourceManager::ResourceManager(): resourceJob_([this]()
+AssetManager::AssetManager(): assetLoadingJob_([this]()
 {
 #ifdef EASY_PROFILE_USE
         EASY_BLOCK("Loading Resource");
 #endif
     BufferFile newFile;
-    newFile.Load(currentLoadedResource_.assetPath);
+    newFile.Load(currentLoadedAsset_.assetPath);
     {
-        std::lock_guard<std::mutex> lock(resourceMapMutex_);
-        resourceMap_[currentLoadedResource_.resourceId] = std::move(newFile);
+        std::lock_guard<std::mutex> lock(assetMapMutex_);
+        assetMap_[currentLoadedAsset_.assetId] = std::move(newFile);
     }
+    currentLoadedAsset_.assetId = INVALID_ASSET_ID;
 })
 {
 }
 
-const BufferFile* ResourceManager::GetResource(ResourceId resourceId)
+const BufferFile* AssetManager::GetResource(AssetId resourceId)
 {
-    std::lock_guard<std::mutex> lock(resourceMapMutex_);
-    const auto resourcePair = resourceMap_.find(resourceId);
-    if (resourcePair != resourceMap_.end())
+    std::lock_guard<std::mutex> lock(assetMapMutex_);
+    const auto resourcePair = assetMap_.find(resourceId);
+    if (resourcePair != assetMap_.end())
     {
         return &resourcePair->second;
     }
     return nullptr;
 }
 
-ResourceId ResourceManager::LoadResource(const std::string_view assetPath)
+AssetId AssetManager::LoadAsset(const std::string_view assetPath)
 {
     const std::string resourceMetaPath = fmt::format("{}{}", assetPath, resourceMetafile_);
     const json resourceMetaJson = LoadJson(resourceMetaPath);
-    sole::uuid resourceId = INVALID_RESOURCE_ID;
+    sole::uuid resourceId = INVALID_ASSET_ID;
     if(resourceMetaJson.contains("uuid"))
     {
         resourceId = sole::rebuild(resourceMetaJson["uuid"]);
@@ -76,59 +77,57 @@ ResourceId ResourceManager::LoadResource(const std::string_view assetPath)
         return resourceId;
     }
 
-    const auto it = resourcePathMap_.find(resourceId);
-    if (it == resourcePathMap_.end())
+    const auto it = assetPathMap_.find(resourceId);
+    if (it == assetPathMap_.end())
     {
-        resourcePathMap_[resourceId] = assetPath;
-        resourceQueue_.push_back({resourceId, assetPath.data()});
+        assetPathMap_[resourceId] = assetPath;
+        assetLoadingQueue_.push_back({resourceId, assetPath.data()});
     }
 
     return resourceId;
 }
 
-void ResourceManager::Init()
+void AssetManager::Init()
 {
 }
 
-void ResourceManager::Update([[maybe_unused]]seconds dt)
+void AssetManager::Update([[maybe_unused]]seconds dt)
 {
-    if(!resourceQueue_.empty())
+    if(!assetLoadingQueue_.empty())
     {
-        if(!resourceJob_.HasStarted() || resourceJob_.IsDone())
+        if(currentLoadedAsset_.assetId == INVALID_ASSET_ID && 
+            (!assetLoadingJob_.HasStarted() || 
+            assetLoadingJob_.IsDone()))
         {
-            currentLoadedResource_ = resourceQueue_.front();
-            resourceQueue_.erase(resourceQueue_.cbegin());
-            resourceJob_.Reset();
+            currentLoadedAsset_ = assetLoadingQueue_.front();
+            assetLoadingQueue_.erase(assetLoadingQueue_.cbegin());
+            assetLoadingJob_.Reset();
             BasicEngine::GetInstance()->ScheduleJob(
-                &resourceJob_, 
+                &assetLoadingJob_, 
                 JobThreadType::RESOURCE_THREAD);
         }
     }
 }
 
-void ResourceManager::Destroy()
+void AssetManager::Destroy()
 {
-    if(resourceJob_.HasStarted() && !resourceJob_.IsDone())
+    if(assetLoadingJob_.HasStarted() && !assetLoadingJob_.IsDone())
     {
-        resourceJob_.Join();
-    }
-    if (!resourceQueue_.empty())
-    {
-        resourceQueue_.clear();
+        assetLoadingJob_.Join();
     }
 }
 
-void ResourceManager::RemoveResource(ResourceId resourceId)
+void AssetManager::RemoveAsset(AssetId resourceId)
 {
-    const auto it = resourceMap_.find(resourceId);
-    if (it != resourceMap_.end())
+    const auto it = assetMap_.find(resourceId);
+    if (it != assetMap_.end())
     {
-        resourceMap_.erase(it);
+        assetMap_.erase(it);
     }
-    const auto pathIt = resourcePathMap_.find(resourceId);
-    if(pathIt != resourcePathMap_.end())
+    const auto pathIt = assetPathMap_.find(resourceId);
+    if(pathIt != assetPathMap_.end())
     {
-        resourcePathMap_.erase(pathIt);
+        assetPathMap_.erase(pathIt);
     }
 }
 }

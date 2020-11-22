@@ -1,12 +1,12 @@
 #include <gtest/gtest.h>
 
-#include "engine/resource.h"
+#include "engine/Asset.h"
 #include "engine/engine.h"
 
 class Engine : public neko::BasicEngine
 {
 public:
-    using neko::BasicEngine::BasicEngine;
+    using BasicEngine::BasicEngine;
     void ManageEvent() override{}
     void Stop()
     {
@@ -18,7 +18,7 @@ class ResourceResultSystem : public neko::SystemInterface
 {
 public:
     explicit ResourceResultSystem(
-        neko::ResourceManager& resourceManager,
+        neko::AssetManager& resourceManager,
         Engine& engine);
     void Init() override;
     void Update(neko::seconds dt) override;
@@ -29,13 +29,13 @@ public:
     }
 private:
     Engine& engine_;
-    neko::ResourceManager& resourceManager_;
+    neko::AssetManager& resourceManager_;
     std::vector<std::string> paths_;
-    std::vector<neko::ResourceId> resourceIds_;
+    std::vector<neko::AssetId> resourceIds_;
 };
 
 ResourceResultSystem::ResourceResultSystem(
-    neko::ResourceManager& resourceManager, Engine& engine):
+    neko::AssetManager& resourceManager, Engine& engine):
     engine_(engine), resourceManager_(resourceManager)
 {
 }
@@ -44,7 +44,7 @@ void ResourceResultSystem::Init()
 {
     for(auto& path : paths_)
     {
-        auto resourceId = resourceManager_.LoadResource(path);
+        auto resourceId = resourceManager_.LoadAsset(path);
         resourceIds_.push_back(resourceId);
     }
 }
@@ -57,7 +57,7 @@ void ResourceResultSystem::Update(neko::seconds dt)
     {
         for(auto resourceId : resourceIds_)
         {
-            resourceManager_.RemoveResource(resourceId);
+            resourceManager_.RemoveAsset(resourceId);
         }
         engine_.Stop();
     }
@@ -70,7 +70,7 @@ void ResourceResultSystem::Destroy()
 TEST(Engine, TestOneResource)
 {
     Engine engine{nullptr};
-    neko::ResourceManager resourceManager;
+    neko::AssetManager resourceManager;
     ResourceResultSystem result{ resourceManager, engine };
     result.AddFileToLoad("../data/sprites/wall.jpg");
     engine.RegisterSystem(resourceManager);
@@ -83,11 +83,12 @@ TEST(Engine, TestOneResource)
 TEST(Engine, TestSeveralResource)
 {
     Engine engine{ nullptr };
-    neko::ResourceManager resourceManager;
+    neko::AssetManager resourceManager;
     ResourceResultSystem result{ resourceManager, engine };
     result.AddFileToLoad("../data/sprites/wall.jpg");
     //result.AddFileToLoad("../data/sprites/wall.jpg.ktx");
     result.AddFileToLoad("../data/sprites/grass.png");
+    result.AddFileToLoad("../data/sprites/wall.jpg");
     engine.RegisterSystem(resourceManager);
     engine.RegisterSystem(result);
     engine.Init();
