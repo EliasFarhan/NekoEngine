@@ -69,8 +69,9 @@ void ResourceResultSystem::Destroy()
 
 TEST(Engine, TestOneResource)
 {
-    Engine engine{nullptr};
-    neko::AssetManager resourceManager;
+    neko::Filesystem filesystem;
+    Engine engine{std::nullopt};
+    neko::AssetManager resourceManager{filesystem};
     ResourceResultSystem result{ resourceManager, engine };
     result.AddFileToLoad("../data/sprites/wall.jpg");
     engine.RegisterSystem(resourceManager);
@@ -82,8 +83,9 @@ TEST(Engine, TestOneResource)
 
 TEST(Engine, TestSeveralResource)
 {
-    Engine engine{ nullptr };
-    neko::AssetManager resourceManager;
+    neko::Filesystem filesystem;
+    Engine engine{ std::nullopt };
+    neko::AssetManager resourceManager{filesystem};
     ResourceResultSystem result{ resourceManager, engine };
     result.AddFileToLoad("../data/sprites/wall.jpg");
     //result.AddFileToLoad("../data/sprites/wall.jpg.ktx");

@@ -35,19 +35,19 @@
 
 namespace neko
 {
-AssetManager::AssetManager(): assetLoadingJob_([this]()
+AssetManager::AssetManager(FilesystemInterface& filesystem): assetLoadingJob_([this]()
 {
 #ifdef EASY_PROFILE_USE
-        EASY_BLOCK("Loading Resource");
+    EASY_BLOCK("Loading Asset From Asset Manager");
 #endif
-    BufferFile newFile;
-    newFile.Load(currentLoadedAsset_.assetPath);
+    BufferFile newFile = filesystem_.LoadFile(currentLoadedAsset_.assetPath);
     {
         std::lock_guard<std::mutex> lock(assetMapMutex_);
         assetMap_[currentLoadedAsset_.assetId] = std::move(newFile);
     }
     currentLoadedAsset_.assetId = INVALID_ASSET_ID;
-})
+}),
+filesystem_(filesystem)
 {
 }
 

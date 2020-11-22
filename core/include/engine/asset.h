@@ -27,7 +27,7 @@
 #include <map>
 #include "sole.hpp"
 #include "engine/system.h"
-#include "utils/file_utility.h"
+#include "engine/filesystem.h"
 
 namespace neko
 {
@@ -44,7 +44,7 @@ const AssetId INVALID_ASSET_ID = sole::uuid();
 class AssetManager : public SystemInterface
 {
 public:
-    AssetManager();
+    explicit AssetManager(FilesystemInterface&);
     /**
      * \brief Return the non-owning pointer to the BufferFile
      * \return Non owning pointer to the Buffer file, nullptr if not yet loaded
@@ -78,6 +78,7 @@ protected:
     std::vector<Asset> assetLoadingQueue_;
     Job assetLoadingJob_;
     std::mutex assetMapMutex_;
+    FilesystemInterface& filesystem_;
 
 };
 

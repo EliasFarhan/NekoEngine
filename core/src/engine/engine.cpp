@@ -40,11 +40,11 @@ namespace neko
 {
 BasicEngine* BasicEngine::instance_ = nullptr;
 
-BasicEngine::BasicEngine(Configuration* config)
+BasicEngine::BasicEngine(std::optional<Configuration> config)
 {
-	if (config != nullptr)
+	if (config.has_value())
 	{
-		this->config = *config;
+		config_ = config.value();
 	}
 
 #ifdef EASY_PROFILE_USE
@@ -218,6 +218,11 @@ void BasicEngine::RegisterOnDrawUi(DrawImGuiInterface& drawUi)
 void BasicEngine::ScheduleJob(Job* job, JobThreadType threadType)
 {
     jobSystem_.ScheduleJob(job, threadType);
+}
+
+const Configuration& BasicEngine::GetConfig()
+{
+    return config_;
 }
 
 

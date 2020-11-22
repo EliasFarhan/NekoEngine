@@ -47,7 +47,7 @@ def validate_skybox(data_src, data_out, meta_content):
         textures = map(lambda path : os.path.join(os.path.dirname(data_src), path), textures)
         command.extend(textures)
         command.extend([
-            "-tex_type","cubemap",
+            "-tex_type", "cubemap",
             "-output_file",
             os.path.join(os.path.dirname(data_out), skybox_content["name"]+".ktx")
         ])

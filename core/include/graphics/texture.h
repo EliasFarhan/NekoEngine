@@ -24,12 +24,16 @@
  */
 #include <queue>
 #include <map>
-#include "engine/assert.h"
-#include <engine/log.h>
-#include <engine/asset.h>
+
 #include <xxhash.hpp>
 #include <sole.hpp>
+
+#include <engine/assert.h>
+#include <engine/log.h>
+#include <engine/asset.h>
 #include <utils/service_locator.h>
+#include <mathematics/vector.h>
+#include <engine/filesystem.h>
 
 namespace neko
 {
@@ -138,10 +142,11 @@ public:
     }
     void Reset();
 private:
+    FilesystemInterface& filesystem_;
     TextureManager& textureManager_;
     Texture::TextureFlags flags_ = Texture::DEFAULT;
     Job convertImageJob_;
-    ResourceJob diskLoadJob_;
+    LoadingAssetJob diskLoadJob_;
     Image image_;
     TextureId textureId_ = INVALID_TEXTURE_ID;
 };
@@ -163,7 +168,7 @@ struct TextureInfo
 class TextureManager : public TextureManagerInterface, public SystemInterface
 {
 public:
-    TextureManager();
+    explicit TextureManager(FilesystemInterface&);
     /**
      * \brief Open the meta file of the texture file to get the Texture Id. If not already loaded
      * it will put the loading texture into the texturesToLoad queue.
@@ -182,10 +187,12 @@ public:
 	Texture GetTexture(TextureId index) const override;
 	bool IsTextureLoaded(TextureId textureId) const override;
 protected:
+    friend class TextureLoader;
 	/**
 	 * \brief Called on the renderer pre render
 	 */
     virtual void CreateTexture() = 0;
+
     std::map<TextureId, std::string> texturePathMap_;
     std::map<TextureId, Texture> textureMap_;
     std::queue<TextureInfo> texturesToLoad_;
@@ -193,6 +200,7 @@ protected:
     TextureLoader textureLoader_;
     TextureInfo currentUploadedTexture_;
     Job uploadToGpuJob_;
+    FilesystemInterface& filesystem_;
 };
 using TextureManagerLocator = Locator<TextureManagerInterface, NullTextureManager>;
 

@@ -43,43 +43,8 @@ Java_swiss_sae_gpr5300_MainActivity_load(JNIEnv *env, [[maybe_unused]] jclass cl
 
 namespace neko
 {
-/**
- * \brief Non RAII structure, please Destroy it
- */
-struct BufferFile
-{
-    BufferFile() = default;
-    ~BufferFile();
-    BufferFile(BufferFile&& bufferFile) noexcept;
-    BufferFile& operator=(BufferFile&& bufferFile) noexcept;
-    BufferFile(const BufferFile&) = delete;
-    BufferFile& operator= (const BufferFile&) = delete;
 
-    unsigned char* dataBuffer = nullptr;
-    size_t dataLength = 0;
 
-    void Load(std::string_view path);
-    void Destroy();
-
-};
-class ResourceJob : public Job
-{
-public:
-    ResourceJob();
-    void SetFilePath(std::string_view path);
-    std::string GetFilePath() const {return filePath_; }
-    const BufferFile& GetBufferFile() const {return bufferFile_;}
-    void Reset() override;
-private:
-    std::string filePath_;
-    BufferFile bufferFile_;
-};
-
-bool FileExists(const std::string_view filename);
-
-bool IsRegularFile(const std::string_view filename);
-
-bool IsDirectory(const std::string_view filename);
 
 void IterateDirectory(const std::string_view dirname, std::function<void(const std::string_view)> func, bool recursive=false);
 

@@ -24,13 +24,14 @@
  */
 #include <mutex>
 #include <string>
+#include <optional>
+
 #include <engine/system.h>
 #include <utils/action_utility.h>
 #include <graphics/color.h>
 #include <utils/time_utility.h>
-#include <mathematics/vector.h>
-
-#include "jobsystem.h"
+#include <engine/configuration.h>
+#include <engine/jobsystem.h>
 
 
 namespace neko
@@ -38,25 +39,6 @@ namespace neko
 class Renderer;
 class Window;
 
-/**
- * \brief store various Engine constant or global values
- */
-struct Configuration
-{
-    std::string windowName = "NekoEngine 0.1";
-    Vec2u windowSize = Vec2u(1024, 1024);
-    Vec2u gameWindowSize{1280, 720};
-    bool fullscreen = false;
-    bool vSync = true;
-    unsigned int framerateLimit = 0u;
-#if defined(EMSCRIPTEN)
-    std::string dataRootPath = "./";
-#elif defined(__ANDROID__)
-    std::string dataRootPath = "data/";
-#else
-    std::string dataRootPath = "../../data/";
-#endif
-};
 
 
 /**
@@ -65,9 +47,9 @@ struct Configuration
 class BasicEngine : public SystemInterface
 {
 public:
-    explicit BasicEngine(Configuration* config = nullptr);
+    explicit BasicEngine(std::optional<Configuration> config);
 	BasicEngine() = delete;
-    ~BasicEngine();
+    ~BasicEngine() override;
     void Init() override;
     void Update(seconds dt) final;
     void Destroy() override;
@@ -80,7 +62,7 @@ public:
 
     void SetWindowAndRenderer(Window* window, Renderer* renderer);
 
-    Configuration config;
+    const Configuration& GetConfig();
 
     void RegisterSystem(SystemInterface& system);
     void RegisterOnDrawUi(DrawImGuiInterface& drawUi);
@@ -94,10 +76,11 @@ public:
     //static T* GetInstance(){ return dynamic_cast<T*>(instance_);};
 protected:
     static BasicEngine* instance_;
+    Configuration config_;
     Renderer* renderer_ = nullptr;
     Window* window_ = nullptr;
     JobSystem jobSystem_;
-	bool isRunning_;
+	bool isRunning_ = false;
     float dt_ = 0.0f;
     Action<> initAction_;
     Action<seconds> updateAction_;

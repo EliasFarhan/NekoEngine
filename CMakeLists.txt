@@ -19,6 +19,7 @@ set(Neko_Assert ON CACHE BOOL "Activate Neko Assertion")
 set(Neko_Benchmark ON CACHE BOOL "Activate Benchmark")
 set(Neko_SFML_NET ON CACHE BOOL "Activate SFML Net Wrapper")
 set(Neko_KTX ON CACHE BOOL "Activate SFML Net Wrapper")
+set(Neko_PhysFS ON CACHE BOOL "Activate PhysFS Wrapper")
 
 MESSAGE("CMAKE SYSTEM NAME: ${CMAKE_SYSTEM_NAME}")
 
@@ -38,6 +39,7 @@ if(MSVC)
 endif()
 
 include(cmake/neko_executable.cmake)
+include(cmake/data.cmake)
 
 set(EXTERNAL_DIR ${CMAKE_SOURCE_DIR}/externals CACHE INTERNAL "Externals folder")
 set(UTILITIES_DIR "${EXTERNAL_DIR}/utilities" CACHE INTERNAL "")
@@ -64,6 +66,12 @@ if(Neko_KTX)
     add_dependencies(ktx mkvk)
 endif()
 
+if(Neko_PhysFS)
+    set(PHYSFS_DIR "${EXTERNAL_DIR}/physfs-3.0.2" CACHE STRING "")
+    add_subdirectory(${PHYSFS_DIR})
+
+    add_subdirectory(common/physfs_wrapper)
+endif()
 
 if(Neko_Profile)
     MESSAGE("Enable profiling")
@@ -96,7 +104,7 @@ foreach(tools_project_path ${tools_projects} )
 endforeach()
 
 
-include("cmake/data.cmake")
+include("cmake/data_generation.cmake")
 set(NEKO_CORE_DIR "${CMAKE_SOURCE_DIR}/core/" CACHE INTERNAL "")
 add_subdirectory(${NEKO_CORE_DIR})
 

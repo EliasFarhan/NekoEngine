@@ -26,6 +26,7 @@ SOFTWARE.
 #include <xxhash.hpp>
 #include <sole.hpp>
 #include <gtest/gtest.h>
+#include <engine/filesystem.h>
 #include "utils/file_utility.h"
 #include "engine/engine.h"
 
@@ -40,6 +41,7 @@ TEST(Engine, TestUUIDToStringToUUID)
 TEST(Engine, TestAssetImport)
 {
 	neko::Configuration config;
+	neko::Filesystem filesystem;
 	config.dataRootPath = "../";
 	std::vector<std::string> filenames =
 	{
@@ -55,8 +57,7 @@ TEST(Engine, TestAssetImport)
 	{
 		xxh::hash_state_t<64> hash_stream(0);
 		hash_stream.update(filename);
-		neko::BufferFile bufferFile;
-		bufferFile.Load(filename);
+		neko::BufferFile bufferFile = filesystem.LoadFile(filename);
 		if (bufferFile.dataBuffer != nullptr)
 		{
 			hash_stream.update(bufferFile.dataBuffer, bufferFile.dataLength);

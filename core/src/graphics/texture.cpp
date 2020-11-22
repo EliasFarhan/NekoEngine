@@ -28,6 +28,7 @@
 #include "engine/engine.h"
 #include "utils/file_utility.h"
 #include <fmt/format.h>
+#include <utils/json_utility.h>
 
 #ifdef EASY_PROFILE_USE
 #include "easy/profiler.h"
@@ -59,7 +60,8 @@ Image StbImageConvert(const BufferFile& imageFile, bool flipY, bool hdr)
 }
 
 TextureLoader::TextureLoader(TextureManager& textureManager) :
-	textureManager_(textureManager),
+	filesystem_(textureManager.filesystem_),
+    textureManager_(textureManager),
 	convertImageJob_([this]
     {
 	    logDebug("[Texture Manager] Convert buffer file to image");
@@ -67,7 +69,8 @@ TextureLoader::TextureLoader(TextureManager& textureManager) :
         TextureInfo textureInfo{ textureId_, std::move(image_), flags_ };
         textureManager_.UploadToGpu(std::move(textureInfo));
         logDebug("[Texture Manager] Finish converting buffer file to image");
-    })
+    }),
+    diskLoadJob_(filesystem_)
 {
 }
 
@@ -96,11 +99,14 @@ void TextureLoader::Reset()
 
 
 
-TextureManager::TextureManager() : textureLoader_(*this), uploadToGpuJob_([this]()
+TextureManager::TextureManager(FilesystemInterface& filesystem) :
+    textureLoader_(*this),
+    uploadToGpuJob_([this]()
 {
 	CreateTexture();
 	currentUploadedTexture_.textureId = INVALID_TEXTURE_ID;
-})
+}),
+    filesystem_(filesystem)
 {
 
 }
