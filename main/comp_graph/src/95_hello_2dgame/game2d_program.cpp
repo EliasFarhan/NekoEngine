@@ -5,7 +5,6 @@ namespace neko
 
 
 Hello2dGameProgram::Hello2dGameProgram() :
-    textureManager_(BasicEngine::GetInstance()->GetFilesystem()),
 	spriteManager_(entityManager_, textureManager_, transform2dManager_),
 	transform2dManager_(entityManager_)
 {

@@ -111,10 +111,5 @@ void HelloCoordsProgram::OnEvent(const SDL_Event& event)
 
 }
 
-HelloCoordsProgram::HelloCoordsProgram() :
-    shader_(BasicEngine::GetInstance()->GetFilesystem())
-{
-
-}
 
 }

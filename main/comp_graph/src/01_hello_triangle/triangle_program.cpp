@@ -214,11 +214,4 @@ void HelloTriangleProgram::OnEvent(const SDL_Event& event)
 
 }
 
-HelloTriangleProgram::HelloTriangleProgram() :
-    shader_(BasicEngine::GetInstance()->GetFilesystem()),
-    nekoShader_(BasicEngine::GetInstance()->GetFilesystem())
-{
-
-}
-
 }

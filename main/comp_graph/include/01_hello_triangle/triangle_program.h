@@ -32,7 +32,6 @@ namespace neko
 class HelloTriangleProgram : public SampleProgram
 {
 public:
-    HelloTriangleProgram();
 	enum class RenderType
 	{
 		Triangle,

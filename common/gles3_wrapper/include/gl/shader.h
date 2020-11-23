@@ -55,7 +55,7 @@ void DeleteShader(GLuint shader);
 class Shader : public neko::Shader
 {
 public:
-    explicit Shader(const FilesystemInterface&);
+    explicit Shader();
     ~Shader() override;
 
     void LoadFromFile(std::string_view vertexShaderPath, std::string_view fragmentShaderPath) override;

@@ -60,7 +60,7 @@ private:
 class TextureManager : public neko::TextureManagerInterface, public SystemInterface
 {
 public:
-    explicit TextureManager(const FilesystemInterface& filesystem);
+    explicit TextureManager();
     TextureId LoadTexture(std::string_view path, Texture::TextureFlags flags) override;
 
     const Texture* GetTexture(TextureId index) const override;

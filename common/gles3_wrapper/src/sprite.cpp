@@ -89,8 +89,7 @@ void SpriteManager::Render()
 
 SpriteManager::SpriteManager(EntityManager& entityManager, TextureManagerInterface& textureManager,
                              Transform2dManager& transformManager) :
-    neko::SpriteManager(entityManager, textureManager,transformManager),
-    spriteShader_(BasicEngine::GetInstance()->GetFilesystem())
+    neko::SpriteManager(entityManager, textureManager,transformManager)
 {
 
 }

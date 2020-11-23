@@ -209,4 +209,5 @@ void HelloCameraProgram::OnEvent(const SDL_Event& event)
 		break;
 	}
 }
+
 }

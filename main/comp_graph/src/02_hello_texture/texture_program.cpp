@@ -32,6 +32,7 @@ void HelloTextureProgram::Init()
 {
     textureManager_.Init();
     const auto& config = BasicEngine::GetInstance()->GetConfig();
+    const auto& filesystem = BasicEngine::GetInstance()->GetFilesystem();
     shader_.LoadFromFile(
             config.dataRootPath + "shaders/02_hello_texture/texture.vert",
             config.dataRootPath + "shaders/02_hello_texture/texture.frag");
@@ -39,8 +40,7 @@ void HelloTextureProgram::Init()
 
     const auto texturePath = config.dataRootPath + "sprites/wall.jpg";
     textureId_ = textureManager_.LoadTexture(texturePath, Texture::DEFAULT);
-    textureKtx_ = gl::CreateTextureFromKTX(
-        config.dataRootPath + "sprites/wall.jpg.ktx");
+    texture_ = gl::StbCreateTexture(texturePath, filesystem, Texture::DEFAULT);
 	//textureId_ = neko::gl::stbCreateTexture(texturePath);
     glEnable(GL_DEPTH_TEST);
 }
@@ -55,8 +55,8 @@ void HelloTextureProgram::Destroy()
     quad_.Destroy();
     shader_.Destroy();
     textureManager_.Destroy();
-    if(textureKtx_ != INVALID_TEXTURE_NAME)
-        gl::DestroyTexture(textureKtx_);
+    if(texture_ != INVALID_TEXTURE_NAME)
+        gl::DestroyTexture(texture_);
 }
 
 void HelloTextureProgram::Render()
@@ -65,9 +65,9 @@ void HelloTextureProgram::Render()
     {
         return;
     }
-	if (texture_ == INVALID_TEXTURE_NAME)
+	if (textureKtx_ == INVALID_TEXTURE_NAME)
 	{
-        texture_ = textureManager_.GetTexture(textureId_)->name;
+        textureKtx_ = textureManager_.GetTexture(textureId_)->name;
         return;
 	}
     shader_.Bind();
@@ -96,7 +96,6 @@ void HelloTextureProgram::DrawImGui()
     const char* textureTypeNames[(int)TextureType::LENGTH] =
     {
     	"Stb Texture (JPG)",
-    	"DDS Texture",
     	"Ktx Texture"
     };
     int textureType = static_cast<int>(textureType_);
@@ -108,12 +107,6 @@ void HelloTextureProgram::DrawImGui()
 }
 
 void HelloTextureProgram::OnEvent(const SDL_Event& event)
-{
-
-}
-
-HelloTextureProgram::HelloTextureProgram() :
-    shader_(BasicEngine::GetInstance()->GetFilesystem())
 {
 
 }

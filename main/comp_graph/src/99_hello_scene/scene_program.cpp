@@ -31,8 +31,7 @@ HelloSceneProgram::HelloSceneProgram() :
 	entityHierarchy_(entityManager_),
 	transform3dManager_(entityManager_),
 	entityViewer_(entityManager_, entityHierarchy_),
-	transformViewer_(entityManager_, transform3dManager_),
-	shader_(BasicEngine::GetInstance()->GetFilesystem())
+	transformViewer_(entityManager_, transform3dManager_)
 {
 }
 

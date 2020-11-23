@@ -185,7 +185,7 @@ Shader::~Shader()
     Destroy();
 }
 
-Shader::Shader(const FilesystemInterface& filesystem): filesystem_(filesystem)
+Shader::Shader() : filesystem_(BasicEngine::GetInstance()->GetFilesystem())
 {
 
 }

@@ -136,10 +136,5 @@ void HelloTransformProgram::OnEvent(const SDL_Event& event)
 
 }
 
-HelloTransformProgram::HelloTransformProgram() :
-    shaderProgram_(BasicEngine::GetInstance()->GetFilesystem())
-{
-
-}
 
 }

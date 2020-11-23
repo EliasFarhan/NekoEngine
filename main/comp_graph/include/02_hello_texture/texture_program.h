@@ -33,7 +33,6 @@ namespace neko
 class HelloTextureProgram : public SampleProgram
 {
 public:
-    HelloTextureProgram();
     void Init() override;
 
     void Update(seconds dt) override;
@@ -58,7 +57,6 @@ private:
     enum class TextureType
 	{
 		STB_TEXTURE,
-		DDS_TEXTURE,
 		KTX_TEXTURE,
 		LENGTH
 	};

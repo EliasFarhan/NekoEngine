@@ -475,7 +475,7 @@ void TextureManager::Update(seconds dt)
 
 }
 
-TextureManager::TextureManager(const FilesystemInterface& filesystem) : filesystem_(filesystem)
+TextureManager::TextureManager() : filesystem_(BasicEngine::GetInstance()->GetFilesystem())
 {
 
 }
@@ -512,8 +512,7 @@ void TextureLoader::DecompressTexture()
     KTX_error_code result;
     {
 #ifdef EASY_PROFILE_USE
-        END_BLOCK();
-      EASY_BLOCK("Create KTX from memory");
+        EASY_BLOCK("Create KTX from memory");
 #endif
         result = ktxTexture_CreateFromMemory(
                 reinterpret_cast<const ktx_uint8_t*>(

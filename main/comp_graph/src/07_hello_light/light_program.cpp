@@ -114,4 +114,6 @@ void HelloLightProgram::OnEvent(const SDL_Event& event)
 {
 	camera_.OnEvent(event);
 }
+
+
 }

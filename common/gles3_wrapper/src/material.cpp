@@ -37,8 +37,7 @@ Material::Material(TextureManager& textureManager, const FilesystemInterface& fi
             LoadShader();
             LoadTextures();
         }),
-        loadMaterialJsonJob_(filesystem),
-        shader_(filesystem)
+        loadMaterialJsonJob_(filesystem)
 {
 
 }

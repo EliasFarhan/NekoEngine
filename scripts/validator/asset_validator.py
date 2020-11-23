@@ -89,9 +89,14 @@ def validate_asset(src="", out=""):
     asset_type = define_asset_type(data_src)
     # load meta data
     if asset_type != AssetType.UNKNOWN:
+        if os.path.isfile(data_src+".meta"):
+            with open(data_src+".meta", 'r') as meta_file:
+                meta_content = json.load(meta_file)
+
         if os.path.isfile(data_out + ".meta"):
             with open(data_out + ".meta", "r") as meta_file:
-                meta_content = json.loads(meta_file.read())
+                meta_content2 = json.load(meta_file)
+                meta_content = {**meta_content, **meta_content2}
 
     if asset_type == AssetType.TEXTURE:
         validate_texture(data_src, data_out, meta_content)

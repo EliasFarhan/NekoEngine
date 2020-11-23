@@ -31,14 +31,7 @@ namespace neko
 
 
 HelloFramebufferProgram::HelloFramebufferProgram() :
-    screenFrame_(gl::RenderQuad(Vec3f::zero, Vec2f(2.0f,2.0f))),
-    screenBlurShader_(BasicEngine::GetInstance()->GetFilesystem()),
-    screenEdgeDetectionShader_(BasicEngine::GetInstance()->GetFilesystem()),
-    screenGrayscaleShader_(BasicEngine::GetInstance()->GetFilesystem()),
-    modelShader_(BasicEngine::GetInstance()->GetFilesystem()),
-    screenInverseShader_(BasicEngine::GetInstance()->GetFilesystem()),
-    screenShader_(BasicEngine::GetInstance()->GetFilesystem()),
-    textureManager_(BasicEngine::GetInstance()->GetFilesystem())
+    screenFrame_(gl::RenderQuad(Vec3f::zero, Vec2f(2.0f,2.0f)))
 {
 
 }

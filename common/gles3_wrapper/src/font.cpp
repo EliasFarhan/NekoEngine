@@ -32,7 +32,7 @@ namespace neko::gl
 {
 
 FontManager::FontManager(const FilesystemInterface& filesystem) :
-        filesystem_(filesystem), textShader_(filesystem)
+        filesystem_(filesystem)
 {
 
 }
