@@ -6,6 +6,7 @@ from os import environ
 from pathlib import Path
 import subprocess
 
+binary_path = os.getenv("BINARY_FOLDER")
 src_path = environ.get("SRC_FOLDER")
 basisu_exe = environ.get("BASISU_EXE")
 if basisu_exe is None:
@@ -20,10 +21,6 @@ ktxable_texture_ext = [
     ".png",
     ".bmp",
     ".tga"
-]
-
-compression_types = [
-    "uastc",
 ]
 
 
@@ -75,7 +72,7 @@ def convert_to_ktx(img, img_out, meta_data):
     # get image format
     command = [img_format_exe, img]
     status = subprocess.run(command, capture_output=True)
-    if(status.returncode != 0):
+    if status.returncode != 0:
         sys.stderr.write("Error while read image format file\n")
         return status.returncode
     img_format_json = json.loads(status.stdout)
@@ -147,7 +144,7 @@ def convert_to_ktx(img, img_out, meta_data):
     if status.returncode != 0:
         sys.stderr.write("[Error] Could not generate ktx file\n")
         return status.returncode
-    meta_data["ktx_path"] = img_out
+    meta_data["ktx_path"] = str(Path(img_out).relative_to(binary_path))
     return 0
 
 

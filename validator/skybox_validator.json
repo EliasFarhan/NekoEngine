@@ -25,7 +25,12 @@
     },
     "back": {
       "type": "string"
-    }
+    },
+    "transcoder": {
+      "type": "string",
+      "enum": [ "undefined", "bc1", "bc3", "bc4", "bc5", "bc7", "etc1", "etc2" ]
+    },
+    "ktx_path": {"type": "string"}
   },
   "required": ["name", "left", "right", "front", "back", "top", "bottom"]
 }

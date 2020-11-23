@@ -142,7 +142,7 @@ void HelloCascadedShadowProgram::Render()
     }
     if (brickWall_ == INVALID_TEXTURE_NAME)
     {
-        brickWall_ = textureManager_.GetTexture(brickWallId_)->name;
+        brickWall_ = textureManager_.GetTextureName(brickWallId_);
         return;
     }
     std::lock_guard<std::mutex> lock(updateMutex_);

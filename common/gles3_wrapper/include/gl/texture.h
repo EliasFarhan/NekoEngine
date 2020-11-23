@@ -32,29 +32,41 @@ namespace neko::gl
 class TextureLoader
 {
 public:
+    enum class TextureLoaderError : std::uint8_t
+    {
+        NONE = 0u,
+        ASSET_LOADING_ERROR = 1u,
+        DECOMPRESS_ERROR = 2u,
+        UPLOAD_TO_GPU_ERROR = 3u
+    };
     explicit TextureLoader(std::string_view path,
-                           const FilesystemInterface&,
                            TextureId,
                            Texture::TextureFlags flags = Texture::DEFAULT);
     TextureLoader(const TextureLoader&) = delete;
-    TextureLoader& operator=(const TextureLoader&)=delete;
-    TextureLoader(TextureLoader&&) = default;
+    TextureLoader& operator=(const TextureLoader&) = delete;
+    TextureLoader(TextureLoader&&) noexcept ;
+    TextureLoader& operator=(TextureLoader&&) = default;
     void Start();
     [[nodiscard]] bool IsDone();
+    [[nodiscard]] TextureId GetTextureId() const;
+    [[nodiscard]] const Texture& GetTexture() const;
+    [[nodiscard]] bool HasErrors() const;
 private:
     void LoadTexture();
     void DecompressTexture();
     void UploadToGL();
+
     std::reference_wrapper<const FilesystemInterface> filesystem_;
     TextureId textureId_;
     std::string path_;
-    Texture::TextureFlags flags_;
+    Texture::TextureFlags flags_ = Texture::DEFAULT;
     ktxTexture* kTexture = nullptr;
     Job loadingTextureJob_;
     Job decompressTextureJob_;
     Job uploadToGLJob_;
     BufferFile bufferFile_;
     Texture texture_;
+    TextureLoaderError error_ = TextureLoaderError::NONE;
 };
 
 class TextureManager : public neko::TextureManagerInterface, public SystemInterface
@@ -64,7 +76,7 @@ public:
     TextureId LoadTexture(std::string_view path, Texture::TextureFlags flags) override;
 
     const Texture* GetTexture(TextureId index) const override;
-
+    [[nodiscard]] TextureName GetTextureName(TextureId textureId) const;
     bool IsTextureLoaded(TextureId textureId) const override;
 
     void Init() override;

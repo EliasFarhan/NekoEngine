@@ -90,13 +90,13 @@ void HelloBlendingProgram::Render()
 {
 	if (windowTexture_ == INVALID_TEXTURE_NAME )
 	{
-		windowTexture_ = textureManager_.GetTexture(windowTextureId_)->name;
+		windowTexture_ = textureManager_.GetTextureName(windowTextureId_);
 		if (windowTexture_ == INVALID_TEXTURE_NAME)
 			return;
 	}
 	if ( cubeTexture_ == INVALID_TEXTURE_NAME)
 	{
-		cubeTexture_ = textureManager_.GetTexture(cubeTextureId_)->name;
+		cubeTexture_ = textureManager_.GetTextureName(cubeTextureId_);
 		if (cubeTexture_ == INVALID_TEXTURE_NAME)
 			return;
 	}

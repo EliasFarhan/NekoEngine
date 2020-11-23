@@ -89,7 +89,7 @@ void HelloHdrProgram::Render()
 {
     if (cubeTexture_ == INVALID_TEXTURE_NAME)
     {
-        cubeTexture_ = textureManager_.GetTexture(cubeTextureId_)->name;
+        cubeTexture_ = textureManager_.GetTextureName(cubeTextureId_);
         return;
     }
 	if(flags_ & RESIZE_FRAMEBUFFER)

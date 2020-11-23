@@ -140,6 +140,7 @@ void GameManager::WinGame(net::PlayerNumber winner)
 
 ClientGameManager::ClientGameManager(PacketSenderInterface& packetSenderInterface) :
     GameManager(),
+    fontManager_(BasicEngine::GetInstance()->GetFilesystem()),
     spriteManager_(entityManager_, textureManager_, transformManager_),
     packetSenderInterface_(packetSenderInterface)
 {
@@ -156,7 +157,7 @@ void ClientGameManager::Init()
     spriteManager_.Init();
     fontManager_.Init();
 
-    const auto& config = BasicEngine::GetInstance()->config;
+    const auto& config = BasicEngine::GetInstance()->GetConfig();
     fontId_ = fontManager_.LoadFont(config.dataRootPath + "font/8-bit-hud.ttf", 36);
 
     GameManager::Init();
@@ -298,10 +299,10 @@ void ClientGameManager::SpawnPlayer(net::PlayerNumber playerNumber, Vec2f positi
     logDebug("Spawn player: " + std::to_string(playerNumber));
     GameManager::SpawnPlayer(playerNumber, position, rotation);
     const auto entity = GetEntityFromPlayerNumber(playerNumber);
-    const auto& config = BasicEngine::GetInstance()->config;
+    const auto& config = BasicEngine::GetInstance()->GetConfig();
     if (shipTextureId_ == INVALID_TEXTURE_ID)
     {
-        shipTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/asteroid/ship.png");
+        shipTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/asteroid/ship.png", Texture::DEFAULT);
     }
     spriteManager_.AddComponent(entity);
     spriteManager_.SetTexture(entity, shipTextureId_);
@@ -314,10 +315,11 @@ void ClientGameManager::SpawnPlayer(net::PlayerNumber playerNumber, Vec2f positi
 Entity ClientGameManager::SpawnBullet(net::PlayerNumber playerNumber, Vec2f position, Vec2f velocity)
 {
     const auto entity = GameManager::SpawnBullet(playerNumber, position, velocity);
-    const auto& config = BasicEngine::GetInstance()->config;
+    const auto& config = BasicEngine::GetInstance()->GetConfig();
     if (bulletTextureId_ == INVALID_TEXTURE_ID)
     {
-        bulletTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/asteroid/bullet.png");
+        bulletTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/asteroid/bullet.png",
+                                                       Texture::DEFAULT);
     }
     spriteManager_.AddComponent(entity);
     spriteManager_.SetTexture(entity, bulletTextureId_);

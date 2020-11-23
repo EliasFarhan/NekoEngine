@@ -67,7 +67,7 @@ void HelloTextureProgram::Render()
     }
 	if (textureKtx_ == INVALID_TEXTURE_NAME)
 	{
-        textureKtx_ = textureManager_.GetTexture(textureId_)->name;
+        textureKtx_ = textureManager_.GetTextureName(textureId_);
         return;
 	}
     shader_.Bind();

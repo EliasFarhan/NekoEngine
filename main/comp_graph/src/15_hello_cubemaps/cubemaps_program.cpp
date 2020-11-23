@@ -53,7 +53,7 @@ void HelloCubemapsProgram::Init()
 	camera_.position = Vec3f(0, 3, 3);
 	camera_.WorldLookAt(Vec3f::zero);
 	cube_.Init();
-	cubeTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/container.jpg", Texture::DEFAULT);
+	cubeTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/container.jpg.ktx", Texture::DEFAULT);
 
 }
 
@@ -115,7 +115,7 @@ void HelloCubemapsProgram::Render()
 	}
 	if(cubeTexture_ == INVALID_TEXTURE_NAME)
 	{
-		cubeTexture_ = textureManager_.GetTexture(cubeTextureId_)->name;
+		cubeTexture_ = textureManager_.GetTextureName(cubeTextureId_);
 		return;
 	}
 	std::lock_guard<std::mutex> lock(updateMutex_);

@@ -265,10 +265,7 @@ void Mesh::LoadMaterialTextures(
         textures_.emplace_back();
         auto& assTexture = textures_.back();
         assTexture.type = texture;
-        std::string path = directory.data();
-        path += '/';
-    	path += str.C_Str();
-    	
+        std::string path = fmt::format("{}/{}", directory.data(), str.C_Str());
         assTexture.textureId = textureManager.LoadTexture(path);
     }
 }

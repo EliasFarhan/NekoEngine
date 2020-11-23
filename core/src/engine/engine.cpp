@@ -46,7 +46,8 @@ BasicEngine* BasicEngine::instance_ = nullptr;
 BasicEngine::BasicEngine(const FilesystemInterface& filesystem, std::optional<Configuration> config) :
     filesystem_(filesystem)
 {
-	if (config.has_value())
+    instance_ = this;
+    if (config.has_value())
 	{
 		config_ = config.value();
 	}
@@ -103,7 +104,6 @@ void BasicEngine::Init()
 #ifdef EASY_PROFILE_USE
 	EASY_FUNCTION(profiler::colors::Magenta);
 #endif
-	instance_ = this;
 	logDebug("Current path: " + GetCurrentPath());
     jobSystem_.Init();
     initAction_.Execute();

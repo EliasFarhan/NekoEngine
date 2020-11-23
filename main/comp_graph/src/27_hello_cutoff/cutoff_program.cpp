@@ -83,13 +83,13 @@ namespace neko
 	{
 		if(grassTexture_ == INVALID_TEXTURE_NAME)
 		{
-			grassTexture_ = textureManager_.GetTexture(grassTextureId_)->name;
+			grassTexture_ = textureManager_.GetTextureName(grassTextureId_);
 			if (grassTexture_ == INVALID_TEXTURE_NAME)
 				return;
 		}
 		if (cubeTexture_ == INVALID_TEXTURE_NAME)
 		{
-			cubeTexture_ = textureManager_.GetTexture(cubeTextureId_)->name;
+			cubeTexture_ = textureManager_.GetTextureName(cubeTextureId_);
 			if (cubeTexture_ == INVALID_TEXTURE_NAME)
 				return;
 			return;

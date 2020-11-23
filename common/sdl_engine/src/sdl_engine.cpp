@@ -49,7 +49,6 @@ void SdlEngine::Init()
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("Init Sdl Engine");
 #endif
-    instance_ = this;
     logDebug("Current path: " + GetCurrentPath());
     jobSystem_.Init();
 

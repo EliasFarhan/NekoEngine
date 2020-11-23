@@ -156,7 +156,7 @@ void HelloShadowProgram::Render()
 	}
 	if(floorTexture_ == INVALID_TEXTURE_NAME)
 	{
-		floorTexture_ = textureManager_.GetTexture(floorTextureId_)->name;
+		floorTexture_ = textureManager_.GetTextureName(floorTextureId_);
 		return;
 	}
 	std::lock_guard<std::mutex> lock(updateMutex_);

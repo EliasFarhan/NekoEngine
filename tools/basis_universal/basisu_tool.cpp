@@ -1201,10 +1201,13 @@ static bool unpack_and_validate_mode(command_line_params &opts)
                         for (uint32_t i = 0; i < 6; i++)
                             cubemap.push_back(gpu_images[format_iter][image_index + i]);
 
-                        std::string ktx_filename(opts.m_output_path + base_filename +
+                        std::string ktx_filename(
+                                opts.m_output_filename.empty() ?
+                                opts.m_output_path + base_filename +
                                                  string_format("_transcoded_cubemap_%s_%u.ktx",
                                                                basist::basis_get_format_name(transcoder_tex_fmt),
-                                                               image_index / 6));
+                                                               image_index / 6)
+                                                               : opts.m_output_filename);
                         if (!write_compressed_texture_file(ktx_filename.c_str(), cubemap, true))
                         {
                             error_printf("Failed writing KTX file \"%s\"!\n", ktx_filename.c_str());
