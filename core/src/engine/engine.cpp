@@ -48,21 +48,21 @@ BasicEngine::BasicEngine(const FilesystemInterface& filesystem, std::optional<Co
 {
     instance_ = this;
     if (config.has_value())
-	{
-		config_ = config.value();
-	}
+    {
+        config_ = config.value();
+    }
 
 #ifdef EASY_PROFILE_USE
-	EASY_PROFILER_ENABLE;
+    EASY_PROFILER_ENABLE;
 #endif
 }
 
 BasicEngine::~BasicEngine()
 {
-	logDebug("Destroy Basic Engine");
+    logDebug("Destroy Basic Engine");
 
 #ifdef EASY_PROFILE_USE
-	profiler::dumpBlocksToFile("Neko_Profile.prof");
+    profiler::dumpBlocksToFile("Neko_Profile.prof");
 #endif
 }
 #ifdef __ANDROID__
@@ -71,11 +71,11 @@ BasicEngine::~BasicEngine()
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_swiss_sae_gpr5300_MainActivity_finalize([[maybe_unused]]JNIEnv *env, [[maybe_unused]]jclass clazz, [[maybe_unused]]jstring directory)
+Java_swiss_sae_gpr5300_MainActivity_finalize([[maybe_unused]] JNIEnv * env, [[maybe_unused]] jclass clazz, [[maybe_unused]] jstring directory)
 {
 
 #ifdef EASY_PROFILE_USE
-    if(env == nullptr)
+    if (env == nullptr)
     {
         logDebug("[Error] Android environment is null");
         return;
@@ -83,16 +83,16 @@ Java_swiss_sae_gpr5300_MainActivity_finalize([[maybe_unused]]JNIEnv *env, [[mayb
 
     std::string path = env->GetStringUTFChars(directory, nullptr);
 
-	path += "/Neko_Profile.prof";
-	logDebug("Android data profile data path: "+path);
+    path += "/Neko_Profile.prof";
+    logDebug("Android data profile data path: " + path);
     auto blockNumber = profiler::dumpBlocksToFile(path.c_str());
-    if(blockNumber == 0)
+    if (blockNumber == 0)
     {
         logDebug("[Error] Could not save profile data");
     }
     else
     {
-        logDebug("Easy Profile with several blocks: "+std::to_string(blockNumber));
+        logDebug("Easy Profile with several blocks: " + std::to_string(blockNumber));
     }
 #endif
 }
@@ -102,9 +102,9 @@ void BasicEngine::Init()
 {
 
 #ifdef EASY_PROFILE_USE
-	EASY_FUNCTION(profiler::colors::Magenta);
+    EASY_FUNCTION(profiler::colors::Magenta);
 #endif
-	logDebug("Current path: " + GetCurrentPath());
+    logDebug("Current path: " + GetCurrentPath());
     jobSystem_.Init();
     initAction_.Execute();
 }
@@ -113,19 +113,19 @@ void BasicEngine::Update(seconds dt)
 {
     dt_ = dt.count();
 #ifdef EASY_PROFILE_USE
-	EASY_BLOCK("Basic Engine Update");
+    EASY_BLOCK("Basic Engine Update");
 #endif
-    if(renderer_)
+    if (renderer_)
         renderer_->ResetJobs();
-    if(window_)
+    if (window_)
         window_->ResetJobs();
-	
+
     Job eventJob([this]
-    {
-	    ManageEvent();
-    });
+        {
+            ManageEvent();
+        });
     Job* swapBufferJob = nullptr;
-    Job updateJob([this, &dt]{updateAction_.Execute(dt);});
+    Job updateJob([this, &dt] { updateAction_.Execute(dt); });
     updateJob.AddDependency(&eventJob);
     if (renderer_)
     {
@@ -146,13 +146,13 @@ void BasicEngine::Update(seconds dt)
     }
     jobSystem_.ScheduleJob(&eventJob, JobThreadType::MAIN_THREAD);
     jobSystem_.ScheduleJob(&updateJob, JobThreadType::MAIN_THREAD);
-    if(swapBufferJob)
+    if (swapBufferJob)
         swapBufferJob->Join();
 }
 
 void BasicEngine::Destroy()
 {
-	destroyAction_.Execute();
+    destroyAction_.Execute();
     if (renderer_)
     {
         renderer_->Destroy();
@@ -161,8 +161,8 @@ void BasicEngine::Destroy()
     {
         window_->Destroy();
     }
-	jobSystem_.Destroy();
-	instance_ = nullptr;
+    jobSystem_.Destroy();
+    instance_ = nullptr;
 }
 
 static std::chrono::time_point<std::chrono::system_clock> clock;
@@ -170,25 +170,25 @@ static std::chrono::time_point<std::chrono::system_clock> clock;
 
 void BasicEngine::EngineLoop()
 {
-	isRunning_ = true;
-	clock = std::chrono::system_clock::now();
+    isRunning_ = true;
+    clock = std::chrono::system_clock::now();
 
-	while (isRunning_)
-	{
-		const auto start = std::chrono::system_clock::now();
-		const auto dt = std::chrono::duration_cast<seconds>(start - clock);
-		clock = start;
-		Update(dt);
-	}
-	Destroy();
+    while (isRunning_)
+    {
+        const auto start = std::chrono::system_clock::now();
+        const auto dt = std::chrono::duration_cast<seconds>(start - clock);
+        clock = start;
+        Update(dt);
+    }
+    Destroy();
 }
 
 void BasicEngine::SetWindowAndRenderer(Window* window, Renderer* renderer)
 {
-	window_ = window;
-	renderer_ = renderer;
-	renderer_->SetWindow(window);
-	RendererLocator::provide(renderer);
+    window_ = window;
+    renderer_ = renderer;
+    renderer_->SetWindow(window);
+    RendererLocator::provide(renderer);
 }
 
 void BasicEngine::GenerateUiFrame()
@@ -196,27 +196,27 @@ void BasicEngine::GenerateUiFrame()
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("Generate ImGui Frame");
 #endif
-	ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_FirstUseEver);
-	ImGui::Begin("Neko Window");
+    ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_FirstUseEver);
+    ImGui::Begin("Neko Window");
 
-	std::ostringstream oss;
-	oss << "App FPS: " << 1.0f / dt_ << '\n'
-		<< '\n';
-	ImGui::Text("%s", oss.str().c_str());
-	ImGui::End();
-	drawImGuiAction_.Execute();
+    std::ostringstream oss;
+    oss << "App FPS: " << 1.0f / dt_ << '\n'
+        << '\n';
+    ImGui::Text("%s", oss.str().c_str());
+    ImGui::End();
+    drawImGuiAction_.Execute();
 }
 
 void BasicEngine::RegisterSystem(SystemInterface& system)
 {
-    initAction_.RegisterCallback([&system]{system.Init();});
-    updateAction_.RegisterCallback([&system](seconds dt){system.Update(dt);});
-    destroyAction_.RegisterCallback([&system]{system.Destroy();});
+    initAction_.RegisterCallback([&system] { system.Init(); });
+    updateAction_.RegisterCallback([&system](seconds dt) { system.Update(dt); });
+    destroyAction_.RegisterCallback([&system] { system.Destroy(); });
 }
 
 void BasicEngine::RegisterOnDrawUi(DrawImGuiInterface& drawUi)
 {
-    drawImGuiAction_.RegisterCallback([&drawUi]{ drawUi.DrawImGui();});
+    drawImGuiAction_.RegisterCallback([&drawUi] { drawUi.DrawImGui(); });
 }
 
 void BasicEngine::ScheduleJob(Job* job, JobThreadType threadType)

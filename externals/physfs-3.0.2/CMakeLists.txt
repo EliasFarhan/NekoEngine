@@ -192,27 +192,6 @@ if(PHYSFS_BUILD_SHARED AND PHYSFS_BUILD_STATIC AND NOT WINDOWS)
     set_target_properties(physfs-static PROPERTIES CLEAN_DIRECT_OUTPUT 1)
 endif()
 
-option(PHYSFS_BUILD_TEST "Build stdio test program." TRUE)
-mark_as_advanced(PHYSFS_BUILD_TEST)
-if(PHYSFS_BUILD_TEST)
-    find_path(READLINE_H readline/readline.h)
-    find_path(HISTORY_H readline/history.h)
-    if(READLINE_H AND HISTORY_H)
-        find_library(CURSES_LIBRARY NAMES curses ncurses)
-        set(CMAKE_REQUIRED_LIBRARIES ${CURSES_LIBRARY})
-        find_library(READLINE_LIBRARY readline)
-        if(READLINE_LIBRARY)
-            set(HAVE_SYSTEM_READLINE TRUE)
-            set(TEST_PHYSFS_LIBS ${TEST_PHYSFS_LIBS} ${READLINE_LIBRARY} ${CURSES_LIBRARY})
-            include_directories(SYSTEM ${READLINE_H} ${HISTORY_H})
-            add_definitions(-DPHYSFS_HAVE_READLINE=1)
-        endif()
-    endif()
-    add_executable(test_physfs test/test_physfs.c)
-    target_link_libraries(test_physfs ${PHYSFS_LIB_TARGET} ${TEST_PHYSFS_LIBS} ${OTHER_LDFLAGS})
-    set(PHYSFS_INSTALL_TARGETS ${PHYSFS_INSTALL_TARGETS} ";test_physfs")
-endif()
-
 install(TARGETS ${PHYSFS_INSTALL_TARGETS}
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION lib${LIB_SUFFIX}

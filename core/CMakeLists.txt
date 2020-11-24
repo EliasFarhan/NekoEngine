@@ -54,5 +54,5 @@ target_include_directories(Neko_Core PUBLIC ${UTILITIES_DIR})
 neko_lib_config(Neko_Core)
 
 if(Neko_Test)
-    add_test(Neko_Core)
+    add_neko_test(Neko_Core)
 endif()
