@@ -63,7 +63,7 @@ void HelloDeferredProgram::Init()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glCheckError();
 
-    model_.LoadModel(config.dataRootPath+"model/nanosuit2/nanosuit.obj");
+    modelId_ = modelManager_.LoadModel(config.dataRootPath+"model/nanosuit2/nanosuit.obj");
     cube_.Init();
     containerId_ = textureManager_.LoadTexture(config.dataRootPath + "material/container2.png", Texture::DEFAULT);
     containerSpecularId_ = textureManager_.LoadTexture(config.dataRootPath + "material/container2_specular.png", Texture::DEFAULT);
@@ -102,7 +102,7 @@ void HelloDeferredProgram::Destroy()
     glDeleteTextures(1, &gAlbedoSpec_);
     floor_.Destroy();
     screenQuad_.Destroy();
-    model_.Destroy();
+    modelManager_.Destroy();
     cube_.Destroy();
     glDeleteBuffers(1, &rbo_);
 
@@ -124,7 +124,7 @@ void HelloDeferredProgram::DrawImGui()
 
 void HelloDeferredProgram::Render()
 {
-    if(!model_.IsLoaded())
+    if(!modelManager_.IsLoaded(modelId_))
     {
         return;
     }
@@ -283,7 +283,7 @@ void HelloDeferredProgram::RenderScene(const gl::Shader& shader)
             model = Transform3d::Translate(model, Vec3f(2.0f*(float(x)+0.5f), 0.0f, 2.0f*(float(z)+2.5f)));
             shader.SetMat4("model", model);
             shader.SetMat4("transposeInverseModel", model.Inverse().Transpose());
-            model_.Draw(shader);
+            modelManager_.GetModel(modelId_)->Draw(shader);
         }
     }
     auto model = Mat4f::Identity;

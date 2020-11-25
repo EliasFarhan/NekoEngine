@@ -54,7 +54,8 @@ private:
 	InstancingType instancingType_ = InstancingType::NO_INSTANCING;
 	
 	sdl::Camera3D camera_;
-	assimp::Model model_;
+	gl::ModelId modelId_;
+	gl::ModelManager modelManager_;
 
 	const size_t maxAsteroidNmb_ = 100'000;
 	const size_t minAsteroidNmb_ = 1'000;

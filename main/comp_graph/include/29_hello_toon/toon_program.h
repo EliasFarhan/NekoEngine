@@ -49,7 +49,8 @@ private:
 	int toonLayers_ = 4;
 	int specularLayers_ = 4;
 	sdl::Camera3D camera_;
-	assimp::Model model_;
+	gl::ModelId modelId_ = gl::INVALID_MODEL_ID;
+	gl::ModelManager modelManager_;
 	gl::Shader toonShader_;
 	gl::Shader blinnShader_;
 };

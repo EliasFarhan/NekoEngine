@@ -7,6 +7,6 @@ namespace neko::editor
 class EditorEngine : public sdl::SdlEngine
 {
 public:
-	explicit EditorEngine(Configuration* config = nullptr);
+	using SdlEngine::SdlEngine;
 };
 }

@@ -50,7 +50,8 @@ private:
 	};
 	
 	sdl::Camera3D camera_;
-	assimp::Model model_;
+    gl::ModelId modelId_ = gl::INVALID_MODEL_ID;
+    gl::ModelManager modelManager_;
 	gl::RenderCuboid cube_{ Vec3f::zero, Vec3f::one };
 	gl::TextureManager textureManager_;
 	TextureName cubeTexture_ = INVALID_TEXTURE_NAME;

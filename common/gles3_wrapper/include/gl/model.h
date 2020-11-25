@@ -23,55 +23,92 @@
  SOFTWARE.
  */
 
+#include <assimp/scene.h>
+#include <assimp/Importer.hpp>
+
+#include "graphics/graphics.h"
 #include "gl/mesh.h"
 #include "gl/shader.h"
-#include <assimp/scene.h>
 
-namespace neko::assimp
+namespace neko::gl
 {
 using ModelId = sole::uuid;
 const ModelId INVALID_MODEL_ID = sole::uuid();
 
-
 class Model
 {
 public:
-    Model();
-    void LoadModel(std::string_view path);
-    bool IsLoaded() const;
-    void Draw(const gl::Shader& shader);
-    void Destroy();
-    [[nodiscard]] size_t GetMeshCount() const
-    {
-	    return meshes_.size();
-    };
-    [[nodiscard]] const Mesh& GetMesh(size_t index) const
-    {
-	    return meshes_[index];
-    };
+    void Draw(const Shader& shader) const;
+
+    [[nodiscard]] const assimp::Mesh& GetMesh(size_t meshIndex) const;
+    [[nodiscard]] size_t GetMeshCount() const;
 private:
-    // model data
-    std::vector<Mesh> meshes_;
-    std::string directory_;
-    std::string path_;
-    Job processModelJob_;
-	
-    void ProcessModel();
-    void ProcessNode(aiNode* node, const aiScene* scene);
+    friend class ModelLoader;
+    std::vector<assimp::Mesh> meshes_;
 };
+
 
 class ModelLoader
 {
 public:
-    explicit ModelLoader(const FilesystemInterface&);
-    [[nodiscard]] bool IsDone();
+    enum ModelFlags : std::uint8_t
+    {
+        NONE = 0u,
+        LOADED = 1u << 0u,
+        ERROR_LOADING = 1u << 1u,
+
+    };
+    explicit ModelLoader(Assimp::Importer&, std::string_view path, ModelId modelId);
+    ModelLoader(ModelLoader&&) noexcept ;
+    ModelLoader(const ModelLoader& ) = delete;
+    ModelLoader& operator=(const ModelLoader&) = delete;
+    void Start();
+    void Update();
+    [[nodiscard]] bool IsDone() const;
+    [[nodiscard]] ModelId GetModelId() const;
+    [[nodiscard]] const Model* GetModel() const;
 private:
-    const FilesystemInterface& filesystem_;
+    /**
+     * \brief Uses the assimp importer to load model from disk
+     */
+    void LoadModel();
+    /**
+     * \brief Process all the node of the aiScene, aka the meshes
+     */
+    void ProcessModel();
+    void ProcessNode(aiNode* node, size_t currentMeshIndex);
+    void ProcessMesh(size_t meshIndex, const aiMesh* aMesh);
+    void LoadMaterialTextures(const aiMaterial* material, aiTextureType textureType, std::string_view directory,
+                              size_t meshIndex);
+    /**
+     * \brief method called on the Render thread to create the VAOs of the meshes
+     */
+    void UploadMeshesToGL();
+    std::string path_;
+    std::string directoryPath_;
+
+    ModelId modelId_ = INVALID_MODEL_ID;
+
+    std::reference_wrapper<Assimp::Importer> importer_;
+    const aiScene* scene = nullptr;
+    Model model_;
+
+    Job loadModelJob_;
+    Job processModelJob_;
+    Job uploadMeshesToGLJob_;
+
+    std::uint8_t flags_ = NONE;
+
+
+
 };
+
+
+
 class ModelManager : public SystemInterface
 {
 public:
-    explicit ModelManager(const FilesystemInterface&);
+    explicit ModelManager();
     ModelId LoadModel(std::string_view path);
     [[nodiscard]] const Model* GetModel(ModelId);
     [[nodiscard]] bool IsLoaded(ModelId);
@@ -83,9 +120,9 @@ public:
     void Destroy() override;
 
 private:
-    const FilesystemInterface& filesystem_;
-    std::map<ModelId, std::string> modelPathMap_;
+    std::map<std::string, ModelId> modelPathMap_;
     std::map<ModelId, Model> modelMap_;
     std::queue<ModelLoader> modelLoaders_;
+    Assimp::Importer importer_;
 };
 }

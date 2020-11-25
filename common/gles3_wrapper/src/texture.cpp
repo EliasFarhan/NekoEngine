@@ -327,57 +327,7 @@ void PrintKTXError(ktx_error_code_e result, const char* file, int line)
     }
     logDebug(fmt::format("{} in file: {} at line: {}", log, file, line));
 }
-/*
-TextureName CreateTextureFromKTX(const std::string_view filename)
-{
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Load KTX Texture");
-#endif
-    ktxTexture* kTexture = nullptr;
-    GLuint texture = 0;
-    GLenum target, glerror;
 
-    BufferFile textureFile;
-    {
-#ifdef EASY_PROFILE_USE
-        EASY_BLOCK("Open File");
-#endif
-        textureFile.Load(filename);
-    }
-    KTX_error_code result;
-    {
-#ifdef EASY_PROFILE_USE
-        END_BLOCK();
-      EASY_BLOCK("Create KTX from memory");
-#endif
-        result = ktxTexture_CreateFromMemory(
-                reinterpret_cast<const ktx_uint8_t*>(textureFile.dataBuffer),
-                textureFile.dataLength,
-                KTX_TEXTURE_CREATE_NO_FLAGS,
-                &kTexture);
-    }
-    if (result != KTX_SUCCESS)
-    {
-        PrintKTXError(result, __FILE__, __LINE__);
-        return INVALID_TEXTURE_NAME;
-    }
-    {
-#ifdef EASY_PROFILE_USE
-        END_BLOCK();
-      EASY_BLOCK("Upload Texture to GPU");
-#endif
-        glGenTextures(1, &texture); // Optional. GLUpload can generate a texture.
-        result = ktxTexture_GLUpload(kTexture, &texture, &target, &glerror);
-        glCheckError();
-        if (result != KTX_SUCCESS)
-        {
-            PrintKTXError(result, __FILE__, __LINE__);
-        }
-    }
-    ktxTexture_Destroy(kTexture);
-    return texture;
-}
-*/
 TextureName LoadCubemap(std::vector<std::string> facesFilename, const FilesystemInterface& filesystem)
 {
     TextureName textureID;
@@ -442,7 +392,7 @@ TextureId TextureManager::LoadTexture(std::string_view path, Texture::TextureFla
     }
     else
     {
-        logDebug("[Error] Could not find texture id in json file");
+        logDebug(fmt::format("[Error] Could not find texture id in json file {}", metaPath));
         return textureId;
     }
     if(CheckJsonExists(metaJson, "ktx_path"))
@@ -467,6 +417,7 @@ TextureId TextureManager::LoadTexture(std::string_view path, Texture::TextureFla
         flags
     });
     textureLoaders_.back().Start();
+    texturePathMap_[path.data()] = textureId;
     return textureId;
 }
 
@@ -515,7 +466,7 @@ void TextureManager::Update([[maybe_unused]]seconds dt)
 TextureManager::TextureManager() :
     filesystem_(BasicEngine::GetInstance()->GetFilesystem())
 {
-
+    TextureManagerLocator::provide(this);
 }
 
 TextureName TextureManager::GetTextureName(TextureId textureId) const

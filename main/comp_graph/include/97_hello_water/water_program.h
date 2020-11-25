@@ -44,7 +44,7 @@ private:
 	void CreateFramebuffer();
 	void CreateDepthbuffer();
 	
-	assimp::Model model_;
+	assimp::OldModel model_;
 	gl::RenderQuad quad_{Vec3f::zero, Vec2f::one};
 	gl::RenderCuboid skyboxCube_{Vec3f::zero, Vec3f::one*2.0f};
 	TextureName skyboxTexture_ = 0;

@@ -38,14 +38,15 @@
 
 namespace neko::assimp
 {
-Mesh::Mesh() : loadMeshToGpu([this]
+/*
+OldMesh::OldMesh() : loadMeshToGpu([this]
 {
     SetupMesh();
 })
 {
 }
 
-void Mesh::Init()
+void OldMesh::Init()
 {
 
     RendererLocator::get().AddPreRenderJob(&loadMeshToGpu);
@@ -63,7 +64,7 @@ void Mesh::Init()
 }
 
 
-void Mesh::Draw(const gl::Shader& shader) const
+void OldMesh::Draw(const gl::Shader& shader) const
 {
     BindTextures(shader);
     // draw mesh
@@ -72,7 +73,7 @@ void Mesh::Draw(const gl::Shader& shader) const
     glBindVertexArray(0);
 }
 
-void Mesh::Destroy()
+void OldMesh::Destroy()
 {
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
@@ -90,7 +91,7 @@ void Mesh::Destroy()
 }
 
 
-void Mesh::ProcessMesh(
+void OldMesh::ProcessMesh(
     const aiMesh* mesh, 
     const aiScene* scene,
     const std::string_view directory)
@@ -164,7 +165,7 @@ void Mesh::ProcessMesh(
     }
 }
 
-bool Mesh::IsLoaded() const
+bool OldMesh::IsLoaded() const
 {
     if (!loadMeshToGpu.IsDone())
     {
@@ -182,7 +183,7 @@ bool Mesh::IsLoaded() const
     return true;
 }
 
-void Mesh::SetupMesh()
+void OldMesh::SetupMesh()
 {
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("Create Mesh VAO");
@@ -242,7 +243,7 @@ void Mesh::SetupMesh()
     glCheckError();
 }
 
-Sphere Mesh::GenerateBoundingSphere() const
+Sphere OldMesh::GenerateBoundingSphere() const
 {
     Sphere s;
     s.radius_ = std::max(std::max(max_.x - min_.x, max_.y - min_.y), max_.z - min_.z);
@@ -250,7 +251,7 @@ Sphere Mesh::GenerateBoundingSphere() const
     return s;
 }
 
-void Mesh::LoadMaterialTextures(
+void OldMesh::LoadMaterialTextures(
     aiMaterial* material,
     aiTextureType aiTexture,
     Texture::TextureType texture,
@@ -270,7 +271,7 @@ void Mesh::LoadMaterialTextures(
     }
 }
 
-void Mesh::BindTextures(const gl::Shader& shader) const
+void OldMesh::BindTextures(const gl::Shader& shader) const
 {
     glCheckError();
     unsigned int diffuseNr = 1;
@@ -307,4 +308,10 @@ void Mesh::BindTextures(const gl::Shader& shader) const
     glActiveTexture(GL_TEXTURE0);
     glCheckError();
 }
+
+void Mesh::Render()
+{
+
+}
+ */
 }

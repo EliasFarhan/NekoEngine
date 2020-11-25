@@ -26,7 +26,7 @@
 #include <graphics/texture.h>
 #include "gl/gles3_include.h"
 
-class ktxTexture;
+struct ktxTexture;
 namespace neko::gl
 {
 class TextureLoader

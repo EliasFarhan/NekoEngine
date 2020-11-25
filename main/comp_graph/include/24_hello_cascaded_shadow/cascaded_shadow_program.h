@@ -75,7 +75,7 @@ private:
 	std::array<DirectionalLight, 3> lights_;
 
 	gl::RenderQuad plane_{Vec3f::zero, Vec2f::one};
-	assimp::Model dragonModel_;
+	assimp::OldModel dragonModel_;
 	gl::TextureManager textureManager_;
 	TextureName brickWall_ = INVALID_TEXTURE_NAME;
 	TextureId brickWallId_;

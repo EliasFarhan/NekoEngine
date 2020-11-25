@@ -45,52 +45,23 @@ namespace neko::assimp
         Vec3f tangent;
         Vec3f bitangent;
     };
+
 	struct Texture
 	{
-		Texture() = default;
 		TextureId textureId = INVALID_TEXTURE_ID;
 		TextureName textureName = INVALID_TEXTURE_NAME;
-		enum class TextureType : std::uint8_t
-		{
-			DIFFUSE,
-			SPECULAR,
-			HEIGHT
-		};
-		TextureType type = TextureType::DIFFUSE;
+
+		aiTextureType type = aiTextureType_NONE;
 	};
-	class Mesh
-	{
-	public:
-		Mesh();
-		void Init();
-		void Draw(const gl::Shader& shader) const;
-        void BindTextures(const gl::Shader& shader) const;
-		void Destroy();
-
-		void ProcessMesh(const aiMesh* mesh, const aiScene* scene,
-			const std::string_view directory);
-		bool IsLoaded() const;
 
 
-		[[nodiscard]] unsigned int GetVao() const {return VAO;}
-		[[nodiscard]] size_t GetElementsCount() const {return indices_.size();}
-
-		[[nodiscard]] Sphere GenerateBoundingSphere() const;
-	protected:
-
-		void LoadMaterialTextures(aiMaterial* material, aiTextureType aiTexture, Texture::TextureType texture,
-			const std::string_view directory);
-		std::vector<Vertex> vertices_;
-		std::vector<unsigned int> indices_;
-		std::vector<Texture> textures_;
-		float specularExponent_ = 0.0f;
-		Vec3f min_, max_;
-		Job loadMeshToGpu;
-		//  render data
-		unsigned int VAO = 0, VBO = 0, EBO = 0;
-		/**
-		 * \brief This function is called on the render thread as a pre-render job
-		 */
-		void SetupMesh();
-	};
+	struct Mesh
+    {
+        std::vector<Vertex> vertices;
+        std::vector<unsigned int> indices;
+        std::vector<Texture> textures;
+        float specularExponent = 0.0f;
+        unsigned int VAO = 0, VBO = 0, EBO = 0;
+        Vec3f min, max;
+    };
 }
