@@ -76,7 +76,7 @@ void HelloCascadedShadowProgram::Init()
     brickWallId_ = textureManager_.LoadTexture
             (config.dataRootPath + "sprites/brickwall/brickwall.jpg", Texture::DEFAULT);
 
-    dragonModel_.LoadModel(config.dataRootPath + "model/dragon/dragon.obj");
+    dragonModelId_ = modelManager_.LoadModel(config.dataRootPath + "model/dragon/dragon.obj");
     glGenTextures(1, &whiteTexture_);
     glBindTexture(GL_TEXTURE_2D, whiteTexture_);
     unsigned char white[] = {255, 255, 255};
@@ -98,6 +98,7 @@ void HelloCascadedShadowProgram::Update(seconds dt)
     const auto& config = BasicEngine::GetInstance()->GetConfig();
     camera_.SetAspect(config.windowSize.x, config.windowSize.y);
     camera_.Update(dt);	textureManager_.Update(dt);
+    modelManager_.Update(dt);
 }
 
 void HelloCascadedShadowProgram::Destroy()
@@ -106,7 +107,7 @@ void HelloCascadedShadowProgram::Destroy()
     shadowShader_.Destroy();
     glDeleteFramebuffers(1, &fbo_);
     glDeleteTextures(shadowMaps_.size(), &shadowMaps_[0]);
-    dragonModel_.Destroy();
+    modelManager_.Destroy();
     plane_.Destroy();
     textureManager_.Destroy();
 }
@@ -136,7 +137,7 @@ void HelloCascadedShadowProgram::DrawImGui()
 
 void HelloCascadedShadowProgram::Render()
 {
-    if (!dragonModel_.IsLoaded())
+    if (!modelManager_.IsLoaded(dragonModelId_))
     {
         return;
     }
@@ -300,6 +301,7 @@ void HelloCascadedShadowProgram::ShadowPass(int cascadeIndex)
 
 void HelloCascadedShadowProgram::RenderScene(const gl::Shader& shader)
 {
+    auto* dragonModel = modelManager_.GetModel(dragonModelId_);
     for (int z = 0; z < 5; z++)
     {
         for (int x = -1; x < 2; x++)
@@ -310,7 +312,7 @@ void HelloCascadedShadowProgram::RenderScene(const gl::Shader& shader)
                                            Vec3f(-10.0f * float(x), 0.0f, 10.0f * float(z) + 5.0f));
             shader.SetMat4("model", model);
             shader.SetMat4("transposeInverseModel", model.Inverse().Transpose());
-            dragonModel_.Draw(shader);
+            dragonModel->Draw(shader);
         }
     }
     auto model = Mat4f::Identity;

@@ -31,40 +31,42 @@ namespace neko
 {
 void HelloModelProgram::Init()
 {
-	textureManager_.Init();
-	const auto& config = BasicEngine::GetInstance()->GetConfig();
+    textureManager_.Init();
+    const auto& config = BasicEngine::GetInstance()->GetConfig();
 
-	const std::string path = config.dataRootPath + "model/nanosuit2/nanosuit.obj";
+    const std::string path = config.dataRootPath + "model/nanosuit2/nanosuit.obj";
     glCheckError();
-	model_.LoadModel(path);
-	camera_.Init();
+    modelId_ = modelManager_.LoadModel(path);
+    camera_.Init();
     shader_.LoadFromFile(
-            config.dataRootPath + "shaders/06_hello_model/model.vert",
-            config.dataRootPath + "shaders/06_hello_model/model.frag");
+        config.dataRootPath + "shaders/06_hello_model/model.vert",
+        config.dataRootPath + "shaders/06_hello_model/model.frag");
 
-	glCheckError();
+    glCheckError();
 
 
 }
 void HelloModelProgram::Update(seconds dt)
 {
-	std::lock_guard<std::mutex> lock(updateMutex_);
+    std::lock_guard<std::mutex> lock(updateMutex_);
 
-	camera_.Update(dt);
-	const auto& config = BasicEngine::GetInstance()->GetConfig();
+    camera_.Update(dt);
+    const auto& config = BasicEngine::GetInstance()->GetConfig();
 
-	projection_ = Transform3d::Perspective(
-		degree_t(45.0f),
-		static_cast<float>(config.windowSize.x) / config.windowSize.y,
-		0.1f,
-		100.0f);	textureManager_.Update(dt);
+    projection_ = Transform3d::Perspective(
+        degree_t(45.0f),
+        static_cast<float>(config.windowSize.x) / config.windowSize.y,
+        0.1f,
+        100.0f);
+    textureManager_.Update(dt);
+    modelManager_.Update(dt);
 }
 
 void HelloModelProgram::Destroy()
 {
-	model_.Destroy();
-	shader_.Destroy();
-	textureManager_.Destroy();
+    modelManager_.Destroy();
+    shader_.Destroy();
+    textureManager_.Destroy();
 }
 
 void HelloModelProgram::DrawImGui()
@@ -73,28 +75,29 @@ void HelloModelProgram::DrawImGui()
 
 void HelloModelProgram::Render()
 {
-	if (shader_.GetProgram() == 0)
-		return;
+    if (shader_.GetProgram() == 0)
+        return;
     glCheckError();
-	std::lock_guard<std::mutex> lock(updateMutex_);
-	if(!model_.IsLoaded())
-		return;
+    std::lock_guard<std::mutex> lock(updateMutex_);
+    if (!modelManager_.IsLoaded(modelId_))
+        return;
 
-	glCheckError();
-	shader_.Bind();
-	shader_.SetMat4("view", camera_.GenerateViewMatrix());
-	shader_.SetMat4("projection", projection_);
-	Mat4f model = Mat4f::Identity;
-	model = Transform3d::Rotate(model, degree_t(180.0f), Vec3f::up);
-	model = Transform3d::Scale(model, Vec3f(0.1f, 0.1f, 0.1f));
-	shader_.SetMat4("model", model);
-	shader_.SetMat4("normalMatrix", model.Inverse().Transpose());
-	model_.Draw(shader_);
+    glCheckError();
+    shader_.Bind();
+    shader_.SetMat4("view", camera_.GenerateViewMatrix());
+    shader_.SetMat4("projection", projection_);
+    Mat4f model = Mat4f::Identity;
+    model = Transform3d::Rotate(model, degree_t(180.0f), Vec3f::up);
+    model = Transform3d::Scale(model, Vec3f(0.1f, 0.1f, 0.1f));
+    shader_.SetMat4("model", model);
+    shader_.SetMat4("normalMatrix", model.Inverse().Transpose());
+    auto* mod = modelManager_.GetModel(modelId_);
+    mod->Draw(shader_);
 }
 
 void HelloModelProgram::OnEvent(const SDL_Event& event)
 {
-	camera_.OnEvent(event);
+    camera_.OnEvent(event);
 }
 
 }

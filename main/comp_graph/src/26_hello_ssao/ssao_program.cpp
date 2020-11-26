@@ -37,7 +37,7 @@ void HelloSsaoProgram::Init()
     const auto& config = BasicEngine::GetInstance()->GetConfig();
     glCheckError();
     CreateFramebuffer();
-	//Crate white texture
+    //Crate white texture
     glGenTextures(1, &whiteTexture_);
     glBindTexture(GL_TEXTURE_2D, whiteTexture_);
     unsigned char white[] = { 255, 255, 255 };
@@ -51,13 +51,13 @@ void HelloSsaoProgram::Init()
     ssaoBlurShader_.LoadFromFile(
         config.dataRootPath + "shaders/26_hello_ssao/ssao.vert",
         config.dataRootPath + "shaders/26_hello_ssao/ssao_blur.frag");
-	ssaoShader_.LoadFromFile(
+    ssaoShader_.LoadFromFile(
         config.dataRootPath + "shaders/26_hello_ssao/ssao.vert",
         config.dataRootPath + "shaders/26_hello_ssao/ssao.frag");
-	ssaoGeometryShader_.LoadFromFile(
+    ssaoGeometryShader_.LoadFromFile(
         config.dataRootPath + "shaders/26_hello_ssao/ssao_geometry.vert",
         config.dataRootPath + "shaders/26_hello_ssao/ssao_geometry.frag");
-	ssaoLightingShader_.LoadFromFile(
+    ssaoLightingShader_.LoadFromFile(
         config.dataRootPath + "shaders/26_hello_ssao/ssao.vert",
         config.dataRootPath + "shaders/26_hello_ssao/ssao_lighting.frag");
     // generate sample kernel
@@ -66,9 +66,9 @@ void HelloSsaoProgram::Init()
     for (int i = 0; i < maxKernelSize_; ++i)
     {
         Vec3f sample(
-            RandomRange(-1.0f, 1.0f), 
-            RandomRange(-1.0f,1.0f), 
-            RandomRange(0.0f,1.0f));
+            RandomRange(-1.0f, 1.0f),
+            RandomRange(-1.0f, 1.0f),
+            RandomRange(0.0f, 1.0f));
         sample = sample.Normalized();
         sample *= RandomRange(0.0f, 1.0f);
         float scale = float(i) / 64.0f;
@@ -80,11 +80,11 @@ void HelloSsaoProgram::Init()
     }
     // generate noise texture
     std::array<Vec3f, 16> ssaoNoise;
-	for (auto& noise : ssaoNoise)
-	{
-		const Vec3f noiseValue = Vec3f(RandomRange(-1.0f, 1.0f), RandomRange(-1.0f, 1.0f), 0.0f);
+    for (auto& noise : ssaoNoise)
+    {
+        const Vec3f noiseValue = Vec3f(RandomRange(-1.0f, 1.0f), RandomRange(-1.0f, 1.0f), 0.0f);
         noise = noiseValue;
-	}
+    }
     glGenTextures(1, &noiseTexture_);
     glBindTexture(GL_TEXTURE_2D, noiseTexture_);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, 4, 4, 0, GL_RGB, GL_FLOAT, &ssaoNoise[0]);
@@ -96,7 +96,7 @@ void HelloSsaoProgram::Init()
     glCheckError();
     plane_.Init();
     screenPlane_.Init();
-    model_.LoadModel(config.dataRootPath + "model/nanosuit2/nanosuit.obj");
+    modelId_ = modelManager_.LoadModel(config.dataRootPath + "model/nanosuit2/nanosuit.obj");
     glCheckError();
     camera_.Init();
 }
@@ -120,7 +120,7 @@ void HelloSsaoProgram::Destroy()
     ssaoLightingShader_.Destroy();
     plane_.Destroy();
     screenPlane_.Destroy();
-    model_.Destroy();
+    modelManager_.Destroy();
 }
 
 void HelloSsaoProgram::DrawImGui()
@@ -130,29 +130,29 @@ void HelloSsaoProgram::DrawImGui()
     ImGui::SliderFloat("Bias", &ssaoBias_, 0.005f, 0.05f);
     ImGui::SliderInt("Kernel Size", &kernelSize_, 1, maxKernelSize_);
     bool enableSsao = flags_ & ENABLE_SSAO;
-	if(ImGui::Checkbox("Enable SSAO", &enableSsao))
-	{
+    if (ImGui::Checkbox("Enable SSAO", &enableSsao))
+    {
         flags_ = enableSsao ? flags_ | ENABLE_SSAO : flags_ & ~ENABLE_SSAO;
-	}
-	ImGui::End();
+    }
+    ImGui::End();
 }
 
 void HelloSsaoProgram::Render()
 {
-	if(!model_.IsLoaded())
-	{
+    if (!modelManager_.IsLoaded(modelId_))
+    {
         return;
-	}
+    }
     std::lock_guard<std::mutex> lock(updateMutex_);
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("Render SSAO Program");
 #endif
-	if(flags_ & RESIZE_SCREEN)
-	{
+    if (flags_ & RESIZE_SCREEN)
+    {
         DestroyFramebuffer();
         CreateFramebuffer();
-        flags_ = flags_ & ~RESIZE_SCREEN;	
-	}
+        flags_ = flags_ & ~RESIZE_SCREEN;
+    }
     const auto view = camera_.GenerateViewMatrix();
     const auto projection = camera_.GenerateProjectionMatrix();
 
@@ -163,7 +163,7 @@ void HelloSsaoProgram::Render()
     glBindFramebuffer(GL_FRAMEBUFFER, gBuffer_);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     ssaoGeometryShader_.Bind();
-    
+
     ssaoGeometryShader_.SetMat4("view", view);
     ssaoGeometryShader_.SetMat4("projection", projection);
     RenderScene(ssaoGeometryShader_);
@@ -176,10 +176,10 @@ void HelloSsaoProgram::Render()
     glBindFramebuffer(GL_FRAMEBUFFER, ssaoFbo_);
     glClear(GL_COLOR_BUFFER_BIT);
     ssaoShader_.Bind();
-	for(unsigned int i = 0; i < 64; i++)
-	{
+    for (unsigned int i = 0; i < 64; i++)
+    {
         ssaoShader_.SetVec3("samples[" + std::to_string(i) + "]", ssaoKernel_[i]);
-	}
+    }
     ssaoShader_.SetMat4("projection", projection);
     ssaoShader_.SetTexture("gPosition", gPosition_, 0);
     ssaoShader_.SetTexture("gNormal", gNormal_, 1);
@@ -221,9 +221,9 @@ void HelloSsaoProgram::Render()
     ssaoLightingShader_.SetTexture("ssao", ssaoColorBufferBlur_, 3);
     ssaoLightingShader_.SetBool("enableSSAO", flags_ & ENABLE_SSAO);
     screenPlane_.Draw();
-	
-	
-	
+
+
+
 }
 
 void HelloSsaoProgram::OnEvent(const SDL_Event& event)
@@ -297,10 +297,10 @@ void HelloSsaoProgram::CreateFramebuffer()
     glCheckError();
     glCheckFramebuffer();
     glCheckError();
-	
+
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     // also create framebuffer to hold SSAO processing stage 
-	// -----------------------------------------------------
+    // -----------------------------------------------------
 
     glGenFramebuffers(1, &ssaoFbo_);  glGenFramebuffers(1, &ssaoBlurFbo_);
     glBindFramebuffer(GL_FRAMEBUFFER, ssaoFbo_);
@@ -338,7 +338,7 @@ void HelloSsaoProgram::RenderScene(const gl::Shader& shader)
 {
     const auto view = camera_.GenerateViewMatrix();
 
-	//Draw floor
+    //Draw floor
     auto model = Mat4f::Identity;
     model = Transform3d::Rotate(model, Quaternion::AngleAxis(degree_t(-90.0f), Vec3f::right));
     model = Transform3d::Scale(model, Vec3f::one * 5.0f);
@@ -346,15 +346,16 @@ void HelloSsaoProgram::RenderScene(const gl::Shader& shader)
     shader.SetMat4("model", model);
     shader.SetMat4("normalMatrix", (view * model).Inverse().Transpose());
     plane_.Draw();
-	//Draw model
+    //Draw model
     model = Mat4f::Identity;
-	model = model = Transform3d::Rotate(model, degree_t(90.0f), Vec3f::right);
+    model = model = Transform3d::Rotate(model, degree_t(90.0f), Vec3f::right);
     model = Transform3d::Scale(model, Vec3f::one * 0.1f);
-    model = Transform3d::Translate(model, Vec3f::up*0.1f);
+    model = Transform3d::Translate(model, Vec3f::up * 0.1f);
     shader.SetMat4("model", model);
     shader.SetMat4("normalMatrix", (view * model).Inverse().Transpose());
-	model_.Draw(shader);
-	
+    auto* mod = modelManager_.GetModel(modelId_);
+    mod->Draw(shader);
+
     glCheckError();
 }
 }

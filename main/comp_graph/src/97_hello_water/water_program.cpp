@@ -44,7 +44,7 @@ void HelloWaterProgram::Init()
 	skyboxShader_.LoadFromFile(
 		config.dataRootPath + "shaders/15_hello_cubemaps/skybox.vert",
 		config.dataRootPath + "shaders/15_hello_cubemaps/skybox.frag");
-	model_.LoadModel(config.dataRootPath + "model/nanosuit2/nanosuit.obj");
+	modelId_ = modelManager_.LoadModel(config.dataRootPath + "model/nanosuit2/nanosuit.obj");
 	modelShader_.LoadFromFile(
 		config.dataRootPath + "shaders/97_hello_water/model.vert", 
 		config.dataRootPath + "shaders/97_hello_water/model.frag");
@@ -81,6 +81,7 @@ void HelloWaterProgram::Destroy()
 	modelShader_.Destroy();
 	waterShader_.Destroy();
 	textureManager_.Destroy();
+	modelManager_.Destroy();
 	//Destroy framebuffers
 	glDeleteFramebuffers(1, &reflectionFramebuffer_);
 	glDeleteFramebuffers(1, &refractionFramebuffer_);
@@ -99,7 +100,7 @@ void HelloWaterProgram::DrawImGui()
 
 void HelloWaterProgram::Render()
 {
-	if (!model_.IsLoaded())
+	if (!modelManager_.IsLoaded(modelId_))
 	{
 		return;
 	}
@@ -140,7 +141,8 @@ void HelloWaterProgram::Render()
 		modelShader_.SetMat4("model", model);
 		modelShader_.SetFloat("waterHeight", waterHeight_);
 		modelShader_.SetInt("passType", passType);
-		model_.Draw(modelShader_);
+		auto* mod = modelManager_.GetModel(modelId_);
+		mod->Draw(modelShader_);
 		//Render skybox
 		glDepthFunc(GL_LEQUAL);
 		skyboxShader_.Bind();

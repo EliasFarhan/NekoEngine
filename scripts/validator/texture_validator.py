@@ -75,6 +75,7 @@ def convert_to_ktx(img, img_out, meta_data):
     if status.returncode != 0:
         sys.stderr.write("Error while read image format file\n")
         return status.returncode
+    print("image format json output: {}".format(status.stdout))
     img_format_json = json.loads(status.stdout)
     channel_count = img_format_json["channelCount"]
     transcoder = ""
@@ -125,6 +126,10 @@ def convert_to_ktx(img, img_out, meta_data):
         output_format.append("-format")
         output_format.append("BC5")
         meta_data["transcoder"] = "bc5"
+    else:
+        sys.stderr.write("[Error] Unsupported noumber of channels: {}\n".format(channel_count))
+        return 1
+    print("Command format: {} with transcoder {} ".format(output_format, transcoder))
     # convert to basis in tmp folder
     img_name = Path(img).stem+".basis"
     basis_path = os.path.join(tmp_folder, img_name)

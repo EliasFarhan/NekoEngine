@@ -51,6 +51,7 @@ private:
 	sdl::Camera3D camera_;
 	gl::ModelId modelId_ = gl::INVALID_MODEL_ID;
 	gl::ModelManager modelManager_;
+	gl::TextureManager textureManager_;
 	gl::Shader toonShader_;
 	gl::Shader blinnShader_;
 };

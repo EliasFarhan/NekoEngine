@@ -78,7 +78,7 @@ function(data_generate binary)
 
         add_custom_command(
                 OUTPUT ${DATA_OUTPUT}
-                DEPENDS ${DATA}
+                DEPENDS ${DATA} ${SCRIPT_FILES}
                 DEPENDS
                 COMMAND ${CMAKE_COMMAND} -E copy ${DATA} "${CMAKE_CURRENT_BINARY_DIR}/${PATH_NAME}/${FILE_NAME}"
                 COMMAND ${CMAKE_COMMAND} -E env VALIDATE_JSON_EXE=$<TARGET_FILE:validate_json> VALIDATOR_FOLDER=${CMAKE_SOURCE_DIR}/validator/

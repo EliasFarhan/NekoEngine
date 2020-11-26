@@ -84,7 +84,9 @@ private:
         	{Vec3f(-1.0f, 1.5f, 2.0f), Vec3f(0.25f), degree_t(60.0f), Vec3f(1,0,1).Normalized()}
         }
     };
-    assimp::OldModel model_;
+    gl::ModelManager modelManager_;
+    gl::ModelId modelId_ = gl::INVALID_MODEL_ID;
+
 
     gl::Shader simpleDepthShader_;
     gl::Shader modelShader_;

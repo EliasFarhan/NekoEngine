@@ -39,10 +39,11 @@ class Model
 {
 public:
     void Draw(const Shader& shader) const;
-
+    void Destroy();
     [[nodiscard]] const assimp::Mesh& GetMesh(size_t meshIndex) const;
     [[nodiscard]] size_t GetMeshCount() const;
-private:
+    void BindTextures(size_t meshIndex, const Shader & shader) const;
+  private:
     friend class ModelLoader;
     std::vector<assimp::Mesh> meshes_;
 };
@@ -67,6 +68,7 @@ public:
     [[nodiscard]] bool IsDone() const;
     [[nodiscard]] ModelId GetModelId() const;
     [[nodiscard]] const Model* GetModel() const;
+    [[nodiscard]] bool HasErrors() const;
 private:
     /**
      * \brief Uses the assimp importer to load model from disk
@@ -76,10 +78,10 @@ private:
      * \brief Process all the node of the aiScene, aka the meshes
      */
     void ProcessModel();
-    void ProcessNode(aiNode* node, size_t currentMeshIndex);
-    void ProcessMesh(size_t meshIndex, const aiMesh* aMesh);
+    void ProcessNode(aiNode* node);
+    void ProcessMesh(assimp::Mesh&, const aiMesh* aMesh);
     void LoadMaterialTextures(const aiMaterial* material, aiTextureType textureType, std::string_view directory,
-                              size_t meshIndex);
+                              assimp::Mesh& mesh);
     /**
      * \brief method called on the Render thread to create the VAOs of the meshes
      */

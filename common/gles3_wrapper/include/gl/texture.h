@@ -44,6 +44,7 @@ public:
                            Texture::TextureFlags flags = Texture::DEFAULT);
     TextureLoader(const TextureLoader&) = delete;
     TextureLoader& operator=(const TextureLoader&) = delete;
+    std::string_view GetPath() const;
     TextureLoader(TextureLoader&&) noexcept ;
     TextureLoader& operator=(TextureLoader&&) = default;
     void Start();
@@ -51,6 +52,7 @@ public:
     [[nodiscard]] TextureId GetTextureId() const;
     [[nodiscard]] const Texture& GetTexture() const;
     [[nodiscard]] bool HasErrors() const;
+    [[nodiscard]] TextureLoaderError GetErrors() const;
 private:
     void LoadTexture();
     void DecompressTexture();

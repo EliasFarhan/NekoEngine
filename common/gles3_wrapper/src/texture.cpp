@@ -439,7 +439,7 @@ bool TextureManager::IsTextureLoaded(TextureId textureId) const
 
 void TextureManager::Init()
 {
-
+    TextureManagerLocator::provide(this);
 }
 
 void TextureManager::Update([[maybe_unused]]seconds dt)
@@ -449,6 +449,20 @@ void TextureManager::Update([[maybe_unused]]seconds dt)
         auto& textureLoader = textureLoaders_.front();
         if(textureLoader.HasErrors())
         {
+            switch (textureLoader.GetErrors())
+            {
+            case TextureLoader::TextureLoaderError::ASSET_LOADING_ERROR:
+                logDebug(fmt::format("[Error] Could not load texture {} from disk", textureLoader.GetPath()));
+                break;
+            case TextureLoader::TextureLoaderError::DECOMPRESS_ERROR:
+                logDebug(fmt::format("[Error] Could not decompress texture {} from disk", textureLoader.GetPath()));
+                break;
+            case TextureLoader::TextureLoaderError::UPLOAD_TO_GPU_ERROR:
+                logDebug(fmt::format("[Error] Could not upload texture {} from disk", textureLoader.GetPath()));
+                break;
+            default:
+                break;
+            }
             textureLoaders_.pop();
         }
         else if(textureLoader.IsDone())
@@ -466,7 +480,7 @@ void TextureManager::Update([[maybe_unused]]seconds dt)
 TextureManager::TextureManager() :
     filesystem_(BasicEngine::GetInstance()->GetFilesystem())
 {
-    TextureManagerLocator::provide(this);
+    
 }
 
 TextureName TextureManager::GetTextureName(TextureId textureId) const
@@ -556,6 +570,11 @@ void TextureLoader::Start()
     BasicEngine::GetInstance()->ScheduleJob(&loadingTextureJob_, JobThreadType::RESOURCE_THREAD);
 }
 
+std::string_view TextureLoader::GetPath() const
+{
+    return path_;
+}
+
 TextureLoader::TextureLoader(TextureLoader&& textureLoader) noexcept :
     filesystem_(BasicEngine::GetInstance()->GetFilesystem()),
     textureId_(textureLoader.textureId_),
@@ -580,6 +599,11 @@ const Texture& TextureLoader::GetTexture() const
 bool TextureLoader::HasErrors() const
 {
     return error_ != TextureLoaderError::NONE;
+}
+
+TextureLoader::TextureLoaderError TextureLoader::GetErrors() const
+{
+    return error_;
 }
 }
 

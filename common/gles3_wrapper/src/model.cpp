@@ -168,44 +168,64 @@ size_t Model::GetMeshCount() const
     return meshes_.size();
 }
 
+void Model::BindTextures(size_t meshIndex, const Shader &shader) const
+{
+    glCheckError();
+    unsigned int diffuseNr = 1;
+    unsigned int specularNr = 1;
+    unsigned int normalNr = 1;
+    auto& mesh = meshes_[meshIndex];
+    for (size_t i = 0; i < mesh.textures.size(); i++)
+    {
+        // activate proper texture unit before binding
+        glActiveTexture(GL_TEXTURE0 + i);
+        // retrieve texture number (the N in diffuse_textureN)
+        std::string number;
+        std::string name;
+        switch (mesh.textures[i].type)
+        {
+        case aiTextureType_DIFFUSE:
+            name = "texture_diffuse";
+            number = std::to_string(diffuseNr++);
+            break;
+        case aiTextureType_SPECULAR:
+            name = "texture_specular";
+            number = std::to_string(specularNr++);
+            break;
+        case aiTextureType_HEIGHT:
+            name = "texture_normal";
+            number = std::to_string(normalNr++);
+            break;
+        default:
+            continue;
+        }
+        shader.SetInt(fmt::format("material.{}{}", name, number), i);
+        glBindTexture(GL_TEXTURE_2D, mesh.textures[i].textureName);
+    }
+    shader.SetFloat("material.shininess", mesh.specularExponent);
+    shader.SetBool("enableNormalMap", normalNr > 1);
+    glActiveTexture(GL_TEXTURE0);
+    glCheckError();
+}
+
 void Model::Draw(const Shader& shader) const
 {
-    for(const auto& mesh : meshes_)
+    for (size_t meshIndex = 0; meshIndex < meshes_.size(); meshIndex++)
     {
-        glCheckError();
-        unsigned int diffuseNr = 1;
-        unsigned int specularNr = 1;
-        unsigned int normalNr = 1;
-        for (size_t i = 0; i < mesh.textures.size(); i++)
-        {
-            // activate proper texture unit before binding
-            glActiveTexture(GL_TEXTURE0 + i);
-            // retrieve texture number (the N in diffuse_textureN)
-            std::string number;
-            std::string name;
-            switch(mesh.textures[i].type)
-            {
-                case aiTextureType_DIFFUSE:
-                    name = "texture_diffuse";
-                    number = std::to_string(diffuseNr++);
-                    break;
-                case aiTextureType_SPECULAR:
-                    name = "texture_specular";
-                    number = std::to_string(specularNr++);
-                    break;
-                case aiTextureType_HEIGHT:
-                    name = "texture_normal";
-                    number = std::to_string(normalNr++);
-                    break;
-                default: ;
-            }
-            shader.SetInt(fmt::format("material.{}{}",name, number), i);
-            glBindTexture(GL_TEXTURE_2D, mesh.textures[i].textureName);
-        }
-        shader.SetFloat("material.shininess", mesh.specularExponent);
-        shader.SetBool("enableNormalMap", normalNr > 1);
-        glActiveTexture(GL_TEXTURE0);
-        glCheckError();
+        BindTextures(meshIndex, shader);
+        const auto& mesh = meshes_[meshIndex];
+        // draw mesh
+        glBindVertexArray(mesh.VAO);
+        glDrawElements(GL_TRIANGLES, mesh.indices.size(), GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
+    }
+}
+
+void Model::Destroy()
+{
+    for (auto& mesh : meshes_)
+    {
+        glDeleteVertexArrays(1, &mesh.VAO);
     }
 }
 
@@ -217,27 +237,39 @@ void ModelManager::Init()
 
 void ModelManager::Update(seconds dt)
 {
-    while(!modelLoaders_.empty())
+    while (!modelLoaders_.empty())
     {
         auto& modelLoader = modelLoaders_.front();
         modelLoader.Update();
-        if(modelLoader.IsDone())
+        if(modelLoader.HasErrors())
+        {
+            modelLoaders_.pop();
+        }
+        else if (modelLoader.IsDone())
         {
             modelMap_[modelLoader.GetModelId()] = *modelLoader.GetModel();
             modelLoaders_.pop();
+        }
+        else
+        {
+            break;
         }
     }
 }
 
 void ModelManager::Destroy()
 {
-
+    // TODO delete mesh VAO
+    for (auto& model : modelMap_)
+    {
+        model.second.Destroy();
+    }
 }
 
 ModelManager::ModelManager()
 {
     importer_.SetIOHandler(new NekoIOSystem(
-            BasicEngine::GetInstance()->GetFilesystem()));
+        BasicEngine::GetInstance()->GetFilesystem()));
 }
 
 ModelId ModelManager::LoadModel(std::string_view path)
@@ -266,10 +298,10 @@ ModelId ModelManager::LoadModel(std::string_view path)
 
 const Model* ModelManager::GetModel(ModelId modelId)
 {
-    if(modelId == INVALID_MODEL_ID)
+    if (modelId == INVALID_MODEL_ID)
         return nullptr;
     const auto it = modelMap_.find(modelId);
-    if (it == modelMap_.end())
+    if (it != modelMap_.end())
     {
         return &it->second;
     }
@@ -282,35 +314,23 @@ bool ModelManager::IsLoaded(ModelId modelId)
 }
 
 ModelLoader::ModelLoader(Assimp::Importer& importer, std::string_view path, ModelId modelId) :
-        importer_(importer),
-        path_(path),
-        loadModelJob_([this]() {
-            LoadModel();
-        }),
-        processModelJob_([this]() {
-            ProcessModel();
-        }),
-        uploadMeshesToGLJob_([this]() {
-            UploadMeshesToGL();
-        }),
-        modelId_(modelId)
+    importer_(importer),
+    path_(path),
+    loadModelJob_([this]() { LoadModel(); }),
+    processModelJob_([this]() { ProcessModel(); }),
+    uploadMeshesToGLJob_([this]() { UploadMeshesToGL(); }),
+    modelId_(modelId)
 {
 
 }
 
 ModelLoader::ModelLoader(ModelLoader&& modelLoader) noexcept :
-        importer_(modelLoader.importer_),
-        path_(modelLoader.path_),
-        loadModelJob_([this]() {
-            LoadModel();
-        }),
-        processModelJob_([this]() {
-            ProcessModel();
-        }),
-        uploadMeshesToGLJob_([this]() {
-            UploadMeshesToGL();
-        }),
-        modelId_(modelLoader.modelId_)
+    path_(modelLoader.path_),
+    modelId_(modelLoader.modelId_),
+    importer_(modelLoader.importer_),
+    loadModelJob_([this]() { LoadModel(); }),
+    processModelJob_([this]() { ProcessModel(); }),
+    uploadMeshesToGLJob_([this]() { UploadMeshesToGL(); })
 {
 
 }
@@ -323,7 +343,7 @@ void ModelLoader::Start()
 
 void ModelLoader::Update()
 {
-    if(flags_ & ERROR_LOADING)
+    if (flags_ & ERROR_LOADING)
     {
         return;
     }
@@ -332,33 +352,33 @@ void ModelLoader::Update()
         const auto& textureManager = TextureManagerLocator::get();
         bool isLoaded = true;
         // load textures if possible
-        for(auto& mesh : model_.meshes_)
+        for (auto& mesh : model_.meshes_)
         {
             size_t loadedTextureCount = 0;
-            for(auto& texture: mesh.textures)
+            for (auto& texture : mesh.textures)
             {
-                if(texture.textureId != INVALID_TEXTURE_ID &&
+                if (texture.textureId != INVALID_TEXTURE_ID &&
                     texture.textureName == INVALID_TEXTURE_NAME)
                 {
-                    auto* texturePtr = textureManager.GetTexture(texture.textureId);
-                    if(texturePtr != nullptr)
+                    const auto* texturePtr = textureManager.GetTexture(texture.textureId);
+                    if (texturePtr != nullptr)
                     {
                         texture.textureName = texturePtr->name;
                     }
                 }
-                if(texture.textureId != INVALID_TEXTURE_ID &&
-                      texture.textureName == INVALID_TEXTURE_NAME)
+                if (texture.textureId != INVALID_TEXTURE_ID &&
+                    texture.textureName != INVALID_TEXTURE_NAME)
                 {
                     loadedTextureCount++;
                 }
 
             }
-            if(loadedTextureCount < mesh.textures.size())
+            if (loadedTextureCount < mesh.textures.size())
             {
                 isLoaded = false;
             }
         }
-        if(isLoaded && uploadMeshesToGLJob_.IsDone())
+        if (isLoaded && uploadMeshesToGLJob_.IsDone())
         {
             flags_ = flags_ | LOADED;
         }
@@ -370,34 +390,50 @@ bool ModelLoader::IsDone() const
     return flags_ & LOADED;
 }
 
+ModelId ModelLoader::GetModelId() const
+{
+    return modelId_;
+}
+
+const Model * ModelLoader::GetModel() const
+{
+    return &model_;
+}
+
+bool ModelLoader::HasErrors() const
+{
+    return flags_ & ERROR_LOADING;
+}
+
 void ModelLoader::ProcessModel()
 {
     model_.meshes_.reserve(scene->mNumMeshes);
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("Process Nodes");
 #endif
-    ProcessNode(scene->mRootNode, 0);
+    ProcessNode(scene->mRootNode);
     RendererLocator::get().AddPreRenderJob(&uploadMeshesToGLJob_);
 }
 
-void ModelLoader::ProcessNode(aiNode* node, size_t currentMeshIndex)
+void ModelLoader::ProcessNode(aiNode* node)
 {
     // process all the node's meshes (if any)
     for (unsigned int i = 0; i < node->mNumMeshes; i++)
     {
-        ProcessMesh(currentMeshIndex, scene->mMeshes[node->mMeshes[i]]);
-        currentMeshIndex++;
+        model_.meshes_.push_back({});
+        auto& mesh = model_.meshes_.back();
+        ProcessMesh(mesh, scene->mMeshes[node->mMeshes[i]]);
+
     }
     // then do the same for each of its children
     for (unsigned int i = 0; i < node->mNumChildren; i++)
     {
-        ProcessNode(node->mChildren[i], currentMeshIndex);
+        ProcessNode(node->mChildren[i]);
     }
 }
 
-void ModelLoader::ProcessMesh(size_t meshIndex, const aiMesh* aMesh)
+void ModelLoader::ProcessMesh(assimp::Mesh& mesh, const aiMesh* aMesh)
 {
-    auto& mesh = model_.meshes_[meshIndex];
 
     mesh.min = Vec3f(aMesh->mAABB.mMin);
     mesh.max = Vec3f(aMesh->mAABB.mMax);
@@ -444,31 +480,23 @@ void ModelLoader::ProcessMesh(size_t meshIndex, const aiMesh* aMesh)
             mesh.indices.push_back(face.mIndices[j]);
     }
 
-    // TODO process material
+    // process material
     if (aMesh->mMaterialIndex >= 0)
     {
         const aiMaterial* material = scene->mMaterials[aMesh->mMaterialIndex];
         material->Get(AI_MATKEY_SHININESS, mesh.specularExponent);
         for (int i = 0; i < AI_TEXTURE_TYPE_MAX; i++)
         {
-            LoadMaterialTextures(material, static_cast<aiTextureType>(i), directoryPath_, 0);
+            LoadMaterialTextures(material, static_cast<aiTextureType>(i), directoryPath_, mesh);
         }
-        /*
-        LoadMaterialTextures(material,
-                             aiTextureType_DIFFUSE, Texture::TextureType::DIFFUSE, directory);
-        LoadMaterialTextures(material,
-                             aiTextureType_SPECULAR, Texture::TextureType::SPECULAR, directory);
-        LoadMaterialTextures(material,
-                             aiTextureType_HEIGHT, Texture::TextureType::HEIGHT, directory);
-    */
     }
 }
 
 void ModelLoader::LoadModel()
 {
     scene = importer_.get().ReadFile(path_.data(),
-                                     aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals |
-                                     aiProcess_CalcTangentSpace);
+        aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals |
+        aiProcess_CalcTangentSpace);
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
         flags_ = ERROR_LOADING;
@@ -513,7 +541,7 @@ void ModelLoader::UploadMeshesToGL()
         glCheckError();
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.EBO);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.indices.size() * sizeof(unsigned int),
-                     &mesh.indices[0], GL_STATIC_DRAW);
+            &mesh.indices[0], GL_STATIC_DRAW);
         glCheckError();
 #ifdef EASY_PROFILE_USE
         EASY_END_BLOCK;
@@ -543,21 +571,21 @@ void ModelLoader::UploadMeshesToGL()
 
 void
 ModelLoader::LoadMaterialTextures(const aiMaterial* material, aiTextureType textureType, std::string_view directory,
-                                  size_t meshIndex)
+                                  assimp::Mesh& mesh)
 {
     auto& textureManager = TextureManagerLocator::get();
-    auto count = material->GetTextureCount(textureType);
+    const auto count = material->GetTextureCount(textureType);
     for (unsigned int i = 0; i < count; i++)
     {
         aiString textureName;
         material->GetTexture(textureType, i, &textureName);
 
-        auto textureId = textureManager.LoadTexture(fmt::format("{}/{}", directory, textureName.C_Str()));
+        const auto textureId = textureManager.LoadTexture(fmt::format("{}/{}", directory, textureName.C_Str()));
 
-        model_.meshes_[meshIndex].textures.push_back(
-                {
-                        textureId, INVALID_TEXTURE_NAME, textureType
-                });
+        mesh.textures.push_back(
+            {
+                    textureId, INVALID_TEXTURE_NAME, textureType
+            });
 
     }
 }

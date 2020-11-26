@@ -34,6 +34,7 @@ namespace neko
 
 void HelloFrustumProgram::Init()
 {
+    textureManager_.Init();
     asteroidPositions_.resize(maxAsteroidNmb_);
     asteroidForces_.resize(maxAsteroidNmb_);
     asteroidVelocities_.resize(maxAsteroidNmb_);
@@ -104,6 +105,8 @@ void HelloFrustumProgram::Init()
 
 void HelloFrustumProgram::Update(seconds dt)
 {
+    textureManager_.Update(dt);
+    modelManager_.Update(dt);
     if (!modelManager_.IsLoaded(modelId_))
     {
         return;
@@ -135,6 +138,7 @@ void HelloFrustumProgram::Update(seconds dt)
 
 void HelloFrustumProgram::Destroy()
 {
+    textureManager_.Destroy();
     modelManager_.Destroy();
     vertexInstancingDrawShader_.Destroy();
     screenShader_.Destroy();

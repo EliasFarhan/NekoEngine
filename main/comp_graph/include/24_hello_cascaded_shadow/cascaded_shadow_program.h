@@ -34,51 +34,53 @@ namespace neko
 class HelloCascadedShadowProgram : public SampleProgram
 {
 public:
-	void Init() override;
-	void Update(seconds dt) override;
-	void Destroy() override;
-	void DrawImGui() override;
-	void Render() override;
-	void OnEvent(const SDL_Event& event) override;
+    void Init() override;
+    void Update(seconds dt) override;
+    void Destroy() override;
+    void DrawImGui() override;
+    void Render() override;
+    void OnEvent(const SDL_Event& event) override;
 private:
 
     enum CascadedShadowFlags : std::uint8_t
     {
         NONE = 0u,
         ENABLE_CASCADE_COLOR = 1u,
-        ENABLE_AABB_CASCADE = 1u<<1u
+        ENABLE_AABB_CASCADE = 1u << 1u
     };
 
-	struct DirectionalLight
-	{
-	    Vec3f position = Vec3f::zero;
-		Vec3f direction = -Vec3f::one;
-		Mat4f lightSpaceMatrix;
-	};
+    struct DirectionalLight
+    {
+        Vec3f position = Vec3f::zero;
+        Vec3f direction = -Vec3f::one;
+        Mat4f lightSpaceMatrix;
+    };
 
-	[[nodiscard]] Camera2D CalculateOrthoLight(float cascadeNear, float cascadeFar, Vec3f lightDir) const;
-	void ShadowPass(int cascadeIndex);
-	void RenderScene(const gl::Shader& shader);
+    [[nodiscard]] Camera2D CalculateOrthoLight(float cascadeNear, float cascadeFar, Vec3f lightDir) const;
+    void ShadowPass(int cascadeIndex);
+    void RenderScene(const gl::Shader& shader);
 
-	sdl::Camera3D camera_;
+    sdl::Camera3D camera_;
 
-	gl::Shader simpleDepthShader_;
-	gl::Shader shadowShader_;
+    gl::Shader simpleDepthShader_;
+    gl::Shader shadowShader_;
 
-	const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
-	unsigned fbo_ = 0;
-	std::array<unsigned, 3> shadowMaps_{};
-	float cascadedNearRatio_ = 0.1f;
-	float cascadedMiddleRatio_ = 0.6f;
-	float shadowBias_ = 0.005f;
-	std::uint8_t flags_ = NONE;
-	std::array<DirectionalLight, 3> lights_;
+    const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+    unsigned fbo_ = 0;
+    std::array<unsigned, 3> shadowMaps_{};
+    float cascadedNearRatio_ = 0.1f;
+    float cascadedMiddleRatio_ = 0.6f;
+    float shadowBias_ = 0.005f;
+    std::uint8_t flags_ = NONE;
+    std::array<DirectionalLight, 3> lights_;
 
-	gl::RenderQuad plane_{Vec3f::zero, Vec2f::one};
-	assimp::OldModel dragonModel_;
-	gl::TextureManager textureManager_;
-	TextureName brickWall_ = INVALID_TEXTURE_NAME;
-	TextureId brickWallId_;
-	TextureName whiteTexture_ = 0;
+    gl::RenderQuad plane_{ Vec3f::zero, Vec2f::one };
+    gl::ModelManager modelManager_;
+    gl::ModelId dragonModelId_ = gl::INVALID_MODEL_ID;
+
+    gl::TextureManager textureManager_;
+    TextureName brickWall_ = INVALID_TEXTURE_NAME;
+    TextureId brickWallId_;
+    TextureName whiteTexture_ = 0;
 };
 }

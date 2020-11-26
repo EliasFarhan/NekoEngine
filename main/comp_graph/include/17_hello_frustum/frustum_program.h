@@ -51,6 +51,8 @@ private:
 	gl::ModelId modelId_ = gl::INVALID_MODEL_ID;
 	gl::ModelManager modelManager_;
 
+	gl::TextureManager textureManager_;
+
 	const size_t maxAsteroidNmb_ = 100'000;
 	const size_t minAsteroidNmb_ = 1'000;
 	size_t instanceChunkSize_ = 1'000;
