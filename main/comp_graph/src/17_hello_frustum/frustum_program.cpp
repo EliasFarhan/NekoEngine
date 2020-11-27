@@ -107,10 +107,7 @@ void HelloFrustumProgram::Update(seconds dt)
 {
     textureManager_.Update(dt);
     modelManager_.Update(dt);
-    if (!modelManager_.IsLoaded(modelId_))
-    {
-        return;
-    }
+
 
     std::lock_guard<std::mutex> lock(updateMutex_);
     dt_ = dt.count();
@@ -119,6 +116,10 @@ void HelloFrustumProgram::Update(seconds dt)
     camera_.SetAspect(config.windowSize.x, config.windowSize.y);
     camera_.Update(dt);
     //Kicking the velocity calculus for force and velocities
+    if (!modelManager_.IsLoaded(modelId_))
+    {
+        return;
+    }
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("Calculate Positions");
 #endif
@@ -198,7 +199,7 @@ void HelloFrustumProgram::Render()
     const auto* model = modelManager_.GetModel(modelId_);
     const auto& asteroidMesh = model->GetMesh(0);
     // TODO bind textures to asteroid
-    // asteroidMesh.BindTextures(vertexInstancingDrawShader_);
+    model->BindTextures(0, vertexInstancingDrawShader_);
 
     const std::function<void()> drawAsteroids = [this, &asteroidMesh]() {
         const auto actualAsteroidNmb = asteroidCulledPositions_.size();
@@ -237,6 +238,7 @@ void HelloFrustumProgram::Render()
     drawAsteroids();
 	//Draw the true astroids view
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     const auto& config = BasicEngine::GetInstance()->GetConfig();
     glViewport(0, 0, config.windowSize.x, config.windowSize.y);
