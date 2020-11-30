@@ -4,8 +4,6 @@ import subprocess
 from zipfile import ZipFile
 
 
-validator_path = os.getenv("VALIDATOR_FOLDER")
-validator_exe = os.getenv("VALIDATE_JSON_EXE")
 
 
 def create_archive(path, files):
@@ -15,6 +13,9 @@ def create_archive(path, files):
 
 
 def validate_pkg(data_src, data_out, meta_content):
+    validator_path = os.getenv("VALIDATOR_FOLDER")
+    validator_exe = os.getenv("VALIDATE_JSON_EXE")
+
     status = subprocess.run([validator_exe, data_src, validator_path+"pkg_validator.json"])
     if status.returncode != 0:
         exit(1)

@@ -6,14 +6,6 @@ from os import environ
 from pathlib import Path
 import subprocess
 
-binary_path = os.getenv("BINARY_FOLDER")
-src_path = environ.get("SRC_FOLDER")
-basisu_exe = environ.get("BASISU_EXE")
-if basisu_exe is None:
-    exit(1)
-img_format_exe = environ.get("IMAGE_FORMAT_EXE")
-if img_format_exe is None:
-    exit(1)
 
 ktxable_texture_ext = [
     ".jpeg",
@@ -25,6 +17,7 @@ ktxable_texture_ext = [
 
 
 def convert_to_ktx(img, img_out, meta_data):
+    global src_path, img_format_exe, basisu_exe, data_binary_path
     arg = []
 
     if "linear" in meta_data:
@@ -81,7 +74,6 @@ def convert_to_ktx(img, img_out, meta_data):
     transcoder = ""
     if "transcoder" in meta_data:
         transcoder = meta_data["transcoder"]
-    
         
     output_format = []
     # RGB
@@ -149,11 +141,22 @@ def convert_to_ktx(img, img_out, meta_data):
     if status.returncode != 0:
         sys.stderr.write("[Error] Could not generate ktx file\n")
         return status.returncode
-    meta_data["ktx_path"] = str(Path(img_out).relative_to(binary_path))
+    meta_data["ktx_path"] = str(Path(img_out).relative_to(data_binary_path))
     return 0
 
 
 def validate_texture(img_src, img_out, meta_data):
+    global src_path, img_format_exe, basisu_exe, data_binary_path
+    src_path = environ.get("SRC_FOLDER")
+    data_binary_path = environ.get("DATA_BIN_FOLDER")
+    basisu_exe = environ.get("BASISU_EXE")
+    if basisu_exe is None:
+        sys.stderr.write("Could not find basisu executable\n")
+        exit(1)
+    img_format_exe = environ.get("IMAGE_FORMAT_EXE")
+    if img_format_exe is None:
+        sys.stderr.write("[Error] Could not find image_format executable\n")
+        exit(1)
     out_path = Path(img_out)
     extension = out_path.suffix.lower()
     if extension in ktxable_texture_ext:

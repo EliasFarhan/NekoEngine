@@ -5,11 +5,6 @@ import json
 import sys
 from pathlib import Path
 
-binary_path = os.getenv("BINARY_FOLDER")
-src_path = os.environ.get("SRC_FOLDER")
-validator_path = os.getenv("VALIDATOR_FOLDER")
-validator_exe = os.getenv("VALIDATE_JSON_EXE")
-print("Validator exe: {} with validator folder: {}".format(validator_exe, validator_path))
 
 
 class CubemapTextureType(Enum):
@@ -23,6 +18,11 @@ class CubemapTextureType(Enum):
 
 
 def validate_skybox(data_src, data_out, meta_content):
+    src_path = os.environ.get("SRC_FOLDER")
+    validator_path = os.getenv("VALIDATOR_FOLDER")
+    validator_exe = os.getenv("VALIDATE_JSON_EXE")
+    data_bin_path = os.getenv("DATA_BIN_FOLDER")
+
     status = subprocess.run([validator_exe, data_src, validator_path+"skybox_validator.json"])
     if status.returncode != 0:
         exit(1)
@@ -89,6 +89,6 @@ def validate_skybox(data_src, data_out, meta_content):
         if status.returncode != 0:
             sys.stderr.write("[Error] Could not generate skybox ktx\n")
             exit(1)
-        meta_content["ktx_path"] = str(Path(img_out).relative_to(binary_path))
+        meta_content["ktx_path"] = str(Path(img_out).relative_to(data_bin_path))
 
 

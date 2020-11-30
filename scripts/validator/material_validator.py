@@ -4,13 +4,6 @@ import subprocess
 
 from pathlib import Path
 
-binary_path = os.getenv("BINARY_FOLDER")
-print("Binary path: {}".format(binary_path))
-
-validator_path = os.getenv("VALIDATOR_FOLDER")
-validator_exe = os.getenv("VALIDATE_JSON_EXE")
-print("Validator exe: {} with validator folder: {}".format(validator_exe, validator_path))
-
 
 def get_texture_id(texture_path):
     # check if texture meta exists
@@ -25,7 +18,9 @@ def get_texture_id(texture_path):
 
 
 def validate_mat_json_file(data_src, data_out, meta_content):
+    global validator_exe, validator_path, data_binary_path
     status = subprocess.run([validator_exe, data_src, validator_path+"material_validator.json"])
+
     if status.returncode != 0:
         exit(1)
     with open(data_src, 'r') as mat_file:
@@ -38,11 +33,11 @@ def validate_mat_json_file(data_src, data_out, meta_content):
             if "map_path" in key:
                 key_id = key.replace('path', 'id')
                 if key_id not in mat_keys:
-                    id = get_texture_id(os.path.join(os.path.join(binary_path, 'data'), mat_content[key]))
+                    id = get_texture_id(os.path.join(data_binary_path, mat_content[key]))
                     new_content[key_id] = id
             # Loading shader content to material
             if "shader_path" in key:
-                shader_path = os.path.join(os.path.join(binary_path, 'data'), mat_content[key])
+                shader_path = os.path.join(data_binary_path, mat_content[key])
                 with open(shader_path, 'r') as shader_content:
                     new_key = key.replace('path', 'content')
                     new_content[new_key] = shader_content.read()
@@ -69,7 +64,7 @@ def validate_mat_json_file(data_src, data_out, meta_content):
 def insert_map_in_mat(map_type, dir_out, texture_name, current_material):
     texture_path = dir_out.joinpath(Path(texture_name))
     texture_id = get_texture_id(texture_path)
-    current_material[map_type+"_path"] = str(texture_path.relative_to(os.path.join(binary_path, "data")))
+    current_material[map_type+"_path"] = str(texture_path.relative_to(data_binary_path))
     current_material[map_type+"_id"] = texture_id
 
 
@@ -140,6 +135,14 @@ def validate_mtl_file(data_src, data_out, meta_content):
 
 
 def validate_material(data_src, data_out, meta_content):
+    global validator_exe, validator_path, data_binary_path
+    data_binary_path = os.getenv("DATA_BIN_FOLDER")
+    print("Binary path: {}".format(data_binary_path))
+
+    validator_path = os.getenv("VALIDATOR_FOLDER")
+    validator_exe = os.getenv("VALIDATE_JSON_EXE")
+    print("Validator exe: {} with validator folder: {}".format(validator_exe, validator_path))
+
     path = Path(data_src)
     extension = path.suffix.lower()
     if extension == '.mtl':

@@ -8,6 +8,8 @@ file(GLOB_RECURSE VALIDATOR_FILES validator/*.json)
 source_group("Scripts"				FILES ${SCRIPT_FILES})
 source_group("Validator"			FILES ${VALIDATOR_FILES})
 
+
+
 function(data_generate binary)
 
     file(GLOB_RECURSE TEXT_FILES
@@ -80,10 +82,7 @@ function(data_generate binary)
                 OUTPUT ${DATA_OUTPUT}
                 DEPENDS ${DATA} ${SCRIPT_FILES}
                 DEPENDS
-                COMMAND ${CMAKE_COMMAND} -E copy ${DATA} "${CMAKE_CURRENT_BINARY_DIR}/${PATH_NAME}/${FILE_NAME}"
-                COMMAND ${CMAKE_COMMAND} -E env VALIDATE_JSON_EXE=$<TARGET_FILE:validate_json> VALIDATOR_FOLDER=${CMAKE_SOURCE_DIR}/validator/
-                BASISU_EXE=$<TARGET_FILE:basisu> SRC_FOLDER=${CMAKE_CURRENT_SOURCE_DIR} BINARY_FOLDER=${CMAKE_CURRENT_BINARY_DIR}
-                IMAGE_FORMAT_EXE=$<TARGET_FILE:image_format>
+                COMMAND ${CMAKE_COMMAND} -E env  SRC_FOLDER=${CMAKE_SOURCE_DIR} DATA_SRC_FOLDER="${CMAKE_CURRENT_SOURCE_DIR}/data" DATA_BIN_FOLDER="${CMAKE_CURRENT_BINARY_DIR}/data"
                 "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/scripts/validator/asset_validator.py"  "${DATA}" "${DATA_OUTPUT}"
 
         )
@@ -93,12 +92,25 @@ function(data_generate binary)
     add_custom_target(
             ${data_generate_name}
             DEPENDS ${DATA_BINARY_FILES} ${DATA_FILES})
-    if(Neko_KTX)
-        add_dependencies(${data_generate_name} basisu image_format)
-    endif()
-    add_dependencies(${data_generate_name} validate_json)
     add_dependencies(${binary} ${data_generate_name})
 endfunction()
+
+
+add_custom_target(GenerateDataTool)
+    set_target_properties (GenerateDataTool PROPERTIES FOLDER __DO_THAT_FIRST_IN_RELEASE)
+add_custom_command( TARGET GenerateDataTool
+        COMMAND ${CMAKE_COMMAND} -E env VALIDATE_JSON_EXE=$<TARGET_FILE:validate_json> VALIDATOR_FOLDER=${CMAKE_SOURCE_DIR}/validator/
+                BASISU_EXE=$<TARGET_FILE:basisu> SRC_FOLDER=${CMAKE_CURRENT_SOURCE_DIR}
+                IMAGE_FORMAT_EXE=$<TARGET_FILE:image_format>
+                "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/scripts/data_tool_env.py"
+)
+
+if(Neko_KTX)
+    add_dependencies(GenerateDataTool basisu image_format)
+endif()
+add_dependencies(GenerateDataTool validate_json)
+
+
 if(MSVC)
     if (${CMAKE_HOST_SYSTEM_PROCESSOR} STREQUAL "AMD64")
         set(GLSL_VALIDATOR "$ENV{VULKAN_SDK}/Bin/glslangValidator.exe")
