@@ -15,7 +15,7 @@ def save_env_var():
     src_folder = os.getenv("SRC_FOLDER")
     env_json_path = Path(os.path.join(src_folder), "tmp/env.json")
     if not env_json_path.parent.is_dir():
-        env_json_path.mkdir(parents=True, exist_ok=True)
+        env_json_path.parent.mkdir(parents=True, exist_ok=True)
     env_var_content = {}
     for env in env_var:
         env_var_content[env] = os.getenv(env)
