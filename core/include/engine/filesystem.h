@@ -35,6 +35,7 @@ struct BufferFile
 class FilesystemInterface
 {
 public:
+    virtual ~FilesystemInterface() = default;
     [[nodiscard]] virtual BufferFile LoadFile(std::string_view path) const = 0;
     [[nodiscard]] virtual bool FileExists(std::string_view) const = 0;
     [[nodiscard]] virtual bool IsRegularFile(std::string_view) const = 0;

@@ -1,3 +1,4 @@
+#include "editor_filesystem.h"
 #include "model_viewer.h"
 
 #include <editor_engine.h>
@@ -9,8 +10,8 @@ int main(int argc, char** argv)
 {
   neko::sdl::Gles3Window window;
   neko::gl::Gles3Renderer renderer;
-
-  neko::editor::EditorEngine engine;
+  neko::editor::EditorFilesystem editorFilesystem;
+  neko::editor::EditorEngine engine{editorFilesystem};
 
   neko::editor::ModelViewer modelViewer;
 

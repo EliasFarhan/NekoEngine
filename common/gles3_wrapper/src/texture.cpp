@@ -42,141 +42,7 @@
 #endif
 namespace neko::gl
 {
-/*
-void TextureManager::CreateTexture()
-{
-    const auto textureId = currentUploadedTexture_.textureId;
-    const auto flags = currentUploadedTexture_.flags;
-    auto& image = currentUploadedTexture_.image;
-    if (image.data == nullptr)
-    {
-        textureMap_[textureId] = {};
-        return;
-    }
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Generate Texture");
-#endif
-    TextureName texture;
-    glCheckError();
-    glGenTextures(1, &texture);
 
-#ifdef EASY_PROFILE_USE
-    EASY_END_BLOCK;
-#endif
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, flags & Texture::CLAMP_WRAP ? GL_CLAMP_TO_EDGE : GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, flags & Texture::CLAMP_WRAP ? GL_CLAMP_TO_EDGE : GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, flags & Texture::SMOOTH_TEXTURE ? GL_LINEAR : GL_NEAREST);
-    glCheckError();
-    if (flags & Texture::MIPMAPS_TEXTURE)
-    {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                        flags & Texture::SMOOTH_TEXTURE ? GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_LINEAR);
-        glCheckError();
-    }
-    else
-    {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, flags & Texture::SMOOTH_TEXTURE ? GL_LINEAR : GL_NEAREST);
-        glCheckError();
-    }
-
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Copy Buffer");
-#endif
-    GLenum internalFormat = 0;
-    GLenum dataFormat = 0;
-    if (flags & Texture::HDR)
-    {
-        switch (image.nbChannels)
-        {
-            case 1:
-                internalFormat = GL_R16F;
-                dataFormat = GL_RED;
-                break;
-            case 2:
-
-                internalFormat = GL_RG16F;
-                dataFormat = GL_RG;
-                break;
-            case 3:
-
-                internalFormat = GL_RGB16F;
-                dataFormat = GL_RGB;
-                break;
-            case 4:
-
-                internalFormat = GL_RGBA16F;
-                dataFormat = GL_RGBA;
-                break;
-            default:
-                break;
-        }
-
-    }
-    else
-    {
-        switch (image.nbChannels)
-        {
-            case 1:
-            {
-                internalFormat = GL_R8;
-                dataFormat = GL_RED;
-                break;
-            }
-            case 2:
-            {
-                internalFormat = GL_RG8;
-                dataFormat = GL_RG;
-                break;
-            }
-            case 3:
-            {
-
-                internalFormat = flags & Texture::GAMMA_CORRECTION ? GL_SRGB8 : GL_RGB8;
-                dataFormat = GL_RGB;
-                break;
-            }
-            case 4:
-            {
-
-                internalFormat = flags & Texture::GAMMA_CORRECTION ? GL_SRGB8_ALPHA8 : GL_RGBA8;
-                dataFormat = GL_RGBA;
-                break;
-            }
-            default:
-                break;
-        }
-    }
-    if (!(flags & Texture::HDR))
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, image.width, image.height, 0, dataFormat, GL_UNSIGNED_BYTE,
-                     image.data);
-        glCheckError();
-    }
-    else
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, image.width, image.height, 0, dataFormat, GL_FLOAT,
-                     (float*) image.data);
-        glCheckError();
-    }
-
-#ifdef EASY_PROFILE_USE
-    EASY_END_BLOCK;
-#endif
-
-    if (flags & Texture::MIPMAPS_TEXTURE)
-    {
-#ifdef EASY_PROFILE_USE
-        EASY_BLOCK("Generate Mipmaps");
-#endif
-        glGenerateMipmap(GL_TEXTURE_2D);
-        glCheckError();
-    }
-    glBindTexture(GL_TEXTURE_2D, 0);
-    textureMap_[textureId] = {texture, {currentUploadedTexture_.image.width, currentUploadedTexture_.image.height}};
-
-}
-*/
 void TextureManager::Destroy()
 {
     for (auto& textureName : textureMap_)
@@ -383,7 +249,13 @@ TextureId TextureManager::LoadTexture(std::string_view path, Texture::TextureFla
         return it->second;
     }
     const std::string metaPath = fmt::format("{}.meta",path);
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("Load JSON");
+#endif
     auto metaJson = LoadJson(metaPath);
+#ifdef EASY_PROFILE_USE
+    EASY_END_BLOCK;
+#endif
     TextureId textureId = INVALID_TEXTURE_ID;
     std::string ktxPath;
     if(CheckJsonExists(metaJson, "uuid"))
@@ -410,9 +282,10 @@ TextureId TextureManager::LoadTexture(std::string_view path, Texture::TextureFla
         logDebug("[Error] Invalid texture id on texture load");
         return textureId;
     }
+    const auto& config = BasicEngine::GetInstance()->GetConfig();
     textureLoaders_.push(TextureLoader
     {
-        ktxPath,
+        config.dataRootPath + ktxPath,
         textureId,
         flags
     });
