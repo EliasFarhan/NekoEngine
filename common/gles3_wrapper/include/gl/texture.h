@@ -96,7 +96,7 @@ private:
 
 TextureName StbCreateTexture(const std::string_view filename, const FilesystemInterface& filesystem,
                              Texture::TextureFlags flags = Texture::DEFAULT);
-TextureName CreateTextureFromKTX(const std::string_view filename);
+TextureName CreateTextureFromKTX(const std::string_view filename, const FilesystemInterface& filesystem);
 TextureName LoadCubemap(std::vector<std::string> facesFilename, const FilesystemInterface& filesystem);
 void DestroyTexture(TextureName);
 

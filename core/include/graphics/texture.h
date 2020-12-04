@@ -125,39 +125,6 @@ public:
     }
     [[nodiscard]] bool IsTextureLoaded([[maybe_unused]] TextureId textureId) const override  { return false; }
 };
-/*
-class TextureLoader
-{
-public:
-    explicit TextureLoader(TextureManager& textureManager);
-
-    void SetTextureFlags(Texture::TextureFlags textureFlags) { flags_ = textureFlags; }
-    void SetTextureId(TextureId textureId);
-	/**
-	 * \brief This function schedules the resource load from disk and the image conversion.
-	 * Must be called after setting the texture id 
-
-    void LoadFromDisk();
-
-    [[nodiscard]] bool IsLoaded() const
-    {
-        return diskLoadJob_.IsDone() && convertImageJob_.IsDone();
-    }
-    [[nodiscard]] bool HasStarted() const
-    {
-        return textureId_ != INVALID_TEXTURE_ID && diskLoadJob_.HasStarted();
-    }
-    void Reset();
-private:
-    FilesystemInterface& filesystem_;
-    TextureManager& textureManager_;
-    Texture::TextureFlags flags_ = Texture::DEFAULT;
-    Job convertImageJob_;
-    LoadingAssetJob diskLoadJob_;
-    Image image_;
-    TextureId textureId_ = INVALID_TEXTURE_ID;
-};
-*/
 using TextureManagerLocator = Locator<TextureManagerInterface, NullTextureManager>;
 
 }

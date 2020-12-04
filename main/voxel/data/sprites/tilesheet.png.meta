@@ -1,0 +1,9 @@
+{
+    "linear": false,
+    "genmipmap": false,
+    "compression": "none",
+    "transcoder": "bc3",
+    "ktx_path": "sprites/tilesheet.png.ktx",
+    "ktx": true,
+    "uuid": "f0828244-3670-11eb-b87a-2cf05d1fffea"
+}

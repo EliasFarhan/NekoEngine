@@ -194,6 +194,58 @@ void PrintKTXError(ktx_error_code_e result, const char* file, int line)
     logDebug(fmt::format("{} in file: {} at line: {}", log, file, line));
 }
 
+
+TextureName CreateTextureFromKTX(const std::string_view filename, const FilesystemInterface& filesystem)
+{
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("Load KTX Texture");
+#endif
+    ktxTexture* kTexture = nullptr;
+    GLuint texture = 0;
+    GLenum target, glerror;
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("Open File");
+#endif
+    BufferFile textureFile = filesystem.LoadFile(filename);
+#ifdef EASY_PROFILE_USE
+    EASY_END_BLOCK;
+#endif
+    KTX_error_code result;
+
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("Create KTX from memory");
+#endif
+    result = ktxTexture_CreateFromMemory(
+            reinterpret_cast<const ktx_uint8_t*>(textureFile.dataBuffer),
+            textureFile.dataLength,
+            KTX_TEXTURE_CREATE_NO_FLAGS,
+            &kTexture);
+#ifdef EASY_PROFILE_USE
+    EASY_END_BLOCK;
+#endif
+    if (result != KTX_SUCCESS)
+    {
+        PrintKTXError(result, __FILE__, __LINE__);
+        return INVALID_TEXTURE_NAME;
+    }
+
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("Upload Texture to GPU");
+#endif
+    glGenTextures(1, &texture); // Optional. GLUpload can generate a texture.
+    result = ktxTexture_GLUpload(kTexture, &texture, &target, &glerror);
+    glCheckError();
+    if(result != KTX_SUCCESS)
+    {
+        PrintKTXError(result, __FILE__, __LINE__);
+    }
+#ifdef EASY_PROFILE_USE
+    EASY_END_BLOCK;
+#endif
+    ktxTexture_Destroy(kTexture);
+    return texture;
+}
+
 TextureName LoadCubemap(std::vector<std::string> facesFilename, const FilesystemInterface& filesystem)
 {
     TextureName textureID;
