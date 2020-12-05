@@ -176,10 +176,26 @@ void VoxelRenderProgram::Render()
     }
 }
 
+void VoxelRenderProgram::AddChunk(const Chunk& chunk, RegionId regionId)
+{
+    if(!(chunk.flag & Chunk::IS_VISIBLE))
+    {
+        return;   
+    }
+    if (chunk.contents == nullptr)
+    {
+        return;
+    }
+    //const auto& chunkContents = *chunk.contents;
+    for(const auto* cube : chunk.visibleCubes)
+    {
+        currentRenderData_.push_back({ regionId, chunk.chunkId, cube->cubeId, cube->cubeTextureId });
+    }
+}
+
 void VoxelRenderProgram::AddCube(const Cube& cube, ChunkId chunkId, RegionId regionId)
 {
-
-    currentRenderData_.push_back({regionId, chunkId, cube.cubeId, GenerateTextureId(cube.type)});
+    currentRenderData_.push_back({regionId, chunkId, cube.cubeId, cube.cubeTextureId});
 }
 
 void VoxelRenderProgram::SyncBuffers()
@@ -202,30 +218,5 @@ void VoxelRenderProgram::SetCurrentCamera(const Camera3D& camera)
     currentCamera3D_ = camera;
 }
 
-CubeTextureId GenerateTextureId(CubeType cubeType)
-{
-    switch (cubeType)
-    {
 
-        case CubeType::NONE:
-            break;
-        case CubeType::GRASS:
-            return (12u << 16u) | (3u << 8u) | 0u;
-        case CubeType::DESERT:
-            return (13u << 16u) | (3u << 8u) | 1u;
-        case CubeType::SNOW:
-            return (26u << 16u) | (3u << 8u) | 2u;
-        case CubeType::ROCK:
-            return (17u << 16u) | (17u << 8u) | 17u;
-        case CubeType::BRICK:
-            return (59u << 16u) | (59u << 8u) | 59u;
-        case CubeType::WOOD:
-            return (45u << 16u) | (45u << 8u) | 45u;
-        case CubeType::DIRT:
-            return (3u << 16u) | (3u << 8u) | 3u;
-        case CubeType::LENGTH:
-            break;
-    }
-    return 0;
-}
 }

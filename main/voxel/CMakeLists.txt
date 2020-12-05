@@ -5,8 +5,9 @@ add_library(voxel_lib STATIC ${src_files})
 target_link_libraries(voxel_lib PUBLIC Neko_Core sdl_engine gles3_wrapper)
 target_include_directories(voxel_lib PUBLIC include/)
 file(GLOB_RECURSE main_files main/*.cpp)
-
+set_target_properties (voxel_lib PROPERTIES FOLDER Neko/Main/Voxel)
 data_generate(voxel_lib)
+set_target_properties (voxel_lib_Generate_Data PROPERTIES FOLDER Neko/Main/Voxel)
 
 foreach(main_project_path ${main_files})
     get_filename_component(main_project_name ${main_project_path} NAME_WE)

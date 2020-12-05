@@ -137,7 +137,7 @@ void BasicEngine::Update(seconds dt)
 
         swapBufferJob = window_->GetSwapBufferJob();
         swapBufferJob->AddDependency(renderJob);
-        swapBufferJob->AddDependency(&updateJob);
+        //swapBufferJob->AddDependency(&updateJob);
 
         renderer_->ScheduleJobs();
         jobSystem_.ScheduleJob(swapBufferJob, JobThreadType::RENDER_THREAD);
@@ -146,6 +146,10 @@ void BasicEngine::Update(seconds dt)
     }
     jobSystem_.ScheduleJob(&eventJob, JobThreadType::MAIN_THREAD);
     jobSystem_.ScheduleJob(&updateJob, JobThreadType::MAIN_THREAD);
+#ifdef EASY_PROFILE_USE
+    EASY_END_BLOCK
+    EASY_BLOCK("Wainting for Swap Buffer");
+#endif
     if (swapBufferJob)
         swapBufferJob->Join();
 }

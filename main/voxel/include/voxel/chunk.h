@@ -1,12 +1,14 @@
 #pragma once
 
 #include <array>
+#include <memory>
+#include <vector>
+#include <memory>
 
 namespace neko::voxel
 {
 const size_t chunkSize = 32;
-const size_t regionHeight = 10;
-const size_t regionSize = 64;
+
 
 using CubeId = std::uint16_t;
 enum class CubeType : std::uint8_t
@@ -21,6 +23,9 @@ enum class CubeType : std::uint8_t
     DIRT,
     LENGTH,
 };
+using CubeTextureId = std::uint32_t;
+
+CubeTextureId GenerateTextureId(CubeType cubeType);
 struct Cube
 {
     enum CubeFlag : std::uint8_t
@@ -30,15 +35,16 @@ struct Cube
 
     };
 
-
-    std::uint8_t flag = NONE;
-    CubeType type = CubeType::NONE;
     /**
      * \brief Used to identify a cube position inside a chunk
      */
     CubeId cubeId = 0;
-};
+    std::uint8_t flag = NONE;
+    CubeTextureId cubeTextureId = 0u;
 
+};
+using ChunkContent = std::array<std::array<std::array<Cube, chunkSize>, chunkSize>, chunkSize>;
+using ChunkVisibleArray = std::vector<Cube*>;
 using ChunkId = std::uint16_t;
 struct Chunk
 {
@@ -47,15 +53,11 @@ struct Chunk
         NONE = 0u,
         IS_VISIBLE = 1u,
     };
-    std::array<std::array<std::array<Cube, chunkSize>, chunkSize>, chunkSize> contents{};
+    std::unique_ptr<ChunkContent> contents = nullptr;
+    ChunkVisibleArray visibleCubes;
     ChunkId chunkId = 0;
     std::uint8_t flag = NONE;
 };
 
-using RegionId = std::uint32_t;
-class Region
-{
-    //std::array<std::array<std::array<Chunk, regionHeight>, regionSize>, regionSize> contents{};
-    RegionId regionId = 0;
-};
+
 }

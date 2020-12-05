@@ -1,5 +1,6 @@
 #pragma once
 
+#include "region.h"
 #include "engine/system.h"
 #include "engine/component.h"
 #include "graphics/graphics.h"
@@ -11,9 +12,7 @@
 
 namespace neko::voxel
 {
-using CubeTextureId = std::uint32_t;
 
-CubeTextureId GenerateTextureId(CubeType cubeType);
 struct CubeRenderData
 {
     RegionId regionId = 0;
@@ -21,6 +20,7 @@ struct CubeRenderData
     CubeId cubeId = 0;
     CubeTextureId textureId = 0;
 };
+
 class VoxelRenderProgram :
         public SystemInterface,
         public RenderCommandInterface,
@@ -40,6 +40,8 @@ public:
     void Destroy() override;
 
     void Render() override;
+
+    void AddChunk(const Chunk& chunk, RegionId regionId = 0);
 
     void AddCube(const Cube& cube, ChunkId chunkId = 0, RegionId regionId = 0);
 
