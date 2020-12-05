@@ -53,9 +53,9 @@ struct Chunk
 };
 
 using RegionId = std::uint32_t;
-struct Region
+class Region
 {
-    std::array<std::array<std::array<Chunk, regionHeight>, regionSize>, regionSize> contents{};
+    //std::array<std::array<std::array<Chunk, regionHeight>, regionSize>, regionSize> contents{};
     RegionId regionId = 0;
 };
 }

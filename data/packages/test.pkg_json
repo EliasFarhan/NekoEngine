@@ -1,4 +1,4 @@
 {
   "name": "package_test",
-  "files": ["sprites/wall.jpg"]
+  "files": ["sprites/platform.jpg"]
 }
