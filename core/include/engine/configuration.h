@@ -20,7 +20,11 @@ struct Configuration
     std::uint8_t flags = VSYNC;
     unsigned int framerateLimit = 0u;
     std::string dataRootPath = "data/";
-
+    /**
+     * \brief Used when creating the JobSystem, 0 means std::thread::hardware_concurrency() - 1.
+     * Minimum requirement is 3
+     */
+    unsigned int workerNumber = 0u;
 };
 
 }

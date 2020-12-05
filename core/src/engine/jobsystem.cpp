@@ -128,7 +128,12 @@ void JobSystem::Work(JobQueue& jobQueue)
 void JobSystem::Init()
 {
     status_ = RUNNING;
-    numberOfWorkers = std::max(3u, std::thread::hardware_concurrency() - 1);
+    const auto& config = BasicEngine::GetInstance()->GetConfig();
+    const auto minWorkerNumber = 3u;
+    numberOfWorkers = config.workerNumber < minWorkerNumber ?
+            std::max(minWorkerNumber, std::thread::hardware_concurrency() - 1):
+            config.workerNumber;
+
     workers_.resize(numberOfWorkers);
 
     const size_t len = numberOfWorkers;

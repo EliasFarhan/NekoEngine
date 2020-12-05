@@ -52,6 +52,11 @@ def convert_to_ktx(img, img_out, meta_data):
         arg.append("-uastc_level")
         arg.append(str(uastc_level))
 
+    if "y_flip" in meta_data:
+        y_flip = meta_data["y_flip"]
+        if y_flip:
+            arg.append("-y_flip")
+
     if os.path.isfile(img_out):
         os.remove(img_out)
     

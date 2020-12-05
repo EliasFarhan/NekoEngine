@@ -30,21 +30,28 @@ namespace neko::sdl
 	{
 		switch (event.type)
 		{
-
-		case SDL_MOUSEMOTION:
-		{
-			mouseMotion_ = Vec2f(event.motion.xrel, event.motion.yrel) / mouseMotionRatio_;
-			break;
-		}
-		case SDL_FINGERDOWN:
-			break;
-		case SDL_FINGERUP:
-			break;
-		case SDL_FINGERMOTION:
-			break;
-		default:
-			break;
-		}
+		    case SDL_WINDOWEVENT:
+            {
+                if(event.window.event == SDL_WINDOWEVENT_RESIZED)
+                {
+                    SetAspect(event.window.data1, event.window.data2);
+                }
+                break;
+            }
+            case SDL_MOUSEMOTION:
+            {
+                mouseMotion_ = Vec2f(event.motion.xrel, event.motion.yrel) / mouseMotionRatio_;
+                break;
+            }
+            case SDL_FINGERDOWN:
+                break;
+            case SDL_FINGERUP:
+                break;
+            case SDL_FINGERMOTION:
+                break;
+            default:
+                break;
+            }
 	}
 
 	void Camera3D::Init()

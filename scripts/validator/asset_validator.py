@@ -80,7 +80,7 @@ def validate_asset(src="", out=""):
         if os.path.isfile(data_out + ".meta"):
             with open(data_out + ".meta", "r") as meta_file:
                 meta_content2 = json.load(meta_file)
-                meta_content = {**meta_content, **meta_content2}
+                meta_content = {**meta_content2, **meta_content}
 
     # Copy file except if meta files says no
     if "copy" in meta_content:

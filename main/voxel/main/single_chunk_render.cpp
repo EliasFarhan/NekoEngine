@@ -11,13 +11,13 @@
 #include "sdl_engine/sdl_camera.h"
 
 #include "voxel/chunk.h"
+#include "voxel/voxel_render_program.h"
 
 namespace neko::voxel
 {
 
 class SingleChunkManager :
         public SystemInterface,
-        public RenderCommandInterface,
         public sdl::SdlEventSystemInterface
 {
 public:
@@ -26,17 +26,7 @@ public:
         Job renderInit(
                 [this]()
                 {
-                    const auto& config = BasicEngine::GetInstance()->GetConfig();
-                    const auto& filesystem = BasicEngine::GetInstance()->GetFilesystem();
-                    chunkShader_.LoadFromFile(config.dataRootPath+"shaders/voxel/chunk.vert",
-                                              config.dataRootPath+"shaders/voxel/chunk.frag");
-                    chunkCube_.Init();
-                    chunkTexture_ = gl::CreateTextureFromKTX(config.dataRootPath+"sprites/tilesheet.png.ktx", filesystem);
-                    glBindTexture(GL_TEXTURE_2D, chunkTexture_);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+                    renderProgram_.Init();
                 });
         BasicEngine::GetInstance()->ScheduleJob(&renderInit, neko::JobThreadType::RENDER_THREAD);
 
@@ -48,22 +38,36 @@ public:
             {
                 for(size_t y = 0; y < chunkSize; y++)
                 {
-                    chunk_.chunkContents[z][x][y] = {std::uint8_t (Cube::CubeFlag::IS_VISIBLE),
-                                                     static_cast<Cube::CubeType>(neko::RandomRange(
+
+                    chunk_.contents[x][z][y] = {std::uint8_t (Cube::CubeFlag::IS_VISIBLE),
+                                                     static_cast<CubeType>(neko::RandomRange(
                             static_cast<std::uint8_t>(1u),
-                            static_cast<std::uint8_t>(Cube::CubeType::LENGTH)))
+                            static_cast<std::uint8_t>(CubeType::LENGTH))),
+                            CubeId(x*chunkSize*chunkSize+z*chunkSize+y)
                     };
                 }
             }
         }
 
         renderInit.Join();
+        RendererLocator::get().RegisterSyncBuffersFunction(&renderProgram_);
     }
 
     void Update(neko::seconds dt) override
     {
         camera3D_.Update(dt);
-        RendererLocator::get().Render(this);
+        for(const auto& zArray : chunk_.contents)
+        {
+            for(const auto& yArray : zArray)
+            {
+                for(const auto& cube : yArray)
+                {
+                    renderProgram_.AddCube(cube, 0,0);
+                }
+            }
+        }
+        renderProgram_.SetCurrentCamera(camera3D_);
+        RendererLocator::get().Render(&renderProgram_);
     }
 
     void Destroy() override
@@ -71,16 +75,10 @@ public:
         Job renderDestroy(
                 [this]()
                 {
-                    chunkShader_.Destroy();
-                    chunkCube_.Destroy();
+                    renderProgram_.Destroy();
                 });
         BasicEngine::GetInstance()->ScheduleJob(&renderDestroy, JobThreadType::RENDER_THREAD);
         renderDestroy.Join();
-    }
-
-    void Render() override
-    {
-
     }
 
     void OnEvent(const SDL_Event& event) override
@@ -89,11 +87,9 @@ public:
     }
 
 private:
+    VoxelRenderProgram renderProgram_;
     sdl::Camera3D camera3D_;
     Chunk chunk_;
-    gl::Shader chunkShader_;
-    gl::RenderCuboid chunkCube_{neko::Vec3f::zero, neko::Vec3f::one};
-    neko::TextureName chunkTexture_ = neko::INVALID_TEXTURE_NAME;
 };
 
 
@@ -109,6 +105,7 @@ int main([[maybe_unused]]int argc, [[maybe_unused]]char** argv)
 
     neko::voxel::SingleChunkManager chunkManager;
     engine.RegisterSystem(chunkManager);
+    engine.RegisterOnEvent(chunkManager);
 
     engine.Init();
     engine.EngineLoop();
