@@ -11,6 +11,8 @@
     "transcoder": {
       "type": "string",
       "enum": [ "undefined", "bc1", "bc3", "bc4", "bc5", "bc7", "etc1", "etc2" ]
-    }
+    },
+    "y_flip": {"type": "boolean"},
+    "q": {"type": "number"}
   }
 }

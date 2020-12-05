@@ -11,7 +11,7 @@ const size_t regionSize = 64;
 using CubeId = std::uint16_t;
 enum class CubeType : std::uint8_t
 {
-    NONE,
+    NONE = 0u,
     GRASS,
     DESERT,
     SNOW,

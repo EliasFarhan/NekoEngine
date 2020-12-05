@@ -7,11 +7,18 @@
 #include "mathematics/vector.h"
 #include "engine/engine.h"
 
+#ifdef EASY_PROFILE_USE
+#include <easy/profiler.h>
+#endif
+
 namespace neko::voxel
 {
 
 void VoxelRenderProgram::Init()
 {
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("Voxel Init");
+#endif
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
 
@@ -41,19 +48,19 @@ void VoxelRenderProgram::Init()
     Vertex vertices[cubeVerticesNmb] =
             {
                     //Right face
-                    {Vec3f(0.5f, 0.5f, 0.5f),    Vec2f(1.0f, 0.0f),Vertex::SIDE},
-                    {Vec3f(0.5f, -0.5f, -0.5f),  Vec2f(0.0f, 1.0f),Vertex::SIDE},
-                    {Vec3f(0.5f, 0.5f, -0.5f),   Vec2f(1.0f, 1.0f),Vertex::SIDE},
-                    {Vec3f(0.5f, -0.5f, -0.5f),  Vec2f(0.0f, 1.0f),Vertex::SIDE},
-                    {Vec3f(0.5f, 0.5f, 0.5f),    Vec2f(1.0f, 0.0f),Vertex::SIDE},
-                    {Vec3f(0.5f, -0.5f, 0.5f),   Vec2f(0.0f, 0.0f),Vertex::SIDE},
+                    {Vec3f(0.5f, 0.5f, 0.5f),    Vec2f(1.0f, 1.0f),Vertex::SIDE},
+                    {Vec3f(0.5f, -0.5f, -0.5f),  Vec2f(0.0f, 0.0f),Vertex::SIDE},
+                    {Vec3f(0.5f, 0.5f, -0.5f),   Vec2f(0.0f, 1.0f),Vertex::SIDE},
+                    {Vec3f(0.5f, -0.5f, -0.5f),  Vec2f(0.0f, 0.0f),Vertex::SIDE},
+                    {Vec3f(0.5f, 0.5f, 0.5f),    Vec2f(1.0f, 1.0f),Vertex::SIDE},
+                    {Vec3f(0.5f, -0.5f, 0.5f),   Vec2f(1.0f, 0.0f),Vertex::SIDE},
                     //Left face                 
-                    {Vec3f(-0.5f, 0.5f, 0.5f),   Vec2f(1.0f, 0.0f),Vertex::SIDE},
-                    {Vec3f(-0.5f, 0.5f, -0.5f),  Vec2f(1.0f, 1.0f),Vertex::SIDE},
-                    {Vec3f(-0.5f, -0.5f, -0.5f), Vec2f(0.0f, 1.0f),Vertex::SIDE},
-                    {Vec3f(-0.5f, -0.5f, -0.5f), Vec2f(0.0f, 1.0f),Vertex::SIDE},
-                    {Vec3f(-0.5f, -0.5f, 0.5f),  Vec2f(0.0f, 0.0f),Vertex::SIDE},
-                    {Vec3f(-0.5f, 0.5f, 0.5f),   Vec2f(1.0f, 0.0f),Vertex::SIDE},
+                    {Vec3f(-0.5f, 0.5f, 0.5f),   Vec2f(1.0f, 1.0f),Vertex::SIDE},
+                    {Vec3f(-0.5f, 0.5f, -0.5f),  Vec2f(0.0f, 1.0f),Vertex::SIDE},
+                    {Vec3f(-0.5f, -0.5f, -0.5f), Vec2f(0.0f, 0.0f),Vertex::SIDE},
+                    {Vec3f(-0.5f, -0.5f, -0.5f), Vec2f(0.0f, 0.0f),Vertex::SIDE},
+                    {Vec3f(-0.5f, -0.5f, 0.5f),  Vec2f(1.0f, 0.0f),Vertex::SIDE},
+                    {Vec3f(-0.5f, 0.5f, 0.5f),   Vec2f(1.0f, 1.0f),Vertex::SIDE},
                     //Top face                  
                     {Vec3f(-0.5f, 0.5f, -0.5f),  Vec2f(0.0f, 1.0f),Vertex::TOP},
                     {Vec3f(0.5f, 0.5f, 0.5f),    Vec2f(1.0f, 0.0f),Vertex::TOP},
@@ -141,6 +148,9 @@ void VoxelRenderProgram::Destroy()
 
 void VoxelRenderProgram::Render()
 {
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("Voxel Render");
+#endif
     cubeShader_.Bind();
     cubeShader_.SetTexture("tilesheet", tilesheetTexture_);
     // set view and proj matrix
@@ -148,6 +158,9 @@ void VoxelRenderProgram::Render()
     cubeShader_.SetMat4("proj", camera3D_.GenerateProjectionMatrix());
     for (size_t chunk = 0; chunk < renderData_.size() / instanceChunkSize_ + 1; chunk++)
     {
+#ifdef EASY_PROFILE_USE
+        EASY_BLOCK("Chunk Render");
+#endif
         const size_t chunkBeginIndex = chunk * instanceChunkSize_ ;
         const size_t chunkEndIndex = std::min(renderData_.size() , (chunk + 1) * instanceChunkSize_ );
         if (chunkEndIndex > chunkBeginIndex)
@@ -166,11 +179,14 @@ void VoxelRenderProgram::Render()
 void VoxelRenderProgram::AddCube(const Cube& cube, ChunkId chunkId, RegionId regionId)
 {
 
-    currentRenderData_.push_back({regionId, chunkId, cube.cubeId});
+    currentRenderData_.push_back({regionId, chunkId, cube.cubeId, GenerateTextureId(cube.type)});
 }
 
 void VoxelRenderProgram::SyncBuffers()
 {
+#ifdef EASY_PROFILE_USE
+    EASY_BLOCK("Voxel Sync Buffer");
+#endif
     std::swap(renderData_, currentRenderData_);
     std::swap(camera3D_, currentCamera3D_);
     currentRenderData_.clear();
@@ -194,19 +210,19 @@ CubeTextureId GenerateTextureId(CubeType cubeType)
         case CubeType::NONE:
             break;
         case CubeType::GRASS:
-            break;
+            return (12u << 16u) | (3u << 8u) | 0u;
         case CubeType::DESERT:
-            break;
+            return (13u << 16u) | (3u << 8u) | 1u;
         case CubeType::SNOW:
-            break;
+            return (26u << 16u) | (3u << 8u) | 2u;
         case CubeType::ROCK:
-            break;
+            return (17u << 16u) | (17u << 8u) | 17u;
         case CubeType::BRICK:
-            break;
+            return (59u << 16u) | (59u << 8u) | 59u;
         case CubeType::WOOD:
-            break;
+            return (45u << 16u) | (45u << 8u) | 45u;
         case CubeType::DIRT:
-            break;
+            return (3u << 16u) | (3u << 8u) | 3u;
         case CubeType::LENGTH:
             break;
     }

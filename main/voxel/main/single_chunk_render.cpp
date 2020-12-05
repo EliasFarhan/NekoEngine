@@ -41,8 +41,8 @@ public:
 
                     chunk_.contents[x][z][y] = {std::uint8_t (Cube::CubeFlag::IS_VISIBLE),
                                                      static_cast<CubeType>(neko::RandomRange(
-                            static_cast<std::uint8_t>(1u),
-                            static_cast<std::uint8_t>(CubeType::LENGTH))),
+                            static_cast<std::uint8_t>(CubeType::GRASS),
+                            static_cast<std::uint8_t>(CubeType::DIRT))),
                             CubeId(x*chunkSize*chunkSize+z*chunkSize+y)
                     };
                 }

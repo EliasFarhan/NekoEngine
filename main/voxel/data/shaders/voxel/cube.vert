@@ -51,14 +51,14 @@ void main()
         * vec4(aPos, 1.0);
     uint textureIndex =
         faceType == TopFace ? textureId >> 16u :
-        faceType == BottomFace ? (textureId >> 8u) % 256u :
-        textureId % 256u;
+        (faceType == BottomFace ? (textureId >> 8u) & 255u :
+        textureId & 255u);
 
-    uint tileY = textureIndex / tileNmbY;
-    uint tileX = textureIndex - tileY * tileNmbY;
+    uint tileY = textureIndex / tileNmbX;
+    uint tileX = textureIndex - tileY * tileNmbX;
     vec2 texCoord = vec2(
-    float(tileX) * tileSizeX,
-    1.0 - float(tileY) * tileSizeY - tileSizeY)
-    + aTexCoords * vec2(tileSizeX, tileSizeY);
+            float(tileX) * tileSizeX,
+            1.0 - float(tileY) * tileSizeY - tileSizeY)
+        + aTexCoords * vec2(tileSizeX, tileSizeY);
     TexCoord = texCoord;
 }

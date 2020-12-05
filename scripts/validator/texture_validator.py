@@ -57,6 +57,23 @@ def convert_to_ktx(img, img_out, meta_data):
         if y_flip:
             arg.append("-y_flip")
 
+    if "q" in meta_data:
+        q = meta_data["q"]
+    else:
+        q = 128
+        meta_data["q"] = q
+    arg.append("-q")
+    arg.append("{}".format(q))
+
+    if "comp_level" in meta_data:
+        comp_level = meta_data["comp_level"]
+    else:
+        comp_level = 1
+        meta_data["comp_level"] = comp_level
+    arg.append("-comp_level")
+    arg.append("{}".format(comp_level))
+
+
     if os.path.isfile(img_out):
         os.remove(img_out)
     
