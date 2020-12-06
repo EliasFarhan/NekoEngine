@@ -20,7 +20,8 @@ namespace neko::voxel
 
 class VoxelGame :
         public SystemInterface,
-        public sdl::SdlEventSystemInterface
+        public sdl::SdlEventSystemInterface,
+        public DrawImGuiInterface
 {
 public:
     void Init() override
@@ -31,14 +32,16 @@ public:
                     renderProgram_.Init();
                 });
         BasicEngine::GetInstance()->ScheduleJob(&renderInit, neko::JobThreadType::RENDER_THREAD);
-        camera3D_.position = Vec3f(0, 100, 0);
+        voxelManager_.Init();
+
+        const auto& config = BasicEngine::GetInstance()->GetConfig();
+        camera3D_.position = Vec3f(0, voxelManager_.GetInitialHeight() + 2.0f, 0);
         camera3D_.WorldLookAt(camera3D_.position + Vec3f::forward + Vec3f::right);
         camera3D_.farPlane = 5000.0f;
         camera3D_.cameraSpeed_ = 10.0f;
         camera3D_.cameraFast_ = 100.0f;
         camera3D_.fovY = degree_t(45.0f / 2.0f);
-
-        region_ = chunkGenerator_.GenerateRegion(0);
+        camera3D_.SetAspect(config.windowSize.x, config.windowSize.y);
 
         renderInit.Join();
         RendererLocator::get().RegisterSyncBuffersFunction(&renderProgram_);
@@ -49,14 +52,15 @@ public:
 #ifdef EASY_PROFILE_USE
         EASY_BLOCK("Update Region Manager");
 #endif
+        voxelManager_.Update(dt);
         camera3D_.Update(dt);
 #ifdef EASY_PROFILE_USE
         EASY_BLOCK("Push Chunks To Renderer");
 #endif
         for(const auto* chunk : voxelManager_.GetChunks())
         {
-            if(chunk.flag & Chunk::IS_VISIBLE)
-                renderProgram_.AddChunk(chunk);
+            if(chunk->flag & Chunk::IS_VISIBLE)
+                renderProgram_.AddChunk(*chunk);
 
         }
 #ifdef EASY_PROFILE_USE
@@ -82,6 +86,10 @@ public:
         camera3D_.OnEvent(event);
     }
 
+    void DrawImGui() override
+    {
+        renderProgram_.DrawImGui();
+    }
 private:
     VoxelRenderProgram renderProgram_;
     sdl::Camera3D camera3D_;
@@ -94,14 +102,19 @@ private:
 int main([[maybe_unused]]int argc, [[maybe_unused]]char** argv)
 {
     neko::Filesystem filesystem;
+    neko::Configuration config;
+    config.windowSize = neko::Vec2u(1280, 720);
+    config.workerNumber = 4;
+    config.flags = neko::Configuration::NONE;
     neko::sdl::Gles3Window window;
     neko::gl::Gles3Renderer renderer;
-    neko::sdl::SdlEngine engine(filesystem);
+    neko::sdl::SdlEngine engine(filesystem, config);
     engine.SetWindowAndRenderer(&window, &renderer);
 
     neko::voxel::VoxelGame chunkManager;
     engine.RegisterSystem(chunkManager);
     engine.RegisterOnEvent(chunkManager);
+    engine.RegisterOnDrawUi(chunkManager);
 
     engine.Init();
     engine.EngineLoop();

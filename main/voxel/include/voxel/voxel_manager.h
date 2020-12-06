@@ -8,6 +8,14 @@
 
 namespace neko::voxel
 {
+
+struct ChunkLoadingJob
+{
+    Job loadingJob;
+    ChunkId chunkId = 0;
+    RegionId regionId = 0;
+};
+
 class VoxelManager : public SystemInterface
 {
 public:
@@ -15,12 +23,16 @@ public:
     void Update(seconds dt) override;
     void Destroy() override;
 
-    [nodiscard] std::vector<Chunk*> GetChunks() const;
+    [[nodiscard]] const std::vector<const Chunk*>& GetChunks() const;
+    [[nodiscard]] float GetInitialHeight() const;
 
 private:
+    const int renderDistance_ = 10;
+    float initialHeight_ = 0.0f;
     ChunkGenerator chunkGenerator_;
-    std::vector<Chunk*> currentChunks_;
+    std::vector<const Chunk*> currentChunks_;
     std::vector<Region> regions_;
-    std::queue<Job> chunkLoadingQueue_;
+    std::queue<ChunkLoadingJob> chunkLoadingQueue_;
+    Job initJob{ []() {} };
 };
 }

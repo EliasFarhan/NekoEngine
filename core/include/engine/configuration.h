@@ -12,6 +12,7 @@ struct Configuration
 {
     enum Flags : std::uint8_t
     {
+        NONE = 0u,
         FULLSCREEN = 1u << 0u,
         VSYNC = 1u << 1u
     };

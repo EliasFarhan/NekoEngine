@@ -17,6 +17,7 @@ Chunk ChunkGenerator::GenerateChunk(RegionId regionId, ChunkId chunkId) const
 {
     Chunk newChunk;
     newChunk.chunkId = chunkId;
+    newChunk.flag = Chunk::IS_VISIBLE;
     const auto chunkX = chunkId / regionHeight / regionSize;
     const auto chunkZ = (chunkId - chunkX * regionHeight * regionSize) / regionHeight;
     const auto chunkY = chunkId % regionHeight;

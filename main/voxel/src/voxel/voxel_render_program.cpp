@@ -4,6 +4,9 @@
 
 #include <gl/texture.h>
 #include "voxel/voxel_render_program.h"
+
+#include <imgui.h>
+
 #include "mathematics/vector.h"
 #include "engine/engine.h"
 
@@ -210,7 +213,9 @@ void VoxelRenderProgram::SyncBuffers()
 
 void VoxelRenderProgram::DrawImGui()
 {
-
+    ImGui::Begin("Voxel Render Program");
+    ImGui::Text("Cubes: %u", renderData_.size());
+    ImGui::End();
 }
 
 void VoxelRenderProgram::SetCurrentCamera(const Camera3D& camera)
