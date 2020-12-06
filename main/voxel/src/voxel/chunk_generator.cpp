@@ -19,6 +19,7 @@ Region ChunkGenerator::GenerateRegion(RegionId regionId) const
     const double maxHeight = regionHeight * chunkSize;
     const std::int32_t octave = 5;
     const double scale = 4.0;
+    const double elevetionPow = 5.0;
     const int regionWidth = regionSize * chunkSize;
     const auto regionWidthFloat = static_cast<double>(regionWidth);
 
@@ -37,7 +38,9 @@ Region ChunkGenerator::GenerateRegion(RegionId regionId) const
                     / regionWidthFloat * scale;
 
 
-            const auto height = perlinNoise_.normalizedOctaveNoise2D_0_1(voxelX, voxelZ, octave);
+            const auto height = pow(
+                    perlinNoise_.normalizedOctaveNoise2D_0_1(voxelX, voxelZ, octave),
+                    elevetionPow);
             heightMap[x][z] = static_cast<size_t>(maxHeight * height);
             
         }

@@ -43,6 +43,8 @@ struct Cube
     CubeTextureId cubeTextureId = 0u;
 
 };
+
+
 using ChunkContent = std::array<std::array<std::array<Cube, chunkSize>, chunkSize>, chunkSize>;
 using ChunkVisibleArray = std::vector<Cube*>;
 using ChunkId = std::uint16_t;

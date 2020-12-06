@@ -32,6 +32,8 @@ public:
 
         camera3D_.Init();
 
+        chunk_.flag = Chunk::IS_VISIBLE;
+        chunk_.contents = std::make_unique<ChunkContent>();
         for(size_t z = 0; z < chunkSize; z++)
         {
             for(size_t x = 0; x < chunkSize; x++)
@@ -39,12 +41,16 @@ public:
                 for(size_t y = 0; y < chunkSize; y++)
                 {
 
-                    chunk_.contents[x][z][y] = {std::uint8_t (Cube::CubeFlag::IS_VISIBLE),
-                                                     static_cast<CubeType>(neko::RandomRange(
+                    auto textureId = GenerateTextureId(static_cast<CubeType>(neko::RandomRange(
                             static_cast<std::uint16_t>(CubeType::GRASS),
-                            static_cast<std::uint16_t>(CubeType::DIRT))),
-                            CubeId(x*chunkSize*chunkSize+z*chunkSize+y)
+                            static_cast<std::uint16_t>(CubeType::DIRT))));
+                    auto& cube = (*chunk_.contents)[x][z][y];
+                    cube = {
+                        CubeId(x*chunkSize*chunkSize+z*chunkSize+y),
+                        std::uint8_t (Cube::CubeFlag::IS_VISIBLE),
+                        textureId
                     };
+                    chunk_.visibleCubes.push_back(&cube);
                 }
             }
         }
@@ -56,7 +62,7 @@ public:
     void Update(neko::seconds dt) override
     {
         camera3D_.Update(dt);
-        for(const auto& zArray : chunk_.contents)
+        for(const auto& zArray : (*chunk_.contents))
         {
             for(const auto& yArray : zArray)
             {

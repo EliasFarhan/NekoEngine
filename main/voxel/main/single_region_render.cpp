@@ -36,7 +36,9 @@ public:
         BasicEngine::GetInstance()->ScheduleJob(&renderInit, neko::JobThreadType::RENDER_THREAD);
         camera3D_.position = Vec3f(0, 300, 0);
         camera3D_.WorldLookAt(camera3D_.position + Vec3f::forward + Vec3f::right);
-        camera3D_.farPlane = 1000.0f;
+        camera3D_.farPlane = 5000.0f;
+        camera3D_.cameraSpeed_ = 10.0f;
+        camera3D_.cameraFast_ = 100.0f;
 
         region_ = chunkGenerator_.GenerateRegion(0);
 

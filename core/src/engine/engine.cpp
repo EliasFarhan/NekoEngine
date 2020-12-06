@@ -148,7 +148,7 @@ void BasicEngine::Update(seconds dt)
     jobSystem_.ScheduleJob(&updateJob, JobThreadType::MAIN_THREAD);
 #ifdef EASY_PROFILE_USE
     EASY_END_BLOCK
-    EASY_BLOCK("Wainting for Swap Buffer");
+    EASY_BLOCK("Waiting for Swap Buffer");
 #endif
     if (swapBufferJob)
         swapBufferJob->Join();
