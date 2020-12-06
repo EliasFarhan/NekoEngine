@@ -2,7 +2,7 @@
 
 namespace neko::net
 {
-RdtEngine::RdtEngine(Configuration* config) : SdlEngine(config)
+RdtEngine::RdtEngine(FilesystemInterface& filesystem) : SdlEngine(filesystem)
 {
     RegisterSystem(sampleBrowser_);
     RegisterOnDrawUi(sampleBrowser_);

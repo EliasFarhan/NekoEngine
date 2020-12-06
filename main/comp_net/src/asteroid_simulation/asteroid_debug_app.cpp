@@ -47,7 +47,7 @@ void SimulationDebugApp::Init()
         {
             quad_.Init();
             //client shader init
-            const auto& config = BasicEngine::GetInstance()->config;
+            const auto& config = BasicEngine::GetInstance()->GetConfig();
             clientShader_.LoadFromFile(config.dataRootPath + "shaders/comp_net/client.vert",
                 config.dataRootPath + "shaders/comp_net/client.frag");
             windowSize_ = config.windowSize;
@@ -122,7 +122,7 @@ void SimulationDebugApp::DrawImGui()
 
 void SimulationDebugApp::Render()
 {
-    const auto& config = BasicEngine::GetInstance()->config;
+    const auto& config = BasicEngine::GetInstance()->GetConfig();
     if (config.windowSize != windowSize_)
     {
         logDebug(fmt::format(

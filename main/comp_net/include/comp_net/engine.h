@@ -8,7 +8,7 @@ namespace neko::net
 class RdtEngine : public sdl::SdlEngine
 {
 public:
-    explicit RdtEngine(Configuration* config = nullptr);
+    explicit RdtEngine(FilesystemInterface& filesystem);
 
     void Destroy() override;
 

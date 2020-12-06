@@ -76,7 +76,7 @@ void PerlinViewer::ReloadTexture()
         {
             const float x = float(i) / textureSize_ * currentScale_;
             const float y = float(j) / textureSize_ * currentScale_;
-            perlinValues_[i][j] = float(perlinNoise.octaveNoise(x, y, currentOctave_)) / 2.0f + 0.5f;
+            perlinValues_[i][j] = float(perlinNoise.normalizedOctaveNoise2D_0_1(x, y, currentOctave_));
         }
     }
     glGenTextures(1, &perlinTexture_);

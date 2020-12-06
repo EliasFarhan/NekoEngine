@@ -1,7 +1,7 @@
 
 file(GLOB_RECURSE src_files include/*.h src/*.cpp)
-
-add_library(voxel_lib STATIC ${src_files})
+file(GLOB_RECURSE shader_files data/shaders/*.vert data/shaders/*.frag)
+add_library(voxel_lib STATIC ${src_files} ${shader_files})
 target_link_libraries(voxel_lib PUBLIC Neko_Core sdl_engine gles3_wrapper)
 target_include_directories(voxel_lib PUBLIC include/)
 file(GLOB_RECURSE main_files main/*.cpp)

@@ -38,19 +38,19 @@ mat4 translate(float x, float y, float z) {
 void main()
 {
     // TODO add region position calculation
-    // TODO add chunk position calculation
+    // chunk position calculation
     uint chunkY = chunkId % regionHeight;
     uint chunkX = chunkId / regionHeight / regionSize;
     uint chunkZ = (chunkId - chunkX * regionHeight * regionSize) / regionHeight;
     float chunkLength = float(chunkSize);
-
+    // cube position calculation
     uint cubeY = cubeId % chunkSize;
     uint cubeX = cubeId / chunkSize / chunkSize;
     uint cubeZ = (cubeId - cubeX * chunkSize * chunkSize) / chunkSize;
     vec3 worldPos = vec3( 
-        float(cubeX) + float(chunkX) * chunkLength,
-        float(cubeY) + float(chunkY) * chunkLength,
-        float(cubeZ) + float(chunkZ) * chunkLength);
+        float(cubeX) + float(chunkX) * chunkLength - float(regionSize) / 2.0 * chunkLength,
+        float(cubeY) + float(chunkY) * chunkLength - float(regionHeight) / 2.0 * chunkLength,
+        float(cubeZ) + float(chunkZ) * chunkLength - float(regionSize) / 2.0 * chunkLength);
 
     gl_Position = proj * view * translate(worldPos.x, worldPos.y, worldPos.z)
         * vec4(aPos, 1.0);

@@ -38,7 +38,7 @@ public:
     {
         Job initJob = Job([this]()
             {
-                const auto& config = BasicEngine::GetInstance()->config;
+                const auto& config = BasicEngine::GetInstance()->GetConfig();
                 windowSize_ = config.windowSize;
                 client_.SetWindowSize(windowSize_);
                 client_.Init();
@@ -52,7 +52,7 @@ public:
 
     void Update(seconds dt) override
     {
-        const auto& config = BasicEngine::GetInstance()->config;
+        const auto& config = BasicEngine::GetInstance()->GetConfig();
         if (windowSize_ != config.windowSize)
         {
             client_.SetWindowSize(config.windowSize);
@@ -91,7 +91,7 @@ private:
 class ClientEngine : public sdl::SdlEngine
 {
 public:
-    explicit ClientEngine(Configuration* config = nullptr) : sdl::SdlEngine(config)
+    explicit ClientEngine(FilesystemInterface& filesystem) : sdl::SdlEngine(filesystem)
     {
         RegisterOnDrawUi(app_);
         RegisterSystem(app_);
@@ -103,7 +103,8 @@ private:
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 {
-    neko::asteroid::ClientEngine engine;
+    neko::Filesystem filesystem;
+    neko::asteroid::ClientEngine engine(filesystem);
 
     neko::sdl::Gles3Window window;
     neko::gl::Gles3Renderer renderer;

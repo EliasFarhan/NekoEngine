@@ -49,4 +49,24 @@ void Region::GenerateFromHeightMap(const HeightMap& map)
         }
     }
 }
+
+void Region::SetChunk(const ChunkId chunkId, Chunk&& chunk)
+{
+    chunks_[chunkId] = std::move(chunk);
+}
+
+const Chunk* Region::GetChunk(ChunkId chunkId)
+{
+    return &chunks_[chunkId];
+}
+
+Vec2df Region::GetRegionPos(RegionId regionId)
+{
+    return Vec2df();
+}
+
+ChunkId Region::GetChunkId(size_t chunkX, size_t chunkZ, size_t chunkY)
+{
+    return chunkX * regionHeight * regionSize + chunkZ * regionHeight + chunkY;
+}
 }
