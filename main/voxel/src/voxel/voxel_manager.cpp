@@ -40,9 +40,9 @@ void VoxelManager::Init()
 
                     auto minHeight = height;
                     auto maxHeight = height;
-                    for (unsigned int cubeDx = 0; cubeDx < chunkSize; cubeDx+=3u)
+                    for (unsigned int cubeDx = 0; cubeDx < chunkSize; cubeDx++)
                     {
-                        for (unsigned int cubeDz = 0; cubeDz < chunkSize; cubeDz+=3u)
+                        for (unsigned int cubeDz = 0; cubeDz < chunkSize; cubeDz++)
                         {
                             const auto tmpHeight = chunkGenerator_.GetHeight(0, cubePos + Vec2u(cubeDx, cubeDz));
                             if (tmpHeight > maxHeight)

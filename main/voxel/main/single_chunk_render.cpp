@@ -17,37 +17,38 @@ namespace neko::voxel
 {
 
 class SingleChunkManager :
-        public SystemInterface,
-        public sdl::SdlEventSystemInterface
+    public SystemInterface,
+    public sdl::SdlEventSystemInterface
 {
 public:
     void Init() override
     {
         Job renderInit(
-                [this]()
-                {
-                    renderProgram_.Init();
-                });
+            [this]()
+            {
+                renderProgram_.Init();
+            });
         BasicEngine::GetInstance()->ScheduleJob(&renderInit, neko::JobThreadType::RENDER_THREAD);
 
         camera3D_.Init();
+        camera3D_.farPlane = 3000.0f;
 
         chunk_.flag = Chunk::IS_VISIBLE;
         chunk_.contents = std::make_unique<ChunkContent>();
-        for(size_t z = 0; z < chunkSize; z++)
+        chunk_.chunkId = regionSize / 2u * regionHeight * regionSize + regionHeight * regionSize / 2u + regionHeight / 2u;
+        for (size_t z = 0; z < chunkSize; z++)
         {
-            for(size_t x = 0; x < chunkSize; x++)
+            for (size_t x = 0; x < chunkSize; x++)
             {
-                for(size_t y = 0; y < chunkSize; y++)
+                for (size_t y = 0; y < chunkSize; y++)
                 {
-
-                    auto textureId = GenerateTextureId(static_cast<CubeType>(neko::RandomRange(
-                            static_cast<std::uint16_t>(CubeType::GRASS),
-                            static_cast<std::uint16_t>(CubeType::DIRT))));
+                    const auto textureId = GenerateTextureId(static_cast<CubeType>(neko::RandomRange(
+                        static_cast<std::uint16_t>(CubeType::GRASS),
+                        static_cast<std::uint16_t>(CubeType::DIRT))));
                     auto& cube = (*chunk_.contents)[x][z][y];
                     cube = {
-                        CubeId(x*chunkSize*chunkSize+z*chunkSize+y),
-                        std::uint8_t (Cube::CubeFlag::IS_VISIBLE),
+                        CubeId(x * chunkSize * chunkSize + z * chunkSize + y),
+                        std::uint8_t(Cube::CubeFlag::IS_VISIBLE),
                         textureId
                     };
                     chunk_.visibleCubes.push_back(&cube);
@@ -62,16 +63,7 @@ public:
     void Update(neko::seconds dt) override
     {
         camera3D_.Update(dt);
-        for(const auto& zArray : (*chunk_.contents))
-        {
-            for(const auto& yArray : zArray)
-            {
-                for(const auto& cube : yArray)
-                {
-                    renderProgram_.AddCube(cube, 0,0);
-                }
-            }
-        }
+        renderProgram_.AddChunk(chunk_, 0);
         renderProgram_.SetCurrentCamera(camera3D_);
         RendererLocator::get().Render(&renderProgram_);
     }
@@ -79,10 +71,10 @@ public:
     void Destroy() override
     {
         Job renderDestroy(
-                [this]()
-                {
-                    renderProgram_.Destroy();
-                });
+            [this]()
+            {
+                renderProgram_.Destroy();
+            });
         BasicEngine::GetInstance()->ScheduleJob(&renderDestroy, JobThreadType::RENDER_THREAD);
         renderDestroy.Join();
     }
@@ -101,7 +93,7 @@ private:
 
 }
 
-int main([[maybe_unused]]int argc, [[maybe_unused]]char** argv)
+int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 {
     neko::Filesystem filesystem;
     neko::sdl::Gles3Window window;
