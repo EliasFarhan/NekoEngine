@@ -53,6 +53,7 @@ void Region::GenerateFromHeightMap(const HeightMap& map)
 void Region::SetChunk(const ChunkId chunkId, Chunk&& chunk)
 {
     chunks_[chunkId] = std::move(chunk);
+    chunks_[chunkId].flag = Chunk::IS_VISIBLE;
 }
 
 const Chunk* Region::GetChunk(ChunkId chunkId)

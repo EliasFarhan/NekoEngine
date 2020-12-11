@@ -17,7 +17,7 @@ public:
 private:
     siv::PerlinNoise perlinNoise_{};
     static constexpr std::int32_t octave = 5;
-    static constexpr double scale = 5.0;
+    static constexpr double scale = 10.0;
     static constexpr double elevetionPow = 5.0;
     static constexpr double maxHeight = regionHeight * chunkSize;
     static constexpr int regionWidth = regionSize * chunkSize;

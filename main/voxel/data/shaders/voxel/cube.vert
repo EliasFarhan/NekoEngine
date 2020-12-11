@@ -10,7 +10,7 @@ layout(location = 5) in uint cubeId;
 layout(location = 6) in uint textureId;
 
 const uint regionSize = 64u;
-const uint regionHeight = 10u;
+const uint regionHeight = 16u;
 const uint chunkSize = 32u;
 
 const uint TopFace = 1u;

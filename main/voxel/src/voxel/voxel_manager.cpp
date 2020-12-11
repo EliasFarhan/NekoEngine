@@ -13,16 +13,17 @@ void VoxelManager::Init()
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("Init Voxel Manager");
 #endif
-    regions_.push_back({});
+    regions_.emplace_back();
     auto& region = regions_.front();
-    region.Init();
-
     const auto chunkX = regionSize / 2;
     const auto chunkZ = regionSize / 2;
-    const Vec2u cubePos(chunkX * chunkSize, chunkZ * chunkSize);
-    const auto height = chunkGenerator_.GetHeight(0, cubePos);
-    initialHeight_ = float(height) - float(regionHeight / 2 * chunkSize);
+    region.Init();
+    {
 
+        const Vec2u cubePos(chunkX * chunkSize, chunkZ * chunkSize);
+        const auto height = chunkGenerator_.GetHeight(0, cubePos);
+        initialHeight_ = float(height) - float(regionHeight / 2 * chunkSize);
+    }
     initJob = Job([this, chunkX, chunkZ]()
         {
 #ifdef EASY_PROFILE_USE
