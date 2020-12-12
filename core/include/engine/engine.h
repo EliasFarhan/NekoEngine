@@ -74,6 +74,9 @@ public:
     static BasicEngine* GetInstance(){return instance_;}
 
     void ScheduleJob(Job* job, JobThreadType threadType);
+
+    [[nodiscard]] std::uint8_t GetWorkersNumber() const { return jobSystem_.GetWorkersNumber(); }
+
     //template <typename T = BasicEngine>
     //static T* GetInstance(){ return dynamic_cast<T*>(instance_);};
 protected:

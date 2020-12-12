@@ -43,8 +43,8 @@ struct Cube
     CubeId cubeId = 0;
     std::uint8_t flag = NONE;
     CubeTextureId cubeTextureId = 0u;
-    static [[nodiscard]] Vec3b CalculateCubePosition(CubeId cubeId);
-    static [[nodiscard]] CubeId CalculateCubeId(Vec3b cubePosition);
+    [[nodiscard]] static Vec3b CalculateCubePosition(CubeId cubeId);
+    [[nodiscard]] static CubeId CalculateCubeId(Vec3b cubePosition);
 };
 
 

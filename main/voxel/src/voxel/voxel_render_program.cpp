@@ -210,12 +210,27 @@ void VoxelRenderProgram::AddChunk(const Chunk& chunk, RegionId regionId)
     {
         return;
     }
-    //const auto& chunkContents = *chunk.contents;
+
+    const auto chunkY = chunk.chunkId % regionHeight;
+    const auto chunkX = chunk.chunkId / regionHeight / regionSize;
+    const auto chunkZ = (chunk.chunkId - chunkX * regionHeight * regionSize) / regionHeight;
+    const float chunkLength = float(chunkSize);
+    const Vec3f chunkPos = Vec3f(
+            float(chunkX) * chunkLength - float(regionSize) * 0.5f * chunkLength,
+            float(chunkY) * chunkLength - float(regionHeight) * 0.5f * chunkLength,
+            float(chunkZ) * chunkLength - float(regionSize) * 0.5f * chunkLength);
+    if(!frustum_.Contains(chunkPos, regionId))
+    {
+        return;
+    }
     for(const auto cubeId : chunk.visibleCubes)
     {
         const auto cubePosition = Cube::CalculateCubePosition(cubeId);
         const auto& cube = (*chunk.contents)[cubePosition.x][cubePosition.z][cubePosition.y];
-        currentRenderData_.push_back({ regionId, chunk.chunkId, cubeId, cube.cubeTextureId });
+        if(frustum_.Contains(cube, chunkPos, regionId))
+        {
+            currentRenderData_.push_back({ regionId, chunk.chunkId, cubeId, cube.cubeTextureId });
+        };
     }
 }
 
@@ -244,6 +259,7 @@ void VoxelRenderProgram::DrawImGui()
 void VoxelRenderProgram::SetCurrentCamera(const Camera3D& camera)
 {
     currentCamera3D_ = camera;
+    frustum_.SetCamera(camera);
 }
 
 

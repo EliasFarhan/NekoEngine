@@ -124,7 +124,7 @@ public:
     void Update([[maybe_unused]]seconds dt) override{}
 
     void Destroy() override;
-
+    [[nodiscard]] std::uint8_t GetWorkersNumber() const { return numberOfWorkers; }
 private:
 	void Work(JobQueue& jobQueue);
 

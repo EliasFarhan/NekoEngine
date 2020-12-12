@@ -63,4 +63,26 @@ typename std::enable_if<std::is_floating_point<T>::value, T>::type RandomRange(T
     std::uniform_real_distribution<T> dis(start, end);
     return dis(gen);
 }
+template<typename T>
+T constexpr SqrtNewtonRaphson(T x, T curr, T prev)
+{
+    return curr == prev
+           ? curr
+           : SqrtNewtonRaphson<T>(x, (curr + x / curr) * 0.5, curr);
+}
+
+
+/*
+* Constexpr version of the square root
+* Return value:
+*   - For a finite and non-negative value of "x", returns an approximation for the square root of "x"
+*   - Otherwise, returns NaN
+*/
+template<typename T>
+T constexpr Sqrt(T x)
+{
+    return x >= 0 && x < std::numeric_limits<T>::infinity()
+           ? SqrtNewtonRaphson<T>(x, x, 0)
+           : std::numeric_limits<T>::quiet_NaN();
+}
 }

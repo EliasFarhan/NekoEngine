@@ -9,6 +9,7 @@
 #include "gl/gles3_include.h"
 #include "gl/shader.h"
 #include "graphics/camera.h"
+#include "voxel/frustum.h"
 
 namespace neko::voxel
 {
@@ -52,6 +53,11 @@ public:
     void SetCurrentCamera(const Camera3D& camera);
 
 private:
+    Camera3D currentCamera3D_;
+    Camera3D camera3D_;
+    Frustum frustum_;
+    std::vector<CubeRenderData> currentRenderData_;
+    std::vector<CubeRenderData> renderData_;
     gl::Shader cubeShader_;
     gl::Shader skyboxShader_;
     GLuint tilesheetTexture_ = 0;
@@ -60,9 +66,6 @@ private:
     GLuint instanceVbo_ = 0;
     size_t instanceChunkSize_ = 32768;
     static constexpr size_t cubeVerticesNmb = 36;
-    std::vector<CubeRenderData> currentRenderData_;
-    std::vector<CubeRenderData> renderData_;
-    Camera3D currentCamera3D_;
-    Camera3D camera3D_;
+
 };
 }

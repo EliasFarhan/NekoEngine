@@ -24,7 +24,8 @@ void VoxelManager::Init()
         const auto height = chunkGenerator_.GetHeight(0, cubePos);
         initialHeight_ = float(height) - float(regionHeight / 2 * chunkSize);
     }
-    initJob = Job([this, chunkX, chunkZ]()
+    const auto workerNumber = BasicEngine::GetInstance()->GetWorkersNumber();
+    initJob = Job([this, chunkX, chunkZ, workerNumber]()
         {
 #ifdef EASY_PROFILE_USE
             EASY_BLOCK("Init Job Voxel Manager");
@@ -70,9 +71,10 @@ void VoxelManager::Init()
                             regions_.front().SetChunk(chunkId, chunkGenerator_.GenerateChunk(0, chunkId));
                         } }, chunkId, 0 });
 
-                        BasicEngine::GetInstance()->ScheduleJob(&chunkLoadingQueue_.back().loadingJob, chunkId & 1u ? 
-                            JobThreadType::OTHER_THREAD : 
-                            JobThreadType::RESOURCE_THREAD);
+                        BasicEngine::GetInstance()->ScheduleJob(&chunkLoadingQueue_.back().loadingJob,
+                                                            chunkId % workerNumber == 0 ?
+                                                            JobThreadType::RESOURCE_THREAD:
+                                                            JobThreadType::OTHER_THREAD);
                     }
                 }
             }

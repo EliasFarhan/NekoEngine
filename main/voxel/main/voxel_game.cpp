@@ -54,6 +54,7 @@ public:
 #endif
         voxelManager_.Update(dt);
         camera3D_.Update(dt);
+        renderProgram_.SetCurrentCamera(camera3D_);
 #ifdef EASY_PROFILE_USE
         EASY_BLOCK("Push Chunks To Renderer");
 #endif
@@ -66,7 +67,6 @@ public:
 #ifdef EASY_PROFILE_USE
         EASY_END_BLOCK;
 #endif
-        renderProgram_.SetCurrentCamera(camera3D_);
         RendererLocator::get().Render(&renderProgram_);
     }
 
