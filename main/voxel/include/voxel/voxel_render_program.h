@@ -53,7 +53,9 @@ public:
 
 private:
     gl::Shader cubeShader_;
+    gl::Shader skyboxShader_;
     GLuint tilesheetTexture_ = 0;
+    GLuint skyboxTexture_ = 0;
     GLuint cubeVao_ = 0;
     GLuint instanceVbo_ = 0;
     size_t instanceChunkSize_ = 32768;

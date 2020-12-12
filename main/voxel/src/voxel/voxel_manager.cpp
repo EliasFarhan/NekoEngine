@@ -70,7 +70,9 @@ void VoxelManager::Init()
                             regions_.front().SetChunk(chunkId, chunkGenerator_.GenerateChunk(0, chunkId));
                         } }, chunkId, 0 });
 
-                        BasicEngine::GetInstance()->ScheduleJob(&chunkLoadingQueue_.back().loadingJob, JobThreadType::RESOURCE_THREAD);
+                        BasicEngine::GetInstance()->ScheduleJob(&chunkLoadingQueue_.back().loadingJob, chunkId & 1u ? 
+                            JobThreadType::OTHER_THREAD : 
+                            JobThreadType::RESOURCE_THREAD);
                     }
                 }
             }

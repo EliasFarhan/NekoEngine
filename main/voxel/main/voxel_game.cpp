@@ -104,7 +104,7 @@ int main([[maybe_unused]]int argc, [[maybe_unused]]char** argv)
     neko::Filesystem filesystem;
     neko::Configuration config;
     config.windowSize = neko::Vec2u(1280, 720);
-    config.workerNumber = 4;
+    //config.workerNumber = 3;
     config.flags = neko::Configuration::NONE;
     neko::sdl::Gles3Window window;
     neko::gl::Gles3Renderer renderer;

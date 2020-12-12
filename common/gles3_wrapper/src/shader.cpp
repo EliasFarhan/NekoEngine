@@ -64,6 +64,7 @@ void Shader::LoadFromFile(const std::string_view vertexShaderPath, const std::st
 void Shader::Bind() const
 {
     glUseProgram(shaderProgram_);
+    glCheckError();
 }
 
 GLuint Shader::GetProgram() const

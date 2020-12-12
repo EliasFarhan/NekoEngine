@@ -1,5 +1,7 @@
 #include "voxel/region.h"
 
+#include <mutex>
+
 #ifdef EASY_PROFILE_USE
 #include <easy/profiler.h>
 #endif
@@ -52,6 +54,8 @@ void Region::GenerateFromHeightMap(const HeightMap& map)
 
 void Region::SetChunk(const ChunkId chunkId, Chunk&& chunk)
 {
+    static std::mutex localMutex;
+    std::lock_guard<std::mutex> lock(localMutex);
     chunks_[chunkId] = std::move(chunk);
     chunks_[chunkId].flag = Chunk::IS_VISIBLE;
 }

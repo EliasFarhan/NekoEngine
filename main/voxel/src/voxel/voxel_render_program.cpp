@@ -28,12 +28,18 @@ void VoxelRenderProgram::Init()
     const auto& config = BasicEngine::GetInstance()->GetConfig();
     cubeShader_.LoadFromFile(config.dataRootPath+"shaders/voxel/cube.vert",
                              config.dataRootPath+"shaders/voxel/cube.frag");
+    skyboxShader_.LoadFromFile(
+        config.dataRootPath + "shaders/voxel/skybox.vert", 
+        config.dataRootPath + "shaders/voxel/skybox.frag");
     const auto& filesystem = BasicEngine::GetInstance()->GetFilesystem();
     tilesheetTexture_ = gl::CreateTextureFromKTX(config.dataRootPath+"sprites/tilesheet.png.ktx", filesystem);
     glBindTexture(GL_TEXTURE_2D, tilesheetTexture_);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    skyboxTexture_ = gl::CreateTextureFromKTX(config.dataRootPath + "skybox/skybox.skybox.ktx", filesystem);
 
     struct Vertex
     {
@@ -145,7 +151,9 @@ void VoxelRenderProgram::Destroy()
 {
     glDeleteVertexArrays(1, &cubeVao_);
     cubeShader_.Destroy();
+    skyboxShader_.Destroy();
     glDeleteTextures(1, &tilesheetTexture_);
+    glDeleteTextures(1, &skyboxTexture_);
 
 }
 
@@ -157,8 +165,10 @@ void VoxelRenderProgram::Render()
     cubeShader_.Bind();
     cubeShader_.SetTexture("tilesheet", tilesheetTexture_);
     // set view and proj matrix
-    cubeShader_.SetMat4("view", camera3D_.GenerateViewMatrix());
-    cubeShader_.SetMat4("proj", camera3D_.GenerateProjectionMatrix());
+    const auto view = camera3D_.GenerateViewMatrix();
+    const auto projection = camera3D_.GenerateProjectionMatrix();
+    cubeShader_.SetMat4("view", view);
+    cubeShader_.SetMat4("proj", projection);
     for (size_t chunk = 0; chunk < renderData_.size() / instanceChunkSize_ + 1; chunk++)
     {
 #ifdef EASY_PROFILE_USE
@@ -177,6 +187,17 @@ void VoxelRenderProgram::Render()
             glDrawArraysInstanced(GL_TRIANGLES, 0, cubeVerticesNmb, tmpChunkSize);
         }
     }
+    //Draw skybox
+    glDepthFunc(GL_LEQUAL);
+    glDisable(GL_CULL_FACE);
+    skyboxShader_.Bind();
+    skyboxShader_.SetMat4("view", Mat4f(view.ToMat3()));
+    skyboxShader_.SetMat4("projection", projection);
+    skyboxShader_.SetCubemap("skybox", skyboxTexture_, 1);
+    glBindVertexArray(cubeVao_);
+    glDrawArrays(GL_TRIANGLES, 0, cubeVerticesNmb);
+    glEnable(GL_CULL_FACE);
+    glDepthFunc(GL_LESS);
 }
 
 void VoxelRenderProgram::AddChunk(const Chunk& chunk, RegionId regionId)
