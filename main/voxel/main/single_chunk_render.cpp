@@ -47,11 +47,11 @@ public:
                         static_cast<std::uint16_t>(CubeType::DIRT))));
                     auto& cube = (*chunk_.contents)[x][z][y];
                     cube = {
-                        CubeId(x * chunkSize * chunkSize + z * chunkSize + y),
+                        Cube::CalculateCubeId(Vec3b(x,y,z)),
                         std::uint8_t(Cube::CubeFlag::IS_VISIBLE),
                         textureId
                     };
-                    chunk_.visibleCubes.push_back(&cube);
+                    chunk_.visibleCubes.push_back(cube.cubeId);
                 }
             }
         }

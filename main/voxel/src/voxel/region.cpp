@@ -44,8 +44,8 @@ void Region::GenerateFromHeightMap(const HeightMap& map)
             auto& cube = (*chunk.contents)[cubeX][cubeZ][cubeY];
             cube.flag = cube.flag | Cube::IS_VISIBLE;
             cube.cubeTextureId = GenerateTextureId(CubeType::GRASS);
-            cube.cubeId = cubeX * chunkSize * chunkSize + cubeZ * chunkSize + cubeY;
-            chunk.visibleCubes.push_back(&cube);
+            cube.cubeId = Cube::CalculateCubeId(Vec3b(cubeX, cubeY, cubeZ));
+            chunk.visibleCubes.push_back(cube.cubeId);
         }
     }
 }

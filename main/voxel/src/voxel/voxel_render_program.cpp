@@ -190,9 +190,11 @@ void VoxelRenderProgram::AddChunk(const Chunk& chunk, RegionId regionId)
         return;
     }
     //const auto& chunkContents = *chunk.contents;
-    for(const auto* cube : chunk.visibleCubes)
+    for(const auto cubeId : chunk.visibleCubes)
     {
-        currentRenderData_.push_back({ regionId, chunk.chunkId, cube->cubeId, cube->cubeTextureId });
+        const auto cubePosition = Cube::CalculateCubePosition(cubeId);
+        const auto& cube = (*chunk.contents)[cubePosition.x][cubePosition.z][cubePosition.y];
+        currentRenderData_.push_back({ regionId, chunk.chunkId, cubeId, cube.cubeTextureId });
     }
 }
 

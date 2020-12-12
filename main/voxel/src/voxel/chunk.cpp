@@ -25,4 +25,14 @@ CubeTextureId GenerateTextureId(CubeType cubeType)
     }
     return 0;
 }
+
+Vec3b Cube::CalculateCubePosition(CubeId cubeId)
+{
+    return Vec3b((cubeId >> 10u) & 31u, cubeId & 31u, (cubeId >> 5u) & 31u);
+}
+
+CubeId Cube::CalculateCubeId(Vec3b cubePosition)
+{
+    return (cubePosition.x << 10u) + (cubePosition.z << 5u) + cubePosition.y;
+}
 }

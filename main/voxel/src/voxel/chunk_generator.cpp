@@ -50,8 +50,8 @@ Chunk ChunkGenerator::GenerateChunk(RegionId regionId, ChunkId chunkId) const
             auto& cube = (*newChunk.contents)[cubeX][cubeZ][cubeY];
             cube.flag = cube.flag | Cube::IS_VISIBLE;
             cube.cubeTextureId = GenerateTextureId(CubeType::GRASS);
-            cube.cubeId = cubeX * chunkSize * chunkSize + cubeZ * chunkSize + cubeY;
-            newChunk.visibleCubes.push_back(&cube);
+            cube.cubeId = Cube::CalculateCubeId(Vec3b(cubeX, cubeY, cubeZ));
+            newChunk.visibleCubes.push_back(cube.cubeId);
 
             int maxDiff = 0;
             for (int dx = -1; dx <= 1; dx++)
@@ -98,8 +98,8 @@ Chunk ChunkGenerator::GenerateChunk(RegionId regionId, ChunkId chunkId) const
                             auto& otherCube = (*newChunk.contents)[otherCubeX][otherCubeZ][otherCubeY];
                             otherCube.flag = otherCube.flag | Cube::IS_VISIBLE;
                             otherCube.cubeTextureId = GenerateTextureId(CubeType::ROCK);
-                            otherCube.cubeId = otherCubeX * chunkSize * chunkSize + otherCubeZ * chunkSize + otherCubeY;
-                            newChunk.visibleCubes.push_back(&otherCube);
+                            otherCube.cubeId = Cube::CalculateCubeId(Vec3b(otherCubeX, otherCubeY, otherCubeZ));
+                            newChunk.visibleCubes.push_back(otherCube.cubeId);
                             
                         }
                         maxDiff = diff;

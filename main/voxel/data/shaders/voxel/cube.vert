@@ -44,9 +44,9 @@ void main()
     uint chunkZ = (chunkId - chunkX * regionHeight * regionSize) / regionHeight;
     float chunkLength = float(chunkSize);
     // cube position calculation
-    uint cubeY = cubeId % chunkSize;
-    uint cubeX = cubeId / chunkSize / chunkSize;
-    uint cubeZ = (cubeId - cubeX * chunkSize * chunkSize) / chunkSize;
+    uint cubeY = cubeId & 31u;
+    uint cubeX = (cubeId >> 10u) & 31u;
+    uint cubeZ = (cubeId >> 5u) & 31u;
     vec3 worldPos = vec3( 
         float(cubeX) + float(chunkX) * chunkLength - float(regionSize) / 2.0 * chunkLength,
         float(cubeY) + float(chunkY) * chunkLength - float(regionHeight) / 2.0 * chunkLength,

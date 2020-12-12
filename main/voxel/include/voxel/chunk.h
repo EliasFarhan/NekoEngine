@@ -1,5 +1,7 @@
 #pragma once
 
+#include "mathematics/vector.h"
+
 #include <array>
 #include <memory>
 #include <vector>
@@ -41,12 +43,13 @@ struct Cube
     CubeId cubeId = 0;
     std::uint8_t flag = NONE;
     CubeTextureId cubeTextureId = 0u;
-
+    static [[nodiscard]] Vec3b CalculateCubePosition(CubeId cubeId);
+    static [[nodiscard]] CubeId CalculateCubeId(Vec3b cubePosition);
 };
 
 
 using ChunkContent = std::array<std::array<std::array<Cube, chunkSize>, chunkSize>, chunkSize>;
-using ChunkVisibleArray = std::vector<Cube*>;
+using ChunkVisibleArray = std::vector<CubeId>;
 using ChunkId = std::uint16_t;
 struct Chunk
 {
