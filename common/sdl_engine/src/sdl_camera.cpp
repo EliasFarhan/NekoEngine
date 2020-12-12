@@ -63,18 +63,7 @@ namespace neko::sdl
 	void Camera3D::Update(seconds dt)
 	{
 		const auto mouseState = SDL_GetMouseState(nullptr, nullptr);
-		cameraMovement_ = mouseState & SDL_BUTTON(3) ?
-			cameraMovement_ | MOUSE_MOVE :
-			cameraMovement_ & ~MOUSE_MOVE;
-		if (cameraMovement_ & MOUSE_MOVE && mouseMotion_.SquareMagnitude() > 0.001f)
-		{
-			Rotate(EulerAngles(
-				degree_t(mouseMotion_.y),
-				degree_t(mouseMotion_.x),
-				degree_t(0.0f)
-			));
-			mouseMotion_ = Vec2f::zero;
-		}
+		
 		//Checking if keys are down
 		const Uint8* keys = SDL_GetKeyboardState(NULL);
 		cameraMovement_ =
@@ -114,10 +103,50 @@ namespace neko::sdl
 		{
 			cameraMove.y -= 1.0f * dt.count();
 		}
+		
+		if (SDL_IsGameController(0))
+		{
+			auto* controller = SDL_GameControllerOpen(0);
+			const auto move = Vec2f(SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX),
+				-SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTY)) / std::numeric_limits<short>::max();
+			if (move.SquareMagnitude() > 0.1f)
+			{
+				cameraMove += move * dt.count() * cameraSpeed_;
+			}
+            const short rightX = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_RIGHTX);
+            const short rightY = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_RIGHTY);
+			
+			auto rotate = Vec2f(rightX, rightY) / std::numeric_limits<short>::max();
+			if (rotate.SquareMagnitude() > 0.1f)
+			{ 
+				rotate = rotate * cameraRotationSpeed_.value() * dt.count();
+				Rotate(EulerAngles(
+					degree_t(rotate.y),
+					-degree_t(rotate.x),
+					degree_t(0.0f)
+				)) ;
+			}
+			SDL_GameControllerClose(controller);
+		}
+		
 		position +=
 			(rightDir * cameraMove.x -
 				reverseDir * cameraMove.y) *
 			(cameraMovement_ & ACCELERATE ? cameraFast_ : cameraSpeed_);
+
+		cameraMovement_ = mouseState & SDL_BUTTON(3) ?
+			cameraMovement_ | MOUSE_MOVE :
+			cameraMovement_ & ~MOUSE_MOVE;
+		if (cameraMovement_ & MOUSE_MOVE && mouseMotion_.SquareMagnitude() > 0.001f)
+		{
+			const auto rotate = Vec2f(mouseMotion_.x, mouseMotion_.y)  * cameraRotationSpeed_.value() * dt.count();
+			Rotate(EulerAngles(
+				degree_t(rotate.y),
+				degree_t(rotate.x),
+				degree_t(0.0f)
+			));
+			mouseMotion_ = Vec2f::zero;
+		}
 	}
 
 	void Camera3D::Destroy()

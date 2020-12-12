@@ -52,6 +52,7 @@ struct Camera3D : neko::Camera3D, SdlEventSystemInterface, SystemInterface
 		MOUSE_MOVE = 1u << 6u
 	};
 	float cameraSpeed_ = 3.0f;
+	degree_t cameraRotationSpeed_{ degree_t(10.0f) };
 	float cameraFast_ = 7.0f;
 	std::uint8_t cameraMovement_ = NONE;
 	const Vec3f cameraOriginPos = Vec3f(0.0f, 3.0f, -3.0f);
