@@ -113,7 +113,7 @@ void BasicEngine::Update(seconds dt)
 {
     dt_ = dt.count();
 #ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Basic Engine Update");
+    EASY_BLOCK("Main Thread Update");
 #endif
     if (renderer_)
         renderer_->ResetJobs();
@@ -203,10 +203,8 @@ void BasicEngine::GenerateUiFrame()
     ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_FirstUseEver);
     ImGui::Begin("Neko Window");
 
-    std::ostringstream oss;
-    oss << "App FPS: " << 1.0f / dt_ << '\n'
-        << '\n';
-    ImGui::Text("%s", oss.str().c_str());
+    const auto fpsText = fmt::format("App FPS: {}", 1.0f / dt_);
+    ImGui::Text("%s", fpsText.c_str());
     ImGui::End();
     drawImGuiAction_.Execute();
 }

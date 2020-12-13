@@ -1,15 +1,22 @@
 import os
+import glob
 import json
 import subprocess
 from zipfile import ZipFile
 
 
-
-
 def create_archive(path, files):
+    data_binary_path = os.environ.get("DATA_BIN_FOLDER")
     new_archive = ZipFile(path, 'w')
     for file in files:
-        new_archive.write(os.path.join("data", file), file)
+        if '*' in file:
+            all_files = glob.glob(os.path.join(data_binary_path, file))
+            print("Glob: {}".format(all_files))
+            for new_file in all_files:
+                rel_path = os.path.relpath(new_file, data_binary_path)
+                new_archive.write(new_file, rel_path)
+        else:
+            new_archive.write(os.path.join(data_binary_path, file), file)
 
 
 def validate_pkg(data_src, data_out, meta_content):
@@ -25,5 +32,3 @@ def validate_pkg(data_src, data_out, meta_content):
         files = pkg_content["files"]
         path = os.path.join(os.path.dirname(data_out), name+".pkg")
         create_archive(path, files)
-
-

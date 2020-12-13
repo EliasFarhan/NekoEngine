@@ -52,6 +52,9 @@ material_extensions = [
     ".mtl"
 ]
 
+package_extensions = [
+    ".pkg_json"
+]
 
 def iterate_over_type(extensions):
     print("Iterate over type: {} in data_dir {}".format(extensions, data_dir))
@@ -94,4 +97,5 @@ if __name__ == "__main__":
     iterate_over_type(model_extensions)
     iterate_over_type(material_extensions)
     iterate_over_type(font_extensions)
+    iterate_over_type(package_extensions)
 

@@ -1,4 +1,5 @@
 #include "engine/system.h"
+#include "fs/physfs.h"
 #include "gl/shape.h"
 #include "gl/shader.h"
 #include "sdl_engine/sdl_engine.h"
@@ -101,11 +102,14 @@ private:
 
 int main([[maybe_unused]]int argc, [[maybe_unused]]char** argv)
 {
-    neko::Filesystem filesystem;
     neko::Configuration config;
     config.windowSize = neko::Vec2u(1280, 720);
     //config.workerNumber = 3;
     config.flags = neko::Configuration::NONE;
+    neko::physfs::PhysFsFilesystem filesystem (argv[0]);
+    filesystem.Init();
+    filesystem.AddMount(config.dataRootPath + "voxel.pkg", config.dataRootPath, 1);
+   
     neko::sdl::Gles3Window window;
     neko::gl::Gles3Renderer renderer;
     neko::sdl::SdlEngine engine(filesystem, config);
@@ -118,6 +122,7 @@ int main([[maybe_unused]]int argc, [[maybe_unused]]char** argv)
 
     engine.Init();
     engine.EngineLoop();
+    filesystem.Destroy();
     return EXIT_SUCCESS;
 
 }

@@ -57,6 +57,8 @@ function(data_generate binary)
     file(GLOB_RECURSE MATERIAL_FILES
             "${CMAKE_CURRENT_SOURCE_DIR}/data/*.mat"
             "${CMAKE_CURRENT_SOURCE_DIR}/data/*.mtl")
+    file(GLOB_RECURSE PKG_FILES
+            "${CMAKE_CURRENT_SOURCE_DIR}/data/*.pkg_json")
 
     set(data_generate_name "${binary}_Generate_Data")
 
@@ -68,8 +70,9 @@ function(data_generate binary)
     source_group("Shaders"		FILES ${SHADER_FILES})
     source_group("Data/Model" FILES ${MODEL_FILES})
     source_group("Data/Materials" FILES ${MATERIALS_FILES})
+    source_group("Data/Package" FILES ${PKG_FILES})
 
-    LIST(APPEND DATA_FILES ${IMG_FILES} ${SKY_FILES} ${MODEL_FILES} ${SND_FILES} ${TEXT_FILES} ${SHADER_FILES} ${MATERIAL_FILES} ${FONT_FILES})
+    LIST(APPEND DATA_FILES ${IMG_FILES} ${SKY_FILES} ${MODEL_FILES} ${SND_FILES} ${TEXT_FILES} ${SHADER_FILES} ${MATERIAL_FILES} ${FONT_FILES} ${PKG_FILES})
 
     foreach(DATA ${DATA_FILES})
         get_filename_component(FILE_NAME ${DATA} NAME)
