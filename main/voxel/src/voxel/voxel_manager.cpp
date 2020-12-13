@@ -72,14 +72,12 @@ void VoxelManager::Init()
                         } }, chunkId, 0 });
 
                         BasicEngine::GetInstance()->ScheduleJob(&chunkLoadingQueue_.back().loadingJob,
-                                                            chunkId % workerNumber == 0 ?
-                                                            JobThreadType::RESOURCE_THREAD:
                                                             JobThreadType::OTHER_THREAD);
                     }
                 }
             }
         });
-    BasicEngine::GetInstance()->ScheduleJob(&initJob, JobThreadType::OTHER_THREAD);
+    BasicEngine::GetInstance()->ScheduleJob(&initJob, JobThreadType::RESOURCE_THREAD);
     
 }
 
