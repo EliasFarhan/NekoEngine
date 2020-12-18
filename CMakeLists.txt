@@ -20,6 +20,7 @@ set(Neko_Benchmark ON CACHE BOOL "Activate Benchmark")
 set(Neko_SFML_NET ON CACHE BOOL "Activate SFML Net Wrapper")
 set(Neko_KTX ON CACHE BOOL "Activate SFML Net Wrapper")
 set(Neko_PhysFS ON CACHE BOOL "Activate PhysFS Wrapper")
+set(Neko_sqlite3 ON CACHE BOOL "Activate sqlite3 dependency")
 
 MESSAGE("CMAKE SYSTEM NAME: ${CMAKE_SYSTEM_NAME}")
 
@@ -46,6 +47,12 @@ set(UTILITIES_DIR "${EXTERNAL_DIR}/utilities" CACHE INTERNAL "")
 
 if(Neko_Assert)
     add_compile_definitions("NEKO_ASSERT=1")
+endif()
+
+if(Neko_sqlite3)
+    set(SQLITE3_VERSION "3.34.0")
+    set(SQLITE3_PATH "${EXTERNAL_DIR}/sqlite3-${SQLITE3_VERSION}")
+    add_subdirectory(${SQLITE3_PATH})
 endif()
 
 if(Neko_Test)

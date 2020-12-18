@@ -33,7 +33,7 @@ void Shader::LoadFromFile(const std::string_view vertexShaderPath, const std::st
 {
     BufferFile vertexFile = filesystem_.LoadFile(vertexShaderPath);
 
-    GLuint vertexShader = LoadShader(vertexFile, GL_VERTEX_SHADER);
+    const GLuint vertexShader = LoadShader(vertexFile, GL_VERTEX_SHADER);
     vertexFile.Destroy();
     if (vertexShader == INVALID_SHADER)
     {
@@ -42,7 +42,7 @@ void Shader::LoadFromFile(const std::string_view vertexShaderPath, const std::st
     }
     BufferFile fragmentFile = filesystem_.LoadFile(fragmentShaderPath);
 
-    GLuint fragmentShader = LoadShader(fragmentFile, GL_FRAGMENT_SHADER);
+    const GLuint fragmentShader = LoadShader(fragmentFile, GL_FRAGMENT_SHADER);
     fragmentFile.Destroy();
     if (fragmentShader == INVALID_SHADER)
     {

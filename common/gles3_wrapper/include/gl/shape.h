@@ -77,6 +77,7 @@ public:
     void Draw() const override;
 
     void Destroy() override;
+    [[nodiscard]] size_t GetIndicesNmb() const;
 protected:
     size_t segment_ = 0;
 	size_t indexCount_ = 0;

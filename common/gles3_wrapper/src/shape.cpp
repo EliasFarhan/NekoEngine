@@ -440,9 +440,17 @@ void RenderSphere::Draw() const
 
 void RenderSphere::Destroy()
 {
+	if (VAO == 0)
+		return;
 	glDeleteVertexArrays(1, &VAO);
+	VAO = 0;
 	glDeleteBuffers(1, &VBO[0]);
 	glDeleteBuffers(1, &EBO);
+}
+
+size_t RenderSphere::GetIndicesNmb() const
+{
+	return indexCount_;
 }
 
 void RenderCircle::Init()
