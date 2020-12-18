@@ -31,14 +31,14 @@ private:
     static constexpr size_t instanceStep = 10;
     static constexpr size_t framePerSample = 100;
     static constexpr size_t minSegmentNmb = 4;
-    static constexpr size_t maxSegmentNmb = 2048;
+    static constexpr size_t maxSegmentNmb = 256;
     static constexpr size_t segmentStep = 8;
 
     size_t instanceNmb_ = 10;
     size_t segments_ = 64;
     size_t currentFrame = 0;
 
-    gl::RenderSphere sphere_{Vec3f::zero, 1.0f};
+    gl::RenderSphere sphere_{Vec3f::zero, 0.5f};
     gl::Shader instanceShader_;
 
     sdl::Camera3D camera3d_;
