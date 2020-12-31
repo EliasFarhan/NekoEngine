@@ -25,22 +25,23 @@ void EditorPyConsole::DrawImGui()
     ImGui::SameLine();
     if(ImGui::Button("Execute"))
     {
+
         try
         {
             py::exec(currentCommand_);
         }
         catch (py::error_already_set& e)
         {
-            logDebug(e.what());
+            e.discard_as_unraisable(__func__);
         }
-        previousCommands_.push_back(currentCommand_);
+        previousCommands_.emplace_back(currentCommand_);
         currentCommand_[0] = 0;
         
     }
     ImGui::BeginChild("Commands");
     for (auto it = previousCommands_.rbegin(); it != previousCommands_.rend(); it++)
     {
-        ImGui::Text(it->c_str());
+        ImGui::Text("%s", it->c_str());
     }
     ImGui::EndChild();
     ImGui::End();
