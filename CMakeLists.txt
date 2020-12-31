@@ -124,6 +124,10 @@ include_directories("${IMGUI_ROOT}")
 add_subdirectory("${IMGUI_ROOT}")
 set_target_properties(imgui PROPERTIES UNITY_BUILD ON)
 
+#pybind11
+set(PYBIND11_VERSION "2.6.1")
+set(PYBIND11_DIR "${EXTERNAL_DIR}/pybind11-${PYBIND11_VERSION}")
+add_subdirectory("${PYBIND11_DIR}")
 
 if(Neko_GLES3)
     set(ASSIMP_VERSION 5.0.1)

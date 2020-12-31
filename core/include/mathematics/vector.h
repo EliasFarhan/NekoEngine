@@ -135,6 +135,11 @@ struct Vec2
         return Vec2<T>(x - rhs.x, y - rhs.y);
     }
 
+    Vec2<T> operator -() const
+    {
+        return Vec2<T>(-x, -y);
+    }
+
     Vec2<T>& operator-=(const Vec2<T>& rhs)
     {
         this->x -= rhs.x;
@@ -142,26 +147,23 @@ struct Vec2
         return *this;
     }
 
-    Vec2<T> operator*(T rhs) const
-    {
-        return Vec2<T>(x * rhs, y * rhs);
-    }
-
     Vec2<T> operator*(const Vec2<T>& rhs) const
     {
         return Vec2<T>(x * rhs.x, y * rhs.y);
     }
 
-    Vec2<T> operator/(const Vec2<T>& rhs) const
-    {
-        return Vec2<T>(x / rhs.x, y / rhs.y);
-    }
+    
 
     Vec2<T>& operator*=(T rhs)
     {
         this->x *= rhs;
         this->y *= rhs;
         return *this;
+    }
+
+    Vec2<T> operator/(const Vec2<T>& rhs) const
+    {
+        return Vec2<T>(x / rhs.x, y / rhs.y);
     }
 
     Vec2<T> operator/(T rhs) const
@@ -204,7 +206,7 @@ struct Vec2
         return os;
     }
 
-    std::string ToString() const
+    [[nodiscard]] std::string ToString() const
     {
         return fmt::format("Vec2({},{})", x, y);
     }
@@ -223,19 +225,19 @@ struct Vec2
     }
 
     /// \brief Calculates the square magnitude.
-    T SquareMagnitude() const
+    [[nodiscard]] T SquareMagnitude() const
     {
         return Dot(*this, *this);
     }
 
     /// \brief Calculates the magnitude.
-    T Magnitude() const
+    [[nodiscard]] T Magnitude() const
     {
         return std::sqrt(SquareMagnitude());
     }
 
     /// \brief Calculates the normalized vector.
-    Vec2<T> Normalized() const
+    [[nodiscard]] Vec2<T> Normalized() const
     {
         return (*this) / (*this).Magnitude();
     }
@@ -283,6 +285,30 @@ struct Vec2
     template<typename U>
     explicit Vec2(const U& v);
 };
+
+
+//-----------------------------------------------------------------------------
+// Vec2 Implementations
+//-----------------------------------------------------------------------------
+template<typename T>
+neko::radian_t Vec2<T>::AngleBetween(const Vec2& v1, const Vec2& v2)
+{
+    const float dot = Vec2<T>::Dot(v1, v2) / v1.Magnitude() / v2.Magnitude();
+    const float det = v1.x * v2.y - v1.y * v2.x;
+    const neko::radian_t angle = Atan2(det, dot);
+    return angle;
+}
+
+template<typename T>
+Vec2<T> operator*(T lhs, const Vec2<T>& rhs)
+{
+    return Vec2<T>(rhs.x * lhs, rhs.y * lhs);
+}
+template<typename T>
+Vec2<T> operator*(const Vec2<T>& v, T f)
+{
+    return v * f;
+}
 //-----------------------------------------------------------------------------
 // Vec2 Aliases
 //-----------------------------------------------------------------------------
@@ -305,23 +331,7 @@ inline Vec2<T> const Vec2<T>::left = Vec2<T>(-1, 0);
 template<typename T>
 inline Vec2<T> const Vec2<T>::right = Vec2<T>(1, 0);
 
-//-----------------------------------------------------------------------------
-// Vec2 Implementations
-//-----------------------------------------------------------------------------
-template<typename T>
-neko::radian_t Vec2<T>::AngleBetween(const Vec2& v1, const Vec2& v2)
-{
-    const float dot = Vec2<T>::Dot(v1, v2) / v1.Magnitude() / v2.Magnitude();
-    const float det = v1.x * v2.y - v1.y * v2.x;
-    const neko::radian_t angle = Atan2(det, dot);
-    return angle;
-}
 
-template<typename T>
-Vec2<T> operator*(T lhs, const Vec2<T>& rhs)
-{
-    return Vec2<T>(rhs.x * lhs, rhs.y * lhs);
-}
 
 //-----------------------------------------------------------------------------
 // Vec3
@@ -474,11 +484,6 @@ public:
         return *this;
     }
 
-    Vec3<T> operator*(T rhs) const
-    {
-        return Vec3<T>(x * rhs, y * rhs, z * rhs);
-    }
-
     Vec3<T> operator*(const Vec3<T>& rhs) const
     {
         return Vec3<T>(x * rhs.x, y * rhs.y, z * rhs.z);
@@ -547,8 +552,8 @@ public:
     }
 
     /// \brief Calculates the magnitude.
-    template<typename ReturnT = float>
-    ReturnT Magnitude() const
+    
+    T Magnitude() const
     {
         return std::sqrt(SquareMagnitude());
     }
@@ -572,7 +577,7 @@ public:
     static Vec3<T> Reflect(const Vec3<T>& inVec, const Vec3<T>& normal)
     {
         Vec3<T> normalized = normal.Normalized();
-        return inVec - normalized * 2 * Dot(inVec, normalized);
+        return inVec - 2 * Dot(inVec, normalized) * normalized;
     }
 
 	static Vec3<T> Refract(const Vec3<T>& inVec, const Vec3<T>& normal, const T eta)
@@ -604,6 +609,31 @@ public:
     static neko::radian_t AngleBetween(const Vec3& v1, const Vec3& v2);
 
 };
+
+//-----------------------------------------------------------------------------
+// Vec3 Implementations
+//-----------------------------------------------------------------------------
+template<typename T>
+neko::radian_t Vec3<T>::AngleBetween(const Vec3& v1, const Vec3& v2)
+{
+    const float dot = Vec3<T>::Dot(v1, v2) / v1.Magnitude() / v2.Magnitude();
+    const float det = v1.x * v2.y - v1.y * v2.x;
+    const neko::radian_t angle = Atan2(det, dot);
+    return angle;
+}
+
+template<typename T>
+Vec3<T> operator*(T lhs, const Vec3<T>& rhs)
+{
+    return Vec3<T>(rhs.x * lhs, rhs.y * lhs, rhs.z * lhs);
+}
+
+template<typename T>
+Vec3<T> operator*(const Vec3<T>& rhs, T lhs)
+{
+    return Vec3<T>(rhs.x * lhs, rhs.y * lhs, rhs.z * lhs);
+}
+
 //-----------------------------------------------------------------------------
 // Vec3 Aliases
 //-----------------------------------------------------------------------------
@@ -632,23 +662,7 @@ inline Vec3<T> const Vec3<T>::forward = Vec3<T>(0, 0, 1);
 template<typename T>
 inline Vec3<T> const Vec3<T>::back = Vec3<T>(0, 0, -1);
 
-//-----------------------------------------------------------------------------
-// Vec3 Implementations
-//-----------------------------------------------------------------------------
-template<typename T>
-neko::radian_t Vec3<T>::AngleBetween(const Vec3& v1, const Vec3& v2)
-{
-    const float dot = Vec3<T>::Dot(v1, v2) / v1.Magnitude() / v2.Magnitude();
-    const float det = v1.x * v2.y - v1.y * v2.x;
-    const neko::radian_t angle = Atan2(det, dot);
-    return angle;
-}
 
-template<typename T>
-Vec3<T> operator*(T lhs, const Vec3<T>& rhs)
-{
-    return Vec3<T>(rhs.x * lhs, rhs.y * lhs, rhs.z * lhs);
-}
 
 //-----------------------------------------------------------------------------
 // Vec4
@@ -759,6 +773,11 @@ public:
         return Vec4<T>(x - rhs.x, y - rhs.y, z - rhs.z, w - rhs.w);
     }
 
+    Vec4<T> operator -() const
+    {
+        return Vec4<T>(-x, -y, -z, -w);
+    }
+
     Vec4<T>& operator-=(const Vec4<T>& rhs)
     {
         this->x -= rhs.x;
@@ -767,12 +786,7 @@ public:
         this->w -= rhs.w;
         return *this;
     }
-
-    Vec4<T> operator*(T rhs) const
-    {
-        return Vec4<T>(x * rhs, y * rhs, z * rhs, w * rhs);
-    }
-
+    
     Vec4<T> operator*(const Vec4<T>& rhs) const
     {
         return Vec4<T>(x * rhs.x, y * rhs.y, z * rhs.z, w * rhs.w);
@@ -852,8 +866,8 @@ public:
     }
 
     /// \brief Calculates the magnitude.
-    template<typename ReturnT = float>
-    ReturnT Magnitude() const
+    
+    T Magnitude() const
     {
         return std::sqrt(SquareMagnitude());
     }
@@ -884,6 +898,19 @@ public:
                 (dot / mag) * v2.w};
     }
 };
+
+
+template<typename T>
+Vec4<T> operator*(T lhs, const Vec4<T>& rhs)
+{
+    return Vec4<T>(rhs.x * lhs, rhs.y * lhs, rhs.z * lhs, rhs.w * lhs);
+}
+
+template<typename T>
+Vec4<T> operator*(const Vec4<T>& rhs, T lhs)
+{
+    return Vec4<T>(rhs.x * lhs, rhs.y * lhs, rhs.z * lhs, rhs.w * lhs);
+}
 //-----------------------------------------------------------------------------
 // Vec4 Aliases
 //-----------------------------------------------------------------------------

@@ -320,7 +320,7 @@ public:
 	[[nodiscard]] Mat4 Inverse() const
 	{
 		Mat4 inverse = Zero;
-		float determinant = Determinant();
+        const float determinant = Determinant();
 		/*
 		for (int i = 0; i < 4; i++)
 		{

@@ -1,6 +1,6 @@
-find_package (Python3 REQUIRED COMPONENTS Interpreter)
+#find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
 
-MESSAGE("Python Interpreter: ${Python3_EXECUTABLE}")
+#MESSAGE("Python Interpreter: ${Python3_EXECUTABLE}")
 
 file(GLOB_RECURSE SCRIPT_FILES scripts/*.py)
 file(GLOB_RECURSE VALIDATOR_FILES validator/*.json)
