@@ -4,6 +4,8 @@
 
 #include <pybind11/embed.h> // everything needed for embedding
 #include <pybind11/operators.h>
+
+#include "editor_inspector.h"
 namespace py = pybind11;
 
 #include "editor_pyconsole.h"
@@ -141,9 +143,11 @@ namespace neko::editor
 
 Editor::Editor()
 {
+    EditorLocator::provide(this);
     AddEditorSystem("PyConsole", std::make_unique<EditorPyConsole>());
     AddEditorSystem("ModelViewer", std::make_unique<ModelViewer>());
     AddEditorSystem("SceneManager", std::make_unique<EditorSceneManager>());
+    AddEditorSystem("Inspector", std::make_unique<EditorInspector>());
 }
 void Editor::Init()
 {
@@ -191,6 +195,16 @@ void Editor::DrawImGui()
 
 void Editor::OnEvent(const SDL_Event& event)
 {
+
+}
+
+void Editor::SetActiveSystem(std::string_view editorSystem, bool isActive)
+{
+    auto it = editorSystemsMap_.find(editorSystem.data());
+    if(it != editorSystemsMap_.end())
+    {
+        it->second->SetActive(isActive);
+    }
 
 }
 

@@ -26,14 +26,21 @@ void EditorHierarchy::Destroy()
 void EditorHierarchy::DrawImGui()
 {
     ImGui::Begin("Entity Hierarchy");
+    for(Entity entity = 0; entity < entityManager_.GetEntitiesSize(); entity++)
+    {
+        if(entityManager_.EntityExists(entity))
+        {
+            ImGui::Text("%s", entityNameManager_.GetComponent(entity).c_str());
+        }
+    }
     ImGui::End();
 }
 
 EditorHierarchy::EditorHierarchy(
         EntityManager& entityManager,
         EntityNameManager& entityNameManager) :
-    entityNameManager_(entityNameManager),
-    entityManager_(entityManager)
+    entityManager_(entityManager),
+    entityNameManager_(entityNameManager)
 {
 
 }
