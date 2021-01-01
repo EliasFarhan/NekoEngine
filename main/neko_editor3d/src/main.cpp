@@ -17,10 +17,6 @@ int main([[nodiscard]] int argc, [[nodiscard]]char** argv)
   engine.RegisterOnEvent(editor);
   engine.RegisterOnDrawUi(editor);
 
-  neko::editor::ModelViewer modelViewer;
-
-  engine.RegisterSystem(modelViewer);
-  engine.RegisterOnDrawUi(modelViewer);
 
   engine.SetWindowAndRenderer(&window, &renderer);
   engine.Init();

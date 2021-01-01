@@ -3,6 +3,8 @@
 #include "engine/system.h"
 #include "sdl_engine/sdl_engine.h"
 
+#include "engine/entity.h"
+
 #include <map>
 #include <memory>
 #include <string>
@@ -34,5 +36,7 @@ private:
     void AddEditorSystem(std::string_view editorSystemName, std::unique_ptr<EditorSystem> editorSystem);
     std::vector<std::unique_ptr<EditorSystem>> editorSystems_;
     std::map<std::string, EditorSystem*> editorSystemsMap_;
+
+    EntityManager entityManager_;
 };
 }

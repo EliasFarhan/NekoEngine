@@ -237,7 +237,7 @@ GLuint CreateShaderProgram(GLuint vertexShader, GLuint fragmentShader, GLuint co
     return program;
 }
 
-GLuint gl::LoadShader(char* shaderContent, GLenum shaderType)
+GLuint LoadShader(char* shaderContent, GLenum shaderType)
 {
     glCheckError();
     const GLuint shader = glCreateShader(shaderType);

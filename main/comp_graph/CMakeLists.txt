@@ -15,8 +15,7 @@ neko_bin_config(comp_graph)
 data_generate(comp_graph)
 set_target_properties(comp_graph PROPERTIES UNITY_BUILD ON)
 
-if(NOT Emscripten)
 target_precompile_headers(comp_graph PRIVATE "include/comp_graph/comp_graph_pch.h")
-endif()
+
 set_target_properties (comp_graph PROPERTIES FOLDER Neko/Main/CompGraph)
 set_target_properties (comp_graph_Generate_Data PROPERTIES FOLDER Neko/Main/CompGraph)

@@ -21,9 +21,10 @@ void EditorPyConsole::Destroy()
 void EditorPyConsole::DrawImGui()
 {
     ImGui::Begin("PyConsole");
-    ImGui::InputText("Command", currentCommand_, commandBufferSize_);
+    bool confirmCommand = ImGui::InputText("Command", currentCommand_, commandBufferSize_, ImGuiInputTextFlags_EnterReturnsTrue);
+    //bool pressed_enter = IsItemActivePreviousFrame() && !IsItemActive() && IsKeyPressed(io.KeyMap[ImGuiKey_Enter]);
     ImGui::SameLine();
-    if(ImGui::Button("Execute"))
+    if(ImGui::Button("Execute") or confirmCommand)
     {
 
         try

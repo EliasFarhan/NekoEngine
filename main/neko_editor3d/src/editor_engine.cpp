@@ -1,5 +1,6 @@
 #include <editor_engine.h>
 #include "model_viewer.h"
+#include "editor_scene_manager.h"
 
 #include <pybind11/embed.h> // everything needed for embedding
 #include <pybind11/operators.h>
@@ -10,7 +11,7 @@ namespace py = pybind11;
 #include "mathematics/matrix.h"
 
 
-PYBIND11_MODULE(neko, m)
+PYBIND11_EMBEDDED_MODULE(neko, m)
 {
     py::class_<neko::EntityManager>(m, "EntityManager")
         .def("create_entity", &neko::EntityManager::CreateEntity)
@@ -142,6 +143,7 @@ Editor::Editor()
 {
     AddEditorSystem("PyConsole", std::make_unique<EditorPyConsole>());
     AddEditorSystem("ModelViewer", std::make_unique<ModelViewer>());
+    AddEditorSystem("SceneManager", std::make_unique<EditorSceneManager>());
 }
 void Editor::Init()
 {
@@ -153,6 +155,7 @@ void Editor::Init()
         }
     }
     py::initialize_interpreter();
+    py::module nekoModule = py::module::import("neko");
 }
 
 void Editor::Update(seconds dt)
