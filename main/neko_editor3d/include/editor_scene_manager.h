@@ -1,7 +1,7 @@
 #pragma once
 
 #include <editor_system.h>
-#include <editor_entity_name.h>
+#include <editor_entity.h>
 #include <editor_hierarchy.h>
 
 namespace neko::editor
@@ -19,7 +19,7 @@ public:
 
 private:
     EntityManager entityManager_;
-    EntityNameManager entityNameManager_{entityManager_};
+    EntityDataManager entityNameManager_{entityManager_};
     EditorHierarchy hierarchy_{entityManager_, entityNameManager_};
 };
 }

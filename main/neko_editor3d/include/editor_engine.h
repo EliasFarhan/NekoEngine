@@ -5,6 +5,8 @@
 
 #include "engine/entity.h"
 
+#include "editor_entity.h"
+
 #include <map>
 #include <memory>
 #include <string>
@@ -52,8 +54,7 @@ private:
     
     std::vector<std::unique_ptr<EditorSystem>> editorSystems_;
     std::map<std::string, EditorSystem*> editorSystemsMap_;
-
-    EntityManager entityManager_;
+    
 };
 
 using EditorLocator = Locator<EditorInterface, NullEditor>;

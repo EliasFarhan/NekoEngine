@@ -1,9 +1,11 @@
 #include <editor_inspector.h>
 #include <imgui.h>
 #include <editor_engine.h>
+#include <editor_entity.h>
 
 namespace neko::editor
 {
+
 void EditorInspector::Init()
 {
 }
@@ -35,6 +37,7 @@ void EditorInspector::DrawImGui()
             if (ImGui::MenuItem("Paste", "CTRL+V")) {}
             ImGui::EndMenu();
         }
+       
         if(ImGui::BeginMenu("Window"))
         {
 

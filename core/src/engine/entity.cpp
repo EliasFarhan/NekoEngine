@@ -62,28 +62,22 @@ Entity EntityManager::CreateEntity(Entity entity)
             ResizeIfNecessary(entityMaskArray_, newEntity, INVALID_ENTITY_MASK);
             ResizeIfNecessary(parentEntities_, newEntity, INVALID_ENTITY);
 			ResizeIfNecessary(entityHashArray_, newEntity, INVALID_ENTITY_HASH);
-        	AddComponentType(Entity(newEntity), static_cast<EntityMask>(ComponentType::EMPTY));
-            return Entity(newEntity);
+        	AddComponentType(static_cast<Entity>(newEntity), static_cast<EntityMask>(ComponentType::EMPTY));
+            return static_cast<Entity>(newEntity);
         }
-        else
-        {
-            const auto newEntity = entityMaskIt - entityMaskArray_.begin();
-            AddComponentType(Entity(newEntity), static_cast<EntityMask>(ComponentType::EMPTY));
-            return Entity(newEntity);
-        }
+        const auto newEntity = std::distance(entityMaskArray_.begin(),entityMaskIt);
+        AddComponentType(static_cast<Entity>(newEntity), static_cast<EntityMask>(ComponentType::EMPTY));
+        return static_cast<Entity>(newEntity);
     }
-    else
+    ResizeIfNecessary(entityMaskArray_, entity, INVALID_ENTITY_MASK);
+    ResizeIfNecessary(parentEntities_, entity, INVALID_ENTITY);
+    ResizeIfNecessary(entityHashArray_, entity, INVALID_ENTITY_HASH);
+    if(!EntityExists(entity))
     {
-        ResizeIfNecessary(entityMaskArray_, entity, INVALID_ENTITY_MASK);
-        ResizeIfNecessary(parentEntities_, entity, INVALID_ENTITY);
-		ResizeIfNecessary(entityHashArray_, entity, INVALID_ENTITY_HASH);
-    	if(!EntityExists(entity))
-        {
-            AddComponentType(entity, static_cast<EntityMask>(ComponentType::EMPTY));
-            return entity;
-        }
-        return CreateEntity(INVALID_ENTITY);
+        AddComponentType(entity, static_cast<EntityMask>(ComponentType::EMPTY));
+        return entity;
     }
+    return CreateEntity(INVALID_ENTITY);
 }
 
 void EntityManager::DestroyEntity(Entity entity)
@@ -103,17 +97,17 @@ bool EntityManager::HasComponent(Entity entity, EntityMask componentType) const
 	    logDebug(oss.str());
 	    return false;
     }
-    return (entityMaskArray_[entity] & EntityMask(componentType)) == EntityMask(componentType);
+    return (entityMaskArray_[entity] & static_cast<EntityMask>(componentType)) == static_cast<EntityMask>(componentType);
 }
 
 void EntityManager::AddComponentType(Entity entity, EntityMask componentType)
 {
-    entityMaskArray_[entity] |= EntityMask(componentType);
+    entityMaskArray_[entity] |= static_cast<EntityMask>(componentType);
 }
 
 void EntityManager::RemoveComponentType(Entity entity, EntityMask componentType)
 {
-    entityMaskArray_[entity] &= ~EntityMask(componentType);
+    entityMaskArray_[entity] &= ~static_cast<EntityMask>(componentType);
 }
 
 void EntityManager::SetEntityName(Entity entity, const std::string& entityName)
@@ -134,6 +128,18 @@ EntityHash EntityManager::HashEntityName(const std::string& entityName)
 	hash_stream.update(entityName);
 	const EntityHash entityHash = hash_stream.digest();
 	return entityHash;
+}
+
+Entity EntityManager::GetFirstRoot() const
+{
+    for(Entity entity = 0; entity < GetEntitiesSize(); entity++)
+    {
+        if(EntityExists(entity) && GetEntityParent(entity) == INVALID_ENTITY)
+        {
+            return entity;
+        }
+    }
+    return INVALID_ENTITY;
 }
 
 DirtyManager::DirtyManager(EntityManager& entityManager) : entityManager_(entityManager)
@@ -288,7 +294,7 @@ void EntityViewer::DrawEntityHierarchy(neko::Entity entity, bool draw, bool dest
             nodeFlags |= ImGuiTreeNodeFlags_Selected;
         }
         ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.7f);
-        nodeOpen = ImGui::TreeNodeEx((void*)(intptr_t)entity, nodeFlags, "%s",
+        nodeOpen = ImGui::TreeNodeEx((void*)static_cast<intptr_t>(entity), nodeFlags, "%s",
             entityName.c_str());
         ImGui::PopItemWidth();
         if (ImGui::IsItemClicked())
@@ -310,19 +316,19 @@ void EntityViewer::DrawEntityHierarchy(neko::Entity entity, bool draw, bool dest
                 DELETE_ENTITY,
                 LENGTH
             };
-            const char* entityMenuComboItemName[int(EntityMenuComboItem::LENGTH)] = {
+            const char* entityMenuComboItemName[static_cast<int>(EntityMenuComboItem::LENGTH)] = {
                     "Add Empty Entity",
                     "Delete Entity"
             };
 
             const auto entityComboName = entityMenuName + " Combo";
-            for (int i = 0; i < int(EntityMenuComboItem::LENGTH); i++)
+            for (int i = 0; i < static_cast<int>(EntityMenuComboItem::LENGTH); i++)
             {
                 const auto key = entityComboName + " " + entityMenuComboItemName[i];
                 ImGui::PushID(key.c_str());
                 if (ImGui::Selectable(entityMenuComboItemName[i]))
                 {
-                    const auto item = EntityMenuComboItem(i);
+                    const auto item = static_cast<EntityMenuComboItem>(i);
                     switch (item)
                     {
                     case EntityMenuComboItem::ADD_EMPTY_ENTITY:
@@ -365,7 +371,7 @@ void EntityViewer::DrawEntityHierarchy(neko::Entity entity, bool draw, bool dest
             targetFlags |= ImGuiDragDropFlags_AcceptNoDrawDefaultRect; // Don't display the yellow rectangle
             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DND_DEMO_NAME", targetFlags))
             {
-	            const neko::Entity moveFrom = *(const neko::Entity*) payload->Data;
+	            const neko::Entity moveFrom = *static_cast<const neko::Entity*>(payload->Data);
 	            const neko::Entity moveTo = entity;
                 entityManager_.SetEntityParent(moveFrom, moveTo);
             }
@@ -402,7 +408,7 @@ void EntityViewer::DrawEntityHierarchy(neko::Entity entity, bool draw, bool dest
 size_t EntityManager::GetEntitiesNmb(EntityMask filterComponents)
 {
     return std::count_if(entityMaskArray_.begin(), entityMaskArray_.end(),[&filterComponents](EntityMask entityMask){
-        return entityMask != INVALID_ENTITY_MASK && (entityMask & EntityMask(filterComponents)) == EntityMask(filterComponents);
+        return entityMask != INVALID_ENTITY_MASK && (entityMask & static_cast<EntityMask>(filterComponents)) == static_cast<EntityMask>(filterComponents);
     });
 }
 
@@ -425,7 +431,7 @@ std::vector<Entity> EntityManager::FilterEntities(EntityMask filterComponents) c
 	return entities;
 }
 
-bool EntityManager::EntityExists(Entity entity)
+bool EntityManager::EntityExists(Entity entity) const
 {
     return entityMaskArray_[entity] != INVALID_ENTITY_MASK;
 }
@@ -439,7 +445,7 @@ Entity EntityManager::GetLastEntity()
        return entityMask != INVALID_ENTITY_MASK;
     });
 
-    return Entity(std::distance(entityMaskArray_.begin(), it.base()) - 1);
+    return static_cast<Entity>(std::distance(entityMaskArray_.begin(), it.base()) - 1);
 }
 
 bool EntityManager::IsPrefab(Entity entity) const
@@ -475,7 +481,7 @@ void EntityManager::RegisterOnChangeParent(OnChangeParentInterface* onChangeInte
     });
 }
 
-Entity EntityManager::GetEntityParent(Entity entity)
+Entity EntityManager::GetEntityParent(Entity entity) const
 {
     return parentEntities_[entity];
 }
