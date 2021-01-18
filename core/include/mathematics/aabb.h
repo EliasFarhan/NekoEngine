@@ -80,7 +80,7 @@ struct Obb2d {
 		else
 		{
 			Vec2f upperLeftBound = GetOppositeBound(localUpperRightBound, true);
-			Vec2 lowerRightToUpperLeft = (upperLeftBound - GetCenter()) * 2;
+			Vec2f lowerRightToUpperLeft = (upperLeftBound - GetCenter()) * 2;
 
             extend = (lowerRightToUpperLeft.Magnitude() * Vec2f::AngleBetween(lowerRightToUpperLeft, axis)).value();
 		}
@@ -107,7 +107,7 @@ struct Obb2d {
 		{
             centerToProjectionOnDir =
                 CalculateDirection() * (centerToBound).Magnitude() *
-                Cos(Vec2f::AngleBetween(centerToBound, CalculateDirection())) * -1;
+                Cos(Vec2f::AngleBetween(centerToBound, CalculateDirection())) * -1.0f;
             boundToOppositeBound =
                 GetCenter() + centerToProjectionOnDir - bound;
             oppositeBound = localLowerLeftBound + boundToOppositeBound +

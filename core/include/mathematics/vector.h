@@ -299,15 +299,15 @@ neko::radian_t Vec2<T>::AngleBetween(const Vec2& v1, const Vec2& v2)
     return angle;
 }
 
-template<typename T>
-Vec2<T> operator*(T lhs, const Vec2<T>& rhs)
+template<typename T, typename U>
+Vec2<T> operator*(U lhs, const Vec2<T>& rhs)
 {
     return Vec2<T>(rhs.x * lhs, rhs.y * lhs);
 }
-template<typename T>
-Vec2<T> operator*(const Vec2<T>& v, T f)
+template<typename T, typename U>
+Vec2<T> operator*(const Vec2<T>& lhs, U rhs)
 {
-    return v * f;
+    return Vec2<T>(lhs.x * rhs, lhs.y * rhs);
 }
 //-----------------------------------------------------------------------------
 // Vec2 Aliases
@@ -622,14 +622,14 @@ neko::radian_t Vec3<T>::AngleBetween(const Vec3& v1, const Vec3& v2)
     return angle;
 }
 
-template<typename T>
-Vec3<T> operator*(T lhs, const Vec3<T>& rhs)
+template<typename T, typename U>
+Vec3<T> operator*(U lhs, const Vec3<T>& rhs)
 {
     return Vec3<T>(rhs.x * lhs, rhs.y * lhs, rhs.z * lhs);
 }
 
-template<typename T>
-Vec3<T> operator*(const Vec3<T>& rhs, T lhs)
+template<typename T, typename U>
+Vec3<T> operator*(const Vec3<T>& rhs, U lhs)
 {
     return Vec3<T>(rhs.x * lhs, rhs.y * lhs, rhs.z * lhs);
 }
