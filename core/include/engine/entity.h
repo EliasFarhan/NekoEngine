@@ -77,7 +77,7 @@ public:
 
     [[nodiscard]] bool IsPrefab(Entity entity) const;
 
-    [[nodiscard]] bool EntityExists(Entity entity);
+    [[nodiscard]] bool EntityExists(Entity entity) const;
 
     [[nodiscard]] size_t GetEntitiesNmb(EntityMask filterComponents = INVALID_ENTITY_MASK);
 
@@ -108,7 +108,7 @@ public:
 
     void RegisterOnChangeParent(OnChangeParentInterface* onChangeInterface);
 
-    Entity GetEntityParent(Entity entity);
+    Entity GetEntityParent(Entity entity) const;
 
 	/**
 	 * \brief Set the entity parent and check if child is not recursive parent.
@@ -116,6 +116,10 @@ public:
     bool SetEntityParent(Entity child, Entity parent);
 
     static EntityHash HashEntityName(const std::string& entityName);
+    /**
+    * \brief Return the first root existing entity or INVALID_ENTITY
+    */
+    [[nodiscard]] Entity GetFirstRoot() const;
 
 private:
     Action<Entity> onDestroyEntity;

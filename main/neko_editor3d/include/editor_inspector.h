@@ -1,10 +1,11 @@
 #pragma once
 
 #include <editor_system.h>
+#include <engine/entity.h>
 
 namespace neko::editor
 {
-
+class EntityDataManager;
 class EditorInspector : public EditorSystem
 {
 public:
