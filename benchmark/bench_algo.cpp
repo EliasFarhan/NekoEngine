@@ -13,10 +13,10 @@ int is_even(int a)
     return a % 2 == 0;
 }
 
-// Type your code here, or load an example.
-size_t find_even_raw(const std::vector<int>& array)
+size_t count_even_raw(const std::vector<int>& array)
 {
     size_t count = 0;
+    const size_t size = array.size();
     for(size_t i = 0; i < array.size();i++)
     {
         if(is_even(array[i]))
@@ -26,7 +26,7 @@ size_t find_even_raw(const std::vector<int>& array)
 }
 
 // Type your code here, or load an example.
-size_t find_even_ranges(const std::vector<int>& array)
+size_t count_even_ranges(const std::vector<int>& array)
 {
     size_t count = 0;
     for(const auto& a : array)
@@ -38,7 +38,7 @@ size_t find_even_ranges(const std::vector<int>& array)
 }
 
 // Type your code here, or load an example.
-size_t find_even_iterator(const std::vector<int>& array)
+size_t count_even_iterator(const std::vector<int>& array)
 {
     size_t count = 0;
     for(auto it = array.cbegin();it != array.cend();++it)
@@ -49,7 +49,7 @@ size_t find_even_iterator(const std::vector<int>& array)
     return count;
 }
 
-size_t find_even_algo(const std::vector<int>& array)
+size_t count_even_algo(const std::vector<int>& array)
 {
     return std::count_if(array.cbegin(), array.cend(), is_even);
 }
@@ -67,7 +67,7 @@ static void BM_Raw(benchmark::State& state)
     RandomFill(local_numbers);
     for (auto _ : state)
     {
-        benchmark::DoNotOptimize(find_even_raw(local_numbers));
+        benchmark::DoNotOptimize(count_even_raw(local_numbers));
     }
 }
 BENCHMARK(BM_Raw)->Range(fromRange, toRange);
@@ -78,7 +78,7 @@ static void BM_Range(benchmark::State& state)
     RandomFill(local_numbers);
     for (auto _ : state)
     {
-        benchmark::DoNotOptimize(find_even_ranges(local_numbers));
+        benchmark::DoNotOptimize(count_even_ranges(local_numbers));
     }
 }
 BENCHMARK(BM_Range)->Range(fromRange, toRange);
@@ -89,7 +89,7 @@ static void BM_Iterator(benchmark::State& state)
     RandomFill(local_numbers);
     for (auto _ : state)
     {
-        benchmark::DoNotOptimize(find_even_iterator(local_numbers));
+        benchmark::DoNotOptimize(count_even_iterator(local_numbers));
     }
 }
 BENCHMARK(BM_Iterator)->Range(fromRange, toRange);
@@ -99,7 +99,7 @@ static void BM_Algo(benchmark::State& state)
     RandomFill(local_numbers);
     for (auto _ : state)
     {
-        benchmark::DoNotOptimize(find_even_algo(local_numbers));
+        benchmark::DoNotOptimize(count_even_algo(local_numbers));
     }
 }
 BENCHMARK(BM_Algo)->Range(fromRange, toRange);

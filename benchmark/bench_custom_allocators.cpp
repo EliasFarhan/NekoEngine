@@ -31,11 +31,11 @@ BENCHMARK(BM_StdVectorAllocate)->Range(fromRange, toRange);
 static void BM_LinearAllocate(benchmark::State& state)
 {
     size_t size = state.range(0);
-    size_t* values = (size_t*) calloc(size, sizeof(size_t));
+    size_t* values = (size_t*) calloc(size+1, sizeof(size_t));
     size_t maxMemory = 0;
     for (auto _ : state)
     {
-        neko::LinearAllocator allocator(size * sizeof(size_t), values);
+        neko::LinearAllocator allocator((size+1) * sizeof(size_t), values);
         size_t* v = (size_t*) allocator.Allocate(sizeof(size_t) * size, alignof(size_t));
         for (size_t i = 0; i < size; i++)
         {
