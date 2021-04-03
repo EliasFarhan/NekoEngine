@@ -69,7 +69,7 @@ void PerlinViewer::Destroy()
 void PerlinViewer::DrawImGui()
 {
     ImGui::Begin("Perlin Viewer");
-    if(perlinTexture_ != neko::INVALID_TEXTURE_NAME)
+    if(perlinTexture_ != gl::INVALID_TEXTURE_NAME)
     {
         bool update = false;
         update = ImGui::InputFloat("Scale", &currentScale_, 1.0f);
@@ -85,7 +85,7 @@ void PerlinViewer::DrawImGui()
 
 void PerlinViewer::ReloadTexture()
 {
-    if(perlinTexture_ != neko::INVALID_TEXTURE_NAME)
+    if(perlinTexture_ != gl::INVALID_TEXTURE_NAME)
     {
         glDeleteTextures(1, &perlinTexture_);
     }
@@ -108,7 +108,7 @@ void PerlinViewer::ReloadTexture()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, textureSize_, textureSize_, 0, GL_RED, GL_FLOAT, &perlinValues_[0][0]);
-    glBindTexture(GL_TEXTURE_2D, neko::INVALID_TEXTURE_NAME);
+    glBindTexture(GL_TEXTURE_2D, gl::INVALID_TEXTURE_NAME);
 }
 
 void PerlinViewer::Render()

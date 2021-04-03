@@ -300,9 +300,9 @@ void ClientGameManager::SpawnPlayer(net::PlayerNumber playerNumber, Vec2f positi
     GameManager::SpawnPlayer(playerNumber, position, rotation);
     const auto entity = GetEntityFromPlayerNumber(playerNumber);
     const auto& config = BasicEngine::GetInstance()->GetConfig();
-    if (shipTextureId_ == INVALID_TEXTURE_ID)
+    if (shipTextureId_ == gl::INVALID_TEXTURE_ID)
     {
-        shipTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/asteroid/ship.png", Texture::DEFAULT);
+        shipTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/asteroid/ship.png", gl::Texture::DEFAULT);
     }
     spriteManager_.AddComponent(entity);
     spriteManager_.SetTexture(entity, shipTextureId_);
@@ -316,10 +316,10 @@ Entity ClientGameManager::SpawnBullet(net::PlayerNumber playerNumber, Vec2f posi
 {
     const auto entity = GameManager::SpawnBullet(playerNumber, position, velocity);
     const auto& config = BasicEngine::GetInstance()->GetConfig();
-    if (bulletTextureId_ == INVALID_TEXTURE_ID)
+    if (bulletTextureId_ == gl::INVALID_TEXTURE_ID)
     {
         bulletTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/asteroid/bullet.png",
-                                                       Texture::DEFAULT);
+                                                       gl::Texture::DEFAULT);
     }
     spriteManager_.AddComponent(entity);
     spriteManager_.SetTexture(entity, bulletTextureId_);

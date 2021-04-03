@@ -79,7 +79,7 @@ struct Vec2
     //-----------------------------------------------------------------------------
     // Constructors
     //-----------------------------------------------------------------------------
-    Vec2() noexcept
+    constexpr Vec2() noexcept
             : x(0), y(0)
     {
     }
@@ -89,7 +89,7 @@ struct Vec2
     {
     }
 
-    Vec2(T X, T Y) noexcept
+    constexpr Vec2(T X, T Y) noexcept
             : x(X), y(Y)
     {
     }
@@ -380,7 +380,7 @@ public:
 
     }
 
-    Vec3(T X, T Y, T Z)  noexcept
+    constexpr Vec3(T X, T Y, T Z)  noexcept
             : x(X), y(Y), z(Z)
     {
 
@@ -709,7 +709,7 @@ public:
         }
     }
 
-    Vec4(T X, T Y, T Z, T W)  noexcept
+    constexpr Vec4(T X, T Y, T Z, T W)  noexcept
             : x(X), y(Y), z(Z), w(W)
     {
 

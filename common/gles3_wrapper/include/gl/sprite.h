@@ -26,6 +26,7 @@
 #include "gl/shader.h"
 #include "gl/shape.h"
 #include "engine/transform.h"
+#include "graphics/color.h"
 
 
 namespace neko::gl

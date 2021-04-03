@@ -112,8 +112,8 @@ protected:
     unsigned long long startingTime_ = 0;
 	std::uint32_t state_ = 0;
 
-    TextureId shipTextureId_ = INVALID_TEXTURE_ID;
-    TextureId bulletTextureId_ = INVALID_TEXTURE_ID;
+    gl::TextureId shipTextureId_ = gl::INVALID_TEXTURE_ID;
+    gl::TextureId bulletTextureId_ = gl::INVALID_TEXTURE_ID;
     FontId fontId_ = INVALID_FONT_ID;
     std::mutex renderMutex_;
 };
