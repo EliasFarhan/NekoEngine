@@ -63,8 +63,8 @@ private:
 	
 	std::array<Light, 4> lights_;
 	gl::TextureManager textureManager_;
-	TextureName hdrTexture_ = INVALID_TEXTURE_NAME;
-	TextureId hdrTextureId_;
+	gl::TextureName hdrTexture_ = gl::INVALID_TEXTURE_NAME;
+	gl::TextureId hdrTextureId_;
 	gl::RenderSphere sphere_{Vec3f::zero, 1.0f};
 	gl::RenderCuboid skybox_{ Vec3f::zero, Vec3f::one*2.0f };
 	gl::RenderQuad quad_{ Vec3f::zero, Vec2f::one*2.0f };
@@ -77,9 +77,9 @@ private:
 	gl::Shader brdfShader_;
 
 	unsigned int captureFbo_ = 0, captureRbo_ = 0;
-	TextureName envCubemap_ = 0;
-	TextureName irradianceMap_ = 0;
-	TextureName brdfLUTTexture_ = 0;
+	gl::TextureName envCubemap_ = 0;
+	gl::TextureName irradianceMap_ = 0;
+	gl::TextureName brdfLUTTexture_ = 0;
 
 	sdl::Camera3D camera_;
 	Vec3f baseColor_ = { 1.0f,0.5f,0.5f };
@@ -109,6 +109,6 @@ private:
 		Vec3f(0.0f, 1.0f,  0.0f),
 		}
 	};
-	TextureName prefilterMap_ = 0;
+    gl::TextureName prefilterMap_ = 0;
 };
 }

@@ -38,7 +38,7 @@ void HelloStencilProgam::Init()
                              config.dataRootPath + "shaders/12_hello_stencil/cube.frag");
     floorShader_.LoadFromFile(config.dataRootPath + "shaders/12_hello_stencil/floor.vert",
                               config.dataRootPath + "shaders/12_hello_stencil/floor.frag");
-	cubeTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/container.jpg", Texture::DEFAULT);
+	cubeTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/container.jpg", gl::Texture::DEFAULT);
 
 
 	camera_.position = Vec3f(0.0f, 4.0f, 4.0f);
@@ -82,7 +82,7 @@ void HelloStencilProgam::DrawImGui()
 
 void HelloStencilProgam::Render()
 {
-	if (cubeTexture_ == INVALID_TEXTURE_NAME)
+	if (cubeTexture_ == gl::INVALID_TEXTURE_NAME)
 	{
 		cubeTexture_ = textureManager_.GetTextureName(cubeTextureId_);
 		return;

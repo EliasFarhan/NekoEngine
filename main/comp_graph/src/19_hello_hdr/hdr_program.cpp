@@ -40,7 +40,7 @@ void HelloHdrProgram::Init()
 
     cubeTextureId_ = textureManager_.LoadTexture(
         config.dataRootPath+"sprites/brickwall/brickwall.jpg",
-        Texture::TextureFlags(Texture::MIRROR_REPEAT_WRAP | Texture::GAMMA_CORRECTION | Texture::DEFAULT));
+        gl::Texture::TextureFlags(gl::Texture::MIRROR_REPEAT_WRAP | gl::Texture::GAMMA_CORRECTION | gl::Texture::DEFAULT));
 
 
     CreateFramebuffer();
@@ -87,7 +87,7 @@ void HelloHdrProgram::DrawImGui()
 
 void HelloHdrProgram::Render()
 {
-    if (cubeTexture_ == INVALID_TEXTURE_NAME)
+    if (cubeTexture_ == gl::INVALID_TEXTURE_NAME)
     {
         cubeTexture_ = textureManager_.GetTextureName(cubeTextureId_);
         return;

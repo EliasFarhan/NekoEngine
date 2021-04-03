@@ -63,8 +63,8 @@ private:
     };
     gl::Shader shader_;
     gl::TextureManager textureManager_;
-    TextureName  textureWall_ = INVALID_TEXTURE_NAME;
-    TextureId  textureWallId_;
+    gl::TextureName  textureWall_ = gl::INVALID_TEXTURE_NAME;
+    gl::TextureId  textureWallId_;
 
     Mat4f view{Mat4f::Identity};
     Mat4f projection{Mat4f::Identity};

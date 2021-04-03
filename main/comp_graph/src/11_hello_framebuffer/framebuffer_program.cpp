@@ -82,7 +82,7 @@ void HelloFramebufferProgram::Init()
     screenEdgeDetectionShader_.LoadFromFile(
             config.dataRootPath + "shaders/11_hello_framebuffer/screen.vert",
             config.dataRootPath + "shaders/11_hello_framebuffer/screen_edge_detection.frag");
-    containerTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/container.jpg", Texture::DEFAULT);
+    containerTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/container.jpg", gl::Texture::DEFAULT);
 
 
     modelShader_.LoadFromFile(config.dataRootPath + "shaders/11_hello_framebuffer/model.vert",
@@ -140,7 +140,7 @@ void HelloFramebufferProgram::DrawImGui()
 void HelloFramebufferProgram::Render()
 {
 
-    if (containerTexture_ == INVALID_TEXTURE_NAME)
+    if (containerTexture_ == gl::INVALID_TEXTURE_NAME)
     {
         containerTexture_ = textureManager_.GetTextureName(containerTextureId_);
         return;

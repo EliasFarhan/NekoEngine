@@ -40,7 +40,7 @@ void HelloCubemapsProgram::Init()
                                              config.dataRootPath + "sprites/skybox/front.jpg",
                                              config.dataRootPath + "sprites/skybox/back.jpg"
         }, BasicEngine::GetInstance()->GetFilesystem());
-    skyboxTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/skybox/skybox.skybox", Texture::DEFAULT);
+    skyboxTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/skybox/skybox.skybox", gl::Texture::DEFAULT);
     skyboxShader_.LoadFromFile(
         config.dataRootPath + "shaders/15_hello_cubemaps/skybox.vert",
         config.dataRootPath + "shaders/15_hello_cubemaps/skybox.frag");
@@ -54,7 +54,7 @@ void HelloCubemapsProgram::Init()
     camera_.position = Vec3f(0, 3, 3);
     camera_.WorldLookAt(Vec3f::zero);
     cube_.Init();
-    cubeTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/container.jpg.ktx", Texture::DEFAULT);
+    cubeTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/container.jpg.ktx", gl::Texture::DEFAULT);
 
 }
 
@@ -115,16 +115,16 @@ void HelloCubemapsProgram::Render()
     {
         return;
     }
-    if (cubeTexture_ == INVALID_TEXTURE_NAME)
+    if (cubeTexture_ == gl::INVALID_TEXTURE_NAME)
     {
         cubeTexture_ = textureManager_.GetTextureName(cubeTextureId_);
-        if(cubeTexture_ == INVALID_TEXTURE_NAME)
+        if(cubeTexture_ == gl::INVALID_TEXTURE_NAME)
             return;
     }
-    if(skyboxKtxTexture_ == INVALID_TEXTURE_NAME) 
+    if(skyboxKtxTexture_ == gl::INVALID_TEXTURE_NAME)
     {
         skyboxKtxTexture_ = textureManager_.GetTextureName(skyboxTextureId_);
-        if(skyboxKtxTexture_ == INVALID_TEXTURE_NAME)
+        if(skyboxKtxTexture_ == gl::INVALID_TEXTURE_NAME)
             return;
     }
     std::lock_guard<std::mutex> lock(updateMutex_);

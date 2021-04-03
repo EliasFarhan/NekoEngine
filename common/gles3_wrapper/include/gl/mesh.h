@@ -48,8 +48,8 @@ namespace neko::assimp
 
 	struct Texture
 	{
-		TextureId textureId = INVALID_TEXTURE_ID;
-		TextureName textureName = INVALID_TEXTURE_NAME;
+		gl::TextureId textureId = gl::INVALID_TEXTURE_ID;
+        gl::TextureName textureName = gl::INVALID_TEXTURE_NAME;
 
 		aiTextureType type = aiTextureType_NONE;
 	};

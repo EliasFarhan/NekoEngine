@@ -50,14 +50,14 @@ private:
 	gl::Shader pbrShader_;
 	sdl::Camera3D camera_;
 	gl::TextureManager textureManager_;
-	TextureName albedo_;
-	TextureId albedoId_;
-	TextureName normal_;
-	TextureId normalId_;
-	TextureName metallic_;
-	TextureId metallicId_;
-	TextureName roughness_;
-	TextureId roughnessId_;
+	gl::TextureName albedo_;
+	gl::TextureId albedoId_;
+	gl::TextureName normal_;
+	gl::TextureId normalId_;
+	gl::TextureName metallic_;
+	gl::TextureId metallicId_;
+	gl::TextureName roughness_;
+	gl::TextureId roughnessId_;
 	unsigned int ao_ = 0;
 
 

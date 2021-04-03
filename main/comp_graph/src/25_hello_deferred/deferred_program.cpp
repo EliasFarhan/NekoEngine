@@ -65,8 +65,8 @@ void HelloDeferredProgram::Init()
 
     modelId_ = modelManager_.LoadModel(config.dataRootPath+"model/nanosuit2/nanosuit.obj");
     cube_.Init();
-    containerId_ = textureManager_.LoadTexture(config.dataRootPath + "material/container2.png", Texture::DEFAULT);
-    containerSpecularId_ = textureManager_.LoadTexture(config.dataRootPath + "material/container2_specular.png", Texture::DEFAULT);
+    containerId_ = textureManager_.LoadTexture(config.dataRootPath + "material/container2.png", gl::Texture::DEFAULT);
+    containerSpecularId_ = textureManager_.LoadTexture(config.dataRootPath + "material/container2_specular.png", gl::Texture::DEFAULT);
 
 
     camera_.position = Vec3f(0.0f, 3.0f, -3.0f);
@@ -128,16 +128,16 @@ void HelloDeferredProgram::Render()
     {
         return;
     }
-    if (containerSpecular_ == INVALID_TEXTURE_NAME)
+    if (containerSpecular_ == gl::INVALID_TEXTURE_NAME)
     {
         containerSpecular_ = textureManager_.GetTextureName(containerSpecularId_);
-        if (containerSpecular_ == INVALID_TEXTURE_NAME)
+        if (containerSpecular_ == gl::INVALID_TEXTURE_NAME)
 			return;
     }
-    if(container_ == INVALID_TEXTURE_NAME)
+    if(container_ == gl::INVALID_TEXTURE_NAME)
     {
         container_ = textureManager_.GetTextureName(containerId_);
-        if (container_ == INVALID_TEXTURE_NAME)
+        if (container_ == gl::INVALID_TEXTURE_NAME)
             return;
         return;
     }

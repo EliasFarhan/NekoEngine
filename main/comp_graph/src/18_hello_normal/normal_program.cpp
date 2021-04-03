@@ -32,9 +32,9 @@ void HelloNormalProgram::Init()
 {
     textureManager_.Init();
     const auto& config = BasicEngine::GetInstance()->GetConfig();
-    diffuseTexId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/brickwall/brickwall.jpg", Texture::DEFAULT);
+    diffuseTexId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/brickwall/brickwall.jpg", gl::Texture::DEFAULT);
 
-    normalTexId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/brickwall/brickwall_normal.jpg", Texture::DEFAULT);
+    normalTexId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/brickwall/brickwall_normal.jpg", gl::Texture::DEFAULT);
 
 
     normalShader_.LoadFromFile(
@@ -109,12 +109,12 @@ void HelloNormalProgram::Render()
 {
     if (!modelManager_.IsLoaded(modelId_))
         return;
-    if (normalTex_ == INVALID_TEXTURE_NAME)
+    if (normalTex_ == gl::INVALID_TEXTURE_NAME)
     {
         normalTex_ = textureManager_.GetTextureName(normalTexId_);
         return;
     }
-    if (diffuseTex_ == INVALID_TEXTURE_NAME)
+    if (diffuseTex_ == gl::INVALID_TEXTURE_NAME)
     {
         diffuseTex_ = textureManager_.GetTextureName(diffuseTexId_);
         return;

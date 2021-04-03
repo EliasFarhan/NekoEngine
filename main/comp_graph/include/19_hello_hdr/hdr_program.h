@@ -77,8 +77,8 @@ private:
     gl::RenderCuboid cube_{Vec3f::forward*10.0f, Vec3f(5.0f,5.0f,50.0f)};
 
     gl::TextureManager textureManager_;
-    TextureName cubeTexture_;
-    TextureId cubeTextureId_;
+    gl::TextureName cubeTexture_;
+    gl::TextureId cubeTextureId_;
     gl::Shader cubeShader_;
 
     sdl::Camera3D camera_;

@@ -34,9 +34,9 @@ void HelloBlendingProgram::Init()
 		config.dataRootPath + "shaders/28_hello_blending/blending.vert",
 		config.dataRootPath + "shaders/28_hello_blending/blending.frag");
 	camera_.Init();
-	windowTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/blending_transparent_window.png", Texture::DEFAULT);
+	windowTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/blending_transparent_window.png", gl::Texture::DEFAULT);
 	
-	cubeTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/container.jpg", Texture::DEFAULT);
+	cubeTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/container.jpg", gl::Texture::DEFAULT);
 	
 	plane_.Init();
 	cube_.Init();
@@ -88,16 +88,16 @@ void HelloBlendingProgram::DrawImGui()
 
 void HelloBlendingProgram::Render()
 {
-	if (windowTexture_ == INVALID_TEXTURE_NAME )
+	if (windowTexture_ == gl::INVALID_TEXTURE_NAME )
 	{
 		windowTexture_ = textureManager_.GetTextureName(windowTextureId_);
-		if (windowTexture_ == INVALID_TEXTURE_NAME)
+		if (windowTexture_ == gl::INVALID_TEXTURE_NAME)
 			return;
 	}
-	if ( cubeTexture_ == INVALID_TEXTURE_NAME)
+	if (cubeTexture_ == gl::INVALID_TEXTURE_NAME)
 	{
 		cubeTexture_ = textureManager_.GetTextureName(cubeTextureId_);
-		if (cubeTexture_ == INVALID_TEXTURE_NAME)
+		if (cubeTexture_ == gl::INVALID_TEXTURE_NAME)
 			return;
 	}
 	std::lock_guard<std::mutex> lock(updateMutex_);

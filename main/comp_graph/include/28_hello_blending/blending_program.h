@@ -50,14 +50,14 @@ private:
 	gl::RenderCuboid cube_{ Vec3f::zero, Vec3f::one };
 	gl::Shader cutoffShader_;
 	gl::TextureManager textureManager_;
-	TextureName windowTexture_ = INVALID_TEXTURE_NAME;
-	TextureId windowTextureId_;
-	TextureName cubeTexture_ = INVALID_TEXTURE_NAME;
-	TextureId cubeTextureId_;
+	gl::TextureName windowTexture_ = gl::INVALID_TEXTURE_NAME;
+	gl::TextureId windowTextureId_;
+	gl::TextureName cubeTexture_ = gl::INVALID_TEXTURE_NAME;
+	gl::TextureId cubeTextureId_;
 
 	sdl::Camera3D camera_;
 
-	TextureName whiteTexture_ = 0;
+	gl::TextureName whiteTexture_ = 0;
 	std::uint8_t flags_ = NONE;
 };
 }

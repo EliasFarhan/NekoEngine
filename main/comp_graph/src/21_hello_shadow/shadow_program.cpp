@@ -40,7 +40,7 @@ void HelloShadowProgram::Init()
     modelId_ = modelManager_.LoadModel(config.dataRootPath + "model/nanosuit2/nanosuit.obj");
 
     floorTextureId_ = textureManager_.LoadTexture(
-        config.dataRootPath + "sprites/brickwall/brickwall.jpg", Texture::DEFAULT);
+        config.dataRootPath + "sprites/brickwall/brickwall.jpg", gl::Texture::DEFAULT);
 
     glGenFramebuffers(1, &depthMapFbo_);
     glGenTextures(1, &depthMap_);
@@ -156,7 +156,7 @@ void HelloShadowProgram::Render()
     {
         return;
     }
-    if (floorTexture_ == INVALID_TEXTURE_NAME)
+    if (floorTexture_ == gl::INVALID_TEXTURE_NAME)
     {
         floorTexture_ = textureManager_.GetTextureName(floorTextureId_);
         return;

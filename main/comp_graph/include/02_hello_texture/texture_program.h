@@ -45,18 +45,18 @@ public:
 
     void OnEvent(const SDL_Event& event) override;
 
-    static TextureName LoadTextureWithGli(std::string_view path);
+    static gl::TextureName LoadTextureWithGli(std::string_view path);
 
 private:
     gl::RenderQuad quad_{Vec3f::zero, Vec2f::one};
     gl::Shader shader_;
 
     gl::TextureManager textureManager_;
-    TextureName texture_ = INVALID_TEXTURE_NAME;
-    TextureId textureId_;
-    TextureName textureKtx_ = INVALID_TEXTURE_NAME;
+    gl::TextureName texture_ = gl::INVALID_TEXTURE_NAME;
+    gl::TextureId textureId_;
+    gl::TextureName textureKtx_ = gl::INVALID_TEXTURE_NAME;
 
-    TextureName gliTextureName_ = INVALID_TEXTURE_NAME;
+    gl::TextureName gliTextureName_ = gl::INVALID_TEXTURE_NAME;
 
     enum class TextureType
 	{

@@ -67,8 +67,8 @@ private:
 
     gl::Shader cubeShader_;
     gl::TextureManager textureManager_;
-    TextureName cubeTexture_ = INVALID_TEXTURE_NAME;
-    TextureId cubeTextureId_;
+    gl::TextureName cubeTexture_ = gl::INVALID_TEXTURE_NAME;
+    gl::TextureId cubeTextureId_;
 
     const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
     unsigned int depthMapFbo_;

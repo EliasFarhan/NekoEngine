@@ -44,7 +44,7 @@ void HelloPointShadowProgram::Init()
 		config.dataRootPath + "shaders/23_hello_point_shadow/lamp.frag");
 
 	cubeTextureId_ = textureManager_.LoadTexture(
-	        config.dataRootPath + "sprites/brickwall/brickwall.jpg", Texture::DEFAULT);
+	        config.dataRootPath + "sprites/brickwall/brickwall.jpg", gl::Texture::DEFAULT);
 
 	glGenFramebuffers(1, &depthMapFbo_);
 	// create depth cubemap texture
@@ -115,7 +115,7 @@ void HelloPointShadowProgram::DrawImGui()
 
 void HelloPointShadowProgram::Render()
 {
-	if (cubeTexture_ == INVALID_TEXTURE_NAME)
+	if (cubeTexture_ == gl::INVALID_TEXTURE_NAME)
 	{
 		cubeTexture_ = textureManager_.GetTextureName(cubeTextureId_);
 		return;

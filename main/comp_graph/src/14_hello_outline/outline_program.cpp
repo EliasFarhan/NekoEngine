@@ -32,7 +32,7 @@ void HelloOutlineProgram::Init()
 	textureManager_.Init();
 	const auto& config = BasicEngine::GetInstance()->GetConfig();
 	cube_.Init();
-	cubeTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/container.jpg", Texture::DEFAULT);
+	cubeTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/container.jpg", gl::Texture::DEFAULT);
 
 
     modelShader_.LoadFromFile(config.dataRootPath + "shaders/14_hello_outline/model.vert",
@@ -80,7 +80,7 @@ void HelloOutlineProgram::DrawImGui()
 
 void HelloOutlineProgram::Render()
 {
-	if (cubeTexture_ == INVALID_TEXTURE_NAME)
+	if (cubeTexture_ == gl::INVALID_TEXTURE_NAME)
 	{
 		cubeTexture_ = textureManager_.GetTextureName(cubeTextureId_);
 		return;

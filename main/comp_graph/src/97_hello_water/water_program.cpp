@@ -53,9 +53,9 @@ void HelloWaterProgram::Init()
 		config.dataRootPath + "shaders/97_hello_water/water.frag");
 
 	dudvTexturerId_ = textureManager_.LoadTexture(
-		config.dataRootPath + "sprites/water/waveDUDV.png", Texture::DEFAULT);
+		config.dataRootPath + "sprites/water/waveDUDV.png", gl::Texture::DEFAULT);
 	normalMapId_ = textureManager_.LoadTexture(
-	        config.dataRootPath + "sprites/water/waveNM.png", Texture::DEFAULT);
+	        config.dataRootPath + "sprites/water/waveNM.png", gl::Texture::DEFAULT);
 	
 	CreateFramebuffer();
 	CreateDepthbuffer();
@@ -104,16 +104,16 @@ void HelloWaterProgram::Render()
 	{
 		return;
 	}
-	if (dudvTexturer_ == INVALID_TEXTURE_NAME)
+	if (dudvTexturer_ == gl::INVALID_TEXTURE_NAME)
 	{
 		dudvTexturer_ = textureManager_.GetTextureName(dudvTexturerId_);
-		if (dudvTexturer_ == INVALID_TEXTURE_NAME)
+		if (dudvTexturer_ == gl::INVALID_TEXTURE_NAME)
 			return;
 	}
-	if (normalMap_ == INVALID_TEXTURE_NAME)
+	if (normalMap_ == gl::INVALID_TEXTURE_NAME)
 	{
 		normalMap_ = textureManager_.GetTextureName(normalMapId_);
-		if (normalMap_ == INVALID_TEXTURE_NAME)
+		if (normalMap_ == gl::INVALID_TEXTURE_NAME)
 			return;
 	}
 	std::lock_guard<std::mutex> lock(updateMutex_);

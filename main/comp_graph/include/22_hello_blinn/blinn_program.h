@@ -50,8 +50,8 @@ private:
 
 	gl::RenderQuad floor_{Vec3f::zero, Vec2f::one*10.0f};
 	gl::TextureManager textureManager_;
-	TextureName floorTexture_ = INVALID_TEXTURE_NAME;
-	TextureId floorTextureId_;
+    gl::TextureName floorTexture_ = gl::INVALID_TEXTURE_NAME;
+    gl::TextureId floorTextureId_;
 	float floorResolution_ = 6.0f;
 	int specularPow_ = 32;
 	enum BlinnFlags : std::uint8_t

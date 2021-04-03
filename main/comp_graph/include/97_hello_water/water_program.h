@@ -49,17 +49,17 @@ private:
 
 	gl::RenderQuad quad_{Vec3f::zero, Vec2f::one};
 	gl::RenderCuboid skyboxCube_{Vec3f::zero, Vec3f::one*2.0f};
-	TextureName skyboxTexture_ = 0;
+	gl::TextureName skyboxTexture_ = 0;
 	sdl::Camera3D camera_;
 	gl::Shader modelShader_;
 	gl::Shader waterShader_;
 	gl::Shader skyboxShader_;
 
 	gl::TextureManager textureManager_;
-	TextureName dudvTexturer_;
-	TextureId dudvTexturerId_;
-	TextureName normalMap_;
-	TextureId normalMapId_;
+	gl::TextureName dudvTexturer_;
+	gl::TextureId dudvTexturerId_;
+	gl::TextureName normalMap_;
+	gl::TextureId normalMapId_;
 
 	const Vec2u reflectionFrameSize = Vec2u(480, 240);
 	unsigned int reflectionFramebuffer_;

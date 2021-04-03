@@ -53,8 +53,8 @@ private:
 	gl::Shader cubeShader_;
 	gl::Shader floorShader_;
 	gl::TextureManager textureManager_;
-	TextureName cubeTexture_ = INVALID_TEXTURE_NAME;
-	TextureId cubeTextureId_;
+	gl::TextureName cubeTexture_ = gl::INVALID_TEXTURE_NAME;
+	gl::TextureId cubeTextureId_;
 
 	sdl::Camera3D camera_;
 	std::uint8_t flags_ = NONE;

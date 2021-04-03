@@ -54,8 +54,8 @@ private:
     gl::ModelManager modelManager_;
 	gl::RenderCuboid cube_{ Vec3f::zero, Vec3f::one };
 	gl::TextureManager textureManager_;
-	TextureName cubeTexture_ = INVALID_TEXTURE_NAME;
-	TextureId cubeTextureId_;
+	gl::TextureName cubeTexture_ = gl::INVALID_TEXTURE_NAME;
+	gl::TextureId cubeTextureId_;
 	gl::Shader modelShader_;
 
 	sdl::Camera3D externalCamera_;

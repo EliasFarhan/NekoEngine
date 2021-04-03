@@ -79,8 +79,8 @@ private:
     gl::ModelId dragonModelId_ = gl::INVALID_MODEL_ID;
 
     gl::TextureManager textureManager_;
-    TextureName brickWall_ = INVALID_TEXTURE_NAME;
-    TextureId brickWallId_;
-    TextureName whiteTexture_ = 0;
+    gl::TextureName brickWall_ = gl::INVALID_TEXTURE_NAME;
+    gl::TextureId brickWallId_;
+    gl::TextureName whiteTexture_ = 0;
 };
 }

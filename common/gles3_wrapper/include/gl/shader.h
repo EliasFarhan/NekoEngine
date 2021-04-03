@@ -24,7 +24,7 @@
  */
 #include <string>
 #include <graphics/shader.h>
-#include "graphics/texture.h"
+#include "gl/texture.h"
 #include "gl/gles3_include.h"
 #include "mathematics/vector.h"
 #include "mathematics/matrix.h"

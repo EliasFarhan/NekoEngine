@@ -41,11 +41,11 @@ void HelloTextureProgram::Init()
     quad_.Init();
 
     const auto texturePath = config.dataRootPath + "sprites/wall.jpg";
-    textureId_ = textureManager_.LoadTexture(texturePath, Texture::DEFAULT);
-    texture_ = gl::StbCreateTexture(texturePath, filesystem, Texture::DEFAULT);
+    textureId_ = textureManager_.LoadTexture(texturePath, gl::Texture::DEFAULT);
+    texture_ = gl::StbCreateTexture(texturePath, filesystem, gl::Texture::DEFAULT);
 	//textureId_ = neko::gl::stbCreateTexture(texturePath);
 
-    gliTextureName_ = LoadTextureWithGli(texturePath + ".ktx");
+    gliTextureName_ = gl::CreateTextureFromKTX(texturePath + ".ktx", filesystem);
     glEnable(GL_DEPTH_TEST);
 }
 
@@ -59,7 +59,7 @@ void HelloTextureProgram::Destroy()
     quad_.Destroy();
     shader_.Destroy();
     textureManager_.Destroy();
-    if(texture_ != INVALID_TEXTURE_NAME)
+    if(texture_ != gl::INVALID_TEXTURE_NAME)
         gl::DestroyTexture(texture_);
     gl::DestroyTexture(gliTextureName_);
 }
@@ -70,7 +70,7 @@ void HelloTextureProgram::Render()
     {
         return;
     }
-	if (textureKtx_ == INVALID_TEXTURE_NAME)
+	if (textureKtx_ == gl::INVALID_TEXTURE_NAME)
 	{
         textureKtx_ = textureManager_.GetTextureName(textureId_);
         return;
@@ -122,7 +122,7 @@ void HelloTextureProgram::OnEvent(const SDL_Event& event)
 
 }
 
-TextureName HelloTextureProgram::LoadTextureWithGli(std::string_view path)
+gl::TextureName HelloTextureProgram::LoadTextureWithGli(std::string_view path)
 {
     gli::texture texture = gli::load(path.data());
     if (texture.empty())

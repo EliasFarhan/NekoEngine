@@ -22,8 +22,6 @@
  SOFTWARE.
  */
 
-#include <graphics/sprite.h>
-
 #include "gl/sprite.h"
 #include "engine/transform.h"
 #include "graphics/camera.h"
@@ -36,6 +34,30 @@
 namespace neko::gl
 {
 
+void SpriteManagerInterface::SetTexture(neko::Entity entity, TextureId textureId)
+{
+    auto& sprite = components_[entity];
+    sprite.textureId = textureId;
+
+}
+
+void SpriteManagerInterface::Update([[maybe_unused]]neko::seconds dt)
+{
+    //Update sprite if textureName is INVALID
+    for(Entity entity = 0; entity < entityManager_.get().GetEntitiesSize(); entity++)
+    {
+        if(entityManager_.get().HasComponent(entity, static_cast<EntityMask>(ComponentType::SPRITE2D)))
+        {
+            auto& sprite = components_[entity];
+            if(sprite.textureId != INVALID_TEXTURE_ID && sprite.texture.name == INVALID_TEXTURE_NAME)
+            {
+                const auto* texture = textureManager_.GetTexture(sprite.textureId);
+                if(texture)
+                    sprite.texture = *texture;
+            }
+        }
+    }
+}
 
 void SpriteManager::Init()
 {
@@ -89,7 +111,7 @@ void SpriteManager::Render()
 
 SpriteManager::SpriteManager(EntityManager& entityManager, TextureManagerInterface& textureManager,
                              Transform2dManager& transformManager) :
-    neko::SpriteManager(entityManager, textureManager,transformManager)
+    SpriteManagerInterface(entityManager, textureManager,transformManager)
 {
 
 }

@@ -79,11 +79,11 @@ private:
     gl::ModelId modelId_ = gl::INVALID_MODEL_ID;
 
     gl::TextureManager textureManager_;
-    TextureName container_ = INVALID_TEXTURE_NAME;
-    TextureId containerId_;
-    TextureName containerSpecular_ = INVALID_TEXTURE_NAME;
-    TextureId containerSpecularId_;
-    TextureName whiteTexture_ = 0;
+    gl::TextureName container_ = gl::INVALID_TEXTURE_NAME;
+    gl::TextureId containerId_;
+    gl::TextureName containerSpecular_ = gl::INVALID_TEXTURE_NAME;
+    gl::TextureId containerSpecularId_;
+    gl::TextureName whiteTexture_ = 0;
 
     unsigned int gBuffer_ = 0;
     unsigned int gPosition_ = 0;

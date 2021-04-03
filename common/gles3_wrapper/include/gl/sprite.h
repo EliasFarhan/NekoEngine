@@ -23,15 +23,45 @@
  SOFTWARE.
  */
 
-#include "graphics/sprite.h"
 #include "gl/shader.h"
 #include "gl/shape.h"
+#include "engine/transform.h"
 
 
 namespace neko::gl
 {
 
-class SpriteManager : public neko::SpriteManager
+struct Sprite
+{
+    Sprite() = default;
+    ~Sprite() = default;
+    Color4 color = Color4(Color::white, 1.0f);
+    TextureId textureId = INVALID_TEXTURE_ID;
+    Texture texture{};
+};
+
+class SpriteManagerInterface :
+        public ComponentManager<Sprite, EntityMask(ComponentType::SPRITE2D)>,
+        public SystemInterface,
+        public RenderCommandInterface
+{
+public:
+    explicit SpriteManagerInterface (
+            EntityManager& entityManager,
+            TextureManagerInterface& textureManager,
+            Transform2dManager& transformManager) :
+            ComponentManager(entityManager),
+            textureManager_(textureManager),
+            transformManager_(transformManager)
+    {}
+
+    void Update(seconds dt) override;
+    void SetTexture(Entity entity, TextureId textureId);
+protected:
+    TextureManagerInterface& textureManager_;
+    Transform2dManager& transformManager_;
+};
+class SpriteManager : public SpriteManagerInterface
 {
 public:
     explicit SpriteManager(

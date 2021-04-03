@@ -56,13 +56,13 @@ void HelloPbrTextureProgram::Init()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glCheckError();
 
-	albedoId_ = textureManager_.LoadTexture(config.dataRootPath + "textures/rustediron2/rustediron2_basecolor.png", Texture::DEFAULT);
+	albedoId_ = textureManager_.LoadTexture(config.dataRootPath + "textures/rustediron2/rustediron2_basecolor.png", gl::Texture::DEFAULT);
 	
-	normalId_ = textureManager_.LoadTexture(config.dataRootPath + "textures/rustediron2/rustediron2_normal.png", Texture::DEFAULT);
+	normalId_ = textureManager_.LoadTexture(config.dataRootPath + "textures/rustediron2/rustediron2_normal.png", gl::Texture::DEFAULT);
 	
-	metallicId_ = textureManager_.LoadTexture(config.dataRootPath + "textures/rustediron2/rustediron2_metallic.png", Texture::DEFAULT);
+	metallicId_ = textureManager_.LoadTexture(config.dataRootPath + "textures/rustediron2/rustediron2_metallic.png", gl::Texture::DEFAULT);
 	
-	roughnessId_ = textureManager_.LoadTexture(config.dataRootPath + "textures/rustediron2/rustediron2_roughness.png", Texture::DEFAULT);
+	roughnessId_ = textureManager_.LoadTexture(config.dataRootPath + "textures/rustediron2/rustediron2_roughness.png", gl::Texture::DEFAULT);
 	
 }
 
@@ -79,7 +79,7 @@ void HelloPbrTextureProgram::Destroy()
 	sphere_.Destroy();
 	pbrShader_.Destroy();
 	textureManager_.Destroy();
-	albedo_ = INVALID_TEXTURE_NAME;
+	albedo_ = gl::INVALID_TEXTURE_NAME;
 }
 
 void HelloPbrTextureProgram::DrawImGui()
@@ -89,28 +89,28 @@ void HelloPbrTextureProgram::DrawImGui()
 void HelloPbrTextureProgram::Render()
 {
 	std::lock_guard<std::mutex> lock(updateMutex_);
-	if(albedo_ == INVALID_TEXTURE_NAME )
+	if(albedo_ == gl::INVALID_TEXTURE_NAME )
 	{
 		albedo_ = textureManager_.GetTextureName(albedoId_);
-		if (albedo_ == INVALID_TEXTURE_NAME)
+		if (albedo_ == gl::INVALID_TEXTURE_NAME)
 			return;
 	}
-	if (normal_ == INVALID_TEXTURE_NAME)
+	if (normal_ == gl::INVALID_TEXTURE_NAME)
 	{
 		normal_ = textureManager_.GetTextureName(normalId_);
-		if (normal_ == INVALID_TEXTURE_NAME)
+		if (normal_ == gl::INVALID_TEXTURE_NAME)
 			return;
 	}
-	if (metallic_ == INVALID_TEXTURE_NAME)
+	if (metallic_ == gl::INVALID_TEXTURE_NAME)
 	{
 		metallic_ = textureManager_.GetTextureName(metallicId_);
-		if (metallic_ == INVALID_TEXTURE_NAME)
+		if (metallic_ == gl::INVALID_TEXTURE_NAME)
 			return;
 	}
-	if (roughness_ == INVALID_TEXTURE_NAME)
+	if (roughness_ == gl::INVALID_TEXTURE_NAME)
 	{
 		roughness_ = textureManager_.GetTextureName(roughnessId_);
-		if (roughness_ == INVALID_TEXTURE_NAME)
+		if (roughness_ == gl::INVALID_TEXTURE_NAME)
 			return;
 	}
 	pbrShader_.Bind();

@@ -37,7 +37,7 @@ void HelloBlinnProgram::Init()
     floor_.Init();
     floorTextureId_ = textureManager_.LoadTexture(
         config.dataRootPath + "sprites/brickwall/brickwall.jpg",
-        Texture::TextureFlags(Texture::REPEAT_WRAP | Texture::DEFAULT));
+        gl::Texture::TextureFlags(gl::Texture::REPEAT_WRAP | gl::Texture::DEFAULT));
 
     modelId_ = modelManager_.LoadModel(config.dataRootPath + "model/nanosuit2/nanosuit.obj");
 
@@ -90,7 +90,7 @@ void HelloBlinnProgram::Render()
 {
     if (!modelManager_.IsLoaded(modelId_))
         return;
-    if (floorTexture_ == INVALID_TEXTURE_NAME)
+    if (floorTexture_ == gl::INVALID_TEXTURE_NAME)
     {
         floorTexture_ = textureManager_.GetTextureName(floorTextureId_);
         return;

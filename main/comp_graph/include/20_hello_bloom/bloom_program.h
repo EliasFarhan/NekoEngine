@@ -72,8 +72,8 @@ private:
 	gl::Shader blurShader_;
 	gl::Shader bloomShader_;
 	gl::TextureManager textureManager_;
-	TextureName cubeTexture_ = INVALID_TEXTURE_NAME;
-	TextureId cubeTextureId_;
+	gl::TextureName cubeTexture_ = gl::INVALID_TEXTURE_NAME;
+	gl::TextureId cubeTextureId_;
 	gl::RenderCuboid cube_{ Vec3f::zero, Vec3f::one };
 
 	std::array<Transform, 6> cubeTransforms_ = {

@@ -36,18 +36,7 @@
 
 namespace neko
 {
-/**
- * \brief Using OpenGL naming convention. A texture name is returned by glGenTextures
- */
-using TextureName = std::uint32_t;
-const TextureName INVALID_TEXTURE_NAME = 0;
-/**
- * \brief Unique identifier (16 bytes UUID for the texture in the texture manager.
- * Generated at compile time and loaded at init.
- */
-using TextureId = sole::uuid;
-const TextureId INVALID_TEXTURE_ID = sole::uuid();
-using TexturePathHash = xxh::hash32_t;
+
 /**
  * \brief Image stores the data from a image file.
  * Used for PNG JPG and other basic image format.
@@ -76,55 +65,5 @@ struct Image
  * @return
  */
 Image StbImageConvert(const BufferFile& imageFile, bool flipY=false, bool hdr = false);
-
-/**
- * \brief Result from Texture Manager functions: LoadTexture and GetTexture
- */
-struct Texture
-{
-    enum TextureFlags : unsigned
-    {
-        SMOOTH_TEXTURE = 1u << 0u,
-        MIPMAPS_TEXTURE = 1u << 1u,
-        CLAMP_WRAP = 1u << 2u,
-        REPEAT_WRAP = 1u << 3u,
-        MIRROR_REPEAT_WRAP = 1u << 4u,
-        GAMMA_CORRECTION = 1u << 5u,
-        FLIP_Y = 1u << 6u,
-        HDR = 1u << 7u,
-        DEFAULT = REPEAT_WRAP | SMOOTH_TEXTURE | MIPMAPS_TEXTURE,
-
-    };
-    TextureName name = INVALID_TEXTURE_NAME;
-    Vec2i size;
-};
-
-class TextureManagerInterface
-{
-public:
-	virtual ~TextureManagerInterface() = default;
-	virtual TextureId LoadTexture(std::string_view path, Texture::TextureFlags flags = Texture::DEFAULT) = 0;
-    [[nodiscard]] virtual const Texture* GetTexture(TextureId index) const = 0;
-    [[nodiscard]] virtual bool IsTextureLoaded(TextureId textureId) const = 0;
-};
-
-class NullTextureManager : public TextureManagerInterface
-{
-public:
-    TextureId LoadTexture([[maybe_unused]] std::string_view path, [[maybe_unused]] Texture::TextureFlags flags = Texture::DEFAULT) override
-    {
-        neko_assert(false, "[Warning] Using NullTextureManager to Load Texture");
-        logDebug("[Warning] Using NullTextureManager to Load Texture");
-	    return INVALID_TEXTURE_ID;
-    }
-    [[nodiscard]] const Texture* GetTexture([[maybe_unused]] TextureId index) const override
-    {
-        neko_assert(false, "[Warning] Using NullTextureManager to Get Texture Id");
-        logDebug("[Warning] Using NullTextureManager to Get Texture Id");
-	    return {};
-    }
-    [[nodiscard]] bool IsTextureLoaded([[maybe_unused]] TextureId textureId) const override  { return false; }
-};
-using TextureManagerLocator = Locator<TextureManagerInterface, NullTextureManager>;
 
 }

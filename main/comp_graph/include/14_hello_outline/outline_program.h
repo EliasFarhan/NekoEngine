@@ -51,8 +51,8 @@ private:
 	gl::Shader modelShader_;
 	gl::Shader outlineShader_;
 	gl::TextureManager textureManager_;
-	TextureName cubeTexture_ = INVALID_TEXTURE_NAME;
-	TextureId cubeTextureId_;
+	gl::TextureName cubeTexture_ = gl::INVALID_TEXTURE_NAME;
+	gl::TextureId cubeTextureId_;
 
 	sdl::Camera3D camera_;
 

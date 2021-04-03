@@ -32,8 +32,6 @@
 #include <graphics/texture.h>
 #include <engine/engine.h>
 
-#include "ktx.h"
-
 #include <fmt/format.h>
 
 
@@ -129,121 +127,78 @@ StbCreateTexture(const std::string_view filename, const FilesystemInterface& fil
     return texture;
 }
 
-void PrintKTXError(ktx_error_code_e result, const char* file, int line)
-{
-    std::string log;
-    switch (result)
-    {
-        case KTX_FILE_DATA_ERROR:
-            log = ("[KTX] Error file data error");
-            break;
-        case KTX_FILE_ISPIPE:
-            log = ("[KTX] Error file is pipe");
-            break;
-        case KTX_FILE_OPEN_FAILED:
-            log = ("[KTX] Error file open failed");
-            break;
-        case KTX_FILE_OVERFLOW:
-            log = ("[KTX] Error file overflow");
-            break;
-        case KTX_FILE_READ_ERROR:
-            log = ("[KTX] Error file read error");
-            break;
-        case KTX_FILE_SEEK_ERROR:
-            log = ("[KTX] Error file seek error");
-            break;
-        case KTX_FILE_UNEXPECTED_EOF:
-            log = ("[KTX] Error file unexpected eof");
-            break;
-        case KTX_FILE_WRITE_ERROR:
-            log = ("[KTX] Error file write error");
-            break;
-        case KTX_GL_ERROR:
-            log = ("[KTX] Error gl error");
-            break;
-        case KTX_INVALID_OPERATION:
-            log = ("[KTX] Error Invalid Operation");
-            break;
-        case KTX_INVALID_VALUE:
-            log = ("[KTX] Error Invliad value");
-            break;
-        case KTX_NOT_FOUND:
-            log = ("[KTX] Error KTX not found");
-            break;
-        case KTX_OUT_OF_MEMORY:
-            log = ("[KTX] Error Out fo memory");
-            break;
-        case KTX_TRANSCODE_FAILED:
-            log = ("[KTX] Error transcode failed");
-            break;
-        case KTX_UNKNOWN_FILE_FORMAT:
-            log = ("[KTX] Error file unknown file format");
-            break;
-        case KTX_UNSUPPORTED_TEXTURE_TYPE:
-            log = ("[KTX] Error unsupported texture type");
-            break;
-        case KTX_UNSUPPORTED_FEATURE:
-            log = ("[KTX] Error unsupported feature");
-            break;
-        case KTX_LIBRARY_NOT_LINKED:
-            log = ("[KTX] Error Library not linked");
-            break;
-        default:
-            return;
-    }
-    logDebug(fmt::format("{} in file: {} at line: {}", log, file, line));
-}
-
 
 TextureName CreateTextureFromKTX(const std::string_view filename, const FilesystemInterface& filesystem)
 {
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("Load KTX Texture");
-#endif
-    ktxTexture* kTexture = nullptr;
-    GLuint texture = 0;
-    GLenum target, glerror;
-#ifdef EASY_PROFILE_USE
     EASY_BLOCK("Open File");
 #endif
     BufferFile textureFile = filesystem.LoadFile(filename);
 #ifdef EASY_PROFILE_USE
     EASY_END_BLOCK;
 #endif
-    KTX_error_code result;
 
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("Create KTX from memory");
 #endif
-    result = ktxTexture_CreateFromMemory(
-            reinterpret_cast<const ktx_uint8_t*>(textureFile.dataBuffer),
-            textureFile.dataLength,
-            KTX_TEXTURE_CREATE_NO_FLAGS,
-            &kTexture);
+    gli::gl glProfile(gli::gl::PROFILE_ES30);
+
+    auto texture = gli::load(reinterpret_cast<const char*>(textureFile.dataBuffer), textureFile.dataLength);
+    if (texture.empty())
+    {
+        logDebug("Could not load texture with GLI");
+        return 0;
+    }
+    const gli::gl::format format = glProfile.translate(texture.format(), texture.swizzles());
+
+    GLenum target = glProfile.translate(texture.target());
+    logDebug(fmt::format("texture format: {}, texture target {}, is compressed {}",
+                         (int)texture.format(),
+                         (int) texture.target(),
+                         is_compressed(texture.format())));
 #ifdef EASY_PROFILE_USE
     EASY_END_BLOCK;
 #endif
-    if (result != KTX_SUCCESS)
-    {
-        PrintKTXError(result, __FILE__, __LINE__);
-        return INVALID_TEXTURE_NAME;
-    }
 
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("Upload Texture to GPU");
 #endif
-    glGenTextures(1, &texture); // Optional. GLUpload can generate a texture.
-    result = ktxTexture_GLUpload(kTexture, &texture, &target, &glerror);
+    TextureName textureName = 0;
+    glGenTextures(1, &textureName);
+    glBindTexture(target, textureName);
+
     glCheckError();
-    if(result != KTX_SUCCESS)
+    glTexParameteri(target, GL_TEXTURE_BASE_LEVEL, 0);
+    glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(texture.levels() - 1));
+
+    glCheckError();
+    glm::tvec3<GLsizei> extent{ texture.extent() };
+    glTexStorage2D(target, static_cast<GLint>(texture.levels()), format.Internal, extent.x, extent.y);
+
+    glCheckError();
+    for (std::size_t level = 0; level < texture.levels(); ++level)
     {
-        PrintKTXError(result, __FILE__, __LINE__);
+        glm::tvec3<GLsizei> levelExtent(texture.extent(level));
+        if(gli::is_compressed(texture.format()))
+        {
+            glCompressedTexSubImage2D(
+                    target, static_cast<GLint>(level), 0, 0, levelExtent.x, levelExtent.y,
+                    format.Internal, static_cast<GLsizei>(texture.size(level)), texture.data(0, 0, level));
+        }
+        else
+        {
+            glTexSubImage2D(
+                    target, static_cast<GLint>(level), 0, 0, levelExtent.x, levelExtent.y,
+                    format.Internal, static_cast<GLsizei>(texture.size(level)), texture.data(0, 0, level));
+        }
+        glCheckError();
     }
+    glCheckError();
 #ifdef EASY_PROFILE_USE
     EASY_END_BLOCK;
 #endif
-    ktxTexture_Destroy(kTexture);
-    return texture;
+    return textureName;
 }
 
 TextureName LoadCubemap(std::vector<std::string> facesFilename, const FilesystemInterface& filesystem)
@@ -451,25 +406,21 @@ void TextureLoader::LoadTexture()
 
 void TextureLoader::DecompressTexture()
 {
-    KTX_error_code result;
     {
 #ifdef EASY_PROFILE_USE
         EASY_BLOCK("Create KTX from memory");
 #endif
-        result = ktxTexture_CreateFromMemory(
-                reinterpret_cast<const ktx_uint8_t*>(
-                        bufferFile_.dataBuffer),
-                bufferFile_.dataLength,
-                KTX_TEXTURE_CREATE_NO_FLAGS,
-                &kTexture);
+        texture_.gliTexture = gli::load(reinterpret_cast<const char*>(
+                bufferFile_.dataBuffer),
+                                        bufferFile_.dataLength);
     }
-    if (result != KTX_SUCCESS)
+    if (texture_.gliTexture.empty())
     {
-        PrintKTXError(result, __FILE__, __LINE__);
+        logDebug("[Error] OpenGLI error while opening KTX content");
         error_ = TextureLoaderError::DECOMPRESS_ERROR;
         return;
     }
-    RendererLocator ::get().AddPreRenderJob(&uploadToGLJob_);
+    RendererLocator::get().AddPreRenderJob(&uploadToGLJob_);
 }
 
 void TextureLoader::UploadToGL()
@@ -477,17 +428,38 @@ void TextureLoader::UploadToGL()
 #ifdef EASY_PROFILE_USE
       EASY_BLOCK("Upload KTX Texture to GPU");
 #endif
-    GLenum target, glerror;
-    glGenTextures(1, &texture_.name); // Optional. GLUpload can generate a texture.
-    auto result = ktxTexture_GLUpload(kTexture, &texture_.name,
-                                      &target, &glerror);
-    glCheckError();
-    if (result != KTX_SUCCESS)
+    gli::gl glProfile(gli::gl::PROFILE_ES30);
+
+    auto& texture = texture_.gliTexture;
+    const auto isCompressed = gli::is_compressed(texture.format());
+    const auto format = glProfile.translate(texture.format(), texture.swizzles());
+    const auto target = glProfile.translate(texture.target());
+    glGenTextures(1, &texture_.name);
+    glBindTexture(target, texture_.name);
+
+    glTexParameteri(target, GL_TEXTURE_BASE_LEVEL, 0);
+    glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(texture.levels() - 1));
+
+    glm::tvec3<GLsizei> extent{ texture.extent() };
+    glTexStorage2D(target, static_cast<GLint>(texture.levels()), format.Internal, extent.x, extent.y);
+    for (std::size_t level = 0; level < texture.levels(); ++level)
     {
-        error_ = TextureLoaderError::UPLOAD_TO_GPU_ERROR;
-        PrintKTXError(result, __FILE__, __LINE__);
+        glm::tvec3<GLsizei> levelExtent(texture.extent(level));
+        if(isCompressed)
+        {
+            glCompressedTexSubImage2D(
+                    target, static_cast<GLint>(level), 0, 0, levelExtent.x, levelExtent.y,
+                    format.Internal, static_cast<GLsizei>(texture.size(level)), texture.data(0, 0, level));
+        }
+        else
+        {
+            glTexSubImage2D(
+                    target, static_cast<GLint>(level), 0, 0, levelExtent.x, levelExtent.y,
+                    format.Internal, static_cast<GLsizei>(texture.size(level)), texture.data(0, 0, level));
+        }
     }
-    ktxTexture_Destroy(kTexture);
+    glCheckError();
+
 }
 
 void TextureLoader::Start()

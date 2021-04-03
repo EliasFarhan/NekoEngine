@@ -38,7 +38,7 @@ void HelloCoordsProgram::Init()
     shader_.LoadFromFile(
             config.dataRootPath + "shaders/04_hello_coords/coords.vert",
             config.dataRootPath + "shaders/04_hello_coords/coords.frag");
-    textureWallId_ = textureManager_.LoadTexture(config.dataRootPath+"sprites/wall.jpg", Texture::DEFAULT);
+    textureWallId_ = textureManager_.LoadTexture(config.dataRootPath+"sprites/wall.jpg", gl::Texture::DEFAULT);
 
     cube_.Init();
 
@@ -71,7 +71,7 @@ void HelloCoordsProgram::Render()
 {
     if(shader_.GetProgram() == 0)
         return;
-    if(textureWall_ == INVALID_TEXTURE_NAME)
+    if(textureWall_ == gl::INVALID_TEXTURE_NAME)
     {
         textureWall_ = textureManager_.GetTextureName(textureWallId_);
         return;

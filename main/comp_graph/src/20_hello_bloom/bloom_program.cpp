@@ -49,7 +49,7 @@ void HelloBloomProgram::Init()
 	cube_.Init();
     cubeTextureId_ = textureManager_.LoadTexture(
         config.dataRootPath + "sprites/container.jpg",
-        Texture::TextureFlags(Texture::REPEAT_WRAP | Texture::SMOOTH_TEXTURE | Texture::GAMMA_CORRECTION));
+        gl::Texture::TextureFlags(gl::Texture::REPEAT_WRAP | gl::Texture::SMOOTH_TEXTURE | gl::Texture::GAMMA_CORRECTION));
 
 
     screenPlane_.Init();
@@ -103,7 +103,7 @@ void HelloBloomProgram::DrawImGui()
 
 void HelloBloomProgram::Render()
 {
-	if(cubeTexture_ == INVALID_TEXTURE_NAME)
+	if(cubeTexture_ == gl::INVALID_TEXTURE_NAME)
 	{
         cubeTexture_ = textureManager_.GetTextureName(cubeTextureId_);
         return;

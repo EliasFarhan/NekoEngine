@@ -61,11 +61,11 @@ private:
 	void RenderScene(const gl::Shader& shader);
 	sdl::Camera3D camera_;
 	gl::TextureManager textureManager_;
-	TextureName container_ = INVALID_TEXTURE_NAME;
-	TextureId containerId_;
-	TextureName containerSpecular_ = INVALID_TEXTURE_NAME;
-	TextureId containerSpecularId_;
-	TextureName whiteTexture_ = 0;
+	gl::TextureName container_ = gl::INVALID_TEXTURE_NAME;
+	gl::TextureId containerId_;
+	gl::TextureName containerSpecular_ = gl::INVALID_TEXTURE_NAME;
+	gl::TextureId containerSpecularId_;
+	gl::TextureName whiteTexture_ = 0;
 
 	gl::Shader ssaoGeometryShader_;
 	gl::Shader ssaoLightingShader_;
@@ -88,7 +88,7 @@ private:
 
 	float ssaoRadius_ = 0.5f;
 	float ssaoBias_ = 0.025f;
-	TextureName noiseTexture_ = 0;
+	gl::TextureName noiseTexture_ = 0;
 	const int maxKernelSize_ = 64;
 	int kernelSize_ = maxKernelSize_;
 	std::vector<Vec3f> ssaoKernel_;

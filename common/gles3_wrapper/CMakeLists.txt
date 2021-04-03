@@ -1,6 +1,6 @@
 
 #opengl
-LIST(APPEND GLES3_WRAPPER_LIBS Neko_Core  ktx freetype assimp)
+LIST(APPEND GLES3_WRAPPER_LIBS Neko_Core freetype assimp)
 
 if(NOT Neko_Android)
     set(OpenGL_GL_PREFERENCE GLVND)
@@ -29,7 +29,6 @@ endif()
 file(GLOB_RECURSE gles3_wrapper_src include/*.h src/*.cpp)
 add_library(gles3_wrapper STATIC ${gles3_wrapper_src})
 target_link_libraries(gles3_wrapper PUBLIC ${GLES3_WRAPPER_LIBS})
-add_dependencies(gles3_wrapper mkvk)
 
 target_include_directories(gles3_wrapper PUBLIC "include/")
 target_include_directories(gles3_wrapper PUBLIC "${EXTERNAL_DIR}/gli/")

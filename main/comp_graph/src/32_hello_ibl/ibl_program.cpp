@@ -69,11 +69,11 @@ void HelloIblProgram::Init()
 	};
 
 	hdrTextureId_ = textureManager_.LoadTexture(
-		config.dataRootPath + "textures/Ridgecrest_Road_Ref.hdr", Texture::TextureFlags(
-		Texture::TextureFlags::CLAMP_WRAP |
-		Texture::TextureFlags::SMOOTH_TEXTURE |
-		Texture::TextureFlags::FLIP_Y |
-		Texture::TextureFlags::HDR));
+		config.dataRootPath + "textures/Ridgecrest_Road_Ref.hdr", gl::Texture::TextureFlags(
+		gl::Texture::TextureFlags::CLAMP_WRAP |
+		gl::Texture::TextureFlags::SMOOTH_TEXTURE |
+		gl::Texture::TextureFlags::FLIP_Y |
+		gl::Texture::TextureFlags::HDR));
 
 	flags_ = FIRST_FRAME;
 
@@ -152,10 +152,10 @@ void HelloIblProgram::Render()
 {
 
 	std::lock_guard<std::mutex> lock(updateMutex_);
-	if (hdrTexture_ == INVALID_TEXTURE_NAME)
+	if (hdrTexture_ == gl::INVALID_TEXTURE_NAME)
 	{
 		hdrTexture_ = textureManager_.GetTextureName(hdrTextureId_);
-		if (hdrTexture_ == INVALID_TEXTURE_NAME)
+		if (hdrTexture_ == gl::INVALID_TEXTURE_NAME)
 			return;
 	}
 	if (flags_ & FIRST_FRAME)

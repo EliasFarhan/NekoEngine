@@ -60,10 +60,10 @@ private:
     gl::Shader normalShader_;
     gl::Shader diffuseShader_;
     gl::TextureManager textureManager_;
-    TextureName diffuseTex_ = INVALID_TEXTURE_NAME;
-    TextureId diffuseTexId_;
-    TextureName normalTex_ = INVALID_TEXTURE_NAME;
-    TextureId normalTexId_;
+    gl::TextureName diffuseTex_ = gl::INVALID_TEXTURE_NAME;
+    gl::TextureId diffuseTexId_;
+    gl::TextureName normalTex_ = gl::INVALID_TEXTURE_NAME;
+    gl::TextureId normalTexId_;
     gl::RenderQuad plane_{Vec3f::zero, Vec2f::one};
     gl::RenderCuboid cube_{ Vec3f::zero, Vec3f::one };
     gl::RenderSphere sphere_{ Vec3f::zero, 1.0f };

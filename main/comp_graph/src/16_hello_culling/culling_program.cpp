@@ -39,7 +39,7 @@ void HelloCullingProgram::Init()
     camera_.position = Vec3f(0, 3, 3);
     camera_.WorldLookAt(Vec3f::zero);
     cube_.Init();
-    cubeTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/container.jpg", Texture::DEFAULT);
+    cubeTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/container.jpg", gl::Texture::DEFAULT);
 
 }
 
@@ -87,7 +87,7 @@ void HelloCullingProgram::Render()
     {
         return;
     }
-    if (cubeTexture_ == INVALID_TEXTURE_NAME)
+    if (cubeTexture_ == gl::INVALID_TEXTURE_NAME)
     {
         cubeTexture_ = textureManager_.GetTextureName(cubeTextureId_);
         return;

@@ -46,14 +46,14 @@ namespace neko
 		gl::RenderCuboid cube_{ Vec3f::zero, Vec3f::one };
 		gl::Shader cutoffShader_;
 		gl::TextureManager textureManager_;
-		TextureName grassTexture_ = INVALID_TEXTURE_NAME;
-		TextureId grassTextureId_;
-		TextureName cubeTexture_ = INVALID_TEXTURE_NAME;
-		TextureId cubeTextureId_;
+		gl::TextureName grassTexture_ = gl::INVALID_TEXTURE_NAME;
+		gl::TextureId grassTextureId_;
+		gl::TextureName cubeTexture_ = gl::INVALID_TEXTURE_NAME;
+		gl::TextureId cubeTextureId_;
 
 		sdl::Camera3D camera_;
 		bool enableCutoff_ = false;
-		TextureName whiteTexture_ = 0;
+		gl::TextureName whiteTexture_ = 0;
 	};
 	
 }

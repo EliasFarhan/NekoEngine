@@ -74,7 +74,7 @@ void HelloCascadedShadowProgram::Init()
             config.dataRootPath + "shaders/24_hello_cascaded_shadow/shadow.frag"
     );
     brickWallId_ = textureManager_.LoadTexture
-            (config.dataRootPath + "sprites/brickwall/brickwall.jpg", Texture::DEFAULT);
+            (config.dataRootPath + "sprites/brickwall/brickwall.jpg", gl::Texture::DEFAULT);
 
     dragonModelId_ = modelManager_.LoadModel(config.dataRootPath + "model/dragon/dragon.obj");
     glGenTextures(1, &whiteTexture_);
@@ -141,7 +141,7 @@ void HelloCascadedShadowProgram::Render()
     {
         return;
     }
-    if (brickWall_ == INVALID_TEXTURE_NAME)
+    if (brickWall_ == gl::INVALID_TEXTURE_NAME)
     {
         brickWall_ = textureManager_.GetTextureName(brickWallId_);
         return;

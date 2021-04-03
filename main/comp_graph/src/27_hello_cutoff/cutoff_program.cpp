@@ -37,9 +37,9 @@ namespace neko
 		camera_.Init();
 		grassTextureId_ = textureManager_.LoadTexture(
 			config.dataRootPath + "sprites/grass.png",
-			static_cast<Texture::TextureFlags>(Texture::CLAMP_WRAP));
+			static_cast<gl::Texture::TextureFlags>(gl::Texture::CLAMP_WRAP));
 		
-		cubeTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/container.jpg", Texture::DEFAULT);
+		cubeTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/container.jpg", gl::Texture::DEFAULT);
 
 
 		plane_.Init();
@@ -81,16 +81,16 @@ namespace neko
 
 	void HelloCutoffProgram::Render()
 	{
-		if(grassTexture_ == INVALID_TEXTURE_NAME)
+		if(grassTexture_ == gl::INVALID_TEXTURE_NAME)
 		{
 			grassTexture_ = textureManager_.GetTextureName(grassTextureId_);
-			if (grassTexture_ == INVALID_TEXTURE_NAME)
+			if (grassTexture_ == gl::INVALID_TEXTURE_NAME)
 				return;
 		}
-		if (cubeTexture_ == INVALID_TEXTURE_NAME)
+		if (cubeTexture_ == gl::INVALID_TEXTURE_NAME)
 		{
 			cubeTexture_ = textureManager_.GetTextureName(cubeTextureId_);
-			if (cubeTexture_ == INVALID_TEXTURE_NAME)
+			if (cubeTexture_ == gl::INVALID_TEXTURE_NAME)
 				return;
 			return;
 		}
