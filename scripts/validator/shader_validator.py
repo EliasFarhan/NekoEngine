@@ -30,7 +30,14 @@ class UniformObject:
 
 
 def validate_shader(data_src, data_out, meta_content):
-    status = subprocess.run([program, data_src])
+    args = []
+    is_vulkan = False
+    if "vulkan" in meta_content:
+        is_vulkan = True
+    if is_vulkan:
+        status = subprocess.run([program,"-V", data_src, "-o", data_out+".spv"])
+    else:
+        status = subprocess.run([program, data_src])
     if status.returncode != 0:
         exit(1)
     path = Path(data_out)

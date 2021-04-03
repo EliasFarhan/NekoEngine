@@ -1,6 +1,9 @@
 
 #opengl
 LIST(APPEND GLES3_WRAPPER_LIBS Neko_Core freetype assimp)
+if(Neko_SDL2)
+    LIST(APPEND GLES3_WRAPPER_LIBS sdl_engine)
+endif()
 
 if(NOT Neko_Android)
     set(OpenGL_GL_PREFERENCE GLVND)

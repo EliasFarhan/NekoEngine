@@ -1,3 +1,6 @@
+#pragma once
+
+
 /*
  MIT License
 
@@ -22,21 +25,29 @@
  SOFTWARE.
  */
 
-#include <gl/graphics.h>
-#include <comp_graph/comp_graph_engine.h>
-#include <gl/sdl_window.h>
+#include <vector>
+#include <vulkan/vulkan.h>
 
-
-int main([[maybe_unused]]int argc, [[maybe_unused]]char** argv)
+namespace neko::vk
 {
-    neko::gl::Gles3Window window;
-    neko::gl::Gles3Renderer renderer;
-    neko::Filesystem filesystem;
-    neko::CompGraphEngine engine{filesystem};
 
-    engine.SetWindowAndRenderer(&window, &renderer);
+struct VkDriver
+{
+    VkInstance instance_;
+    VkPhysicalDevice physicalDevice_ = VK_NULL_HANDLE;
+    VkDevice device_ = VK_NULL_HANDLE;
+    VkQueue graphicsQueue_;
+    VkQueue presentQueue_;
+    VkSurfaceKHR surface_;
+};
 
-    engine.Init();
-    engine.EngineLoop();
-    return EXIT_SUCCESS;
+struct VkSwapchain
+{
+    VkSwapchainKHR swapChain_;
+    std::vector<VkImage> swapChainImages_;
+    std::vector<VkImageView> swapChainImageViews_;
+
+    VkFormat swapChainImageFormat_;
+    VkExtent2D swapChainExtent_;
+};
 }

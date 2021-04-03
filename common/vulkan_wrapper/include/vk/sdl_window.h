@@ -24,48 +24,38 @@
  SOFTWARE.
  */
 
-#ifdef NEKO_GLES3
+#if defined(NEKO_SDL2)
 
-#include <mathematics/vector.h>
-#include "gl/gles3_include.h"
+#include <vk/vk_driver.h>
 #include "sdl_engine/sdl_window.h"
-#include "graphics/graphics.h"
-namespace neko::sdl
-{
 
-class OnResizeRenderCommand : public neko::RenderCommandInterface
+namespace neko::vk
+{
+class VkWindow : public sdl::SdlWindow
 {
 public:
-	void Render() override;
-    void SetWindowSize(Vec2u newWindowSize) { newWindowSize_ = newWindowSize; }
-protected:
-    Vec2u newWindowSize_;
-};
-	
-class Gles3Window : public SdlWindow
-{
-public:
-    enum WindowFlag
-    {
-        ImGuiFirstFrame = 1u << 0u
-    };
+    VkWindow();
     void Init() override;
-
-    void InitImGui() override;
-
     void Destroy() override;
     void GenerateUiFrame() override;
-    void SwapBuffer() override;
-
     void OnResize(Vec2u newWindowSize) override;
-    void BeforeRenderLoop() override;
-    void AfterRenderLoop() override;
-protected:
-    virtual void MakeCurrentContext();
-    virtual void LeaveCurrentContext();
-    void RenderUi() override;
-    SDL_GLContext glRenderContext_{};
-    OnResizeRenderCommand onResizeCommand_;
+private:
+    VkDriver driver_;
+    VkSwapchain vkSwapchain_;
+    bool enableValidationLayers_;
+    VkDebugUtilsMessengerEXT debugMessenger_;
+
+    void CreateInstance();
+    void SetupDebugMessenger();
+    void CreateLogicalDevice();
+    void CreateSurface();
+    void CreateSwapChain();
+    void CreateImageViews();
+
+    VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
+
 };
+
 }
+
 #endif

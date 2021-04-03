@@ -20,6 +20,8 @@ set(Neko_Benchmark ON CACHE BOOL "Activate Benchmark")
 set(Neko_SFML_NET ON CACHE BOOL "Activate SFML Net Wrapper")
 set(Neko_PhysFS ON CACHE BOOL "Activate PhysFS Wrapper")
 set(Neko_sqlite3 ON CACHE BOOL "Activate sqlite3 dependency")
+set(Neko_Vulkan ON CACHE BOOL "Activate Vulkan Wrapper")
+set(Neko_Assimp ON CACHE BOOL "Activate Assimp Dependencies")
 
 MESSAGE("CMAKE SYSTEM NAME: ${CMAKE_SYSTEM_NAME}")
 
@@ -121,8 +123,30 @@ set(PYBIND11_VERSION "2.6.1")
 set(PYBIND11_DIR "${EXTERNAL_DIR}/pybind11-${PYBIND11_VERSION}")
 add_subdirectory("${PYBIND11_DIR}")
 
-if(Neko_GLES3)
-    set(ASSIMP_VERSION 5.0.1)
+
+
+
+if(Neko_SDL2)
+    #sdl2
+	
+	add_compile_definitions("NEKO_SDL2=1")
+    set(SDL_VERSION 2.0.12)
+    set(SDL_DIR ${EXTERNAL_DIR}/SDL2-${SDL_VERSION}/)
+    set(SDL_STATIC ON CACHE INTERNAL "")
+    set(SDL_SHARED OFF CACHE INTERNAL "")
+    set(SDL_ENGINE_DIR ON CACHE INTERNAL "")
+    add_subdirectory(${SDL_DIR})
+    include_directories(${SDL_DIR}/include ${SDL_DIR}/src)
+
+    add_subdirectory("common/sdl_engine")
+    target_precompile_headers(sdl_engine PRIVATE "common/sdl_engine/include/sdl_wrapper_pch.h")
+
+endif()
+
+if(Neko_Assimp)
+
+    add_compile_definitions("NEKO_ASSIMP=1")
+	set(ASSIMP_VERSION 5.0.1)
     set(ASSIMP_DIR "${EXTERNAL_DIR}/assimp-${ASSIMP_VERSION}")
     set(ASSIMP_NO_EXPORT ON CACHE INTERNAL "")
     set(ASSIMP_BUILD_ALL_EXPORTERS_BY_DEFAULT OFF CACHE INTERNAL "")
@@ -140,25 +164,20 @@ if(Neko_GLES3)
     add_subdirectory("${ASSIMP_DIR}")
     set_target_properties (assimp IrrXML PROPERTIES
             FOLDER Externals)
+endif()
+
+if(Neko_GLES3)
+    
     add_compile_definitions("NEKO_GLES3=1")
     add_subdirectory("${EXTERNAL_DIR}/glad")
     set(GLES3_WRAPPER_DIR "common/gles3_wrapper" CACHE INTERNAL "")
     add_subdirectory(${GLES3_WRAPPER_DIR})
 endif()
 
-if(Neko_SDL2)
-    #sdl2
-    set(SDL_VERSION 2.0.12)
-    set(SDL_DIR ${EXTERNAL_DIR}/SDL2-${SDL_VERSION}/)
-    set(SDL_STATIC ON CACHE INTERNAL "")
-    set(SDL_SHARED OFF CACHE INTERNAL "")
-    set(SDL_ENGINE_DIR ON CACHE INTERNAL "")
-    add_subdirectory(${SDL_DIR})
-    include_directories(${SDL_DIR}/include ${SDL_DIR}/src)
-
-    add_subdirectory("common/sdl_engine")
-    target_precompile_headers(sdl_engine PRIVATE "common/sdl_engine/include/sdl_wrapper_pch.h")
-
+if(Neko_Vulkan)
+	add_compile_definitions("NEKO_VULKAN=1")
+	 set(VULKAN_WRAPPER_DIR "common/vulkan_wrapper" CACHE INTERNAL "")
+    add_subdirectory(${VULKAN_WRAPPER_DIR})
 endif()
 
 if(Neko_SFML_NET)

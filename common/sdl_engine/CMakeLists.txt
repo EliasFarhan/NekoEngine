@@ -14,10 +14,6 @@ if(NOT Emscripten)
     endif(MSVC)
 endif()
 
-if(Neko_GLES3)
-    LIST(APPEND sdl_engine_libs gles3_wrapper)
-endif()
-
 #imgui sdl
 file(GLOB_RECURSE sdl_engine_src include/*.h src/*.cpp)
 
@@ -26,8 +22,5 @@ target_link_libraries(sdl_engine PUBLIC ${sdl_engine_libs} imgui)
 
 target_include_directories(sdl_engine PUBLIC include/)
 neko_lib_config(sdl_engine)
-if(Emscripten)
-    set_property(TARGET sdl_engine APPEND_STRING PROPERTY LINK_FLAGS " -s USE_SDL=2 -s USE_WEBGL2=1 ")
-endif()
 set_target_properties (sdl_engine PROPERTIES FOLDER Neko/Common)
 

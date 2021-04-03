@@ -46,11 +46,7 @@ void sdl::SdlWindow::Init()
     const auto& config = BasicEngine::GetInstance()->GetConfig();
 
 
-    flags_ = SDL_WINDOW_RESIZABLE |
-#ifdef NEKO_GLES3
-        SDL_WINDOW_OPENGL
-#endif
-        ;
+    
 #if defined(__ANDROID__)
     //config.fullscreen = true;
     config.windowSize = Vec2u(1280, 720);

@@ -1,3 +1,4 @@
+#pragma once
 /*
  MIT License
 
@@ -22,21 +23,47 @@
  SOFTWARE.
  */
 
-#include <gl/graphics.h>
-#include <comp_graph/comp_graph_engine.h>
-#include <gl/sdl_window.h>
+#include <mathematics/vector.h>
+#include "gl/gles3_include.h"
+#include "sdl_engine/sdl_window.h"
+#include "graphics/graphics.h"
 
-
-int main([[maybe_unused]]int argc, [[maybe_unused]]char** argv)
+namespace neko::gl
 {
-    neko::gl::Gles3Window window;
-    neko::gl::Gles3Renderer renderer;
-    neko::Filesystem filesystem;
-    neko::CompGraphEngine engine{filesystem};
 
-    engine.SetWindowAndRenderer(&window, &renderer);
+class OnResizeRenderCommand : public neko::RenderCommandInterface
+{
+public:
+    void Render() override;
+    void SetWindowSize(Vec2u newWindowSize) { newWindowSize_ = newWindowSize; }
+protected:
+    Vec2u newWindowSize_;
+};
 
-    engine.Init();
-    engine.EngineLoop();
-    return EXIT_SUCCESS;
+class Gles3Window : public sdl::SdlWindow
+{
+public:
+    enum WindowFlag
+    {
+        ImGuiFirstFrame = 1u << 0u
+    };
+    Gles3Window();
+    void Init() override;
+
+    void InitImGui() override;
+
+    void Destroy() override;
+    void GenerateUiFrame() override;
+    void SwapBuffer() override;
+
+    void OnResize(Vec2u newWindowSize) override;
+    void BeforeRenderLoop() override;
+    void AfterRenderLoop() override;
+protected:
+    virtual void MakeCurrentContext();
+    virtual void LeaveCurrentContext();
+    void RenderUi() override;
+    SDL_GLContext glRenderContext_{};
+    OnResizeRenderCommand onResizeCommand_;
+};
 }

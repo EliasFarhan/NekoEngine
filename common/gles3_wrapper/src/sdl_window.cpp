@@ -21,9 +21,8 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-#ifdef NEKO_GLES3
 
-#include "gl/gles3_window.h"
+#include "gl/sdl_window.h"
 
 #include <sstream>
 #include <engine/engine.h>
@@ -38,12 +37,17 @@
 #include <easy/profiler.h>
 #endif
 
-namespace neko::sdl
+namespace neko::gl
 {
 void OnResizeRenderCommand::Render()
 {
 	logDebug(fmt::format("Resize window with new size: {}", newWindowSize_.ToString()));
 	glViewport(0, 0, newWindowSize_.x, newWindowSize_.y);
+}
+
+Gles3Window::Gles3Window()
+{
+	flags_ = SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL;
 }
 
 void Gles3Window::Init()
@@ -79,7 +83,7 @@ void Gles3Window::Init()
 #ifndef __EMSCRIPTEN__
 
 
-    const std::string videoDriver = SDL_GetCurrentVideoDriver();
+	const std::string videoDriver = SDL_GetCurrentVideoDriver();
 	logDebug(videoDriver);
 #endif
 
@@ -96,17 +100,17 @@ void Gles3Window::Init()
 #else
 	SDL_GL_SetSwapInterval(false);
 #endif
-        glCheckError();
-        InitImGui();
-        glCheckError();
-        LeaveCurrentContext();
-	
+	glCheckError();
+	InitImGui();
+	glCheckError();
+	LeaveCurrentContext();
+
 	Job initRenderJob([this] { MakeCurrentContext(); });
 	auto* engine = BasicEngine::GetInstance();
 	engine->ScheduleJob(&initRenderJob, JobThreadType::RENDER_THREAD);
 
 	initRenderJob.Join();
-	
+
 }
 
 void Gles3Window::InitImGui()
@@ -149,9 +153,9 @@ void Gles3Window::Destroy()
 	EASY_BLOCK("DestroyWindow");
 #endif
 	Job leaveContext([this]
-	{
-	    LeaveCurrentContext();
-	});
+		{
+			LeaveCurrentContext();
+		});
 	BasicEngine::GetInstance()->ScheduleJob(&leaveContext, JobThreadType::RENDER_THREAD);
 	leaveContext.Join();
 	MakeCurrentContext();
@@ -197,7 +201,7 @@ void Gles3Window::MakeCurrentContext()
 	const auto currentContext = SDL_GL_GetCurrentContext();
 	std::ostringstream oss;
 	oss << "Current Context: " << currentContext << " Render Context: " << glRenderContext_ << " from Thread: " << std::this_thread::get_id();
-	if(currentContext == nullptr)
+	if (currentContext == nullptr)
 	{
 		oss << "\nSDL Error: " << SDL_GetError();
 	}
@@ -210,15 +214,14 @@ void Gles3Window::LeaveCurrentContext()
 	SDL_GL_MakeCurrent(window_, nullptr);
 	const auto currentContext = SDL_GL_GetCurrentContext();
 
-	std::ostringstream oss;
-	oss << "Leave current context from thread: " << std::this_thread::get_id();
-	if(currentContext != nullptr)
+	logDebug(fmt::format(
+		"Leave current context from thread: {}",
+		std::this_thread::get_id()));
+	if (currentContext != nullptr)
 	{
-		oss << "[Error] After Leave Current Context, context: " << currentContext;
+		logDebug(fmt::format("[Error] After Leave Current Context, context: {}", currentContext));
 	}
-	logDebug(oss.str());
 
 }
 }
 
-#endif
