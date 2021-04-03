@@ -45,6 +45,8 @@ public:
 
     void OnEvent(const SDL_Event& event) override;
 
+    static TextureName LoadTextureWithGli(std::string_view path);
+
 private:
     gl::RenderQuad quad_{Vec3f::zero, Vec2f::one};
     gl::Shader shader_;
@@ -54,10 +56,13 @@ private:
     TextureId textureId_;
     TextureName textureKtx_ = INVALID_TEXTURE_NAME;
 
+    TextureName gliTextureName_ = INVALID_TEXTURE_NAME;
+
     enum class TextureType
 	{
 		STB_TEXTURE,
 		KTX_TEXTURE,
+        GLI_TEXTURE,
 		LENGTH
 	};
     TextureType textureType_ = TextureType::STB_TEXTURE;

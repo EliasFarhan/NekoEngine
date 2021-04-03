@@ -24,9 +24,6 @@ List(APPEND Neko_SRC
 
 #Utility
 set(UTILITIES_DIR ${EXTERNAL_DIR}/utilities/)
-#taskflow
-set(TASKFLOW_DIR ${EXTERNAL_DIR}/taskflow-2.2)
-include_directories(${TASKFLOW_DIR})
 
 add_library(Neko_Core STATIC ${Neko_SRC})
 target_link_libraries(Neko_Core PUBLIC imgui)

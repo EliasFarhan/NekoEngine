@@ -25,6 +25,8 @@
 #include <gl/texture.h>
 #include "02_hello_texture/texture_program.h"
 #include "imgui.h"
+#include <gli/gli.hpp>
+
 namespace neko
 {
 
@@ -42,6 +44,8 @@ void HelloTextureProgram::Init()
     textureId_ = textureManager_.LoadTexture(texturePath, Texture::DEFAULT);
     texture_ = gl::StbCreateTexture(texturePath, filesystem, Texture::DEFAULT);
 	//textureId_ = neko::gl::stbCreateTexture(texturePath);
+
+    gliTextureName_ = LoadTextureWithGli(texturePath + ".ktx");
     glEnable(GL_DEPTH_TEST);
 }
 
@@ -57,6 +61,7 @@ void HelloTextureProgram::Destroy()
     textureManager_.Destroy();
     if(texture_ != INVALID_TEXTURE_NAME)
         gl::DestroyTexture(texture_);
+    gl::DestroyTexture(gliTextureName_);
 }
 
 void HelloTextureProgram::Render()
@@ -85,7 +90,12 @@ void HelloTextureProgram::Render()
         glBindTexture(GL_TEXTURE_2D, textureKtx_);//bind texture id to texture slot
         break;
     }
-    default: ;
+    case TextureType::GLI_TEXTURE:
+    {
+        glBindTexture(GL_TEXTURE_2D, gliTextureName_);
+        break;
+    }
+    default: break;
     }
     quad_.Draw();
 }
@@ -96,10 +106,11 @@ void HelloTextureProgram::DrawImGui()
     const char* textureTypeNames[(int)TextureType::LENGTH] =
     {
     	"Stb Texture (JPG)",
-    	"Ktx Texture"
+    	"Ktx Texture",
+        "Ktx Texture With GLI"
     };
     int textureType = static_cast<int>(textureType_);
-	if(ImGui::Combo("Texture Type", &textureType, textureTypeNames, (int)TextureType::LENGTH ))
+	if(ImGui::Combo("Texture Type", &textureType, textureTypeNames, static_cast<int>(TextureType::LENGTH) ))
 	{
         textureType_ = static_cast<TextureType>(textureType);
 	}
@@ -109,5 +120,41 @@ void HelloTextureProgram::DrawImGui()
 void HelloTextureProgram::OnEvent(const SDL_Event& event)
 {
 
+}
+
+TextureName HelloTextureProgram::LoadTextureWithGli(std::string_view path)
+{
+    gli::texture texture = gli::load(path.data());
+    if (texture.empty())
+    {
+        logDebug("Could not load texture with GLI");
+        return 0;
+    }
+    gli::gl glProfile(gli::gl::PROFILE_ES30);
+    const gli::gl::format format = glProfile.translate(texture.format(), texture.swizzles());
+    GLenum target = glProfile.translate(texture.target());
+    logDebug(fmt::format("texture format: {}, texture target {}, is compressed {}", 
+        (int)texture.format(), 
+        (int) texture.target(),
+        is_compressed(texture.format())));
+    neko_assert(gli::is_compressed(texture.format()) && texture.target() == gli::TARGET_2D, "Is compressed and Target 2d");
+
+    GLuint textureName = 0;
+    glGenTextures(1, &textureName);
+    glBindTexture(target, textureName);
+    glTexParameteri(target, GL_TEXTURE_BASE_LEVEL, 0);
+    glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(texture.levels() - 1));
+    
+    glm::tvec3<GLsizei> extent{ texture.extent() };
+    glTexStorage2D(target, static_cast<GLint>(texture.levels()), format.Internal, extent.x, extent.y);
+    for (std::size_t level = 0; level < texture.levels(); ++level)
+    {
+        glm::tvec3<GLsizei> levelExtent(texture.extent(level));
+        glCompressedTexSubImage2D(
+            target, static_cast<GLint>(level), 0, 0, levelExtent.x, levelExtent.y,
+            format.Internal, static_cast<GLsizei>(texture.size(level)), texture.data(0, 0, level));
+    }
+
+    return textureName;
 }
 }
