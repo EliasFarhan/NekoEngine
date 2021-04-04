@@ -171,7 +171,7 @@ void VkWindow::SetupDebugMessenger()
     if (CreateDebugUtilsMessengerEXT(driver_.instance_, &createInfo, nullptr, &debugMessenger_) != VK_SUCCESS)
     {
         logDebug("[Error] failed to set up debug messenger!");
-        neko_assert(false, "");
+        //neko_assert(false, "");
     }
 }
 

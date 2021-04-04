@@ -8,13 +8,6 @@ if(NOT Neko_Android)
     LIST(APPEND vk_WRAPPER_LIBS "${Vulkan_LIBRARIES}")
 endif()
 
-
-if(Neko_Android)
-    LIST(APPEND vk_WRAPPER_LIBS glad)
-endif()
-
-
-
 file(GLOB_RECURSE vk_wrapper_src include/*.h src/*.cpp)
 add_library(vk_wrapper STATIC ${vk_wrapper_src})
 target_link_libraries(vk_wrapper PUBLIC ${vk_WRAPPER_LIBS})

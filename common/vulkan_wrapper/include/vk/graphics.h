@@ -24,39 +24,20 @@
  SOFTWARE.
  */
 
-#if defined(NEKO_SDL2)
-
-#include <vk/vk_driver.h>
-#include "sdl_engine/sdl_window.h"
+#include "graphics/graphics.h"
+#include "vk/vk_window.h"
 
 namespace neko::vk
 {
-class VkWindow : public sdl::SdlWindow
+
+class VkRenderer : public Renderer
 {
 public:
-    VkWindow();
-    void Init() override;
-    void Destroy() override;
-    void GenerateUiFrame() override;
-    void OnResize(Vec2u newWindowSize) override;
-    VkDriver& GetDriver() {return driver_;}
+    VkRenderer(VkWindow& window);
+    void ClearScreen() override;
+
 private:
-    VkDriver driver_;
-    VkSwapchain vkSwapchain_;
-    bool enableValidationLayers_;
-    VkDebugUtilsMessengerEXT debugMessenger_;
-
-    void CreateInstance();
-    void SetupDebugMessenger();
-    void CreateLogicalDevice();
-    void CreateSurface();
-    void CreateSwapChain();
-    void CreateImageViews();
-
-    VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
-
+    VkWindow& window_;
 };
 
 }
-
-#endif
