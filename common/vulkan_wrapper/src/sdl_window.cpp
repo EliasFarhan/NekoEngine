@@ -23,20 +23,22 @@
  SOFTWARE.
  */
 
-#include <set>
 
-#include "engine/assert.h"
-#include "engine/log.h"
-#include "vk/vk_utility.h"
 
 #if defined(NEKO_SDL2)
 
 #include <SDL2/SDL_vulkan.h>
 #include <vk/sdl_window.h>
+#include <set>
+#include <imgui_impl_sdl.h>
+
+#include "engine/assert.h"
+#include "engine/log.h"
+#include "vk/vk_utility.h"
 
 namespace neko::vk
 {
-VkWindow::VkWindow()
+VkWindow::VkWindow() : vkImgui_(*this)
 {
     flags_ = SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE;
 #if defined(NEKO_ASSERT)
@@ -56,10 +58,23 @@ void VkWindow::Init()
     CreateLogicalDevice();
     CreateSwapChain();
     CreateImageViews();
+    CreateCommandPool();
+
+    VmaAllocatorCreateInfo allocatorInfo = {};
+    allocatorInfo.vulkanApiVersion = VK_API_VERSION_1_0;
+    allocatorInfo.physicalDevice = driver_.physicalDevice_;
+    allocatorInfo.device = driver_.device_;
+    allocatorInfo.instance = driver_.instance_;
+
+    vmaCreateAllocator(&allocatorInfo, &allocator_);
+
+    InitImGui();
 }
 
 void VkWindow::Destroy()
 {
+    vkImgui_.Destroy();
+    vkDestroyCommandPool(driver_.device_, driver_.commandPool, nullptr);
     vkDestroyDevice(driver_.device_, nullptr);
     if (enableValidationLayers_)
     {
@@ -73,6 +88,10 @@ void VkWindow::Destroy()
 
 void VkWindow::GenerateUiFrame()
 {
+
+    ImGui_ImplVulkan_NewFrame();
+    ImGui_ImplSDL2_NewFrame(window_);
+    ImGui::NewFrame();
 }
 
 void VkWindow::OnResize(Vec2u newWindowSize)
@@ -170,14 +189,14 @@ void VkWindow::SetupDebugMessenger()
     PopulateDebugMessengerCreateInfo(createInfo);
     if (CreateDebugUtilsMessengerEXT(driver_.instance_, &createInfo, nullptr, &debugMessenger_) != VK_SUCCESS)
     {
-        logDebug("[Error] failed to set up debug messenger!");
+        logDebug("[Error] Failed to set up debug messenger!");
         //neko_assert(false, "");
     }
 }
 
 void VkWindow::CreateLogicalDevice()
 {
-    std::cout << "[Log] Creating Logical Device\n";
+    logDebug("[Log] Creating Logical Device");
     QueueFamilyIndices indices = FindQueueFamilies(driver_.physicalDevice_, driver_.surface_);
 
 
@@ -219,8 +238,8 @@ void VkWindow::CreateLogicalDevice()
 
     if (vkCreateDevice(driver_.physicalDevice_, &createInfo, nullptr, &driver_.device_) != VK_SUCCESS)
     {
-        std::cerr << ("[Error] Failed to create logical device!");
-        assert(false);
+        logDebug("[Error] Failed to create logical device!");
+        neko_assert(false, "");
     }
     vkGetDeviceQueue(driver_.device_, indices.graphicsFamily.value(), 0, &driver_.graphicsQueue_);
     vkGetDeviceQueue(driver_.device_, indices.presentFamily.value(), 0, &driver_.presentQueue_);
@@ -240,32 +259,35 @@ void VkWindow::CreateSurface()
 
 void VkWindow::CreateSwapChain()
 {
-    std::cout << "[Vulkan] Create SwapChain\n";
+    logDebug("[Vulkan] Create SwapChain");
     SwapChainSupportDetails swapChainSupport = QuerySwapChainSupport(driver_.physicalDevice_, driver_.surface_);
 
     VkSurfaceFormatKHR surfaceFormat = ChooseSwapSurfaceFormat(swapChainSupport.formats);
     VkPresentModeKHR presentMode = ChooseSwapPresentMode(swapChainSupport.presentModes);
     VkExtent2D extent = ChooseSwapExtent(swapChainSupport.capabilities);
-    std::cout << "[Vulkan] Swapchain support, minImageCount: " << swapChainSupport.capabilities.minImageCount <<
-        " maxImageCount: " << swapChainSupport.capabilities.maxImageCount << '\n';
-    std::uint32_t imageCount = swapChainSupport.capabilities.minImageCount + 1;
+    logDebug(fmt::format("[Vulkan] Swapchain support, minImageCount: {} maxImageCount: {}",
+                         swapChainSupport.capabilities.minImageCount,
+                         swapChainSupport.capabilities.maxImageCount));
+    vkSwapchain_.minImageCount = swapChainSupport.capabilities.minImageCount;
+    vkSwapchain_.imageCount = swapChainSupport.capabilities.minImageCount + 1;
 
-    if (swapChainSupport.capabilities.maxImageCount > 0 && imageCount > swapChainSupport.capabilities.maxImageCount)
+    if (swapChainSupport.capabilities.maxImageCount > 0 && vkSwapchain_.imageCount > swapChainSupport.capabilities.maxImageCount)
     {
-        imageCount = swapChainSupport.capabilities.maxImageCount;
+        vkSwapchain_.imageCount = swapChainSupport.capabilities.maxImageCount;
     }
-    std::cout << "[Vulkan] Image count: " << imageCount << '\n';
+    logDebug(fmt::format("[Vulkan] Image count: {}", vkSwapchain_.imageCount));
 
     VkSwapchainCreateInfoKHR createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
     createInfo.surface = driver_.surface_;
 
-    createInfo.minImageCount = imageCount;
+    createInfo.minImageCount = vkSwapchain_.imageCount;
     createInfo.imageFormat = surfaceFormat.format;
     createInfo.imageColorSpace = surfaceFormat.colorSpace;
     createInfo.imageExtent = extent;
     createInfo.imageArrayLayers = 1;
     createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+
 
     QueueFamilyIndices indices = FindQueueFamilies(driver_.physicalDevice_, driver_.surface_);
     uint32_t queueFamilyIndices[] = { indices.graphicsFamily.value(), indices.presentFamily.value() };
@@ -291,13 +313,13 @@ void VkWindow::CreateSwapChain()
 
     if (vkCreateSwapchainKHR(driver_.device_, &createInfo, nullptr, &vkSwapchain_.swapChain_) != VK_SUCCESS)
     {
-        std::cerr << "[Error] failed to create swap chain!\n";
-        assert(false);
+        logDebug("[Error] failed to create swap chain!");
+        neko_assert(false, "");
     }
     //Adding images
-    vkGetSwapchainImagesKHR(driver_.device_, vkSwapchain_.swapChain_, &imageCount, nullptr);
-    vkSwapchain_.swapChainImages_.resize(imageCount);
-    vkGetSwapchainImagesKHR(driver_.device_, vkSwapchain_.swapChain_, &imageCount, vkSwapchain_.swapChainImages_.data());
+    vkGetSwapchainImagesKHR(driver_.device_, vkSwapchain_.swapChain_, &vkSwapchain_.imageCount, nullptr);
+    vkSwapchain_.swapChainImages_.resize(vkSwapchain_.imageCount);
+    vkGetSwapchainImagesKHR(driver_.device_, vkSwapchain_.swapChain_, &vkSwapchain_.imageCount, vkSwapchain_.swapChainImages_.data());
 
     vkSwapchain_.swapChainImageFormat_ = surfaceFormat.format;
     vkSwapchain_.swapChainExtent_ = extent;
@@ -324,7 +346,7 @@ void VkWindow::CreateImageViews()
         createInfo.subresourceRange.layerCount = 1;
         if (vkCreateImageView(driver_.device_, &createInfo, nullptr, &vkSwapchain_.swapChainImageViews_[i]) != VK_SUCCESS)
         {
-            logDebug ("[Error] Failed to create image views!");
+            logDebug("[Error] Failed to create image views!");
             neko_assert(false, "");
         }
     }
@@ -349,6 +371,82 @@ VkExtent2D VkWindow::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabiliti
 
     return actualExtent;
 
+}
+
+void VkWindow::InitImGui()
+{
+    SdlWindow::InitImGui();
+    vkImgui_.Init();
+}
+
+void VkWindow::Update(seconds dt)
+{
+    SdlWindow::Update(dt);
+}
+
+void VkWindow::SwapBuffer()
+{
+    SdlWindow::SwapBuffer();
+}
+
+void VkWindow::RenderUi()
+{
+    SdlWindow::RenderUi();
+}
+
+void VkWindow::OnEvent(const SDL_Event& event)
+{
+    SdlWindow::OnEvent(event);
+}
+
+VkCommandBuffer VkWindow::BeginSingleTimeCommands()
+{
+    VkCommandBufferAllocateInfo allocInfo{};
+    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    allocInfo.commandPool = driver_.commandPool;
+    allocInfo.commandBufferCount = 1;
+
+    VkCommandBuffer commandBuffer;
+    vkAllocateCommandBuffers(driver_.device_, &allocInfo, &commandBuffer);
+
+    VkCommandBufferBeginInfo beginInfo{};
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+    vkBeginCommandBuffer(commandBuffer, &beginInfo);
+
+    return commandBuffer;
+}
+
+void VkWindow::EndSingleTimeCommands(VkCommandBuffer commandBuffer)
+{
+    vkEndCommandBuffer(commandBuffer);
+
+    VkSubmitInfo submitInfo{};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &commandBuffer;
+
+    vkQueueSubmit(driver_.graphicsQueue_, 1, &submitInfo, VK_NULL_HANDLE);
+    vkQueueWaitIdle(driver_.graphicsQueue_);
+
+    vkFreeCommandBuffers(driver_.device_, driver_.commandPool, 1, &commandBuffer);
+}
+
+void VkWindow::CreateCommandPool()
+{
+    QueueFamilyIndices queueFamilyIndices = FindQueueFamilies(driver_.physicalDevice_,driver_.surface_);
+
+    VkCommandPoolCreateInfo poolInfo{};
+    poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+    poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily.value();
+    poolInfo.flags = 0; // Optional
+    if (vkCreateCommandPool(driver_.device_, &poolInfo, nullptr, &driver_.commandPool) != VK_SUCCESS)
+    {
+        logDebug("[Error] Failed to create command pool!");
+        neko_assert(false, "");
+    }
 }
 }
 

@@ -22,8 +22,6 @@
  SOFTWARE.
  */
 
-#include <sstream>
-
 #include <utils/service_locator.h>
 #include <engine/log.h>
 #include "sdl_engine/sdl_window.h"
@@ -34,7 +32,7 @@
 #ifdef EASY_PROFILE_USE
 #include "easy/profiler.h"
 #endif
-namespace neko
+namespace neko::sdl
 {
 
 void sdl::SdlWindow::Init()
@@ -43,6 +41,8 @@ void sdl::SdlWindow::Init()
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("InitSdlWindow");
 #endif
+    auto* engine = (SdlEngine*)BasicEngine::GetInstance();
+    engine->RegisterOnEvent(*this);
     const auto& config = BasicEngine::GetInstance()->GetConfig();
 
 
@@ -101,15 +101,8 @@ void sdl::SdlWindow::InitImGui()
     // Setup Dear ImGui style
     //ImGui::StyleColorsDark();
     ImGui::StyleColorsClassic();
+    ImGui_ImplSDL2_Init(window_, nullptr);
 }
-
-
-void sdl::SdlWindow::ImguiNewFrame()
-{
-    ImGui_ImplSDL2_NewFrame(window_);
-    ImGui::NewFrame();
-}
-
 
 void sdl::SdlWindow::Destroy()
 {
@@ -132,6 +125,11 @@ void sdl::SdlWindow::SwapBuffer()
 void sdl::SdlWindow::RenderUi()
 {
     ImGui::Render();
+}
+
+void sdl::SdlWindow::OnEvent(const SDL_Event& event)
+{
+    ImGui_ImplSDL2_ProcessEvent(&event);
 }
 
 }

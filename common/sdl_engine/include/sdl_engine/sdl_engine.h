@@ -24,7 +24,6 @@
  */
 
 #include "engine/engine.h"
-#include "sdl_engine/sdl_window.h"
 #include "graphics/graphics.h"
 #include <SDL.h>
 #include <SDL_main.h>

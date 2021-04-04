@@ -32,6 +32,7 @@
 #include <fmt/format.h>
 
 #include "utils/file_utility.h"
+#include "engine/window.h"
 
 #ifdef NEKO_GLES3
 #include "gl/gles3_window.h"
@@ -76,7 +77,6 @@ void SdlEngine::ManageEvent()
     SDL_Event event;
     while (SDL_PollEvent(&event))
     {
-        ImGui_ImplSDL2_ProcessEvent(&event);
         if (event.type == SDL_QUIT)
         {
             isRunning_ = false;

@@ -27,7 +27,11 @@
 #if defined(NEKO_SDL2)
 
 #include <vk/vk_driver.h>
+#include <imgui.h>
+#include <imgui_impl_vulkan.h>
 #include "sdl_engine/sdl_window.h"
+#include "vk_mem_alloc.h"
+#include "vk_imgui.h"
 
 namespace neko::vk
 {
@@ -40,11 +44,31 @@ public:
     void GenerateUiFrame() override;
     void OnResize(Vec2u newWindowSize) override;
     VkDriver& GetDriver() {return driver_;}
+    VkSwapchain& GetSwapchain(){return vkSwapchain_;}
+    VmaAllocator GetAllocator(){return allocator_;}
+
+    void Update(seconds dt) override;
+
+    void OnEvent(const SDL_Event &event) override;
+
+
+    VkCommandBuffer BeginSingleTimeCommands();
+
+    void EndSingleTimeCommands(VkCommandBuffer commandBuffer);
+protected:
+
+    void InitImGui() override;
+    void SwapBuffer() override;
+
+    void RenderUi() override;
+
 private:
     VkDriver driver_;
     VkSwapchain vkSwapchain_;
     bool enableValidationLayers_;
     VkDebugUtilsMessengerEXT debugMessenger_;
+    VmaAllocator allocator_;
+    VkImGUI vkImgui_;
 
     void CreateInstance();
     void SetupDebugMessenger();
@@ -52,6 +76,7 @@ private:
     void CreateSurface();
     void CreateSwapChain();
     void CreateImageViews();
+    void CreateCommandPool();
 
     VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
 

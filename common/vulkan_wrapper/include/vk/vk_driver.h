@@ -24,7 +24,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-
+#include <cstdint>
 #include <vector>
 #include <vulkan/vulkan.h>
 
@@ -39,6 +39,7 @@ struct VkDriver
     VkQueue graphicsQueue_;
     VkQueue presentQueue_;
     VkSurfaceKHR surface_;
+    VkCommandPool commandPool;
 };
 
 struct VkSwapchain
@@ -49,5 +50,8 @@ struct VkSwapchain
 
     VkFormat swapChainImageFormat_;
     VkExtent2D swapChainExtent_;
+
+    std::uint32_t minImageCount = 0;
+    std::uint32_t imageCount = 0;
 };
 }

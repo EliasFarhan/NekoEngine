@@ -25,20 +25,22 @@
  */
 
 #include "engine/window.h"
+#include "sdl_engine/sdl_engine.h"
 #include <SDL.h>
 #include <utils/time_utility.h>
 
 namespace neko::sdl
 {
-class SdlWindow : public Window
+class SdlWindow : public Window, public SdlEventSystemInterface
 {
 public:
-    virtual void Init() override;
+    void Init() override;
     void Update([[maybe_unused]]seconds dt) override{};
 
     void Destroy() override;
 
-    virtual void ImguiNewFrame();
+
+    void OnEvent(const SDL_Event& event) override;
 
 protected:
     void SwapBuffer() override;
