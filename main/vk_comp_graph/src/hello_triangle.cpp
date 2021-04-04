@@ -25,8 +25,10 @@ void HelloTriangle::Update(seconds dt)
 
 void HelloTriangle::Destroy()
 {
-    CleanupSwapChain();
+    std::lock_guard<std::mutex> lock(updateLock_);
     auto& driver = window_.GetDriver();
+    vkDeviceWaitIdle(driver.device);
+    CleanupSwapChain();
     vkDestroySemaphore(driver.device, renderFinishedSemaphore_, nullptr);
     vkDestroySemaphore(driver.device, imageAvailableSemaphore_, nullptr);
     vkDestroyCommandPool(driver.device, commandPool_, nullptr);
@@ -408,6 +410,10 @@ void HelloTriangle::RecreateSwapChain()
 void HelloTriangle::CleanupSwapChain()
 {
     auto& driver = window_.GetDriver();
+    for (size_t i = 0; i < swapChainFramebuffers_.size(); i++)
+    {
+        vkDestroyFramebuffer(driver.device, swapChainFramebuffers_[i], nullptr);
+    }
     vkFreeCommandBuffers(driver.device, commandPool_, static_cast<uint32_t>(commandBuffers_.size()), commandBuffers_.data());
 
     vkDestroyPipeline(driver.device, graphicsPipeline_, nullptr);
