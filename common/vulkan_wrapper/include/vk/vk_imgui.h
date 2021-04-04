@@ -18,5 +18,6 @@ private:
     VkRenderPass renderPass_;
     VkWindow& window_;
     VkDescriptorPool descriptorPool_;
+    VkCommandPool commandPool_;
 };
 }

@@ -52,9 +52,12 @@ public:
     void OnEvent(const SDL_Event &event) override;
 
 
-    VkCommandBuffer BeginSingleTimeCommands();
+    VkCommandBuffer BeginSingleTimeCommands(VkCommandPool commandPool);
 
-    void EndSingleTimeCommands(VkCommandBuffer commandBuffer);
+    void EndSingleTimeCommands(VkCommandPool commandPool, VkCommandBuffer commandBuffer);
+
+    VkShaderModule CreateShaderModule(const BufferFile& file);
+
 protected:
 
     void InitImGui() override;
@@ -76,7 +79,6 @@ private:
     void CreateSurface();
     void CreateSwapChain();
     void CreateImageViews();
-    void CreateCommandPool();
 
     VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
 

@@ -35,7 +35,7 @@ void VkImGUI::Init()
         pool_info.maxSets = 1000 * IM_ARRAYSIZE(pool_sizes);
         pool_info.poolSizeCount = (uint32_t)IM_ARRAYSIZE(pool_sizes);
         pool_info.pPoolSizes = pool_sizes;
-        const auto status = vkCreateDescriptorPool(driver.device_, &pool_info, nullptr, &descriptorPool_);
+        const auto status = vkCreateDescriptorPool(driver.device, &pool_info, nullptr, &descriptorPool_);
         if(status != VK_SUCCESS)
         {
             logDebug("[Error] Could not create descriptor pool for ImGui");
@@ -45,7 +45,7 @@ void VkImGUI::Init()
 
 
     VkAttachmentDescription attachment = {};
-    attachment.format = swapchain.swapChainImageFormat_;
+    attachment.format = swapchain.imageFormat;
     attachment.samples = VK_SAMPLE_COUNT_1_BIT;
     attachment.loadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
     attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -80,18 +80,18 @@ void VkImGUI::Init()
     info.dependencyCount = 1;
     info.pDependencies = &dependency;
 
-    if (vkCreateRenderPass(driver.device_, &info, nullptr, &renderPass_) != VK_SUCCESS)
+    if (vkCreateRenderPass(driver.device, &info, nullptr, &renderPass_) != VK_SUCCESS)
     {
         logDebug("[Error] Could not create Dear ImGui's render pass");
         neko_assert(false, "");
     }
     ImGui_ImplVulkan_InitInfo imguiInfo=
     {
-        driver.instance_,
-        driver.physicalDevice_,
-        driver.device_,
+        driver.instance,
+        driver.physicalDevice,
+        driver.device,
         0,
-        driver.graphicsQueue_,
+        driver.graphicsQueue,
         VK_NULL_HANDLE,
         descriptorPool_,
         swapchain.minImageCount,
@@ -102,9 +102,21 @@ void VkImGUI::Init()
     };
     ImGui_ImplVulkan_Init(&imguiInfo, renderPass_);
 
-    VkCommandBuffer commandBuffer = window_.BeginSingleTimeCommands();
+    QueueFamilyIndices queueFamilyIndices = FindQueueFamilies(driver.physicalDevice, driver.surface);
+
+    VkCommandPoolCreateInfo poolInfo{};
+    poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+    poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily.value();
+    poolInfo.flags = 0; // Optional
+    if (vkCreateCommandPool(driver.device, &poolInfo, nullptr, &commandPool_) != VK_SUCCESS)
+    {
+        logDebug("[Error] Failed to create command pool!");
+        neko_assert(false, "");
+    }
+    //Upload Font to GPU
+    VkCommandBuffer commandBuffer = window_.BeginSingleTimeCommands(commandPool_);
     ImGui_ImplVulkan_CreateFontsTexture(commandBuffer);
-    window_.EndSingleTimeCommands(commandBuffer);
+    window_.EndSingleTimeCommands(commandPool_, commandBuffer);
 }
 
 void VkImGUI::Update(seconds dt)
@@ -118,7 +130,8 @@ void VkImGUI::Destroy()
     auto& swapchain = window_.GetSwapchain();
     ImGui_ImplVulkan_Shutdown();
 
-    vkDestroyRenderPass(driver.device_, renderPass_, nullptr);
-    vkDestroyDescriptorPool(driver.device_, descriptorPool_, nullptr);
+    vkDestroyRenderPass(driver.device, renderPass_, nullptr);
+    vkDestroyDescriptorPool(driver.device, descriptorPool_, nullptr);
+    vkDestroyCommandPool(driver.device, commandPool_, nullptr);
 }
 }

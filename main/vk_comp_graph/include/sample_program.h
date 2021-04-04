@@ -6,6 +6,7 @@
 
 namespace neko::vk
 {
+
 class SampleProgram : public RenderProgram, public sdl::SdlEventSystemInterface, public DrawImGuiInterface
 {
 public:
@@ -13,6 +14,21 @@ public:
     virtual ~SampleProgram() = default;
 
 protected:
+    std::mutex updateLock_;
     VkWindow& window_;
+};
+class SampleBrowser : public SystemInterface
+{
+public:
+    SampleBrowser(VkWindow& window);
+    void Init() override;
+
+    void Update(seconds dt) override;
+
+    void Destroy() override;
+
+private:
+    std::vector<std::unique_ptr<SampleProgram>> samplePrograms_;
+
 };
 }

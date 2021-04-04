@@ -33,23 +33,22 @@ namespace neko::vk
 
 struct VkDriver
 {
-    VkInstance instance_;
-    VkPhysicalDevice physicalDevice_ = VK_NULL_HANDLE;
-    VkDevice device_ = VK_NULL_HANDLE;
-    VkQueue graphicsQueue_;
-    VkQueue presentQueue_;
-    VkSurfaceKHR surface_;
-    VkCommandPool commandPool;
+    VkInstance instance;
+    VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
+    VkDevice device = VK_NULL_HANDLE;
+    VkQueue graphicsQueue;
+    VkQueue presentQueue;
+    VkSurfaceKHR surface;
 };
 
 struct VkSwapchain
 {
-    VkSwapchainKHR swapChain_;
-    std::vector<VkImage> swapChainImages_;
-    std::vector<VkImageView> swapChainImageViews_;
+    VkSwapchainKHR swapChain;
+    std::vector<VkImage> images;
+    std::vector<VkImageView> imageViews;
 
-    VkFormat swapChainImageFormat_;
-    VkExtent2D swapChainExtent_;
+    VkFormat imageFormat;
+    VkExtent2D extent;
 
     std::uint32_t minImageCount = 0;
     std::uint32_t imageCount = 0;

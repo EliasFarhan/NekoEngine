@@ -25,8 +25,9 @@
 #include <vk/vk_window.h>
 #include <vk/graphics.h>
 #include <sdl_engine/sdl_engine.h>
+#include <hello_triangle.h>
 
-int main(int argc, char** argv)
+int main([[maybe_unused]] int argc, [[maybe_unused]]  char** argv)
 {
     neko::vk::VkWindow window;
     neko::vk::VkRenderer renderer(window);
@@ -34,6 +35,8 @@ int main(int argc, char** argv)
     neko::sdl::SdlEngine engine(filesystem);
 
     engine.SetWindowAndRenderer(&window, &renderer);
+    neko::vk::SampleBrowser sampleBrowser(window);
+    engine.RegisterSystem(sampleBrowser);
 
     engine.Init();
     engine.EngineLoop();
