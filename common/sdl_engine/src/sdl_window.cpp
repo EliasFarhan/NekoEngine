@@ -35,7 +35,7 @@
 namespace neko::sdl
 {
 
-void sdl::SdlWindow::Init()
+void SdlWindow::Init()
 {
 
 #ifdef EASY_PROFILE_USE
@@ -84,7 +84,7 @@ void sdl::SdlWindow::Init()
     }
 }
 
-void sdl::SdlWindow::InitImGui()
+void SdlWindow::InitImGui()
 {
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("InitSdlImGui");
@@ -104,7 +104,7 @@ void sdl::SdlWindow::InitImGui()
     ImGui_ImplSDL2_Init(window_, nullptr);
 }
 
-void sdl::SdlWindow::Destroy()
+void SdlWindow::Destroy()
 {
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("DestroySdlWindow");
@@ -117,17 +117,17 @@ void sdl::SdlWindow::Destroy()
 
 }
 
-void sdl::SdlWindow::SwapBuffer()
+void SdlWindow::SwapBuffer()
 {
 
 }
 
-void sdl::SdlWindow::RenderUi()
+void SdlWindow::RenderUi()
 {
     ImGui::Render();
 }
 
-void sdl::SdlWindow::OnEvent(const SDL_Event& event)
+void SdlWindow::OnEvent(const SDL_Event& event)
 {
     ImGui_ImplSDL2_ProcessEvent(&event);
 }

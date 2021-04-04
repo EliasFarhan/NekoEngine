@@ -13,11 +13,13 @@ public:
     void Destroy() override;
 
     void Update(seconds dt) override;
+    void Render();
 
 private:
-    VkRenderPass renderPass_;
+
     VkWindow& window_;
     VkDescriptorPool descriptorPool_;
     VkCommandPool commandPool_;
+    VkRenderPass renderPass_;
 };
 }

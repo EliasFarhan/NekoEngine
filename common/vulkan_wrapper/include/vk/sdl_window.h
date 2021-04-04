@@ -46,6 +46,7 @@ public:
     VkDriver& GetDriver() {return driver_;}
     VkSwapchain& GetSwapchain(){return vkSwapchain_;}
     VmaAllocator GetAllocator(){return allocator_;}
+    SDL_Window* GetWindow() { return window_; }
 
     void Update(seconds dt) override;
 
@@ -53,7 +54,6 @@ public:
 
 
     VkCommandBuffer BeginSingleTimeCommands(VkCommandPool commandPool);
-
     void EndSingleTimeCommands(VkCommandPool commandPool, VkCommandBuffer commandBuffer);
 
     VkShaderModule CreateShaderModule(const BufferFile& file);

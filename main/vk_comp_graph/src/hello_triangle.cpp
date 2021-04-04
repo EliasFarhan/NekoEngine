@@ -46,7 +46,13 @@ void HelloTriangle::Render()
     auto& driver = window_.GetDriver();
     auto& swapchain = window_.GetSwapchain();
     std::uint32_t imageIndex;
-    const auto result = vkAcquireNextImageKHR(driver.device, swapchain.swapChain, UINT64_MAX, imageAvailableSemaphore_, VK_NULL_HANDLE, &imageIndex);
+    const auto result = vkAcquireNextImageKHR(
+        driver.device, 
+        swapchain.swapChain, 
+        UINT64_MAX, 
+        imageAvailableSemaphore_,
+        VK_NULL_HANDLE, 
+        &imageIndex);
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
     {
         RecreateSwapChain();
@@ -54,8 +60,8 @@ void HelloTriangle::Render()
     }
     else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
     {
-        std::cerr<<("[Error] failed to acquire swap chain image!\n");
-        assert(false);
+        logDebug("[Error] failed to acquire swap chain image!");
+        neko_assert(false, "");
     }
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -279,8 +285,8 @@ void HelloTriangle::CreateRenderPass()
 
     if (vkCreateRenderPass(driver.device, &renderPassInfo, nullptr, &renderPass_) != VK_SUCCESS)
     {
-        std::cerr << ("[Error] failed to create render pass!\n");
-        assert(false);
+        logDebug("[Error] failed to create render pass!");
+        neko_assert(false, "");
     }
 }
 
@@ -317,7 +323,6 @@ void HelloTriangle::CreateCommandPool()
 {
 
     auto& driver = window_.GetDriver();
-    auto& swapchain = window_.GetSwapchain();
     QueueFamilyIndices queueFamilyIndices = FindQueueFamilies(driver.physicalDevice, driver.surface);
 
     VkCommandPoolCreateInfo poolInfo{};
@@ -346,8 +351,8 @@ void HelloTriangle::CreateCommandBuffers()
 
     if (vkAllocateCommandBuffers(driver.device, &allocInfo, commandBuffers_.data()) != VK_SUCCESS)
     {
-        std::cerr <<("[Error] failed to allocate command buffers!\n");
-        assert(false);
+        logDebug("[Error] failed to allocate command buffers!\n");
+        neko_assert(false, "");
     }
 
     for (size_t i = 0; i < commandBuffers_.size(); i++)
@@ -359,8 +364,8 @@ void HelloTriangle::CreateCommandBuffers()
 
         if (vkBeginCommandBuffer(commandBuffers_[i], &beginInfo) != VK_SUCCESS)
         {
-            std::cerr <<("[Error] failed to begin recording command buffer!\n");
-            assert(false);
+            logDebug("[Error] failed to begin recording command buffer!");
+            neko_assert(false, "");
         }
         VkRenderPassBeginInfo renderPassInfo{};
         renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;

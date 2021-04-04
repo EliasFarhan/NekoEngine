@@ -380,6 +380,9 @@ VkExtent2D VkWindow::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabiliti
 void VkWindow::InitImGui()
 {
     SdlWindow::InitImGui();
+
+    //this initializes the core structures of imgui
+    ImGui::CreateContext();
     vkImgui_.Init();
 }
 
@@ -396,6 +399,7 @@ void VkWindow::SwapBuffer()
 void VkWindow::RenderUi()
 {
     SdlWindow::RenderUi();
+    vkImgui_.Render();
 }
 
 void VkWindow::OnEvent(const SDL_Event& event)

@@ -1,6 +1,8 @@
 #include <vk/vk_imgui.h>
 #include <vk/vk_window.h>
 
+#include "../../../externals/SFML-2.5.1/include/SFML/System/Err.hpp"
+
 namespace neko::vk
 {
 
@@ -12,23 +14,22 @@ void VkImGUI::Init()
 {
     auto& driver = window_.GetDriver();
     auto& swapchain = window_.GetSwapchain();
-    auto allocator = window_.GetAllocator();
     // Create Descriptor Pool
     {
         VkDescriptorPoolSize pool_sizes[] =
-                {
-                        { VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
-                        { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000 },
-                        { VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000 },
-                        { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000 },
-                        { VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1000 },
-                        { VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1000 },
-                        { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000 },
-                        { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000 },
-                        { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000 },
-                        { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000 },
-                        { VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000 }
-                };
+        {
+            { VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
+            { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000 },
+            { VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000 },
+            { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000 },
+            { VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1000 },
+            { VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1000 },
+            { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000 },
+            { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000 },
+            { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000 },
+            { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000 },
+            { VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000 }
+        };
         VkDescriptorPoolCreateInfo pool_info = {};
         pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
         pool_info.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
@@ -85,21 +86,17 @@ void VkImGUI::Init()
         logDebug("[Error] Could not create Dear ImGui's render pass");
         neko_assert(false, "");
     }
-    ImGui_ImplVulkan_InitInfo imguiInfo=
-    {
-        driver.instance,
-        driver.physicalDevice,
-        driver.device,
-        0,
-        driver.graphicsQueue,
-        VK_NULL_HANDLE,
-        descriptorPool_,
-        swapchain.minImageCount,
-        swapchain.imageCount,
-        VK_SAMPLE_COUNT_1_BIT,
-        nullptr,
-        nullptr
-    };
+
+    
+    ImGui_ImplVulkan_InitInfo imguiInfo{};
+    imguiInfo.Instance = driver.instance;
+    imguiInfo.PhysicalDevice = driver.physicalDevice;
+    imguiInfo.Device = driver.device;
+    imguiInfo.Queue = driver.graphicsQueue;
+    imguiInfo.DescriptorPool = descriptorPool_;
+    imguiInfo.MinImageCount = swapchain.minImageCount;
+    imguiInfo.ImageCount = swapchain.imageCount;
+    
     ImGui_ImplVulkan_Init(&imguiInfo, renderPass_);
 
     QueueFamilyIndices queueFamilyIndices = FindQueueFamilies(driver.physicalDevice, driver.surface);
@@ -117,12 +114,25 @@ void VkImGUI::Init()
     VkCommandBuffer commandBuffer = window_.BeginSingleTimeCommands(commandPool_);
     ImGui_ImplVulkan_CreateFontsTexture(commandBuffer);
     window_.EndSingleTimeCommands(commandPool_, commandBuffer);
+
+    ImGui_ImplVulkan_DestroyFontUploadObjects();
 }
 
 void VkImGUI::Update(seconds dt)
 {
 
 }
+
+void VkImGUI::Render()
+{
+    /*
+    VkCommandBuffer commandBuffer = window_.BeginSingleTimeCommands(commandPool_);
+    ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer);
+    window_.EndSingleTimeCommands(commandPool_, commandBuffer);
+    ImGui::GetDrawData()->Clear();
+    */
+}
+
 
 void VkImGUI::Destroy()
 {
