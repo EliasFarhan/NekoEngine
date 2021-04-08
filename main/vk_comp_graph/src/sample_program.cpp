@@ -3,13 +3,14 @@
 //
 
 #include <sample_program.h>
+#include <hello_triangle.h>
 
 namespace neko::vk
 {
 
-SampleBrowser::SampleBrowser(VkWindow& window)
+SampleBrowser::SampleBrowser(VkWindow& window, VkRenderer& renderer)
 {
-    samplePrograms_.push_back(std::make_unique<HelloTriangle>(window));
+    samplePrograms_.push_back(std::make_unique<HelloTriangle>(window, renderer));
 }
 
 void SampleBrowser::Init()
@@ -28,7 +29,7 @@ void SampleBrowser::Destroy()
 }
 
 
-SampleProgram::SampleProgram(VkWindow& window) : window_(window)
+SampleProgram::SampleProgram(VkWindow& window, VkRenderer& renderer) : window_(window), renderer_(renderer)
 {
 
 }

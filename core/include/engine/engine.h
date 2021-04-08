@@ -69,7 +69,8 @@ public:
     void RegisterSystem(SystemInterface& system);
     void RegisterOnDrawUi(DrawImGuiInterface& drawUi);
 
-    float GetDeltaTime() const { return dt_; };
+    float GetDeltaTime() const { return dt_; }
+    Renderer* GetRenderer() { return renderer_; }
 
     static BasicEngine* GetInstance(){return instance_;}
 

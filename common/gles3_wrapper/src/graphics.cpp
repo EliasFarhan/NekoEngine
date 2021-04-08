@@ -109,14 +109,13 @@ void Gles3Renderer::ClearScreen()
 }
 
 
-void Gles3Renderer::BeforeRenderLoop()
+void Gles3Renderer::BeforeRender()
 {
-    Renderer::BeforeRenderLoop();
-    glEnable(GL_DEPTH_TEST);
+    Renderer::BeforeRender();
 }
 
-void Gles3Renderer::AfterRenderLoop()
+void Gles3Renderer::AfterRender()
 {
-    Renderer::AfterRenderLoop();
+    Renderer::AfterRender();
 }
 }

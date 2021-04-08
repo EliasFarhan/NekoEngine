@@ -29,6 +29,7 @@
 
 #include <SDL2/SDL_vulkan.h>
 #include <vk/sdl_window.h>
+#include <vk/graphics.h>
 #include <set>
 #include <imgui_impl_sdl.h>
 
@@ -67,12 +68,17 @@ void VkWindow::Init()
 
     vmaCreateAllocator(&allocatorInfo, &allocator_);
 
+    auto* renderer = static_cast<VkRenderer*>(BasicEngine::GetInstance()->GetRenderer());
+    renderer->Init();
+
     InitImGui();
 }
 
 void VkWindow::Destroy()
 {
     vkImgui_.Destroy();
+    auto* renderer = static_cast<VkRenderer*>(BasicEngine::GetInstance()->GetRenderer());
+    renderer->Destroy();
     for (auto & imageView : vkSwapchain_.imageViews)
     {
         vkDestroyImageView(driver_.device, imageView, nullptr);
@@ -114,7 +120,7 @@ void VkWindow::CreateInstance()
     appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     appInfo.pApplicationName = "Hello Vulkan";
     appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-    appInfo.pEngineName = "No Engine";
+    appInfo.pEngineName = "Neko Engine";
     appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
     appInfo.apiVersion = VK_API_VERSION_1_0;
 

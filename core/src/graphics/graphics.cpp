@@ -44,11 +44,13 @@ Renderer::Renderer() :
             EASY_BLOCK("Renderer Update");
 #endif
             auto* engine = BasicEngine::GetInstance();
+            BeforeRender();
             PreRender();
             ClearScreen();
             engine->GenerateUiFrame();
             RenderAll();
             window_->RenderUi();
+            AfterRender();
         }),
     syncJob_([this] { SyncBuffers(); })
 {
@@ -71,16 +73,6 @@ void Renderer::RenderAll()
     {
         renderCommand->Render();
     }
-}
-
-void Renderer::BeforeRenderLoop()
-{
-    window_->BeforeRenderLoop();
-}
-
-void Renderer::AfterRenderLoop()
-{
-    window_->AfterRenderLoop();
 }
 
 void Renderer::ScheduleJobs()

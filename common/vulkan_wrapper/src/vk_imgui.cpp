@@ -125,12 +125,43 @@ void VkImGUI::Update(seconds dt)
 
 void VkImGUI::Render()
 {
-    /*
-    VkCommandBuffer commandBuffer = window_.BeginSingleTimeCommands(commandPool_);
-    ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer);
-    window_.EndSingleTimeCommands(commandPool_, commandBuffer);
+    
+    //VkCommandBuffer commandBuffer = window_.BeginSingleTimeCommands(commandPool_);
+
+    //vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+    //ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer);
+    //vkCmdEndRenderPass(commandBuffer);
+    //window_.EndSingleTimeCommands(commandPool_, commandBuffer);
     ImGui::GetDrawData()->Clear();
-    */
+    
+}
+
+void VkImGUI::CreateFramebuffers()
+{
+    auto& driver = window_.GetDriver();
+    auto& swapchain = window_.GetSwapchain();
+    framebuffers_.resize(swapchain.imageViews.size());
+    for (size_t i = 0; i < swapchain.imageViews.size(); i++)
+    {
+        VkImageView attachments[] = {
+                swapchain.imageViews[i]
+        };
+
+        VkFramebufferCreateInfo framebufferInfo{};
+        framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+        framebufferInfo.renderPass = renderPass_;
+        framebufferInfo.attachmentCount = 1;
+        framebufferInfo.pAttachments = attachments;
+        framebufferInfo.width = swapchain.extent.width;
+        framebufferInfo.height = swapchain.extent.height;
+        framebufferInfo.layers = 1;
+
+        if (vkCreateFramebuffer(driver.device, &framebufferInfo, nullptr, &framebuffers_[i]) != VK_SUCCESS)
+        {
+            logDebug("[Error] Failed to create framebuffers for ImGui!");
+            neko_assert(false, "");
+        }
+    }
 }
 
 

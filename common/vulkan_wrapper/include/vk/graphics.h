@@ -26,6 +26,7 @@
 
 #include "graphics/graphics.h"
 #include "vk/vk_window.h"
+#include <vulkan/vulkan.h>
 
 namespace neko::vk
 {
@@ -34,10 +35,24 @@ class VkRenderer : public Renderer
 {
 public:
     VkRenderer(VkWindow& window);
+    void Init();
+    void Destroy();
     void ClearScreen() override;
-
+    VkRenderPass GetRenderPass() { return renderPass_; }
+    VkSemaphore GetRenderFinishedSemaphore() { return renderFinishedSemaphore_; }
+    std::uint32_t GetImageIndex() const { return imageIndex_; }
+    VkSemaphore GetImageAvailableSemaphore() { return imageAvailableSemaphore_; }
+protected:
+    void BeforeRender() override;
+    void AfterRender() override;
 private:
+    void CreateRenderPass();
+    void CreateSemaphores();
     VkWindow& window_;
+    VkRenderPass renderPass_;
+    VkSemaphore imageAvailableSemaphore_;
+    VkSemaphore renderFinishedSemaphore_;
+    std::uint32_t imageIndex_ = 0;
 };
 
 }

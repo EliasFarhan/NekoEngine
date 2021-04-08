@@ -7,20 +7,16 @@ namespace neko::vk
 {
 void HelloTriangle::Init()
 {
-    CreateRenderPass();
     CreateGraphicsPipeline();
     CreateFramebuffers();
     CreateCommandPool();
     CreateCommandBuffers();
-    CreateSemaphores();
 }
 
 void HelloTriangle::Update(seconds dt)
 {
-    std::lock_guard<std::mutex> lock(updateLock_);
-    auto& driver = window_.GetDriver();
+    //std::lock_guard<std::mutex> lock(updateLock_);
     RendererLocator::get().Render(this);
-    vkDeviceWaitIdle(driver.device);
 }
 
 void HelloTriangle::Destroy()
@@ -29,8 +25,6 @@ void HelloTriangle::Destroy()
     auto& driver = window_.GetDriver();
     vkDeviceWaitIdle(driver.device);
     CleanupSwapChain();
-    vkDestroySemaphore(driver.device, renderFinishedSemaphore_, nullptr);
-    vkDestroySemaphore(driver.device, imageAvailableSemaphore_, nullptr);
     vkDestroyCommandPool(driver.device, commandPool_, nullptr);
 
 }
@@ -42,38 +36,24 @@ void HelloTriangle::DrawImGui()
 
 void HelloTriangle::Render()
 {
-    std::lock_guard<std::mutex> lock(updateLock_);
     auto& driver = window_.GetDriver();
     auto& swapchain = window_.GetSwapchain();
-    std::uint32_t imageIndex;
-    const auto result = vkAcquireNextImageKHR(
-        driver.device, 
-        swapchain.swapChain, 
-        UINT64_MAX, 
-        imageAvailableSemaphore_,
-        VK_NULL_HANDLE, 
-        &imageIndex);
-    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
-    {
-        RecreateSwapChain();
-        return;
-    }
-    else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
-    {
-        logDebug("[Error] failed to acquire swap chain image!");
-        neko_assert(false, "");
-    }
+
+    auto imageAvailableSemaphore = renderer_.GetImageAvailableSemaphore();
+    auto renderFinishedSemaphore = renderer_.GetRenderFinishedSemaphore();
+    auto imageIndex = renderer_.GetImageIndex();
+
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-    VkSemaphore waitSemaphores[] = { imageAvailableSemaphore_ };
+    VkSemaphore waitSemaphores[] = { imageAvailableSemaphore };
     VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
     submitInfo.waitSemaphoreCount = 1;
     submitInfo.pWaitSemaphores = waitSemaphores;
     submitInfo.pWaitDstStageMask = waitStages;
     submitInfo.commandBufferCount = 1;
     submitInfo.pCommandBuffers = &commandBuffers_[imageIndex];
-    VkSemaphore signalSemaphores[] = { renderFinishedSemaphore_ };
+    VkSemaphore signalSemaphores[] = { renderFinishedSemaphore };
     submitInfo.signalSemaphoreCount = 1;
     submitInfo.pSignalSemaphores = signalSemaphores;
     if (vkQueueSubmit(driver.graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE) != VK_SUCCESS)
@@ -81,17 +61,7 @@ void HelloTriangle::Render()
         logDebug("[Error] failed to submit draw command buffer!");
         neko_assert(false, "");
     }
-    VkPresentInfoKHR presentInfo{};
-    presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
 
-    presentInfo.waitSemaphoreCount = 1;
-    presentInfo.pWaitSemaphores = signalSemaphores;
-    VkSwapchainKHR swapChains[] = { swapchain.swapChain };
-    presentInfo.swapchainCount = 1;
-    presentInfo.pSwapchains = swapChains;
-    presentInfo.pImageIndices = &imageIndex;
-    presentInfo.pResults = nullptr; // Optional
-    vkQueuePresentKHR(driver.presentQueue, &presentInfo);
 
 }
 
@@ -213,7 +183,7 @@ void HelloTriangle::CreateGraphicsPipeline()
         logDebug("[Error] failed to create pipeline layout!\n");
         neko_assert(false, "");
     }
-
+    auto renderPass = renderer_.GetRenderPass();
     VkGraphicsPipelineCreateInfo pipelineInfo{};
     pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
     pipelineInfo.stageCount = 2;
@@ -227,7 +197,7 @@ void HelloTriangle::CreateGraphicsPipeline()
     pipelineInfo.pColorBlendState = &colorBlending;
     pipelineInfo.pDynamicState = nullptr; // Optional
     pipelineInfo.layout = pipelineLayout_;
-    pipelineInfo.renderPass = renderPass_;
+    pipelineInfo.renderPass = renderPass;
     pipelineInfo.subpass = 0;
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // Optional
     pipelineInfo.basePipelineIndex = -1; // Optional
@@ -243,58 +213,12 @@ void HelloTriangle::CreateGraphicsPipeline()
 
 }
 
-void HelloTriangle::CreateRenderPass()
-{
-    auto& driver = window_.GetDriver();
-    auto& swapchain = window_.GetSwapchain();
-    VkAttachmentDescription colorAttachment{};
-    colorAttachment.format = swapchain.imageFormat;
-    colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-    colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-    colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-    colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-    colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-
-    VkAttachmentReference colorAttachmentRef{};
-    colorAttachmentRef.attachment = 0;
-    colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-
-    VkSubpassDescription subpass{};
-    subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-    subpass.colorAttachmentCount = 1;
-    subpass.pColorAttachments = &colorAttachmentRef;
-
-    VkSubpassDependency dependency{};
-    dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
-    dependency.dstSubpass = 0;
-    dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-    dependency.srcAccessMask = 0;
-    dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-    dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-
-    VkRenderPassCreateInfo renderPassInfo{};
-    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-    renderPassInfo.attachmentCount = 1;
-    renderPassInfo.pAttachments = &colorAttachment;
-    renderPassInfo.subpassCount = 1;
-    renderPassInfo.pSubpasses = &subpass;
-    renderPassInfo.dependencyCount = 1;
-    renderPassInfo.pDependencies = &dependency;
-
-    if (vkCreateRenderPass(driver.device, &renderPassInfo, nullptr, &renderPass_) != VK_SUCCESS)
-    {
-        logDebug("[Error] failed to create render pass!");
-        neko_assert(false, "");
-    }
-}
-
 void HelloTriangle::CreateFramebuffers()
 {
 
     auto& driver = window_.GetDriver();
     auto& swapchain = window_.GetSwapchain();
+    auto renderPass = renderer_.GetRenderPass();
     swapChainFramebuffers_.resize(swapchain.imageViews.size());
     for (size_t i = 0; i < swapchain.imageViews.size(); i++)
     {
@@ -304,7 +228,7 @@ void HelloTriangle::CreateFramebuffers()
 
         VkFramebufferCreateInfo framebufferInfo{};
         framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-        framebufferInfo.renderPass = renderPass_;
+        framebufferInfo.renderPass = renderPass;
         framebufferInfo.attachmentCount = 1;
         framebufferInfo.pAttachments = attachments;
         framebufferInfo.width = swapchain.extent.width;
@@ -354,7 +278,7 @@ void HelloTriangle::CreateCommandBuffers()
         logDebug("[Error] failed to allocate command buffers!\n");
         neko_assert(false, "");
     }
-
+    auto renderPass = renderer_.GetRenderPass();
     for (size_t i = 0; i < commandBuffers_.size(); i++)
     {
         VkCommandBufferBeginInfo beginInfo{};
@@ -367,9 +291,10 @@ void HelloTriangle::CreateCommandBuffers()
             logDebug("[Error] failed to begin recording command buffer!");
             neko_assert(false, "");
         }
+        
         VkRenderPassBeginInfo renderPassInfo{};
         renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-        renderPassInfo.renderPass = renderPass_;
+        renderPassInfo.renderPass = renderPass;
         renderPassInfo.framebuffer = swapChainFramebuffers_[i];
         renderPassInfo.renderArea.offset = { 0, 0 };
         renderPassInfo.renderArea.extent = swapchain.extent;
@@ -392,21 +317,6 @@ void HelloTriangle::CreateCommandBuffers()
     }
 }
 
-void HelloTriangle::CreateSemaphores()
-{
-
-    auto& driver = window_.GetDriver();
-    VkSemaphoreCreateInfo semaphoreInfo{};
-    semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-    if (vkCreateSemaphore(driver.device, &semaphoreInfo, nullptr, &imageAvailableSemaphore_) != VK_SUCCESS ||
-        vkCreateSemaphore(driver.device, &semaphoreInfo, nullptr, &renderFinishedSemaphore_) != VK_SUCCESS)
-    {
-
-        logDebug("[Error] failed to create semaphores!");
-        neko_assert(false, "");
-    }
-}
-
 void HelloTriangle::RecreateSwapChain()
 {
 
@@ -423,7 +333,6 @@ void HelloTriangle::CleanupSwapChain()
 
     vkDestroyPipeline(driver.device, graphicsPipeline_, nullptr);
     vkDestroyPipelineLayout(driver.device, pipelineLayout_, nullptr);
-    vkDestroyRenderPass(driver.device, renderPass_, nullptr);
 
 }
 }

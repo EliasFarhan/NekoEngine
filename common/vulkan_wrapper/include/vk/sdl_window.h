@@ -35,6 +35,7 @@
 
 namespace neko::vk
 {
+class VkRenderer;
 class VkWindow : public sdl::SdlWindow
 {
 public:

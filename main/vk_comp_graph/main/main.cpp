@@ -35,7 +35,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]]  char** argv)
     neko::sdl::SdlEngine engine(filesystem);
 
     engine.SetWindowAndRenderer(&window, &renderer);
-    neko::vk::SampleBrowser sampleBrowser(window);
+    neko::vk::SampleBrowser sampleBrowser(window, renderer);
     engine.RegisterSystem(sampleBrowser);
 
     engine.Init();

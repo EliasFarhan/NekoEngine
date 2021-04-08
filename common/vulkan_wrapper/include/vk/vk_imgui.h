@@ -16,10 +16,11 @@ public:
     void Render();
 
 private:
-
+    void CreateFramebuffers();
     VkWindow& window_;
     VkDescriptorPool descriptorPool_;
     VkCommandPool commandPool_;
     VkRenderPass renderPass_;
+    std::vector<VkFramebuffer> framebuffers_;
 };
 }
