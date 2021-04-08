@@ -38,21 +38,35 @@ public:
     void Init();
     void Destroy();
     void ClearScreen() override;
+
+    VkCommandBuffer BeginSingleTimeCommands();
+    void EndSingleTimeCommands(VkCommandBuffer commandBuffer);
+
     VkRenderPass GetRenderPass() { return renderPass_; }
     VkSemaphore GetRenderFinishedSemaphore() { return renderFinishedSemaphore_; }
     std::uint32_t GetImageIndex() const { return imageIndex_; }
     VkSemaphore GetImageAvailableSemaphore() { return imageAvailableSemaphore_; }
+    const std::vector<VkFramebuffer>& GetFramebuffers()const { return framebuffers_; }
+    VkCommandPool GetCommandPool() { return commandPool_; }
+    std::vector<VkCommandBuffer> GetCommandBuffers() { return commandBuffers_; }
 protected:
     void BeforeRender() override;
     void AfterRender() override;
 private:
     void CreateRenderPass();
     void CreateSemaphores();
+    void CreateFramebuffers();
+    void CreateCommandPool();
+
+    void CreateCommandBuffers();
     VkWindow& window_;
     VkRenderPass renderPass_;
     VkSemaphore imageAvailableSemaphore_;
     VkSemaphore renderFinishedSemaphore_;
     std::uint32_t imageIndex_ = 0;
+    std::vector<VkFramebuffer> framebuffers_;
+    VkCommandPool commandPool_;
+    std::vector<VkCommandBuffer> commandBuffers_;
 };
 
 }

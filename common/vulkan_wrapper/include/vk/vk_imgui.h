@@ -3,6 +3,7 @@
 
 namespace neko::vk
 {
+class VkRenderer;
 class VkWindow;
 class VkImGUI : public SystemInterface
 {
@@ -16,11 +17,9 @@ public:
     void Render();
 
 private:
-    void CreateFramebuffers();
+    static VkRenderer& GetRenderer();
     VkWindow& window_;
+    VkRenderer* renderer_ = nullptr;
     VkDescriptorPool descriptorPool_;
-    VkCommandPool commandPool_;
-    VkRenderPass renderPass_;
-    std::vector<VkFramebuffer> framebuffers_;
 };
 }

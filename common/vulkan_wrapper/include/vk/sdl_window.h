@@ -54,8 +54,7 @@ public:
     void OnEvent(const SDL_Event &event) override;
 
 
-    VkCommandBuffer BeginSingleTimeCommands(VkCommandPool commandPool);
-    void EndSingleTimeCommands(VkCommandPool commandPool, VkCommandBuffer commandBuffer);
+    
 
     VkShaderModule CreateShaderModule(const BufferFile& file);
 

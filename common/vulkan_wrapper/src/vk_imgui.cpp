@@ -1,12 +1,13 @@
 #include <vk/vk_imgui.h>
 #include <vk/vk_window.h>
+#include <vk/graphics.h>
+#include <engine/assert.h>
 
-#include "../../../externals/SFML-2.5.1/include/SFML/System/Err.hpp"
 
 namespace neko::vk
 {
 
-vk::VkImGUI::VkImGUI(VkWindow& window) : window_(window)
+VkImGUI::VkImGUI(VkWindow& window) : window_(window)
 {
 }
 
@@ -14,6 +15,7 @@ void VkImGUI::Init()
 {
     auto& driver = window_.GetDriver();
     auto& swapchain = window_.GetSwapchain();
+    auto& renderer = GetRenderer();
     // Create Descriptor Pool
     {
         VkDescriptorPoolSize pool_sizes[] =
@@ -44,49 +46,7 @@ void VkImGUI::Init()
         }
     }
 
-
-    VkAttachmentDescription attachment = {};
-    attachment.format = swapchain.imageFormat;
-    attachment.samples = VK_SAMPLE_COUNT_1_BIT;
-    attachment.loadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
-    attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-    attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-    attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    attachment.initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-    attachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-
-    VkAttachmentReference color_attachment = {};
-    color_attachment.attachment = 0;
-    color_attachment.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-
-    VkSubpassDescription subpass = {};
-    subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-    subpass.colorAttachmentCount = 1;
-    subpass.pColorAttachments = &color_attachment;
-
-    VkSubpassDependency dependency = {};
-    dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
-    dependency.dstSubpass = 0;
-    dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-    dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-    dependency.srcAccessMask = 0;  // or VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-    dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-
-    VkRenderPassCreateInfo info = {};
-    info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-    info.attachmentCount = 1;
-    info.pAttachments = &attachment;
-    info.subpassCount = 1;
-    info.pSubpasses = &subpass;
-    info.dependencyCount = 1;
-    info.pDependencies = &dependency;
-
-    if (vkCreateRenderPass(driver.device, &info, nullptr, &renderPass_) != VK_SUCCESS)
-    {
-        logDebug("[Error] Could not create Dear ImGui's render pass");
-        neko_assert(false, "");
-    }
-
+    
     
     ImGui_ImplVulkan_InitInfo imguiInfo{};
     imguiInfo.Instance = driver.instance;
@@ -97,23 +57,13 @@ void VkImGUI::Init()
     imguiInfo.MinImageCount = swapchain.minImageCount;
     imguiInfo.ImageCount = swapchain.imageCount;
     
-    ImGui_ImplVulkan_Init(&imguiInfo, renderPass_);
+    ImGui_ImplVulkan_Init(&imguiInfo, renderer.GetRenderPass());
 
-    QueueFamilyIndices queueFamilyIndices = FindQueueFamilies(driver.physicalDevice, driver.surface);
-
-    VkCommandPoolCreateInfo poolInfo{};
-    poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-    poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily.value();
-    poolInfo.flags = 0; // Optional
-    if (vkCreateCommandPool(driver.device, &poolInfo, nullptr, &commandPool_) != VK_SUCCESS)
-    {
-        logDebug("[Error] Failed to create command pool!");
-        neko_assert(false, "");
-    }
+    
     //Upload Font to GPU
-    VkCommandBuffer commandBuffer = window_.BeginSingleTimeCommands(commandPool_);
+    VkCommandBuffer commandBuffer = renderer.BeginSingleTimeCommands();
     ImGui_ImplVulkan_CreateFontsTexture(commandBuffer);
-    window_.EndSingleTimeCommands(commandPool_, commandBuffer);
+    renderer.EndSingleTimeCommands(commandBuffer);
 
     ImGui_ImplVulkan_DestroyFontUploadObjects();
 }
@@ -126,42 +76,18 @@ void VkImGUI::Update(seconds dt)
 void VkImGUI::Render()
 {
     
-    //VkCommandBuffer commandBuffer = window_.BeginSingleTimeCommands(commandPool_);
-
-    //vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-    //ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer);
-    //vkCmdEndRenderPass(commandBuffer);
-    //window_.EndSingleTimeCommands(commandPool_, commandBuffer);
+    auto& renderer = GetRenderer();
+    const auto imageIndex = renderer.GetImageIndex();
+    auto commandBuffer = renderer.GetCommandBuffers()[imageIndex];
+   
+    ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer);
     ImGui::GetDrawData()->Clear();
     
 }
 
-void VkImGUI::CreateFramebuffers()
+VkRenderer& VkImGUI::GetRenderer()
 {
-    auto& driver = window_.GetDriver();
-    auto& swapchain = window_.GetSwapchain();
-    framebuffers_.resize(swapchain.imageViews.size());
-    for (size_t i = 0; i < swapchain.imageViews.size(); i++)
-    {
-        VkImageView attachments[] = {
-                swapchain.imageViews[i]
-        };
-
-        VkFramebufferCreateInfo framebufferInfo{};
-        framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-        framebufferInfo.renderPass = renderPass_;
-        framebufferInfo.attachmentCount = 1;
-        framebufferInfo.pAttachments = attachments;
-        framebufferInfo.width = swapchain.extent.width;
-        framebufferInfo.height = swapchain.extent.height;
-        framebufferInfo.layers = 1;
-
-        if (vkCreateFramebuffer(driver.device, &framebufferInfo, nullptr, &framebuffers_[i]) != VK_SUCCESS)
-        {
-            logDebug("[Error] Failed to create framebuffers for ImGui!");
-            neko_assert(false, "");
-        }
-    }
+    return *static_cast<VkRenderer*>(BasicEngine::GetInstance()->GetRenderer());
 }
 
 
@@ -170,9 +96,7 @@ void VkImGUI::Destroy()
     auto& driver = window_.GetDriver();
     auto& swapchain = window_.GetSwapchain();
     ImGui_ImplVulkan_Shutdown();
-
-    vkDestroyRenderPass(driver.device, renderPass_, nullptr);
+    
     vkDestroyDescriptorPool(driver.device, descriptorPool_, nullptr);
-    vkDestroyCommandPool(driver.device, commandPool_, nullptr);
 }
 }

@@ -8,9 +8,6 @@ namespace neko::vk
 void HelloTriangle::Init()
 {
     CreateGraphicsPipeline();
-    CreateFramebuffers();
-    CreateCommandPool();
-    CreateCommandBuffers();
 }
 
 void HelloTriangle::Update(seconds dt)
@@ -25,7 +22,6 @@ void HelloTriangle::Destroy()
     auto& driver = window_.GetDriver();
     vkDeviceWaitIdle(driver.device);
     CleanupSwapChain();
-    vkDestroyCommandPool(driver.device, commandPool_, nullptr);
 
 }
 
@@ -36,32 +32,9 @@ void HelloTriangle::DrawImGui()
 
 void HelloTriangle::Render()
 {
-    auto& driver = window_.GetDriver();
-    auto& swapchain = window_.GetSwapchain();
 
-    auto imageAvailableSemaphore = renderer_.GetImageAvailableSemaphore();
-    auto renderFinishedSemaphore = renderer_.GetRenderFinishedSemaphore();
-    auto imageIndex = renderer_.GetImageIndex();
-
-    VkSubmitInfo submitInfo{};
-    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-
-    VkSemaphore waitSemaphores[] = { imageAvailableSemaphore };
-    VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
-    submitInfo.waitSemaphoreCount = 1;
-    submitInfo.pWaitSemaphores = waitSemaphores;
-    submitInfo.pWaitDstStageMask = waitStages;
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &commandBuffers_[imageIndex];
-    VkSemaphore signalSemaphores[] = { renderFinishedSemaphore };
-    submitInfo.signalSemaphoreCount = 1;
-    submitInfo.pSignalSemaphores = signalSemaphores;
-    if (vkQueueSubmit(driver.graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE) != VK_SUCCESS)
-    {
-        logDebug("[Error] failed to submit draw command buffer!");
-        neko_assert(false, "");
-    }
-
+    vkCmdBindPipeline(renderer_.GetCommandBuffers()[renderer_.GetImageIndex()], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline_);
+    vkCmdDraw(renderer_.GetCommandBuffers()[renderer_.GetImageIndex()], 3, 1, 0, 0);
 
 }
 
@@ -213,110 +186,6 @@ void HelloTriangle::CreateGraphicsPipeline()
 
 }
 
-void HelloTriangle::CreateFramebuffers()
-{
-
-    auto& driver = window_.GetDriver();
-    auto& swapchain = window_.GetSwapchain();
-    auto renderPass = renderer_.GetRenderPass();
-    swapChainFramebuffers_.resize(swapchain.imageViews.size());
-    for (size_t i = 0; i < swapchain.imageViews.size(); i++)
-    {
-        VkImageView attachments[] = {
-                swapchain.imageViews[i]
-        };
-
-        VkFramebufferCreateInfo framebufferInfo{};
-        framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-        framebufferInfo.renderPass = renderPass;
-        framebufferInfo.attachmentCount = 1;
-        framebufferInfo.pAttachments = attachments;
-        framebufferInfo.width = swapchain.extent.width;
-        framebufferInfo.height = swapchain.extent.height;
-        framebufferInfo.layers = 1;
-
-        if (vkCreateFramebuffer(driver.device, &framebufferInfo, nullptr, &swapChainFramebuffers_[i]) != VK_SUCCESS)
-        {
-            logDebug("failed to create framebuffer!");
-            neko_assert(false, "");
-        }
-    }
-}
-
-void HelloTriangle::CreateCommandPool()
-{
-
-    auto& driver = window_.GetDriver();
-    QueueFamilyIndices queueFamilyIndices = FindQueueFamilies(driver.physicalDevice, driver.surface);
-
-    VkCommandPoolCreateInfo poolInfo{};
-    poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-    poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily.value();
-    poolInfo.flags = 0; // Optional
-    if (vkCreateCommandPool(driver.device, &poolInfo, nullptr, &commandPool_) != VK_SUCCESS)
-    {
-        logDebug("[Error] failed to create command pool!");
-        neko_assert(false, "");
-    }
-}
-
-void HelloTriangle::CreateCommandBuffers()
-{
-
-    auto& driver = window_.GetDriver();
-    auto& swapchain = window_.GetSwapchain();
-    commandBuffers_.resize(swapChainFramebuffers_.size());
-
-    VkCommandBufferAllocateInfo allocInfo{};
-    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    allocInfo.commandPool = commandPool_;
-    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    allocInfo.commandBufferCount = static_cast<uint32_t>(commandBuffers_.size());
-
-    if (vkAllocateCommandBuffers(driver.device, &allocInfo, commandBuffers_.data()) != VK_SUCCESS)
-    {
-        logDebug("[Error] failed to allocate command buffers!\n");
-        neko_assert(false, "");
-    }
-    auto renderPass = renderer_.GetRenderPass();
-    for (size_t i = 0; i < commandBuffers_.size(); i++)
-    {
-        VkCommandBufferBeginInfo beginInfo{};
-        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-        beginInfo.flags = 0; // Optional
-        beginInfo.pInheritanceInfo = nullptr; // Optional
-
-        if (vkBeginCommandBuffer(commandBuffers_[i], &beginInfo) != VK_SUCCESS)
-        {
-            logDebug("[Error] failed to begin recording command buffer!");
-            neko_assert(false, "");
-        }
-        
-        VkRenderPassBeginInfo renderPassInfo{};
-        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-        renderPassInfo.renderPass = renderPass;
-        renderPassInfo.framebuffer = swapChainFramebuffers_[i];
-        renderPassInfo.renderArea.offset = { 0, 0 };
-        renderPassInfo.renderArea.extent = swapchain.extent;
-
-        VkClearValue clearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
-        renderPassInfo.clearValueCount = 1;
-        renderPassInfo.pClearValues = &clearColor;
-
-        vkCmdBeginRenderPass(commandBuffers_[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-        vkCmdBindPipeline(commandBuffers_[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline_);
-        vkCmdDraw(commandBuffers_[i], 3, 1, 0, 0);
-        vkCmdEndRenderPass(commandBuffers_[i]);
-
-        if (vkEndCommandBuffer(commandBuffers_[i]) != VK_SUCCESS)
-        {
-            logDebug("[Error] failed to record command buffer!");
-            neko_assert(false, "");
-        }
-
-    }
-}
-
 void HelloTriangle::RecreateSwapChain()
 {
 
@@ -325,12 +194,7 @@ void HelloTriangle::RecreateSwapChain()
 void HelloTriangle::CleanupSwapChain()
 {
     auto& driver = window_.GetDriver();
-    for (size_t i = 0; i < swapChainFramebuffers_.size(); i++)
-    {
-        vkDestroyFramebuffer(driver.device, swapChainFramebuffers_[i], nullptr);
-    }
-    vkFreeCommandBuffers(driver.device, commandPool_, static_cast<uint32_t>(commandBuffers_.size()), commandBuffers_.data());
-
+   
     vkDestroyPipeline(driver.device, graphicsPipeline_, nullptr);
     vkDestroyPipelineLayout(driver.device, pipelineLayout_, nullptr);
 
