@@ -16,8 +16,10 @@ public:
     void Update(seconds dt) override;
     void Render();
 
+    void CleanupSwapChain();
+    void CreateSwapChain();
+
 private:
-    static VkRenderer& GetRenderer();
     VkWindow& window_;
     VkRenderer* renderer_ = nullptr;
     VkDescriptorPool descriptorPool_;

@@ -186,11 +186,6 @@ void HelloTriangle::CreateGraphicsPipeline()
 
 }
 
-void HelloTriangle::RecreateSwapChain()
-{
-
-}
-
 void HelloTriangle::CleanupSwapChain()
 {
     auto& driver = window_.GetDriver();
@@ -198,5 +193,10 @@ void HelloTriangle::CleanupSwapChain()
     vkDestroyPipeline(driver.device, graphicsPipeline_, nullptr);
     vkDestroyPipelineLayout(driver.device, pipelineLayout_, nullptr);
 
+}
+
+void HelloTriangle::CreateSwapChain()
+{
+    CreateGraphicsPipeline();
 }
 }

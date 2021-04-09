@@ -77,14 +77,9 @@ void VkWindow::Init()
 void VkWindow::Destroy()
 {
     vkImgui_.Destroy();
-    auto* renderer = static_cast<VkRenderer*>(BasicEngine::GetInstance()->GetRenderer());
+    auto* renderer = GetRenderer();
     renderer->Destroy();
-    for (auto & imageView : vkSwapchain_.imageViews)
-    {
-        vkDestroyImageView(driver_.device, imageView, nullptr);
-    }
-
-    vkDestroySwapchainKHR(driver_.device, vkSwapchain_.swapChain, nullptr);
+    CleanupSwapChain();
     vkDestroyDevice(driver_.device, nullptr);
     if (enableValidationLayers_)
     {
@@ -106,14 +101,34 @@ void VkWindow::GenerateUiFrame()
 
 void VkWindow::OnResize(Vec2u newWindowSize)
 {
+    vkDeviceWaitIdle(driver_.device);
+
+    auto* renderer = GetRenderer();
+    for (auto* interface : recreateSwapchainInterfaces_)
+    {
+        interface->CleanupSwapChain();
+    }
+
+    renderer->CleanupSwapChain();
+    vkImgui_.CleanupSwapChain();
+    CleanupSwapChain();
+    //Recreate sawpchain
+    CreateSwapChain();
+    CreateImageViews();
+    renderer->CreateSwapChain();
+    vkImgui_.CreateSwapChain();
+    for (auto* interface : recreateSwapchainInterfaces_)
+    {
+        interface->CreateSwapChain();
+    }
 }
 
 void VkWindow::CreateInstance()
 {
-    std::cout << "[Log] Creating Instance\n";
+    logDebug( "[Log] Creating Instance");
     if (enableValidationLayers_ && !CheckValidationLayerSupport())
     {
-        std::cerr << "[Error] Validation layers requested, but not available!\n";
+        logDebug("[Error] Validation layers requested, but not available!");
         assert(false);
     }
     VkApplicationInfo appInfo{};
@@ -362,6 +377,16 @@ void VkWindow::CreateImageViews()
     }
 }
 
+void VkWindow::CleanupSwapChain()
+{
+    for (auto& imageView : vkSwapchain_.imageViews)
+    {
+        vkDestroyImageView(driver_.device, imageView, nullptr);
+    }
+
+    vkDestroySwapchainKHR(driver_.device, vkSwapchain_.swapChain, nullptr);
+}
+
 VkExtent2D VkWindow::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities)
 {
     if (capabilities.currentExtent.width != std::numeric_limits<std::uint32_t>::max())
@@ -428,6 +453,15 @@ VkShaderModule VkWindow::CreateShaderModule(const BufferFile& file)
     return shaderModule;
 }
 
+void VkWindow::RegisterRecreateSwapchainInterface(RecreateSwapchainInterface* interface)
+{
+    recreateSwapchainInterfaces_.push_back(interface);
+}
+
+VkRenderer* VkWindow::GetRenderer()
+{
+    return static_cast<VkRenderer*>(BasicEngine::GetInstance()->GetRenderer());
+}
 }
 
 #endif

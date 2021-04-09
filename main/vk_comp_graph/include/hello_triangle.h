@@ -22,10 +22,10 @@ public:
 
     void OnEvent(const SDL_Event& event) override;
 
+    void CleanupSwapChain() override;
+    void CreateSwapChain() override;
 private:
     void CreateGraphicsPipeline();
-    void RecreateSwapChain();
-    void CleanupSwapChain();
     
     VkPipelineLayout pipelineLayout_;
     VkPipeline graphicsPipeline_;

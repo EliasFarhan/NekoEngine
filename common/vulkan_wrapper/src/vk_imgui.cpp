@@ -15,7 +15,7 @@ void VkImGUI::Init()
 {
     auto& driver = window_.GetDriver();
     auto& swapchain = window_.GetSwapchain();
-    auto& renderer = GetRenderer();
+    auto& renderer = *VkWindow::GetRenderer();
     // Create Descriptor Pool
     {
         VkDescriptorPoolSize pool_sizes[] =
@@ -46,26 +46,7 @@ void VkImGUI::Init()
         }
     }
 
-    
-    
-    ImGui_ImplVulkan_InitInfo imguiInfo{};
-    imguiInfo.Instance = driver.instance;
-    imguiInfo.PhysicalDevice = driver.physicalDevice;
-    imguiInfo.Device = driver.device;
-    imguiInfo.Queue = driver.graphicsQueue;
-    imguiInfo.DescriptorPool = descriptorPool_;
-    imguiInfo.MinImageCount = swapchain.minImageCount;
-    imguiInfo.ImageCount = swapchain.imageCount;
-    
-    ImGui_ImplVulkan_Init(&imguiInfo, renderer.GetRenderPass());
-
-    
-    //Upload Font to GPU
-    VkCommandBuffer commandBuffer = renderer.BeginSingleTimeCommands();
-    ImGui_ImplVulkan_CreateFontsTexture(commandBuffer);
-    renderer.EndSingleTimeCommands(commandBuffer);
-
-    ImGui_ImplVulkan_DestroyFontUploadObjects();
+    CreateSwapChain();
 }
 
 void VkImGUI::Update(seconds dt)
@@ -76,7 +57,7 @@ void VkImGUI::Update(seconds dt)
 void VkImGUI::Render()
 {
     
-    auto& renderer = GetRenderer();
+    auto& renderer = *VkWindow::GetRenderer();
     const auto imageIndex = renderer.GetImageIndex();
     auto commandBuffer = renderer.GetCommandBuffers()[imageIndex];
    
@@ -85,11 +66,36 @@ void VkImGUI::Render()
     
 }
 
-VkRenderer& VkImGUI::GetRenderer()
+void VkImGUI::CleanupSwapChain()
 {
-    return *static_cast<VkRenderer*>(BasicEngine::GetInstance()->GetRenderer());
+    ImGui_ImplVulkan_Shutdown();
 }
 
+void VkImGUI::CreateSwapChain()
+{
+    auto& driver = window_.GetDriver();
+    auto& swapchain = window_.GetSwapchain();
+    auto& renderer = *VkWindow::GetRenderer();
+
+    ImGui_ImplVulkan_InitInfo imguiInfo{};
+    imguiInfo.Instance = driver.instance;
+    imguiInfo.PhysicalDevice = driver.physicalDevice;
+    imguiInfo.Device = driver.device;
+    imguiInfo.Queue = driver.graphicsQueue;
+    imguiInfo.DescriptorPool = descriptorPool_;
+    imguiInfo.MinImageCount = swapchain.minImageCount;
+    imguiInfo.ImageCount = swapchain.imageCount;
+
+    ImGui_ImplVulkan_Init(&imguiInfo, renderer.GetRenderPass());
+
+
+    //Upload Font to GPU
+    VkCommandBuffer commandBuffer = renderer.BeginSingleTimeCommands();
+    ImGui_ImplVulkan_CreateFontsTexture(commandBuffer);
+    renderer.EndSingleTimeCommands(commandBuffer);
+
+    ImGui_ImplVulkan_DestroyFontUploadObjects();
+}
 
 void VkImGUI::Destroy()
 {

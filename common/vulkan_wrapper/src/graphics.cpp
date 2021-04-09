@@ -103,6 +103,25 @@ void VkRenderer::EndSingleTimeCommands(VkCommandBuffer commandBuffer)
     vkFreeCommandBuffers(driver.device, commandPool_, 1, &commandBuffer);
 }
 
+void VkRenderer::CleanupSwapChain()
+{
+    auto& driver = window_.GetDriver();
+    for (size_t i = 0; i < framebuffers_.size(); i++)
+    {
+        vkDestroyFramebuffer(driver.device, framebuffers_[i], nullptr);
+    }
+    vkFreeCommandBuffers(driver.device, commandPool_, static_cast<uint32_t>(commandBuffers_.size()), commandBuffers_.data());
+
+    vkDestroyRenderPass(driver.device, renderPass_, nullptr);
+}
+
+void VkRenderer::CreateSwapChain()
+{
+    CreateRenderPass();
+    CreateFramebuffers();
+    CreateCommandBuffers();
+}
+
 void VkRenderer::BeforeRender()
 {
     auto& driver = window_.GetDriver();
@@ -115,14 +134,9 @@ void VkRenderer::BeforeRender()
         imageAvailableSemaphore_,
         VK_NULL_HANDLE,
         &imageIndex_);
-    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
+    if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
     {
-        //RecreateSwapChain();
-        return;
-    }
-    else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
-    {
-        logDebug("[Error] failed to acquire swap chain image!");
+        logDebug("[Error] Failed to acquire swap chain image!");
         neko_assert(false, "");
     }
 

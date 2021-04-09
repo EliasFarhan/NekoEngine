@@ -15,22 +15,41 @@ SampleBrowser::SampleBrowser(VkWindow& window, VkRenderer& renderer)
 
 void SampleBrowser::Init()
 {
-    samplePrograms_[0]->Init();
+    samplePrograms_[currentIndex_]->Init();
 }
 
 void SampleBrowser::Update(seconds dt)
 {
-    samplePrograms_[0]->Update(dt);
+    samplePrograms_[currentIndex_]->Update(dt);
+}
+
+void SampleBrowser::DrawImGui()
+{
+    ImGui::Begin("Sample Browser");
+    ImGui::End();
+    samplePrograms_[currentIndex_]->DrawImGui();
 }
 
 void SampleBrowser::Destroy()
 {
-    samplePrograms_[0]->Destroy();
+    samplePrograms_[currentIndex_]->Destroy();
+}
+
+void SampleBrowser::CleanupSwapChain()
+{
+    samplePrograms_[currentIndex_]->CleanupSwapChain();
+}
+
+void SampleBrowser::CreateSwapChain()
+{
+    samplePrograms_[currentIndex_]->CreateSwapChain();
 }
 
 
 SampleProgram::SampleProgram(VkWindow& window, VkRenderer& renderer) : window_(window), renderer_(renderer)
 {
-
+    auto* engine = BasicEngine::GetInstance();
+    window_.RegisterRecreateSwapchainInterface(this);
+    
 }
 }

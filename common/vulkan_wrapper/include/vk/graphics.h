@@ -31,7 +31,7 @@
 namespace neko::vk
 {
 
-class VkRenderer : public Renderer
+class VkRenderer : public Renderer, public RecreateSwapchainInterface
 {
 public:
     VkRenderer(VkWindow& window);
@@ -49,6 +49,8 @@ public:
     const std::vector<VkFramebuffer>& GetFramebuffers()const { return framebuffers_; }
     VkCommandPool GetCommandPool() { return commandPool_; }
     std::vector<VkCommandBuffer> GetCommandBuffers() { return commandBuffers_; }
+    void CleanupSwapChain() override;
+    void CreateSwapChain() override;
 protected:
     void BeforeRender() override;
     void AfterRender() override;

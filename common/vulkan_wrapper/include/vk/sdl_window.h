@@ -36,6 +36,15 @@
 namespace neko::vk
 {
 class VkRenderer;
+
+class RecreateSwapchainInterface
+{
+public:
+    virtual ~RecreateSwapchainInterface() = default;
+    virtual void CreateSwapChain() = 0;
+    virtual void CleanupSwapChain() = 0;
+};
+
 class VkWindow : public sdl::SdlWindow
 {
 public:
@@ -53,18 +62,15 @@ public:
 
     void OnEvent(const SDL_Event &event) override;
 
-
-    
-
     VkShaderModule CreateShaderModule(const BufferFile& file);
-
+    void RegisterRecreateSwapchainInterface(RecreateSwapchainInterface* interface);
+    static VkRenderer* GetRenderer();
 protected:
 
     void InitImGui() override;
     void SwapBuffer() override;
 
     void RenderUi() override;
-
 private:
     VkDriver driver_;
     VkSwapchain vkSwapchain_;
@@ -72,6 +78,7 @@ private:
     VkDebugUtilsMessengerEXT debugMessenger_;
     VmaAllocator allocator_;
     VkImGUI vkImgui_;
+    std::vector<RecreateSwapchainInterface*> recreateSwapchainInterfaces_;
 
     void CreateInstance();
     void SetupDebugMessenger();
@@ -79,7 +86,7 @@ private:
     void CreateSurface();
     void CreateSwapChain();
     void CreateImageViews();
-
+    void CleanupSwapChain();
     VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
 
 };
