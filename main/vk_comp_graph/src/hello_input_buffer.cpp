@@ -1,62 +1,79 @@
+#include <hello_input_buffer.h>
 
-#include <hello_triangle.h>
-#include <engine/assert.h>
-#include <vk/vk_utility.h>
+#include "engine/assert.h"
+#include "vk/vk_utility.h"
 
 namespace neko::vk
 {
-void HelloTriangle::Init()
+void HelloInputBuffer::Init()
 {
     CreateGraphicsPipeline();
+    CreateInputBuffer();
     SampleProgram::Init();
 }
 
-void HelloTriangle::Update(seconds dt)
+void HelloInputBuffer::Update(seconds dt)
 {
-    //std::lock_guard<std::mutex> lock(updateLock_);
     RendererLocator::get().Render(this);
 }
 
-void HelloTriangle::Destroy()
+void HelloInputBuffer::Destroy()
 {
     SampleProgram::Destroy();
     std::lock_guard<std::mutex> lock(updateLock_);
     auto& driver = window_.GetDriver();
     vkDeviceWaitIdle(driver.device);
+    CleanupInputBuffer();
     CleanupSwapChain();
-
 }
 
-void HelloTriangle::DrawImGui()
+void HelloInputBuffer::DrawImGui()
 {
-
 }
 
-void HelloTriangle::Render()
+void HelloInputBuffer::Render()
 {
-    if (!initialized_)
+    if(!initialized_)
         return;
     vkCmdBindPipeline(renderer_.GetCommandBuffers()[renderer_.GetImageIndex()], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline_);
+
+    VkBuffer vertexBuffers[] = { vertexBuffer_ };
+    VkDeviceSize offsets[] = { 0 };
+    vkCmdBindVertexBuffers(renderer_.GetCommandBuffers()[renderer_.GetImageIndex()], 0, 1, vertexBuffers, offsets);
+
     vkCmdDraw(renderer_.GetCommandBuffers()[renderer_.GetImageIndex()], 3, 1, 0, 0);
 
 }
 
-void HelloTriangle::OnEvent(const SDL_Event& event)
+void HelloInputBuffer::OnEvent(const SDL_Event& event)
 {
+}
+
+void HelloInputBuffer::CleanupSwapChain()
+{
+    auto& driver = window_.GetDriver();
+
+    vkDestroyPipeline(driver.device, graphicsPipeline_, nullptr);
+    vkDestroyPipelineLayout(driver.device, pipelineLayout_, nullptr);
 
 }
 
-void HelloTriangle::CreateGraphicsPipeline()
+void HelloInputBuffer::CreateSwapChain()
+{
+    CreateGraphicsPipeline();
+}
+
+void HelloInputBuffer::CreateGraphicsPipeline()
 {
     const auto& filesystem = BasicEngine::GetInstance()->GetFilesystem();
     auto& driver = window_.GetDriver();
     auto& swapchain = window_.GetSwapchain();
 
-    BufferFile vertexShaderFile = filesystem.LoadFile("data/shaders/01_triangle/triangle.vert.spv");
-    BufferFile fragmentShaderFile = filesystem.LoadFile("data/shaders/01_triangle/triangle.frag.spv");
+    BufferFile vertexShaderFile = filesystem.LoadFile("data/shaders/02_triangle/triangle.vert.spv");
+    BufferFile fragmentShaderFile = filesystem.LoadFile("data/shaders/02_triangle/triangle.frag.spv");
 
-    VkShaderModule vertShaderModule = window_.CreateShaderModule(vertexShaderFile);
-    VkShaderModule fragShaderModule = window_.CreateShaderModule(fragmentShaderFile);
+    VkShaderModule vertShaderModule = CreateShaderModule(vertexShaderFile, driver.device);
+    VkShaderModule fragShaderModule = CreateShaderModule(fragmentShaderFile, driver.device);
 
     VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
     vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -72,13 +89,14 @@ void HelloTriangle::CreateGraphicsPipeline()
 
     VkPipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };
 
-    //We don't give any input buffer
+    auto bindingDescription = Vertex::GetBindingDescription();
+    auto attributeDescriptions = Vertex::GetAttributeDescriptions();
     VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
     vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    vertexInputInfo.vertexBindingDescriptionCount = 0;
-    vertexInputInfo.pVertexBindingDescriptions = nullptr; // Optional
-    vertexInputInfo.vertexAttributeDescriptionCount = 0;
-    vertexInputInfo.pVertexAttributeDescriptions = nullptr; // Optional
+    vertexInputInfo.vertexBindingDescriptionCount = 1;
+    vertexInputInfo.pVertexBindingDescriptions = &bindingDescription; // Optional
+    vertexInputInfo.vertexAttributeDescriptionCount = static_cast<std::uint32_t>(attributeDescriptions.size());
+    vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data(); // Optional
 
     VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
     inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -156,10 +174,10 @@ void HelloTriangle::CreateGraphicsPipeline()
 
     if (vkCreatePipelineLayout(driver.device, &pipelineLayoutInfo, nullptr, &pipelineLayout_) != VK_SUCCESS)
     {
-        logDebug("[Error] failed to create pipeline layout!\n");
+        logDebug("[Error] failed to create pipeline layout!");
         neko_assert(false, "");
     }
-    auto renderPass = renderer_.GetRenderPass();
+
     VkGraphicsPipelineCreateInfo pipelineInfo{};
     pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
     pipelineInfo.stageCount = 2;
@@ -173,7 +191,7 @@ void HelloTriangle::CreateGraphicsPipeline()
     pipelineInfo.pColorBlendState = &colorBlending;
     pipelineInfo.pDynamicState = nullptr; // Optional
     pipelineInfo.layout = pipelineLayout_;
-    pipelineInfo.renderPass = renderPass;
+    pipelineInfo.renderPass = window_.GetRenderer()->GetRenderPass();
     pipelineInfo.subpass = 0;
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // Optional
     pipelineInfo.basePipelineIndex = -1; // Optional
@@ -181,25 +199,41 @@ void HelloTriangle::CreateGraphicsPipeline()
 
     if (vkCreateGraphicsPipelines(driver.device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline_) != VK_SUCCESS)
     {
-        logDebug("failed to create graphics pipeline!\n");
-        neko_assert(false, "");
+        std::cerr << ("failed to create graphics pipeline!\n");
+        assert(false);
     }
     vkDestroyShaderModule(driver.device, vertShaderModule, nullptr);
     vkDestroyShaderModule(driver.device, fragShaderModule, nullptr);
+}
+
+void HelloInputBuffer::CreateInputBuffer()
+{
+    VkBufferCreateInfo bufferInfo{};
+    bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    bufferInfo.size = sizeof(vertices_[0]) * vertices_.size();
+    bufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+    bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+    VmaAllocationCreateInfo allocInfo = {};
+    allocInfo.usage = VMA_MEMORY_USAGE_CPU_TO_GPU;
+    allocInfo.requiredFlags = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+        VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+    auto* allocator = window_.GetAllocator();
+    if (vmaCreateBuffer(allocator, &bufferInfo, &allocInfo, &vertexBuffer_, &allocation_, nullptr) != VK_SUCCESS)
+    {
+        logDebug( "[Error] failed to create a buffer for vertex buffer");
+        neko_assert(false, "");
+    }
+    void* data;
+    vmaMapMemory(allocator, allocation_, &data);
+    memcpy(data, vertices_.data(), vertices_.size() * sizeof(Vertex));
+    vmaUnmapMemory(allocator, allocation_);
 
 }
 
-void HelloTriangle::CleanupSwapChain()
+void HelloInputBuffer::CleanupInputBuffer()
 {
-    auto& driver = window_.GetDriver();
-   
-    vkDestroyPipeline(driver.device, graphicsPipeline_, nullptr);
-    vkDestroyPipelineLayout(driver.device, pipelineLayout_, nullptr);
-
-}
-
-void HelloTriangle::CreateSwapChain()
-{
-    CreateGraphicsPipeline();
+    auto* allocator = window_.GetAllocator();
+    vmaDestroyBuffer(allocator, vertexBuffer_, allocation_);
 }
 }

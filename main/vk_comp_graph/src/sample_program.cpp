@@ -4,13 +4,17 @@
 
 #include <sample_program.h>
 #include <hello_triangle.h>
+#include <hello_input_buffer.h>
 
 namespace neko::vk
 {
 
 SampleBrowser::SampleBrowser(VkWindow& window, VkRenderer& renderer)
 {
-    samplePrograms_.push_back(std::make_unique<HelloTriangle>(window, renderer));
+    RegisterSample("Hello Triangle", 
+        std::make_unique<HelloTriangle>(window, renderer));
+    RegisterSample("Hello Input Buffer", 
+        std::make_unique<HelloInputBuffer>(window, renderer));
 }
 
 void SampleBrowser::Init()
@@ -26,6 +30,24 @@ void SampleBrowser::Update(seconds dt)
 void SampleBrowser::DrawImGui()
 {
     ImGui::Begin("Sample Browser");
+    if(ImGui::BeginCombo("Samples", sampleNames_[currentIndex_].data()))
+    {
+        for(std::size_t i = 0; i < sampleNames_.size(); i++)
+        {
+            const bool isSelected = i == currentIndex_;
+            if(ImGui::Selectable(sampleNames_[i].data(), isSelected))
+            {
+                samplePrograms_[currentIndex_]->Destroy();
+                samplePrograms_[i]->Init();
+                currentIndex_ = i;
+            }
+            if(isSelected)
+            {
+                ImGui::SetItemDefaultFocus();
+            }
+        }
+        ImGui::EndCombo();
+    }
     ImGui::End();
     samplePrograms_[currentIndex_]->DrawImGui();
 }
@@ -43,6 +65,12 @@ void SampleBrowser::CleanupSwapChain()
 void SampleBrowser::CreateSwapChain()
 {
     samplePrograms_[currentIndex_]->CreateSwapChain();
+}
+
+void SampleBrowser::RegisterSample(std::string_view sampleName, std::unique_ptr<SampleProgram> sample)
+{
+    sampleNames_.push_back(sampleName.data());
+    samplePrograms_.push_back(std::move(sample));
 }
 
 

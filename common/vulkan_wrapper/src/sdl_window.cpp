@@ -27,7 +27,7 @@
 
 #if defined(NEKO_SDL2)
 
-#include <SDL2/SDL_vulkan.h>
+#include <SDL_vulkan.h>
 #include <vk/sdl_window.h>
 #include <vk/graphics.h>
 #include <set>
@@ -76,6 +76,7 @@ void VkWindow::Init()
 
 void VkWindow::Destroy()
 {
+    vmaDestroyAllocator(allocator_);
     vkImgui_.Destroy();
     auto* renderer = GetRenderer();
     renderer->Destroy();

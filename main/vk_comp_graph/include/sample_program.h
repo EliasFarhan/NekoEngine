@@ -17,13 +17,15 @@ class SampleProgram : public RenderProgram,
 public:
     SampleProgram(VkWindow& window, VkRenderer& renderer);
     virtual ~SampleProgram() = default;
-    virtual void CleanupSwapChain() = 0;
-    virtual void CreateSwapChain() = 0;
+    void Init() override { initialized_ = true; }
+    void Destroy() override { initialized_ = false; }
 protected:
     std::mutex updateLock_;
     VkWindow& window_;
     VkRenderer& renderer_;
+    bool initialized_ = false;
 };
+
 class SampleBrowser :
     public SystemInterface,
     public DrawImGuiInterface,
@@ -38,8 +40,10 @@ public:
     void Destroy() override;
     void CleanupSwapChain() override;
     void CreateSwapChain() override;
+    void RegisterSample(std::string_view sampleName, std::unique_ptr<SampleProgram> sample);
 private:
     std::vector<std::unique_ptr<SampleProgram>> samplePrograms_;
+    std::vector<std::string> sampleNames_;
     std::size_t currentIndex_ = 0;
 
 };

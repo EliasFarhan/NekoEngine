@@ -216,7 +216,7 @@ void Gles3Window::LeaveCurrentContext()
 
 	logDebug(fmt::format(
 		"Leave current context from thread: {}",
-		std::this_thread::get_id()));
+		std::hash<std::thread::id>{}(std::this_thread::get_id())));
 	if (currentContext != nullptr)
 	{
 		logDebug(fmt::format("[Error] After Leave Current Context, context: {}", currentContext));

@@ -37,7 +37,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]]  char** argv)
     engine.SetWindowAndRenderer(&window, &renderer);
     neko::vk::SampleBrowser sampleBrowser(window, renderer);
     engine.RegisterSystem(sampleBrowser);
-
+    engine.RegisterOnDrawUi(sampleBrowser);
     engine.Init();
     engine.EngineLoop();
 

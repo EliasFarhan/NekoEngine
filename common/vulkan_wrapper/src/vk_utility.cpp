@@ -1,8 +1,11 @@
-#include <cassert>
+
 #include <iostream>
 #include <set>
 #include <vector>
 #include <vk/vk_utility.h>
+#include <engine/log.h>
+#include <fmt/format.h>
+#include <engine/assert.h>
 
 namespace neko::vk
 {
@@ -15,10 +18,10 @@ bool CheckValidationLayerSupport()
     std::vector<VkLayerProperties> availableLayers(layerCount);
     vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
 
-    std::cout << "Available layers: \n";
+    logDebug("Available layers: ");
     for (auto& layerProperties : availableLayers)
     {
-        std::cout << layerProperties.layerName << std::endl;
+        logDebug(layerProperties.layerName);
     }
 
     for (const char* layerName : validationLayers)
@@ -109,6 +112,7 @@ bool IsDeviceSuitable(VkPhysicalDevice device, VkSurfaceKHR surface)
     if (extensionsSupported)
     {
         SwapChainSupportDetails swapChainSupport = QuerySwapChainSupport(device, surface);
+        
         swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
     }
     return deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU &&
@@ -227,20 +231,23 @@ VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>
 
 VkPhysicalDevice PickPhysicalDevice(VkInstance instance, VkSurfaceKHR surface)
 {
-    std::cout << "[Log] Picking a physical device\n";
+    logDebug("[Log] Picking a physical device");
     VkPhysicalDevice physicalDevice;
     std::uint32_t deviceCount = 0;
     vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
     if (deviceCount == 0)
     {
-        std::cerr << "[Vulkan] Failed to find GPUs with Vulkan support!\n";
-        assert(false);
+        logDebug("[Vulkan] Failed to find GPUs with Vulkan support!");
+        neko_assert(false, "");
     }
     std::vector<VkPhysicalDevice> devices(deviceCount);
     vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
     int maxScore = 0;
     for (const auto& device : devices)
     {
+        VkPhysicalDeviceProperties deviceInfo;
+        vkGetPhysicalDeviceProperties(device, &deviceInfo);
+        logDebug(fmt::format("Device info: {}", deviceInfo.deviceName));
         const int deviceScore = RateDeviceSuitability(device, surface);
         if (deviceScore > maxScore)
         {
@@ -251,8 +258,8 @@ VkPhysicalDevice PickPhysicalDevice(VkInstance instance, VkSurfaceKHR surface)
 
     if (physicalDevice == VK_NULL_HANDLE)
     {
-        std::cerr << "[Vulkan] Failed to find a suitable GPU!\n";
-        assert(false);
+        logDebug("[Vulkan] Failed to find a suitable GPU!");
+        neko_assert(false, "");
     }
     return physicalDevice;
 }
@@ -272,8 +279,8 @@ VkShaderModule CreateShaderModule(const BufferFile& bufferFile, VkDevice device)
     VkShaderModule shaderModule;
     if (vkCreateShaderModule(device, &createInfo, nullptr, &shaderModule) != VK_SUCCESS)
     {
-        std::cerr << ("[Error] failed to create shader module!");
-        assert(false);
+        logDebug("[Error] failed to create shader module!");
+        neko_assert(false, "");
     }
     return shaderModule;
 }
