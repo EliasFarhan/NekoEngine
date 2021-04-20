@@ -4,7 +4,7 @@ project(Neko)
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set_property(GLOBAL PROPERTY USE_FOLDERS On)
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 
 add_compile_definitions("FMT_HEADER_ONLY=1")

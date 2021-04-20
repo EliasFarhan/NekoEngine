@@ -19,12 +19,12 @@ void HelloInputBuffer::Update(seconds dt)
 
 void HelloInputBuffer::Destroy()
 {
-    SampleProgram::Destroy();
     std::lock_guard<std::mutex> lock(updateLock_);
     auto& driver = window_.GetDriver();
     vkDeviceWaitIdle(driver.device);
     CleanupInputBuffer();
     CleanupSwapChain();
+    SampleProgram::Destroy();
 }
 
 void HelloInputBuffer::DrawImGui()
@@ -51,6 +51,8 @@ void HelloInputBuffer::OnEvent(const SDL_Event& event)
 
 void HelloInputBuffer::CleanupSwapChain()
 {
+    if (!initialized_)
+        return;
     auto& driver = window_.GetDriver();
 
     vkDestroyPipeline(driver.device, graphicsPipeline_, nullptr);
@@ -233,6 +235,8 @@ void HelloInputBuffer::CreateInputBuffer()
 
 void HelloInputBuffer::CleanupInputBuffer()
 {
+    if (!initialized_)
+        return;
     auto* allocator = window_.GetAllocator();
     vmaDestroyBuffer(allocator, vertexBuffer_, allocation_);
 }

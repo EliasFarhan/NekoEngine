@@ -19,11 +19,11 @@ void HelloTriangle::Update(seconds dt)
 
 void HelloTriangle::Destroy()
 {
-    SampleProgram::Destroy();
     std::lock_guard<std::mutex> lock(updateLock_);
     auto& driver = window_.GetDriver();
     vkDeviceWaitIdle(driver.device);
     CleanupSwapChain();
+    SampleProgram::Destroy();
 
 }
 
@@ -191,6 +191,8 @@ void HelloTriangle::CreateGraphicsPipeline()
 
 void HelloTriangle::CleanupSwapChain()
 {
+    if (!initialized_)
+        return;
     auto& driver = window_.GetDriver();
    
     vkDestroyPipeline(driver.device, graphicsPipeline_, nullptr);

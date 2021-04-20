@@ -15,6 +15,7 @@ SampleBrowser::SampleBrowser(VkWindow& window, VkRenderer& renderer)
         std::make_unique<HelloTriangle>(window, renderer));
     RegisterSample("Hello Input Buffer", 
         std::make_unique<HelloInputBuffer>(window, renderer));
+    window.RegisterRecreateSwapchainInterface(this);
 }
 
 void SampleBrowser::Init()
@@ -76,8 +77,6 @@ void SampleBrowser::RegisterSample(std::string_view sampleName, std::unique_ptr<
 
 SampleProgram::SampleProgram(VkWindow& window, VkRenderer& renderer) : window_(window), renderer_(renderer)
 {
-    auto* engine = BasicEngine::GetInstance();
-    window_.RegisterRecreateSwapchainInterface(this);
     
 }
 }
