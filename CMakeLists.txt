@@ -53,15 +53,15 @@ endif()
 if(Neko_sqlite3)
     set(SQLITE3_VERSION "3.34.0")
     set(SQLITE3_PATH "${EXTERNAL_DIR}/sqlite3-${SQLITE3_VERSION}")
-    add_subdirectory(${SQLITE3_PATH})
+    add_subdirectory("${SQLITE3_PATH}")
 endif()
 
 if(Neko_Test)
     enable_testing()
-    set(GOOGLE_TEST_DIR ${EXTERNAL_DIR}/googletest-1.8.1)
+    set(GOOGLE_TEST_DIR "${EXTERNAL_DIR}/googletest-1.8.1")
     set(BUILD_GMOCK OFF CACHE INTERNAL "")
     set(INSTALL_GTEST OFF CACHE INTERNAL "")
-    add_subdirectory(${GOOGLE_TEST_DIR})
+    add_subdirectory("${GOOGLE_TEST_DIR}")
     include(cmake/test.cmake)
     set_target_properties (gtest PROPERTIES FOLDER Externals/GTest)
     set_target_properties(gtest_main PROPERTIES FOLDER Externals/GTest)
@@ -69,7 +69,7 @@ endif()
 
 if(Neko_PhysFS)
     set(PHYSFS_DIR "${EXTERNAL_DIR}/physfs-3.0.2" CACHE STRING "")
-    add_subdirectory(${PHYSFS_DIR})
+    add_subdirectory("${PHYSFS_DIR}")
 
     add_subdirectory(common/physfs_wrapper)
 endif()
@@ -78,7 +78,7 @@ if(Neko_Profile)
     MESSAGE("Enable profiling")
     set(EASY_PROFILE_DIR "${EXTERNAL_DIR}/easy_profiler-2.1.0")
     add_compile_definitions("EASY_PROFILE_USE=1")
-    add_subdirectory(${EASY_PROFILE_DIR})
+    add_subdirectory("${EASY_PROFILE_DIR}")
     
     set_target_properties (easy_profiler PROPERTIES FOLDER Externals)
     set_target_properties (profiler_converter PROPERTIES FOLDER Externals)
@@ -94,13 +94,13 @@ file(GLOB tools_projects "${tools_project_dir}/*")
 
 foreach(tools_project_path ${tools_projects} )
     # I used a simple string replace, to cut off .cpp.
-    get_filename_component(tools_project_name ${tools_project_path} NAME )
+    get_filename_component(tools_project_name "${tools_project_path}" NAME )
 
     message("Tools project path: ${tools_project_path} and name: ${tools_project_name}")
     set(${tools_project_name} ON CACHE BOOL "")
 
     if(${tools_project_name})
-        add_subdirectory(${tools_project_path})
+        add_subdirectory("${tools_project_path}")
     endif()
 endforeach()
 
@@ -111,12 +111,7 @@ add_subdirectory(${NEKO_CORE_DIR})
 
 target_precompile_headers(Neko_Core PRIVATE "${NEKO_CORE_DIR}/include/core_pch.h")
 
-#imgui
-set(IMGUI_VERSION "1.80" CACHE INTERNAL "")
-set(IMGUI_ROOT "${EXTERNAL_DIR}/imgui-${IMGUI_VERSION}" CACHE STRING "")
-include_directories("${IMGUI_ROOT}")
-add_subdirectory("${IMGUI_ROOT}")
-set_target_properties(imgui PROPERTIES UNITY_BUILD ON)
+
 
 #pybind11
 set(PYBIND11_VERSION "2.6.1")
@@ -131,14 +126,14 @@ if(Neko_SDL2)
 	
 	add_compile_definitions("NEKO_SDL2=1")
     set(SDL_VERSION 2.0.12)
-    set(SDL_DIR ${EXTERNAL_DIR}/SDL2-${SDL_VERSION}/)
+    set(SDL_DIR "${EXTERNAL_DIR}/SDL2-${SDL_VERSION}/")
     set(SDL_STATIC ON CACHE INTERNAL "")
     set(SDL_SHARED OFF CACHE INTERNAL "")
     set(SDL_ENGINE_DIR ON CACHE INTERNAL "")
     add_subdirectory(${SDL_DIR})
-    include_directories(${SDL_DIR}/include ${SDL_DIR}/src)
 
     add_subdirectory("common/sdl_engine")
+    target_include_directories(sdl_engine PUBLIC ${SDL_DIR}/include ${SDL_DIR}/src)
     target_precompile_headers(sdl_engine PRIVATE "common/sdl_engine/include/sdl_wrapper_pch.h")
 
 endif()

@@ -2,12 +2,15 @@ if (NOT Neko_GLES3 OR NOT Neko_SDL2 OR NOT Neko_SFML_NET)
     return()
 endif()
 
-include_directories("include/")
+
 
 file(GLOB_RECURSE comp_net_src include/*.h src/*.cpp)
 
 message("SFML LIBRARIES: ${SFML_LIBRARIES}")
 add_library(comp_net_lib ${comp_net_src})
+
+target_include_directories(comp_net_lib PUBLIC "include/")
+
 target_link_libraries(comp_net_lib PUBLIC Neko_Core sdl_engine gles3_wrapper sfml-network)
 set_target_properties (comp_net_lib PROPERTIES FOLDER Neko/Main/CompNet)
 set_target_properties(comp_net_lib PROPERTIES UNITY_BUILD ON)
