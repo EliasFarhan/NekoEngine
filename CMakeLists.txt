@@ -7,6 +7,15 @@ set (CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(EXTERNAL_DIR ${CMAKE_SOURCE_DIR}/externals)
 
+
+set(TRACY_ENABLE OFF CACHE BOOL "")
+
+if(TRACY_ENABLE)
+    add_compile_definitions(TRACY_ENABLE)
+    set(TRACY_FOLDER "${CMAKE_SOURCE_DIR}/externals/tracy/")
+    include_directories("${TRACY_FOLDER}")
+endif()
+
 #data
 
 file(GLOB_RECURSE JSON_FILES "${PROJECT_SOURCE_DIR}/data/*.json")
@@ -75,6 +84,9 @@ List(APPEND Neko_SRC
 	${IMG_FILES}
 	${SND_FILES})
 
+if(TRACY_ENABLE)
+	list(APPEND Neko_SRC "${TRACY_FOLDER}/TracyClient.cpp" "${TRACY_FOLDER}/Tracy.hpp")
+endif()
 
 #SFML
 find_package(SFML COMPONENTS system window graphics CONFIG REQUIRED)

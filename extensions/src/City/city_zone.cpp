@@ -28,6 +28,9 @@
 #include <City/city_building.h>
 #include <City/city_engine.h>
 
+#ifdef TRACY_ENABLE
+#include <Tracy.hpp>
+#endif
 namespace neko
 {
 
@@ -35,6 +38,10 @@ namespace neko
 void CityZoneManager::UpdateZoneTilemap(const CityBuilderMap& cityMap, CityBuildingManager& cityBuildingMap,
                                         sf::View mainView)
 {
+
+#ifdef TRACY_ENABLE
+    ZoneScoped
+#endif
     const auto frameIndex = MainEngine::GetInstance()->frameIndex % 2;
     const auto windowView_ = sf::FloatRect((mainView.getCenter() - mainView.getSize() / 2.0f), mainView.getSize());
     zoneVertexArray_[frameIndex].clear();
@@ -75,12 +82,20 @@ void CityZoneManager::UpdateZoneTilemap(const CityBuilderMap& cityMap, CityBuild
 
 void CityZoneManager::PushCommand(GraphicsManager* graphicsManager)
 {
+
+#ifdef TRACY_ENABLE
+    ZoneScoped
+#endif
     const auto frameIndex = MainEngine::GetInstance()->frameIndex % 2;
     graphicsManager->Draw(zoneVertexArray_[frameIndex]);
 }
 
 void CityZoneManager::AddZone(sf::Vector2i position, ZoneType zoneType, CityBuilderMap& cityMap)
 {
+
+#ifdef TRACY_ENABLE
+    ZoneScoped
+#endif
 	auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
 	if(engine->GetCityMoney() < zoneCost)
 		return;
@@ -121,6 +136,10 @@ void CityZoneManager::AddZone(sf::Vector2i position, ZoneType zoneType, CityBuil
 
 void CityZoneManager::RemoveZone(sf::Vector2i position)
 {
+
+#ifdef TRACY_ENABLE
+    ZoneScoped
+#endif
 	const auto existingZone = std::find_if(zones_.begin(), zones_.end(), [&position](const Zone& zone){
         return zone.position == position;
     });
@@ -132,6 +151,10 @@ void CityZoneManager::RemoveZone(sf::Vector2i position)
 
 const Zone* CityZoneManager::GetZoneAt(sf::Vector2i position) const 
 {
+
+#ifdef TRACY_ENABLE
+    ZoneScoped
+#endif
 	const auto existingZone = std::find_if(zones_.begin(), zones_.end(), [&position](const Zone& zone) {
 		return zone.position == position;
 	});

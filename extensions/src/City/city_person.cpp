@@ -4,10 +4,17 @@
 #include <engine/transform.h>
 #include "engine/log.h"
 
+#ifdef TRACY_ENABLE
+#include <Tracy.hpp>
+#endif
 namespace neko
 {
 void CityPeopleManager::Init()
 {
+
+#ifdef TRACY_ENABLE
+	ZoneScoped
+#endif
 	people_.resize(INIT_ENTITY_NMB);
 	personBehaviorTree_ = R"JSON(
 	{
@@ -333,6 +340,10 @@ void CityPeopleManager::Init()
 
 void CityPeopleManager::Update(float dt)
 {
+
+#ifdef TRACY_ENABLE
+	ZoneScoped
+#endif
 	spawningTimer_.Update(dt);
 	if (spawningTimer_.IsOver())
 	{
@@ -347,6 +358,10 @@ void CityPeopleManager::Destroy()
 
 Entity CityPeopleManager::SpawnPerson()
 {
+
+#ifdef TRACY_ENABLE
+	ZoneScoped
+#endif
 	auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
 	const auto mapEnds = engine->GetCityMap().GetRoadEnds();
 	if (mapEnds.empty())
@@ -365,6 +380,10 @@ Entity CityPeopleManager::SpawnPerson()
 
 Entity CityPeopleManager::AddPerson(Entity entity, sf::Vector2i position)
 {
+
+#ifdef TRACY_ENABLE
+	ZoneScoped
+#endif
 	const Person person = { position, entity };
 	if (entity == INVALID_ENTITY)
 	{
@@ -387,6 +406,10 @@ Entity CityPeopleManager::AddPerson(Entity entity, sf::Vector2i position)
 
 Person* CityPeopleManager::GetPersonAt(Entity entity)
 {
+
+#ifdef TRACY_ENABLE
+	ZoneScoped
+#endif
 	if (entity >= people_.size())
 	{
 		return nullptr;
@@ -396,6 +419,10 @@ Person* CityPeopleManager::GetPersonAt(Entity entity)
 
 Index CityPeopleManager::GetPeopleCount()
 {
+
+#ifdef TRACY_ENABLE
+	ZoneScoped
+#endif
 	auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
 	return Index(std::count_if(people_.begin(), people_.end(), [&engine](const Person& person)
 	{
@@ -406,6 +433,10 @@ Index CityPeopleManager::GetPeopleCount()
 
 void CityPeopleManager::DestroyPerson(Entity entity)
 {
+
+#ifdef TRACY_ENABLE
+	ZoneScoped
+#endif
 	if (entity == INVALID_ENTITY)
 		return;
 	auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());

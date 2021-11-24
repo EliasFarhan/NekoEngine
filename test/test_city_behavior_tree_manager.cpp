@@ -31,7 +31,6 @@
 #include <City/city_behavior_tree_manager.h>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <imgui.h>
-#include <Remotery.h>
 
 class BehaviorTreeManagerTest : public ::testing::Test, public neko::BasicEngine 
 {

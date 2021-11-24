@@ -31,10 +31,17 @@
 #include <City/city_building.h>
 #include <City/city_engine.h>
 
+#ifdef TRACY_ENABLE
+#include <Tracy.hpp>
+#endif
 namespace neko
 {
 void CityBuilderTilemap::Init(TextureManager& textureManager)
 {
+
+#ifdef TRACY_ENABLE
+	ZoneScoped
+#endif
 	static const auto reverseCityMap =
 		[]() ->std::map<std::string, CityTileType>
 	{
@@ -109,6 +116,10 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 	const Transform2dManager& transformManager,
 	sf::View mainView, CityTilesheetType updatedCityTileType)
 {
+
+#ifdef TRACY_ENABLE
+	ZoneScoped
+#endif
 	const Index frameIndex = MainEngine::GetInstance()->frameIndex % 2;
 	//Manage window view
 	windowView_ = sf::FloatRect((mainView.getCenter() - mainView.getSize() / 2.0f), mainView.getSize());
@@ -660,6 +671,10 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 
 void CityBuilderTilemap::PushCommand(GraphicsManager* graphicsManager)
 {
+
+#ifdef TRACY_ENABLE
+	ZoneScoped
+#endif
 	const Index frameIndex = MainEngine::GetInstance()->frameIndex % 2;
 
 	{
@@ -760,6 +775,7 @@ void CityBuilderTilemap::AddNewCityTile(const sf::Vector2f position, const sf::V
 void CityBuilderTilemap::AddCar(const sf::Vector2f position, const sf::Vector2f size, const sf::FloatRect rect,
 	const sf::Vector2f center, bool flipX, bool culling)
 {
+
 	const Index frameIndex = MainEngine::GetInstance()->frameIndex % 2;
 	if (culling)
 	{

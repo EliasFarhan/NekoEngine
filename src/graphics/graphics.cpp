@@ -26,6 +26,10 @@
 #include "SFML/Graphics/RenderTexture.hpp"
 #include "engine/log.h"
 #include <sstream>
+#ifdef TRACY_ENABLE
+#include <Tracy.hpp>
+#endif
+
 #include "engine/globals.h"
 
 namespace neko
@@ -37,6 +41,10 @@ void SfmlCommand::Draw(sf::RenderTarget* renderTarget)
 
 GraphicsManager::GraphicsManager()
 {
+
+#ifdef TRACY_ENABLE
+    ZoneScoped
+#endif
 	commandBuffers_[0].fill(nullptr);
 	commandBuffers_[1].fill(nullptr);
 	editor = std::make_unique<Editor>();
@@ -44,6 +52,10 @@ GraphicsManager::GraphicsManager()
 
 void GraphicsManager::Draw(sf::Drawable& drawable)
 {
+
+#ifdef TRACY_ENABLE
+    ZoneScoped
+#endif
     if (nextRenderLength_ >= MAX_COMMAND_NMB)
     {
         logDebug("[Error] Too many draw calls compare to MAX_COMMAND_NMB");
@@ -66,6 +78,10 @@ void GraphicsManager::Draw(sf::Drawable& drawable)
 
 void TilemapCommand::Draw(sf::RenderTarget* renderTarget)
 {
+
+#ifdef TRACY_ENABLE
+    ZoneScoped
+#endif
     sf::RenderStates states;
     states.texture = texture;
     renderTarget->draw(*vertexArray, states);
@@ -74,6 +90,9 @@ void TilemapCommand::Draw(sf::RenderTarget* renderTarget)
 
 void GraphicsManager::Draw(sf::VertexArray* vertexArray, sf::Texture* texture)
 {
+#ifdef TRACY_ENABLE
+    ZoneScoped
+#endif
     const int index = MainEngine::GetInstance()->frameIndex % 2;
     TilemapCommand tilemapCommand;
     tilemapCommand.vertexArray = vertexArray;
@@ -105,7 +124,9 @@ void GraphicsManager::RenderLoop()
 
     do
     {
-
+#ifdef TRACY_ENABLE
+        ZoneNamedN(RendererUpdate, "Renderer Update", true);
+#endif
         {
             /*{
                 std::ostringstream oss;
@@ -142,16 +163,24 @@ void GraphicsManager::RenderLoop()
 
             }
 #endif
-			for (auto i = 0u; i < renderLength_; i++)
-			{
-				std::unique_lock<std::mutex> renderLock(engine->renderStartMutex);
-				auto* command = commandBuffer[i];
-				if (command != nullptr)
-				{
-					command->Draw(renderWindow_);
-				}
-			}
+            {
+#ifdef TRACY_ENABLE
+                ZoneNamedN(RendererDrawCommand,"Draw Commands", true);
+#endif
+                for (auto i = 0u; i < renderLength_; i++)
+                {
+                    std::unique_lock<std::mutex> renderLock(engine->renderStartMutex);
+                    auto* command = commandBuffer[i];
+                    if (command != nullptr)
+                    {
+                        command->Draw(renderWindow_);
+                    }
+                }
+            }
             editor->Update(engine->clockDeltatime.asSeconds());
+#ifdef TRACY_ENABLE
+            ZoneNamedN(RendererDisplay, "Display", true);
+#endif
             renderWindow_->display();
             renderWindow_->setActive(false);
         }

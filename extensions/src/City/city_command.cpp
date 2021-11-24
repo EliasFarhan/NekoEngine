@@ -30,10 +30,19 @@
 #include "City/city_editor.h"
 #include "sound/sound.h"
 
+
+#ifdef TRACY_ENABLE
+#include <Tracy.hpp>
+#endif
+
 namespace neko
 {
 void CityCommandManager::AddCommand(std::unique_ptr<CityCommand> command, bool fromRenderThread)
 {
+
+#ifdef TRACY_ENABLE
+	ZoneScoped
+#endif
 	const Index frameIndex = (MainEngine::GetInstance()->frameIndex - (fromRenderThread ? 1 : 0)) % 2;
 	if (command->commandType == CityCommandType::CHANGE_CURSOR_MODE)
 	{
@@ -56,6 +65,10 @@ void CityCommandManager::AddCommand(std::unique_ptr<CityCommand> command, bool f
 
 void CityCommandManager::Init()
 {
+
+#ifdef TRACY_ENABLE
+	ZoneScoped
+#endif
 	engine_ = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
 	soundBufferErase_ = Sound::LoadSoundBuffer("data/Swip.wav");
 	soundBufferBuild_ = Sound::LoadSoundBuffer("data/Truip.wav");
@@ -71,6 +84,10 @@ void CityCommandManager::Init()
 
 void CityCommandManager::ExecuteCommand(const std::shared_ptr<CityCommand>& command) const
 {
+
+#ifdef TRACY_ENABLE
+	ZoneScoped
+#endif
 	switch (command->commandType)
 	{
 	case CityCommandType::CHANGE_CURSOR_MODE:
@@ -132,6 +149,10 @@ void CityCommandManager::ExecuteCommand(const std::shared_ptr<CityCommand>& comm
 
 void CityCommandManager::Update(float dt)
 {
+
+#ifdef TRACY_ENABLE
+	ZoneScoped
+#endif
 	const Index frameIndex = (MainEngine::GetInstance()->frameIndex) % 2;
 	const auto commandNmb = commandQueue_[frameIndex].size();
 	for (auto i = 0u; i < commandNmb; i++)
@@ -144,6 +165,10 @@ void CityCommandManager::Update(float dt)
 
 void CityCommandManager::Destroy()
 {
+
+#ifdef TRACY_ENABLE
+	ZoneScoped
+#endif
 	Sound::RemoveSoundBuffer(soundBufferErase_);
 	Sound::RemoveSoundBuffer(soundBufferBuild_);
 	Sound::RemoveSoundBuffer(soundBufferRoad_);

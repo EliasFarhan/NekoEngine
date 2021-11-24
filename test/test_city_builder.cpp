@@ -26,7 +26,6 @@
 #include <City/city_graph.h>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <imgui.h>
-#include <Remotery.h>
 
 class PathfindingEngine : public neko::BasicEngine
 {

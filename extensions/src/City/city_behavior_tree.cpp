@@ -29,11 +29,18 @@
 #include "engine/engine.h"
 #include "engine/log.h"
 
+#ifdef TRACY_ENABLE
+#include <Tracy.hpp>
+#endif
 namespace neko {
 
 	BehaviorTreeNode::BehaviorTreeNode(
 		const std::vector<std::pair<std::string, std::string>>& il)
 	{
+
+#ifdef TRACY_ENABLE
+		ZoneScoped
+#endif
 		std::for_each(il.begin(), il.end(),
 			[this](std::pair<std::string, std::string> elem) 
 		{
@@ -45,12 +52,20 @@ namespace neko {
 		const std::string& variable, 
 		const std::string& value)
 	{
+
+#ifdef TRACY_ENABLE
+		ZoneScoped
+#endif
 		variables_.insert({ variable, value });
 	}
 
 	const std::string BehaviorTreeNode::GetVariable(
 		const std::string& variable) const
 	{
+
+#ifdef TRACY_ENABLE
+		ZoneScoped
+#endif
 		auto it = variables_.find(variable);
 		if (it != variables_.end())
 		{
@@ -61,6 +76,10 @@ namespace neko {
 
 	BehaviorTreeFlow BehaviorTreeCompositeSequence::Execute()
 	{
+
+#ifdef TRACY_ENABLE
+		ZoneScoped
+#endif
 		if (currentCount_ >= children_.size()) currentCount_ = 0;
 		BehaviorTreeFlow flow = children_[currentCount_]->Execute();
 		if (flow == BehaviorTreeFlow::RUNNING) 
@@ -73,6 +92,10 @@ namespace neko {
 
 	BehaviorTreeFlow BehaviorTreeCompositeSelector::Execute()
 	{
+
+#ifdef TRACY_ENABLE
+		ZoneScoped
+#endif
 		if (currentCount_ >= children_.size()) currentCount_ = 0;
 		BehaviorTreeFlow flow = children_[currentCount_]->Execute();
 		if (flow == BehaviorTreeFlow::RUNNING) 
@@ -85,6 +108,10 @@ namespace neko {
 
 	BehaviorTreeFlow BehaviorTreeDecorator::Execute()
 	{
+
+#ifdef TRACY_ENABLE
+		ZoneScoped
+#endif
 		std::string decorator = GetVariable("decorator");
 		if (decorator != decorator_)
 		{
@@ -110,6 +137,10 @@ namespace neko {
 
 	BehaviorTreeFlow BehaviorTreeLeafCondition::Execute()
 	{
+
+#ifdef TRACY_ENABLE
+		ZoneScoped
+#endif
 		std::string condition = GetVariable("condition");
 		if (condition != condition_)
 		{
@@ -129,6 +160,10 @@ namespace neko {
 
 	BehaviorTreeFlow BehaviorTreeLeafWait::Execute()
 	{
+
+#ifdef TRACY_ENABLE
+		ZoneScoped
+#endif
 		if (!started_)
 		{
 			durationDelay_ = 
@@ -152,6 +187,10 @@ namespace neko {
 
 	BehaviorTreeFlow BehaviorTreeLeafMoveTo::Execute()
 	{
+
+#ifdef TRACY_ENABLE
+		ZoneScoped
+#endif
 		if (to_.x == std::numeric_limits<int>::max() &&
 			to_.y == std::numeric_limits<int>::max()) 
 		{
@@ -203,6 +242,10 @@ namespace neko {
 
 	BehaviorTreeFlow BehaviorTreeLeafFunctional::Execute()
 	{
+
+#ifdef TRACY_ENABLE
+		ZoneScoped
+#endif
 		std::string functional = GetVariable("functional");
 		std::vector<double> values;
 		if (functional != functional_) 

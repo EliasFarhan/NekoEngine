@@ -26,10 +26,17 @@
 #include "City/city_engine.h"
 #include <City/city_map.h>
 
+#ifdef TRACY_ENABLE
+#include <Tracy.hpp>
+#endif
 namespace neko
 {
 void CityCarManager::Init()
 {
+
+#ifdef TRACY_ENABLE
+	ZoneScoped
+#endif
 	auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
 	entityManagerPtr_ = &engine->GetEntityManager();
 	transformManagerPtr_ = &engine->GetTransformManager();
@@ -40,6 +47,10 @@ void CityCarManager::Init()
 
 void CityCarManager::Update(float dt)
 {
+
+#ifdef TRACY_ENABLE
+	ZoneScoped
+#endif
 	/*
 	{
 		const auto position = roadGraphPtr_->GetNodesVector()[rand() % roadGraphPtr_->GetNodesVector().size()].position;
@@ -133,6 +144,10 @@ void CityCarManager::Destroy()
 
 Entity CityCarManager::SpawnCar(sf::Vector2i position, CarType carType)
 {
+
+#ifdef TRACY_ENABLE
+	ZoneScoped
+#endif
 	const Entity newCarEntity = entityManagerPtr_->CreateEntity();
 	AddCar(newCarEntity, carType, position);
 	entityManagerPtr_->AddComponentType(newCarEntity, EntityMask(CityComponentType::CAR));
@@ -146,6 +161,10 @@ Entity CityCarManager::SpawnCar(sf::Vector2i position, CarType carType)
 
 Entity CityCarManager::AddCar(Entity entity, CarType carType, sf::Vector2i position)
 {
+
+#ifdef TRACY_ENABLE
+	ZoneScoped
+#endif
 	if (cars_.size() <= entity)
 	{
 		cars_.resize(size_t(entity) + 1u);
@@ -167,6 +186,10 @@ const std::vector<CityCar>& CityCarManager::GetCarsVector() const
 
 void CityCarManager::RescheduleCarPathfinding(const sf::Vector2i& removedPosition)
 {
+
+#ifdef TRACY_ENABLE
+	ZoneScoped
+#endif
 	for (Entity carEntity = 0u; carEntity < cars_.size(); carEntity++)
 	{
 		if (entityManagerPtr_->HasComponent(carEntity, EntityMask(CityComponentType::CAR) | EntityMask(CityComponentType::TRANSFORM)))
@@ -188,6 +211,10 @@ void CityCarManager::RescheduleCarPathfinding(const sf::Vector2i& removedPositio
 
 size_t CityCarManager::CountCar() const
 {
+
+#ifdef TRACY_ENABLE
+	ZoneScoped
+#endif
 	Index count = 0;
 	for (Entity entity = 0; entity < cars_.size(); entity++)
 	{
@@ -201,6 +228,10 @@ size_t CityCarManager::CountCar() const
 
 CityCar* CityCarManager::GetCar(Index carEntity)
 {
+
+#ifdef TRACY_ENABLE
+	ZoneScoped
+#endif
 	if (carEntity >= cars_.size())
 		return nullptr;
 	return &cars_[carEntity];

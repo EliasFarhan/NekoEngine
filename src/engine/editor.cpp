@@ -29,7 +29,9 @@
 #include <graphics/graphics.h>
 
 #include <utility>
-
+#ifdef TRACY_ENABLE
+#include <Tracy.hpp>
+#endif
 namespace neko
 {
 void Editor::Init()
@@ -39,6 +41,9 @@ void Editor::Init()
 
 void Editor::Update(float dt)
 {
+#ifdef TRACY_ENABLE
+	ZoneScoped
+#endif
 	const auto* engine = MainEngine::GetInstance();
 	const Index frameIndex = (engine->frameIndex - 1) % 2; //Render frame is always the previous one
 	ImGui::SFML::Update(*renderWindow_, engine->clockDeltatime);

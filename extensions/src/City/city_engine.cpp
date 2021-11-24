@@ -21,6 +21,10 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
+
+#ifdef TRACY_ENABLE
+#include <Tracy.hpp>
+#endif
 #include <City/city_engine.h>
 #include <City/city_editor.h>
 
@@ -32,6 +36,9 @@ namespace neko
 {
 void CityBuilderEngine::Init()
 {
+#ifdef TRACY_ENABLE
+	ZoneScoped
+#endif
 	config.vSync = true;
 	config.windowStyle = sf::Style::Titlebar | sf::Style::Close;
 	MainEngine::Init();
@@ -60,6 +67,9 @@ void CityBuilderEngine::Init()
 
 void CityBuilderEngine::Update(float dt)
 {
+#ifdef TRACY_ENABLE
+	ZoneScoped
+#endif
 	MainEngine::Update(dt);
 	tf::Taskflow taskflow;
 	auto carsUpdateTask = taskflow.emplace([&]() {cityCarManager_.Update(dt); });
@@ -165,6 +175,9 @@ void CityBuilderEngine::Update(float dt)
 
 void CityBuilderEngine::OnEvent(sf::Event& event)
 {
+#ifdef TRACY_ENABLE
+	ZoneScoped
+#endif
 	MainEngine::OnEvent(event);
 	cursor_.OnEvent(event);
 	if (event.type == sf::Event::MouseWheelScrolled)
@@ -186,6 +199,9 @@ void CityBuilderEngine::OnEvent(sf::Event& event)
 
 void CityBuilderEngine::Destroy()
 {
+#ifdef TRACY_ENABLE
+	ZoneScoped
+#endif
 	Sound::RemoveMusic(musicInd_);
 	cursor_.Destroy();
 	commandManager_.Destroy();

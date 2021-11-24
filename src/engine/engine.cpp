@@ -35,6 +35,11 @@
 #include "imgui.h"
 #include "imgui-SFML.h"
 
+#ifdef TRACY_ENABLE
+#include <Tracy.hpp>
+#endif
+
+
 namespace neko
 {
 
@@ -162,6 +167,10 @@ void MainEngine::EngineLoop()
     renderThread_.detach();
     while (isRunning)
     {
+#ifdef TRACY_ENABLE
+        ZoneNamedN(EngineUpdate, "Update", true);
+#endif
+
         clockDeltatime = engineClock_.restart();
         if (frameIndex > 0)
         {
@@ -193,6 +202,9 @@ void MainEngine::EngineLoop()
         }
 
 		++frameIndex;
+#ifdef TRACY_ENABLE
+        FrameMark
+#endif
     }
 
     Destroy();
@@ -213,6 +225,10 @@ MainEngine::~MainEngine()
 
 void MainEngine::Init()
 {
+#ifdef TRACY_ENABLE
+    ZoneScoped
+#endif
+
     //workingThreadPool.resize(std::max(1u,std::thread::hardware_concurrency() - 3));//removing main and render and audio thread
 #ifdef __linux__
     XInitThreads();

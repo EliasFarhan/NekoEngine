@@ -29,6 +29,9 @@
 #include <cmath>
 #include <engine/log.h>
 
+#ifdef TRACY_ENABLE
+#include <Tracy.hpp>
+#endif
 namespace std
 {
 template<>
@@ -55,6 +58,10 @@ const std::vector<Node>& TileMapGraph::GetNodesVector() const
 
 void TileMapGraph::AddNode(sf::Vector2i pos)
 {
+
+#ifdef TRACY_ENABLE
+	ZoneScoped
+#endif
 	if (ContainNode(pos))
 		return;
 	Node newNode{};
@@ -95,6 +102,10 @@ void TileMapGraph::AddNode(sf::Vector2i pos)
 
 void TileMapGraph::RemoveNode(sf::Vector2i pos)
 {
+
+#ifdef TRACY_ENABLE
+	ZoneScoped
+#endif
 	const auto nodeIt = std::find_if(nodes_.begin(), nodes_.end(), [&pos](const Node& node)
 	{
 		return node.position == pos;
@@ -128,19 +139,22 @@ float distance(const Node& nodeA, const Node& nodeB)
 	const sf::Vector2f posA = sf::Vector2f(nodeA.position);
 	const sf::Vector2f posB = sf::Vector2f(nodeB.position);
 	const sf::Vector2f deltaPos = posB - posA;
-	return sqrtf(deltaPos.x * deltaPos.x + deltaPos.y * deltaPos.y);
+	return std::sqrt(deltaPos.x * deltaPos.x + deltaPos.y * deltaPos.y);
 }
 
 float distance(const sf::Vector2i& posA, const sf::Vector2i& posB)
 {
 	const auto deltaPos = posB - posA;
-	return sqrtf(float(deltaPos.x * deltaPos.x + deltaPos.y * deltaPos.y));
+	return std::sqrt(float(deltaPos.x * deltaPos.x + deltaPos.y * deltaPos.y));
 }
 
 
 const std::vector<sf::Vector2i>
 TileMapGraph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vector2i& endPos) const
 {
+#ifdef TRACY_ENABLE
+	ZoneScoped
+#endif
 	auto path = std::vector<sf::Vector2i>();
 	if (startPos == INVALID_TILE_POS || endPos == INVALID_TILE_POS)
 		return path;
@@ -262,6 +276,10 @@ TileMapGraph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vect
 
 Node* TileMapGraph::GetClosestNode(sf::Vector2i position)
 {
+
+#ifdef TRACY_ENABLE
+	ZoneScoped
+#endif
 	Node* closestNode = nullptr;
 	float closestDistance = -1.0f;
 	for(auto& node: nodes_)
@@ -278,6 +296,10 @@ Node* TileMapGraph::GetClosestNode(sf::Vector2i position)
 
 bool TileMapGraph::ContainNode(sf::Vector2i pos) const
 {
+
+#ifdef TRACY_ENABLE
+	ZoneScoped
+#endif
 	const auto nodeIt = std::find_if(nodes_.begin(), nodes_.end(), [&pos](const Node& node)
 	{
 		return node.position == pos;
@@ -287,6 +309,10 @@ bool TileMapGraph::ContainNode(sf::Vector2i pos) const
 
 NeighborType GetNeighborType(const sf::Vector2i& direction)
 {
+
+#ifdef TRACY_ENABLE
+	ZoneScoped
+#endif
 	const static auto reverseMap = []() -> std::unordered_map<sf::Vector2i, NeighborType>
 	{
 		std::unordered_map<sf::Vector2i, NeighborType> reverse;
@@ -310,6 +336,10 @@ NeighborType GetNeighborType(const sf::Vector2i& direction)
 
 sf::Vector2i GetDirection(NeighborType neighborType)
 {
+
+#ifdef TRACY_ENABLE
+	ZoneScoped
+#endif
 	const auto neighborIt = neighborTypeMap.find(neighborType);
 	if (neighborIt == neighborTypeMap.end())
 	{

@@ -27,12 +27,20 @@
 #include <City/city_engine.h>
 #include <City/city_zone.h>
 
+
+#ifdef TRACY_ENABLE
+#include <Tracy.hpp>
+#endif
+
 namespace neko
 {
 
 void CityBuildingManager::Update(const CityZoneManager& zoneManager, CityBuilderMap& cityMap, const float dt)
 {
 
+#ifdef TRACY_ENABLE
+	ZoneScoped
+#endif
 	spawnTimer_.Update(dt);
 	if (spawnTimer_.IsOver())
 	{
@@ -135,6 +143,10 @@ void CityBuildingManager::Update(const CityZoneManager& zoneManager, CityBuilder
 void
 CityBuildingManager::AddBuilding(Building building, const CityZoneManager& zoneManager, CityBuilderMap& cityMap)
 {
+
+#ifdef TRACY_ENABLE
+	ZoneScoped
+#endif
 	for (int dx = 0; dx < building.size.x; dx++)
 	{
 		for (int dy = 0; dy < building.size.y; dy++)
@@ -155,6 +167,10 @@ const std::vector<Building>& CityBuildingManager::GetBuildingsVector() const
 
 void CityBuildingManager::RemoveBuilding(sf::Vector2i position)
 {
+
+#ifdef TRACY_ENABLE
+	ZoneScoped
+#endif
 	const auto buildingIt = std::find_if(buildings_.begin(), buildings_.end(), [&position](const Building& building)
 	{
 		for (int dx = 0; dx < building.size.x; dx++)
@@ -177,6 +193,10 @@ void CityBuildingManager::RemoveBuilding(sf::Vector2i position)
 
 sf::Vector2i CityBuildingManager::FindBuilding(ZoneType zoneType)
 {
+
+#ifdef TRACY_ENABLE
+	ZoneScoped
+#endif
 	switch (zoneType)
 	{
 	case ZoneType::RESIDENTIAL:
@@ -233,6 +253,10 @@ sf::Vector2i CityBuildingManager::FindBuilding(ZoneType zoneType)
 
 Building* CityBuildingManager::GetBuildingAt(sf::Vector2i position)
 {
+
+#ifdef TRACY_ENABLE
+	ZoneScoped
+#endif
 	const auto result = std::find_if(buildings_.begin(), buildings_.end(), [&position](const Building& building)
 	{
 		for (int dx = 0; dx < building.size.x; dx++)
