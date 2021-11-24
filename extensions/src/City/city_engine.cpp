@@ -26,7 +26,6 @@
 
 #include <engine/log.h>
 #include <sound/sound.h>
-#include <Remotery.h>
 #include "City/city_function_map.h"
 
 namespace neko
@@ -62,7 +61,6 @@ void CityBuilderEngine::Init()
 void CityBuilderEngine::Update(float dt)
 {
 	MainEngine::Update(dt);
-	rmt_ScopedCPUSample(CityBuilderUpdate, 0);
 	tf::Taskflow taskflow;
 	auto carsUpdateTask = taskflow.emplace([&]() {cityCarManager_.Update(dt); });
 

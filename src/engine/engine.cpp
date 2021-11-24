@@ -32,7 +32,6 @@
 
 #include <engine/log.h>
 #include <sstream>
-#include <Remotery.h>
 #include "imgui.h"
 #include "imgui-SFML.h"
 
@@ -46,15 +45,13 @@ BasicEngine::BasicEngine(Configuration* config)
         this->config = *config;
     }
     initLog();
-
-    rmt_CreateGlobalInstance(&rmt_);
+    
 }
 
 BasicEngine::~BasicEngine()
 {
     logDebug("Destroy Basic Engine");
     destroyLog();
-    rmt_DestroyGlobalInstance(rmt_);
 }
 
 void BasicEngine::Update(float dt)
@@ -90,8 +87,6 @@ void BasicEngine::EngineLoop()
     isRunning = true;
     while (isRunning)
     {
-
-        rmt_ScopedCPUSample(EngineLoop, 0);
         clockDeltatime = engineClock_.restart();
 
         keyboardManager_.ClearKeys();
@@ -104,7 +99,6 @@ void BasicEngine::EngineLoop()
         }
 
         {
-            rmt_ScopedCPUSample(Draw, 0);
             renderWindow->clear(config.bgColor);
             ImGui::SFML::Update(*renderWindow, clockDeltatime);
             Update(clockDeltatime.asSeconds());
@@ -168,14 +162,9 @@ void MainEngine::EngineLoop()
     renderThread_.detach();
     while (isRunning)
     {
-
-
-
-        rmt_ScopedCPUSample(EngineLoop, 0);
         clockDeltatime = engineClock_.restart();
         if (frameIndex > 0)
         {
-            rmt_ScopedCPUSample(WaitForGraphics, 0);
             std::unique_lock<std::mutex> lock(renderStartMutex);
 			if (graphicsManager_->DidRenderingStart())
 			{

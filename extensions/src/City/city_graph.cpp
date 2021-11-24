@@ -28,7 +28,6 @@
 #include <sstream>
 #include <cmath>
 #include <engine/log.h>
-#include <Remotery.h>
 
 namespace std
 {
@@ -142,7 +141,6 @@ float distance(const sf::Vector2i& posA, const sf::Vector2i& posB)
 const std::vector<sf::Vector2i>
 TileMapGraph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vector2i& endPos) const
 {
-	rmt_ScopedCPUSample(GeneratePath, 0);
 	auto path = std::vector<sf::Vector2i>();
 	if (startPos == INVALID_TILE_POS || endPos == INVALID_TILE_POS)
 		return path;

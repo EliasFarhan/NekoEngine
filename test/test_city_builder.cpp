@@ -127,7 +127,6 @@ public:
             }
 		}
 		{
-			rmt_ScopedCPUSample(DrawRectangles, 0);
 			for (const auto& rect : rects_)
 			{
 				renderWindow->draw(rect);

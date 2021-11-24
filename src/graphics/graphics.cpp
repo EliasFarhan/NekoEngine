@@ -26,7 +26,6 @@
 #include "SFML/Graphics/RenderTexture.hpp"
 #include "engine/log.h"
 #include <sstream>
-#include <Remotery.h>
 #include "engine/globals.h"
 
 namespace neko
@@ -106,7 +105,6 @@ void GraphicsManager::RenderLoop()
 
     do
     {
-        rmt_ScopedCPUSample(RenderLoop, 0);
 
         {
             /*{
@@ -125,8 +123,7 @@ void GraphicsManager::RenderLoop()
         //We only start the new graphics frame if the engine had time to loop
         if (engine->isRunning)
         {
-
-            rmt_ScopedCPUSample(ActiveRenderLoop, 0);
+            
             std::unique_lock<std::mutex> lock(renderingMutex);
             renderWindow_->setActive(true);
             renderWindow_->setView(views_[frameIndex % 2]);

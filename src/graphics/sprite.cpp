@@ -26,7 +26,6 @@
 #include <graphics/graphics.h>
 #include <engine/engine.h>
 #include "engine/globals.h"
-#include <Remotery.h>
 #include <SFML/Graphics/Texture.hpp>
 
 namespace neko
@@ -53,7 +52,6 @@ Index SpriteManager::AddSprite(const std::shared_ptr<sf::Texture> texture)
 
 void SpriteManager::CopyTransformPosition(Transform2dManager& transformManager, size_t start, size_t length)
 {
-    rmt_ScopedCPUSample(CopySpritePositions, 0);
     const int frameIndex = MainEngine::GetInstance()->frameIndex % 2;
     for (auto i = start; i < start + length; i++)
     {
@@ -63,7 +61,6 @@ void SpriteManager::CopyTransformPosition(Transform2dManager& transformManager, 
 
 void SpriteManager::CopyTransformScales(Transform2dManager& transformManager, size_t start, size_t length)
 {
-    rmt_ScopedCPUSample(CopySpriteScales, 0);
     const int frameIndex = MainEngine::GetInstance()->frameIndex % 2;
     for (auto i = start; i < start + length; i++)
     {
@@ -73,7 +70,6 @@ void SpriteManager::CopyTransformScales(Transform2dManager& transformManager, si
 
 void SpriteManager::CopyTransformAngles(Transform2dManager& transformManager, size_t start, size_t length)
 {
-    rmt_ScopedCPUSample(CopySpriteAngles, 0);
     const int frameIndex = MainEngine::GetInstance()->frameIndex % 2;
     for (auto i = start; i < start + length; i++)
     {
@@ -83,7 +79,6 @@ void SpriteManager::CopyTransformAngles(Transform2dManager& transformManager, si
 
 void SpriteManager::PushCommands(GraphicsManager* graphicsManager, size_t start, size_t length)
 {
-    rmt_ScopedCPUSample(PushSpriteCommands, 0);
     const int frameIndex = MainEngine::GetInstance()->frameIndex % 2;
     for (auto i = start; i < start + length; i++)
     {

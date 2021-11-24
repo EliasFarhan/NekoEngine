@@ -24,7 +24,6 @@
 #include <City/city_tilemap.h>
 #include <graphics/texture.h>
 #include <engine/engine.h>
-#include <Remotery.h>
 #include <City/city_map.h>
 #include "utilities/json_utility.h"
 #include "City/city_car.h"
@@ -116,7 +115,6 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 
 	if (updatedCityTileType == CityTilesheetType::LENGTH)
 	{
-		rmt_ScopedCPUSample(UpdateTilemap, 0);
 		for (Index i = 0u; i < Index(CityTilesheetType::LENGTH); i++)
 		{
 			UpdateTilemap(cityBuilderMap, cityCarManager, buildingManager, transformManager, mainView,
@@ -127,15 +125,13 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 	switch (updatedCityTileType)
 	{
 	case CityTilesheetType::ENVIRONMENT:
-		rmt_BeginCPUSample(UpdateEnvironmentTilemap, 0);
 		break;
 	case CityTilesheetType::TRANSPORT:
-		rmt_BeginCPUSample(UpdateTransportTilemap, 0);
 		break;
 	case CityTilesheetType::CITY:
-		rmt_BeginCPUSample(UpdateCityTilemap, 0); break;
+		break;
 	case CityTilesheetType::CAR:
-		rmt_BeginCPUSample(UpdateCarTilemap, 0); break;
+		break;
 	default: break;
 	}
 	tilesheets_[Index(updatedCityTileType)].tilemap[frameIndex].clear();
@@ -660,12 +656,10 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 	default:
 		break;
 	}
-	rmt_EndCPUSample();
 }
 
 void CityBuilderTilemap::PushCommand(GraphicsManager* graphicsManager)
 {
-	rmt_ScopedCPUSample(PushCityTilemapCommands, 0);
 	const Index frameIndex = MainEngine::GetInstance()->frameIndex % 2;
 
 	{

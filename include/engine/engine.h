@@ -29,7 +29,6 @@
 #include <graphics/graphics.h>
 #include <ctpl_stl.h>
 #include <SFML/Graphics/RenderWindow.hpp>
-#include <Box2D/Common/b2Math.h>
 #include "input.h"
 #include <SFML/Window/WindowStyle.hpp>
 
@@ -46,7 +45,6 @@ struct Collider;
 struct Configuration
 {
     sf::Vector2u screenSize = sf::Vector2u(1280, 720);
-    b2Vec2 gravity = b2Vec2(0.0f, 9.81f);
     float physicsTimeStep = 1.0f / 50.0f;
     int velocityIterations = 8;
     int positionIterations = 3;

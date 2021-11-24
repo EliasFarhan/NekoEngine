@@ -25,7 +25,6 @@
 #include "engine/engine.h"
 #include "City/city_engine.h"
 #include <City/city_map.h>
-#include <Remotery.h>
 
 namespace neko
 {
@@ -41,7 +40,6 @@ void CityCarManager::Init()
 
 void CityCarManager::Update(float dt)
 {
-	rmt_ScopedCPUSample(UpdateCars, 0);
 	/*
 	{
 		const auto position = roadGraphPtr_->GetNodesVector()[rand() % roadGraphPtr_->GetNodesVector().size()].position;

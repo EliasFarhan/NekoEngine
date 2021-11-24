@@ -24,7 +24,6 @@
 #include <graphics/shape.h>
 #include <engine/globals.h>
 #include <engine/engine.h>
-#include <Remotery.h>
 
 namespace neko
 {
@@ -72,7 +71,6 @@ ShapeManager::AddPolygon(const sf::Vector2f& pos, const sf::Vector2f* points, si
 
 void ShapeManager::PushCommands(GraphicsManager* graphicsManager, size_t start, size_t length)
 {
-    rmt_ScopedCPUSample(PushShapeCommands, 0);
     const int frameIndex = MainEngine::GetInstance()->frameIndex % 2;
     for (auto i = start; i < start + length; i++)
     {
@@ -82,7 +80,6 @@ void ShapeManager::PushCommands(GraphicsManager* graphicsManager, size_t start, 
 
 void ShapeManager::CopyTransformPosition(Transform2dManager& transformManager, size_t start, size_t length)
 {
-    rmt_ScopedCPUSample(CopySpritePositions, 0);
     const int frameIndex = MainEngine::GetInstance()->frameIndex % 2;
     for (auto i = start; i < start + length; i++)
     {

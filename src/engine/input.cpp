@@ -28,7 +28,6 @@
 #include <engine/engine.h>
 #include <SFML/Window/Mouse.hpp>
 #include <SFML/Window/Event.hpp>
-#include <Remotery.h>
 
 namespace neko
 {
@@ -39,7 +38,6 @@ KeyboardManager::KeyboardManager()
 
 void KeyboardManager::ClearKeys()
 {
-    rmt_ScopedCPUSample(KeyboardLoop, 0)
     pressedKeys_.clear();
     releasedKeys_.clear();
 }

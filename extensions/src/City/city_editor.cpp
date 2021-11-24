@@ -23,8 +23,8 @@
  */
 
 #include <City/city_editor.h>
-#include <imgui-SFML.h>
 #include <imgui.h>
+#include <imgui-SFML.h>
 #include "engine/engine.h"
 #include <City/city_engine.h>
 
@@ -54,7 +54,7 @@ void CityEditor::Update(float dt)
 
 
 	ImGui::Begin("Gameplay");
-	for (Index i = 0; i < Index(ButtonIconType::LENGTH); i++)
+	for (Index i = 0; i < static_cast<Index>(ButtonIconType::LENGTH); i++)
 	{
 		const auto buttonTexture = engine_->GetTextureManager().GetTexture(buttonUiIndex[i]);
 		if (ImGui::ImageButton(*buttonTexture))
@@ -63,7 +63,7 @@ void CityEditor::Update(float dt)
 			buttonSelected[i] = true;
 
 			auto newCommand = std::make_unique<ChangeModeCommand>();
-			newCommand->newCursorMode = ButtonIconType(i);
+			newCommand->newCursorMode = static_cast<ButtonIconType>(i);
 			newCommand->commandType = CityCommandType::CHANGE_CURSOR_MODE;
 			engine_->GetCommandManager().AddCommand(std::move(newCommand), true);
 		}

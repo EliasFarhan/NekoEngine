@@ -28,7 +28,6 @@
 #include <memory>
 #include <SFML/Graphics/VertexArray.hpp>
 #include <SFML/Graphics/Texture.hpp>
-#include <physics/physics.h>
 #include <graphics/texture.h>
 
 namespace neko
@@ -70,7 +69,7 @@ class TiledMap : public Tilemap
 {
 public:
     void
-    Init(const std::string& tilemapPath, TextureManager& textureManager, Physics2dManager* physics2DManager = nullptr);
+    Init(const std::string& tilemapPath, TextureManager& textureManager);
 	void PushCommand(GraphicsManager* graphicsManager) override;
 protected:
 	std::vector<Tiledsheet> tileSheets_;

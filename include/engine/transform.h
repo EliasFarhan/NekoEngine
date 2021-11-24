@@ -41,11 +41,6 @@ class Transform2dManager
 public:
     Transform2dManager();
 
-    void
-    CopyPositionsFromPhysics2d(Physics2dManager& physics2dManager, size_t start = 0, size_t length = INIT_ENTITY_NMB);
-
-    void CopyAnglesFromPhysics2d(Physics2dManager& physics2dManager, size_t start = 0, size_t length = INIT_ENTITY_NMB);
-
     Index AddPosition(sf::Vector2f position, Entity entity = INVALID_ENTITY);
     Index AddScale(sf::Vector2f scale, Entity entity = INVALID_ENTITY);
     Index AddAngle(float angle, Entity entity = INVALID_ENTITY);
