@@ -35,7 +35,7 @@
 namespace neko
 {
 
-void CityBuildingManager::Update(const CityZoneManager& zoneManager, CityBuilderMap& cityMap, const float dt)
+void CityBuildingManager::Update(CityZoneManager& zoneManager, CityBuilderMap& cityMap, const float dt)
 {
 
 #ifdef TRACY_ENABLE
@@ -48,40 +48,27 @@ void CityBuildingManager::Update(const CityZoneManager& zoneManager, CityBuilder
 
 		//Add residential building
 		{
-			const auto& zones = zoneManager.GetZoneVector();
-			std::vector<Zone> residentialZones;
-			residentialZones.reserve(zones.size());
-			std::copy_if(zones.begin(), zones.end(), std::back_inserter(residentialZones), [&](const Zone& zone)
-			{
-				const auto buildingAtPos = std::find_if(buildings_.begin(), buildings_.end(), [&zone](const Building& building) {
-					return building.position == zone.position;
-				});
-				return zone.zoneType == ZoneType::RESIDENTIAL && buildingAtPos == buildings_.end();
-			});
+			const auto& residentialZones = zoneManager.GetResidentialZoneVector();
+			
 			if (!residentialZones.empty())
 			{
                 const auto& newHousePlace = residentialZones[rand() % residentialZones.size()];
 				AddBuilding({
-					newHousePlace.position,
-					sf::Vector2i(1, 1),
-					static_cast<CityTileType>((rand() % (static_cast<Index>(CityTileType::HOUSE4) - static_cast<Index>(CityTileType::HOUSE1))) +
-                        static_cast<Index>(CityTileType::HOUSE1)),
-					(rand() % (10u - 5u)) + 5u
-					},
-					zoneManager,
-					cityMap);
+                                newHousePlace.position,
+                                sf::Vector2i(1, 1),
+                                static_cast<CityTileType>((rand() % (static_cast<Index>(CityTileType::HOUSE4) - static_cast<Index>(CityTileType::HOUSE1))) +
+                                    static_cast<Index>(CityTileType::HOUSE1)),
+                                ZoneType::RESIDENTIAL,
+                                (rand() % (10u - 5u)) + 5u
+                            },
+                            zoneManager,
+                            cityMap);
 			}
 		}
 		//Add commercial building
 		{
-			const auto& zones = zoneManager.GetZoneVector();
-			std::vector<Zone> commercialZones;
-			commercialZones.reserve(zones.size());
-			std::copy_if(zones.begin(), zones.end(), std::back_inserter(commercialZones), [&](const Zone& zone)
-			{
-				const auto buildingAtPos = GetBuildingAt(zone.position);
-				return zone.zoneType == ZoneType::COMMERCIAL && buildingAtPos == nullptr;
-			});
+			const auto& commercialZones = zoneManager.GetCommericalZoneVector();
+			
 			if (!commercialZones.empty())
 			{
 				auto& newWorkPlace = commercialZones[rand() % commercialZones.size()];
@@ -97,7 +84,7 @@ void CityBuildingManager::Update(const CityZoneManager& zoneManager, CityBuilder
 							buildBig = false;
 							break;
 						}
-						const auto* zone = zoneManager.GetZoneAt(newPos);
+						const auto* zone = zoneManager.GetZoneAt(newPos, ZoneType::COMMERCIAL);
 						if (zone == nullptr || zone->zoneType != newWorkPlace.zoneType)
 						{
 							buildBig = false;
@@ -118,21 +105,23 @@ void CityBuildingManager::Update(const CityZoneManager& zoneManager, CityBuilder
 						}
 					}
 					AddBuilding({
-						newWorkPlace.position,
-						sf::Vector2i(3, 3),
-						static_cast<CityTileType>((rand() % (Index(CityTileType::OFFICE5) - Index(CityTileType::OFFICE2))) + Index(
-                            CityTileType::OFFICE2)),
-					((rand() % (60u - 40u)) + 40u)
-						}, zoneManager, cityMap);
+                                    newWorkPlace.position,
+                                    sf::Vector2i(3, 3),
+                                    static_cast<CityTileType>((rand() % (Index(CityTileType::OFFICE5) - Index(CityTileType::OFFICE2))) + Index(
+                                        CityTileType::OFFICE2)),
+                                    ZoneType::COMMERCIAL,
+                                    ((rand() % (60u - 40u)) + 40u)
+                                }, zoneManager, cityMap);
 				}
 				else
 				{
 					AddBuilding({
-						newWorkPlace.position,
-						sf::Vector2i(1, 1),
-						CityTileType::OFFICE1,
-					(rand() % (20u - 10u)) + 10u
-						}, zoneManager, cityMap);
+                                    newWorkPlace.position,
+                                    sf::Vector2i(1, 1),
+                                    CityTileType::OFFICE1,
+                                    ZoneType::COMMERCIAL,
+                                    (rand() % (20u - 10u)) + 10u
+                                }, zoneManager, cityMap);
 				}
 			}
 		}
@@ -142,7 +131,7 @@ void CityBuildingManager::Update(const CityZoneManager& zoneManager, CityBuilder
 }
 
 void
-CityBuildingManager::AddBuilding(Building building, const CityZoneManager& zoneManager, CityBuilderMap& cityMap)
+CityBuildingManager::AddBuilding(Building building, CityZoneManager& zoneManager, CityBuilderMap& cityMap)
 {
 	
 	for (int dx = 0; dx < building.size.x; dx++)
@@ -150,6 +139,7 @@ CityBuildingManager::AddBuilding(Building building, const CityZoneManager& zoneM
 		for (int dy = 0; dy < building.size.y; dy++)
 		{
 			sf::Vector2i newPos = building.position + sf::Vector2i(dx, -dy);
+			zoneManager.RemoveZone(newPos, building.zoneType);
 			cityMap.RemoveCityElement(newPos);
 		}
 	}

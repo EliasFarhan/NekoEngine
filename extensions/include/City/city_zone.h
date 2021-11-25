@@ -76,13 +76,15 @@ public:
 
     void AddZone(sf::Vector2i position, ZoneType zoneType, CityBuilderMap& cityMap);
 
-    void RemoveZone(sf::Vector2i position);
+    void RemoveZone(sf::Vector2i position, ZoneType zoneType);
 
-    const Zone* GetZoneAt(sf::Vector2i position) const;
+    const Zone* GetZoneAt(sf::Vector2i position, ZoneType zoneType) const;
 
-    const std::vector<Zone>& GetZoneVector() const;
+    const std::vector<Zone>& GetResidentialZoneVector() const;
+    const std::vector<Zone>& GetCommericalZoneVector() const;
 private:
-    std::vector<Zone> zones_;
+    std::vector<Zone> residentialZones_;
+    std::vector<Zone> commercialZones_;
     sf::VertexArray zoneVertexArray_[2];
 
 };

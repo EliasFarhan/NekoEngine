@@ -105,7 +105,8 @@ void CityCommandManager::ExecuteCommand(const std::shared_ptr<CityCommand>& comm
 			break;
 		}
 		auto* buildCommand = dynamic_cast<BuildElementCommand*>(command.get());
-		engine_->GetZoneManager().RemoveZone(buildCommand->position);
+		engine_->GetZoneManager().RemoveZone(buildCommand->position,ZoneType::RESIDENTIAL);
+		engine_->GetZoneManager().RemoveZone(buildCommand->position,ZoneType::COMMERCIAL);
 		engine_->GetCityMap().AddCityElement(buildCommand->elementType, buildCommand->position);
 		if (buildCommand->elementType == CityElementType::ROAD)
 		{
@@ -120,7 +121,8 @@ void CityCommandManager::ExecuteCommand(const std::shared_ptr<CityCommand>& comm
 		auto* buildCommand = dynamic_cast<DestroyElementCommand*>(command.get());
 		engine_->GetCityMap().RemoveCityElement(buildCommand->position);
 		engine_->GetCarManager().RescheduleCarPathfinding(buildCommand->position);
-		engine_->GetZoneManager().RemoveZone(buildCommand->position);
+		engine_->GetZoneManager().RemoveZone(buildCommand->position,ZoneType::RESIDENTIAL);
+		engine_->GetZoneManager().RemoveZone(buildCommand->position,ZoneType::COMMERCIAL);
 		engine_->GetBuildingManager().RemoveBuilding(buildCommand->position);
 		Sound::PlaySound(soundErase_);
 		break;

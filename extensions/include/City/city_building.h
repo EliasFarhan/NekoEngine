@@ -37,6 +37,7 @@ struct Building
     sf::Vector2i position = INVALID_TILE_POS;
     sf::Vector2i size = sf::Vector2i(1,1);
     CityTileType buildingType = CityTileType::NONE;
+    ZoneType zoneType = ZoneType::NONE;
 	unsigned capacity = 0;
 	unsigned occupancy = 0;
 };
@@ -44,8 +45,8 @@ struct Building
 class CityBuildingManager
 {
 public:
-    void Update(const CityZoneManager& zoneManager, CityBuilderMap& cityMap, const float dt);
-    void AddBuilding(Building building, const CityZoneManager& zoneManager, CityBuilderMap& cityMap);
+    void Update(CityZoneManager& zoneManager, CityBuilderMap& cityMap, const float dt);
+    void AddBuilding(Building building, CityZoneManager& zoneManager, CityBuilderMap& cityMap);
     void RemoveBuilding(sf::Vector2i position);
 	sf::Vector2i FindBuilding(ZoneType zoneType);
     Building* GetBuildingAt(sf::Vector2i position);

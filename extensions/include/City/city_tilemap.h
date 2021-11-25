@@ -41,7 +41,7 @@ class CityCarManager;
 class Transform2dManager;
 class CityBuildingManager;
 
-enum class CityTileType : Index
+enum class CityTileType : std::uint8_t
 {
 
 	GRASS = 0,
@@ -111,7 +111,7 @@ const static std::map<CityTileType, std::string> mapCityTileString =
 
 
 };
-enum class CarType : Index
+enum class CarType : std::uint8_t
 {
 	BUS = Index(CityTileType::LENGTH),
 	TRUCK,
@@ -133,7 +133,7 @@ const static std::map<CarType, std::string> mapCarTypeString =
 };
 
 
-enum class CityTilesheetType : unsigned
+enum class CityTilesheetType : std::uint8_t
 {
 	ENVIRONMENT = 0u,
 	TRANSPORT,

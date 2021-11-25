@@ -47,37 +47,41 @@ void CityZoneManager::UpdateZoneTilemap(const CityBuilderMap& cityMap, CityBuild
     zoneVertexArray_[frameIndex].clear();
     zoneVertexArray_[frameIndex].setPrimitiveType(sf::PrimitiveType::Triangles);
     const auto tileSize = cityMap.city.tileSize;
-    for (auto& zone: zones_)
-    {
-
-        //Checking if there is other zone buildings
-		const auto* buildingAtPos = cityBuildingMap.GetBuildingAt(zone.position);
-        if(buildingAtPos != nullptr)
-            continue;
-
-        //culling with mainView
-        const auto zoneSize = sf::Vector2f(tileSize);
-        const auto worldPos = sf::Vector2f(
-			float(zone.position.x * tileSize.x), 
-			float(zone.position.y * tileSize.y));
-        const sf::FloatRect tileRect = sf::FloatRect((worldPos - zoneSize/2.0f), zoneSize);
-
-        if (!windowView_.intersects(tileRect))
-            continue;
-        const auto color = zoneColorMap.find(zone.zoneType)->second;
-        sf::Vertex quad[6];
-        quad[0].position = worldPos - zoneSize / 2.0f;
-        quad[1].position = worldPos - sf::Vector2f(zoneSize.x, -zoneSize.y) / 2.0f;
-        quad[2].position = worldPos + zoneSize / 2.0f;
-        quad[3].position = worldPos - zoneSize / 2.0f;
-        quad[4].position = worldPos + zoneSize / 2.0f;
-        quad[5].position = worldPos - sf::Vector2f(-zoneSize.x, zoneSize.y) / 2.0f;
-        for (auto & v : quad)
+    const auto func = [this, &windowView_, &cityBuildingMap, tileSize, frameIndex](const std::vector<Zone>& zones_) {
+        for (auto& zone : zones_)
         {
-            v.color = color;
-            zoneVertexArray_[frameIndex].append(v);
+
+            //Checking if there is other zone buildings
+            const auto* buildingAtPos = cityBuildingMap.GetBuildingAt(zone.position);
+            if (buildingAtPos != nullptr)
+                continue;
+
+            //culling with mainView
+            const auto zoneSize = sf::Vector2f(tileSize);
+            const auto worldPos = sf::Vector2f(
+                float(zone.position.x * tileSize.x),
+                float(zone.position.y * tileSize.y));
+            const sf::FloatRect tileRect = sf::FloatRect((worldPos - zoneSize / 2.0f), zoneSize);
+
+            if (!windowView_.intersects(tileRect))
+                continue;
+            const auto color = zoneColorMap.find(zone.zoneType)->second;
+            sf::Vertex quad[6];
+            quad[0].position = worldPos - zoneSize / 2.0f;
+            quad[1].position = worldPos - sf::Vector2f(zoneSize.x, -zoneSize.y) / 2.0f;
+            quad[2].position = worldPos + zoneSize / 2.0f;
+            quad[3].position = worldPos - zoneSize / 2.0f;
+            quad[4].position = worldPos + zoneSize / 2.0f;
+            quad[5].position = worldPos - sf::Vector2f(-zoneSize.x, zoneSize.y) / 2.0f;
+            for (auto& v : quad)
+            {
+                v.color = color;
+                zoneVertexArray_[frameIndex].append(v);
+            }
         }
-    }
+    };
+    func(residentialZones_);
+    func(commercialZones_);
 }
 
 void CityZoneManager::PushCommand(GraphicsManager* graphicsManager)
@@ -99,72 +103,127 @@ void CityZoneManager::AddZone(sf::Vector2i position, ZoneType zoneType, CityBuil
 	auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
 	if(engine->GetCityMoney() < zoneCost)
 		return;
-	if(position.x < 0 || position.y < 0 || position.x >= int(cityMap.city.mapSize.x) || position.y >= int(cityMap.city.mapSize.y))
+	if(position.x < 0 || position.y < 0 || 
+        position.x >= static_cast<int>(cityMap.city.mapSize.x) || position.y >= static_cast<int>(cityMap.city.mapSize.y))
 	{
 		return;
 	}
-    auto existingZone = std::find_if(zones_.begin(), zones_.end(), [&position](const Zone& zone){
-        return zone.position == position;
-    });
-    //Just changing the existing zone
-    if(existingZone != zones_.end())
-    {
-		engine->ChangeCityMoney(-zoneCost);
-        existingZone->zoneType = zoneType;
-        return;
-    }
-    //No zone on water
-    if(!cityMap.IsGrass(position))
-        return;
-    //No zone when there is already a building
-    auto* cityElement = cityMap.GetCityElementAt(position);
-    if(cityElement != nullptr && cityElement->elementType != CityElementType::TREES)
-        return;
-    for(auto& road : cityMap.GetRoadGraph().GetNodesVector())
-    {
-        const auto roadPos = road.position;
-        const auto deltaPos = roadPos-position;
-        if((deltaPos.x == 0 && abs(deltaPos.y) <= ZONE_RADIUS) ||
-                (deltaPos.y == 0 && abs(deltaPos.x) <= ZONE_RADIUS))
+    const auto func = [this, zoneType, engine, position, &cityMap](std::vector<Zone>& zones_) {
+
+        //No zone on water
+        if (!cityMap.IsGrass(position))
+            return;
+        //No zone when there is already a building
+        auto* cityElement = cityMap.GetCityElementAt(position);
+        if (cityElement != nullptr && cityElement->elementType != CityElementType::TREES)
+            return;
+        for (auto& road : cityMap.GetRoadGraph().GetNodesVector())
         {
-			engine->ChangeCityMoney(-zoneCost);
-            zones_.push_back( {position, zoneType});
-            break;
+            const auto roadPos = road.position;
+            const auto deltaPos = roadPos - position;
+            if ((deltaPos.x == 0 && abs(deltaPos.y) <= ZONE_RADIUS) ||
+                (deltaPos.y == 0 && abs(deltaPos.x) <= ZONE_RADIUS))
+            {
+                engine->ChangeCityMoney(-zoneCost);
+                zones_.push_back({ position, zoneType });
+                break;
+            }
         }
-    }
-}
-
-void CityZoneManager::RemoveZone(sf::Vector2i position)
-{
-
-#ifdef TRACY_ENABLE
-    ZoneScoped
-#endif
-	const auto existingZone = std::find_if(zones_.begin(), zones_.end(), [&position](const Zone& zone){
-        return zone.position == position;
-    });
-    if(existingZone != zones_.end())
+    };
+    switch (zoneType)
     {
-        zones_.erase(existingZone);
+    case ZoneType::COMMERCIAL:
+    {
+        const auto existingZone = std::find_if(residentialZones_.begin(), residentialZones_.end(), [&position](const Zone& zone) {
+            return zone.position == position;
+            });
+        if (existingZone != residentialZones_.end())
+        {
+            engine->ChangeCityMoney(-zoneCost);
+            existingZone->zoneType = zoneType;
+            return;
+        }
+        func(commercialZones_);
+        break;
+    }
+    case ZoneType::RESIDENTIAL:
+        const auto existingZone = std::find_if(commercialZones_.begin(), commercialZones_.end(), [&position](const Zone& zone) {
+            return zone.position == position;
+            });
+        //TODO the other existing zone
+        if (existingZone != commercialZones_.end())
+        {
+            engine->ChangeCityMoney(-zoneCost);
+            existingZone->zoneType = zoneType;
+            return;
+        }
+        func(residentialZones_);
+        break;
     }
 }
 
-const Zone* CityZoneManager::GetZoneAt(sf::Vector2i position) const 
+void CityZoneManager::RemoveZone(sf::Vector2i position, ZoneType zoneType)
 {
 
 #ifdef TRACY_ENABLE
     ZoneScoped
 #endif
-	const auto existingZone = std::find_if(zones_.begin(), zones_.end(), [&position](const Zone& zone) {
-		return zone.position == position;
-	});
-	if (existingZone == zones_.end())
-		return nullptr;
-	return &*existingZone;
+        const auto func = [this, position](std::vector<Zone>& zones_) {
+        const auto existingZone = std::find_if(zones_.begin(), zones_.end(), [&position](const Zone& zone) {
+            return zone.position == position;
+            });
+        if (existingZone != zones_.end())
+        {
+            zones_.erase(existingZone);
+        }
+    };
+    switch (zoneType)
+    {
+    case ZoneType::COMMERCIAL:
+        func(commercialZones_);
+        break;
+    case ZoneType::RESIDENTIAL:
+        func(residentialZones_);
+        break;
+    default:
+        break;
+    }
 }
 
-const std::vector<Zone>& CityZoneManager::GetZoneVector() const
+const Zone* CityZoneManager::GetZoneAt(sf::Vector2i position, ZoneType zoneType) const 
 {
-    return zones_;
+
+#ifdef TRACY_ENABLE
+    ZoneScoped
+#endif
+        const auto func = [this, position](const std::vector<Zone>& zones_)-> const Zone*
+    {
+        const auto existingZone = std::find_if(zones_.begin(), zones_.end(), [&position](const Zone& zone) {
+            return zone.position == position;
+            });
+        if (existingZone == zones_.end())
+            return nullptr;
+        return &*existingZone;
+    };
+    switch (zoneType)
+    {
+    case ZoneType::COMMERCIAL:
+        return func(commercialZones_);
+    case ZoneType::RESIDENTIAL:
+        return func(residentialZones_);
+    default:
+        break;
+    }
+    return nullptr;
+}
+
+const std::vector<Zone>& CityZoneManager::GetCommericalZoneVector() const
+{
+    return commercialZones_;
+}
+
+const std::vector<Zone>& CityZoneManager::GetResidentialZoneVector() const
+{
+    return residentialZones_;
 }
 }

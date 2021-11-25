@@ -35,7 +35,7 @@ class Transform2dManager;
 class TileMapGraph;
 class CityBuilderMap;
 
-enum class CarType : Index;
+enum class CarType : std::uint8_t;
 
 enum class CarState : Index
 {
