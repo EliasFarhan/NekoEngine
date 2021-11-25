@@ -41,12 +41,14 @@ void CityBuildingManager::Update(const CityZoneManager& zoneManager, CityBuilder
 #ifdef TRACY_ENABLE
 	ZoneScoped
 #endif
+	auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
 	spawnTimer_.Update(dt);
-	if (spawnTimer_.IsOver())
+	if (spawnTimer_.IsOver() || (engine->GetCheatData() & CheatModeData::QUICK_HOUSE_SPAWN))
 	{
 
 		//Add residential building
 		{
+
 			const auto& zones = zoneManager.GetZoneVector();
 			std::vector<Zone> residentialZones;
 			residentialZones.reserve(zones.size());
@@ -59,13 +61,12 @@ void CityBuildingManager::Update(const CityZoneManager& zoneManager, CityBuilder
 			});
 			if (!residentialZones.empty())
 			{
-				auto& newHousePlace = residentialZones[rand() % residentialZones.size()];
+                const auto& newHousePlace = residentialZones[rand() % residentialZones.size()];
 				AddBuilding({
 					newHousePlace.position,
 					sf::Vector2i(1, 1),
-					CityTileType(
-						(rand() % (Index(CityTileType::HOUSE4) - Index(CityTileType::HOUSE1))) +
-						Index(CityTileType::HOUSE1)),
+					static_cast<CityTileType>((rand() % (static_cast<Index>(CityTileType::HOUSE4) - static_cast<Index>(CityTileType::HOUSE1))) +
+                        static_cast<Index>(CityTileType::HOUSE1)),
 					(rand() % (10u - 5u)) + 5u
 					},
 					zoneManager,
@@ -120,7 +121,8 @@ void CityBuildingManager::Update(const CityZoneManager& zoneManager, CityBuilder
 					AddBuilding({
 						newWorkPlace.position,
 						sf::Vector2i(3, 3),
-						CityTileType((rand() % (Index(CityTileType::OFFICE5) - Index(CityTileType::OFFICE2))) + Index(CityTileType::OFFICE2)),
+						static_cast<CityTileType>((rand() % (Index(CityTileType::OFFICE5) - Index(CityTileType::OFFICE2))) + Index(
+                            CityTileType::OFFICE2)),
 					((rand() % (60u - 40u)) + 40u)
 						}, zoneManager, cityMap);
 				}
@@ -143,10 +145,7 @@ void CityBuildingManager::Update(const CityZoneManager& zoneManager, CityBuilder
 void
 CityBuildingManager::AddBuilding(Building building, const CityZoneManager& zoneManager, CityBuilderMap& cityMap)
 {
-
-#ifdef TRACY_ENABLE
-	ZoneScoped
-#endif
+	
 	for (int dx = 0; dx < building.size.x; dx++)
 	{
 		for (int dy = 0; dy < building.size.y; dy++)
@@ -167,10 +166,7 @@ const std::vector<Building>& CityBuildingManager::GetBuildingsVector() const
 
 void CityBuildingManager::RemoveBuilding(sf::Vector2i position)
 {
-
-#ifdef TRACY_ENABLE
-	ZoneScoped
-#endif
+	
 	const auto buildingIt = std::find_if(buildings_.begin(), buildings_.end(), [&position](const Building& building)
 	{
 		for (int dx = 0; dx < building.size.x; dx++)
@@ -193,10 +189,7 @@ void CityBuildingManager::RemoveBuilding(sf::Vector2i position)
 
 sf::Vector2i CityBuildingManager::FindBuilding(ZoneType zoneType)
 {
-
-#ifdef TRACY_ENABLE
-	ZoneScoped
-#endif
+	
 	switch (zoneType)
 	{
 	case ZoneType::RESIDENTIAL:
@@ -218,7 +211,6 @@ sf::Vector2i CityBuildingManager::FindBuilding(ZoneType zoneType)
 		if (houseBuildings.empty())
 			return INVALID_TILE_POS;
 		return houseBuildings[rand() % houseBuildings.size()]->position;
-		break;
 	}
 	case ZoneType::COMMERCIAL:
 	{
@@ -242,7 +234,6 @@ sf::Vector2i CityBuildingManager::FindBuilding(ZoneType zoneType)
 			return INVALID_TILE_POS;
 		return workBuildings[rand() % workBuildings.size()]->position;
 	}
-	break;
 	case ZoneType::INDUSTRY:
 		break;
 	default:
@@ -253,10 +244,7 @@ sf::Vector2i CityBuildingManager::FindBuilding(ZoneType zoneType)
 
 Building* CityBuildingManager::GetBuildingAt(sf::Vector2i position)
 {
-
-#ifdef TRACY_ENABLE
-	ZoneScoped
-#endif
+	
 	const auto result = std::find_if(buildings_.begin(), buildings_.end(), [&position](const Building& building)
 	{
 		for (int dx = 0; dx < building.size.x; dx++)

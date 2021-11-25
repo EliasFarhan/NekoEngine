@@ -37,10 +37,7 @@ namespace neko {
 			const json& jsonContent,
 			BehaviorTreeElementType behaviorTreeElementType) const
 	{
-
-#ifdef TRACY_ENABLE
-		ZoneScoped
-#endif
+		
 		NodeVariableDesc nodeVariables;
 		for (const auto& element : jsonContent.items())
 		{
@@ -106,10 +103,7 @@ namespace neko {
 			Index comp,
 			const json& jsonContent) const
 	{
-
-#ifdef TRACY_ENABLE
-		ZoneScoped
-#endif
+		
 		auto nodeVariables =
 			ParseJsonVariablesNodes(
 				comp, 
@@ -127,10 +121,7 @@ namespace neko {
 			Index comp,
 			const json& jsonContent) const
 	{
-
-#ifdef TRACY_ENABLE
-		ZoneScoped
-#endif
+		
 		auto nodeVariables =
 			ParseJsonVariablesNodes(
 				comp, 
@@ -147,10 +138,7 @@ namespace neko {
 		Index comp,
 		const json& jsonContent) const
 	{
-
-#ifdef TRACY_ENABLE
-		ZoneScoped
-#endif
+		
 		logDebug("WARNING trying to parse a composite node!");
 		auto nodeVariables =
 			ParseJsonVariablesNodes(
@@ -168,10 +156,7 @@ namespace neko {
 		Index comp,
 		const json& jsonContent) const
 	{
-
-#ifdef TRACY_ENABLE
-		ZoneScoped
-#endif
+		
 		logDebug("WARNING trying to parse a decorator node!");
 		auto nodeVariables =
 			ParseJsonVariablesNodes(
@@ -193,10 +178,7 @@ namespace neko {
 		Index comp,
 		const json& jsonContent) const
 	{
-
-#ifdef TRACY_ENABLE
-		ZoneScoped
-#endif
+		
 		auto nodeVariables = ParseJsonVariablesNodes(comp, jsonContent);
 		std::shared_ptr<BehaviorTreeLeafCondition> condition =
 			std::make_shared<BehaviorTreeLeafCondition>(
@@ -209,10 +191,7 @@ namespace neko {
 		Index comp,
 		const json& jsonContent) const
 	{
-
-#ifdef TRACY_ENABLE
-		ZoneScoped
-#endif
+		
 		auto nodeVariables = ParseJsonVariablesNodes(comp, jsonContent);
 		std::shared_ptr<BehaviorTreeLeafWait> wait =
 			std::make_shared<BehaviorTreeLeafWait>(
@@ -224,10 +203,7 @@ namespace neko {
 		Index comp,
 		const json& jsonContent) const
 	{
-
-#ifdef TRACY_ENABLE
-		ZoneScoped
-#endif
+		
 		auto nodeVariables = ParseJsonVariablesNodes(comp, jsonContent);
 		std::shared_ptr<BehaviorTreeLeafMoveTo> moveTo =
 			std::make_shared<BehaviorTreeLeafMoveTo>(
@@ -240,10 +216,7 @@ namespace neko {
 		Index comp,
 		const json& jsonContent) const 
 	{
-
-#ifdef TRACY_ENABLE
-		ZoneScoped
-#endif
+		
 		auto nodeVariables = ParseJsonVariablesNodes(comp, jsonContent);
 		std::shared_ptr<BehaviorTreeLeafFunctional> functional =
 			std::make_shared<BehaviorTreeLeafFunctional>(
@@ -256,10 +229,7 @@ namespace neko {
 		Index comp,
 		const json& jsonContent) const
 	{
-
-#ifdef TRACY_ENABLE
-		ZoneScoped
-#endif
+		
 		logDebug("WARNING trying to parse a leaf node!");
 		auto nodeVariables = ParseJsonVariablesNodes(comp, jsonContent);
 		std::shared_ptr<BehaviorTreeLeaf> leaf =
@@ -271,10 +241,7 @@ namespace neko {
 	BehaviorTreeObjectType BehaviorTreeManager::GetTypeFromJson(
 		const json& jsonContent) const
 	{
-
-#ifdef TRACY_ENABLE
-		ZoneScoped
-#endif
+		
 		static const std::map<std::string, BehaviorTreeObjectType> reverseMap =
 			[]() ->std::map<std::string, BehaviorTreeObjectType>
 		{
@@ -298,10 +265,6 @@ namespace neko {
 		Index comp,
 		const json& jsonContent) const
 	{
-
-#ifdef TRACY_ENABLE
-		ZoneScoped
-#endif
 		switch (GetTypeFromJson(jsonContent)) {
 		case BehaviorTreeObjectType::COMPOSITE_SEQUENCE:
 			return ParseJsonCompositeSequence(comp, jsonContent);
@@ -335,10 +298,7 @@ namespace neko {
 	void BehaviorTreeManager::LogBehaviorTree(
 		const std::shared_ptr<BehaviorTreeNode> behaviorTree) const
 	{
-
-#ifdef TRACY_ENABLE
-		ZoneScoped
-#endif
+		
 		static int indent = 0;
 		std::ostringstream oss_indent;
 		for (int i = 0; i < indent; ++i)
@@ -444,10 +404,7 @@ namespace neko {
 		Index comp,
 		const json& jsonContent)
 	{
-
-#ifdef TRACY_ENABLE
-		ZoneScoped
-#endif
+		
 		auto behaviorTree = ParseBehaviorTreeFromJson(comp, jsonContent);
 		size_t futureSize = vecBehaviorTree_.capacity();
 		if (futureSize <= comp)
@@ -470,10 +427,7 @@ namespace neko {
 		Index comp,
 		const std::string& jsonFile)
 	{
-
-#ifdef TRACY_ENABLE
-		ZoneScoped
-#endif
+		
 		size_t futureSize = vecBehaviorTree_.capacity();
 		while (futureSize <= comp)
 		{

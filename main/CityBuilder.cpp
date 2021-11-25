@@ -22,12 +22,39 @@
  SOFTWARE.
  */
 
-
+#include <argh.h>
 #include <City/city_engine.h>
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 {
-	neko::CityBuilderEngine engine;
+    const argh::parser cmdl(argv);
+    neko::Configuration config{};
+
+	bool vsync = true;
+	if (cmdl({"--vsync"}) >> vsync)
+	{
+		config.vSync = vsync;
+	}
+	int framerateLimit = 0;
+	if (cmdl({ "--fpslimit" }) >> framerateLimit)
+	{
+		config.framerateLimit = framerateLimit;
+	}
+	neko::CityBuilderEngine engine(&config);
+	if(cmdl[{"--infinite-money"}])
+	{
+		auto cheatData = engine.GetCheatData();
+		cheatData |= neko::CheatModeData::INFINITE_MONEY;
+		engine.SetCheatData(cheatData);
+	}
+
+	if(cmdl[{"--quick-spawn"}])
+	{
+		auto cheatData = engine.GetCheatData();
+		cheatData |= neko::CheatModeData::QUICK_SPAWN;
+		engine.SetCheatData(cheatData);
+	}
+
 	engine.Init();
 	engine.EngineLoop();
 	return EXIT_SUCCESS;

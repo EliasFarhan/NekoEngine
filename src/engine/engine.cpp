@@ -210,10 +210,6 @@ void MainEngine::EngineLoop()
     Destroy();
 }
 
-MainEngine::MainEngine(Configuration* config) : BasicEngine(config)
-{
-
-}
 
 MainEngine::~MainEngine()
 {

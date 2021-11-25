@@ -32,9 +32,6 @@
 #include "input.h"
 #include <SFML/Window/WindowStyle.hpp>
 
-
-struct Remotery;
-
 namespace neko
 {
 struct Collider;
@@ -83,7 +80,6 @@ public:
     sf::Time clockDeltatime;
 protected:
     sf::Clock engineClock_;
-    Remotery* rmt_ = nullptr;
     KeyboardManager keyboardManager_;
     MouseManager mouseManager_;
 };
@@ -95,7 +91,7 @@ protected:
 class MainEngine : public BasicEngine
 {
 public:
-    explicit MainEngine(Configuration* config = nullptr);
+    using BasicEngine::BasicEngine;
 
     virtual ~MainEngine();
 

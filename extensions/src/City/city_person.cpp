@@ -342,13 +342,22 @@ void CityPeopleManager::Update(float dt)
 {
 
 #ifdef TRACY_ENABLE
-	ZoneScoped
+	ZoneScoped;
 #endif
-	spawningTimer_.Update(dt);
-	if (spawningTimer_.IsOver())
+	auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+	const auto cheatData = engine->GetCheatData();
+	if(cheatData & CheatModeData::QUICK_PEOPLE_SPAWN)
 	{
 		SpawnPerson();
-		spawningTimer_.Reset();
+	}
+	else
+	{
+		spawningTimer_.Update(dt);
+		if (spawningTimer_.IsOver())
+		{
+			SpawnPerson();
+			spawningTimer_.Reset();
+		}
 	}
 }
 
@@ -370,10 +379,10 @@ Entity CityPeopleManager::SpawnPerson()
 	auto& btManager = engine->GetBehaviorTreeManager();
 	const Entity person = entityManager.CreateEntity();
 
-	auto index = btManager.ParseBehaviorTreeFromJsonIndex(person, personBehaviorTree_);
+	const auto index = btManager.ParseBehaviorTreeFromJsonIndex(person, personBehaviorTree_);
 	assert(index == person);
-	entityManager.AddComponentType(person, EntityMask(CityComponentType::PERSON));
-	entityManager.AddComponentType(person, EntityMask(CityComponentType::BEHAVIOR_TREE));
+	entityManager.AddComponentType(person, static_cast<EntityMask>(CityComponentType::PERSON));
+	entityManager.AddComponentType(person, static_cast<EntityMask>(CityComponentType::BEHAVIOR_TREE));
 	AddPerson(person, mapEnds[rand() % mapEnds.size()]);
 	return person;
 }

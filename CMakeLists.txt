@@ -142,6 +142,7 @@ foreach(EXTENSION_FOLDER ${EXTENSIONS_FOLDERS})
 endforeach()
 
 #City Builder
+find_package(argh CONFIG REQUIRED)
 add_executable(CityBuilder ${CMAKE_SOURCE_DIR}/main/CityBuilder.cpp)
-target_link_libraries(CityBuilder PUBLIC Neko_COMMON City)
+target_link_libraries(CityBuilder PUBLIC Neko_COMMON City argh)
 set_target_properties (CityBuilder PROPERTIES FOLDER Main)

@@ -13,7 +13,8 @@
         "units",
         "gtest",
         "fmt",
-        "spdlog"
+        "spdlog",
+        "argh"
     ],
 	"overrides": [
 	{"name": "freetype", "version": "2.10.0"},

@@ -44,10 +44,7 @@ namespace neko {
 
 	bool FunctionMap::CallFunction(const std::string_view name, double value)
 	{
-
-#ifdef TRACY_ENABLE
-		ZoneScoped
-#endif
+		
 		auto it = staticNameFunctionMap_.find(std::string(name));
 		if (it != staticNameFunctionMap_.end())
 		{
@@ -61,10 +58,7 @@ namespace neko {
 		const std::string_view name, 
 		const std::vector<double>& values)
 	{
-
-#ifdef TRACY_ENABLE
-		ZoneScoped
-#endif
+		
 		auto it = staticNameFunctionMap_.find(std::string(name));
 		if (it != staticNameFunctionMap_.end())
 		{

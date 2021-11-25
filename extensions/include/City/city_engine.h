@@ -53,14 +53,30 @@ enum class CityComponentType : EntityMask
 	PERSON = 1 << 4,
 };
 
-const int roadCost = 100;
-const int zoneCost = 1000;
-const int personBaseSalary = 100;
-const int baseCityBudget = 1'000'000;
+constexpr int roadCost = 100;
+constexpr int zoneCost = 1000;
+constexpr int personBaseSalary = 100;
+constexpr int baseCityBudget = 1'000'000;
 
-class CityBuilderEngine : public neko::MainEngine
+struct CheatModeData
+{
+    using DataType = std::uint16_t;
+    enum CheatModeBit : DataType
+    {
+        NONE = 0u,
+        INFINITE_MONEY = 1u << 0u,
+        QUICK_PEOPLE_SPAWN = 1u << 1u,
+        QUICK_HOUSE_SPAWN = 1u << 2u,
+        QUICK_WORK_SPAWN = 1u << 3u,
+        QUICK_SPAWN = QUICK_HOUSE_SPAWN | QUICK_PEOPLE_SPAWN | QUICK_WORK_SPAWN,
+    };
+    DataType data = 0;
+};
+
+class CityBuilderEngine : public MainEngine
 {
 public:
+    using MainEngine::MainEngine;
     void Init() override;
 
     void Update(float dt) override;
@@ -98,6 +114,8 @@ public:
     long long GetCityMoney() const;
 	void ChangeCityMoney(int delta);
 
+    [[nodiscard]] CheatModeData::DataType GetCheatData() const { return cheatModeData_.data; }
+    void SetCheatData(CheatModeData::DataType dataType) { cheatModeData_.data = dataType; }
 private:
 
     tf::Executor executor_{std::thread::hardware_concurrency() - 2};
@@ -120,5 +138,7 @@ private:
 	Index musicInd_ = INDEX_INVALID;
 
 	long long cityMoney_ = baseCityBudget;
+
+    CheatModeData cheatModeData_{};
 };
 }
