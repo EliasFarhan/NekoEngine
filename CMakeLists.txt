@@ -9,11 +9,15 @@ set(EXTERNAL_DIR ${CMAKE_SOURCE_DIR}/externals)
 
 
 set(TRACY_ENABLE OFF CACHE BOOL "")
+set(TRACY_ON_DEMAND ON CACHE BOOL "")
 
 if(TRACY_ENABLE)
     add_compile_definitions(TRACY_ENABLE)
     set(TRACY_FOLDER "${CMAKE_SOURCE_DIR}/externals/tracy/")
     include_directories("${TRACY_FOLDER}")
+	if(TRACY_ON_DEMAND)
+		add_compile_definitions(TRACY_ON_DEMAND)
+	endif()
 endif()
 
 #data

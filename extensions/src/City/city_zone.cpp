@@ -59,8 +59,8 @@ void CityZoneManager::UpdateZoneTilemap(const CityBuilderMap& cityMap, CityBuild
             //culling with mainView
             const auto zoneSize = sf::Vector2f(tileSize);
             const auto worldPos = sf::Vector2f(
-                float(zone.position.x * tileSize.x),
-                float(zone.position.y * tileSize.y));
+                static_cast<float>(zone.position.x * tileSize.x),
+                static_cast<float>(zone.position.y * tileSize.y));
             const sf::FloatRect tileRect = sf::FloatRect((worldPos - zoneSize / 2.0f), zoneSize);
 
             if (!windowView_.intersects(tileRect))

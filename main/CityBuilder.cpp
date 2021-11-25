@@ -54,6 +54,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 		cheatData |= neko::CheatModeData::QUICK_SPAWN;
 		engine.SetCheatData(cheatData);
 	}
+	if(cmdl[{"--init-spawn"}])
+	{
+		auto cheatData = engine.GetCheatData();
+		cheatData |= neko::CheatModeData::CITY_SPAWN_INIT;
+		engine.SetCheatData(cheatData);
+	}
 
 	engine.Init();
 	engine.EngineLoop();

@@ -196,6 +196,46 @@ void CityBuilderMap::Init()
 		}
 	}
 
+	//Spawn city beginning in cheat
+	auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+	if(engine->GetCheatData() & CheatModeData::CITY_SPAWN_INIT)
+	{
+		const auto centerPos = sf::Vector2i(city.mapSize.x / 2, city.mapSize.y / 2);
+		constexpr int spawnRadius = 60;
+		auto& zoneManager = engine->GetZoneManager();
+
+		for(int x = -spawnRadius; x <= spawnRadius; x++)
+		{
+			//Spawn road vertically
+			if(x % 8 == 0)
+			{
+			    for(int y = -spawnRadius; y <= spawnRadius; y++)
+			    {
+					AddCityElement(CityElementType::ROAD, centerPos+sf::Vector2i(x, y));
+			    }
+			}
+			else
+			{
+			    for(int y = -spawnRadius; y <= spawnRadius; y+=8)
+			    {
+					AddCityElement(CityElementType::ROAD, centerPos + sf::Vector2i(x, y));
+			    }
+			}
+			//Zone spawning
+			if(x%8 != 0)
+			{
+			    for(int y = -spawnRadius; y < spawnRadius; y++)
+			    {
+			        if(y%8 != 0)
+			        {
+						zoneManager.AddZone(centerPos + sf::Vector2i(x, y), y > 0 ? ZoneType::RESIDENTIAL : ZoneType::COMMERCIAL, * this);
+			        }
+			    }
+			}
+			
+		}
+	}
+
 
 }
 

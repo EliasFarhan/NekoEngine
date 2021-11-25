@@ -170,7 +170,8 @@ namespace neko
                 ZoneNamedN(ZoneUpdateTask, "ZoneUpdateTask", true);
 #endif
                 cityZoneManager_.UpdateZoneTilemap(cityBuilderMap_,
-                    cityBuildingManager_, mainView); });
+                    cityBuildingManager_, mainView);
+            });
         zoneUpdateTask->AddDependency(buildingUpdateTask);
         zoneUpdateTask->AddDependency(commandUpdateTask);
         zoneUpdateTask->AddDependency(mainViewUpdateTask);

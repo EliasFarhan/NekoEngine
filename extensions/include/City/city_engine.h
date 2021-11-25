@@ -69,6 +69,7 @@ struct CheatModeData
         QUICK_HOUSE_SPAWN = 1u << 2u,
         QUICK_WORK_SPAWN = 1u << 3u,
         QUICK_SPAWN = QUICK_HOUSE_SPAWN | QUICK_PEOPLE_SPAWN | QUICK_WORK_SPAWN,
+        CITY_SPAWN_INIT = 1u << 4u
     };
     DataType data = 0;
 };
