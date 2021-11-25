@@ -112,7 +112,7 @@ void GraphicsManager::SetView(sf::View view)
 
 void GraphicsManager::RenderLoop()
 {
-    auto* engine = MainEngine::GetInstance();
+    const auto* engine = MainEngine::GetInstance();
 
     renderWindow_ = engine->renderWindow.get();
     renderWindow_->setActive(true);
@@ -124,67 +124,8 @@ void GraphicsManager::RenderLoop()
 
     do
     {
-#ifdef TRACY_ENABLE
-        ZoneNamedN(RendererUpdate, "Renderer Update", true);
-#endif
-        {
-            /*{
-                std::ostringstream oss;
-                oss << "Graphics Frame Start: " << MainEngine::GetInstance()->frameIndex << " and Graphics frame: " << frameIndex;
-                logDebug(oss.str());
-            }*/
-            std::unique_lock<std::mutex> lock(engine->renderStartMutex);
 
-			isRendering_ = true;
-            engine->condSyncRender.wait(lock);
-            renderLength_ = nextRenderLength_;
-            nextRenderLength_ = 0;
-            frameIndex = engine->frameIndex - 1;
-        }
-        //We only start the new graphics frame if the engine had time to loop
-        if (engine->isRunning)
-        {
-            
-            std::unique_lock<std::mutex> lock(renderingMutex);
-            renderWindow_->setActive(true);
-            renderWindow_->setView(views_[frameIndex % 2]);
-
-
-            renderWindow_->clear(engine->config.bgColor);
-
-            //manage command buffers
-            auto& commandBuffer = commandBuffers_[frameIndex % 2];
-#ifdef __neko_dbg__
-            {
-                std::ostringstream oss;
-                oss << "Command Buffers length: " << renderLength_ << "\n";
-                oss << "Engine frame: " << engine->frameIndex << " Graphics Frame: " << frameIndex;
-                logDebug(oss.str());
-
-            }
-#endif
-            {
-#ifdef TRACY_ENABLE
-                ZoneNamedN(RendererDrawCommand,"Draw Commands", true);
-#endif
-                for (auto i = 0u; i < renderLength_; i++)
-                {
-                    std::unique_lock<std::mutex> renderLock(engine->renderStartMutex);
-                    auto* command = commandBuffer[i];
-                    if (command != nullptr)
-                    {
-                        command->Draw(renderWindow_);
-                    }
-                }
-            }
-            editor->Update(engine->clockDeltatime.asSeconds());
-#ifdef TRACY_ENABLE
-            ZoneNamedN(RendererDisplay, "Display", true);
-#endif
-            renderWindow_->display();
-            renderWindow_->setActive(false);
-        }
-
+        Update();
     }
     while (engine->isRunning);
 
@@ -200,5 +141,69 @@ bool GraphicsManager::DidRenderingStart() const
 	return isRendering_;
 }
 
+void GraphicsManager::Update()
+{
 
+    auto* engine = MainEngine::GetInstance();
+#ifdef TRACY_ENABLE
+    ZoneNamedN(RendererUpdate, "Renderer Update", true);
+#endif
+    {
+        /*{
+            std::ostringstream oss;
+            oss << "Graphics Frame Start: " << MainEngine::GetInstance()->frameIndex << " and Graphics frame: " << frameIndex;
+            logDebug(oss.str());
+        }*/
+        std::unique_lock<std::mutex> lock(engine->renderStartMutex);
+
+        isRendering_ = true;
+        engine->condSyncRender.wait(lock);
+        renderLength_ = nextRenderLength_;
+        nextRenderLength_ = 0;
+        frameIndex = engine->frameIndex - 1;
+    }
+    //We only start the new graphics frame if the engine had time to loop
+    if (engine->isRunning)
+    {
+
+        std::unique_lock<std::mutex> lock(renderingMutex);
+        renderWindow_->setActive(true);
+        renderWindow_->setView(views_[frameIndex % 2]);
+
+
+        renderWindow_->clear(engine->config.bgColor);
+
+        //manage command buffers
+        auto& commandBuffer = commandBuffers_[frameIndex % 2];
+#ifdef __neko_dbg__
+        {
+            std::ostringstream oss;
+            oss << "Command Buffers length: " << renderLength_ << "\n";
+            oss << "Engine frame: " << engine->frameIndex << " Graphics Frame: " << frameIndex;
+            logDebug(oss.str());
+
+        }
+#endif
+        {
+#ifdef TRACY_ENABLE
+            ZoneNamedN(RendererDrawCommand, "Draw Commands", true);
+#endif
+            for (auto i = 0u; i < renderLength_; i++)
+            {
+                std::unique_lock<std::mutex> renderLock(engine->renderStartMutex);
+                auto* command = commandBuffer[i];
+                if (command != nullptr)
+                {
+                    command->Draw(renderWindow_);
+                }
+            }
+        }
+        editor->Update(engine->clockDeltatime.asSeconds());
+#ifdef TRACY_ENABLE
+        ZoneNamedN(RendererDisplay, "Display", true);
+#endif
+        renderWindow_->display();
+        renderWindow_->setActive(false);
+    }
+}
 }

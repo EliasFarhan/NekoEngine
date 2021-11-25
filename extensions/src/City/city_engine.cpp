@@ -75,9 +75,9 @@ namespace neko
         ZoneScoped
 #endif
         MainEngine::Update(dt);
-        auto carsUpdateTask = std::make_shared<Task>([&]() {cityCarManager_.Update(dt); });
+        const auto carsUpdateTask = std::make_shared<Task>([&]() {cityCarManager_.Update(dt); });
         workerManager_.AddTask(carsUpdateTask, "other");
-        auto peopleUpdateTask = std::make_shared<Task>([&]()
+        const auto peopleUpdateTask = std::make_shared<Task>([&]()
             {
 #ifdef TRACY_ENABLE
                 ZoneNamedN(PeopleUpdateTask, "PeopleUpdateTask", true);
@@ -85,12 +85,12 @@ namespace neko
                 cityPeopleManager_.Update(dt);
             });
         workerManager_.AddTask(peopleUpdateTask, "other");
-        auto btUpdateTask = std::make_shared<Task>([&]()
+        const auto btUpdateTask = std::make_shared<Task>([&]()
             {
 #ifdef TRACY_ENABLE
                 ZoneNamedN(BehaviorTreeTask, "BehaviorTreeTask", true);
 #endif
-                const auto btEntities = entityManager_.FilterEntities(EntityMask(CityComponentType::BEHAVIOR_TREE));
+                const auto btEntities = entityManager_.FilterEntities(static_cast<EntityMask>(CityComponentType::BEHAVIOR_TREE));
                 for (const auto entity : btEntities)
                 {
                     behaviorTreeManager_.ExecuteIndex(entity);
@@ -98,15 +98,15 @@ namespace neko
             });
         btUpdateTask->AddDependency(peopleUpdateTask);
         workerManager_.AddTask(btUpdateTask, "other");
-        auto commandUpdateTask = std::make_shared<Task>([&]() {commandManager_.Update(dt); });
+        const auto commandUpdateTask = std::make_shared<Task>([&]() {commandManager_.Update(dt); });
         workerManager_.AddTask(commandUpdateTask, "other");
-        auto buildingUpdateTask = std::make_shared<Task>([&]() { cityBuildingManager_.
+        const auto buildingUpdateTask = std::make_shared<Task>([&]() { cityBuildingManager_.
             Update(cityZoneManager_, cityBuilderMap_, dt); });
         buildingUpdateTask->AddDependency(commandUpdateTask);
         workerManager_.AddTask(buildingUpdateTask, "other");
 
         std::array<std::shared_ptr<Task>, static_cast<int>(CityTilesheetType::LENGTH)> tilemapUpdateTasks{};
-        auto pushCommandTask = std::make_shared<Task>([&]() {environmentTilemap_.PushCommand(graphicsManager_.get()); });
+        const auto pushCommandTask = std::make_shared<Task>([&]() {environmentTilemap_.PushCommand(graphicsManager_.get()); });
         auto mainViewUpdateTask = std::make_shared<Task>([&]() {
 #ifdef TRACY_ENABLE
             ZoneNamedN(MainViewUpdateTask, "MainViewUpdateTask", true);
@@ -117,7 +117,7 @@ namespace neko
                 mainView.setCenter(mainView.getCenter() - currentZoom_ * delta);
             }
             {
-                const float keyboardMoveSpeed = 5.0f;
+                constexpr float keyboardMoveSpeed = 5.0f;
                 sf::Vector2f move = sf::Vector2f();
                 if (keyboardManager_.IsKeyHeld(sf::Keyboard::Left))
                 {
@@ -162,7 +162,7 @@ namespace neko
             workerManager_.AddTask(tilemapUpdateTasks[i], "other");
         }
         workerManager_.AddTask(pushCommandTask, "other");
-        auto zoneUpdateTask = std::make_shared<Task>([&]()
+        const auto zoneUpdateTask = std::make_shared<Task>([&]()
             {
 #ifdef TRACY_ENABLE
                 ZoneNamedN(ZoneUpdateTask, "ZoneUpdateTask", true);
@@ -174,17 +174,17 @@ namespace neko
         zoneUpdateTask->AddDependency(mainViewUpdateTask);
         workerManager_.AddTask(zoneUpdateTask, "other");
 
-        auto pushZoneCommandTask = std::make_shared<Task>([&]() {cityZoneManager_.PushCommand(graphicsManager_.get()); });
+        const auto pushZoneCommandTask = std::make_shared<Task>([&]() {cityZoneManager_.PushCommand(graphicsManager_.get()); });
         pushZoneCommandTask->AddDependency(zoneUpdateTask);
         pushZoneCommandTask->AddDependency(pushCommandTask);
         workerManager_.AddTask(pushZoneCommandTask, "other");
 
-        auto cursorUpdateTask = std::make_shared<Task>([&]() {cursor_.Update(dt); });
+        const auto cursorUpdateTask = std::make_shared<Task>([&]() {cursor_.Update(dt); });
         cursorUpdateTask->AddDependency(pushCommandTask);
         workerManager_.AddTask(cursorUpdateTask, "other");
 
 
-        auto editorUpdateTask = std::make_shared<Task>([&]() {
+        const auto editorUpdateTask = std::make_shared<Task>([&]() {
             graphicsManager_->editor->AddInspectorInfo("FPS", std::to_string(1.0f / dt));
             graphicsManager_->editor->AddInspectorInfo("Budget", std::to_string(cityMoney_) + "$");
             graphicsManager_->editor->AddInspectorInfo("People", std::to_string(cityPeopleManager_.GetPeopleCount()));

@@ -104,6 +104,8 @@ public:
     std::unique_ptr<Editor> editor = nullptr;
     //Used for Engine loop to wait for graphics thread
     std::mutex renderingMutex;
+
+    void Update();
 protected:
     /**
      * \brief non owning ptr to renderwindow
