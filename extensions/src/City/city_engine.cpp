@@ -34,267 +34,276 @@
 
 namespace neko
 {
-void CityBuilderEngine::Init()
-{
+    void CityBuilderEngine::Init()
+    {
 #ifdef TRACY_ENABLE
-	ZoneScoped
+        ZoneScoped
 #endif
-	config.windowStyle = sf::Style::Titlebar | sf::Style::Close;
-	MainEngine::Init();
+            config.windowStyle = sf::Style::Titlebar | sf::Style::Close;
+        MainEngine::Init();
 
-	mainView = renderWindow->getView();
-	cityBuilderMap_.Init();
-	environmentTilemap_.Init(textureManager_);
-	graphicsManager_->editor = std::make_unique<CityEditor>();
-	graphicsManager_->editor->Init();
+        mainView = renderWindow->getView();
+        cityBuilderMap_.Init();
+        environmentTilemap_.Init(textureManager_);
+        graphicsManager_->editor = std::make_unique<CityEditor>();
+        graphicsManager_->editor->Init();
 
-	cursor_.Init();
-	commandManager_.Init();
-	cityCarManager_.Init();
+        cursor_.Init();
+        commandManager_.Init();
+        cityCarManager_.Init();
 
-	cityPeopleManager_.Init();
-	musicInd_ = Sound::LoadMusic("data/Meydn01.ogg");
-	if (!Sound::PlayMusic(musicInd_))
-	{
-		logDebug("Could not load music...");
-	}
-	else
-	{
-		Sound::SetLoop(musicInd_, true);
-	}
-	if(cheatModeData_.data & CheatModeData::INFINITE_MONEY)
-	{
-		cityMoney_ = std::numeric_limits<long long>::max();
-	}
-}
+        cityPeopleManager_.Init();
+        musicInd_ = Sound::LoadMusic("data/Meydn01.ogg");
+        if (!Sound::PlayMusic(musicInd_))
+        {
+            logDebug("Could not load music...");
+        }
+        else
+        {
+            Sound::SetLoop(musicInd_, true);
+        }
+        if (cheatModeData_.data & CheatModeData::INFINITE_MONEY)
+        {
+            cityMoney_ = std::numeric_limits<long long>::max();
+        }
+        workerManager_.Init({ "main", 1 }, { {"render", 1},{"other", std::thread::hardware_concurrency() - 2} });
+    }
 
-void CityBuilderEngine::Update(float dt)
-{
+    void CityBuilderEngine::Update(float dt)
+    {
 #ifdef TRACY_ENABLE
-	ZoneScoped
+        ZoneScoped
 #endif
-	MainEngine::Update(dt);
-	tf::Taskflow taskflow;
-	auto carsUpdateTask = taskflow.emplace([&]() {cityCarManager_.Update(dt); });
-
-	auto peopleUpdateTask = taskflow.emplace([&]()
-	{
+        MainEngine::Update(dt);
+        auto carsUpdateTask = std::make_shared<Task>([&]() {cityCarManager_.Update(dt); });
+        workerManager_.AddTask(carsUpdateTask, "other");
+        auto peopleUpdateTask = std::make_shared<Task>([&]()
+            {
 #ifdef TRACY_ENABLE
-			ZoneNamedN(PeopleUpdateTask, "PeopleUpdateTask", true);
+                ZoneNamedN(PeopleUpdateTask, "PeopleUpdateTask", true);
 #endif
-		cityPeopleManager_.Update(dt);
-	});
-	auto btUpdateTask = taskflow.emplace([&]()
-	{
+                cityPeopleManager_.Update(dt);
+            });
+        workerManager_.AddTask(peopleUpdateTask, "other");
+        auto btUpdateTask = std::make_shared<Task>([&]()
+            {
 #ifdef TRACY_ENABLE
-			ZoneNamedN(BehaviorTreeTask, "BehaviorTreeTask", true);
+                ZoneNamedN(BehaviorTreeTask, "BehaviorTreeTask", true);
 #endif
-        const auto btEntities = entityManager_.FilterEntities(EntityMask(CityComponentType::BEHAVIOR_TREE));
-		for (const auto entity : btEntities)
-		{
-			behaviorTreeManager_.ExecuteIndex(entity);
-		}
-	});
-	peopleUpdateTask.precede(btUpdateTask);
+                const auto btEntities = entityManager_.FilterEntities(EntityMask(CityComponentType::BEHAVIOR_TREE));
+                for (const auto entity : btEntities)
+                {
+                    behaviorTreeManager_.ExecuteIndex(entity);
+                }
+            });
+        btUpdateTask->AddDependency(peopleUpdateTask);
+        workerManager_.AddTask(btUpdateTask, "other");
+        auto commandUpdateTask = std::make_shared<Task>([&]() {commandManager_.Update(dt); });
+        workerManager_.AddTask(commandUpdateTask, "other");
+        auto buildingUpdateTask = std::make_shared<Task>([&]() { cityBuildingManager_.
+            Update(cityZoneManager_, cityBuilderMap_, dt); });
+        buildingUpdateTask->AddDependency(commandUpdateTask);
+        workerManager_.AddTask(buildingUpdateTask, "other");
 
-	auto commandUpdateTask = taskflow.emplace([&]() {commandManager_.Update(dt); });
-
-	auto buildingUpdateTask = taskflow.emplace([&]() { cityBuildingManager_.
-		Update(cityZoneManager_, cityBuilderMap_, dt); });
-	commandUpdateTask.precede(buildingUpdateTask);
-	std::array<tf::Task, static_cast<int>(CityTilesheetType::LENGTH)> tilemapUpdateTasks;
-	auto pushCommandTask = taskflow.emplace([&]() {environmentTilemap_.PushCommand(graphicsManager_.get()); });
-	auto mainViewUpdateTask = taskflow.emplace([&]() {
+        std::array<std::shared_ptr<Task>, static_cast<int>(CityTilesheetType::LENGTH)> tilemapUpdateTasks{};
+        auto pushCommandTask = std::make_shared<Task>([&]() {environmentTilemap_.PushCommand(graphicsManager_.get()); });
+        auto mainViewUpdateTask = std::make_shared<Task>([&]() {
 #ifdef TRACY_ENABLE
-		ZoneNamedN(MainViewUpdateTask, "MainViewUpdateTask", true);
+            ZoneNamedN(MainViewUpdateTask, "MainViewUpdateTask", true);
 #endif
-		if (mouseManager_.IsButtonPressed(sf::Mouse::Button::Right))
-		{
-			const auto delta = sf::Vector2f(mouseManager_.GetMouseDelta());
-			mainView.setCenter(mainView.getCenter() - currentZoom_ * delta);
-		}
-		{
-			const float keyboardMoveSpeed = 5.0f;
-			sf::Vector2f move = sf::Vector2f();
-			if (keyboardManager_.IsKeyHeld(sf::Keyboard::Left))
-			{
-				move.x -= 1;
-			}
-			if (keyboardManager_.IsKeyHeld(sf::Keyboard::Right))
-			{
-				move.x += 1;
-			}
-			if (keyboardManager_.IsKeyHeld(sf::Keyboard::Up))
-			{
-				move.y -= 1;
-			}
-			if (keyboardManager_.IsKeyHeld(sf::Keyboard::Down))
-			{
-				move.y += 1;
-			}
-			mainView.setCenter(mainView.getCenter() + currentZoom_ * move * keyboardMoveSpeed );
-		}
-		graphicsManager_->SetView(mainView);
-	});
-	for (int i = 0; i < static_cast<int>(CityTilesheetType::LENGTH); i++)
-	{
-		tilemapUpdateTasks[i] = taskflow.emplace(std::bind([&](CityTilesheetType cityTilesheetType) {
-			environmentTilemap_.UpdateTilemap(cityBuilderMap_, cityCarManager_, cityBuildingManager_, transformManager_,
-				mainView, cityTilesheetType);
-		}, static_cast<CityTilesheetType>(i)));
+            if (mouseManager_.IsButtonPressed(sf::Mouse::Button::Right))
+            {
+                const auto delta = sf::Vector2f(mouseManager_.GetMouseDelta());
+                mainView.setCenter(mainView.getCenter() - currentZoom_ * delta);
+            }
+            {
+                const float keyboardMoveSpeed = 5.0f;
+                sf::Vector2f move = sf::Vector2f();
+                if (keyboardManager_.IsKeyHeld(sf::Keyboard::Left))
+                {
+                    move.x -= 1;
+                }
+                if (keyboardManager_.IsKeyHeld(sf::Keyboard::Right))
+                {
+                    move.x += 1;
+                }
+                if (keyboardManager_.IsKeyHeld(sf::Keyboard::Up))
+                {
+                    move.y -= 1;
+                }
+                if (keyboardManager_.IsKeyHeld(sf::Keyboard::Down))
+                {
+                    move.y += 1;
+                }
+                mainView.setCenter(mainView.getCenter() + currentZoom_ * move * keyboardMoveSpeed);
+            }
+            graphicsManager_->SetView(mainView);
+            });
+        workerManager_.AddTask(mainViewUpdateTask, "other");
+        for (int i = 0; i < static_cast<int>(CityTilesheetType::LENGTH); i++)
+        {
+            tilemapUpdateTasks[i] = std::make_shared<Task>([&, i]() {
+                environmentTilemap_.UpdateTilemap(cityBuilderMap_, cityCarManager_, cityBuildingManager_, transformManager_,
+                    mainView, static_cast<CityTilesheetType>(i));
+                });
 
-		if (static_cast<CityTilesheetType>(i) == CityTilesheetType::CAR)
-		{
-			carsUpdateTask.precede(tilemapUpdateTasks[i]);
-			btUpdateTask.precede(tilemapUpdateTasks[i]);
-		}
-		if (static_cast<CityTilesheetType>(i) == CityTilesheetType::CITY)
-		{
-			buildingUpdateTask.precede(tilemapUpdateTasks[i]);
-		}
-		commandUpdateTask.precede(tilemapUpdateTasks[i]);
-		tilemapUpdateTasks[i].precede(pushCommandTask);
-		mainViewUpdateTask.precede(tilemapUpdateTasks[i]);
-	}
-
-	auto zoneUpdateTask = taskflow.emplace([&]() 
-		{
+            if (static_cast<CityTilesheetType>(i) == CityTilesheetType::CAR)
+            {
+                tilemapUpdateTasks[i]->AddDependency(carsUpdateTask);
+                tilemapUpdateTasks[i]->AddDependency(btUpdateTask);
+            }
+            if (static_cast<CityTilesheetType>(i) == CityTilesheetType::CITY)
+            {
+                tilemapUpdateTasks[i]->AddDependency(buildingUpdateTask);
+            }
+            tilemapUpdateTasks[i]->AddDependency(commandUpdateTask);
+            pushCommandTask->AddDependency(tilemapUpdateTasks[i]);
+            tilemapUpdateTasks[i]->AddDependency(mainViewUpdateTask);
+            workerManager_.AddTask(tilemapUpdateTasks[i], "other");
+        }
+        workerManager_.AddTask(pushCommandTask, "other");
+        auto zoneUpdateTask = std::make_shared<Task>([&]()
+            {
 #ifdef TRACY_ENABLE
-		ZoneNamedN(ZoneUpdateTask, "ZoneUpdateTask", true);
+                ZoneNamedN(ZoneUpdateTask, "ZoneUpdateTask", true);
 #endif
-		cityZoneManager_.UpdateZoneTilemap(cityBuilderMap_,
-		                                   cityBuildingManager_, mainView); });
-	buildingUpdateTask.precede(zoneUpdateTask);
-	commandUpdateTask.precede(zoneUpdateTask);
-	auto pushZoneCommandTask = taskflow.emplace([&]() {cityZoneManager_.PushCommand(graphicsManager_.get()); });
-	zoneUpdateTask.precede(pushZoneCommandTask);
-	pushCommandTask.precede(pushZoneCommandTask);
+                cityZoneManager_.UpdateZoneTilemap(cityBuilderMap_,
+                    cityBuildingManager_, mainView); });
+        zoneUpdateTask->AddDependency(buildingUpdateTask);
+        zoneUpdateTask->AddDependency(commandUpdateTask);
+        zoneUpdateTask->AddDependency(mainViewUpdateTask);
+        workerManager_.AddTask(zoneUpdateTask, "other");
 
-	auto cursorUpdateTask = taskflow.emplace([&]() {cursor_.Update(dt); });
-	pushCommandTask.precede(cursorUpdateTask);
+        auto pushZoneCommandTask = std::make_shared<Task>([&]() {cityZoneManager_.PushCommand(graphicsManager_.get()); });
+        pushZoneCommandTask->AddDependency(zoneUpdateTask);
+        pushZoneCommandTask->AddDependency(pushCommandTask);
+        workerManager_.AddTask(pushZoneCommandTask, "other");
 
-
-	mainViewUpdateTask.precede(zoneUpdateTask);
-
-	auto editorUpdateTask = taskflow.emplace([&]() {
-		graphicsManager_->editor->AddInspectorInfo("FPS", std::to_string(1.0f / dt));
-		graphicsManager_->editor->AddInspectorInfo("Budget", std::to_string(cityMoney_)+"$");
-		graphicsManager_->editor->AddInspectorInfo("People", std::to_string(cityPeopleManager_.GetPeopleCount()));
-	});
-	carsUpdateTask.precede(editorUpdateTask);
-	btUpdateTask.precede(editorUpdateTask);
+        auto cursorUpdateTask = std::make_shared<Task>([&]() {cursor_.Update(dt); });
+        cursorUpdateTask->AddDependency(pushCommandTask);
+        workerManager_.AddTask(cursorUpdateTask, "other");
 
 
-	executor_.run(taskflow);
-	executor_.wait_for_all();
-}
+        auto editorUpdateTask = std::make_shared<Task>([&]() {
+            graphicsManager_->editor->AddInspectorInfo("FPS", std::to_string(1.0f / dt));
+            graphicsManager_->editor->AddInspectorInfo("Budget", std::to_string(cityMoney_) + "$");
+            graphicsManager_->editor->AddInspectorInfo("People", std::to_string(cityPeopleManager_.GetPeopleCount()));
+            });
+        editorUpdateTask->AddDependency(carsUpdateTask);
+        editorUpdateTask->AddDependency(btUpdateTask);
+        workerManager_.AddTask(editorUpdateTask, "other");
+        
+        cursorUpdateTask->Join();
+        pushZoneCommandTask->Join();
+        editorUpdateTask->Join();
+    }
 
-void CityBuilderEngine::OnEvent(sf::Event& event)
-{
+    void CityBuilderEngine::OnEvent(sf::Event& event)
+    {
 #ifdef TRACY_ENABLE
-	ZoneScoped
+        ZoneScoped
 #endif
-	MainEngine::OnEvent(event);
-	cursor_.OnEvent(event);
-	if (event.type == sf::Event::MouseWheelScrolled)
-	{
-		const float wheelDelta = event.mouseWheelScroll.delta;
+            MainEngine::OnEvent(event);
+        cursor_.OnEvent(event);
+        if (event.type == sf::Event::MouseWheelScrolled)
+        {
+            const float wheelDelta = event.mouseWheelScroll.delta;
 #ifdef __neko_dbg__
-		{
-			std::ostringstream oss;
-			oss << "Mouse Wheel Delta: " << wheelDelta;
-			logDebug(oss.str());
-		}
+            {
+                std::ostringstream oss;
+                oss << "Mouse Wheel Delta: " << wheelDelta;
+                logDebug(oss.str());
+            }
 #endif
-		const auto size = mainView.getSize();
-		currentZoom_ -= wheelDelta * scrollDelta_ * currentZoom_;
+            const auto size = mainView.getSize();
+            currentZoom_ -= wheelDelta * scrollDelta_ * currentZoom_;
 
-		mainView.setSize(size - wheelDelta * scrollDelta_ * size);
-	}
-}
+            mainView.setSize(size - wheelDelta * scrollDelta_ * size);
+        }
+    }
 
-void CityBuilderEngine::Destroy()
-{
+    void CityBuilderEngine::Destroy()
+    {
 #ifdef TRACY_ENABLE
-	ZoneScoped
+        ZoneScoped
 #endif
-	Sound::RemoveMusic(musicInd_);
-	cursor_.Destroy();
-	commandManager_.Destroy();
-	MainEngine::Destroy();
-}
+            Sound::RemoveMusic(musicInd_);
+        cursor_.Destroy();
+        commandManager_.Destroy();
+        MainEngine::Destroy();
+    }
 
-TextureManager& CityBuilderEngine::GetTextureManager()
-{
-	return textureManager_;
-}
+    TextureManager& CityBuilderEngine::GetTextureManager()
+    {
+        return textureManager_;
+    }
 
-CityCommandManager& CityBuilderEngine::GetCommandManager()
-{
-	return commandManager_;
-}
+    CityCommandManager& CityBuilderEngine::GetCommandManager()
+    {
+        return commandManager_;
+    }
 
-CityCursor& CityBuilderEngine::GetCursor()
-{
-	return cursor_;
-}
+    CityCursor& CityBuilderEngine::GetCursor()
+    {
+        return cursor_;
+    }
 
-float CityBuilderEngine::GetCurrentZoom() const
-{
-	return currentZoom_;
-}
+    float CityBuilderEngine::GetCurrentZoom() const
+    {
+        return currentZoom_;
+    }
 
-CityBuilderMap& CityBuilderEngine::GetCityMap()
-{
-	return cityBuilderMap_;
-}
+    CityBuilderMap& CityBuilderEngine::GetCityMap()
+    {
+        return cityBuilderMap_;
+    }
 
-EntityManager& CityBuilderEngine::GetEntityManager()
-{
-	return entityManager_;
-}
+    EntityManager& CityBuilderEngine::GetEntityManager()
+    {
+        return entityManager_;
+    }
 
-Transform2dManager& CityBuilderEngine::GetTransformManager()
-{
-	return transformManager_;
-}
+    Transform2dManager& CityBuilderEngine::GetTransformManager()
+    {
+        return transformManager_;
+    }
 
-CityCarManager& CityBuilderEngine::GetCarManager()
-{
-	return cityCarManager_;
-}
+    CityCarManager& CityBuilderEngine::GetCarManager()
+    {
+        return cityCarManager_;
+    }
 
-CityZoneManager& CityBuilderEngine::GetZoneManager()
-{
-	return cityZoneManager_;
-}
+    CityZoneManager& CityBuilderEngine::GetZoneManager()
+    {
+        return cityZoneManager_;
+    }
 
-CityPeopleManager& CityBuilderEngine::GetPeopleManager()
-{
-	return cityPeopleManager_;
-}
+    CityPeopleManager& CityBuilderEngine::GetPeopleManager()
+    {
+        return cityPeopleManager_;
+    }
 
-CityBuildingManager& CityBuilderEngine::GetBuildingManager()
-{
-	return cityBuildingManager_;
-}
+    CityBuildingManager& CityBuilderEngine::GetBuildingManager()
+    {
+        return cityBuildingManager_;
+    }
 
-BehaviorTreeManager& CityBuilderEngine::GetBehaviorTreeManager()
-{
-	return behaviorTreeManager_;
-}
+    BehaviorTreeManager& CityBuilderEngine::GetBehaviorTreeManager()
+    {
+        return behaviorTreeManager_;
+    }
 
-long long CityBuilderEngine::GetCityMoney() const
-{
-	return cityMoney_;
-}
+    long long CityBuilderEngine::GetCityMoney() const
+    {
+        return cityMoney_;
+    }
 
-void CityBuilderEngine::ChangeCityMoney(int delta)
-{
-	if(cheatModeData_.data & CheatModeData::INFINITE_MONEY)
-	{
-		return;
-	}
-	cityMoney_ += delta;
-}
+    void CityBuilderEngine::ChangeCityMoney(int delta)
+    {
+        if (cheatModeData_.data & CheatModeData::INFINITE_MONEY)
+        {
+            return;
+        }
+        cityMoney_ += delta;
+    }
 }

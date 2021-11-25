@@ -105,9 +105,7 @@ LIST(APPEND Neko_LIBRARIES  glm::glm)
 #Utility
 set(UTILITIES_DIR ${EXTERNAL_DIR}/utilities/)
 include_directories(${UTILITIES_DIR})
-#taskflow
-set(TASKFLOW_DIR ${EXTERNAL_DIR}/taskflow-2.2)
-include_directories(${TASKFLOW_DIR})
+
 #Neko_COMMON
 
 include_directories(include/ extensions/include/)

@@ -34,12 +34,12 @@
 #include "City/city_command.h"
 #include <City/city_cursor.h>
 #include <engine/transform.h>
-#include <core/executor.hpp>
 #include "City/city_car.h"
 #include "City/city_zone.h"
 #include <City/city_building.h>
 #include "city_behavior_tree_manager.h"
 #include "city_person.h"
+#include "engine/worker_system.h"
 
 namespace neko
 {
@@ -118,7 +118,7 @@ public:
     void SetCheatData(CheatModeData::DataType dataType) { cheatModeData_.data = dataType; }
 private:
 
-    tf::Executor executor_{std::thread::hardware_concurrency() - 2};
+    WorkerManager workerManager_;
     EntityManager entityManager_;
     Transform2dManager transformManager_;
     TextureManager textureManager_;

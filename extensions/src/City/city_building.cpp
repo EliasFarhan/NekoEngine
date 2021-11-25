@@ -48,7 +48,6 @@ void CityBuildingManager::Update(const CityZoneManager& zoneManager, CityBuilder
 
 		//Add residential building
 		{
-
 			const auto& zones = zoneManager.GetZoneVector();
 			std::vector<Zone> residentialZones;
 			residentialZones.reserve(zones.size());
