@@ -32,6 +32,8 @@
 #include "input.h"
 #include <SFML/Window/WindowStyle.hpp>
 
+#include "worker_system.h"
+
 namespace neko
 {
 struct Collider;
@@ -79,6 +81,7 @@ public:
 	MouseManager& GetMouseManager();
     sf::Time clockDeltatime;
 protected:
+    WorkerManager workerManager_;
     sf::Clock engineClock_;
     KeyboardManager keyboardManager_;
     MouseManager mouseManager_;
@@ -93,7 +96,7 @@ class MainEngine : public BasicEngine
 public:
     using BasicEngine::BasicEngine;
 
-    virtual ~MainEngine();
+    ~MainEngine() override;
 
     void Init() override;
 
@@ -125,9 +128,6 @@ public:
     std::atomic<Index> frameIndex = 0u;
 
 protected:
-
-    ctpl::thread_pool workingThreadPool_;
-    std::thread renderThread_;
     std::unique_ptr<GraphicsManager> graphicsManager_ = nullptr;
 
 

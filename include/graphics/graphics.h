@@ -34,90 +34,87 @@
 namespace neko
 {
 
-const size_t MAX_COMMAND_NMB = 1024;
+    const size_t MAX_COMMAND_NMB = 1024;
 
-class MainEngine;
+    class MainEngine;
 
-/**
- * \brief abstraction of a graphic command send to the render thread
- */
-struct Command
-{
-    virtual void Draw(sf::RenderTarget* renderTarget) = 0;
-};
-
-/**
- * \brief specialization for SFML basic drawable type
- */
-struct SfmlCommand : public Command
-{
     /**
-     * \brief non owning raw pointer of an SFML Drawable stored in a graphic class with double buffering (SpriteManager, ShapeManager, etc...)
+     * \brief abstraction of a graphic command send to the render thread
      */
-    sf::Drawable* drawable = nullptr;
+    struct Command
+    {
+        virtual void Draw(sf::RenderTarget* renderTarget) = 0;
+    };
 
-    void Draw(sf::RenderTarget* renderTarget) override;
-};
-/**
- * \brief specialization for SFML vertex array drawing type
- */
-struct TilemapCommand : public Command
-{
-    sf::Texture* texture = nullptr;
-    sf::VertexArray* vertexArray = nullptr;
-
-    void Draw(sf::RenderTarget* renderTarget) override;
-};
-
-/**
- * \brief graphics manager run in a render thread by the MainEngine
- */
-class GraphicsManager
-{
-public:
-    GraphicsManager();
-
-/**
- * \brief called by the render loop when iterating through all the basic sfml commands
- * Should not be called from engine thread
- * @param drawable
- */
-    virtual void Draw(sf::Drawable& drawable);
-/**
- * \brief called by the render loop when iterating through all the tilemap commands
- * Should not be called from engine thread
- * @param vertexArray
- * @param texture
- */
-    virtual void Draw(sf::VertexArray* vertexArray, sf::Texture* texture);
-/**
- * \brief called from engine loop, changing the view for the next frame
- * @param view
- */
-    virtual void SetView(sf::View view);
-/**
- * \brief run by MainEngine in the render thread
- */
-    virtual void RenderLoop();
-
-	bool DidRenderingStart() const;
-    std::unique_ptr<Editor> editor = nullptr;
-    //Used for Engine loop to wait for graphics thread
-    std::mutex renderingMutex;
-
-    void Update();
-protected:
     /**
-     * \brief non owning ptr to renderwindow
+     * \brief specialization for SFML basic drawable type
      */
-    sf::RenderWindow* renderWindow_ = nullptr;
-    std::array<SfmlCommand, MAX_COMMAND_NMB> commands_[2];
-    std::array<TilemapCommand, MAX_COMMAND_NMB> tileCommands_[2];
-    std::array<Command*, MAX_COMMAND_NMB> commandBuffers_[2];
-    sf::View views_[2];
-    size_t renderLength_ = 0;
-    size_t nextRenderLength_ = 0;
-    Index frameIndex = 0u;
-	bool isRendering_ = false;
-};
+    struct SfmlCommand : public Command
+    {
+        /**
+         * \brief non owning raw pointer of an SFML Drawable stored in a graphic class with double buffering (SpriteManager, ShapeManager, etc...)
+         */
+        sf::Drawable* drawable = nullptr;
+
+        void Draw(sf::RenderTarget* renderTarget) override;
+    };
+    /**
+     * \brief specialization for SFML vertex array drawing type
+     */
+    struct TilemapCommand : public Command
+    {
+        sf::Texture* texture = nullptr;
+        sf::VertexArray* vertexArray = nullptr;
+
+        void Draw(sf::RenderTarget* renderTarget) override;
+    };
+
+    /**
+     * \brief graphics manager run in a render thread by the MainEngine
+     */
+    class GraphicsManager
+    {
+    public:
+        GraphicsManager();
+
+        /**
+         * \brief called by the render loop when iterating through all the basic sfml commands
+         * Should not be called from engine thread
+         * @param drawable
+         */
+        virtual void Draw(sf::Drawable& drawable);
+        /**
+         * \brief called by the render loop when iterating through all the tilemap commands
+         * Should not be called from engine thread
+         * @param vertexArray
+         * @param texture
+         */
+        virtual void Draw(sf::VertexArray* vertexArray, sf::Texture* texture);
+        /**
+         * \brief called from engine loop, changing the view for the next frame
+         * @param view
+         */
+        virtual void SetView(sf::View view);
+
+        bool DidRenderingStart() const;
+        std::unique_ptr<Editor> editor = nullptr;
+        //Used for Engine loop to wait for graphics thread
+        std::mutex renderingMutex;
+
+        void Update();
+        void Init();
+    protected:
+        /**
+         * \brief non owning ptr to renderwindow
+         */
+        sf::RenderWindow* renderWindow_ = nullptr;
+        std::array<SfmlCommand, MAX_COMMAND_NMB> commands_[2];
+        std::array<TilemapCommand, MAX_COMMAND_NMB> tileCommands_[2];
+        std::array<Command*, MAX_COMMAND_NMB> commandBuffers_[2];
+        sf::View views_[2];
+        size_t renderLength_ = 0;
+        size_t nextRenderLength_ = 0;
+        Index frameIndex = 0u;
+        bool isRendering_ = false;
+    };
 }

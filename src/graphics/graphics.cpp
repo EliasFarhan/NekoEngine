@@ -110,31 +110,6 @@ void GraphicsManager::SetView(sf::View view)
     views_[index] = view;
 }
 
-void GraphicsManager::RenderLoop()
-{
-    const auto* engine = MainEngine::GetInstance();
-
-    renderWindow_ = engine->renderWindow.get();
-    renderWindow_->setActive(true);
-    views_[0] = renderWindow_->getView();
-    views_[1] = views_[0];
-    editor->graphicsManager_ = this;
-    editor->renderWindow_ = renderWindow_;
-    renderWindow_->setActive(false);
-
-    do
-    {
-
-        Update();
-    }
-    while (engine->isRunning);
-
-    renderWindow_->setActive(true);
-    logDebug("Graphics Loop Destroy");
-    renderWindow_->setActive(false);
-
-
-}
 
 bool GraphicsManager::DidRenderingStart() const
 {
@@ -143,11 +118,11 @@ bool GraphicsManager::DidRenderingStart() const
 
 void GraphicsManager::Update()
 {
-
-    auto* engine = MainEngine::GetInstance();
 #ifdef TRACY_ENABLE
     ZoneNamedN(RendererUpdate, "Renderer Update", true);
 #endif
+    auto* engine = MainEngine::GetInstance();
+
     {
         /*{
             std::ostringstream oss;
@@ -157,7 +132,6 @@ void GraphicsManager::Update()
         std::unique_lock<std::mutex> lock(engine->renderStartMutex);
 
         isRendering_ = true;
-        engine->condSyncRender.wait(lock);
         renderLength_ = nextRenderLength_;
         nextRenderLength_ = 0;
         frameIndex = engine->frameIndex - 1;
@@ -205,5 +179,18 @@ void GraphicsManager::Update()
         renderWindow_->display();
         renderWindow_->setActive(false);
     }
+}
+
+void GraphicsManager::Init()
+{
+    const auto* engine = MainEngine::GetInstance();
+
+    renderWindow_ = engine->renderWindow.get();
+    renderWindow_->setActive(true);
+    views_[0] = renderWindow_->getView();
+    views_[1] = views_[0];
+    editor->graphicsManager_ = this;
+    editor->renderWindow_ = renderWindow_;
+    renderWindow_->setActive(false);
 }
 }

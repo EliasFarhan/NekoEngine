@@ -45,8 +45,10 @@ namespace neko
         mainView = renderWindow->getView();
         cityBuilderMap_.Init();
         environmentTilemap_.Init(textureManager_);
+        auto* renderWindow = graphicsManager_->editor->renderWindow_;
         graphicsManager_->editor = std::make_unique<CityEditor>();
         graphicsManager_->editor->Init();
+        graphicsManager_->editor->renderWindow_ = renderWindow;
 
         cursor_.Init();
         commandManager_.Init();
@@ -66,7 +68,7 @@ namespace neko
         {
             cityMoney_ = std::numeric_limits<long long>::max();
         }
-        workerManager_.Init({ "main", 1 }, { {"render", 1},{"other", std::thread::hardware_concurrency() - 2} });
+        
     }
 
     void CityBuilderEngine::Update(float dt)

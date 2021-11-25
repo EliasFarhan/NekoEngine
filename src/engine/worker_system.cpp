@@ -200,8 +200,8 @@ namespace neko
 
     void WorkerManager::Destroy()
     {
-        std::for_each(queues_.begin(), queues_.end(), [](auto& queue) {queue.Destroy(); });
-        std::for_each(threads_.begin(), threads_.end(), [](auto& thread) {thread.Destroy(); });
+        std::ranges::for_each(threads_, [](auto& thread) {thread.Destroy(); });
+        std::ranges::for_each(queues_, [](auto& queue) {queue.Destroy(); });
     }
 
     WorkerThread::~WorkerThread()
@@ -212,6 +212,7 @@ namespace neko
     void WorkerThread::Destroy()
     {
         isRunning_ = false;
+        taskQueue_.Destroy();
         if (thread_.joinable())
         {
             thread_.join();

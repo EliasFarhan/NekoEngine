@@ -118,7 +118,6 @@ public:
     void SetCheatData(CheatModeData::DataType dataType) { cheatModeData_.data = dataType; }
 private:
 
-    WorkerManager workerManager_;
     EntityManager entityManager_;
     Transform2dManager transformManager_;
     TextureManager textureManager_;

@@ -78,13 +78,16 @@ void BasicEngine::Init()
     }
     ImGui::SFML::Init(*renderWindow);
     mouseManager_.SetWindow(renderWindow.get());
+    workerManager_.Init({ "main", 1 }, { {"render", 1},{"other", std::thread::hardware_concurrency() - 2} });
 }
 
 void BasicEngine::Destroy()
 {
+    workerManager_.Destroy();
     renderWindow->close();
     ImGui::SFML::Shutdown();
     renderWindow = nullptr;
+    
 }
 
 void BasicEngine::EngineLoop()
@@ -92,6 +95,7 @@ void BasicEngine::EngineLoop()
     isRunning = true;
     while (isRunning)
     {
+
         clockDeltatime = engineClock_.restart();
 
         keyboardManager_.ClearKeys();
@@ -163,8 +167,6 @@ void MainEngine::EngineLoop()
 {
 
     isRunning = true;
-    renderThread_ = std::thread(&GraphicsManager::RenderLoop, graphicsManager_.get());
-    renderThread_.detach();
     while (isRunning)
     {
 #ifdef TRACY_ENABLE
@@ -172,6 +174,11 @@ void MainEngine::EngineLoop()
 #endif
 
         clockDeltatime = engineClock_.restart();
+        auto renderTask = std::make_shared<Task>([this]()
+            {
+                graphicsManager_->Update();
+            });
+        this->workerManager_.AddTask(renderTask, "render");
         if (frameIndex > 0)
         {
             std::unique_lock<std::mutex> lock(renderStartMutex);
@@ -234,8 +241,9 @@ void MainEngine::Init()
     instance_ = this;
 
     graphicsManager_ = std::make_unique<GraphicsManager>();
-
-
+    const auto task = std::make_shared<Task>([this]() {graphicsManager_->Init(); });
+    workerManager_.AddTask(task, "render");
+    task->Join();
 }
 
 void MainEngine::Update(float dt)
@@ -250,6 +258,7 @@ void MainEngine::Destroy()
     }
     renderWindow->setActive(true);
 
+    condSyncRender.notify_all();
     BasicEngine::Destroy();
     instance_ = nullptr;
     graphicsManager_ = nullptr;
