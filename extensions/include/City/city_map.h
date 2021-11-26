@@ -99,14 +99,14 @@ public:
 	void Update(float dt) override;
 	void Destroy() override;
 
-	size_t Position2Index(sf::Vector2i pos) const;
+	std::size_t Position2Index(sf::Vector2i pos) const;
 	sf::Vector2i Index2Position(size_t index) const;
 	void AddCityElement(CityElementType cityElement, const sf::Vector2i& position);
 	void RemoveCityElement(const sf::Vector2i& position);
 	CityElement* GetCityElementAt(sf::Vector2i position);
 	bool IsGrass(sf::Vector2i position);
 	TileMapGraph& GetRoadGraph();
-	std::vector<sf::Vector2i> GetRoadEnds() const;
+    [[nodiscard]] std::vector<sf::Vector2i> GetRoadEnds() const;
 	City city{};
 private:
     friend class CityBuilderTilemap;

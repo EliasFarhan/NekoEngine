@@ -109,7 +109,7 @@ namespace neko
 
         std::array<std::shared_ptr<Task>, static_cast<int>(CityTilesheetType::LENGTH)> tilemapUpdateTasks{};
         const auto pushCommandTask = std::make_shared<Task>([&]() {environmentTilemap_.PushCommand(graphicsManager_.get()); });
-        auto mainViewUpdateTask = std::make_shared<Task>([&]() {
+        const auto mainViewUpdateTask = std::make_shared<Task>([&]() {
 #ifdef TRACY_ENABLE
             ZoneNamedN(MainViewUpdateTask, "MainViewUpdateTask", true);
 #endif

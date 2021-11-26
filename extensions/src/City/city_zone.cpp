@@ -46,16 +46,17 @@ void CityZoneManager::UpdateZoneTilemap(const CityBuilderMap& cityMap, CityBuild
     const auto windowView_ = sf::FloatRect((mainView.getCenter() - mainView.getSize() / 2.0f), mainView.getSize());
     zoneVertexArray_[frameIndex].clear();
     zoneVertexArray_[frameIndex].setPrimitiveType(sf::PrimitiveType::Triangles);
+    
     const auto tileSize = cityMap.city.tileSize;
     const auto func = [this, &windowView_, &cityBuildingMap, tileSize, frameIndex](const std::vector<Zone>& zones_) {
         for (auto& zone : zones_)
         {
-
+            /*
             //Checking if there is other zone buildings
             const auto* buildingAtPos = cityBuildingMap.GetBuildingAt(zone.position);
             if (buildingAtPos != nullptr)
                 continue;
-
+            */
             //culling with mainView
             const auto zoneSize = sf::Vector2f(tileSize);
             const auto worldPos = sf::Vector2f(
