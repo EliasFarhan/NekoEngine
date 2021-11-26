@@ -271,6 +271,7 @@ namespace neko
 
     bool WorkerQueue::Contains(const std::shared_ptr<Task>& task)
     {
+        std::shared_lock<std::shared_mutex> lock(queueMutex_);
         return std::ranges::find(tasks_, task) != tasks_.end();
     }
 }

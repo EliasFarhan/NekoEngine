@@ -19,7 +19,11 @@ if(TRACY_ENABLE)
 		add_compile_definitions(TRACY_ON_DEMAND)
 	endif()
 endif()
-
+set(THREAD_SANITIZE OFF CACHE BOOL "")
+if(THREAD_SANITIZE)
+	add_compile_options("-fsanitize=thread")
+	add_link_options("-fsanitize=thread")
+endif()
 #data
 
 file(GLOB_RECURSE JSON_FILES "${PROJECT_SOURCE_DIR}/data/*.json")
