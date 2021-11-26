@@ -37,11 +37,13 @@ EntityManager::EntityManager()
 
 EntityMask EntityManager::GetMask(Entity entity)
 {
+    std::shared_lock lock(mutex_);
     return entityMaskArray_[entity];
 }
 
 Entity EntityManager::CreateEntity()
 {
+    std::lock_guard lock(mutex_);
     const auto entityMaskIt = std::find_if(entityMaskArray_.begin(), entityMaskArray_.end(),[](EntityMask entityMask){
        return  entityMask == INVALID_ENTITY_MASK;
     });
@@ -58,11 +60,13 @@ Entity EntityManager::CreateEntity()
 
 void EntityManager::DestroyEntity(Entity entity)
 {
+    std::lock_guard lock(mutex_);
     entityMaskArray_[entity] = INVALID_ENTITY_MASK;
 }
 
 bool EntityManager::HasComponent(Entity entity, EntityMask componentType)
 {
+    std::shared_lock lock(mutex_);
 	if (entity >= entityMaskArray_.size())
 		return false;
     return (entityMaskArray_[entity] & componentType) == componentType;
@@ -70,16 +74,19 @@ bool EntityManager::HasComponent(Entity entity, EntityMask componentType)
 
 void EntityManager::AddComponentType(Entity entity, EntityMask componentType)
 {
+    std::lock_guard lock(mutex_);
     entityMaskArray_[entity] |= componentType;
 }
 
 void EntityManager::RemoveComponentType(Entity entity, EntityMask componentType)
 {
+    std::lock_guard lock(mutex_);
     entityMaskArray_[entity] &= ~componentType;
 }
 
 size_t EntityManager::GetEntitiesNmb(EntityMask filterComponents)
 {
+    std::shared_lock lock(mutex_);
     return std::count_if(entityMaskArray_.begin(), entityMaskArray_.end(),[&filterComponents](EntityMask entityMask){
         return entityMask != INVALID_ENTITY_MASK && (entityMask & filterComponents) == filterComponents;
     });
@@ -90,6 +97,7 @@ std::vector<Entity> EntityManager::FilterEntities(EntityMask filterComponents)
 #ifdef TRACY_ENABLE
     ZoneScoped;
 #endif
+    std::shared_lock lock(mutex_);
 	std::vector<Entity> entities;
 	for(Entity i = 0; i < entityMaskArray_.size();i++)
 	{
@@ -103,6 +111,7 @@ std::vector<Entity> EntityManager::FilterEntities(EntityMask filterComponents)
 
 bool EntityManager::EntityExists(Entity entity)
 {
+    std::shared_lock lock(mutex_);
     return entityMaskArray_[entity] != INVALID_ENTITY_MASK;
 }
 }

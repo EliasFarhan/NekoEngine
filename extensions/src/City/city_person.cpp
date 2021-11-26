@@ -473,6 +473,7 @@ void CityPeopleManager::DestroyPerson(Entity entity)
 			work->occupancy--;
 		}
 	}
+	person->carEntity = INVALID_ENTITY;
 	engine->GetEntityManager().DestroyEntity(entity);
 }
 }

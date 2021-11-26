@@ -67,6 +67,7 @@ public:
 
 	void RemoveComponentType(Entity entity, EntityMask componentType);
 private:
+	mutable std::shared_mutex mutex_;
 	std::vector<EntityMask> entityMaskArray_;
 };
 
