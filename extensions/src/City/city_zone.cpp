@@ -148,9 +148,12 @@ void CityZoneManager::AddZone(sf::Vector2i position, ZoneType zoneType, CityBuil
         break;
     }
     case ZoneType::RESIDENTIAL:
-        const auto existingZone = std::find_if(commercialZones_.begin(), commercialZones_.end(), [&position](const Zone& zone) {
-            return zone.position == position;
-            });
+    {
+        const auto existingZone = std::find_if(commercialZones_.begin(), commercialZones_.end(),
+                                               [&position](const Zone& zone)
+                                               {
+                                                   return zone.position == position;
+                                               });
         //TODO the other existing zone
         if (existingZone != commercialZones_.end())
         {
@@ -159,6 +162,9 @@ void CityZoneManager::AddZone(sf::Vector2i position, ZoneType zoneType, CityBuil
             return;
         }
         func(residentialZones_);
+        break;
+    }
+    default:
         break;
     }
 }

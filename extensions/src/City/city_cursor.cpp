@@ -75,15 +75,15 @@ void CityCursor::Update(float dt)
 			const auto deltaPos = currentPos - originPos_;
 			auto direction = sf::Vector2i(0, 0);
 			float length;
-			if (fabs(deltaPos.x) > fabs(deltaPos.y))
+			if (std::abs(deltaPos.x) > std::abs(deltaPos.y))
 			{
 				direction.x = int(copysign(1, deltaPos.x));
-				length = fabs(float(deltaPos.x));
+				length = std::abs(float(deltaPos.x));
 			}
 			else
 			{
 				direction.y = int(copysign(1, deltaPos.y));
-				length = fabs(float(deltaPos.y));
+				length = std::abs(float(deltaPos.y));
 			}
 			if (direction == sf::Vector2i(1, 0))
 			{
@@ -202,15 +202,15 @@ void CityCursor::OnEvent(sf::Event& event)
 			const auto deltaPos = currentPos - originPos_;
 			auto direction = sf::Vector2i(0, 0);
 			int length;
-			if (fabs(deltaPos.x) > fabs(deltaPos.y))
+			if (std::abs(deltaPos.x) > std::abs(deltaPos.y))
 			{
 				direction.x = int(copysign(1, deltaPos.x));
-				length = abs(deltaPos.x);
+				length = std::abs(deltaPos.x);
 			}
 			else
 			{
 				direction.y = int(copysign(1, deltaPos.y));
-				length = abs(deltaPos.y);
+				length = std::abs(deltaPos.y);
 			}
 			for (int i = 0; i <= length; i++)
 			{

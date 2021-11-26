@@ -93,7 +93,7 @@ if(TRACY_ENABLE)
 endif()
 
 #SFML
-find_package(SFML COMPONENTS system window graphics CONFIG REQUIRED)
+find_package(SFML COMPONENTS system window graphics audio CONFIG REQUIRED)
 LIST(APPEND Neko_LIBRARIES
 		sfml-audio sfml-graphics sfml-window sfml-system)
 
@@ -146,5 +146,5 @@ endforeach()
 #City Builder
 find_package(argh CONFIG REQUIRED)
 add_executable(CityBuilder ${CMAKE_SOURCE_DIR}/main/CityBuilder.cpp)
-target_link_libraries(CityBuilder PUBLIC Neko_COMMON City argh)
+target_link_libraries(CityBuilder PUBLIC City argh)
 set_target_properties (CityBuilder PROPERTIES FOLDER Main)
