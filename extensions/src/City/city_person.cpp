@@ -154,7 +154,7 @@ void CityPeopleManager::Init()
 		bool searchNewHouse = false;
 		if (housePos != INVALID_TILE_POS)
 		{
-			auto* building = engine->GetBuildingManager().GetBuildingAt(housePos);
+			auto[ building, lock] = engine->GetBuildingManager().GetBuildingAt(housePos);
 			if (building == nullptr)
 			{
 				searchNewHouse = true;
@@ -168,7 +168,7 @@ void CityPeopleManager::Init()
 		if (searchNewHouse)
 		{
 			housePos = engine->GetBuildingManager().FindBuilding(ZoneType::RESIDENTIAL);
-			auto* building = engine->GetBuildingManager().GetBuildingAt(housePos);
+			auto[ building, lock] = engine->GetBuildingManager().GetBuildingAt(housePos);
 			if (building == nullptr)
 			{
 				logDebug("[Error] No available building for house");
@@ -216,7 +216,7 @@ void CityPeopleManager::Init()
 		bool searchNewWork = false;
 		if (workPos != INVALID_TILE_POS)
 		{
-			auto* building = engine->GetBuildingManager().GetBuildingAt(workPos);
+			auto[ building, lock] = engine->GetBuildingManager().GetBuildingAt(workPos);
 			if (building == nullptr)
 			{
 				searchNewWork = true;
@@ -230,7 +230,7 @@ void CityPeopleManager::Init()
 		if (searchNewWork)
 		{
 			workPos = engine->GetBuildingManager().FindBuilding(ZoneType::COMMERCIAL);
-			auto* building = engine->GetBuildingManager().GetBuildingAt(workPos);
+			auto[ building, lock] = engine->GetBuildingManager().GetBuildingAt(workPos);
 			if (building == nullptr)
 			{
 				logDebug("[Error] No available building for work");
@@ -272,8 +272,11 @@ void CityPeopleManager::Init()
 
 		auto housePos = person->housePos;
 		bool searchNewHouse = false;
-		if (engine->GetBuildingManager().GetBuildingAt(housePos) == nullptr)
-			searchNewHouse = true;
+		{
+			auto [building, lock] = engine->GetBuildingManager().GetBuildingAt(housePos);
+			if (building == nullptr)
+				searchNewHouse = true;
+		}
 		if (searchNewHouse)
 		{
 			housePos = engine->GetBuildingManager().FindBuilding(ZoneType::RESIDENTIAL);
@@ -282,8 +285,11 @@ void CityPeopleManager::Init()
 
 		auto workPos = person->workPos;
 		bool searchNewWork = false;
-		if (engine->GetBuildingManager().GetBuildingAt(workPos) == nullptr)
-			searchNewWork = true;
+		{
+			auto [building, lock] = engine->GetBuildingManager().GetBuildingAt(housePos);
+			if (building == nullptr)
+				searchNewWork = true;
+		}
 		if (searchNewWork)
 		{
 			workPos = engine->GetBuildingManager().FindBuilding(ZoneType::COMMERCIAL);
@@ -447,24 +453,26 @@ void CityPeopleManager::DestroyPerson(Entity entity)
 #ifdef TRACY_ENABLE
 	ZoneScoped
 #endif
-	if (entity == INVALID_ENTITY)
-		return;
+		if (entity == INVALID_ENTITY)
+			return;
 	auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
 	auto* person = GetPersonAt(entity);
 	if (person == nullptr)
 		return;
-
-	auto* house = engine->GetBuildingManager().GetBuildingAt(person->housePos);
-	if (house != nullptr)
 	{
-		house->occupancy--;
-	}
-	auto* work = engine->GetBuildingManager().GetBuildingAt(person->housePos);
-	if (work != nullptr)
+	    auto [house, lock] = engine->GetBuildingManager().GetBuildingAt(person->housePos);
+	    if (house != nullptr)
+	    {
+		    house->occupancy--;
+	    }
+    }
 	{
-		work->occupancy--;
+		auto[ work, lock] = engine->GetBuildingManager().GetBuildingAt(person->housePos);
+		if (work != nullptr)
+		{
+			work->occupancy--;
+		}
 	}
-
 	engine->GetEntityManager().DestroyEntity(entity);
 }
 }

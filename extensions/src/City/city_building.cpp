@@ -78,11 +78,13 @@ void CityBuildingManager::Update(CityZoneManager& zoneManager, CityBuilderMap& c
 					for (int dy = 0; dy < 3; dy++)
 					{
 						const sf::Vector2i newPos = newWorkPlace.position + sf::Vector2i(dx, -dy);
-						const auto* building = GetBuildingAt(newPos);
-						if (building != nullptr && building->size != sf::Vector2i(1, 1))
 						{
-							buildBig = false;
-							break;
+							const auto [building, lock] = GetBuildingAt(newPos);
+							if (building != nullptr && building->size != sf::Vector2i(1, 1))
+							{
+								buildBig = false;
+								break;
+							}
 						}
 						const auto* zone = zoneManager.GetZoneAt(newPos, ZoneType::COMMERCIAL);
 						if (zone == nullptr || zone->zoneType != newWorkPlace.zoneType)
@@ -133,7 +135,7 @@ void CityBuildingManager::Update(CityZoneManager& zoneManager, CityBuilderMap& c
 void
 CityBuildingManager::AddBuilding(Building building, CityZoneManager& zoneManager, CityBuilderMap& cityMap)
 {
-	
+	std::lock_guard lock(buildingMutex);
 	for (int dx = 0; dx < building.size.x; dx++)
 	{
 		for (int dy = 0; dy < building.size.y; dy++)
@@ -155,7 +157,7 @@ const std::vector<Building>& CityBuildingManager::GetBuildingsVector() const
 
 void CityBuildingManager::RemoveBuilding(sf::Vector2i position)
 {
-	
+	std::lock_guard lock(buildingMutex);
 	const auto buildingIt = std::find_if(buildings_.begin(), buildings_.end(), [&position](const Building& building)
 	{
 		for (int dx = 0; dx < building.size.x; dx++)
@@ -231,9 +233,9 @@ sf::Vector2i CityBuildingManager::FindBuilding(ZoneType zoneType)
 	return INVALID_TILE_POS;
 }
 
-Building* CityBuildingManager::GetBuildingAt(sf::Vector2i position)
+std::pair<Building*, std::shared_lock<std::shared_mutex>> CityBuildingManager::GetBuildingAt(sf::Vector2i position)
 {
-	
+	std::shared_lock lock(buildingMutex);
 	const auto result = std::find_if(buildings_.begin(), buildings_.end(), [&position](const Building& building)
 	{
 		for (int dx = 0; dx < building.size.x; dx++)
@@ -249,8 +251,8 @@ Building* CityBuildingManager::GetBuildingAt(sf::Vector2i position)
 	});
 	if (result == buildings_.end())
 	{
-		return nullptr;
+		return { nullptr, std::move(lock)};
 	}
-	return &*result;
+	return { &*result, std::move(lock) };
 }
 }

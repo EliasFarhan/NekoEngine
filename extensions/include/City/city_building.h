@@ -49,9 +49,10 @@ public:
     void AddBuilding(Building building, CityZoneManager& zoneManager, CityBuilderMap& cityMap);
     void RemoveBuilding(sf::Vector2i position);
 	sf::Vector2i FindBuilding(ZoneType zoneType);
-    Building* GetBuildingAt(sf::Vector2i position);
+    std::pair<Building*, std::shared_lock<std::shared_mutex>> GetBuildingAt(sf::Vector2i position);
     const std::vector<Building>& GetBuildingsVector() const;
 private:
+    mutable std::shared_mutex buildingMutex;
     std::vector<Building> buildings_;
     Timer spawnTimer_ = Timer(0.0f, 0.2f);
 };

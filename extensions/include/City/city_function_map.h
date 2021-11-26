@@ -25,6 +25,7 @@
 
 #include <functional>
 #include <map>
+#include <mutex>
 #include <string>
 #include <engine/globals.h>
 
@@ -43,6 +44,7 @@ namespace neko {
 
 	protected:
 		Index comp_;
+	    static std::mutex mutex;
 		static std::map<
 			std::string, 
 			std::function<bool(Index, const std::vector<double>&)>>

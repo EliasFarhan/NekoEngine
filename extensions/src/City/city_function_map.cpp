@@ -34,36 +34,59 @@ namespace neko {
 		std::string, 
 		std::function<bool(Index, const std::vector<double>&)>>
 		FunctionMap::staticNameFunctionMap_;
-
+	std::mutex FunctionMap::mutex;
 	void FunctionMap::SetFunction(
 		const std::string_view name,
 		std::function<bool(Index, const std::vector<double>&)> func)
 	{
+		std::lock_guard lock(mutex);
 		staticNameFunctionMap_.insert(std::make_pair(std::string(name), func));
 	}
 
 	bool FunctionMap::CallFunction(const std::string_view name, double value) const
     {
-        const auto it = staticNameFunctionMap_.find(std::string(name));
-		if (it != staticNameFunctionMap_.end())
+		const auto retrieveFunction = [this, &name]()->std::function<bool(unsigned, const std::vector<double>&)>* {
+
+			
+			std::lock_guard lock(mutex);
+			const auto it = staticNameFunctionMap_.find(std::string(name));
+			if (it != staticNameFunctionMap_.end())
+			{
+				return &it->second;
+			}
+			return nullptr;
+		};
+		auto func = retrieveFunction();
+		if (func == nullptr)
 		{
-			return it->second(comp_, { value });
+			logDebug("ERROR executing : " + std::string(name));
+			return false;
 		}
-		logDebug("ERROR executing : " + std::string(name));
-		return false;
+		return (*func)(comp_, { value });
 	}
 
 	bool FunctionMap::CallFunction(
 		const std::string_view name, 
 		const std::vector<double>& values) const
     {
-        const auto it = staticNameFunctionMap_.find(std::string(name));
-		if (it != staticNameFunctionMap_.end())
+		const auto retrieveFunction = [this, &name]()->std::function<bool(unsigned, const std::vector<double>&)>*{
+
+			static std::mutex mutex;
+		    std::lock_guard lock(mutex);
+			const auto it = staticNameFunctionMap_.find(std::string(name));
+			if (it != staticNameFunctionMap_.end())
+			{
+				return &it->second;
+			}
+			return nullptr;
+		};
+        const auto func = retrieveFunction();
+		if (func == nullptr)
 		{
-			return it->second(comp_, values);
+			logDebug("ERROR executing : " + std::string(name));
+			return false;
 		}
-		logDebug("ERROR executing : " + std::string(name));
-		return false;
+		return (*func)(comp_, values);
 	}
 
 } // end namespace neko
