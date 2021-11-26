@@ -461,6 +461,8 @@ namespace neko {
 	BehaviorTreeFlow BehaviorTreeManager::ExecuteIndex(Index id)
 	{
 		assert(id < vecBehaviorTree_.size());
+		if (vecBehaviorTree_[id] == nullptr)
+			return BehaviorTreeFlow::FAILURE;
 		return vecBehaviorTree_[id]->Execute();
 	}
 

@@ -74,7 +74,7 @@ public:
     bool ContainNode(sf::Vector2i pos) const;
     const std::vector<Node>& GetNodesVector() const;
 
-    const std::vector<sf::Vector2i> CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vector2i& endPos) const;
+    std::vector<sf::Vector2i> CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vector2i& endPos) const;
 	Node* GetClosestNode(sf::Vector2i position);
 private:
 

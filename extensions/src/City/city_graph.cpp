@@ -149,7 +149,7 @@ float distance(const sf::Vector2i& posA, const sf::Vector2i& posB)
 }
 
 
-const std::vector<sf::Vector2i>
+std::vector<sf::Vector2i>
 TileMapGraph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vector2i& endPos) const
 {
 #ifdef TRACY_ENABLE

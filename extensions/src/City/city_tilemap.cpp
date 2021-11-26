@@ -111,6 +111,295 @@ void CityBuilderTilemap::Init(TextureManager& textureManager)
 
 }
 
+
+void CityBuilderTilemap::UpdateTransportTilemap(const CityBuilderMap& cityBuilderMap)
+{
+
+	const auto addRoad = [this, &cityBuilderMap](const CityElement& road)
+	{
+
+		constexpr auto updatedCityTileType = CityTilesheetType::TRANSPORT;
+		bool directions[] = { 0, 0, 0, 0 };//UP, DOWN, LEFT, RIGHT
+
+		if (road.position.y == 0)
+		{
+			directions[0] = true;
+		}
+		if (road.position.y == static_cast<int>(cityBuilderMap.city.mapSize.y - 1))
+		{
+			directions[1] = true;
+		}
+		if (road.position.x == 0)
+		{
+			directions[2] = true;
+		}
+		if (road.position.x == static_cast<int>(cityBuilderMap.city.mapSize.x - 1))
+		{
+			directions[3] = true;
+		}
+		const bool isWater = cityBuilderMap.environmentTiles_[cityBuilderMap.Position2Index(road.position)] ==
+			EnvironmentTile::WATER;
+
+		if(cityBuilderMap.ContainsRoad(road.position+sf::Vector2i(0,-1)))
+		{
+
+			directions[0] = true;
+		}
+		if (cityBuilderMap.ContainsRoad(road.position + sf::Vector2i(0, 1)))
+		{
+			directions[1] = true;
+		}
+		if (cityBuilderMap.ContainsRoad(road.position + sf::Vector2i(-1, 0)))
+		{
+			directions[2] = true;
+		}
+		if (cityBuilderMap.ContainsRoad(road.position + sf::Vector2i(1, 0)))
+		{
+			directions[3] = true;
+		}
+		
+		const auto position = sf::Vector2f(
+			static_cast<float>(road.position.x * tileSize_.x),
+			static_cast<float>(road.position.y * tileSize_.y));
+		Index roadIndex = 0;
+
+		if ((directions[0] && directions[1] && !directions[2] && !directions[3]) or
+			(directions[0] && !directions[1] && !directions[2] && !directions[3]) or
+			(!directions[0] && directions[1] && !directions[2] && !directions[3]))
+		{
+			roadIndex = Index(
+				isWater ? CityTileType::ROAD_BRIDGE_VERTICAL : CityTileType::ROAD_LINE);
+			const auto rect = textureRects_[roadIndex];
+			const auto center = rectCenter_[roadIndex];
+			const auto size = sf::Vector2f(
+				static_cast<float>(tileSize_.x),
+				(isWater ? 2.0f : 1.0f) * tileSize_.y);
+
+			AddNewCityTile(position, size, rect, center, updatedCityTileType);
+		}
+		else if ((!directions[0] && !directions[1] && directions[2] && directions[3]) or
+			(!directions[0] && !directions[1] && !directions[2] && directions[3]) or
+			(!directions[0] && !directions[1] && directions[2] && !directions[3]) or
+			(!directions[0] && !directions[1] && !directions[2] && !directions[3]))
+		{
+			roadIndex = Index(
+				isWater ? CityTileType::ROAD_BRIDGE_HORIZONTAL : CityTileType::ROAD_LINE);
+			const auto rect = textureRects_[roadIndex];
+			const auto center = rectCenter_[roadIndex];
+			const auto size = sf::Vector2f(
+				float(tileSize_.x),
+				(isWater ? 2.0f : 1.0f) * tileSize_.y);
+
+			AddNewCityTile(position, size, rect, center, updatedCityTileType, false, false, !isWater, true);
+		}
+		else if (directions[0] && directions[1] && directions[2] && directions[3])
+		{
+			roadIndex = Index(CityTileType::CROSS_ROAD);
+			const auto rect = textureRects_[roadIndex];
+			const auto center = rectCenter_[roadIndex];
+			const auto size = sf::Vector2f(float(tileSize_.x), float(tileSize_.y));
+
+			AddNewCityTile(position, size, rect, center, updatedCityTileType, false, false, false, true);
+		}
+		else if (directions[0] && directions[1] && !directions[2] && directions[3])
+		{
+			roadIndex = static_cast<Index>(CityTileType::ROAD_T);
+			const auto rect = textureRects_[roadIndex];
+			const auto center = rectCenter_[roadIndex];
+			const auto size = sf::Vector2f(float(tileSize_.x), float(tileSize_.y));
+
+			AddNewCityTile(position, size, rect, center, updatedCityTileType, false, false, false, true);
+		}
+		else if (directions[0] && directions[1] && directions[2] && !directions[3])
+		{
+			roadIndex = static_cast<Index>(CityTileType::ROAD_T);
+			const auto rect = textureRects_[roadIndex];
+			const auto center = rectCenter_[roadIndex];
+			const auto size = sf::Vector2f(float(tileSize_.x), float(tileSize_.y));
+
+			AddNewCityTile(position, size, rect, center, updatedCityTileType, true, false, false, true);
+		}
+		else if (directions[0] && !directions[1] && directions[2] && directions[3])
+		{
+			roadIndex = static_cast<Index>(CityTileType::ROAD_T);
+			const auto rect = textureRects_[roadIndex];
+			const auto center = rectCenter_[roadIndex];
+			const auto size = sf::Vector2f(float(tileSize_.x), float(tileSize_.y));
+
+			AddNewCityTile(position, size, rect, center, updatedCityTileType, false, false, true, true);
+		}
+		else if (!directions[0] && directions[1] && directions[2] && directions[3])
+		{
+			roadIndex = static_cast<Index>(CityTileType::ROAD_T);
+			const auto rect = textureRects_[roadIndex];
+			const auto center = rectCenter_[roadIndex];
+			const auto size = sf::Vector2f(float(tileSize_.x), float(tileSize_.y));
+
+			AddNewCityTile(position, size, rect, center, updatedCityTileType, true, false, true, true);
+		}
+		else if (!directions[0] && directions[1] && !directions[2] && directions[3])
+		{
+			roadIndex = static_cast<Index>(CityTileType::ROAD_TURN);
+			const auto rect = textureRects_[roadIndex];
+			const auto center = rectCenter_[roadIndex];
+			const auto size = sf::Vector2f(float(tileSize_.x), float(tileSize_.y));
+
+			AddNewCityTile(position, size, rect, center, updatedCityTileType, false, false, false, true);
+		}
+		else if (!directions[0] && directions[1] && directions[2] && !directions[3])
+		{
+			roadIndex = static_cast<Index>(CityTileType::ROAD_TURN);
+			const auto rect = textureRects_[roadIndex];
+			const auto center = rectCenter_[roadIndex];
+			const auto size = sf::Vector2f(float(tileSize_.x), float(tileSize_.y));
+
+			AddNewCityTile(position, size, rect, center, updatedCityTileType, true, false, false, true);
+		}
+		else if (directions[0] && !directions[1] && !directions[2] && directions[3])
+		{
+			roadIndex = static_cast<Index>(CityTileType::ROAD_TURN);
+			const auto rect = textureRects_[roadIndex];
+			const auto center = rectCenter_[roadIndex];
+			const auto size = sf::Vector2f(float(tileSize_.x), float(tileSize_.y));
+
+			AddNewCityTile(position, size, rect, center, updatedCityTileType, false, true, false, true);
+		}
+		else if (directions[0] && !directions[1] && directions[2] && !directions[3])
+		{
+			roadIndex = static_cast<Index>(CityTileType::ROAD_TURN);
+			const auto rect = textureRects_[roadIndex];
+			const auto center = rectCenter_[roadIndex];
+			const auto size = sf::Vector2f(float(tileSize_.x), float(tileSize_.y));
+
+			AddNewCityTile(position, size, rect, center, updatedCityTileType, true, true, false, true);
+		}
+	};
+	const auto addRail = [this, &cityBuilderMap](const CityElement& rail)
+	{
+		constexpr auto updatedCityTileType = CityTilesheetType::TRANSPORT;
+		bool directions[] = { false, false, false, false };//UP, DOWN, LEFT, RIGHT
+
+		if (rail.position.y == 0)
+		{
+			directions[0] = true;
+		}
+		if (rail.position.y == static_cast<int>(cityBuilderMap.city.mapSize.y - 1))
+		{
+			directions[1] = true;
+		}
+		if (rail.position.x == 0)
+		{
+			directions[2] = true;
+		}
+		if (rail.position.x == static_cast<int>(cityBuilderMap.city.mapSize.x - 1))
+		{
+			directions[3] = true;
+		}
+
+		if (cityBuilderMap.ContainsRail(rail.position+sf::Vector2i(0, -1)))
+		{
+			directions[0] = true;
+		}
+		if (cityBuilderMap.ContainsRail(rail.position + sf::Vector2i(0, 1)))
+		{
+			directions[1] = true;
+		}
+		if (cityBuilderMap.ContainsRail(rail.position + sf::Vector2i(-1, 0)))
+		{
+			directions[2] = true;
+		}
+		if (cityBuilderMap.ContainsRail(rail.position + sf::Vector2i(1, 0)))
+		{
+			directions[3] = true;
+		}
+	
+		const auto position = sf::Vector2f(
+			static_cast<float>(rail.position.x * tileSize_.x),
+			static_cast<float>(rail.position.y * tileSize_.y));
+		//HORIZONTAL FIRST
+		if (directions[2] && directions[3])
+		{
+			constexpr int railIndex = static_cast<int>(CityTileType::RAIL_LINE);
+			const auto rect = textureRects_[railIndex];
+			const auto center = rectCenter_[railIndex];
+			const auto size = sf::Vector2f(tileSize_);
+
+			AddNewCityTile(position, size, rect, center, updatedCityTileType);
+		}
+
+		//UP RIGHT
+		else if (directions[0] && directions[3])
+		{
+			constexpr auto railIndex = static_cast<Index>(CityTileType::RAIL_TURN);
+			const auto rect = textureRects_[railIndex];
+			const auto center = rectCenter_[railIndex];
+			const auto size = sf::Vector2f(tileSize_);
+
+			AddNewCityTile(position, size, rect, center, updatedCityTileType);
+		}
+		//DOWN LEFT
+		else if (directions[1] && directions[2])
+		{
+			constexpr int railIndex = static_cast<int>(CityTileType::RAIL_TURN);
+			const auto rect = textureRects_[railIndex];
+			const auto center = rectCenter_[railIndex];
+			const auto size = sf::Vector2f(tileSize_);
+
+			AddNewCityTile(position, size, rect, center, updatedCityTileType, true, true, false, true);
+		}
+		//DOWN RIGHT
+		else if (directions[1] && directions[3])
+		{
+			constexpr int railIndex = static_cast<int>(CityTileType::RAIL_TURN);
+			const auto rect = textureRects_[railIndex];
+			const auto center = rectCenter_[railIndex];
+			const auto size = sf::Vector2f(tileSize_);
+
+			AddNewCityTile(position, size, rect, center, updatedCityTileType, false, true, false, true);
+		}
+		//UP LEFT
+		else if (directions[0] && directions[2])
+		{
+			constexpr int railIndex = static_cast<int>(CityTileType::RAIL_TURN);
+			const auto rect = textureRects_[railIndex];
+			const auto center = rectCenter_[railIndex];
+			const auto size = sf::Vector2f(tileSize_);
+
+			AddNewCityTile(position, size, rect, center, updatedCityTileType, true, false, false, true);
+		}
+		//VERTICAL LAST
+		else if (directions[0] && directions[1])
+		{
+			constexpr int railIndex = static_cast<int>(CityTileType::RAIL_LINE);
+			const auto rect = textureRects_[railIndex];
+			const auto center = rectCenter_[railIndex];
+			const auto size = sf::Vector2f(tileSize_);
+
+			AddNewCityTile(position, size, rect, center, updatedCityTileType, false, false, true, true);
+		}
+	};
+	//ROAD
+	for (const auto& cityElement : cityBuilderMap.elements_)
+	{
+		if (cityElement.elementType != CityElementType::ROAD && cityElement.elementType != CityElementType::RAIL) continue;
+
+		const sf::FloatRect tileRect = sf::FloatRect(sf::Vector2f(
+			float(cityElement.position.x * tileSize_.x - tileSize_.x / 2),
+			float(cityElement.position.y * tileSize_.y - tileSize_.y / 2)),
+			2.0f * sf::Vector2f(tileSize_));
+		if (!windowView_.intersects(tileRect))
+			continue;
+		if(cityElement.elementType == CityElementType::ROAD)
+		{
+			addRoad(cityElement);
+		}
+		else if(cityElement.elementType == CityElementType::RAIL)
+		{
+			addRail(cityElement);
+		}
+	}
+}
+
 void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, const CityCarManager& cityCarManager,
 	const CityBuildingManager& buildingManager,
 	const Transform2dManager& transformManager,
@@ -118,7 +407,8 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 {
 
 #ifdef TRACY_ENABLE
-	ZoneScoped
+	ZoneScoped;
+	ZoneValue(static_cast<std::uint64_t>(updatedCityTileType));
 #endif
 	const Index frameIndex = MainEngine::GetInstance()->frameIndex % 2;
 	//Manage window view
@@ -264,331 +554,7 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 	}
 	case CityTilesheetType::TRANSPORT:
 	{
-		//ROAD
-		std::vector<const CityElement*> roads;
-		for (const auto& cityElement : cityBuilderMap.elements_)
-		{
-			if (cityElement.elementType != CityElementType::ROAD) continue;
-
-			const sf::FloatRect tileRect = sf::FloatRect(sf::Vector2f(
-				float(cityElement.position.x*tileSize_.x - tileSize_.x / 2),
-				float(cityElement.position.y*tileSize_.y - tileSize_.y / 2)),
-				2.0f*sf::Vector2f(tileSize_));
-			if (!windowView_.intersects(tileRect))
-				continue;
-			roads.push_back(&cityElement);
-
-		}
-		for (const auto& roadPtr : roads)
-		{
-			const auto& road = *roadPtr;
-			bool directions[] = { 0, 0, 0, 0 };//UP, DOWN, LEFT, RIGHT
-
-			if (road.position.y == 0)
-			{
-				directions[0] = true;
-			}
-			if (road.position.y == int(cityBuilderMap.city.mapSize.y - 1))
-			{
-				directions[1] = true;
-			}
-			if (road.position.x == 0)
-			{
-				directions[2] = true;
-			}
-			if (road.position.x == int(cityBuilderMap.city.mapSize.x - 1))
-			{
-				directions[3] = true;
-			}
-			const bool isWater = cityBuilderMap.environmentTiles_[cityBuilderMap.Position2Index(road.position)] ==
-				EnvironmentTile::WATER;
-			const sf::FloatRect tileRect = sf::FloatRect(sf::Vector2f(
-				float(road.position.x*tileSize_.x - tileSize_.x / 2),
-				float(road.position.y*tileSize_.y - tileSize_.y / 2)),
-				2.0f*sf::Vector2f(tileSize_));
-
-			if (!windowView_.intersects(tileRect))
-				continue;
-			for (const auto* otherRoadPtr : roads)
-			{
-				const auto& otherRoad = *otherRoadPtr;
-				if (otherRoad.position == road.position)
-				{
-					continue;
-				}
-				const sf::Vector2i deltaPos = otherRoad.position - road.position;
-				if (deltaPos == sf::Vector2i(0, -1))
-				{
-					directions[0] = true;
-				}
-				if (deltaPos == sf::Vector2i(0, 1))
-				{
-					directions[1] = true;
-				}
-				if (deltaPos == sf::Vector2i(-1, 0))
-				{
-					directions[2] = true;
-				}
-				if (deltaPos == sf::Vector2i(1, 0))
-				{
-					directions[3] = true;
-				}
-			}
-			const auto position = sf::Vector2f(
-				static_cast<float>(road.position.x * tileSize_.x),
-				static_cast<float>(road.position.y * tileSize_.y));
-			Index roadIndex = 0;
-
-			if ((directions[0] && directions[1] && !directions[2] && !directions[3]) or
-				(directions[0] && !directions[1] && !directions[2] && !directions[3]) or
-				(!directions[0] && directions[1] && !directions[2] && !directions[3]))
-			{
-				roadIndex = Index(
-					isWater ? CityTileType::ROAD_BRIDGE_VERTICAL : CityTileType::ROAD_LINE);
-				const auto rect = textureRects_[roadIndex];
-				const auto center = rectCenter_[roadIndex];
-				const auto size = sf::Vector2f(
-					static_cast<float>(tileSize_.x),
-					(isWater ? 2.0f : 1.0f) * tileSize_.y);
-
-				AddNewCityTile(position, size, rect, center, updatedCityTileType);
-			}
-			else if ((!directions[0] && !directions[1] && directions[2] && directions[3]) or
-				(!directions[0] && !directions[1] && !directions[2] && directions[3]) or
-				(!directions[0] && !directions[1] && directions[2] && !directions[3]) or
-				(!directions[0] && !directions[1] && !directions[2] && !directions[3]))
-			{
-				roadIndex = Index(
-					isWater ? CityTileType::ROAD_BRIDGE_HORIZONTAL : CityTileType::ROAD_LINE);
-				const auto rect = textureRects_[roadIndex];
-				const auto center = rectCenter_[roadIndex];
-				const auto size = sf::Vector2f(
-					float(tileSize_.x),
-					(isWater ? 2.0f : 1.0f) * tileSize_.y);
-
-				AddNewCityTile(position, size, rect, center, updatedCityTileType, false, false, !isWater, true);
-			}
-			else if (directions[0] && directions[1] && directions[2] && directions[3])
-			{
-				roadIndex = Index(CityTileType::CROSS_ROAD);
-				const auto rect = textureRects_[roadIndex];
-				const auto center = rectCenter_[roadIndex];
-				const auto size = sf::Vector2f(float(tileSize_.x), float(tileSize_.y));
-
-				AddNewCityTile(position, size, rect, center, updatedCityTileType, false, false, false, true);
-			}
-			else if (directions[0] && directions[1] && !directions[2] && directions[3])
-			{
-				roadIndex = Index(CityTileType::ROAD_T);
-				const auto rect = textureRects_[roadIndex];
-				const auto center = rectCenter_[roadIndex];
-				const auto size = sf::Vector2f(float(tileSize_.x), float(tileSize_.y));
-
-				AddNewCityTile(position, size, rect, center, updatedCityTileType, false, false, false, true);
-			}
-			else if (directions[0] && directions[1] && directions[2] && !directions[3])
-			{
-				roadIndex = Index(CityTileType::ROAD_T);
-				const auto rect = textureRects_[roadIndex];
-				const auto center = rectCenter_[roadIndex];
-				const auto size = sf::Vector2f(float(tileSize_.x), float(tileSize_.y));
-
-				AddNewCityTile(position, size, rect, center, updatedCityTileType, true, false, false, true);
-			}
-			else if (directions[0] && !directions[1] && directions[2] && directions[3])
-			{
-				roadIndex = Index(CityTileType::ROAD_T);
-				const auto rect = textureRects_[roadIndex];
-				const auto center = rectCenter_[roadIndex];
-				const auto size = sf::Vector2f(float(tileSize_.x), float(tileSize_.y));
-
-				AddNewCityTile(position, size, rect, center, updatedCityTileType, false, false, true, true);
-			}
-			else if (!directions[0] && directions[1] && directions[2] && directions[3])
-			{
-				roadIndex = Index(CityTileType::ROAD_T);
-				const auto rect = textureRects_[roadIndex];
-				const auto center = rectCenter_[roadIndex];
-				const auto size = sf::Vector2f(float(tileSize_.x), float(tileSize_.y));
-
-				AddNewCityTile(position, size, rect, center, updatedCityTileType, true, false, true, true);
-			}
-			else if (!directions[0] && directions[1] && !directions[2] && directions[3])
-			{
-				roadIndex = Index(CityTileType::ROAD_TURN);
-				const auto rect = textureRects_[roadIndex];
-				const auto center = rectCenter_[roadIndex];
-				const auto size = sf::Vector2f(float(tileSize_.x), float(tileSize_.y));
-
-				AddNewCityTile(position, size, rect, center, updatedCityTileType, false, false, false, true);
-			}
-			else if (!directions[0] && directions[1] && directions[2] && !directions[3])
-			{
-				roadIndex = Index(CityTileType::ROAD_TURN);
-				const auto rect = textureRects_[roadIndex];
-				const auto center = rectCenter_[roadIndex];
-				const auto size = sf::Vector2f(float(tileSize_.x), float(tileSize_.y));
-
-				AddNewCityTile(position, size, rect, center, updatedCityTileType, true, false, false, true);
-			}
-			else if (directions[0] && !directions[1] && !directions[2] && directions[3])
-			{
-				roadIndex = Index(CityTileType::ROAD_TURN);
-				const auto rect = textureRects_[roadIndex];
-				const auto center = rectCenter_[roadIndex];
-				const auto size = sf::Vector2f(float(tileSize_.x), float(tileSize_.y));
-
-				AddNewCityTile(position, size, rect, center, updatedCityTileType, false, true, false, true);
-			}
-			else if (directions[0] && !directions[1] && directions[2] && !directions[3])
-			{
-				roadIndex = Index(CityTileType::ROAD_TURN);
-				const auto rect = textureRects_[roadIndex];
-				const auto center = rectCenter_[roadIndex];
-				const auto size = sf::Vector2f(float(tileSize_.x), float(tileSize_.y));
-
-				AddNewCityTile(position, size, rect, center, updatedCityTileType, true, true, false, true);
-			}
-
-		}
-
-		//RAILS
-
-		std::vector<const CityElement*> rails;
-		rails.reserve(cityBuilderMap.elements_.size());
-		for (const auto& cityElement : cityBuilderMap.elements_)
-		{
-			if (cityElement.elementType != CityElementType::RAIL) 
-				continue;
-
-			const sf::FloatRect tileRect = sf::FloatRect(sf::Vector2f(
-				float(cityElement.position.x*tileSize_.x - tileSize_.x / 2),
-				float(cityElement.position.y*tileSize_.y - tileSize_.y / 2)),
-				2.0f*sf::Vector2f(tileSize_));
-			if (!windowView_.intersects(tileRect))
-				continue;
-			rails.push_back(&cityElement);
-
-		}
-		for (auto* railPtr : rails)
-		{
-			const auto& rail = *railPtr;
-			bool directions[] = { 0, 0, 0, 0 };//UP, DOWN, LEFT, RIGHT
-
-			if (rail.position.y == 0)
-			{
-				directions[0] = true;
-			}
-			if (rail.position.y == int(cityBuilderMap.city.mapSize.y - 1))
-			{
-				directions[1] = true;
-			}
-			if (rail.position.x == 0)
-			{
-				directions[2] = true;
-			}
-			if (rail.position.x == int(cityBuilderMap.city.mapSize.x - 1))
-			{
-				directions[3] = true;
-			}
-			const sf::FloatRect tileRect = sf::FloatRect(sf::Vector2f(
-				float(rail.position.x*tileSize_.x - tileSize_.x / 2), 
-				float(rail.position.y*tileSize_.y - tileSize_.y / 2)),
-				sf::Vector2f(tileSize_));
-
-			if (!windowView_.intersects(tileRect))
-				continue;
-
-			for (auto* otherRailPtr : rails)
-			{
-				auto& otherRail = *otherRailPtr;
-				if (otherRail.position == rail.position)
-				{
-					continue;
-				}
-				const sf::Vector2i deltaPos = otherRail.position - rail.position;
-				if (deltaPos == sf::Vector2i(0, -1))
-				{
-					directions[0] = true;
-				}
-				if (deltaPos == sf::Vector2i(0, 1))
-				{
-					directions[1] = true;
-				}
-				if (deltaPos == sf::Vector2i(-1, 0))
-				{
-					directions[2] = true;
-				}
-				if (deltaPos == sf::Vector2i(1, 0))
-				{
-					directions[3] = true;
-				}
-			}
-			const auto position = sf::Vector2f(
-				static_cast<float>(rail.position.x * tileSize_.x),
-				static_cast<float>(rail.position.y * tileSize_.y));
-			//HORIZONTAL FIRST
-			if (directions[2] && directions[3])
-			{
-				const int railIndex = int(CityTileType::RAIL_LINE);
-				const auto rect = textureRects_[railIndex];
-				const auto center = rectCenter_[railIndex];
-				const auto size = sf::Vector2f(tileSize_);
-
-				AddNewCityTile(position, size, rect, center, updatedCityTileType);
-			}
-
-			//UP RIGHT
-			else if (directions[0] && directions[3])
-			{
-				const Index railIndex = Index(CityTileType::RAIL_TURN);
-				const auto rect = textureRects_[railIndex];
-				const auto center = rectCenter_[railIndex];
-				const auto size = sf::Vector2f(tileSize_);
-
-				AddNewCityTile(position, size, rect, center, updatedCityTileType);
-			}
-			//DOWN LEFT
-			else if (directions[1] && directions[2])
-			{
-				const int railIndex = int(CityTileType::RAIL_TURN);
-				const auto rect = textureRects_[railIndex];
-				const auto center = rectCenter_[railIndex];
-				const auto size = sf::Vector2f(tileSize_);
-
-				AddNewCityTile(position, size, rect, center, updatedCityTileType, true, true, false, true);
-			}
-			//DOWN RIGHT
-			else if (directions[1] && directions[3])
-			{
-				const int railIndex = int(CityTileType::RAIL_TURN);
-				const auto rect = textureRects_[railIndex];
-				const auto center = rectCenter_[railIndex];
-				const auto size = sf::Vector2f(tileSize_);
-
-				AddNewCityTile(position, size, rect, center, updatedCityTileType, false, true, false, true);
-			}
-			//UP LEFT
-			else if (directions[0] && directions[2])
-			{
-				const int railIndex = int(CityTileType::RAIL_TURN);
-				const auto rect = textureRects_[railIndex];
-				const auto center = rectCenter_[railIndex];
-				const auto size = sf::Vector2f(tileSize_);
-
-				AddNewCityTile(position, size, rect, center, updatedCityTileType, true, false, false, true);
-			}
-			//VERTICAL LAST
-			else if (directions[0] && directions[1])
-			{
-				const int railIndex = int(CityTileType::RAIL_LINE);
-				const auto rect = textureRects_[railIndex];
-				const auto center = rectCenter_[railIndex];
-				const auto size = sf::Vector2f(tileSize_);
-
-				AddNewCityTile(position, size, rect, center, updatedCityTileType, false, false, true, true);
-			}
-		}
+		UpdateTransportTilemap(cityBuilderMap);
 		break;
 	}
 
@@ -655,8 +621,8 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 			if (car.entity == INVALID_ENTITY)
 				continue;
 
-			const auto rect = textureRects_[Index(car.carType)];
-			const auto center = rectCenter_[Index(car.carType)];
+			const auto rect = textureRects_[static_cast<Index>(car.carType)];
+			const auto center = rectCenter_[static_cast<Index>(car.carType)];
 			const auto position = transformManager.GetPosition(car.entity);
 			auto deltaPos = car.currentPath[car.currentIndex + 1] - car.currentPath[car.currentIndex];
 
@@ -814,4 +780,5 @@ void CityBuilderTilemap::AddCar(const sf::Vector2f position, const sf::Vector2f 
 		tilesheets_[Index(CityTilesheetType::CAR)].tilemap[frameIndex].append(v);
 	}
 }
+
 }

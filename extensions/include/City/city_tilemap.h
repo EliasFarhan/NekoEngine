@@ -176,7 +176,7 @@ protected:
 		bool flipY = false, bool rotate90 = false, bool culling = true);
 	void AddCar(const sf::Vector2f position, const sf::Vector2f size, const sf::FloatRect rect,
 		const sf::Vector2f center, bool flipX = false, bool culling = true);
-	void UpdateTransportTilemap();
+	void UpdateTransportTilemap(const CityBuilderMap& cityBuilderMap);
 	/**
 	 * \brief use for tile culling
 	 */

@@ -68,8 +68,9 @@ public:
 	const std::vector<CityCar>& GetCarsVector() const;
 	void RescheduleCarPathfinding(const sf::Vector2i& removedPosition);
 	size_t CountCar() const;
-	CityCar* GetCar(Index carEntity);
+	std::pair<CityCar*, std::shared_lock<std::shared_mutex>> GetCar(Index carEntity);
 private:
+	mutable std::shared_mutex carMutex_;
 	std::vector<CityCar> cars_;
 	EntityManager* entityManagerPtr_ = nullptr;
 	Transform2dManager* transformManagerPtr_ = nullptr;

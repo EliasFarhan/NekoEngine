@@ -204,12 +204,12 @@ void CityCursor::OnEvent(sf::Event& event)
 			int length;
 			if (std::abs(deltaPos.x) > std::abs(deltaPos.y))
 			{
-				direction.x = int(copysign(1, deltaPos.x));
+				direction.x = static_cast<int>(copysign(1, deltaPos.x));
 				length = std::abs(deltaPos.x);
 			}
 			else
 			{
-				direction.y = int(copysign(1, deltaPos.y));
+				direction.y = static_cast<int>(copysign(1, deltaPos.y));
 				length = std::abs(deltaPos.y);
 			}
 			for (int i = 0; i <= length; i++)

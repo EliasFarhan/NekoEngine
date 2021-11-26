@@ -29,6 +29,7 @@
 #include "engine/globals.h"
 #include "City/city_command.h"
 #include <City/city_graph.h>
+#include <unordered_set>
 
 
 namespace neko
@@ -92,6 +93,18 @@ struct RoadElement : CityElement
     unsigned neighborsBitwise = 0u;
 };
 
+
+// custom specialization of std::hash can be injected in namespace std
+
+struct Vector2iHash
+{
+	std::size_t operator()(sf::Vector2i const& v) const noexcept
+	{
+		std::size_t h1 = std::hash<int>{}(v.x);
+		std::size_t h2 = std::hash<int>{}(v.y);
+		return h1 ^ (h2 << 1); // or use boost::hash_combine
+	}
+};
 class CityBuilderMap : public System
 {
 public:
@@ -100,7 +113,7 @@ public:
 	void Destroy() override;
 
 	std::size_t Position2Index(sf::Vector2i pos) const;
-	sf::Vector2i Index2Position(size_t index) const;
+    [[nodiscard]] sf::Vector2i Index2Position(size_t index) const;
 	void AddCityElement(CityElementType cityElement, const sf::Vector2i& position);
 	void RemoveCityElement(const sf::Vector2i& position);
 	CityElement* GetCityElementAt(sf::Vector2i position);
@@ -108,11 +121,15 @@ public:
 	TileMapGraph& GetRoadGraph();
     [[nodiscard]] std::vector<sf::Vector2i> GetRoadEnds() const;
 	City city{};
+    [[nodiscard]] bool ContainsRoad(sf::Vector2i pos) const;
+	[[nodiscard]] bool ContainsRail(sf::Vector2i pos) const;
 private:
     friend class CityBuilderTilemap;
     TileMapGraph roadGraph_;
     std::vector<EnvironmentTile> environmentTiles_;
     std::vector<CityElement> elements_;
+	std::unordered_set<sf::Vector2i, Vector2iHash> roadSet;
+	std::unordered_set<sf::Vector2i, Vector2iHash> railSet;
 };
 
 }

@@ -90,7 +90,7 @@ void CityPeopleManager::Init()
 	})JSON"_json;
 
 
-	const auto moveToFunc = [&](Index entity, const std::vector<double>&) -> bool
+	const auto moveToFunc = [this](Index entity, const std::vector<double>&) -> bool
 	{
 		auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
 		Person* personPtr = engine->GetPeopleManager().GetPersonAt(entity);
@@ -99,7 +99,8 @@ void CityPeopleManager::Init()
 			DestroyPerson(entity);
 			return true;
 		}
-		auto* car = engine->GetCarManager().GetCar(personPtr->carEntity);
+		
+		auto [car, lock] = engine->GetCarManager().GetCar(personPtr->carEntity);
 		if (car == nullptr)
 		{
 			DestroyPerson(entity);
@@ -137,7 +138,7 @@ void CityPeopleManager::Init()
 	};
 
 	FunctionMap functionMap;
-	functionMap.SetFunction("FindHouse", [&](Index entity, const std::vector<double>&) -> bool
+	functionMap.SetFunction("FindHouse", [this](Index entity, const std::vector<double>&) -> bool
 	{
 
 		logDebug("Find House " + std::to_string(entity));
@@ -190,8 +191,8 @@ void CityPeopleManager::Init()
 				return false;
 			}
 			personPtr->carEntity = engine->GetCarManager().SpawnCar(closestCurrentPos, CarType::AVG_CAR);
-			auto* car = engine->GetCarManager().GetCar(personPtr->carEntity);
-			car->currentPath = path;
+			auto [car, lock] = engine->GetCarManager().GetCar(personPtr->carEntity);
+		    car->currentPath = path;
 
 			car->carState = CarState::MOVING_TO_NEXT_POS;
 			car->currentIndex = 0u;
@@ -200,7 +201,7 @@ void CityPeopleManager::Init()
 		}
 		return housePos != INVALID_TILE_POS;
 	});
-	functionMap.SetFunction("FindWork", [&](Index entity, const std::vector<double>&) -> bool
+	functionMap.SetFunction("FindWork", [this](Index entity, const std::vector<double>&) -> bool
 	{
 		logDebug("Find Work " + std::to_string(entity));
 		auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
@@ -251,7 +252,7 @@ void CityPeopleManager::Init()
 				return false;
 			}
 			personPtr->carEntity = engine->GetCarManager().SpawnCar(closestCurrentPos, CarType::BIG_CAR);
-			auto* car = engine->GetCarManager().GetCar(personPtr->carEntity);
+			auto [car, lock] = engine->GetCarManager().GetCar(personPtr->carEntity);
 			car->currentPath = path;
 
 			car->carState = CarState::MOVING_TO_NEXT_POS;
@@ -261,7 +262,7 @@ void CityPeopleManager::Init()
 		}
 		return workPos != INVALID_TILE_POS;
 	});
-	functionMap.SetFunction("CheckHomeAndWork", [&](Index entity, const std::vector<double>&) -> bool
+	functionMap.SetFunction("CheckHomeAndWork", [this](Index entity, const std::vector<double>&) -> bool
 	{
 		auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
 		logDebug("CheckHomeAndWork " + std::to_string(entity));
@@ -305,7 +306,7 @@ void CityPeopleManager::Init()
 				return false;
 			}
 			person->carEntity = engine->GetCarManager().SpawnCar(closestCurrentPos, CarType::BUS);
-			auto* car = engine->GetCarManager().GetCar(person->carEntity);
+			auto [car, lock] = engine->GetCarManager().GetCar(person->carEntity);
 			car->currentPath = path;
 			car->carState = CarState::MOVING_TO_NEXT_POS;
 			car->currentIndex = 0u;

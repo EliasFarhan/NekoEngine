@@ -42,10 +42,9 @@ namespace neko {
 		staticNameFunctionMap_.insert(std::make_pair(std::string(name), func));
 	}
 
-	bool FunctionMap::CallFunction(const std::string_view name, double value)
-	{
-		
-		auto it = staticNameFunctionMap_.find(std::string(name));
+	bool FunctionMap::CallFunction(const std::string_view name, double value) const
+    {
+        const auto it = staticNameFunctionMap_.find(std::string(name));
 		if (it != staticNameFunctionMap_.end())
 		{
 			return it->second(comp_, { value });
@@ -56,10 +55,9 @@ namespace neko {
 
 	bool FunctionMap::CallFunction(
 		const std::string_view name, 
-		const std::vector<double>& values)
-	{
-		
-		auto it = staticNameFunctionMap_.find(std::string(name));
+		const std::vector<double>& values) const
+    {
+        const auto it = staticNameFunctionMap_.find(std::string(name));
 		if (it != staticNameFunctionMap_.end())
 		{
 			return it->second(comp_, values);

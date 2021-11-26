@@ -121,38 +121,27 @@ void CityBuilderMap::Init()
 			CityElement element{};
 			if (x < railDownX)
 			{
-				element.position = pos;
-				element.size = sf::Vector2u(1, 1);
-				element.elementType = CityElementType::RAIL;
-				elements_.push_back(element);
+				AddCityElement(CityElementType::RAIL, pos);
 			}
 			else if (x == railDownX)
 			{
 				for (unsigned int y = pos.y; y < city.mapSize.y; y++)
 				{
-					element.position = sf::Vector2i(railDownX, y);
-					element.size = sf::Vector2u(1, 1);
-					element.elementType = CityElementType::RAIL;
-					elements_.push_back(element);
+					AddCityElement(CityElementType::RAIL, sf::Vector2i(railDownX, y));
 				}
 			}
 
 			//Up track
 			if (x > railUpX)
 			{
-				element.position = pos - sf::Vector2i(0, 1);
+				AddCityElement(CityElementType::RAIL, pos - sf::Vector2i(0, 1));
 
-				element.elementType = CityElementType::RAIL;
-				elements_.push_back(element);
 			}
 			else if (x == railUpX)
 			{
 				for (int y = pos.y; y >= 0; y--)
 				{
-					element.position = sf::Vector2i(railUpX, y);
-					element.size = sf::Vector2u(1, 1);
-					element.elementType = CityElementType::RAIL;
-					elements_.push_back(element);
+					AddCityElement(CityElementType::RAIL, sf::Vector2i(railUpX, y));
 				}
 			}
 		}
@@ -169,13 +158,13 @@ void CityBuilderMap::Init()
 				const sf::Vector2i pos = sf::Vector2i(x, y);
 
 				const auto pnoise = perlinNoise.noise0_1(
-					float(pos.x) / city.mapSize.x * city.perlinFreq,
-					float(pos.y) / city.mapSize.y * city.perlinFreq);
+					static_cast<float>(pos.x) / city.mapSize.x * city.perlinFreq,
+					static_cast<float>(pos.y) / city.mapSize.y * city.perlinFreq);
 				auto result = std::find_if(obstacles.begin(), obstacles.end(), [&pos](CityElement& elem)
 				{
 					for (unsigned int dx = 0; dx < elem.size.x; dx++)
 					{
-						for (int dy = 0; dy < int(elem.size.y); dy++)
+						for (int dy = 0; dy < static_cast<int>(elem.size.y); dy++)
 						{
 							if (elem.position + sf::Vector2i(dx, -dy) == pos)
 								return true;
@@ -287,8 +276,19 @@ void CityBuilderMap::AddCityElement(CityElementType cityElement, const sf::Vecto
 			element.size = sf::Vector2u(1, 1);
 			element.elementType = CityElementType::ROAD;
 			roadGraph_.AddNode(position);
+			roadSet.insert(position);
 			elements_.push_back(element);
 		}
+		break;
+	}
+	case CityElementType::RAIL:
+	{
+		CityElement element{};
+		element.position = position;
+		element.size = sf::Vector2u(1, 1);
+		element.elementType = CityElementType::RAIL;
+		railSet.insert(position);
+		elements_.push_back(element);
 		break;
 	}
 	default:
@@ -312,6 +312,19 @@ void CityBuilderMap::RemoveCityElement(const sf::Vector2i& position)
 		if (elementIt->elementType == CityElementType::ROAD)
 		{
 			roadGraph_.RemoveNode(position);
+			auto it = roadSet.find(elementIt->position);
+			if (it != roadSet.end())
+			{
+				roadSet.erase(it);
+			}
+		}
+		if(elementIt->elementType == CityElementType::RAIL)
+		{
+			auto it = railSet.find(elementIt->position);
+			if(it != railSet.end())
+			{
+				railSet.erase(it);
+			}
 		}
 		elements_.erase(elementIt);
 
@@ -345,6 +358,16 @@ std::vector<sf::Vector2i> CityBuilderMap::GetRoadEnds() const
 		}
 	}
 	return ends;
+}
+
+bool CityBuilderMap::ContainsRoad(sf::Vector2i pos) const
+{
+	return roadSet.contains(pos);
+}
+
+bool CityBuilderMap::ContainsRail(sf::Vector2i pos) const
+{
+	return railSet.contains(pos);
 }
 
 CityElement* CityBuilderMap::GetCityElementAt(sf::Vector2i position)

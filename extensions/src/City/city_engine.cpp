@@ -87,19 +87,36 @@ namespace neko
                 cityPeopleManager_.Update(dt);
             });
         workerManager_.AddTask(peopleUpdateTask, "other");
-        const auto btUpdateTask = std::make_shared<Task>([&]()
+        std::vector<Entity> btEntities;
+        const auto generateBtEntities = std::make_shared<Task>([&btEntities, this]()
             {
-#ifdef TRACY_ENABLE
-                ZoneNamedN(BehaviorTreeTask, "BehaviorTreeTask", true);
-#endif
-                const auto btEntities = entityManager_.FilterEntities(static_cast<EntityMask>(CityComponentType::BEHAVIOR_TREE));
-                for (const auto entity : btEntities)
-                {
-                    behaviorTreeManager_.ExecuteIndex(entity);
-                }
+                btEntities = entityManager_.FilterEntities(static_cast<EntityMask>(CityComponentType::BEHAVIOR_TREE));
             });
-        btUpdateTask->AddDependency(peopleUpdateTask);
-        workerManager_.AddTask(btUpdateTask, "other");
+        generateBtEntities->AddDependency(peopleUpdateTask);
+        workerManager_.AddTask(generateBtEntities, "other");
+        std::vector<std::shared_ptr<Task>> btUpdateTasks(std::thread::hardware_concurrency()-2);
+        for (std::size_t i = 0; i < btUpdateTasks.size(); i++)
+        {
+            
+            btUpdateTasks[i] = std::make_shared<Task>([this, &btEntities, &btUpdateTasks, i]()
+                {
+#ifdef TRACY_ENABLE
+                    ZoneNamedN(BehaviorTreeTask, "BehaviorTreeTask", true);
+#endif
+                    const auto btEntitiesChunkSize = btEntities.size() / btUpdateTasks.size();
+                    const auto beginIndex = i * btEntitiesChunkSize;
+                    const auto endIndex = i == btUpdateTasks.size() - 1 ? 
+                        btEntities.size() :
+                        (i + 1u) * btEntitiesChunkSize;
+                    for (std::size_t btEntityIndex = beginIndex; btEntityIndex < endIndex; btEntityIndex++)
+                    {
+                        behaviorTreeManager_.ExecuteIndex(btEntities[btEntityIndex]);
+                    }
+                });
+            btUpdateTasks[i]->AddDependency(generateBtEntities);
+            btUpdateTasks[i]->AddDependency(peopleUpdateTask);
+            workerManager_.AddTask(btUpdateTasks[i], "other");
+        }
         const auto commandUpdateTask = std::make_shared<Task>([&]() {commandManager_.Update(dt); });
         workerManager_.AddTask(commandUpdateTask, "other");
         const auto buildingUpdateTask = std::make_shared<Task>([&]() { cityBuildingManager_.
@@ -152,7 +169,9 @@ namespace neko
             if (static_cast<CityTilesheetType>(i) == CityTilesheetType::CAR)
             {
                 tilemapUpdateTasks[i]->AddDependency(carsUpdateTask);
-                tilemapUpdateTasks[i]->AddDependency(btUpdateTask);
+                std::ranges::for_each(btUpdateTasks, [&tilemapUpdateTasks, i](auto& btUpdateTask) {
+                    tilemapUpdateTasks[i]->AddDependency(btUpdateTask);
+                    });
             }
             if (static_cast<CityTilesheetType>(i) == CityTilesheetType::CITY)
             {
@@ -193,7 +212,11 @@ namespace neko
             graphicsManager_->editor->AddInspectorInfo("People", std::to_string(cityPeopleManager_.GetPeopleCount()));
             });
         editorUpdateTask->AddDependency(carsUpdateTask);
-        editorUpdateTask->AddDependency(btUpdateTask);
+        std::ranges::for_each(btUpdateTasks, [&editorUpdateTask](const auto& btUpdateTask)
+            {
+                editorUpdateTask->AddDependency(btUpdateTask);
+            });
+        
         workerManager_.AddTask(editorUpdateTask, "other");
         
         cursorUpdateTask->Join();

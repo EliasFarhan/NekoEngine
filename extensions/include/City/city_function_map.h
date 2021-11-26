@@ -36,10 +36,10 @@ namespace neko {
 		void SetFunction(
 			const std::string_view name, 
 			std::function<bool(Index, const std::vector<double>&)> func);
-		bool CallFunction(const std::string_view name, double value);
+		bool CallFunction(const std::string_view name, double value) const;
 		bool CallFunction(
 			const std::string_view name, 
-			const std::vector<double>& vecDouble);
+			const std::vector<double>& vecDouble) const;
 
 	protected:
 		Index comp_;

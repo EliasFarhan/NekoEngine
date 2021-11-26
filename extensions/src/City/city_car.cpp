@@ -151,17 +151,17 @@ Entity CityCarManager::SpawnCar(sf::Vector2i position, CarType carType)
 	const Entity newCarEntity = entityManagerPtr_->CreateEntity();
 	AddCar(newCarEntity, carType, position);
 	entityManagerPtr_->AddComponentType(newCarEntity, EntityMask(CityComponentType::CAR));
-	auto& car = cars_[newCarEntity];
-	car.entity = newCarEntity;
+	auto [car, lock] = GetCar(newCarEntity);
+	car->entity = newCarEntity;
 	const auto tileSize = cityMap_->city.tileSize;
-	transformManagerPtr_->AddPosition(sf::Vector2f(car.position.x * float(tileSize.x), car.position.y * float(tileSize.y)), newCarEntity);
+	transformManagerPtr_->AddPosition(sf::Vector2f(car->position.x * float(tileSize.x), car->position.y * float(tileSize.y)), newCarEntity);
 	entityManagerPtr_->AddComponentType(newCarEntity, EntityMask(CityComponentType::TRANSFORM));
 	return newCarEntity;
 }
 
 Entity CityCarManager::AddCar(Entity entity, CarType carType, sf::Vector2i position)
 {
-
+	std::lock_guard lock(carMutex_);
 #ifdef TRACY_ENABLE
 	ZoneScoped
 #endif
@@ -194,13 +194,13 @@ void CityCarManager::RescheduleCarPathfinding(const sf::Vector2i& removedPositio
 	{
 		if (entityManagerPtr_->HasComponent(carEntity, EntityMask(CityComponentType::CAR) | EntityMask(CityComponentType::TRANSFORM)))
 		{
-			auto& car = cars_[carEntity];
-			auto posIt = std::find(car.currentPath.begin(), car.currentPath.end(), removedPosition);
-			if (posIt != car.currentPath.end())
+			auto [car, lock] = GetCar(carEntity);
+			auto posIt = std::ranges::find(car->currentPath, removedPosition);
+			if (posIt != car->currentPath.end())
 			{
-				car.carState = CarState::RESCHEDULE;
+				car->carState = CarState::RESCHEDULE;
 				//Destroy car if it is in the destroyed area
-				if (posIt - car.currentPath.begin() == car.currentIndex)
+				if (posIt - car->currentPath.begin() == car->currentIndex)
 				{
 					entityManagerPtr_->DestroyEntity(carEntity);
 				}
@@ -215,6 +215,7 @@ size_t CityCarManager::CountCar() const
 #ifdef TRACY_ENABLE
 	ZoneScoped
 #endif
+	std::shared_lock lock(carMutex_);
 	Index count = 0;
 	for (Entity entity = 0; entity < cars_.size(); entity++)
 	{
@@ -226,14 +227,14 @@ size_t CityCarManager::CountCar() const
 	return count;
 }
 
-CityCar* CityCarManager::GetCar(Index carEntity)
+std::pair<CityCar*, std::shared_lock<std::shared_mutex>>  CityCarManager::GetCar(Index carEntity)
 {
-
+	std::shared_lock lock(carMutex_);
 #ifdef TRACY_ENABLE
 	ZoneScoped
 #endif
 	if (carEntity >= cars_.size())
-		return nullptr;
-	return &cars_[carEntity];
+		return {nullptr, std::move(lock)};
+	return { &cars_[carEntity], std::move(lock) };
 }
 }
