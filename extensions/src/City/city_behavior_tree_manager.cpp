@@ -404,8 +404,7 @@ namespace neko {
 		Index comp,
 		const json& jsonContent)
 	{
-		
-		auto behaviorTree = ParseBehaviorTreeFromJson(comp, jsonContent);
+        const auto behaviorTree = ParseBehaviorTreeFromJson(comp, jsonContent);
 		size_t futureSize = vecBehaviorTree_.capacity();
 		if (futureSize <= comp)
 		{

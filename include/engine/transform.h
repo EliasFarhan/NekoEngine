@@ -45,7 +45,7 @@ public:
     Index AddScale(sf::Vector2f scale, Entity entity = INVALID_ENTITY);
     Index AddAngle(float angle, Entity entity = INVALID_ENTITY);
 
-    sf::Vector2f GetPosition(Index i) const;
+    [[nodiscard]] sf::Vector2f GetPosition(Index i) const;
 	void SetPosition(const sf::Vector2f& position, Index i);
 
 private:

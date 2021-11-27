@@ -38,9 +38,9 @@ using Entity = Index;
  */
 using EntityMask = std::uint32_t;
 enum class ComponentType : unsigned;
-const Entity INVALID_ENTITY = std::numeric_limits<Index>::max();
-const EntityMask INVALID_ENTITY_MASK = 0u;
-
+constexpr Entity INVALID_ENTITY = std::numeric_limits<Index>::max();
+constexpr EntityMask INVALID_ENTITY_MASK = 0u;
+constexpr EntityMask ENTITY_EXIST_FLAG = 1u << 30u;
 /**
  * \brief Used in an Entity-Component-System to store all entities and what components they have
  */

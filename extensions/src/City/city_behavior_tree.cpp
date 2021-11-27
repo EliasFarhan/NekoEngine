@@ -212,8 +212,7 @@ namespace neko {
 
 	BehaviorTreeFlow BehaviorTreeLeafFunctional::Execute()
 	{
-		
-		std::string functional = GetVariable("functional");
+        const std::string functional = GetVariable("functional");
 		std::vector<double> values;
 		if (functional != functional_) 
 		{

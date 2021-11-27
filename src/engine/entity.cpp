@@ -32,6 +32,7 @@ namespace neko
 
 EntityManager::EntityManager()
 {
+    std::lock_guard lock(mutex_);
     entityMaskArray_.reserve(INIT_ENTITY_NMB);
 }
 
@@ -44,17 +45,19 @@ EntityMask EntityManager::GetMask(Entity entity)
 Entity EntityManager::CreateEntity()
 {
     std::lock_guard lock(mutex_);
-    const auto entityMaskIt = std::find_if(entityMaskArray_.begin(), entityMaskArray_.end(),[](EntityMask entityMask){
+    const auto entityMaskIt = std::ranges::find_if(entityMaskArray_,[](EntityMask entityMask){
        return  entityMask == INVALID_ENTITY_MASK;
     });
     if(entityMaskIt == entityMaskArray_.end())
     {
-        entityMaskArray_.push_back(INVALID_ENTITY_MASK);
+        entityMaskArray_.push_back(ENTITY_EXIST_FLAG);
         return static_cast<Entity>(entityMaskArray_.size() - 1);
     }
     else
     {
-        return static_cast<Entity>(entityMaskIt - entityMaskArray_.begin());
+        const auto entity = static_cast<Entity>(entityMaskIt - entityMaskArray_.begin());
+        entityMaskArray_[entity] = ENTITY_EXIST_FLAG;
+        return entity;
     }
 }
 
@@ -87,7 +90,7 @@ void EntityManager::RemoveComponentType(Entity entity, EntityMask componentType)
 size_t EntityManager::GetEntitiesNmb(EntityMask filterComponents)
 {
     std::shared_lock lock(mutex_);
-    return std::count_if(entityMaskArray_.begin(), entityMaskArray_.end(),[&filterComponents](EntityMask entityMask){
+    return std::ranges::count_if(entityMaskArray_,[&filterComponents](EntityMask entityMask){
         return entityMask != INVALID_ENTITY_MASK && (entityMask & filterComponents) == filterComponents;
     });
 }
