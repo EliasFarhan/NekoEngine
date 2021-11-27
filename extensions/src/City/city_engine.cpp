@@ -77,8 +77,11 @@ namespace neko
         ZoneScoped
 #endif
         MainEngine::Update(dt);
+        //Update car task
         const auto carsUpdateTask = std::make_shared<Task>([&]() {cityCarManager_.Update(dt); });
         workerManager_.AddTask(carsUpdateTask, "other");
+
+        //Update people task
         const auto peopleUpdateTask = std::make_shared<Task>([&]()
             {
 #ifdef TRACY_ENABLE
@@ -87,6 +90,8 @@ namespace neko
                 cityPeopleManager_.Update(dt);
             });
         workerManager_.AddTask(peopleUpdateTask, "other");
+
+        // Generate Behavior tree entities
         std::vector<Entity> btEntities;
         const auto generateBtEntities = std::make_shared<Task>([&btEntities, this]()
             {
@@ -94,6 +99,8 @@ namespace neko
             });
         generateBtEntities->AddDependency(peopleUpdateTask);
         workerManager_.AddTask(generateBtEntities, "other");
+
+        //Behavior Tree Update tasks
         std::vector<std::shared_ptr<Task>> btUpdateTasks(std::thread::hardware_concurrency()-2);
         for (std::size_t i = 0; i < btUpdateTasks.size(); i++)
         {
@@ -117,13 +124,18 @@ namespace neko
             btUpdateTasks[i]->AddDependency(peopleUpdateTask);
             workerManager_.AddTask(btUpdateTasks[i], "other");
         }
+
+        //Command task
         const auto commandUpdateTask = std::make_shared<Task>([&]() {commandManager_.Update(dt); });
         workerManager_.AddTask(commandUpdateTask, "other");
+
+        //Update building task
         const auto buildingUpdateTask = std::make_shared<Task>([&]() { cityBuildingManager_.
             Update(cityZoneManager_, cityBuilderMap_, dt); });
         buildingUpdateTask->AddDependency(commandUpdateTask);
         workerManager_.AddTask(buildingUpdateTask, "other");
 
+        //Update city tilemap task
         std::array<std::shared_ptr<Task>, static_cast<int>(CityTilesheetType::LENGTH)> tilemapUpdateTasks{};
         const auto pushCommandTask = std::make_shared<Task>([&]() {environmentTilemap_.PushCommand(graphicsManager_.get()); });
         const auto mainViewUpdateTask = std::make_shared<Task>([&]() {
@@ -159,6 +171,7 @@ namespace neko
             graphicsManager_->SetView(mainView);
             });
         workerManager_.AddTask(mainViewUpdateTask, "other");
+
         for (int i = 0; i < static_cast<int>(CityTilesheetType::LENGTH); i++)
         {
             tilemapUpdateTasks[i] = std::make_shared<Task>([&, i]() {

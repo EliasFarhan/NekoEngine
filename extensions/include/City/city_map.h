@@ -100,8 +100,8 @@ struct Vector2iHash
 {
 	std::size_t operator()(sf::Vector2i const& v) const noexcept
 	{
-		std::size_t h1 = std::hash<int>{}(v.x);
-		std::size_t h2 = std::hash<int>{}(v.y);
+        const std::size_t h1 = std::hash<int>{}(v.x);
+        const std::size_t h2 = std::hash<int>{}(v.y);
 		return h1 ^ (h2 << 1); // or use boost::hash_combine
 	}
 };
@@ -112,7 +112,7 @@ public:
 	void Update(float dt) override;
 	void Destroy() override;
 
-	std::size_t Position2Index(sf::Vector2i pos) const;
+    [[nodiscard]] std::size_t Position2Index(sf::Vector2i pos) const;
     [[nodiscard]] sf::Vector2i Index2Position(size_t index) const;
 	void AddCityElement(CityElementType cityElement, const sf::Vector2i& position);
 	void RemoveCityElement(const sf::Vector2i& position);

@@ -182,9 +182,9 @@ protected:
 	 */
 	sf::FloatRect windowView_{};
 	sf::RectangleShape bgRect[2];
-	std::array<Tilesheet, size_t(CityTilesheetType::LENGTH)> tilesheets_;
-	std::array<sf::FloatRect, size_t(CarType::LENGTH)> textureRects_;
-	std::array<sf::Vector2f, size_t(CarType::LENGTH)> rectCenter_;
+	std::array<Tilesheet, static_cast<std::size_t>(CityTilesheetType::LENGTH)> tilesheets_;
+	std::array<sf::FloatRect, static_cast<std::size_t>(CarType::LENGTH)> textureRects_;
+	std::array<sf::Vector2f, static_cast<std::size_t>(CarType::LENGTH)> rectCenter_;
 	const std::string cityTextureName_ = "data/tilemap/CuteCityBuilder.png";
 	const std::string carTextureName_ = "data/tilemap/car.png";
 	const sf::Vector2i tileSize_ = sf::Vector2i(20, 20);

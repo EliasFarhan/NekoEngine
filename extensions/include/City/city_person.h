@@ -7,7 +7,7 @@
 namespace neko
 {
 
-const int INIT_PERSON_MONEY = 100;
+constexpr int INIT_PERSON_MONEY = 100;
 struct Person
 {
 	sf::Vector2i position = INVALID_TILE_POS;

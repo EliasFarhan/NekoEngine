@@ -32,7 +32,7 @@
 #endif
 namespace neko
 {
-const static sf::Color cursorColor[size_t(ButtonIconType::LENGTH)] =
+const static sf::Color cursorColor[static_cast<std::size_t>(ButtonIconType::LENGTH)] =
 {
 		sf::Color(0, 0, 255, 100),
 		sf::Color(255, 0, 0, 100),
@@ -77,13 +77,13 @@ void CityCursor::Update(float dt)
 			float length;
 			if (std::abs(deltaPos.x) > std::abs(deltaPos.y))
 			{
-				direction.x = int(copysign(1, deltaPos.x));
-				length = std::abs(float(deltaPos.x));
+				direction.x = static_cast<int>(std::copysign(1, deltaPos.x));
+				length = std::abs(static_cast<float>(deltaPos.x));
 			}
 			else
 			{
-				direction.y = int(copysign(1, deltaPos.y));
-				length = std::abs(float(deltaPos.y));
+				direction.y = static_cast<int>(std::copysign(1, deltaPos.y));
+				length = std::abs(static_cast<float>(deltaPos.y));
 			}
 			if (direction == sf::Vector2i(1, 0))
 			{
@@ -111,7 +111,7 @@ void CityCursor::Update(float dt)
 			}
 		}
 
-		rect.setFillColor(cursorColor[Index(cursorMode_)]);
+		rect.setFillColor(cursorColor[static_cast<Index>(cursorMode_)]);
 		break;
 	}
 	case ButtonIconType::BULLDOZER:
@@ -127,12 +127,12 @@ void CityCursor::Update(float dt)
 			const auto currentPos = GetMouseTilePos();
 			const auto deltaPos = currentPos - originPos_;
 			const sf::Vector2i direction = sf::Vector2i(
-				int(copysign(1, deltaPos.x)),
-				int(copysign(1, deltaPos.y)));
+				static_cast<int>(std::copysign(1, deltaPos.x)),
+				static_cast<int>(std::copysign(1, deltaPos.y)));
 			rect.setPosition(sf::Vector2f(originPos_.x * tileSize.x, originPos_.y * tileSize.y) - tileSize / 2.0f);
 
 			rect.setSize(
-				sf::Vector2f(tileSize.x * float(abs(deltaPos.x) + 1), tileSize.y * float(abs(deltaPos.y) + 1)));
+				sf::Vector2f(tileSize.x * static_cast<float>(abs(deltaPos.x) + 1), tileSize.y * static_cast<float>(abs(deltaPos.y) + 1)));
 			if (direction.x == -1)
 			{
 				rect.setPosition(sf::Vector2f(currentPos.x * tileSize.x - tileSize.x / 2.0f, rect.getPosition().y));
@@ -143,7 +143,7 @@ void CityCursor::Update(float dt)
 			}
 
 		}
-		rect.setFillColor(cursorColor[Index(cursorMode_)]);
+		rect.setFillColor(cursorColor[static_cast<Index>(cursorMode_)]);
 		break;
 	}
 	default:
@@ -188,13 +188,17 @@ void CityCursor::OnEvent(sf::Event& event)
 		{
 			auto& cityMap = engine_->GetCityMap();
 			if (originPos_ == INVALID_TILE_POS) break;
-			if (originPos_.x < 0 || originPos_.y < 0 || originPos_.x >= int(cityMap.city.mapSize.x) || originPos_.y >= int(cityMap.city.mapSize.y))
+			if (originPos_.x < 0 || originPos_.y < 0 || 
+				originPos_.x >= static_cast<int>(cityMap.city.mapSize.x) || 
+				originPos_.y >= static_cast<int>(cityMap.city.mapSize.y))
 			{
 				originPos_ = INVALID_TILE_POS;
 				return;
 			}
 			const auto currentPos = GetMouseTilePos();
-			if (currentPos.x < 0 || currentPos.y < 0 || currentPos.x >= int(cityMap.city.mapSize.x) || currentPos.y >= int(cityMap.city.mapSize.y))
+			if (currentPos.x < 0 || currentPos.y < 0 || 
+				currentPos.x >= static_cast<int>(cityMap.city.mapSize.x) || 
+				currentPos.y >= static_cast<int>(cityMap.city.mapSize.y))
 			{
 				originPos_ = INVALID_TILE_POS;
 				return;
@@ -229,9 +233,11 @@ void CityCursor::OnEvent(sf::Event& event)
 		case ButtonIconType::RESIDENTIAL:
 		case ButtonIconType::COMMERCIAL:
 		{
-			auto& cityMap = engine_->GetCityMap();
+            const auto& cityMap = engine_->GetCityMap();
 			if (originPos_ == INVALID_TILE_POS) break;
-			if (originPos_.x < 0 || originPos_.y < 0 || originPos_.x >= int(cityMap.city.mapSize.x) || originPos_.y >= int(cityMap.city.mapSize.y))
+			if (originPos_.x < 0 || originPos_.y < 0 || 
+				originPos_.x >= static_cast<int>(cityMap.city.mapSize.x) || 
+				originPos_.y >= static_cast<int>(cityMap.city.mapSize.y))
 			{
 				originPos_ = INVALID_TILE_POS;
 				return;
@@ -244,8 +250,8 @@ void CityCursor::OnEvent(sf::Event& event)
 			}
 			const auto deltaPos = currentPos - originPos_;
 			const auto direction = sf::Vector2i(
-				int(copysign(1, deltaPos.x)),
-				int(copysign(1, deltaPos.y)));
+				static_cast<int>(std::copysign(1, deltaPos.x)),
+				static_cast<int>(std::copysign(1, deltaPos.y)));
 			for (int dx = 0; dx <= abs(deltaPos.x); dx++)
 			{
 				for (int dy = 0; dy <= abs(deltaPos.y); dy++)
@@ -326,7 +332,7 @@ sf::Vector2i CityCursor::GetMouseTilePos() const
 	const auto tileSize = engine_->GetCityMap().city.tileSize;
 	const auto worldMousePos = GetMouseWorldPos() + sf::Vector2i(tileSize) / 2;
 	return sf::Vector2i(
-		int(worldMousePos.x) / tileSize.x,
-		int(worldMousePos.y) / tileSize.y);
+		static_cast<int>(worldMousePos.x) / tileSize.x,
+		static_cast<int>(worldMousePos.y) / tileSize.y);
 }
 }

@@ -130,7 +130,9 @@ void CityPeopleManager::Init()
 			deltaPos = sf::Vector2f(car->currentPath[1u + car->currentIndex] - car->position) * car->movingTimer.GetCurrentRatio();
 			deltaPos = sf::Vector2f(deltaPos.x * tileSize.x, deltaPos.y * tileSize.y);
 		}
-		const auto carWorldPos = sf::Vector2f(car->position.x * float(tileSize.x), car->position.y * float(tileSize.y));
+		const auto carWorldPos = sf::Vector2f(
+			car->position.x * static_cast<float>(tileSize.x), 
+			car->position.y * static_cast<float>(tileSize.y));
 		engine->GetTransformManager().SetPosition(
 			carWorldPos + deltaPos,
 			personPtr->carEntity);
@@ -333,8 +335,8 @@ void CityPeopleManager::Init()
 		if( person != nullptr)
 		{
 			person->dayCount++;
-			person->salary = int(float(personBaseSalary) * powf(1.1f, float(person->dayCount)));
-			const int houseTaxValue = int(float(person->salary) * engine->houseTax);
+			person->salary = static_cast<int>(static_cast<float>(personBaseSalary) * std::pow(1.1f, static_cast<float>(person->dayCount)));
+			const int houseTaxValue = static_cast<int>(static_cast<float>(person->salary) * engine->houseTax);
 			person->money += person->salary - houseTaxValue;
 			engine->ChangeCityMoney(houseTaxValue);
 		}
@@ -351,7 +353,7 @@ void CityPeopleManager::Update(float dt)
 #ifdef TRACY_ENABLE
 	ZoneScoped;
 #endif
-	auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+    const auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
 	const auto cheatData = engine->GetCheatData();
 	if(cheatData & CheatModeData::QUICK_PEOPLE_SPAWN)
 	{
@@ -404,7 +406,7 @@ Entity CityPeopleManager::AddPerson(Entity entity, sf::Vector2i position)
 	if (entity == INVALID_ENTITY)
 	{
 		people_.push_back(person);
-		return Index(people_.size());
+		return static_cast<Index>(people_.size());
 	}
 	if (people_.size() <= entity)
 	{
@@ -440,11 +442,11 @@ Index CityPeopleManager::GetPeopleCount()
 	ZoneScoped
 #endif
 	auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
-	return Index(std::count_if(people_.begin(), people_.end(), [&engine](const Person& person)
-	{
-		return engine->GetEntityManager().HasComponent(person.personEntity, EntityMask(CityComponentType::PERSON)) && 
-			person.housePos != INVALID_TILE_POS;
-	}));
+	return static_cast<Index>(std::ranges::count_if(people_, [&engine](const Person& person)
+    {
+        return engine->GetEntityManager().HasComponent(person.personEntity, static_cast<EntityMask>(CityComponentType::PERSON)) &&
+            person.housePos != INVALID_TILE_POS;
+    }));
 }
 
 void CityPeopleManager::DestroyPerson(Entity entity)

@@ -21,7 +21,7 @@ void CityBuilderMap::Init()
 	ZoneScoped
 #endif
 	//River
-	environmentTiles_.resize(size_t(city.mapSize.x) * city.mapSize.y, EnvironmentTile::GRASS);
+	environmentTiles_.resize(static_cast<std::size_t>(city.mapSize.x) * city.mapSize.y, EnvironmentTile::GRASS);
 	{
 		sf::Vector2i pos = sf::Vector2i((rand() % (city.mapSize.x / 3)) + city.mapSize.x / 3, 0);
 		int previousX = 0;
@@ -84,7 +84,7 @@ void CityBuilderMap::Init()
 		const int railDownX = city.mapSize.x - ((rand() % (city.mapSize.x / 6)) + city.mapSize.x / 6);
 		pos.x = 0;
 		pos.y -= 2;
-		for (int x = 0; x < int(city.mapSize.x); x++)
+		for (int x = 0; x < static_cast<int>(city.mapSize.x); x++)
 		{
 			pos.x = x;
 
@@ -96,7 +96,9 @@ void CityBuilderMap::Init()
 				trainStation.size = sf::Vector2u(5, 3);
 				trainStation.elementType = CityElementType::TRAIN_STATION;
 				auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
-				engine->mainView.setCenter(sf::Vector2f(float(trainStation.position.x)*city.tileSize.x, float(trainStation.position.y)*city.tileSize.y));
+				engine->mainView.setCenter(sf::Vector2f(
+					static_cast<float>(trainStation.position.x)*city.tileSize.x, 
+					static_cast<float>(trainStation.position.y)*city.tileSize.y));
 				elements_.push_back(trainStation);
 			}
 			if (x > trainStationX && x < trainStationX + 4)
@@ -149,8 +151,7 @@ void CityBuilderMap::Init()
 	//Trees
 	{
 		siv::PerlinNoise perlinNoise;
-		const auto elementsNmb = elements_.size();
-		std::vector<CityElement> obstacles(elements_);
+		std::vector obstacles(elements_);
 		for (auto x = 0u; x < city.mapSize.x; x++)
 		{
 			for (auto y = 0u; y < city.mapSize.y; y++)
@@ -252,7 +253,7 @@ void CityBuilderMap::AddCityElement(CityElementType cityElement, const sf::Vecto
 #ifdef TRACY_ENABLE
 	ZoneScoped
 #endif
-	if(position.x < 0 || position.y < 0 || position.x >= int(city.mapSize.x) || position.y >= int(city.mapSize.y))
+	if(position.x < 0 || position.y < 0 || position.x >= static_cast<int>(city.mapSize.x) || position.y >= static_cast<int>(city.mapSize.y))
 	{
 		return;
 	}
@@ -260,10 +261,10 @@ void CityBuilderMap::AddCityElement(CityElementType cityElement, const sf::Vecto
 	{
 	case CityElementType::ROAD:
 	{
-		auto elementIt = std::find_if(elements_.begin(), elements_.end(), [&position](const CityElement& element)
-		{
-			return element.position == position;
-		});
+		auto elementIt = std::ranges::find_if(elements_, [&position](const CityElement& element)
+        {
+            return element.position == position;
+        });
 		if (elementIt != elements_.end() && elementIt->elementType == CityElementType::TREES)
 		{
 			elements_.erase(elementIt);
@@ -303,10 +304,10 @@ void CityBuilderMap::RemoveCityElement(const sf::Vector2i& position)
 	ZoneScoped
 #endif
 	//TODO need to check each element positions taking into account the size
-	auto elementIt = std::find_if(elements_.begin(), elements_.end(), [&position](const CityElement& element)
-	{
-		return element.position == position;
-	});
+	auto elementIt = std::ranges::find_if(elements_, [&position](const CityElement& element)
+    {
+        return element.position == position;
+    });
 	while (elementIt != elements_.end())
 	{
 		if (elementIt->elementType == CityElementType::ROAD)
@@ -328,10 +329,10 @@ void CityBuilderMap::RemoveCityElement(const sf::Vector2i& position)
 		}
 		elements_.erase(elementIt);
 
-		elementIt = std::find_if(elements_.begin(), elements_.end(), [&position](const CityElement& element)
-		{
-			return element.position == position;
-		});
+		elementIt = std::ranges::find_if(elements_, [&position](const CityElement& element)
+        {
+            return element.position == position;
+        });
 	};
 }
 
@@ -351,8 +352,8 @@ std::vector<sf::Vector2i> CityBuilderMap::GetRoadEnds() const
 	{
 		if (node.position.x == 0 ||
 			node.position.y == 0 ||
-			node.position.x == int(city.mapSize.x-1) ||
-			node.position.y == int(city.mapSize.y-1))
+			node.position.x == static_cast<int>(city.mapSize.x - 1) ||
+			node.position.y == static_cast<int>(city.mapSize.y - 1))
 		{
 			ends.push_back(node.position);
 		}
@@ -376,18 +377,18 @@ CityElement* CityBuilderMap::GetCityElementAt(sf::Vector2i position)
 #ifdef TRACY_ENABLE
 	ZoneScoped
 #endif
-	const auto result = std::find_if(elements_.begin(), elements_.end(), [&position](const CityElement& cityElement)
-	{
-		for (int dx = 0; dx < static_cast<int>(cityElement.size.x); dx++)
-		{
-			for (int dy = 0; dy < static_cast<int>(cityElement.size.y); dy++)
-			{
-				if (position == cityElement.position + sf::Vector2i(dx, -dy))
-					return true;
-			}
-		}
-		return false;
-	});
+	const auto result = std::ranges::find_if(elements_, [&position](const CityElement& cityElement)
+    {
+        for (int dx = 0; dx < static_cast<int>(cityElement.size.x); dx++)
+        {
+            for (int dy = 0; dy < static_cast<int>(cityElement.size.y); dy++)
+            {
+                if (position == cityElement.position + sf::Vector2i(dx, -dy))
+                    return true;
+            }
+        }
+        return false;
+    });
 	if (result == elements_.end())
 		return nullptr;
 	else

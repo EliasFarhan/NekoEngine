@@ -40,7 +40,7 @@ void CityEditor::Init()
 	ZoneScoped
 #endif
 	engine_ = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
-	for (Index i = 0; i < Index(ButtonIconType::LENGTH); i++)
+	for (Index i = 0; i < static_cast<Index>(ButtonIconType::LENGTH); i++)
 	{
 		buttonUiIndex[i] = engine_->GetTextureManager().LoadTexture(buttonIconTexture[i]);
 	}
@@ -70,7 +70,7 @@ void CityEditor::Update(float dt)
 		const auto buttonTexture = engine_->GetTextureManager().GetTexture(buttonUiIndex[i]);
 		if (ImGui::ImageButton(*buttonTexture))
 		{
-			std::fill(std::begin(buttonSelected), std::end(buttonSelected), false);
+			std::ranges::fill(buttonSelected, false);
 			buttonSelected[i] = true;
 
 			auto newCommand = std::make_unique<ChangeModeCommand>();
@@ -81,15 +81,15 @@ void CityEditor::Update(float dt)
 	}
 	//Tax management
 	{
-		int newWorkTax = int(100.0f * engine_->workTax);
+		int newWorkTax = static_cast<int>(100.0f * engine_->workTax);
 		ImGui::SliderInt("Work Tax", &newWorkTax, 0, 50, "%d%");
-		int newHouseTax = int(100.0f * engine_->houseTax);
+		int newHouseTax = static_cast<int>(100.0f * engine_->houseTax);
 		ImGui::SliderInt("House Tax", &newHouseTax, 0, 50, "%d%");
-		if (newWorkTax != int(100.0f * engine_->workTax) || newHouseTax != int(100.0f * engine_->houseTax))
+		if (newWorkTax != static_cast<int>(100.0f * engine_->workTax) || newHouseTax != static_cast<int>(100.0f * engine_->houseTax))
 		{
 			auto newCommand = std::make_unique<ChangeTaxCommand>();
-			newCommand->workTax = float(newWorkTax) / 100.0f;
-			newCommand->houseTax = float(newHouseTax) / 100.0f;
+			newCommand->workTax = static_cast<float>(newWorkTax) / 100.0f;
+			newCommand->houseTax = static_cast<float>(newHouseTax) / 100.0f;
 			newCommand->commandType = CityCommandType::CHANGE_TAX;
 			engine_->GetCommandManager().AddCommand(std::move(newCommand), true);
 		}

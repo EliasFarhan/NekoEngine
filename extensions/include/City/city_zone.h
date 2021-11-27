@@ -36,7 +36,7 @@ class GraphicsManager;
 class CityBuilderMap;
 class CityBuildingManager;
 
-const Index ZONE_RADIUS = 4;
+constexpr Index ZONE_RADIUS = 4;
 enum class ZoneType
 {
     RESIDENTIAL,
@@ -78,10 +78,10 @@ public:
 
     void RemoveZone(sf::Vector2i position, ZoneType zoneType);
 
-    const Zone* GetZoneAt(sf::Vector2i position, ZoneType zoneType) const;
+    [[nodiscard]] const Zone* GetZoneAt(sf::Vector2i position, ZoneType zoneType) const;
 
-    const std::vector<Zone>& GetResidentialZoneVector() const;
-    const std::vector<Zone>& GetCommericalZoneVector() const;
+    [[nodiscard]] const std::vector<Zone>& GetResidentialZoneVector() const;
+    [[nodiscard]] const std::vector<Zone>& GetCommericalZoneVector() const;
 private:
     std::vector<Zone> residentialZones_;
     std::vector<Zone> commercialZones_;

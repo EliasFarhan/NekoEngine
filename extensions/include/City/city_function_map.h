@@ -34,7 +34,7 @@ namespace neko {
 	class FunctionMap {
 	public:
 		FunctionMap(Index componentId = INDEX_INVALID) : comp_(componentId) {}
-		void SetFunction(
+        static void SetFunction(
 			const std::string_view name, 
 			std::function<bool(Index, const std::vector<double>&)> func);
 		bool CallFunction(const std::string_view name, double value) const;

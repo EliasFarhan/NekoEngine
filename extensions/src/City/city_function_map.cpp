@@ -34,7 +34,9 @@ namespace neko {
 		std::string, 
 		std::function<bool(Index, const std::vector<double>&)>>
 		FunctionMap::staticNameFunctionMap_;
+
 	std::mutex FunctionMap::mutex;
+
 	void FunctionMap::SetFunction(
 		const std::string_view name,
 		std::function<bool(Index, const std::vector<double>&)> func)
@@ -56,7 +58,7 @@ namespace neko {
 			}
 			return nullptr;
 		};
-		auto func = retrieveFunction();
+        const auto* func = retrieveFunction();
 		if (func == nullptr)
 		{
 			logDebug("ERROR executing : " + std::string(name));
@@ -80,7 +82,7 @@ namespace neko {
 			}
 			return nullptr;
 		};
-        const auto func = retrieveFunction();
+        const auto* func = retrieveFunction();
 		if (func == nullptr)
 		{
 			logDebug("ERROR executing : " + std::string(name));

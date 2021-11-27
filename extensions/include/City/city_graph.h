@@ -58,7 +58,7 @@ void RemoveNeighborToBit(NeighborBit& neighborBit, NeighborType neighborType);
 
 bool HasBitNeighbor(const NeighborBit& neighborBit, NeighborType neighborType);
 
-const static Index maxNeighborsNmb = 4;
+constexpr static Index maxNeighborsNmb = 4;
 struct Node
 {
 	sf::Vector2i position = INVALID_TILE_POS;
@@ -74,13 +74,12 @@ public:
     bool ContainNode(sf::Vector2i pos) const;
     const std::vector<Node>& GetNodesVector() const;
 
-    std::vector<sf::Vector2i> CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vector2i& endPos) const;
+    [[nodiscard]] std::vector<sf::Vector2i> CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vector2i& endPos) const;
 	Node* GetClosestNode(sf::Vector2i position);
 private:
-
-    void AddNeighbor(Node& node, NeighborType neighborBit) const;
-    void RemoveNeighbor(Node& node, NeighborType neighborBit) const;
-    bool HasNeighbor(const Node& node, NeighborType neighborBit) const;
+    static void AddNeighbor(Node& node, NeighborType neighborBit);
+    static void RemoveNeighbor(Node& node, NeighborType neighborBit);
+    static bool HasNeighbor(const Node& node, NeighborType neighborBit);
     std::vector<Node> nodes_;
 };
 }

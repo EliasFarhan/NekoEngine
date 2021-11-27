@@ -41,7 +41,7 @@ void CityBuildingManager::Update(CityZoneManager& zoneManager, CityBuilderMap& c
 #ifdef TRACY_ENABLE
 	ZoneScoped
 #endif
-	auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+    const auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
 	spawnTimer_.Update(dt);
 	if (spawnTimer_.IsOver() || (engine->GetCheatData() & CheatModeData::QUICK_HOUSE_SPAWN))
 	{
@@ -146,7 +146,7 @@ CityBuildingManager::AddBuilding(Building building, CityZoneManager& zoneManager
 		}
 	}
 	buildings_.push_back(building);
-	std::sort(buildings_.begin(), buildings_.end(), [](const Building& b1, const Building& b2) {return (b1.position.y < b2.position.y); });
+	std::ranges::sort(buildings_, [](const Building& b1, const Building& b2) {return (b1.position.y < b2.position.y); });
 }
 
 
@@ -158,20 +158,20 @@ const std::vector<Building>& CityBuildingManager::GetBuildingsVector() const
 void CityBuildingManager::RemoveBuilding(sf::Vector2i position)
 {
 	std::lock_guard lock(buildingMutex);
-	const auto buildingIt = std::find_if(buildings_.begin(), buildings_.end(), [&position](const Building& building)
-	{
-		for (int dx = 0; dx < building.size.x; dx++)
-		{
-			for (int dy = 0; dy < building.size.y; dy++)
-			{
-				if (position == building.position + sf::Vector2i(dx, -dy))
-				{
-					return true;
-				}
-			}
-		}
-		return false;
-	});
+	const auto buildingIt = std::ranges::find_if(buildings_, [&position](const Building& building)
+    {
+        for (int dx = 0; dx < building.size.x; dx++)
+        {
+            for (int dy = 0; dy < building.size.y; dy++)
+            {
+                if (position == building.position + sf::Vector2i(dx, -dy))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    });
 	if (buildingIt != buildings_.end())
 	{
 		buildings_.erase(buildingIt);
@@ -205,7 +205,7 @@ sf::Vector2i CityBuildingManager::FindBuilding(ZoneType zoneType)
 	}
 	case ZoneType::COMMERCIAL:
 	{
-		auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+        const auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
 		std::vector<Building*> workBuildings;
 		workBuildings.reserve(buildings_.size());
 		for (auto& building : buildings_)
@@ -236,19 +236,19 @@ sf::Vector2i CityBuildingManager::FindBuilding(ZoneType zoneType)
 std::pair<Building*, std::shared_lock<std::shared_mutex>> CityBuildingManager::GetBuildingAt(sf::Vector2i position)
 {
 	std::shared_lock lock(buildingMutex);
-	const auto result = std::find_if(buildings_.begin(), buildings_.end(), [&position](const Building& building)
-	{
-		for (int dx = 0; dx < building.size.x; dx++)
-		{
-			for (int dy = 0; dy < building.size.y; dy++)
-			{
-				const sf::Vector2i newPos = building.position + sf::Vector2i(dx, -dy);
-				if (newPos == position)
-					return true;
-			}
-		}
-		return false;
-	});
+	const auto result = std::ranges::find_if(buildings_, [&position](const Building& building)
+    {
+        for (int dx = 0; dx < building.size.x; dx++)
+        {
+            for (int dy = 0; dy < building.size.y; dy++)
+            {
+                const sf::Vector2i newPos = building.position + sf::Vector2i(dx, -dy);
+                if (newPos == position)
+                    return true;
+            }
+        }
+        return false;
+    });
 	if (result == buildings_.end())
 	{
 		return { nullptr, std::move(lock)};

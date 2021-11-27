@@ -158,10 +158,10 @@ TileMapGraph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vect
 	auto path = std::vector<sf::Vector2i>();
 	if (startPos == INVALID_TILE_POS || endPos == INVALID_TILE_POS)
 		return path;
-	const auto startNodeIt = std::find_if(nodes_.begin(), nodes_.end(), [&startPos](const Node& node)
-	{
-		return node.position == startPos;
-	});
+	const auto startNodeIt = std::ranges::find_if(nodes_, [&startPos](const Node& node)
+    {
+        return node.position == startPos;
+    });
 
 	if (startNodeIt == nodes_.end())
 	{
@@ -170,10 +170,10 @@ TileMapGraph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vect
 #endif
 		return path;
 	}
-	const auto endNodeIt = std::find_if(nodes_.begin(), nodes_.end(), [&startPos](const Node& node)
-	{
-		return node.position == startPos;
-	});
+	const auto endNodeIt = std::ranges::find_if(nodes_, [&startPos](const Node& node)
+    {
+        return node.position == startPos;
+    });
 	if (endNodeIt == nodes_.end())
 	{
 #ifdef __neko_dbg__
@@ -259,11 +259,11 @@ TileMapGraph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vect
 			}
 			else
 			{
-				return std::vector<sf::Vector2i>();
+				return {};
 			}
 		}
 		path.push_back(startPos);
-		std::reverse(path.begin(), path.end());
+		std::ranges::reverse(path);
 	}
 	else
 	{
@@ -316,17 +316,17 @@ NeighborType GetNeighborType(const sf::Vector2i& direction)
 	const static auto reverseMap = []() -> std::unordered_map<sf::Vector2i, NeighborType>
 	{
 		std::unordered_map<sf::Vector2i, NeighborType> reverse;
-		std::for_each(neighborTypeMap.begin(), neighborTypeMap.end(),
-			[&reverse](const std::pair<NeighborType, sf::Vector2i>& pair)
-		{
-			reverse.insert({ pair.second, pair.first });
-		});
+		std::ranges::for_each(neighborTypeMap,
+                              [&reverse](const std::pair<NeighborType, sf::Vector2i>& pair)
+                              {
+                                  reverse.insert({ pair.second, pair.first });
+                              });
 		return reverse;
 	}();
 	const auto typeIt = reverseMap.find(direction);
 	if (typeIt == reverseMap.end())
 	{
-		return NeighborType(0u);
+		return static_cast<NeighborType>(0u);
 	}
 	else
 	{
@@ -353,28 +353,28 @@ sf::Vector2i GetDirection(NeighborType neighborType)
 
 void AddNeighborToBit(NeighborBit& node, NeighborType neighborType)
 {
-	node = node | NeighborBit(neighborType);
+	node = node | static_cast<NeighborBit>(neighborType);
 }
 void RemoveNeighborToBit(NeighborBit& node, NeighborType neighborType)
 {
-	node = node & ~NeighborBit(neighborType);
+	node = node & ~static_cast<NeighborBit>(neighborType);
 }
 bool HasBitNeighbor(const NeighborBit& node, NeighborType neighborType)
 {
-	return (node & NeighborBit(neighborType)) == NeighborBit(neighborType);
+	return (node & static_cast<NeighborBit>(neighborType)) == static_cast<NeighborBit>(neighborType);
 }
 
-void TileMapGraph::AddNeighbor(Node& node, NeighborType neighborBit) const
+void TileMapGraph::AddNeighbor(Node& node, NeighborType neighborBit)
 {
 	AddNeighborToBit(node.neighborBitwise, neighborBit);
 }
 
-void TileMapGraph::RemoveNeighbor(Node& node, NeighborType neighborBit) const
+void TileMapGraph::RemoveNeighbor(Node& node, NeighborType neighborBit)
 {
 	RemoveNeighborToBit(node.neighborBitwise, neighborBit);
 }
 
-bool TileMapGraph::HasNeighbor(const Node& node, NeighborType neighborBit) const
+bool TileMapGraph::HasNeighbor(const Node& node, NeighborType neighborBit)
 {
 	return HasBitNeighbor(node.neighborBitwise, neighborBit);
 }

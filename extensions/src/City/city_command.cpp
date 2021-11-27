@@ -92,7 +92,7 @@ void CityCommandManager::ExecuteCommand(const std::shared_ptr<CityCommand>& comm
 	{
 	case CityCommandType::CHANGE_CURSOR_MODE:
 	{
-		auto* cursorCommand = dynamic_cast<ChangeModeCommand*>(command.get());
+        const auto* cursorCommand = dynamic_cast<ChangeModeCommand*>(command.get());
 		engine_->GetCursor().SetCursorMode(cursorCommand->newCursorMode);
 		Sound::PlaySound(soundSelect_);
 		break;
@@ -104,7 +104,7 @@ void CityCommandManager::ExecuteCommand(const std::shared_ptr<CityCommand>& comm
 			Sound::PlaySound(soundOut_);
 			break;
 		}
-		auto* buildCommand = dynamic_cast<BuildElementCommand*>(command.get());
+        const auto* buildCommand = dynamic_cast<BuildElementCommand*>(command.get());
 		engine_->GetZoneManager().RemoveZone(buildCommand->position,ZoneType::RESIDENTIAL);
 		engine_->GetZoneManager().RemoveZone(buildCommand->position,ZoneType::COMMERCIAL);
 		engine_->GetCityMap().AddCityElement(buildCommand->elementType, buildCommand->position);
@@ -118,7 +118,7 @@ void CityCommandManager::ExecuteCommand(const std::shared_ptr<CityCommand>& comm
 	}
 	case CityCommandType::DELETE_CITY_ELEMENT:
 	{
-		auto* buildCommand = dynamic_cast<DestroyElementCommand*>(command.get());
+        const auto* buildCommand = dynamic_cast<DestroyElementCommand*>(command.get());
 		engine_->GetCityMap().RemoveCityElement(buildCommand->position);
 		engine_->GetCarManager().RescheduleCarPathfinding(buildCommand->position);
 		engine_->GetZoneManager().RemoveZone(buildCommand->position,ZoneType::RESIDENTIAL);
@@ -129,7 +129,7 @@ void CityCommandManager::ExecuteCommand(const std::shared_ptr<CityCommand>& comm
 	}
 	case CityCommandType::ADD_CITY_ZONE:
 	{
-		auto* zoneCommand = dynamic_cast<AddZoneCommand*>(command.get());
+        const auto* zoneCommand = dynamic_cast<AddZoneCommand*>(command.get());
 		if (engine_->GetCityMoney() < zoneCost)
 		{
 			Sound::PlaySound(soundOut_);
@@ -140,7 +140,7 @@ void CityCommandManager::ExecuteCommand(const std::shared_ptr<CityCommand>& comm
 	}
 	case CityCommandType::CHANGE_TAX:
 	{
-		auto* taxCommand = dynamic_cast<ChangeTaxCommand*>(command.get());
+        const auto* taxCommand = dynamic_cast<ChangeTaxCommand*>(command.get());
 		engine_->houseTax = taxCommand->houseTax;
 		engine_->workTax = taxCommand->workTax;
 	}

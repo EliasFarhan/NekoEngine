@@ -23,7 +23,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-
+#include <array>
 #include <engine/editor.h>
 #include "City/city_command.h"
 #include "engine/globals.h"
@@ -67,7 +67,7 @@ public:
 	void Destroy() override;
 private:
 	CityBuilderEngine* engine_ = nullptr;
-	Index buttonUiIndex[Index(ButtonIconType::LENGTH)] = {};
-	bool buttonSelected[Index(ButtonIconType::LENGTH)] = {};
+	std::array<Index, static_cast<Index>(ButtonIconType::LENGTH)>  buttonUiIndex {};
+	std::array<bool, static_cast<Index>(ButtonIconType::LENGTH)> buttonSelected{};
 };
 }
