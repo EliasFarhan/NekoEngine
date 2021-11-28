@@ -4,8 +4,6 @@
 #include <engine/engine.h>
 #include <City/city_engine.h>
 #include <sstream>
-#include <cstring>
-#include <iterator>
 #ifdef TRACY_ENABLE
 #include <Tracy.hpp>
 #endif
@@ -191,7 +189,7 @@ void CityBuilderMap::Init()
 	if(engine->GetCheatData() & CheatModeData::CITY_SPAWN_INIT)
 	{
 		const auto centerPos = sf::Vector2i(city.mapSize.x / 2, city.mapSize.y / 2);
-		constexpr int spawnRadius = 60;
+		constexpr int spawnRadius = 90;
 		auto& zoneManager = engine->GetZoneManager();
 
 		for(int x = -spawnRadius; x <= spawnRadius; x++)

@@ -67,6 +67,7 @@ file(GLOB_RECURSE Neko_ENGINE_SRC src/engine/*.cpp include/engine/*.h)
 file(GLOB_RECURSE Neko_GRAPHICS_SRC src/graphics/*.cpp include/graphics/*.h)
 file(GLOB_RECURSE Neko_UTILITY_SRC src/utilities/*.cpp include/utilities/*.h)
 file(GLOB_RECURSE Neko_SOUND_SRC src/sound/*.cpp include/sound/*.h)
+file(GLOB_RECURSE Neko_ALLOC_SRC src/allocator/*.cpp include/allocator/*.h)
 file(GLOB_RECURSE Neko_EXTENSIONS_SRC extensions/src/*.cpp extensions/include/*.h)
 
 include_directories(include ${CMAKE_SOURCE_DIR}/include)
@@ -78,6 +79,7 @@ source_group("Graphics"				FILES ${Neko_GRAPHICS_SRC})
 source_group("Engine"				FILES ${Neko_ENGINE_SRC})
 source_group("Utility"				FILES ${Neko_UTILITY_SRC})
 source_group("Sound"				FILES ${Neko_SOUND_SRC})
+source_group("Allocator"			FILES ${Neko_ALLOC_SRC})
 source_group("Data\\Json"           FILES ${JSON_FILES})
 source_group("Data\\Img"            FILES ${IMG_FILES})
 source_group("Data\\Snd"			FILES ${SND_FILES})
@@ -88,6 +90,7 @@ List(APPEND Neko_SRC
 	${Neko_UTILITY_SRC} 
 	${Neko_PHYSICS_SRC}
 	${Neko_SOUND_SRC}
+	${Neko_ALLOC_SRC}
 	${JSON_FILES} 
 	${IMG_FILES}
 	${SND_FILES})

@@ -25,7 +25,8 @@
  */
 
 #include <vector>
-#include <engine/globals.h>
+#include "engine/globals.h"
+#include "allocator/allocator.h"
 
 namespace neko
 {
@@ -61,7 +62,7 @@ public:
 
 	size_t GetEntitiesNmb(EntityMask filterComponents = INVALID_ENTITY_MASK);
 
-	std::vector<Entity> FilterEntities(EntityMask filterComponents = INVALID_ENTITY_MASK);
+	std::vector<Entity, StandardAllocator<Entity>> FilterEntities(EntityMask filterComponents = INVALID_ENTITY_MASK);
 
 	void AddComponentType(Entity entity, EntityMask componentType);
 

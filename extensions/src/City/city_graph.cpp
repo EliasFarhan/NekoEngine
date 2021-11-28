@@ -24,10 +24,12 @@
 
 #include <City/city_graph.h>
 #include <unordered_map>
-#include <queue>
-#include <sstream>
 #include <cmath>
 #include <engine/log.h>
+
+#include "allocator/allocator.h"
+#include "City/city_engine.h"
+#include "engine/engine.h"
 
 #ifdef TRACY_ENABLE
 #include <Tracy.hpp>
@@ -189,12 +191,13 @@ TileMapGraph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vect
 		float cost = -1.0f;
 		Index parentIndex = INDEX_INVALID;
 	};
-	std::vector<NodePathData> nodePathDatas(nodes_.size());
+	auto* engine = MainEngine::GetInstance();
+	std::vector<NodePathData, StandardAllocator<NodePathData>> nodePathDatas(nodes_.size(), {engine->GetFrameAllocator()});
 	auto comp = [](const NodePair& nodeA, const NodePair& nodeB) -> bool
 	{
 		return nodeA.second < nodeB.second;
 	};
-	std::vector<NodePair> frontier;
+	std::vector<NodePair, StandardAllocator<NodePair>> frontier(StandardAllocator<NodePair>{engine->GetFrameAllocator()});
 	frontier.reserve(nodes_.size());
 	frontier.emplace_back(startNodeIndex, 0.0f);
 	nodePathDatas[startNodeIndex].cost = 0.0f;

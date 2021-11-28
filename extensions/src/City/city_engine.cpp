@@ -92,7 +92,7 @@ namespace neko
         workerManager_.AddTask(peopleUpdateTask, "other");
 
         // Generate Behavior tree entities
-        std::vector<Entity> btEntities;
+        std::vector<Entity, StandardAllocator<Entity>> btEntities(StandardAllocator<Entity>{GetFrameAllocator()});
         const auto generateBtEntities = std::make_shared<Task>([&btEntities, this]()
             {
                 btEntities = entityManager_.FilterEntities(static_cast<EntityMask>(CityComponentType::BEHAVIOR_TREE));

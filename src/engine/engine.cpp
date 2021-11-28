@@ -43,86 +43,86 @@
 namespace neko
 {
 
-BasicEngine::BasicEngine(Configuration* config)
-{
-    if (config != nullptr)
+    BasicEngine::BasicEngine(Configuration* config)
     {
-        this->config = *config;
-    }
-    initLog();
-    
-}
-
-BasicEngine::~BasicEngine()
-{
-    logDebug("Destroy Basic Engine");
-    destroyLog();
-}
-
-void BasicEngine::Update(float dt)
-{
-
-}
-
-void BasicEngine::Init()
-{
-    renderWindow = std::make_unique<sf::RenderWindow>(
-		sf::VideoMode(config.screenSize.x, config.screenSize.y), "Neko Engine", config.windowStyle);
-    if (config.vSync)
-    {
-        renderWindow->setVerticalSyncEnabled(config.vSync);
-    }
-    else
-    {
-        renderWindow->setFramerateLimit(config.framerateLimit);
-    }
-    ImGui::SFML::Init(*renderWindow);
-    mouseManager_.SetWindow(renderWindow.get());
-    workerManager_.Init({ "main", 1 }, { {"render", 1},{"other", std::thread::hardware_concurrency() - 2} });
-}
-
-void BasicEngine::Destroy()
-{
-    workerManager_.Destroy();
-    renderWindow->close();
-    ImGui::SFML::Shutdown();
-    renderWindow = nullptr;
-    
-}
-
-void BasicEngine::EngineLoop()
-{
-    isRunning = true;
-    while (isRunning)
-    {
-
-        clockDeltatime = engineClock_.restart();
-
-        keyboardManager_.ClearKeys();
-        mouseManager_.ClearFrameData();
-        sf::Event event{};
-        while (renderWindow->pollEvent(event))
+        if (config != nullptr)
         {
-            OnEvent(event);
-            ImGui::SFML::ProcessEvent(event);
+            this->config = *config;
+        }
+        initLog();
+
+    }
+
+    BasicEngine::~BasicEngine()
+    {
+        logDebug("Destroy Basic Engine");
+        destroyLog();
+    }
+
+    void BasicEngine::Update(float dt)
+    {
+
+    }
+
+    void BasicEngine::Init()
+    {
+        renderWindow = std::make_unique<sf::RenderWindow>(
+            sf::VideoMode(config.screenSize.x, config.screenSize.y), "Neko Engine", config.windowStyle);
+        if (config.vSync)
+        {
+            renderWindow->setVerticalSyncEnabled(config.vSync);
+        }
+        else
+        {
+            renderWindow->setFramerateLimit(config.framerateLimit);
+        }
+        ImGui::SFML::Init(*renderWindow);
+        mouseManager_.SetWindow(renderWindow.get());
+        workerManager_.Init({ "main", 1 }, { {"render", 1},{"other", std::thread::hardware_concurrency() - 2} });
+    }
+
+    void BasicEngine::Destroy()
+    {
+        workerManager_.Destroy();
+        renderWindow->close();
+        ImGui::SFML::Shutdown();
+        renderWindow = nullptr;
+
+    }
+
+    void BasicEngine::EngineLoop()
+    {
+        isRunning = true;
+        while (isRunning)
+        {
+
+            clockDeltatime = engineClock_.restart();
+
+            keyboardManager_.ClearKeys();
+            mouseManager_.ClearFrameData();
+            sf::Event event{};
+            while (renderWindow->pollEvent(event))
+            {
+                OnEvent(event);
+                ImGui::SFML::ProcessEvent(event);
+            }
+
+            {
+                renderWindow->clear(config.bgColor);
+                ImGui::SFML::Update(*renderWindow, clockDeltatime);
+                Update(clockDeltatime.asSeconds());
+                ImGui::SFML::Render(*renderWindow);
+                renderWindow->display();
+            }
         }
 
-        {
-            renderWindow->clear(config.bgColor);
-            ImGui::SFML::Update(*renderWindow, clockDeltatime);
-            Update(clockDeltatime.asSeconds());
-            ImGui::SFML::Render(*renderWindow);
-            renderWindow->display();
-        }
+        Destroy();
     }
 
-    Destroy();
-}
-
-void BasicEngine::OnEvent(sf::Event& event)
-{
-    switch (event.type)
+    void BasicEngine::OnEvent(sf::Event& event)
     {
+        switch (event.type)
+        {
         case sf::Event::Closed:
         {
             isRunning = false;
@@ -152,127 +152,139 @@ void BasicEngine::OnEvent(sf::Event& event)
         {
             break;
         }
+        }
     }
-}
 
-MouseManager& BasicEngine::GetMouseManager()
-{
-	return mouseManager_;
-}
-
-MainEngine* MainEngine::instance_ = nullptr;
-
-
-void MainEngine::EngineLoop()
-{
-
-    isRunning = true;
-    while (isRunning)
+    MouseManager& BasicEngine::GetMouseManager()
     {
+        return mouseManager_;
+    }
+
+    MainEngine* MainEngine::instance_ = nullptr;
+
+
+    void MainEngine::EngineLoop()
+    {
+
+        isRunning = true;
+        while (isRunning)
+        {
 #ifdef TRACY_ENABLE
-        ZoneNamedN(EngineUpdate, "Update", true);
+            ZoneNamedN(EngineUpdate, "Update", true);
 #endif
 
-        clockDeltatime = engineClock_.restart();
-        auto renderTask = std::make_shared<Task>([this]()
+            clockDeltatime = engineClock_.restart();
+            auto renderTask = std::make_shared<Task>([this]()
+                {
+                    graphicsManager_->Update();
+                });
+            this->workerManager_.AddTask(renderTask, "render");
+            if (frameIndex > 0)
             {
-                graphicsManager_->Update();
-            });
-        this->workerManager_.AddTask(renderTask, "render");
-        if (frameIndex > 0)
-        {
-            std::unique_lock<std::mutex> lock(renderStartMutex);
-			if (graphicsManager_->DidRenderingStart())
-			{
-				condSyncRender.notify_all();
-			}
-			else
-			{
-				//Wait until the graphics manager is ready to draw the next frame
-				continue;
-			}
-        }
-        keyboardManager_.ClearKeys();
-        mouseManager_.ClearFrameData();
-        sf::Event event{};
-        while (renderWindow->pollEvent(event))
-        {
-            OnEvent(event);
-            ImGui::SFML::ProcessEvent(event);
-        }
-        Update(clockDeltatime.asSeconds());
+                std::unique_lock<std::mutex> lock(renderStartMutex);
+                if (graphicsManager_->DidRenderingStart())
+                {
+                    condSyncRender.notify_all();
+                }
+                else
+                {
+                    //Wait until the graphics manager is ready to draw the next frame
+                    continue;
+                }
+            }
+            keyboardManager_.ClearKeys();
+            mouseManager_.ClearFrameData();
+            sf::Event event{};
+            while (renderWindow->pollEvent(event))
+            {
+                OnEvent(event);
+                ImGui::SFML::ProcessEvent(event);
+            }
+            Update(clockDeltatime.asSeconds());
 
-        if (frameIndex > 0)
+            linearAllocator_.Clear();
+            if (frameIndex > 0)
+            {
+                //wait for the end of the rendering
+                std::unique_lock<std::mutex> lock(graphicsManager_->renderingMutex);
+            }
+
+            ++frameIndex;
+#ifdef TRACY_ENABLE
+            FrameMark
+#endif
+        }
+
+        Destroy();
+    }
+
+
+    MainEngine::MainEngine(Configuration* config) : BasicEngine(config)
+    {
+    }
+
+    MainEngine::~MainEngine()
+    {
+        std::free(frameTmpDataPtr);
+        logDebug("Destroy Main Engine");
+
+
+    }
+
+    void MainEngine::Init()
+    {
+#ifdef TRACY_ENABLE
+        ZoneScoped
+#endif
+
+            //workingThreadPool.resize(std::max(1u,std::thread::hardware_concurrency() - 3));//removing main and render and audio thread
+#ifdef __linux__
+            XInitThreads();
+#endif
+        BasicEngine::Init();
+        renderWindow->setActive(false);
+        instance_ = this;
+
+        frameTmpDataPtr = std::malloc(config.frameTmpDataSize);
+        linearAllocator_.Init(frameTmpDataPtr, config.frameTmpDataSize);
+
+        graphicsManager_ = std::make_unique<GraphicsManager>();
+        const auto task = std::make_shared<Task>([this]() {graphicsManager_->Init(); });
+        workerManager_.AddTask(task, "render");
+        task->Join();
+    }
+
+    void MainEngine::Update(float dt)
+    {
+
+    }
+
+    void MainEngine::Destroy()
+    {
         {
-            //wait for the end of the rendering
             std::unique_lock<std::mutex> lock(graphicsManager_->renderingMutex);
         }
+        renderWindow->setActive(true);
 
-		++frameIndex;
-#ifdef TRACY_ENABLE
-        FrameMark
-#endif
+        linearAllocator_.Clear();
+        std::free(frameTmpDataPtr);
+        frameTmpDataPtr = nullptr;
+
+        condSyncRender.notify_all();
+        BasicEngine::Destroy();
+        instance_ = nullptr;
+        graphicsManager_ = nullptr;
     }
 
-    Destroy();
-}
-
-
-MainEngine::~MainEngine()
-{
-
-    logDebug("Destroy Main Engine");
-
-
-}
-
-void MainEngine::Init()
-{
-#ifdef TRACY_ENABLE
-    ZoneScoped
-#endif
-
-    //workingThreadPool.resize(std::max(1u,std::thread::hardware_concurrency() - 3));//removing main and render and audio thread
-#ifdef __linux__
-    XInitThreads();
-#endif
-    BasicEngine::Init();
-    renderWindow->setActive(false);
-    instance_ = this;
-
-    graphicsManager_ = std::make_unique<GraphicsManager>();
-    const auto task = std::make_shared<Task>([this]() {graphicsManager_->Init(); });
-    workerManager_.AddTask(task, "render");
-    task->Join();
-}
-
-void MainEngine::Update(float dt)
-{
-
-}
-
-void MainEngine::Destroy()
-{
+    GraphicsManager* MainEngine::GetGraphicsManager() const
     {
-        std::unique_lock<std::mutex> lock(graphicsManager_->renderingMutex);
+        return graphicsManager_.get();
     }
-    renderWindow->setActive(true);
 
-    condSyncRender.notify_all();
-    BasicEngine::Destroy();
-    instance_ = nullptr;
-    graphicsManager_ = nullptr;
-}
-
-GraphicsManager* MainEngine::GetGraphicsManager() const
-{
-	return graphicsManager_.get();
-}
-
-MainEngine* MainEngine::GetInstance()
-{
-    return instance_;
-}
+    MainEngine* MainEngine::GetInstance()
+    {
+        return instance_;
+    }
 
 
 }

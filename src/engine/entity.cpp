@@ -23,6 +23,7 @@
  */
 #include <engine/entity.h>
 #include "engine/globals.h"
+#include "engine/engine.h"
 #include <algorithm>
 #ifdef TRACY_ENABLE
 #include <Tracy.hpp>
@@ -95,13 +96,14 @@ size_t EntityManager::GetEntitiesNmb(EntityMask filterComponents)
     });
 }
 
-std::vector<Entity> EntityManager::FilterEntities(EntityMask filterComponents)
+std::vector<Entity, StandardAllocator<Entity>> EntityManager::FilterEntities(EntityMask filterComponents)
 {
 #ifdef TRACY_ENABLE
     ZoneScoped;
 #endif
     std::shared_lock lock(mutex_);
-	std::vector<Entity> entities;
+    auto* engine = MainEngine::GetInstance();
+    std::vector<Entity, StandardAllocator<Entity>> entities{ StandardAllocator<Entity>{engine->GetFrameAllocator()} };
 	for(Entity i = 0; i < entityMaskArray_.size();i++)
 	{
 		if(HasComponent(i, filterComponents))

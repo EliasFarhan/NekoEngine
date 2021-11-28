@@ -33,6 +33,9 @@
 #include <SFML/Window/WindowStyle.hpp>
 
 #include "worker_system.h"
+#include "allocator/allocator.h"
+#include "allocator/linear_allocator.h"
+#include "allocator/proxy_allocator.h"
 
 namespace neko
 {
@@ -52,6 +55,8 @@ struct Configuration
     bool vSync = true;
     unsigned int framerateLimit = 0u;
     int windowStyle = sf::Style::Default;
+    // 50 MB of tmp data per frame
+    std::size_t frameTmpDataSize = 50'000'000u;
 };
 
 /**
@@ -69,7 +74,7 @@ public:
     void Update(float dt) override;
 
     void Destroy() override;
-
+    
     virtual void EngineLoop();
 
 
@@ -94,7 +99,7 @@ protected:
 class MainEngine : public BasicEngine
 {
 public:
-    using BasicEngine::BasicEngine;
+    MainEngine(Configuration* config);
 
     ~MainEngine() override;
 
@@ -127,13 +132,16 @@ public:
 
     std::atomic<Index> frameIndex = 0u;
 
+    ProxyAllocator& GetFrameAllocator() { return frameAllocator_; }
 protected:
     std::unique_ptr<GraphicsManager> graphicsManager_ = nullptr;
+    void* frameTmpDataPtr = nullptr;
+    LinearAllocator linearAllocator_;
+    ProxyAllocator frameAllocator_{ linearAllocator_ };
 
-
-/**
- * static instance use to access the engine from anywhere, because I don't want to have thousands of MainEngine& ref
- */
+    /**
+     * static instance use to access the engine from anywhere, because I don't want to have thousands of MainEngine& ref
+     */
     static MainEngine* instance_;
 };
 
