@@ -77,22 +77,22 @@ void TileMapGraph::AddNode(sf::Vector2i pos)
 				continue;
 			const sf::Vector2i dir = sf::Vector2i(dx, dy);
 			const sf::Vector2i neighborPos = pos + dir;
-			auto neighborIt = std::find_if(nodes_.begin(), nodes_.end(), [&neighborPos](const Node& node)
-			{
-				return node.position == neighborPos;
-			});
+			auto neighborIt = std::ranges::find_if(nodes_, [&neighborPos](const Node& node)
+            {
+                return node.position == neighborPos;
+            });
 			if (neighborIt != nodes_.end())
 			{
 				{
 					const auto neighborType = GetNeighborType(-dir);
-					const Index neighborIndex = Index(log2(double(neighborType)));
-					neighborIt->neighborsIndex[neighborIndex] = Index(nodes_.size() - 1);
+					const auto neighborIndex = static_cast<Index>(std::log2(static_cast<double>(neighborType)));
+					neighborIt->neighborsIndex[neighborIndex] = static_cast<Index>(nodes_.size() - 1);
 					AddNeighbor(*neighborIt, neighborType);
 				}
 				{
 					const auto neighborType = GetNeighborType(dir);
-					const Index neighborIndex = Index(log2(double(neighborType)));
-					nodePtr->neighborsIndex[neighborIndex] = Index(neighborIt - nodes_.begin());
+					const auto neighborIndex = static_cast<Index>(std::log2(static_cast<double>(neighborType)));
+					nodePtr->neighborsIndex[neighborIndex] = static_cast<Index>(neighborIt - nodes_.begin());
 					AddNeighbor(*nodePtr, neighborType);
 				}
 			}
@@ -106,22 +106,22 @@ void TileMapGraph::RemoveNode(sf::Vector2i pos)
 #ifdef TRACY_ENABLE
 	ZoneScoped
 #endif
-	const auto nodeIt = std::find_if(nodes_.begin(), nodes_.end(), [&pos](const Node& node)
-	{
-		return node.position == pos;
-	});
+	const auto nodeIt = std::ranges::find_if(nodes_, [&pos](const Node& node)
+    {
+        return node.position == pos;
+    });
 	//Cannot remove a node that does not exist
 	if (nodeIt == nodes_.end())
 		return;
-	const Index nodeIndex = Index(nodeIt - nodes_.begin());
+	const Index nodeIndex = static_cast<Index>(nodeIt - nodes_.begin());
 	nodes_.erase(nodeIt);
 	for (auto& otherNode : nodes_)
 	{
 		for (Index i = 0; i < maxNeighborsNmb; i++)
 		{
-			if (otherNode.position + GetDirection(NeighborType(1u << i)) == pos)
+			if (otherNode.position + GetDirection(static_cast<NeighborType>(1u << i)) == pos)
 			{
-				RemoveNeighbor(otherNode, NeighborType(1u << i));
+				RemoveNeighbor(otherNode, static_cast<NeighborType>(1u << i));
 				otherNode.neighborsIndex[i] = 0;
 			}
 			
@@ -145,7 +145,7 @@ float distance(const Node& nodeA, const Node& nodeB)
 float distance(const sf::Vector2i& posA, const sf::Vector2i& posB)
 {
 	const auto deltaPos = posB - posA;
-	return std::sqrt(float(deltaPos.x * deltaPos.x + deltaPos.y * deltaPos.y));
+	return std::sqrt(static_cast<float>(deltaPos.x * deltaPos.x + deltaPos.y * deltaPos.y));
 }
 
 
@@ -170,9 +170,10 @@ TileMapGraph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vect
 #endif
 		return path;
 	}
-	const auto endNodeIt = std::ranges::find_if(nodes_, [&startPos](const Node& node)
+	const auto startNodeIndex = static_cast<Index>(std::distance(nodes_.begin(), startNodeIt));
+	const auto endNodeIt = std::ranges::find_if(nodes_, [&endPos](const Node& node)
     {
-        return node.position == startPos;
+        return node.position == endPos;
     });
 	if (endNodeIt == nodes_.end())
 	{
@@ -181,28 +182,31 @@ TileMapGraph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vect
 #endif
 		return path;
 	}
-	using NodePair = std::pair<const Node*, float>;
-	std::unordered_map<sf::Vector2i, float> costs;
-	costs.reserve(nodes_.size());
-	std::unordered_map<sf::Vector2i, sf::Vector2i> parentMap;
-	parentMap.reserve(nodes_.size());
+	const auto endNodeIndex = static_cast<Index>(std::distance(nodes_.begin(), endNodeIt));
+	using NodePair = std::pair<Index, float>;
+	struct NodePathData
+	{
+		float cost = -1.0f;
+		Index parentIndex = INDEX_INVALID;
+	};
+	std::vector<NodePathData> nodePathDatas(nodes_.size());
 	auto comp = [](const NodePair& nodeA, const NodePair& nodeB) -> bool
 	{
 		return nodeA.second < nodeB.second;
 	};
 	std::vector<NodePair> frontier;
 	frontier.reserve(nodes_.size());
-	frontier.emplace_back(&(*startNodeIt), 0.0f);
-	costs[startNodeIt->position] = 0.0f;
-	parentMap[startNodeIt->position] = startNodeIt->position;
+	frontier.emplace_back(startNodeIndex, 0.0f);
+	nodePathDatas[startNodeIndex].cost = 0.0f;
+	nodePathDatas[startNodeIndex].parentIndex = startNodeIndex;
 
 	while (!frontier.empty())
 	{
 		const auto currentNodePair = frontier.front();
 		frontier.erase(frontier.begin());
-		auto* currentNode = currentNodePair.first;
-
-		if (currentNode->position == endPos)
+		const auto currentNodeIndex = currentNodePair.first;
+		auto& currentNode = nodes_[currentNodeIndex];
+		if (currentNode.position == endPos)
 		{
 #ifdef __neko_dbg__
 			logDebug("Manage to go to the end");
@@ -211,51 +215,49 @@ TileMapGraph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vect
 		}
 		for (size_t i = 0; i < maxNeighborsNmb; i++)
 		{
-			if (!HasNeighbor(*currentNode, NeighborType(1u << i))) continue;
-
-			const auto neighborPos = currentNode->position + GetDirection(NeighborType(1 << i));
-			const auto* neighborPtr = &nodes_[currentNode->neighborsIndex[i]];
-			const float newCost = costs[currentNode->position] + distance(neighborPos, currentNode->position);
-			auto costsIt = costs.find(neighborPos);
-			if (costsIt == costs.end() || newCost < costs[neighborPos])
+			if (!HasNeighbor(currentNode, static_cast<NeighborType>(1u << i))) continue;
+			const auto neighborIndex = currentNode.neighborsIndex[i];
+			const auto neighborPos = currentNode.position + GetDirection(static_cast<NeighborType>(1 << i));
+			const float newCost = nodePathDatas[currentNodeIndex].cost + distance(neighborPos, currentNode.position);
+			const auto neighborCost = nodePathDatas[neighborIndex].cost;
+			if (neighborCost < 0.0f || newCost < neighborCost)
 			{
-				auto neighborIt = std::find_if(frontier.begin(), frontier.end(), [&neighborPos](const NodePair& pair)
-				{
-					return pair.first->position == neighborPos;
-				});
-				if (costsIt != costs.end() && neighborIt != frontier.end())
+				auto neighborIt = std::ranges::find_if(frontier, [&neighborIndex](const NodePair& pair)
+                {
+                    return pair.first == neighborIndex;
+                });
+				if (neighborCost < 0.0f && neighborIt != frontier.end())
 				{
 
 					//Remove pair and put it back with new cost
 					auto neighbor = *neighborIt;
 					frontier.erase(neighborIt);
 					neighbor.second = newCost + distance(neighborPos, endPos);
-					const auto lower = std::lower_bound(frontier.begin(), frontier.end(), neighbor, comp);
+					const auto lower = std::ranges::lower_bound(frontier, neighbor, comp);
 					frontier.insert(lower, neighbor);
 
 				}
 				else
 				{
-					NodePair neighbor = { neighborPtr, newCost + distance(neighborPos, endPos) };
-					const auto lower = std::lower_bound(frontier.begin(), frontier.end(), neighbor, comp);
+					NodePair neighbor = { neighborIndex, newCost + distance(neighborPos, endPos) };
+					const auto lower = std::ranges::lower_bound(frontier, neighbor, comp);
 					frontier.insert(lower, neighbor);
 				}
-				costs[neighborPos] = newCost;
-				parentMap[neighborPos] = currentNode->position;
+				nodePathDatas[neighborIndex] = { newCost, currentNodeIndex };
 			}
 		}
 	}
 
-	if (parentMap.find(endPos) != parentMap.end())
+	if (nodePathDatas[endNodeIndex].parentIndex != INDEX_INVALID)
 	{
 		path.push_back(endPos);
-		auto parentPos = parentMap[endPos];
-		while (parentPos != startPos)
+		auto parentIndex = nodePathDatas[endNodeIndex].parentIndex;
+		while (parentIndex != startNodeIndex)
 		{
-			path.push_back(parentPos);
-			if(parentMap.find(parentPos) != parentMap.end())
+			path.push_back(nodes_[parentIndex].position);
+			if(nodePathDatas[parentIndex].parentIndex != INDEX_INVALID)
 			{
-				parentPos = parentMap[parentPos];
+				parentIndex = nodePathDatas[parentIndex].parentIndex;
 			}
 			else
 			{
@@ -271,6 +273,9 @@ TileMapGraph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vect
 		logDebug("[Error] No parent for end");
 #endif
 	}
+#ifdef TRACY_ENABLE
+	ZoneValue(path.size());
+#endif
 	return path;
 }
 
@@ -300,10 +305,10 @@ bool TileMapGraph::ContainNode(sf::Vector2i pos) const
 #ifdef TRACY_ENABLE
 	ZoneScoped
 #endif
-	const auto nodeIt = std::find_if(nodes_.begin(), nodes_.end(), [&pos](const Node& node)
-	{
-		return node.position == pos;
-	});
+	const auto nodeIt = std::ranges::find_if(nodes_, [&pos](const Node& node)
+    {
+        return node.position == pos;
+    });
 	return nodeIt != nodes_.end();
 }
 
