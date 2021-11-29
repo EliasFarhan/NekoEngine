@@ -25,6 +25,7 @@
  */
 
 #include <vector>
+#include <shared_mutex>
 #include "engine/globals.h"
 #include "allocator/allocator.h"
 
