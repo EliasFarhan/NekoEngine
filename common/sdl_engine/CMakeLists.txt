@@ -1,18 +1,14 @@
 
-if(NOT Emscripten)
-    if(Neko_Android)
 
-        LIST(APPEND sdl_engine_libs SDL2-static Neko_Core SDL2main)
-    else()
-        LIST(APPEND sdl_engine_libs SDL2-static Neko_Core)
-        set_target_properties (SDL2-static PROPERTIES FOLDER Externals)
-    endif()
-    if(MSVC)
-        LIST(APPEND sdl_engine_libs
-                SDL2main)
-        set_target_properties (SDL2main PROPERTIES FOLDER Externals)
-    endif(MSVC)
+if(Neko_Android)
+    LIST(APPEND sdl_engine_libs SDL2-static Neko_Core SDL2main)
+else()
+    find_package(SDL2 CONFIG REQUIRED)
+
+    LIST(APPEND sdl_engine_libs SDL2::SDL2 SDL2::SDL2main Neko_Core)
+    set_target_properties (SDL2-static PROPERTIES FOLDER Externals)
 endif()
+
 
 #imgui sdl
 file(GLOB_RECURSE sdl_engine_src include/*.h src/*.cpp)

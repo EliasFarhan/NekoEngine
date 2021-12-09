@@ -1,3 +1,5 @@
+
+
 #source files
 file(GLOB_RECURSE Neko_ENGINE_SRC src/engine/*.cpp include/engine/*.h)
 file(GLOB_RECURSE Neko_GRAPHICS_SRC src/graphics/*.cpp include/graphics/*.h)
@@ -21,11 +23,6 @@ List(APPEND Neko_SRC
         ${Neko_SOUND_SRC}
         ${Neko_MATH_SRC})
 
-#imgui
-set(IMGUI_VERSION "1.80" CACHE INTERNAL "")
-set(IMGUI_ROOT "${EXTERNAL_DIR}/imgui-${IMGUI_VERSION}" CACHE STRING "")
-add_subdirectory("${IMGUI_ROOT}" ${CMAKE_CURRENT_BINARY_DIR}/imgui)
-set_target_properties(imgui PROPERTIES UNITY_BUILD ON)
 #Utility
 set(UTILITIES_DIR ${EXTERNAL_DIR}/utilities/)
 
@@ -36,6 +33,12 @@ if (APPLE)
     target_link_libraries(Neko_Core PUBLIC ${Boost_LIBRARIES})
 endif(APPLE)
 
+
+target_compile_definitions(Neko_Core PUBLIC "FMT_HEADER_ONLY=1")
+
+if(Neko_Assert)
+    target_compile_definitions(Neko_Core PUBLIC "NEKO_ASSERT=1")
+endif()
 if(Neko_Profile)
     target_link_libraries(Neko_Core PUBLIC easy_profiler)
 endif()
