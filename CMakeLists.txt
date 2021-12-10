@@ -49,6 +49,7 @@ endif()
 
 if(Neko_Profile)
     MESSAGE("Enable profiling")
+    set(TRACY_FOLDER "${EXTERNAL_DIR}/tracy" CACHE INTERNAL "")
 endif()
 
 set(tools_project_dir "tools/")
@@ -80,7 +81,10 @@ set(PYBIND11_VERSION "2.6.1")
 set(PYBIND11_DIR "${EXTERNAL_DIR}/pybind11-${PYBIND11_VERSION}")
 add_subdirectory("${PYBIND11_DIR}")
 
-
+if(Neko_SDL2)
+    #sdl2
+    add_subdirectory("common/sdl_engine")
+endif()
 
 if(Neko_GLES3)
     set(GLES3_WRAPPER_DIR "common/gles3_wrapper" CACHE INTERNAL "")

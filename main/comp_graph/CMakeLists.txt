@@ -1,8 +1,3 @@
-if (NOT Neko_GLES3 OR NOT Neko_SDL2 OR NOT Neko_Freetype)
-    return()
-endif()
-
-
 file(GLOB_RECURSE comp_graph_src include/*.h src/*.cpp)
 
 file(GLOB_RECURSE shaders_src data/shaders/*.vert data/shaders/*.frag)

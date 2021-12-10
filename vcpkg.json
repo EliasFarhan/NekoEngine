@@ -1,0 +1,25 @@
+{
+    "name": "nekoengine",
+    "version-string": "1.0",
+    "dependencies": [
+      "assimp",
+      "glm",
+      "sdl2",
+      "fmt",
+      "stb",
+      {
+        "name": "imgui",
+        "features": [ "sdl2-binding", "opengl3-binding" ]
+      },
+      "spdlog",
+      "argh",
+      "gtest",
+      "benchmark",
+      "protobuf",
+      "units",
+      "sqlite3",
+      "gli",
+      "freetype",
+      "glew"
+    ]
+  }

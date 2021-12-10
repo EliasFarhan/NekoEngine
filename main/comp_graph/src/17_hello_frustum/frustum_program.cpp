@@ -159,8 +159,8 @@ void HelloFrustumProgram::DrawImGui()
 
     ImGui::SliderScalar("Asteroid Nmb", ImGuiDataType_U64, &asteroidNmb_, &minAsteroidNmb_, &maxAsteroidNmb_);
 
-    const size_t minChunkSize = 100;
-    const size_t maxChunkSize = 10'000;
+    constexpr std::size_t minChunkSize = 100;
+    constexpr std::size_t maxChunkSize = 10'000;
     ImGui::SliderScalar("Instance Chunk Size", ImGuiDataType_U64, &instanceChunkSize_, &minChunkSize, &maxChunkSize);
     ImGui::LabelText("Asteroid Actual Nmb", "%zu", asteroidCulledPositions_.size());
     ImGui::End();
@@ -173,7 +173,7 @@ void HelloFrustumProgram::Render()
         return;
     }
 
-    std::lock_guard<std::mutex> lock(updateMutex_);
+    std::lock_guard lock(updateMutex_);
     if (instanceVBO_ == 0)
     {
         const auto* model = modelManager_.GetModel(modelId_);

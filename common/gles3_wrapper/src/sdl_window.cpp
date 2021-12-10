@@ -92,7 +92,7 @@ void Gles3Window::Init()
 #ifndef __EMSCRIPTEN__
 	SDL_GL_SetSwapInterval(config.flags & Configuration::VSYNC ? 1 : 0);
 
-	if (!gladLoadGLES2Loader(static_cast<GLADloadproc>(SDL_GL_GetProcAddress)))
+	if (GLEW_OK != glewInit())
 	{
 		logDebug("Failed to initialize OpenGL context\n");
 		assert(false);
@@ -102,6 +102,8 @@ void Gles3Window::Init()
 #endif
 	glCheckError();
 	InitImGui();
+
+	ImGui_ImplSDL2_InitForOpenGL(window_, &glRenderContext_);
 	glCheckError();
 	LeaveCurrentContext();
 
