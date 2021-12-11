@@ -25,16 +25,16 @@
  */
 
 #include <cstdlib>
-#include <iostream>
+#include "engine/log.h"
+#include <fmt/format.h>
 
 #ifdef NEKO_ASSERT
 #define neko_assert(Expr, Msg) \
     if(!(Expr)) \
     { \
-        std::cerr << "Assert failed:\t"<<Msg <<'\n' \
-            <<"Condition:\t"<< (#Expr) << '\n' \
-            << "Source:\t\t"<<__FILE__<<", line "<<__LINE__<<'\n'; \
-            abort(); \
+        logError(fmt::format("Assert failed:\t{}\nCondition:\t{}\nSource:\t\t{}, line {}" \
+            Msg, (#Expr),__FILE__,__LINE__)); \
+            std::terminate(); \
     }
 #else
 #define neko_assert(Expr, Msg) \

@@ -22,22 +22,44 @@
  SOFTWARE.
  */
 #include <engine/log.h>
-#include <iostream>
+#include <spdlog/spdlog.h>
+
 #if defined(__ANDROID__)
 #include <android/log.h>
 #endif
+namespace neko
+{
+
 static std::vector<std::string> logs;
-void logDebug(const std::string& msg)
+void logDebug(std::string_view msg)
 {
 #if defined(__ANDROID__)
-    __android_log_print(ANDROID_LOG_INFO, "NekoEngine", "%s", msg.c_str());
+    __android_log_print(ANDROID_LOG_INFO, "NekoEngine", "%s", msg.data());
 #else
-	std::cout << msg << std::endl;
-	//logs.push_back(msg);
+    spdlog::info(msg);
+#endif
+}
+
+void logWarning(std::string_view msg)
+{
+#if defined(__ANDROID__)
+    __android_log_print(ANDROID_LOG_WARN, "NekoEngine", "%s", msg.data());
+#else
+    spdlog::warn(msg);
+#endif
+}
+
+void logError(std::string_view msg)
+{
+#if defined(__ANDROID__)
+    __android_log_print(ANDROID_LOG_ERROR, "NekoEngine", "%s", msg.data());
+#else
+    spdlog::error(msg);
 #endif
 }
 
 const std::vector<std::string>& getLog()
 {
     return logs;
+}
 }

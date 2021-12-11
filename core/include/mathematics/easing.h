@@ -25,116 +25,116 @@
 
 namespace neko
 {
-float Linear(float t)
+constexpr float Linear(float t)
 {
     return t;
 }
 
-float SmoothStart2(float t)
+constexpr float SmoothStart2(float t)
 {
     return t * t;
 }
 
-float SmoothStart3(float t)
+constexpr float SmoothStart3(float t)
 {
     return t * t * t;
 }
 
-float SmoothStart4(float t)
+constexpr float SmoothStart4(float t)
 {
     return t * t * t * t;
 }
 
-float SmoothStart5(float t)
+constexpr float SmoothStart5(float t)
 {
     return t * t * t * t * t;
 }
 
-float FlipY(float t)
+constexpr float FlipY(float t)
 {
     return 1.0f - t;
 }
 
-float SmoothStop2(float t)
+constexpr float SmoothStop2(float t)
 {
-    float inverseT = 1.0f - t;
+    const float inverseT = 1.0f - t;
     return 1.0f - inverseT * inverseT;
 }
 
-float SmoothStop3(float t)
+constexpr float SmoothStop3(float t)
 {
-    float inverseT = 1.0f - t;
+    const float inverseT = 1.0f - t;
     return 1.0f - inverseT * inverseT * inverseT;
 }
 
-float SmoothStop4(float t)
+constexpr float SmoothStop4(float t)
 {
-    float inverseT = 1.0f - t;
+    const float inverseT = 1.0f - t;
     return 1.0f - inverseT * inverseT * inverseT * inverseT;
 }
 
-float SmoothStop5(float t)
+constexpr float SmoothStop5(float t)
 {
-    float inverseT = 1.0f - t;
+    const float inverseT = 1.0f - t;
     return 1.0f - inverseT * inverseT * inverseT * inverseT * inverseT;
 }
 
-float SmoothStep(float t)
+constexpr float SmoothStep(float t)
 {
     return t * t * (3.0f - 2.0f * t);
 }
 
-float SmootherStep(float t)
+constexpr float SmootherStep(float t)
 {
     return t * t * t * (6.0f * t * t - 15.0f * t + 10.0f);
 }
 
-float Mix(float a, float b, float blend)
+constexpr float Mix(float a, float b, float blend)
 {
     return (a + blend * (b - a));
 }
 
-float Scale(float a, float t)
+constexpr float Scale(float a, float t)
 {
     return  a * t;
 }
 
-float ReverseScale(float a, float t)
+constexpr float ReverseScale(float a, float t)
 {
     return (1.0f - t) * a;
 }
 
-float Arch2(float t)
+constexpr float Arch2(float t)
 {
     return Scale(FlipY(t), t);
 }
 
-float SmoothStartArch3(float t)
+constexpr float SmoothStartArch3(float t)
 {
     return 20.0f / 3.0f * Scale(Arch2(t), t);
 }
 
-float SmoothStopArch3(float t)
+constexpr float SmoothStopArch3(float t)
 {
     return 20.0f / 3.0f * ReverseScale(Arch2(t), t);
 }
 
-float SmoothStepArch4(float t)
+constexpr float SmoothStepArch4(float t)
 {
     return 12.0f / 5.0f * ReverseScale(SmoothStartArch3(t), t);
 }
 
-float BellCurve6(float t)
+constexpr float BellCurve6(float t)
 {
     return 36.0f / 25.0f * SmoothStopArch3(t) * SmoothStartArch3(t);
 }
 
-float NormalizedBezier3(float b, float c, float t)
+constexpr float NormalizedBezier3(float b, float c, float t)
 {
-    float s = 1.0f - t;
-    float t2 = t * t;
-    float s2 = s * s;
-    float t3 = t2 * t;
+    const float s = 1.0f - t;
+    const float t2 = t * t;
+    const float s2 = s * s;
+    const float t3 = t2 * t;
     return (3.0f * b * s2 * t) + (3.0f * c * s * t2) + t3;
 }
 }

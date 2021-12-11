@@ -30,8 +30,7 @@ namespace neko::net
 void ServerNetworkManager::SendReliablePacket(
     std::unique_ptr<asteroid::Packet> packet)
 {
-    logDebug("[Server] Sending TCP packet: " +
-        std::to_string(static_cast<int>(packet->packetType)));
+    logDebug(fmt::format("[Server] Sending TCP packet: ", packet->packetType));
     for (PlayerNumber playerNumber = 0; playerNumber < asteroid::maxPlayerNmb;
         playerNumber++)
     {
@@ -45,7 +44,7 @@ void ServerNetworkManager::SendReliablePacket(
             switch (status)
             {
             case sf::Socket::NotReady:
-                logDebug(fmt::format(
+                logError(fmt::format(
                     "[Server] Error trying to send packet to Player: {} socket is not ready",
                     playerNumber));
                 break;
@@ -65,7 +64,7 @@ void ServerNetworkManager::SendUnreliablePacket(
     {
         if (clientInfoMap_[playerNumber].udpRemotePort == 0)
         {
-            logDebug(fmt::format("[Warning] Trying to send UDP packet, but missing port!"));
+            logWarning(fmt::format("Trying to send UDP packet, but missing port!"));
             continue;
         }
 
@@ -82,16 +81,16 @@ void ServerNetworkManager::SendUnreliablePacket(
 
         case sf::Socket::Disconnected:
         {
-            logDebug("[Server] Error while sending UDP packet, DISCONNECTED");
+            logError("[Server] Error while sending UDP packet, DISCONNECTED");
             break;
         }
         case sf::Socket::NotReady:
-            logDebug("[Server] Error while sending UDP packet, NOT READY");
+            logError("[Server] Error while sending UDP packet, NOT READY");
 
             break;
 
         case sf::Socket::Error:
-            logDebug("[Server] Error while sending UDP packet, DISCONNECTED");
+            logError("[Server] Error while sending UDP packet, DISCONNECTED");
             break;
         default:
             break;
@@ -166,8 +165,8 @@ void ServerNetworkManager::Update(seconds dt)
             break;
         case sf::Socket::Disconnected:
         {
-            logDebug(fmt::format(
-                "[Error] Player Number {} is disconnected when receiving",
+            logError(fmt::format(
+                "Player Number {} is disconnected when receiving",
                 playerNumber + 1));
             status_ = status_ & ~(FIRST_PLAYER_CONNECT << playerNumber);
             auto endGame = std::make_unique<asteroid::WinGamePacket>();

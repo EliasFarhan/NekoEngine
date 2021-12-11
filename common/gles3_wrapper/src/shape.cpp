@@ -25,6 +25,7 @@
 #include <gl/shape.h>
 #include <mathematics/trigo.h>
 #include "gl/gles3_include.h"
+#include <vector>
 
 namespace neko::gl
 {
@@ -421,13 +422,13 @@ void RenderSphere::Init()
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
 	const auto stride = (3 + 2 + 3 + 3) * sizeof(float);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, static_cast<void*>(nullptr));
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<void*>(3 * sizeof(float)));
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)(5 * sizeof(float)));
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<void*>(5 * sizeof(float)));
 	glEnableVertexAttribArray(3);
-	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, stride, (void*)(8 * sizeof(float)));
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<void*>(8 * sizeof(float)));
 	glBindVertexArray(0);
 	glCheckError();
 }
@@ -435,7 +436,7 @@ void RenderSphere::Init()
 void RenderSphere::Draw() const
 {
 	glBindVertexArray(VAO);
-	glDrawElements(GL_TRIANGLE_STRIP, indexCount_, GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLE_STRIP, static_cast<GLsizei>(indexCount_), GL_UNSIGNED_INT, 0);
 }
 
 void RenderSphere::Destroy()

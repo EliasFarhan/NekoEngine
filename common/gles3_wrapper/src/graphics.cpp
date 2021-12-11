@@ -34,67 +34,71 @@
 #include "easy/profiler.h"
 #endif
 
-void CheckGlError(const char* file, int line)
-{
-    GLenum err;
-    while ((err = glGetError()) != GL_NO_ERROR)
-    {
-        std::string log;
-        // Process/log the error.
-        switch (err)
-        {
-        case GL_INVALID_ENUM:
-            log += "[Error] GL Invalid Enum";
-            break;
-        case GL_INVALID_VALUE:
-            log += "[Error] GL Invalid Value";
-            break;
-        case GL_INVALID_OPERATION:
-            log += "[Error] GL Invalid Operation";
-            break;
-        case GL_OUT_OF_MEMORY:
-            log += "[Error] GL Out Of Memory";
-            break;
-        case GL_INVALID_FRAMEBUFFER_OPERATION:
-            log += "[Error] GL Invalid Framebuffer Operation";
-            break;
-        default:
-        	continue;
-        }
-        logDebug(fmt::format("{} in file: {} at line: {}",log, file, line));
-    }
-}
 
-
-void CheckFramebuffer(const char* file, int line)
-{
-    const auto status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    if (status != GL_FRAMEBUFFER_COMPLETE)
-    {
-        std::string log;
-        switch (status)
-        {
-            case GL_FRAMEBUFFER_UNDEFINED:
-                log+="[Error] Framebuffer is undefined!";
-                break;
-            case GL_FRAMEBUFFER_UNSUPPORTED:
-                log+="[Error] Framebuffer is unsupported!";
-                break;
-            case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-                log+="[Error] Framebuffer has incomplete attachment!";
-                break;
-            case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-                log+="[Error] Framebuffer has incomplete missing attachment!";
-                break;
-            default:
-                return;
-        }
-        logDebug(fmt::format("{} in file: {} at line: {}", log, file, line));
-    }
-}
 
 namespace neko::gl
 {
+
+
+    void CheckGlError(const char* file, int line)
+    {
+        GLenum err;
+        while ((err = glGetError()) != GL_NO_ERROR)
+        {
+            std::string log;
+            // Process/log the error.
+            switch (err)
+            {
+            case GL_INVALID_ENUM:
+                log += "GL Invalid Enum";
+                break;
+            case GL_INVALID_VALUE:
+                log += "GL Invalid Value";
+                break;
+            case GL_INVALID_OPERATION:
+                log += "GL Invalid Operation";
+                break;
+            case GL_OUT_OF_MEMORY:
+                log += "GL Out Of Memory";
+                break;
+            case GL_INVALID_FRAMEBUFFER_OPERATION:
+                log += "GL Invalid Framebuffer Operation";
+                break;
+            default:
+                continue;
+            }
+            logError(fmt::format("{} in file: {} at line: {}", log, file, line));
+        }
+    }
+
+
+    void CheckFramebuffer(const char* file, int line)
+    {
+        const auto status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+        if (status != GL_FRAMEBUFFER_COMPLETE)
+        {
+            std::string log;
+            switch (status)
+            {
+            case GL_FRAMEBUFFER_UNDEFINED:
+                log += "Framebuffer is undefined!";
+                break;
+            case GL_FRAMEBUFFER_UNSUPPORTED:
+                log += "Framebuffer is unsupported!";
+                break;
+            case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+                log += "Framebuffer has incomplete attachment!";
+                break;
+            case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+                log += "Framebuffer has incomplete missing attachment!";
+                break;
+            default:
+                return;
+            }
+            logError(fmt::format("{} in file: {} at line: {}", log, file, line));
+        }
+    }
+
 Gles3Renderer::Gles3Renderer() : Renderer()
 {
 }

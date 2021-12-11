@@ -67,7 +67,7 @@ void ClientNetworkManager::Update(seconds dt)
                 //logDebug("[Client] Error while receiving tcp socket is not ready");
                 break;
             case sf::Socket::Partial:
-                logDebug("[Client] Error while receiving TCP packet, PARTIAL");
+                logError("[Client] Error while receiving TCP packet, PARTIAL");
                 break;
             case sf::Socket::Disconnected: break;
             case sf::Socket::Error: break;
@@ -89,13 +89,13 @@ void ClientNetworkManager::Update(seconds dt)
                 break;
             case sf::Socket::NotReady: break;
             case sf::Socket::Partial:
-                logDebug("[Client] Error while receiving UDP packet, PARTIAL");
+                logError("[Client] Error while receiving UDP packet, PARTIAL");
                 break;
             case sf::Socket::Disconnected:
-                logDebug("[Client] Error while receiving UDP packet, DISCONNECTED");
+                logError("[Client] Error while receiving UDP packet, DISCONNECTED");
                 break;
             case sf::Socket::Error:
-                logDebug("[Client] Error while receiving UDP packet, ERROR");
+                logError("[Client] Error while receiving UDP packet, ERROR");
                 break;
             default:;
             }
@@ -161,7 +161,7 @@ void ClientNetworkManager::DrawImGui()
         }
         else
         {
-            logDebug("[Client] Error trying to connect to " + serverAddress_ + " with port: " +
+            logError("[Client] Error trying to connect to " + serverAddress_ + " with port: " +
                 std::to_string(serverTcpPort_) + " with status: " + std::to_string(status));
         }
     }
@@ -201,16 +201,16 @@ void ClientNetworkManager::SendUnreliablePacket(std::unique_ptr<asteroid::Packet
         //	serverAddress_.toString() + " port: " + std::to_string(serverUdpPort_));
         break;
     case sf::Socket::NotReady:
-        logDebug("[Client] Error sending UDP to server, NOT READY");
+        logError("[Client] Error sending UDP to server, NOT READY");
         break;
     case sf::Socket::Partial:
-        logDebug("[Client] Error sending UDP to server, PARTIAL");
+        logError("[Client] Error sending UDP to server, PARTIAL");
         break;
     case sf::Socket::Disconnected:
-        logDebug("[Client] Error sending UDP to server, DISCONNECTED");
+        logError("[Client] Error sending UDP to server, DISCONNECTED");
         break;
     case sf::Socket::Error:
-        logDebug("[Client] Error sending UDP to server, ERROR");
+        logError("[Client] Error sending UDP to server, ERROR");
         break;
     default:
         break;
@@ -235,7 +235,7 @@ void ClientNetworkManager::ReceivePacket(sf::Packet& packet, PacketSource source
     case asteroid::PacketType::JOIN_ACK:
     {
         logDebug("[Client] Receive " + std::string(source == PacketSource::UDP ? "UDP" : "TCP") + " Join ACK Packet");
-        auto* joinAckPacket = static_cast<asteroid::JoinAckPacket*>(receivePacket.get());
+        const auto* joinAckPacket = static_cast<asteroid::JoinAckPacket*>(receivePacket.get());
 
         serverUdpPort_ = ConvertFromBinary<unsigned short>(joinAckPacket->udpPort);
         const auto clientId = ConvertFromBinary<ClientId>(joinAckPacket->clientId);

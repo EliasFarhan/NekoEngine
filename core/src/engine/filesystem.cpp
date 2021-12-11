@@ -3,6 +3,10 @@
 //
 #include "engine/filesystem.h"
 
+#include <fstream>
+#include "engine/log.h"
+#include <fmt/format.h>
+
 #ifdef STD_FILESYSTEM
 
 #include <filesystem>
@@ -74,18 +78,18 @@ void LoadingAssetJob::Reset()
 
 
 
-BufferFile Filesystem::LoadFile(std::string_view path) const
+BufferFile Filesystem::LoadFile(std::string_view filename) const
 {
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("Load File from Filesystem");
 #endif
     BufferFile newFile;
-    if (FileExists(path))
+    if (FileExists(filename))
     {
-        std::ifstream is(path.data(), std::ifstream::binary);
+        std::ifstream is(filename.data(), std::ifstream::binary);
         if (!is)
         {
-            logDebug(fmt::format("[Error] Could not open file: {}  for BufferFile", path));
+            logError(fmt::format("Could not open file: {} for BufferFile", filename));
         }
         else
         {

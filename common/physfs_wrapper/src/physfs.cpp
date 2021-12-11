@@ -52,7 +52,7 @@ BufferFile PhysFsFilesystem::LoadFile(std::string_view path) const
     newFile.dataBuffer[newFile.dataLength] = 0;
     if(PHYSFS_readBytes(file, newFile.dataBuffer, newFile.dataLength) == -1)
     {
-        logDebug(fmt::format("[Error] Physfs could not read file: {}\nLog: {}",
+        logError(fmt::format("Physfs could not read file: {}\nLog: {}",
                              path, PHYSFS_getLastErrorCode()));
         PHYSFS_close(file);
         return {};
@@ -71,8 +71,8 @@ bool PhysFsFilesystem::IsRegularFile(std::string_view filename) const
     PHYSFS_Stat stat;
     if(PHYSFS_stat(filename.data(), &stat))
     {
-        logDebug(fmt::format(
-                "[Error] PhysFS could not get stat of file: {}\nLog: {}",
+        logError(fmt::format(
+                "PhysFS could not get stat of file: {}\nLog: {}",
                 filename, PHYSFS_getLastErrorCode()));
         return false;
     }
@@ -84,8 +84,8 @@ bool PhysFsFilesystem::IsDirectory(std::string_view filename) const
     PHYSFS_Stat stat;
     if(PHYSFS_stat(filename.data(), &stat))
     {
-        logDebug(fmt::format(
-                "[Error] PhysFS could not get stat of file: {}\nLog: {}",
+        logError(fmt::format(
+                "PhysFS could not get stat of file: {}\nLog: {}",
                 filename, PHYSFS_getLastErrorCode()));
         return false;
     }
@@ -96,7 +96,7 @@ void PhysFsFilesystem::Init()
 {
     if(!PHYSFS_init(argv0.c_str()))
     {
-        logDebug(fmt::format("[Error] PhysFS init failed {}", PHYSFS_getLastErrorCode()));
+        logError(fmt::format("PhysFS init failed {}", PHYSFS_getLastErrorCode()));
         return;
     }
 }
@@ -110,7 +110,7 @@ void PhysFsFilesystem::Destroy()
 {
     if (!PHYSFS_deinit())
     {
-        logDebug(fmt::format("[Error] PhysFS deinit failed: {}", PHYSFS_getLastErrorCode()));
+        logError(fmt::format("PhysFS deinit failed: {}", PHYSFS_getLastErrorCode()));
     }
 }
 
@@ -118,8 +118,8 @@ void PhysFsFilesystem::AddMount(std::string_view dir, std::string_view mountPoin
 {
     if(!PHYSFS_mount(dir.data(), mountPoint.data(), append))
     {
-        logDebug(fmt::format(
-                "[Error] PhysFS could not mount: {} at mount point: {}\n Log: {}",
+        logError(fmt::format(
+                "PhysFS could not mount: {} at mount point: {}\n Log: {}",
                              dir, mountPoint, PHYSFS_getLastErrorCode()));
     }
 }

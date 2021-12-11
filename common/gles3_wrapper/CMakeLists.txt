@@ -26,5 +26,7 @@ if(NOT Neko_Android)
     target_include_directories(gles3_wrapper PUBLIC ${OPENGL_INCLUDE_DIR})
 endif()
 target_include_directories(gles3_wrapper PUBLIC "include/")
+
+target_precompile_headers(gles3_wrapper PUBLIC "include/gles3_wrapper_pch.h")
 neko_lib_config(gles3_wrapper)
 set_target_properties (gles3_wrapper PROPERTIES FOLDER Neko/Common)

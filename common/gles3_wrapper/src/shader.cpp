@@ -26,6 +26,9 @@
 #include <sstream>
 #include <engine/log.h>
 #include <fmt/core.h>
+
+#include <engine/engine.h>
+
 namespace neko::gl
 {
 
@@ -37,7 +40,7 @@ void Shader::LoadFromFile(const std::string_view vertexShaderPath, const std::st
     vertexFile.Destroy();
     if (vertexShader == INVALID_SHADER)
     {
-        logDebug(fmt::format("[Error] Loading vertex shader: {} unsuccessful", vertexShaderPath));
+        logError(fmt::format("Loading vertex shader: {} unsuccessful", vertexShaderPath));
         return;
     }
     BufferFile fragmentFile = filesystem_.LoadFile(fragmentShaderPath);
@@ -47,14 +50,14 @@ void Shader::LoadFromFile(const std::string_view vertexShaderPath, const std::st
     if (fragmentShader == INVALID_SHADER)
     {
         DeleteShader(vertexShader);
-        logDebug(fmt::format("[Error] Loading fragment shader: {} unsuccessful", vertexShaderPath));
+        logError(fmt::format("Loading fragment shader: {} unsuccessful", vertexShaderPath));
         return;
     }
 
     shaderProgram_ = CreateShaderProgram(vertexShader, fragmentShader);
     if(shaderProgram_ == 0)
     {
-        logDebug(fmt::format("[Error] Loading shader program with vertex: {} and fragment {}",
+        logError(fmt::format("Loading shader program with vertex: {} and fragment {}",
                              vertexShaderPath, fragmentShaderPath));
     }
     DeleteShader(vertexShader);
@@ -223,16 +226,17 @@ GLuint CreateShaderProgram(GLuint vertexShader, GLuint fragmentShader, GLuint co
     glLinkProgram(program);
     //Check if shader program was linked correctly
     GLint success;
-    char infoLog[512];
     glGetProgramiv(program, GL_LINK_STATUS, &success);
     if (!success)
     {
-        glGetProgramInfoLog(program, 512, nullptr, infoLog);
-        logDebug(fmt::format("[Error] Shader program with vertex {} and fragment {}: LINK_FAILED with infoLog:\n{}",
+        constexpr GLsizei infoLogSize = 512;
+        char infoLog[infoLogSize];
+        glGetProgramInfoLog(program, infoLogSize, nullptr, infoLog);
+        logError(fmt::format("Shader program with vertex {} and fragment {}: LINK_FAILED with infoLog:\n{}",
                              vertexShader,
                              fragmentShader,
                              infoLog));
-        return 0;
+        return INVALID_PROGRAM;
     }
     return program;
 }
@@ -248,15 +252,16 @@ GLuint LoadShader(char* shaderContent, GLenum shaderType)
     glCompileShader(shader);
     //Check success status of shader compilation
     GLint success;
-    char infoLog[512];
     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
     if (!success)
     {
-        glGetShaderInfoLog(shader, 512, nullptr, infoLog);
-        logDebug(fmt::format("[Error] Shader compilation failed with this log:\n{}\nShader content:\n{}",
+        constexpr GLsizei infoLogSize = 512;
+        char infoLog[infoLogSize];
+        glGetShaderInfoLog(shader, infoLogSize, nullptr, infoLog);
+        logError(fmt::format("Shader compilation failed with this log:\n{}\nShader content:\n{}",
                              infoLog,
                              shaderContent));
-        return 0;
+        return INVALID_SHADER;
     }
     return shader;
 }

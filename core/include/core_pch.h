@@ -37,6 +37,5 @@
 #include <cmath>
 #include <imgui.h>
 
-#ifdef EASY_PROFILE_USE
-#include "easy/profiler.h"
-#endif
+#include <fmt/core.h>
+#include <units.h>

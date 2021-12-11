@@ -79,7 +79,7 @@ void SdlWindow::Init()
     // Check that everything worked out okay
     if (window_ == nullptr)
     {
-        logDebug("[Error] Unable to create window\n");
+        logError("Unable to create window\n");
         return;
     }
 }

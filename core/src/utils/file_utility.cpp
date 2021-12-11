@@ -215,7 +215,7 @@ void IterateDirectory(const std::string_view dirname, std::function<void(const s
 	}
 	else
 	{
-		logDebug(fmt::format("[Error] Path: {}  is not a directory!", dirname));
+		logError(fmt::format("Path: {}  is not a directory!", dirname));
 	}
 }
 

@@ -36,6 +36,7 @@
 #ifdef EASY_PROFILE_USE
 #include <easy/profiler.h>
 #endif
+#include <engine/assert.h>
 
 namespace neko::gl
 {
@@ -94,8 +95,7 @@ void Gles3Window::Init()
 
 	if (GLEW_OK != glewInit())
 	{
-		logDebug("Failed to initialize OpenGL context\n");
-		assert(false);
+		neko_assert(false, "Failed to initialize OpenGL context");
 	}
 #else
 	SDL_GL_SetSwapInterval(false);
@@ -201,14 +201,17 @@ void Gles3Window::MakeCurrentContext()
 {
 	SDL_GL_MakeCurrent(window_, glRenderContext_);
 	const auto currentContext = SDL_GL_GetCurrentContext();
-	std::ostringstream oss;
-	oss << "Current Context: " << currentContext << " Render Context: " << glRenderContext_ << " from Thread: " << std::this_thread::get_id();
+
+	logDebug(fmt::format("Current Context: {} Render Context: {} from Thread: {}",
+		currentContext,
+		glRenderContext_,
+		std::hash < std::thread::id>{}( std::this_thread::get_id())));
+
 	if (currentContext == nullptr)
 	{
-		oss << "\nSDL Error: " << SDL_GetError();
+		logError(fmt::format("SDL Error: {}", SDL_GetError()));
 	}
-	logDebug(oss.str());
-
+	
 }
 
 void Gles3Window::LeaveCurrentContext()
@@ -221,7 +224,7 @@ void Gles3Window::LeaveCurrentContext()
 		std::hash<std::thread::id>{}(std::this_thread::get_id())));
 	if (currentContext != nullptr)
 	{
-		logDebug(fmt::format("[Error] After Leave Current Context, context: {}", currentContext));
+		logError(fmt::format("After Leave Current Context, context: {}", currentContext));
 	}
 
 }

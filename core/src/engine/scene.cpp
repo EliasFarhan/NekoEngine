@@ -59,7 +59,7 @@ void SceneManager::ParseSceneJson(const json& sceneJson)
         }
         else
         {
-            logDebug(fmt::format("[Warning] Scene Path in scene: {} contains a bad scene path", currentScene_.sceneName));
+            logWarning(fmt::format("Scene Path in scene: {} contains a bad scene path", currentScene_.sceneName));
         }
     }
 

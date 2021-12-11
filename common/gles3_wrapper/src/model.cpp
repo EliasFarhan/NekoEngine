@@ -288,7 +288,7 @@ ModelId ModelManager::LoadModel(std::string_view path)
     }
     else
     {
-        logDebug(fmt::format("[Error] Could not find model id in json file: {}", metaPath));
+        logError(fmt::format("Could not find model id in json file: {}", metaPath));
         return modelId;
     }
     modelLoaders_.push(ModelLoader(importer_, path, modelId));
@@ -500,7 +500,7 @@ void ModelLoader::LoadModel()
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
         flags_ = ERROR_LOADING;
-        logDebug(fmt::format("[ERROR] ASSIMP {}", importer_.get().GetErrorString()));
+        logError(fmt::format("ASSIMP {}", importer_.get().GetErrorString()));
         return;
     }
     BasicEngine::GetInstance()->ScheduleJob(&processModelJob_, JobThreadType::OTHER_THREAD);

@@ -22,7 +22,6 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-#include "engine/log.h"
 
 #ifdef EMSCRIPTEN
 #include <emscripten.h>
@@ -32,7 +31,11 @@
 #define GL_GLEXT_PROTOTYPES 1
 #endif
 
+namespace neko::gl
+{
+
 void CheckFramebuffer(const char* file, int line);
 void CheckGlError(const char* file, int line);
-#define glCheckError() CheckGlError(__FILE__, __LINE__) 
-#define glCheckFramebuffer() CheckFramebuffer(__FILE__, __LINE__)
+}
+#define glCheckError() neko::gl::CheckGlError(__FILE__, __LINE__) 
+#define glCheckFramebuffer() neko::gl::CheckFramebuffer(__FILE__, __LINE__)

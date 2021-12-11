@@ -104,7 +104,7 @@ void BasicEngine::Init()
 #ifdef EASY_PROFILE_USE
     EASY_FUNCTION(profiler::colors::Magenta);
 #endif
-    logDebug("Current path: " + GetCurrentPath());
+    logDebug(fmt::format("Current path: {}", GetCurrentPath()));
     jobSystem_.Init();
     initAction_.Execute();
 }

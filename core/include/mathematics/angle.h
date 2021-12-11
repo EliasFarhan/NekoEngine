@@ -22,7 +22,6 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-#define UNIT_LIB_DEFAULT_TYPE float
 #include <units.h>
 
 namespace neko

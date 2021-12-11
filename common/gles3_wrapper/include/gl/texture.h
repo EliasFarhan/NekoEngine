@@ -81,14 +81,10 @@ public:
     TextureId LoadTexture([[maybe_unused]] std::string_view path, [[maybe_unused]] Texture::TextureFlags flags = Texture::DEFAULT) override
     {
         neko_assert(false, "[Warning] Using NullTextureManager to Load Texture");
-        logDebug("[Warning] Using NullTextureManager to Load Texture");
-        return INVALID_TEXTURE_ID;
     }
     [[nodiscard]] const Texture* GetTexture([[maybe_unused]] TextureId index) const override
     {
         neko_assert(false, "[Warning] Using NullTextureManager to Get Texture Id");
-        logDebug("[Warning] Using NullTextureManager to Get Texture Id");
-        return {};
     }
     [[nodiscard]] bool IsTextureLoaded([[maybe_unused]] TextureId textureId) const override  { return false; }
 };

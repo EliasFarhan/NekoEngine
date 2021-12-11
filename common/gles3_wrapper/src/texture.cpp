@@ -38,6 +38,7 @@
 #ifdef EASY_PROFILE_USE
 #include "easy/profiler.h"
 #endif
+#include <utils/json_utility.h>
 namespace neko::gl
 {
 
@@ -61,7 +62,7 @@ StbCreateTexture(const std::string_view filename, const FilesystemInterface& fil
     const std::string extension = GetFilenameExtension(filename);
     if (!filesystem.FileExists(filename))
     {
-        logDebug(fmt::format("[Error] Texture: {} does not exist", filename));
+        logError(fmt::format("Texture: {} does not exist", filename));
         return 0;
     }
 
@@ -85,7 +86,7 @@ StbCreateTexture(const std::string_view filename, const FilesystemInterface& fil
     textureFile.Destroy();
     if (image.data == nullptr)
     {
-        logDebug(fmt::format("[Error] Texture: cannot load {}", filename));
+        logError(fmt::format("Texture: cannot load {}", filename));
         return INVALID_TEXTURE_NAME;
     }
 #ifdef EASY_PROFILE_USE
@@ -147,15 +148,15 @@ TextureName CreateTextureFromKTX(const std::string_view filename, const Filesyst
     auto texture = gli::load(reinterpret_cast<const char*>(textureFile.dataBuffer), textureFile.dataLength);
     if (texture.empty())
     {
-        logDebug("Could not load texture with GLI");
-        return 0;
+        logError("Could not load texture with GLI");
+        return INVALID_TEXTURE_NAME;
     }
     const gli::gl::format format = glProfile.translate(texture.format(), texture.swizzles());
 
     GLenum target = glProfile.translate(texture.target());
     logDebug(fmt::format("texture format: {}, texture target {}, is compressed {}",
-                         (int)texture.format(),
-                         (int) texture.target(),
+                         texture.format(),
+                         texture.target(),
                          is_compressed(texture.format())));
 #ifdef EASY_PROFILE_USE
     EASY_END_BLOCK;
@@ -227,7 +228,7 @@ TextureName LoadCubemap(std::vector<std::string> facesFilename, const Filesystem
         }
         else
         {
-            logDebug(fmt::format("[Error] Cubemap tex failed to load at path: {}", facesFilename[i]));
+            logError(fmt::format("Cubemap tex failed to load at path: {}", facesFilename[i]));
         }
         image.Destroy();
     }
@@ -271,7 +272,7 @@ TextureId TextureManager::LoadTexture(std::string_view path, Texture::TextureFla
     }
     else
     {
-        logDebug(fmt::format("[Error] Could not find texture id in json file {}", metaPath));
+        logError(fmt::format("Could not find texture id in json file {}", metaPath));
         return textureId;
     }
     if(CheckJsonExists(metaJson, "ktx_path"))
@@ -280,13 +281,13 @@ TextureId TextureManager::LoadTexture(std::string_view path, Texture::TextureFla
     }
     else
     {
-        logDebug("[Error] Could not find ktx path in json file");
+        logError("Could not find ktx path in json file");
         return INVALID_TEXTURE_ID;
     }
 
     if (textureId == INVALID_TEXTURE_ID)
     {
-        logDebug("[Error] Invalid texture id on texture load");
+        logError(" Invalid texture id on texture load");
         return textureId;
     }
     const auto& config = BasicEngine::GetInstance()->GetConfig();
@@ -332,13 +333,13 @@ void TextureManager::Update([[maybe_unused]]seconds dt)
             switch (textureLoader.GetErrors())
             {
             case TextureLoader::TextureLoaderError::ASSET_LOADING_ERROR:
-                logDebug(fmt::format("[Error] Could not load texture {} from disk", textureLoader.GetPath()));
+                logError(fmt::format(" Could not load texture {} from disk", textureLoader.GetPath()));
                 break;
             case TextureLoader::TextureLoaderError::DECOMPRESS_ERROR:
-                logDebug(fmt::format("[Error] Could not decompress texture {} from disk", textureLoader.GetPath()));
+                logError(fmt::format(" Could not decompress texture {} from disk", textureLoader.GetPath()));
                 break;
             case TextureLoader::TextureLoaderError::UPLOAD_TO_GPU_ERROR:
-                logDebug(fmt::format("[Error] Could not upload texture {} from disk", textureLoader.GetPath()));
+                logError(fmt::format(" Could not upload texture {} from disk", textureLoader.GetPath()));
                 break;
             default:
                 break;
@@ -416,7 +417,7 @@ void TextureLoader::DecompressTexture()
     }
     if (texture_.gliTexture.empty())
     {
-        logDebug("[Error] OpenGLI error while opening KTX content");
+        logError(" OpenGLI error while opening KTX content");
         error_ = TextureLoaderError::DECOMPRESS_ERROR;
         return;
     }

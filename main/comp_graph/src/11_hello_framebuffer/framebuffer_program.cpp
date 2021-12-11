@@ -63,7 +63,7 @@ void HelloFramebufferProgram::Init()
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo_);
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
     {
-        logDebug("[Error] Framebuffer is not complete!");
+        logError("Framebuffer is not complete!");
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -173,7 +173,7 @@ void HelloFramebufferProgram::Render()
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo_);
         if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         {
-            logDebug("[Error] Framebuffer is not complete afetr resize!");
+            logError("Framebuffer is not complete after resize!");
         }
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         hasScreenResize_ = false;

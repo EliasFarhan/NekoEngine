@@ -24,11 +24,15 @@
  */
 
 #include <string>
+#include <string_view>
 #include <vector>
 
-/**
- * \brief log a msg to cout and a log file to the log thread
- * @param msg
- */
-void logDebug(const std::string& msg);
+namespace neko
+{
+
+void logDebug(std::string_view msg);
+void logWarning(std::string_view msg);
+void logError(std::string_view msg);
 const std::vector<std::string>& getLog();
+
+}

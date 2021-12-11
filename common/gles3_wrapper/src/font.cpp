@@ -70,13 +70,13 @@ FontId FontManager::LoadFont(std::string_view fontName, int pixelHeight)
     }
     else
     {
-        logDebug("[Error] Could not find font id in json file");
+        logError(" Could not find font id in json file");
         return fontId;
     }
 
     if (fontId == INVALID_FONT_ID)
     {
-        logDebug("[Error] Invalid font id on texture load");
+        logError(" Invalid font id on texture load");
         return fontId;
     }
     auto it = fonts_.find(fontId);
@@ -89,7 +89,7 @@ FontId FontManager::LoadFont(std::string_view fontName, int pixelHeight)
     FT_Library ft;
     if (FT_Init_FreeType(&ft))
     {
-        logDebug("[Error] Freetype could not init FreeType Library");
+        logError(" Freetype could not init FreeType Library");
         return INVALID_FONT_ID;
     }
     FT_Face face;
@@ -100,7 +100,7 @@ FontId FontManager::LoadFont(std::string_view fontName, int pixelHeight)
                            0,
                            &face))
     {
-        logDebug("[Error] Freetype: Failed to load font");
+        logError(" Freetype: Failed to load font");
         return INVALID_FONT_ID;
     }
     // set size to load glyphs as
@@ -116,7 +116,7 @@ FontId FontManager::LoadFont(std::string_view fontName, int pixelHeight)
         // Load character glyph
         if (FT_Load_Char(face, c, FT_LOAD_RENDER))
         {
-            logDebug("[Error] Freetype failed to load Glyph");
+            logError(" Freetype failed to load Glyph");
             continue;
         }
         // generate texture
@@ -272,7 +272,10 @@ Vec2f FontManager::CalculateTextPosition(Vec2f position, TextAnchor anchor)
             return position + windowSize_ * (Vec2f::right/2.0f);
         case TextAnchor::BOTTOM_RIGHT:
             return position + windowSize_ * Vec2f::right;
+    default:
+        break;
     }
+    return position;
 }
 
 void FontManager::SetWindowSize(const Vec2f& windowSize)

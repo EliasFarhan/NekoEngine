@@ -30,8 +30,6 @@ namespace neko
 neko::Mat4f NullCamera::GenerateProjectionMatrix() const
 {
     neko_assert(false, "[Error] No camera defined in CameraLocator!");
-    logDebug("[Error] No camera defined in CameraLocator!");
-    return neko::Mat4f();
 }
 
 neko::Mat4f Camera::GenerateViewMatrix() const

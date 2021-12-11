@@ -143,7 +143,7 @@ public:
 		{
 			for (int row = 0; row < 4; row++)
 			{
-				if(col == 3 or row == 3)
+				if(col == 3 || row == 3)
 				{
 					columns_[col][row] = 0;
 				}

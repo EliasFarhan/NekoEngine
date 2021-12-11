@@ -92,9 +92,7 @@ bool EntityManager::HasComponent(Entity entity, EntityMask componentType) const
 {
 	if (entity >= entityMaskArray_.size())
     {
-	    std::ostringstream oss;
-	    oss << "[Error] Accessing entity: "<<entity<<" while entity mask array is of size: "<<entityMaskArray_.size();
-	    logDebug(oss.str());
+	    logError(fmt::format("Accessing entity : {} while entity mask array is of size: {}", entity, entityMaskArray_.size()));
 	    return false;
     }
     return (entityMaskArray_[entity] & static_cast<EntityMask>(componentType)) == static_cast<EntityMask>(componentType);
@@ -294,7 +292,7 @@ void EntityViewer::DrawEntityHierarchy(neko::Entity entity, bool draw, bool dest
             nodeFlags |= ImGuiTreeNodeFlags_Selected;
         }
         ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.7f);
-        nodeOpen = ImGui::TreeNodeEx((void*)static_cast<intptr_t>(entity), nodeFlags, "%s",
+        nodeOpen = ImGui::TreeNodeEx(reinterpret_cast<void*>(static_cast<intptr_t>(entity)), nodeFlags, "%s",
             entityName.c_str());
         ImGui::PopItemWidth();
         if (ImGui::IsItemClicked())
@@ -494,7 +492,7 @@ bool EntityManager::SetEntityParent(Entity child, Entity parent)
     {
 	    if(p == child)
 	    {
-            logDebug(fmt::format("[Warning] Child entity: {} cannot have parent entity: {}", child , parent));
+            logWarning(fmt::format("Child entity: {} cannot have parent entity: {}", child , parent));
             return false;
 	    }
         p = GetEntityParent(p);

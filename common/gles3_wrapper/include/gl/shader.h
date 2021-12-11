@@ -31,7 +31,8 @@
 
 namespace neko::gl
 {
-const GLuint INVALID_SHADER = 0;
+constexpr GLuint INVALID_SHADER = 0;
+constexpr GLuint INVALID_PROGRAM = 0;
 /**
  * Load shader with given shader type
  * (GL_COMPUTE_SHADER, GL_VERTEX_SHADER, GL_TESS_CONTROL_SHADER,

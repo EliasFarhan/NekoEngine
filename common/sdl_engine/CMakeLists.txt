@@ -16,7 +16,7 @@ add_library(sdl_engine STATIC ${sdl_engine_src})
 target_link_libraries(sdl_engine PUBLIC ${sdl_engine_libs})
 
 target_include_directories(sdl_engine PUBLIC "include/")
-target_precompile_headers(sdl_engine PRIVATE "include/sdl_wrapper_pch.h")
+target_precompile_headers(sdl_engine PUBLIC "include/sdl_wrapper_pch.h")
 neko_lib_config(sdl_engine)
 set_target_properties (sdl_engine PROPERTIES FOLDER Neko/Common)
 

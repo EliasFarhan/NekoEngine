@@ -61,13 +61,13 @@ private:
 class Filesystem : public FilesystemInterface
 {
 public:
-    BufferFile LoadFile(std::string_view path) const override;
+    [[nodiscard]] BufferFile LoadFile(std::string_view filename) const override;
 
-    bool FileExists(std::string_view view) const override;
+    [[nodiscard]] bool FileExists(std::string_view filename) const override;
 
-    bool IsRegularFile(std::string_view view) const override;
+    [[nodiscard]] bool IsRegularFile(std::string_view filename) const override;
 
-    bool IsDirectory(std::string_view view) const override;
+    [[nodiscard]] bool IsDirectory(std::string_view filename) const override;
 
 };
 }

@@ -50,7 +50,7 @@ void SdlEngine::Init()
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("Init Sdl Engine");
 #endif
-    logDebug("Current path: " + GetCurrentPath());
+    logDebug(fmt::format("Current path: {}", GetCurrentPath()));
     jobSystem_.Init();
 
     assert(window_ != nullptr);

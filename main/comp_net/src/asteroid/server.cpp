@@ -20,7 +20,7 @@ void Server::ReceivePacket(std::unique_ptr<asteroid::Packet> packet)
             //Player joined twice!
             return;
         }
-        logDebug("Managing Received Packet Join from: " + std::to_string(clientId));
+        logDebug(fmt::format("Managing Received Packet Join from: {}", clientId));
         clientMap_[lastPlayerNumber_] = clientId;
         SpawnNewPlayer(clientId, lastPlayerNumber_);
 

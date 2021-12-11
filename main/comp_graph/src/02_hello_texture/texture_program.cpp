@@ -127,15 +127,15 @@ gl::TextureName HelloTextureProgram::LoadTextureWithGli(std::string_view path)
     gli::texture texture = gli::load(path.data());
     if (texture.empty())
     {
-        logDebug("Could not load texture with GLI");
-        return 0;
+        logError("Could not load texture with GLI");
+        return gl::INVALID_TEXTURE_NAME;
     }
     gli::gl glProfile(gli::gl::PROFILE_ES30);
     const gli::gl::format format = glProfile.translate(texture.format(), texture.swizzles());
     GLenum target = glProfile.translate(texture.target());
     logDebug(fmt::format("texture format: {}, texture target {}, is compressed {}", 
-        (int)texture.format(), 
-        (int) texture.target(),
+        texture.format(), 
+        texture.target(),
         is_compressed(texture.format())));
     neko_assert(gli::is_compressed(texture.format()) && texture.target() == gli::TARGET_2D, "Is compressed and Target 2d");
 

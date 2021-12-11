@@ -16,14 +16,14 @@ void PerfApp::Init()
     auto rc = sqlite3_open("instancing_perf.db", &db);
     if (rc != SQLITE_OK)
     {
-        logDebug("Could not open db to create table");
+        logError("Could not open db to create table");
     }
     char* errMsg = 0;
     const char* createTableSql = "CREATE TABLE RenderData(Id INTEGER PRIMARY KEY AUTOINCREMENT, Frame INT, Instance INT, Segment INT, Indice INT, Time INT);";
     rc = sqlite3_exec(db, createTableSql, nullptr, nullptr, &errMsg);
     if(rc != SQLITE_OK)
     {
-        logDebug(fmt::format("Could not create table with msg: {}", errMsg));
+        logError(fmt::format("Could not create table with msg: {}", errMsg));
         sqlite3_free(errMsg);
     }
     sqlite3_close(db);
@@ -114,7 +114,7 @@ void PerfApp::Render()
             rc = sqlite3_exec(db, sqlInsertQuery.c_str(), nullptr, nullptr, &errMsg);
             if(rc != SQLITE_OK)
             {
-                logDebug(fmt::format("Could not insert value, error msg: {}", errMsg));
+                logError(fmt::format("Could not insert value, error msg: {}", errMsg));
                 sqlite3_free(errMsg);
             }
         }

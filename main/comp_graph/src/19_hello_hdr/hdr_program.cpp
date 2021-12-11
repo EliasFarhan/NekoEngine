@@ -166,7 +166,7 @@ void HelloHdrProgram::CreateFramebuffer()
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, hdrRbo_);
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
     {
-        logDebug("[Error] Framebuffer not complete!");
+        logError("Framebuffer not complete!");
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glCheckError();

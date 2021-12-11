@@ -296,7 +296,7 @@ void ClientGameManager::Render()
 
 void ClientGameManager::SpawnPlayer(net::PlayerNumber playerNumber, Vec2f position, degree_t rotation)
 {
-    logDebug("Spawn player: " + std::to_string(playerNumber));
+    logDebug(fmt::format("Spawn player: {}", playerNumber));
     GameManager::SpawnPlayer(playerNumber, position, rotation);
     const auto entity = GetEntityFromPlayerNumber(playerNumber);
     const auto& config = BasicEngine::GetInstance()->GetConfig();
@@ -395,7 +395,7 @@ void ClientGameManager::SetPlayerInput(net::PlayerNumber playerNumber, net::Play
 
 void ClientGameManager::StartGame(unsigned long long int startingTime)
 {
-    logDebug("Start game at starting time: " + std::to_string(startingTime));
+    logDebug(fmt::format("Start game at starting time: {}", startingTime));
     startingTime_ = startingTime;
 }
 
