@@ -37,6 +37,7 @@ endif()
 include(cmake/neko_executable.cmake)
 include(cmake/data.cmake)
 include(cmake/test.cmake)
+include(cmake/proto.cmake)
 
 set(EXTERNAL_DIR ${CMAKE_SOURCE_DIR}/externals CACHE INTERNAL "Externals folder")
 set(UTILITIES_DIR "${EXTERNAL_DIR}/utilities" CACHE INTERNAL "")

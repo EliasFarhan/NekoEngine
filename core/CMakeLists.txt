@@ -63,7 +63,7 @@ target_precompile_headers(Neko_Core PUBLIC include/core_pch.h)
 
 
 neko_lib_config(Neko_Core)
-
+add_neko_proto(Neko_Core)
 if(Neko_Test)
     add_neko_test(Neko_Core)
 endif()

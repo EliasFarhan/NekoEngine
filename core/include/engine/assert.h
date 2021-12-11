@@ -32,9 +32,9 @@
 #define neko_assert(Expr, Msg) \
     if(!(Expr)) \
     { \
-        logError(fmt::format("Assert failed:\t{}\nCondition:\t{}\nSource:\t\t{}, line {}" \
-            Msg, (#Expr),__FILE__,__LINE__)); \
-            std::terminate(); \
+        logError(fmt::format("Assert failed:\t{}\nSource:\t\t{}, line {}", \
+            #Msg, __FILE__,__LINE__)); \
+            std::abort(); \
     }
 #else
 #define neko_assert(Expr, Msg) \

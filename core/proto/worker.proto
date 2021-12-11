@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package core.pb;
+
+message WorkerQueue
+{
+    string name = 1;
+}
+
+message WorkerThread
+{
+    WorkerQueue queue = 1;
+    int32 thread_count = 2;
+}
+
+message WorkerManager
+{
+    WorkerQueue main_queue = 1;
+    repeated WorkerQueue other_queues = 2;
+    repeated WorkerThread other_threads = 3;
+}
