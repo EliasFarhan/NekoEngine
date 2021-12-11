@@ -148,6 +148,10 @@ void WorkerThread::Loop() const
     {
         if (taskQueue_.IsEmpty())
         {
+            if (!taskQueue_.IsRunning())
+            {
+                break;
+            }
             taskQueue_.WaitForTask();
         }
         else
@@ -177,39 +181,38 @@ void WorkerManager::Init(const core::pb::WorkerManager& workerManagerPb)
         queueMap_[queue.name()] = i;
     }
     queueMap_[workerManagerPb.main_queue().name()] = -1;
-    for(int i = 0; i < workerManagerPb.other_threads_size(); i++)
+    for (int i = 0; i < workerManagerPb.other_threads_size(); i++)
     {
         auto& thread = workerManagerPb.other_threads(i);
         auto& queue = thread.queue();
         const auto queueIndex = queueMap_[queue.name()];
-        threads_.emplace_back(queueIndex >= 0 ? queues_[queueIndex] : mainQueue_);
+        for (int i = 0; i < thread.thread_count(); i++)
+        {
+            threads_.emplace_back(queueIndex >= 0 ? queues_[queueIndex] : mainQueue_);
+        }
     }
     std::for_each(threads_.begin(), threads_.end(), [](auto& thread) {thread.Start(); });
 
 }
 
-void WorkerManager::AddTask(const std::shared_ptr<Task>& task, std::string_view queueName)
+bool WorkerManager::AddTask(const std::shared_ptr<Task>& task, std::string_view queueName)
 {
     const auto queueIndexIt = queueMap_.find(queueName.data());
     if(queueIndexIt == queueMap_.end())
     {
         logWarning(fmt::format("Could not add task to queue: {}, it does not exist", queueName));
-        return;
+        return false;
     }
     const auto queueIndex = queueIndexIt->second;
     if(queueIndex >= 0)
     {
-        //Checking if already added
-        if (queues_[queueIndex].Contains(task))
-        {
-            return;
-        }
         queues_[queueIndex].AddTask(task);
     }
     else
     {
         mainQueue_.AddTask(task);
     }
+    return true;
 }
 
 void WorkerManager::ExecuteMainThread()
@@ -232,10 +235,6 @@ void WorkerManager::Destroy()
 {
     std::for_each(queues_.begin(), queues_.end(), [](auto& queue) {queue.Destroy(); });
     std::for_each(threads_.begin(), threads_.end(), [](auto& thread) {thread.Destroy(); });
-}
-
-WorkerThread::~WorkerThread()
-{
 }
 
 void WorkerThread::Destroy()
@@ -275,7 +274,10 @@ std::shared_ptr<Task> WorkerQueue::PopNextTask()
 bool WorkerQueue::AddTask(std::shared_ptr<Task> task)
 {
     if (Contains(task))
+    {
+        logWarning("Worker Queue already contains added task");
         return false;
+    }
     std::unique_lock lock(queueMutex_);
     tasks_.push_back(std::move(task));
     conditionVariable_.notify_one();

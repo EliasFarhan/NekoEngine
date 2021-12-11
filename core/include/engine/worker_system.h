@@ -100,7 +100,7 @@ class WorkerThread
 {
 public:
     WorkerThread(WorkerQueue& queue);
-    ~WorkerThread();
+    ~WorkerThread() = default;
 
     WorkerThread(const WorkerThread&) = delete;
     WorkerThread& operator= (const WorkerThread&) = delete;
@@ -123,7 +123,7 @@ class WorkerManager
 public:
 
     void Init(const core::pb::WorkerManager& workerManagerPb);
-    void AddTask(const std::shared_ptr<Task>& task, std::string_view queueName);
+    bool AddTask(const std::shared_ptr<Task>& task, std::string_view queueName);
     void ExecuteMainThread();
     void Destroy();
 private:

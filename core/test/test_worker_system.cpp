@@ -126,6 +126,38 @@ TEST(WorkerSystem, TestTwoWorkerQueue)
     workerThread1.Destroy();
     workerThread2.Destroy();
 }
+
+TEST(WorkerSystem, TestNullWorkerManager)
+{
+    neko::WorkerManager workerManager;
+    core::pb::WorkerManager workerManagerPb;
+    auto* mainQueue = workerManagerPb.mutable_main_queue();
+    mainQueue->set_name("main");
+    workerManager.Init(workerManagerPb);
+    workerManager.Destroy();
+
+}
+
+TEST(WorkerSystem, TestWorkerManagerNoProperQueue)
+{
+    neko::WorkerManager workerManager;
+    core::pb::WorkerManager workerManagerPb;
+    auto* mainQueue = workerManagerPb.mutable_main_queue();
+    static constexpr std::string_view mainQueueName = "main";
+    mainQueue->set_name(mainQueueName.data());
+    workerManager.Init(workerManagerPb);
+    bool value = false;
+    const auto task1 = std::make_shared<neko::Task>([&value] {value = true; });
+    EXPECT_FALSE(workerManager.AddTask(task1, "invalid-queue-name"));
+    EXPECT_TRUE(workerManager.AddTask(task1, mainQueueName));
+    workerManager.ExecuteMainThread();
+    EXPECT_TRUE(task1->IsDone());
+    EXPECT_TRUE(value);
+
+    workerManager.Destroy();
+
+}
+
 TEST(WorkerSystem, TestEmptyWorkerManager)
 {
     neko::WorkerManager workerManager;
@@ -137,14 +169,15 @@ TEST(WorkerSystem, TestEmptyWorkerManager)
     auto* queue = workerManagerPb.add_other_queues();
     queue->set_name("other");
     auto* thread1 = workerManagerPb.add_other_threads();
-    thread1->set_allocated_queue(queue);
-    auto* thread2 = workerManagerPb.add_other_threads();
-    thread2->set_allocated_queue(queue);
+    thread1->set_thread_count(2);
+    auto* threadQueue = thread1->mutable_queue();
+    *threadQueue = *queue;
     workerManager.Init(workerManagerPb);
     
     workerManager.ExecuteMainThread();
     workerManager.Destroy();
 }
+
 TEST(WorkerSystem, TestWorkerManager)
 {
     neko::WorkerManager workerManager;
@@ -153,9 +186,8 @@ TEST(WorkerSystem, TestWorkerManager)
     auto* queue = workerManagerPb.add_other_queues();
     queue->set_name(queueName.data());
     auto* thread1 = workerManagerPb.add_other_threads();
-    thread1->set_allocated_queue(queue);
-    auto* thread2 = workerManagerPb.add_other_threads();
-    thread2->set_allocated_queue(queue);
+    thread1->set_thread_count(2);
+    *thread1->mutable_queue() = *queue;
     workerManager.Init(workerManagerPb);
 
     bool value = false;
