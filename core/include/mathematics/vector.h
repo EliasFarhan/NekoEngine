@@ -30,7 +30,7 @@
 #include "mathematics/angle.h"
 #include "mathematics/trigo.h"
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
 namespace neko
 {
@@ -52,6 +52,10 @@ class alignas(4 * sizeof(T)) Vec4;
 template<typename T>
 struct Vec2
 {
+#ifdef _MSC_VER
+#pragma warning( push )
+#pragma warning(disable : 4201)
+#endif
     union
     {
         struct
@@ -68,7 +72,9 @@ struct Vec2
         };
         T coord[2];
     };
-
+#ifdef _MSC_VER
+#pragma warning( pop )
+#endif
     const static Vec2 zero;
     const static Vec2 one;
     const static Vec2 up;
@@ -340,6 +346,10 @@ template<typename T>
 class Vec3
 {
 public:
+#ifdef _MSC_VER
+#pragma warning( push )
+#pragma warning(disable : 4201)
+#endif
     union
     {
         struct
@@ -357,7 +367,9 @@ public:
         };
         T coord[3];
     };
-
+#ifdef _MSC_VER
+#pragma warning( pop )
+#endif
     const static Vec3 zero;
     const static Vec3 one;
     const static Vec3 up;
@@ -671,6 +683,10 @@ template<typename T>
 class alignas(4 * sizeof(T)) Vec4
 {
 public:
+#ifdef _MSC_VER
+#pragma warning( push )
+#pragma warning(disable : 4201)
+#endif
     union
     {
         struct
@@ -683,7 +699,9 @@ public:
         };
         T coord[4];
     };
-
+#ifdef _MSC_VER
+#pragma warning( pop )
+#endif
     const static Vec4 zero;
     const static Vec4 one;
 

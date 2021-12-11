@@ -28,7 +28,7 @@
 #include <string>
 #include "engine/log.h"
 #include <sstream>
-#include <fmt/format.h>
+#include <fmt/core.h>
 
 namespace neko
 {
@@ -52,8 +52,8 @@ bool CheckJsonParameter(const json& jsonObject, std::string parameterName, json:
 
 bool CheckJsonNumber(const json& jsonObject, std::string parameterName)
 {
-    return CheckJsonParameter(jsonObject, parameterName, json::value_t::number_float) or
-           CheckJsonParameter(jsonObject, parameterName, json::value_t::number_integer) or
+    return CheckJsonParameter(jsonObject, parameterName, json::value_t::number_float) ||
+           CheckJsonParameter(jsonObject, parameterName, json::value_t::number_integer) ||
            CheckJsonParameter(jsonObject, parameterName, json::value_t::number_unsigned);
 }
 

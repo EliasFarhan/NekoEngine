@@ -31,6 +31,10 @@ namespace neko
 {
 struct Quaternion
 {
+#ifdef _MSC_VER
+#pragma warning( push )
+#pragma warning(disable : 4201)
+#endif
 	union
 	{
 		struct
@@ -40,9 +44,11 @@ struct Quaternion
 			float z;
 			float w;
 		};
-		float coord[4];
+		float coord[4]{};
 	};
-
+#ifdef _MSC_VER
+#pragma warning( pop )
+#endif
 	Quaternion()
 	{
 		x = y = z = w = 0;
@@ -118,13 +124,13 @@ struct Quaternion
 		return 2.0f * Acos(std::abs(Dot(a, b)));
 	}
 
-	Quaternion Conjugate() const
+    [[nodiscard]] Quaternion Conjugate() const
 	{
-		return Quaternion(-x, -y, -z, w);
+		return {-x, -y, -z, w};
 	}
 
 	//Returns the Inverse of rotation.
-	Quaternion Inverse() const
+    [[nodiscard]] Quaternion Inverse() const
 	{
 		const Quaternion conj = Conjugate();
 		const float mag = Magnitude(*this);
@@ -146,12 +152,12 @@ struct Quaternion
 		const auto cr = Cos(angle.z * 0.5f);
 		const auto sr = Sin(angle.z * 0.5f);
 
-		return Quaternion(
-			cy * cp * cr + sy * sp * sr,
+		return {
+            cy * cp * cr + sy * sp * sr,
 			cy * cp * sr - sy * sp * cr,
 			sy * cp * sr + cy * sp * cr,
 			sy * cp * cr - cy * sp * sr
-		);
+        };
 	}
 
 	static Quaternion Identity()

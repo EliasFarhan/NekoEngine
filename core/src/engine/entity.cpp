@@ -29,7 +29,7 @@
 #include <sstream>
 #include <engine/log.h>
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 #include "imgui.h"
 
 namespace neko
@@ -257,7 +257,7 @@ void EntityViewer::DrawImGui()
 	
 	for(Entity entity = 0; entity < entityManager_.GetEntitiesSize(); entity++)
 	{
-		if(entityManager_.EntityExists(entity) and entityManager_.GetEntityParent(entity) == INVALID_ENTITY)
+		if(entityManager_.EntityExists(entity) && entityManager_.GetEntityParent(entity) == INVALID_ENTITY)
 		{
             DrawEntityHierarchy(entity, true, false);
 		}
@@ -399,7 +399,7 @@ void EntityViewer::DrawEntityHierarchy(neko::Entity entity, bool draw, bool dest
     {
         entityManager_.DestroyEntity(entity);
     }
-    if (nodeOpen and !leaf)
+    if (nodeOpen && !leaf)
     {
         ImGui::TreePop();
     }
@@ -453,7 +453,7 @@ bool EntityManager::IsPrefab(Entity entity) const
     return HasComponent(entity, static_cast<EntityMask>(ComponentType::PREFAB));
 }
 
-EntityHash EntityManager::GetEntityNameHash(Entity entity)
+EntityHash EntityManager::GetEntityNameHash(Entity entity) const
 {
     return entityHashArray_[entity];
 }
@@ -463,7 +463,7 @@ Entity EntityManager::FindEntityByHash(EntityHash entityHash)
 	const auto index = std::find(entityHashArray_.begin(), entityHashArray_.end(), entityHash);
 	if (index != entityHashArray_.end())
 	{
-		return index - entityHashArray_.begin();
+		return static_cast<Entity>(std::distance(entityHashArray_.begin(), index));
 	}
 	return INVALID_ENTITY;
 }

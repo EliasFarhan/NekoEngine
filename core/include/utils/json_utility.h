@@ -26,7 +26,7 @@
 #include <string>
 #include <memory>
  //Externals includes
-#include <json.hpp>
+#include <nlohmann/json.hpp>
 #include "mathematics/vector.h"
 #include "mathematics/rect.h"
 

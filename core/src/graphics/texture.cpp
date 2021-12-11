@@ -27,7 +27,7 @@
 #include "stb_image.h"
 #include "engine/engine.h"
 #include "utils/file_utility.h"
-#include <fmt/format.h>
+#include <fmt/core.h>
 #include <utils/json_utility.h>
 
 #ifdef EASY_PROFILE_USE
@@ -48,13 +48,22 @@ Image StbImageConvert(const BufferFile& imageFile, bool flipY, bool hdr)
     stbi_set_flip_vertically_on_load(flipY);
     if (hdr)
     {
-        image.data = (unsigned char*)stbi_loadf_from_memory((unsigned char*)(imageFile.dataBuffer),
-            imageFile.dataLength, &image.width, &image.height, &image.nbChannels, 0);
+        image.data = reinterpret_cast<unsigned char*>(stbi_loadf_from_memory(
+            imageFile.dataBuffer,
+            static_cast<int>(imageFile.dataLength), 
+            &image.width, 
+            &image.height,
+            &image.nbChannels, 0));
     }
     else
     {
-        image.data = stbi_load_from_memory((unsigned char*)(imageFile.dataBuffer),
-            imageFile.dataLength, &image.width, &image.height, &image.nbChannels, 0);
+        image.data = stbi_load_from_memory(
+            imageFile.dataBuffer,
+            static_cast<int>(imageFile.dataLength), 
+            &image.width, 
+            &image.height, 
+            &image.nbChannels, 
+            0);
     }
 	return image;
 }

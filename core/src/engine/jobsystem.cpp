@@ -23,7 +23,7 @@
  */
 
 #include <engine/jobsystem.h>
-
+#include <engine/engine.h>
 #include <utility>
 
 #ifdef EASY_PROFILE_USE
@@ -32,16 +32,7 @@
 
 namespace neko
 {
-
-JobSystem::JobSystem()
-{
-
-}
-
-JobSystem::~JobSystem()
-{
-
-}
+    
 
 void JobSystem::ScheduleJob(Job* func, JobThreadType threadType)
 {
@@ -73,7 +64,8 @@ void JobSystem::ScheduleJob(Job* func, JobThreadType threadType)
         scheduleJobFunc(jobs_);
         break;
     }
-	default: ;
+    default: 
+        break;
 	}
 }
 
@@ -129,10 +121,10 @@ void JobSystem::Init()
 {
     status_ = RUNNING;
     const auto& config = BasicEngine::GetInstance()->GetConfig();
-    const auto minWorkerNumber = 3u;
+    constexpr auto minWorkerNumber = 3u;
     numberOfWorkers = config.workerNumber < minWorkerNumber ?
-            std::max(minWorkerNumber, std::thread::hardware_concurrency() - 1):
-            config.workerNumber;
+            static_cast<std::uint8_t>(std::max(minWorkerNumber, std::thread::hardware_concurrency() - 1)):
+            static_cast<std::uint8_t>(config.workerNumber);
 
     workers_.resize(numberOfWorkers);
 

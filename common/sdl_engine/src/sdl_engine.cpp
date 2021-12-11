@@ -29,7 +29,7 @@
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
 #include "utils/file_utility.h"
 #include "engine/window.h"

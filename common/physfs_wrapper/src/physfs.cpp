@@ -23,7 +23,7 @@ SOFTWARE.
 */
 
 #include <physfs.h>
-#include <fmt/format.h>
+#include <fmt/core.h>
 
 #include <engine/log.h>
 #include "fs/physfs.h"

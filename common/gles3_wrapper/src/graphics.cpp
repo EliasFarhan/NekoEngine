@@ -28,7 +28,7 @@
 
 #include "engine/log.h"
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
 #ifdef EASY_PROFILE_USE
 #include "easy/profiler.h"

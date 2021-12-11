@@ -24,7 +24,7 @@
 #include "asteroid_net/network_server.h"
 #include "engine/conversion.h"
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 namespace neko::net
 {
 void ServerNetworkManager::SendReliablePacket(

@@ -1,5 +1,6 @@
 find_package(fmt CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
 #source files
 file(GLOB_RECURSE Neko_ENGINE_SRC src/engine/*.cpp include/engine/*.h)
 file(GLOB_RECURSE Neko_GRAPHICS_SRC src/graphics/*.cpp include/graphics/*.h)
@@ -28,7 +29,7 @@ set(UTILITIES_DIR ${EXTERNAL_DIR}/utilities/)
 
 add_library(Neko_Core STATIC ${Neko_SRC})
 target_include_directories(Neko_Core PUBLIC "${IMGUI_ROOT}")
-target_link_libraries(Neko_Core PUBLIC imgui::imgui fmt::fmt-header-only)
+target_link_libraries(Neko_Core PUBLIC imgui::imgui fmt::fmt-header-only nlohmann_json nlohmann_json::nlohmann_json)
 
 if(Neko_Assert)
     target_compile_definitions(Neko_Core PUBLIC "NEKO_ASSERT=1")
@@ -38,11 +39,16 @@ if(Neko_Profile)
     target_compile_definitions(Neko_Core PUBLIC "TRACY_ENABLE=1")
     target_include_directories(Neko_Core PUBLIC "${TRACY_FOLDER}")
 endif()
+
 target_compile_options(Neko_Core PRIVATE $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
         -Wall -Wextra>
         $<$<CXX_COMPILER_ID:MSVC>:
         /W4>)
 
+if(MSVC)
+    target_compile_definitions(Neko_Core PUBLIC WIN32_LEAN_AND_MEAN NOMINMAX)
+endif()
+target_compile_definitions(Neko_Core PUBLIC UNIT_LIB_DISABLE_IOSTREAM DISABLE_PREDEFINED_UNITS ENABLE_PREDEFINED_ANGLE_UNITS)
 target_compile_definitions(Neko_Core PUBLIC $<$<CONFIG:Debug>:__neko_dbg__>)
 target_compile_definitions(Neko_Core PUBLIC $<$<CONFIG:RelWithDebInfo>:__neko_dbg__>)
 target_compile_definitions(Neko_Core PUBLIC SOURCE_PATH="${CMAKE_SOURCE_DIR}")

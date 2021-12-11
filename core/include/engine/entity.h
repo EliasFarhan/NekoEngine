@@ -93,7 +93,7 @@ public:
 
     void SetEntityNameHash(Entity entity, EntityHash entityHash);
 
-    [[nodiscard]] EntityHash GetEntityNameHash(Entity entity);
+    [[nodiscard]] EntityHash GetEntityNameHash(Entity entity) const;
 
     [[nodiscard]] Entity FindEntityByHash(EntityHash entityHash);
 

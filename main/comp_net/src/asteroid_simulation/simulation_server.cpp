@@ -30,7 +30,7 @@
 #include "comp_net/packet.h"
 #include "imgui.h"
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
 namespace neko::net
 {

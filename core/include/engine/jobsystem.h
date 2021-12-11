@@ -116,8 +116,6 @@ class JobSystem : SystemInterface
     };
 
 public:
-    JobSystem();
-    ~JobSystem() override;
     void ScheduleJob(Job* func, JobThreadType threadType);
     void Init() override;
 
@@ -136,7 +134,7 @@ private:
     JobQueue resourceJobs_; // Managed via mutex. // TODO: replace with custom queue when those are implemented.
     std::uint8_t workersStarted_ = 0;
     [[nodiscard]] std::uint8_t CountStartedWorkers() const;
-    std::uint8_t numberOfWorkers;
+    std::uint8_t numberOfWorkers = 0;
     std::vector<std::thread> workers_; // TODO: replace with fixed vector when those are implemented.
     mutable std::mutex statusMutex_;
 };

@@ -32,7 +32,7 @@
 #include <graphics/texture.h>
 #include <engine/engine.h>
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
 
 #ifdef EASY_PROFILE_USE

@@ -173,9 +173,9 @@ public:
 	{
         const auto newSize = this->components_.size();
         ResizeIfNecessary(currentComponents_, newSize - 1, {});
-		for(size_t i = 0; i < newSize; i++)
+		for(std::size_t i = 0; i < newSize; i++)
 		{
-			if(this->entityManager_.get().HasComponent(i, EntityMask(componentType)))
+			if(this->entityManager_.get().HasComponent(static_cast<Entity>(i), componentType))
 			{
                 currentComponents_[i] = this->components_[i];
 			}
