@@ -24,17 +24,17 @@
  */
 #include "engine/system.h"
 #include "mathematics/vector.h"
-#include "engine/jobsystem.h"
+#include "engine/worker_system.h"
 
 namespace neko
 {
 class Window : public SystemInterface
 {
 public:
-    Window() : swapBufferJob_([this]
+    Window() : swapBufferTask_(std::make_shared<Task>([this]
     {
         SwapBuffer();
-    })
+    }))
     {
 	    
     }
@@ -49,14 +49,14 @@ public:
     virtual void RenderUi() = 0;
     virtual void OnResize(Vec2u newWindowSize) = 0;
 
-    Job* GetSwapBufferJob() { return &swapBufferJob_; }
+    [[nodiscard]] std::weak_ptr<Task> GetSwapBufferTask() { return swapBufferTask_; }
 
-    void ResetJobs() { swapBufferJob_.Reset(); }
+    void ResetTasks() const { swapBufferTask_->Reset(); }
 
     virtual void BeforeRenderLoop() {}
     virtual void AfterRenderLoop() {}
 protected:
-    Job swapBufferJob_;
+    std::shared_ptr<Task> swapBufferTask_;
 };
 
 

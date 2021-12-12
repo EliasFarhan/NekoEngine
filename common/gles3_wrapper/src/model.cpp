@@ -41,122 +41,6 @@
 #endif
 namespace neko::gl
 {
-/*
-void OldModel::Draw(const gl::Shader& shader)
-{
-    for (auto& mesh : meshes_)
-        mesh.Draw(shader);
-}
-
-void OldModel::Destroy()
-{
-    for (auto& mesh : meshes_)
-        mesh.Destroy();
-    meshes_.clear();
-    processModelJob_.Reset();
-}
-
-
-OldModel::OldModel() : processModelJob_([this] {
-    ProcessModel();
-}),
-filesystem_(BasicEngine::GetInstance()->GetFilesystem())
-{
-}
-
-void OldModel::LoadModel(std::string_view path)
-{
-    path_ = path;
-    directory_ = path.substr(0, path.find_last_of('/'));
-    logDebug(fmt::format("ASSIMP: Loading model: {}", path_));
-    BasicEngine::GetInstance()->ScheduleJob(&processModelJob_, JobThreadType::OTHER_THREAD);
-}
-
-bool OldModel::IsLoaded() const
-{
-
-    if (!processModelJob_.IsDone())
-    {
-        return false;
-    }
-    for (const auto& mesh : meshes_)
-    {
-        if (!mesh.IsLoaded())
-            return false;
-    }
-
-    return true;
-}
-
-void OldModel::ProcessModel()
-{
-
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Process 3d Model");
-    EASY_BLOCK("Load 3d Model");
-#endif
-    Assimp::Importer import;
-    const aiScene* scene = nullptr;
-
-    Job loadingModelJob = Job([this, &import, &scene] {
-#ifdef EASY_PROFILE_USE
-        EASY_BLOCK("Model Disk Load");
-#endif
-        //assimp delete automatically the IO System
-        auto* ioSystem = new NekoIOSystem(filesystem_.get());
-        import.SetIOHandler(ioSystem);
-
-        scene = import.ReadFile(path_.data(),
-                                aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals |
-                                aiProcess_CalcTangentSpace);
-    });
-    BasicEngine::GetInstance()->ScheduleJob(&loadingModelJob, JobThreadType::RESOURCE_THREAD);
-
-    loadingModelJob.Join();
-
-#ifdef EASY_PROFILE_USE
-    EASY_END_BLOCK;
-#endif
-    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
-    {
-        logDebug(fmt::format("[ERROR] ASSIMP {}", import.GetErrorString()));
-        return;
-    }
-    meshes_.reserve(scene->mNumMeshes);
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Process Nodes");
-#endif
-    ProcessNode(scene->mRootNode, scene);
-#ifdef EASY_PROFILE_USE
-    EASY_END_BLOCK;
-    EASY_BLOCK("Schedule Mesh Job");
-#endif
-    for (auto& mesh : meshes_)
-    {
-        mesh.Init();
-    }
-
-}
-
-void OldModel::ProcessNode(aiNode* node, const aiScene* scene)
-{
-    // process all the node's meshes (if any)
-    for (unsigned int i = 0; i < node->mNumMeshes; i++)
-    {
-        meshes_.emplace_back();
-        auto& mesh = meshes_.back();
-
-        aiMesh* assMesh = scene->mMeshes[node->mMeshes[i]];
-        mesh.ProcessMesh(assMesh, scene, directory_);
-    }
-    // then do the same for each of its children
-    for (unsigned int i = 0; i < node->mNumChildren; i++)
-    {
-        ProcessNode(node->mChildren[i], scene);
-    }
-}
-*/
-
 
 const assimp::Mesh& Model::GetMesh(size_t meshIndex) const
 {
@@ -316,21 +200,10 @@ bool ModelManager::IsLoaded(ModelId modelId)
 ModelLoader::ModelLoader(Assimp::Importer& importer, std::string_view path, ModelId modelId) :
     importer_(importer),
     path_(path),
-    loadModelJob_([this]() { LoadModel(); }),
-    processModelJob_([this]() { ProcessModel(); }),
-    uploadMeshesToGLJob_([this]() { UploadMeshesToGL(); }),
+    loadModelTask_(std::make_shared<Task>([this]() { LoadModel(); })),
+    processModelTask_(std::make_shared<Task>([this]() { ProcessModel(); })),
+    uploadMeshesToGLTask_(std::make_shared<Task>([this]() { UploadMeshesToGL(); })),
     modelId_(modelId)
-{
-
-}
-
-ModelLoader::ModelLoader(ModelLoader&& modelLoader) noexcept :
-    path_(modelLoader.path_),
-    modelId_(modelLoader.modelId_),
-    importer_(modelLoader.importer_),
-    loadModelJob_([this]() { LoadModel(); }),
-    processModelJob_([this]() { ProcessModel(); }),
-    uploadMeshesToGLJob_([this]() { UploadMeshesToGL(); })
 {
 
 }
@@ -338,7 +211,7 @@ ModelLoader::ModelLoader(ModelLoader&& modelLoader) noexcept :
 void ModelLoader::Start()
 {
     directoryPath_ = path_.substr(0, path_.find_last_of('/'));
-    BasicEngine::GetInstance()->ScheduleJob(&loadModelJob_, JobThreadType::RESOURCE_THREAD);
+    BasicEngine::GetInstance()->ScheduleTask(loadModelTask_, "resourceName?");
 }
 
 void ModelLoader::Update()
@@ -347,7 +220,7 @@ void ModelLoader::Update()
     {
         return;
     }
-    if (!(flags_ & LOADED) && processModelJob_.IsDone())
+    if (!(flags_ & LOADED) && processModelTask_->IsDone())
     {
         const auto& textureManager = TextureManagerLocator::get();
         bool isLoaded = true;
@@ -378,7 +251,7 @@ void ModelLoader::Update()
                 isLoaded = false;
             }
         }
-        if (isLoaded && uploadMeshesToGLJob_.IsDone())
+        if (isLoaded && uploadMeshesToGLTask_->IsDone())
         {
             flags_ = flags_ | LOADED;
         }
@@ -412,7 +285,7 @@ void ModelLoader::ProcessModel()
     EASY_BLOCK("Process Nodes");
 #endif
     ProcessNode(scene->mRootNode);
-    RendererLocator::get().AddPreRenderJob(&uploadMeshesToGLJob_);
+    RendererLocator::get().AddPreRenderTask(uploadMeshesToGLTask_);
 }
 
 void ModelLoader::ProcessNode(aiNode* node)
@@ -503,7 +376,7 @@ void ModelLoader::LoadModel()
         logError(fmt::format("ASSIMP {}", importer_.get().GetErrorString()));
         return;
     }
-    BasicEngine::GetInstance()->ScheduleJob(&processModelJob_, JobThreadType::OTHER_THREAD);
+    BasicEngine::GetInstance()->ScheduleTask(processModelTask_, "otherName?");
 }
 
 void ModelLoader::UploadMeshesToGL()
@@ -571,7 +444,7 @@ void ModelLoader::UploadMeshesToGL()
 
 void
 ModelLoader::LoadMaterialTextures(const aiMaterial* material, aiTextureType textureType, std::string_view directory,
-                                  assimp::Mesh& mesh)
+                                  assimp::Mesh& mesh) const
 {
     auto& textureManager = TextureManagerLocator::get();
     const auto count = material->GetTextureCount(textureType);

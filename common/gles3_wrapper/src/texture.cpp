@@ -379,16 +379,16 @@ TextureLoader::TextureLoader(std::string_view path,
                              Texture::TextureFlags flags) :
         filesystem_(BasicEngine::GetInstance()->GetFilesystem()),
         textureId_(textureId), path_(path), flags_(flags),
-        loadingTextureJob_([this]() { LoadTexture(); }),
-        decompressTextureJob_([this]() { DecompressTexture(); }),
-        uploadToGLJob_([this](){ UploadToGL(); })
+        loadingTextureTask_ (std::make_shared<Task>([this]() { LoadTexture(); })),
+        decompressTextureTask_(std::make_shared<Task>([this]() { DecompressTexture(); })),
+        uploadToGLTask_(std::make_shared<Task>([this](){ UploadToGL(); }))
 {
 
 }
 
-bool TextureLoader::IsDone()
+bool TextureLoader::IsDone() const
 {
-    return uploadToGLJob_.IsDone();
+    return uploadToGLTask_->IsDone();
 }
 
 void TextureLoader::LoadTexture()
@@ -402,7 +402,7 @@ void TextureLoader::LoadTexture()
         error_ = TextureLoaderError::ASSET_LOADING_ERROR;
         return;
     }
-    BasicEngine::GetInstance()->ScheduleJob(&decompressTextureJob_, JobThreadType::OTHER_THREAD);
+    BasicEngine::GetInstance()->ScheduleTask(decompressTextureTask_, "otherName?");
 }
 
 void TextureLoader::DecompressTexture()
@@ -421,7 +421,7 @@ void TextureLoader::DecompressTexture()
         error_ = TextureLoaderError::DECOMPRESS_ERROR;
         return;
     }
-    RendererLocator::get().AddPreRenderJob(&uploadToGLJob_);
+    RendererLocator::get().AddPreRenderTask(uploadToGLTask_);
 }
 
 void TextureLoader::UploadToGL()
@@ -465,23 +465,12 @@ void TextureLoader::UploadToGL()
 
 void TextureLoader::Start()
 {
-    BasicEngine::GetInstance()->ScheduleJob(&loadingTextureJob_, JobThreadType::RESOURCE_THREAD);
+    BasicEngine::GetInstance()->ScheduleTask(loadingTextureTask_, "resourceName");
 }
 
 std::string_view TextureLoader::GetPath() const
 {
     return path_;
-}
-
-TextureLoader::TextureLoader(TextureLoader&& textureLoader) noexcept :
-    filesystem_(BasicEngine::GetInstance()->GetFilesystem()),
-    textureId_(textureLoader.textureId_),
-    path_(textureLoader.path_),
-    flags_(textureLoader.flags_),
-    loadingTextureJob_([this]() { LoadTexture(); }),
-    decompressTextureJob_([this]() { DecompressTexture(); }),
-    uploadToGLJob_([this](){ UploadToGL(); })
-{
 }
 
 TextureId TextureLoader::GetTextureId() const

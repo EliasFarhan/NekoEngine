@@ -106,11 +106,11 @@ public:
                            Texture::TextureFlags flags = Texture::DEFAULT);
     TextureLoader(const TextureLoader&) = delete;
     TextureLoader& operator=(const TextureLoader&) = delete;
-    std::string_view GetPath() const;
-    TextureLoader(TextureLoader&&) noexcept ;
+    TextureLoader(TextureLoader&&) noexcept = default ;
     TextureLoader& operator=(TextureLoader&&) = default;
     void Start();
-    [[nodiscard]] bool IsDone();
+    [[nodiscard]] std::string_view GetPath() const;
+    [[nodiscard]] bool IsDone() const;
     [[nodiscard]] TextureId GetTextureId() const;
     [[nodiscard]] const Texture& GetTexture() const;
     [[nodiscard]] bool HasErrors() const;
@@ -124,9 +124,9 @@ private:
     TextureId textureId_;
     std::string path_;
     Texture::TextureFlags flags_ = Texture::DEFAULT;
-    Job loadingTextureJob_;
-    Job decompressTextureJob_;
-    Job uploadToGLJob_;
+    std::shared_ptr<Task> loadingTextureTask_;
+    std::shared_ptr<Task> decompressTextureTask_;
+    std::shared_ptr<Task> uploadToGLTask_;
     BufferFile bufferFile_;
     Texture texture_;
     TextureLoaderError error_ = TextureLoaderError::NONE;

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string_view>
-#include "engine/jobsystem.h"
+#include "engine/worker_system.h"
 
 #if defined(WIN32) || defined(__linux__)
 #define STD_FILESYSTEM
@@ -42,10 +42,10 @@ public:
     [[nodiscard]] virtual bool IsDirectory(std::string_view) const = 0;
 };
 
-class LoadingAssetJob : public Job
+class LoadingAssetTask : public Task
 {
 public:
-    explicit LoadingAssetJob(const FilesystemInterface&);
+    explicit LoadingAssetTask(const FilesystemInterface&);
     void SetFilePath(std::string_view path);
     std::string GetFilePath() const {return filePath_; }
     const BufferFile& GetBufferFile() const {return bufferFile_;}

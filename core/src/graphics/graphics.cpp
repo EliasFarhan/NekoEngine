@@ -38,7 +38,7 @@
 namespace neko
 {
 Renderer::Renderer() :
-    renderAllJob_([this]
+    renderAllTask_(std::make_shared<Task>([this]
         {
 #ifdef EASY_PROFILE_USE
             EASY_BLOCK("Renderer Update");
@@ -51,8 +51,8 @@ Renderer::Renderer() :
             RenderAll();
             window_->RenderUi();
             AfterRender();
-        }),
-    syncJob_([this] { SyncBuffers(); })
+        })),
+    syncTask_(std::make_shared<Task>([this] { SyncBuffers(); }))
 {
     currentCommandBuffer_.reserve(MAX_COMMAND_NMB);
     nextCommandBuffer_.reserve(MAX_COMMAND_NMB);
@@ -75,11 +75,11 @@ void Renderer::RenderAll()
     }
 }
 
-void Renderer::ScheduleJobs()
+void Renderer::ScheduleTasks() const
 {
     auto* engine = BasicEngine::GetInstance();
-    engine->ScheduleJob(&syncJob_, JobThreadType::RENDER_THREAD);
-    engine->ScheduleJob(&renderAllJob_, JobThreadType::RENDER_THREAD);
+    engine->ScheduleTask(syncTask_, "renderName?");
+    engine->ScheduleTask(renderAllTask_, "renderName?");
 }
 
 void Renderer::RegisterSyncBuffersFunction(SyncBuffersInterface* syncBuffersInterface)
@@ -108,37 +108,37 @@ void Renderer::PreRender()
 #endif
     using namespace std::chrono_literals;
     microseconds availableLoadingTime(8000);
-    bool preRenderJobEmpty = false;
+    bool preRenderTasksEmpty = false;
     {
-        std::lock_guard<std::mutex> lock(preRenderJobsMutex_);
-        if (preRenderJobs_.empty())
+        std::lock_guard<std::mutex> lock(preRenderTasksMutex_);
+        if (preRenderTasks_.empty())
         {
-            preRenderJobEmpty = true;
+            preRenderTasksEmpty = true;
         }
     }
-    while (!preRenderJobEmpty && availableLoadingTime < 8001us)
+    while (!preRenderTasksEmpty && availableLoadingTime < 8001us)
     {
         std::chrono::time_point<std::chrono::system_clock> start =
             std::chrono::system_clock::now();
 
 
-        Job* job = nullptr;
+        std::shared_ptr<Task> task = nullptr;
         {
-            std::lock_guard<std::mutex> lock(preRenderJobsMutex_);
-            if (!preRenderJobs_.empty())
+            std::lock_guard lock(preRenderTasksMutex_);
+            if (!preRenderTasks_.empty())
             {
-                job = preRenderJobs_.front();
-                preRenderJobs_.erase(preRenderJobs_.begin());
+                task = preRenderTasks_.front().lock();
+                preRenderTasks_.erase(preRenderTasks_.begin());
             }
             else
             {
-                preRenderJobEmpty = true;
+                preRenderTasksEmpty = true;
             }
         }
 
-        if (job != nullptr && job->CheckDependenciesStarted())
+        if (task != nullptr && task->CheckDependenciesStarted())
         {
-            job->Execute();
+            task->Execute();
         }
         else
         {
@@ -172,16 +172,16 @@ void Renderer::SetWindow(Window* window)
     window_ = window;
 }
 
-void Renderer::AddPreRenderJob(Job* job)
+void Renderer::AddPreRenderTask(std::weak_ptr<Task> task)
 {
-    std::lock_guard<std::mutex> lock(preRenderJobsMutex_);
-    preRenderJobs_.push_back(job);
+    std::lock_guard lock(preRenderTasksMutex_);
+    preRenderTasks_.push_back(task);
 }
 
-void Renderer::ResetJobs()
+void Renderer::ResetTasks() const
 {
-    syncJob_.Reset();
-    renderAllJob_.Reset();
+    syncTask_->Reset();
+    renderAllTask_->Reset();
 }
 
 std::uint8_t Renderer::GetFlag() const

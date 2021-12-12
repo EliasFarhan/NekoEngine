@@ -49,7 +49,7 @@ OldMesh::OldMesh() : loadMeshToGpu([this]
 void OldMesh::Init()
 {
 
-    RendererLocator::get().AddPreRenderJob(&loadMeshToGpu);
+    RendererLocator::get().AddPreRenderTask(&loadMeshToGpu);
     const TextureManagerInterface& textureManager = TextureManagerLocator::get();
     for (auto& texture : textures_)
     {

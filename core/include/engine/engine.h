@@ -31,7 +31,8 @@
 #include <graphics/color.h>
 #include <utils/time_utility.h>
 #include <engine/configuration.h>
-#include <engine/jobsystem.h>
+
+#include "worker_system.h"
 #include "engine/filesystem.h"
 
 
@@ -64,19 +65,19 @@ public:
     void SetWindowAndRenderer(Window* window, Renderer* renderer);
 
     const Configuration& GetConfig();
-    const FilesystemInterface& GetFilesystem();
+    const FilesystemInterface& GetFilesystem() const;
 
     void RegisterSystem(SystemInterface& system);
     void RegisterOnDrawUi(DrawImGuiInterface& drawUi);
 
-    float GetDeltaTime() const { return dt_; }
-    Renderer* GetRenderer() { return renderer_; }
+    [[nodiscard]] float GetDeltaTime() const { return dt_; }
+    [[nodiscard]] Renderer* GetRenderer() { return renderer_; }
 
     static BasicEngine* GetInstance(){return instance_;}
 
-    void ScheduleJob(Job* job, JobThreadType threadType);
+    void ScheduleTask(const std::shared_ptr<Task>& task, std::string_view queueName);
 
-    [[nodiscard]] std::uint8_t GetWorkersNumber() const { return jobSystem_.GetWorkersNumber(); }
+    [[nodiscard]] std::uint8_t GetWorkersNumber() const { return workerManager_.GetWorkersCount(); }
 
     //template <typename T = BasicEngine>
     //static T* GetInstance(){ return dynamic_cast<T*>(instance_);};
@@ -86,9 +87,12 @@ protected:
     Configuration config_;
     Renderer* renderer_ = nullptr;
     Window* window_ = nullptr;
-    JobSystem jobSystem_;
+    WorkerManager workerManager_;
 	bool isRunning_ = false;
     float dt_ = 0.0f;
+
+    core::pb::WorkerManager workerManagerPb_;
+
     Action<> initAction_;
     Action<seconds> updateAction_;
     Action<> drawImGuiAction_;

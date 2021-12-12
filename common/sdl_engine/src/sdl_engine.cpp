@@ -51,7 +51,7 @@ void SdlEngine::Init()
     EASY_BLOCK("Init Sdl Engine");
 #endif
     logDebug(fmt::format("Current path: {}", GetCurrentPath()));
-    jobSystem_.Init();
+    workerManager_.Init(workerManagerPb_);
 
     assert(window_ != nullptr);
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER);

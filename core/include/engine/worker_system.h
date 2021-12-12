@@ -38,6 +38,7 @@ class Task
 {
 public:
     Task(std::function<void()> task);
+    virtual ~Task() = default;
     Task(const Task&) = delete;
     Task& operator=(Task&) = delete;
     Task(Task&&) noexcept = delete;
@@ -55,7 +56,7 @@ public:
     /**
      * \brief This function clears the dependencies, the promise/future and status, but keeps the task function
      */
-    void Reset();
+    virtual void Reset();
 private:
     enum TaskStatus : std::uint8_t
     {
@@ -126,6 +127,7 @@ public:
     bool AddTask(const std::shared_ptr<Task>& task, std::string_view queueName);
     void ExecuteMainThread();
     void Destroy();
+    [[nodiscard]] std::uint8_t GetWorkersCount() const { return threads_.size(); }
 private:
     WorkerQueue mainQueue_;
     std::vector<WorkerQueue> queues_;

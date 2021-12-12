@@ -52,7 +52,8 @@ void BufferFile::Destroy()
         dataLength = 0;
     }
 }
-LoadingAssetJob::LoadingAssetJob(const FilesystemInterface & filesystem) : Job(
+LoadingAssetTask::LoadingAssetTask(const FilesystemInterface & filesystem) :
+    Task(
         [this] {
 #ifdef EASY_PROFILE_USE
             EASY_BLOCK("Load File in AssetJob");
@@ -60,18 +61,18 @@ LoadingAssetJob::LoadingAssetJob(const FilesystemInterface & filesystem) : Job(
             bufferFile_.Destroy();
             bufferFile_ = filesystem_.LoadFile(filePath_);
         }),
-                                                                     filesystem_(filesystem)
+    filesystem_(filesystem)
 {
 }
 
-void LoadingAssetJob::SetFilePath(std::string_view path)
+void LoadingAssetTask::SetFilePath(std::string_view path)
 {
     filePath_ = path;
 }
 
-void LoadingAssetJob::Reset()
+void LoadingAssetTask::Reset()
 {
-    Job::Reset();
+    Task::Reset();
     bufferFile_.Destroy();
 }
 

@@ -31,15 +31,16 @@
 
 #include "engine/system.h"
 #include "engine/log.h"
-#include "engine/jobsystem.h"
+#include "engine/worker_system.h"
 #include "utils/action_utility.h"
+#include "engine/worker_system.h"
 
 namespace neko
 {
 class SyncBuffersInterface;
 class Job;
-	class Window;
-const size_t MAX_COMMAND_NMB = 8'192;
+class Window;
+constexpr std::size_t MAX_COMMAND_NMB = 8'192;
 
 
 /**
@@ -67,7 +68,7 @@ class RendererInterface
 {
 public:
     virtual void Render(RenderCommandInterface* command) = 0;
-    virtual void AddPreRenderJob(Job* job) = 0;
+    virtual void AddPreRenderTask(std::weak_ptr<Task> job) = 0;
     virtual void RegisterSyncBuffersFunction(SyncBuffersInterface* syncBuffersInterface) = 0;
 };
 
@@ -76,7 +77,7 @@ class NullRenderer final : public RendererInterface
 public:
     void Render([[maybe_unused]]RenderCommandInterface* command) override
     {};
-	void AddPreRenderJob([[maybe_unused]] Job* job) override {}
+	void AddPreRenderTask([[maybe_unused]] std::weak_ptr<Task> job) override {}
     void RegisterSyncBuffersFunction([[maybe_unused]] SyncBuffersInterface* syncBuffersInterface) override {}
 
 };
@@ -109,15 +110,15 @@ public:
     std::uint8_t GetFlag() const;
     void SetWindow(Window* window);
 
-	void AddPreRenderJob(Job* job) override;
+	void AddPreRenderTask(std::weak_ptr<Task> task) override;
 
     virtual void ClearScreen() = 0;
 
 
-    void ResetJobs();
-    Job* GetSyncJob() { return &syncJob_; }
-    Job* GetRenderAllJob() { return &renderAllJob_; }
-    void ScheduleJobs();
+    void ResetTasks() const;
+    [[nodiscard]] std::weak_ptr<Task> GetSyncTask() { return syncTask_; }
+    [[nodiscard]] std::weak_ptr <Task> GetRenderAllTask() { return renderAllTask_; }
+    void ScheduleTasks() const;
     void RegisterSyncBuffersFunction([[maybe_unused]] SyncBuffersInterface* syncBuffersInterface) override;
 protected:
     /**
@@ -135,11 +136,11 @@ protected:
 
     Action<> syncBuffersAction_;
 	
-    Job renderAllJob_;
-    Job syncJob_{ [this] {SyncBuffers(); } };
+    std::shared_ptr<Task> renderAllTask_;
+    std::shared_ptr <Task> syncTask_ = std::make_shared<Task>([this] { SyncBuffers(); } );
 
-    std::mutex preRenderJobsMutex_;
-    std::vector<Job*> preRenderJobs_;
+    std::mutex preRenderTasksMutex_;
+    std::vector<std::weak_ptr<Task>> preRenderTasks_;
 
 
     Window* window_ = nullptr;

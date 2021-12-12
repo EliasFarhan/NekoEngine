@@ -196,7 +196,7 @@ void TextureManager::Update([[maybe_unused]]seconds dt)
         currentUploadedTexture_ = std::move(textureInfo);
 	    texturesToUpload_.pop();
         uploadToGpuJob_.Reset();
-	    RendererLocator::get().AddPreRenderJob(&uploadToGpuJob_);
+	    RendererLocator::get().AddPreRenderTask(&uploadToGpuJob_);
 	}
 }
 

@@ -96,7 +96,7 @@ void VoxelManager::Init()
                         } }, chunkId, 0 });
 
                         BasicEngine::GetInstance()->ScheduleJob(&chunkLoadingQueue_.back().loadingJob,
-                                                            JobThreadType::OTHER_THREAD);
+                                                                JobThreadType::OTHER_THREAD);
                     }
                 }
             }

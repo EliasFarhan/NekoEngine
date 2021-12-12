@@ -105,7 +105,7 @@ void BasicEngine::Init()
     EASY_FUNCTION(profiler::colors::Magenta);
 #endif
     logDebug(fmt::format("Current path: {}", GetCurrentPath()));
-    jobSystem_.Init();
+    workerManager_.Init(workerManagerPb_);
     initAction_.Execute();
 }
 
@@ -116,42 +116,42 @@ void BasicEngine::Update(seconds dt)
     EASY_BLOCK("Main Thread Update");
 #endif
     if (renderer_)
-        renderer_->ResetJobs();
+        renderer_->ResetTasks();
     if (window_)
-        window_->ResetJobs();
+        window_->ResetTasks();
 
-    Job eventJob([this]
+    const auto eventTask = std::make_shared<Task>([this]
         {
             ManageEvent();
         });
-    Job* swapBufferJob = nullptr;
-    Job updateJob([this, &dt] { updateAction_.Execute(dt); });
-    updateJob.AddDependency(&eventJob);
+    const auto swapBufferTask = window_->GetSwapBufferTask().lock();
+    const auto updateTask = std::make_shared<Task>([this, &dt] { updateAction_.Execute(dt); });
+    updateTask->AddDependency(eventTask);
     if (renderer_)
     {
-        Job* rendererSyncJob = renderer_->GetSyncJob();
-        updateJob.AddDependency(rendererSyncJob);
+        const auto rendererSyncTask = renderer_->GetSyncTask().lock();
+        updateTask->AddDependency(rendererSyncTask);
 
-        Job* renderJob = renderer_->GetRenderAllJob();
-        renderJob->AddDependency(&eventJob);
+        const auto renderTask = renderer_->GetRenderAllTask().lock();
+        renderTask->AddDependency(eventTask);
 
-        swapBufferJob = window_->GetSwapBufferJob();
-        swapBufferJob->AddDependency(renderJob);
-        //swapBufferJob->AddDependency(&updateJob);
+        
+        swapBufferTask->AddDependency(renderTask);
+        //swapBufferTask->AddDependency(&updateTask);
 
-        renderer_->ScheduleJobs();
-        jobSystem_.ScheduleJob(swapBufferJob, JobThreadType::RENDER_THREAD);
+        renderer_->ScheduleTasks();
+        workerManager_.AddTask(swapBufferTask, "renderName?");
 
 
     }
-    jobSystem_.ScheduleJob(&eventJob, JobThreadType::MAIN_THREAD);
-    jobSystem_.ScheduleJob(&updateJob, JobThreadType::MAIN_THREAD);
+    workerManager_.AddTask(eventTask, "mainName?");
+    workerManager_.AddTask(updateTask, "mainName?");
 #ifdef EASY_PROFILE_USE
     EASY_END_BLOCK
     EASY_BLOCK("Waiting for Swap Buffer");
 #endif
-    if (swapBufferJob)
-        swapBufferJob->Join();
+    if (swapBufferTask)
+        swapBufferTask->Join();
 }
 
 void BasicEngine::Destroy()
@@ -165,7 +165,7 @@ void BasicEngine::Destroy()
     {
         window_->Destroy();
     }
-    jobSystem_.Destroy();
+    workerManager_.Destroy();
     instance_ = nullptr;
 }
 
@@ -221,9 +221,9 @@ void BasicEngine::RegisterOnDrawUi(DrawImGuiInterface& drawUi)
     drawImGuiAction_.RegisterCallback([&drawUi] { drawUi.DrawImGui(); });
 }
 
-void BasicEngine::ScheduleJob(Job* job, JobThreadType threadType)
+void BasicEngine::ScheduleTask(const std::shared_ptr<Task>& task, std::string_view queueName)
 {
-    jobSystem_.ScheduleJob(job, threadType);
+    workerManager_.AddTask(task, queueName);
 }
 
 const Configuration& BasicEngine::GetConfig()
@@ -231,7 +231,7 @@ const Configuration& BasicEngine::GetConfig()
     return config_;
 }
 
-const FilesystemInterface& BasicEngine::GetFilesystem()
+const FilesystemInterface& BasicEngine::GetFilesystem() const
 {
     return filesystem_;
 }

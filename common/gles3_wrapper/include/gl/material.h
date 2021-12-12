@@ -107,7 +107,7 @@ protected:
     gl::TextureManager& textureManager_;
     gl::Shader shader_;
     std::map<std::string, UniformId> uniformsMap_;
-    std::array<TextureId, size_t(TextureType::LENGTH)> textureIds_;
+    std::array<TextureId, std::size_t(TextureType::LENGTH)> textureIds_;
     const std::map<TextureType, std::string> textureUniformNames{
             {TextureType::DIFFUSE, "diffuseMap"},
             {TextureType::AMBIENT, "ambientMap"},
@@ -119,7 +119,7 @@ protected:
             {TextureType::ROUGHNESS, "roughnessMap"},
             {TextureType::AO, "aoMap"}
     };
-    Job loadingMaterialContentJob_;
-    LoadingAssetJob loadMaterialJsonJob_;
+    std::shared_ptr<Task> loadingMaterialContentTask_;
+    std::shared_ptr<LoadingAssetTask> loadMaterialJsonTask_;
 };
 }

@@ -23,6 +23,7 @@
  */
 
 #include "gl/material.h"
+#include "engine/engine.h"
 
 namespace neko::gl
 {
@@ -30,23 +31,24 @@ namespace neko::gl
 Material::Material(TextureManager& textureManager, const FilesystemInterface& filesystem) :
         filesystem_(filesystem),
         textureManager_(textureManager),
-        loadingMaterialContentJob_([this]()
+        loadingMaterialContentTask_(std::make_shared<Task>([this]()
         {
-            json matJson = json::parse(loadMaterialJsonJob_.GetBufferFile().dataBuffer);
+            json matJson = json::parse(loadMaterialJsonTask_->GetBufferFile().dataBuffer);
             FillContent(matJson);
             LoadShader();
             LoadTextures();
-        }),
-        loadMaterialJsonJob_(filesystem)
+        })),
+        loadMaterialJsonTask_(std::make_shared<LoadingAssetTask>(filesystem))
 {
 
 }
 
 void Material::LoadFromFile(std::string_view path)
 {
-    BasicEngine::GetInstance()->ScheduleJob(&loadMaterialJsonJob_, JobThreadType::RESOURCE_THREAD);
-    loadingMaterialContentJob_.AddDependency(&loadMaterialJsonJob_);
-    BasicEngine::GetInstance()->ScheduleJob(&loadingMaterialContentJob_, JobThreadType::OTHER_THREAD);
+    auto* engine = BasicEngine::GetInstance();
+    engine->ScheduleTask(loadMaterialJsonTask_, "resourceName?");
+    loadingMaterialContentTask_->AddDependency(loadMaterialJsonTask_);
+    engine->ScheduleTask(loadingMaterialContentTask_, "otherName?");
 }
 
 void Material::Bind() const
@@ -66,7 +68,7 @@ void Material::SetShader(Shader& shader)
 
 void Material::SetBool(std::string_view attributeName, bool value)
 {
-    auto uniformId = GetUniformId(attributeName);
+    const auto uniformId = GetUniformId(attributeName);
     if (uniformId != INVALID_UNIFORM_ID)
     {
         glUniform1i(uniformId, value);
@@ -75,7 +77,7 @@ void Material::SetBool(std::string_view attributeName, bool value)
 
 void Material::SetInt(std::string_view attributeName, int value)
 {
-    auto uniformId = GetUniformId(attributeName);
+    const auto uniformId = GetUniformId(attributeName);
     if (uniformId != INVALID_UNIFORM_ID)
     {
         glUniform1i(uniformId, value);
@@ -84,7 +86,7 @@ void Material::SetInt(std::string_view attributeName, int value)
 
 void Material::SetFloat(std::string_view attributeName, float value)
 {
-    auto uniformId = GetUniformId(attributeName);
+    const auto uniformId = GetUniformId(attributeName);
     if (uniformId != INVALID_UNIFORM_ID)
     {
         glUniform1f(uniformId, value);

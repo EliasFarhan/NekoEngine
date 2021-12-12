@@ -107,11 +107,11 @@ void Gles3Window::Init()
 	glCheckError();
 	LeaveCurrentContext();
 
-	Job initRenderJob([this] { MakeCurrentContext(); });
+	auto initRenderJob = std::make_shared<Task>([this] { MakeCurrentContext(); });
 	auto* engine = BasicEngine::GetInstance();
-	engine->ScheduleJob(&initRenderJob, JobThreadType::RENDER_THREAD);
+	engine->ScheduleTask(initRenderJob, "renderName?");
 
-	initRenderJob.Join();
+	initRenderJob->Join();
 
 }
 
@@ -154,12 +154,12 @@ void Gles3Window::Destroy()
 #ifdef EASY_PROFILE_USE
 	EASY_BLOCK("DestroyWindow");
 #endif
-	Job leaveContext([this]
+	std::shared_ptr<Task> leaveContext = std::make_shared<Task>([this]
 		{
 			LeaveCurrentContext();
 		});
-	BasicEngine::GetInstance()->ScheduleJob(&leaveContext, JobThreadType::RENDER_THREAD);
-	leaveContext.Join();
+	BasicEngine::GetInstance()->ScheduleTask(leaveContext, "renderName?");
+	leaveContext->Join();
 	MakeCurrentContext();
 	ImGui_ImplOpenGL3_Shutdown();
 	// Delete our OpengL context

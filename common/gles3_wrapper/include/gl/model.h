@@ -60,7 +60,7 @@ public:
 
     };
     explicit ModelLoader(Assimp::Importer&, std::string_view path, ModelId modelId);
-    ModelLoader(ModelLoader&&) noexcept ;
+    ModelLoader(ModelLoader&&) noexcept = default;
     ModelLoader(const ModelLoader& ) = delete;
     ModelLoader& operator=(const ModelLoader&) = delete;
     void Start();
@@ -81,7 +81,7 @@ private:
     void ProcessNode(aiNode* node);
     void ProcessMesh(assimp::Mesh&, const aiMesh* aMesh);
     void LoadMaterialTextures(const aiMaterial* material, aiTextureType textureType, std::string_view directory,
-                              assimp::Mesh& mesh);
+                              assimp::Mesh& mesh) const;
     /**
      * \brief method called on the Render thread to create the VAOs of the meshes
      */
@@ -95,9 +95,9 @@ private:
     const aiScene* scene = nullptr;
     Model model_;
 
-    Job loadModelJob_;
-    Job processModelJob_;
-    Job uploadMeshesToGLJob_;
+    std::shared_ptr<Task> loadModelTask_;
+    std::shared_ptr<Task> processModelTask_;
+    std::shared_ptr<Task> uploadMeshesToGLTask_;
 
     std::uint8_t flags_ = NONE;
 
