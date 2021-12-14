@@ -77,10 +77,6 @@ target_precompile_headers(Neko_Core PRIVATE "${NEKO_CORE_DIR}/include/core_pch.h
 
 
 
-#pybind11
-set(PYBIND11_VERSION "2.6.1")
-set(PYBIND11_DIR "${EXTERNAL_DIR}/pybind11-${PYBIND11_VERSION}")
-add_subdirectory("${PYBIND11_DIR}")
 
 if(Neko_SDL2)
     #sdl2

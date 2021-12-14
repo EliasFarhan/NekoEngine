@@ -109,7 +109,7 @@ void Gles3Window::Init()
 
 	auto initRenderJob = std::make_shared<Task>([this] { MakeCurrentContext(); });
 	auto* engine = BasicEngine::GetInstance();
-	engine->ScheduleTask(initRenderJob, "renderName?");
+	engine->ScheduleTask(initRenderJob, WorkerQueue::RENDER_QUEUE_NAME);
 
 	initRenderJob->Join();
 
@@ -154,11 +154,11 @@ void Gles3Window::Destroy()
 #ifdef EASY_PROFILE_USE
 	EASY_BLOCK("DestroyWindow");
 #endif
-	std::shared_ptr<Task> leaveContext = std::make_shared<Task>([this]
+    const auto leaveContext = std::make_shared<Task>([this]
 		{
 			LeaveCurrentContext();
 		});
-	BasicEngine::GetInstance()->ScheduleTask(leaveContext, "renderName?");
+	BasicEngine::GetInstance()->ScheduleTask(leaveContext, WorkerQueue::RENDER_QUEUE_NAME);
 	leaveContext->Join();
 	MakeCurrentContext();
 	ImGui_ImplOpenGL3_Shutdown();

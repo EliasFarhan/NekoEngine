@@ -26,11 +26,10 @@
 #include "gl/gles3_include.h"
 
 #include "utils/file_utility.h"
-
-#include <sstream>
 #include <engine/log.h>
 #include <graphics/texture.h>
 #include <engine/engine.h>
+#include "graphics/graphics.h"
 
 #include <fmt/core.h>
 
@@ -251,8 +250,7 @@ void DestroyTexture(TextureName textureName)
 
 TextureId TextureManager::LoadTexture(std::string_view path, Texture::TextureFlags flags)
 {
-    const auto it = texturePathMap_.find(path.data());
-    if (it != texturePathMap_.end())
+    if (const auto it = texturePathMap_.find(path.data()); it != texturePathMap_.end())
     {
         return it->second;
     }
@@ -272,12 +270,13 @@ TextureId TextureManager::LoadTexture(std::string_view path, Texture::TextureFla
     }
     else
     {
-        logError(fmt::format("Could not find texture id in json file {}", metaPath));
+        logError(fmt::format("Could not find texture id in json file: {}", metaPath));
         return textureId;
     }
     if(CheckJsonExists(metaJson, "ktx_path"))
     {
         ktxPath = metaJson["ktx_path"];
+        logDebug(fmt::format("KTX PATH: {}", ktxPath));
     }
     else
     {
@@ -291,13 +290,14 @@ TextureId TextureManager::LoadTexture(std::string_view path, Texture::TextureFla
         return textureId;
     }
     const auto& config = BasicEngine::GetInstance()->GetConfig();
-    textureLoaders_.push(TextureLoader
-    {
+    auto textureLoader = std::make_unique<TextureLoader>(
+
         config.dataRootPath + ktxPath,
         textureId,
         flags
-    });
-    textureLoaders_.back().Start();
+        );
+    textureLoader->Start();
+    textureLoaders_.push(std::move(textureLoader));
     texturePathMap_[path.data()] = textureId;
     return textureId;
 }
@@ -327,28 +327,28 @@ void TextureManager::Update([[maybe_unused]]seconds dt)
 {
     while(!textureLoaders_.empty())
     {
-        auto& textureLoader = textureLoaders_.front();
-        if(textureLoader.HasErrors())
+        const auto& textureLoader = textureLoaders_.front();
+        if(textureLoader->HasErrors())
         {
-            switch (textureLoader.GetErrors())
+            switch (textureLoader->GetErrors())
             {
             case TextureLoader::TextureLoaderError::ASSET_LOADING_ERROR:
-                logError(fmt::format(" Could not load texture {} from disk", textureLoader.GetPath()));
+                logError(fmt::format(" Could not load texture {} from disk", textureLoader->GetPath()));
                 break;
             case TextureLoader::TextureLoaderError::DECOMPRESS_ERROR:
-                logError(fmt::format(" Could not decompress texture {} from disk", textureLoader.GetPath()));
+                logError(fmt::format(" Could not decompress texture {} from disk", textureLoader->GetPath()));
                 break;
             case TextureLoader::TextureLoaderError::UPLOAD_TO_GPU_ERROR:
-                logError(fmt::format(" Could not upload texture {} from disk", textureLoader.GetPath()));
+                logError(fmt::format(" Could not upload texture {} from disk", textureLoader->GetPath()));
                 break;
             default:
                 break;
             }
             textureLoaders_.pop();
         }
-        else if(textureLoader.IsDone())
+        else if(textureLoader->IsDone())
         {
-            textureMap_[textureLoader.GetTextureId()] = textureLoader.GetTexture();
+            textureMap_[textureLoader->GetTextureId()] = textureLoader->GetTexture();
             textureLoaders_.pop();
         }
         else
@@ -396,13 +396,15 @@ void TextureLoader::LoadTexture()
 #ifdef EASY_PROFILE_USE
     EASY_BLOCK("Load KTX from disk");
 #endif
+    logDebug(fmt::format("Loading KTX file {} from disk", path_));
     bufferFile_ = filesystem_.get().LoadFile(path_);
     if(bufferFile_.dataBuffer == nullptr)
     {
         error_ = TextureLoaderError::ASSET_LOADING_ERROR;
+        logError(fmt::format("Asset Loading error with path: {}", path_));
         return;
     }
-    BasicEngine::GetInstance()->ScheduleTask(decompressTextureTask_, "otherName?");
+    BasicEngine::GetInstance()->ScheduleTask(decompressTextureTask_, WorkerQueue::OTHER_QUEUE_NAME);
 }
 
 void TextureLoader::DecompressTexture()
@@ -417,7 +419,7 @@ void TextureLoader::DecompressTexture()
     }
     if (texture_.gliTexture.empty())
     {
-        logError(" OpenGLI error while opening KTX content");
+        logError(fmt::format("File: {} OpenGLI error while opening KTX content", path_));
         error_ = TextureLoaderError::DECOMPRESS_ERROR;
         return;
     }
@@ -465,7 +467,7 @@ void TextureLoader::UploadToGL()
 
 void TextureLoader::Start()
 {
-    BasicEngine::GetInstance()->ScheduleTask(loadingTextureTask_, "resourceName");
+    BasicEngine::GetInstance()->ScheduleTask(loadingTextureTask_, WorkerQueue::RESOURCE_QUEUE_NAME);
 }
 
 std::string_view TextureLoader::GetPath() const

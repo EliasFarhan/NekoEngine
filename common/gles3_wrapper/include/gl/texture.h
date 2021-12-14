@@ -106,8 +106,8 @@ public:
                            Texture::TextureFlags flags = Texture::DEFAULT);
     TextureLoader(const TextureLoader&) = delete;
     TextureLoader& operator=(const TextureLoader&) = delete;
-    TextureLoader(TextureLoader&&) noexcept = default ;
-    TextureLoader& operator=(TextureLoader&&) = default;
+    TextureLoader(TextureLoader&&) noexcept = delete ;
+    TextureLoader& operator=(TextureLoader&&) = delete;
     void Start();
     [[nodiscard]] std::string_view GetPath() const;
     [[nodiscard]] bool IsDone() const;
@@ -152,7 +152,7 @@ private:
     const FilesystemInterface& filesystem_;
     std::map<std::string, TextureId> texturePathMap_;
     std::map<TextureId, Texture> textureMap_;
-    std::queue<TextureLoader> textureLoaders_;
+    std::queue<std::unique_ptr<TextureLoader>> textureLoaders_;
 };
 
 TextureName StbCreateTexture(const std::string_view filename, const FilesystemInterface& filesystem,

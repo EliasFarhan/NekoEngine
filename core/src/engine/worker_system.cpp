@@ -237,6 +237,33 @@ void WorkerManager::Destroy()
     std::for_each(threads_.begin(), threads_.end(), [](auto& thread) {thread.Destroy(); });
 }
 
+core::pb::WorkerManager WorkerManager::CreateWorkerManagerDefinition()
+{
+    core::pb::WorkerManager workerManager;
+
+    auto* mainQueue = workerManager.mutable_main_queue();
+    *mainQueue->mutable_name() = WorkerQueue::MAIN_QUEUE_NAME;
+    auto* renderQueue = workerManager.add_other_queues();
+    *renderQueue->mutable_name() = WorkerQueue::RENDER_QUEUE_NAME;
+    
+    auto* resourceQueue = workerManager.add_other_queues();
+    *resourceQueue->mutable_name() = WorkerQueue::RESOURCE_QUEUE_NAME;
+    auto* otherQueue = workerManager.add_other_queues();
+    *otherQueue->mutable_name() = WorkerQueue::OTHER_QUEUE_NAME;
+
+    auto* renderThread = workerManager.add_other_threads();
+    renderThread->set_thread_count(1);
+    *renderThread->mutable_queue()->mutable_name() = WorkerQueue::RENDER_QUEUE_NAME;
+    auto* resourceThread = workerManager.add_other_threads();
+    resourceThread->set_thread_count(1);
+    *resourceThread->mutable_queue()->mutable_name() = WorkerQueue::RESOURCE_QUEUE_NAME;
+    auto* otherThread = workerManager.add_other_threads();
+    otherThread->set_thread_count(std::thread::hardware_concurrency() - 2);
+    *otherThread->mutable_queue()->mutable_name() = WorkerQueue::OTHER_QUEUE_NAME;
+
+    return workerManager;
+}
+
 void WorkerThread::Destroy()
 {
     neko_assert(!taskQueue_.IsRunning(), "Task Queue is not supposed to be running anymore");

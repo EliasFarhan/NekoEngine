@@ -46,9 +46,9 @@ Material::Material(TextureManager& textureManager, const FilesystemInterface& fi
 void Material::LoadFromFile(std::string_view path)
 {
     auto* engine = BasicEngine::GetInstance();
-    engine->ScheduleTask(loadMaterialJsonTask_, "resourceName?");
+    engine->ScheduleTask(loadMaterialJsonTask_, WorkerQueue::RESOURCE_QUEUE_NAME);
     loadingMaterialContentTask_->AddDependency(loadMaterialJsonTask_);
-    engine->ScheduleTask(loadingMaterialContentTask_, "otherName?");
+    engine->ScheduleTask(loadingMaterialContentTask_, WorkerQueue::OTHER_QUEUE_NAME);
 }
 
 void Material::Bind() const

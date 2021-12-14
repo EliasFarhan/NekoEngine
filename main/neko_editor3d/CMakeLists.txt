@@ -1,3 +1,11 @@
+
+
+
+#pybind11
+set(PYBIND11_VERSION "2.6.1")
+set(PYBIND11_DIR "${EXTERNAL_DIR}/pybind11-${PYBIND11_VERSION}")
+add_subdirectory("${PYBIND11_DIR}" "externals/pybind11")
+
 file(GLOB_RECURSE neko_editor3d_src include/*.h src/*.cpp)
 
 add_executable(neko_editor3d ${neko_editor3d_src})

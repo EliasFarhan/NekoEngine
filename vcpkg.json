@@ -21,6 +21,7 @@
       "gli",
       "freetype",
       "glew",
-      "nlohmann-json"
+      "nlohmann-json",
+      "valijson"
     ]
   }

@@ -52,6 +52,8 @@ BasicEngine::BasicEngine(const FilesystemInterface& filesystem, std::optional<Co
         config_ = config.value();
     }
 
+    workerManagerPb_ = WorkerManager::CreateWorkerManagerDefinition();
+
 #ifdef EASY_PROFILE_USE
     EASY_PROFILER_ENABLE;
 #endif
@@ -140,12 +142,13 @@ void BasicEngine::Update(seconds dt)
         //swapBufferTask->AddDependency(&updateTask);
 
         renderer_->ScheduleTasks();
-        workerManager_.AddTask(swapBufferTask, "renderName?");
+        workerManager_.AddTask(swapBufferTask, WorkerQueue::RENDER_QUEUE_NAME);
 
 
     }
-    workerManager_.AddTask(eventTask, "mainName?");
-    workerManager_.AddTask(updateTask, "mainName?");
+    workerManager_.AddTask(eventTask, WorkerQueue::MAIN_QUEUE_NAME);
+    workerManager_.AddTask(updateTask, WorkerQueue::MAIN_QUEUE_NAME);
+    workerManager_.ExecuteMainThread();
 #ifdef EASY_PROFILE_USE
     EASY_END_BLOCK
     EASY_BLOCK("Waiting for Swap Buffer");

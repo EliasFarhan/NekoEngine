@@ -59,8 +59,8 @@ public:
         ERROR_LOADING = 1u << 1u,
 
     };
-    explicit ModelLoader(Assimp::Importer&, std::string_view path, ModelId modelId);
-    ModelLoader(ModelLoader&&) noexcept = default;
+    explicit ModelLoader(std::string_view path, ModelId modelId);
+    ModelLoader(ModelLoader&&) noexcept = delete;
     ModelLoader(const ModelLoader& ) = delete;
     ModelLoader& operator=(const ModelLoader&) = delete;
     void Start();
@@ -91,7 +91,7 @@ private:
 
     ModelId modelId_ = INVALID_MODEL_ID;
 
-    std::reference_wrapper<Assimp::Importer> importer_;
+    Assimp::Importer importer_;
     const aiScene* scene = nullptr;
     Model model_;
 
@@ -124,7 +124,6 @@ public:
 private:
     std::map<std::string, ModelId> modelPathMap_;
     std::map<ModelId, Model> modelMap_;
-    std::queue<ModelLoader> modelLoaders_;
-    Assimp::Importer importer_;
+    std::queue<std::unique_ptr<ModelLoader>> modelLoaders_;
 };
 }

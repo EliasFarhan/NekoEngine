@@ -89,6 +89,11 @@ public:
     void WaitForTask();
     void Destroy();
     [[nodiscard]] bool IsRunning() const;
+
+    static constexpr std::string_view MAIN_QUEUE_NAME = "main";
+    static constexpr std::string_view RENDER_QUEUE_NAME = "render";
+    static constexpr std::string_view RESOURCE_QUEUE_NAME = "resource";
+    static constexpr std::string_view OTHER_QUEUE_NAME = "other";
 private:
     std::vector<std::shared_ptr<Task>> tasks_;
     mutable std::shared_mutex queueMutex_;
@@ -128,6 +133,8 @@ public:
     void ExecuteMainThread();
     void Destroy();
     [[nodiscard]] std::uint8_t GetWorkersCount() const { return threads_.size(); }
+
+    static core::pb::WorkerManager CreateWorkerManagerDefinition();
 private:
     WorkerQueue mainQueue_;
     std::vector<WorkerQueue> queues_;

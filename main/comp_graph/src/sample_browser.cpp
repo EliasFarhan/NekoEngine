@@ -108,7 +108,7 @@ void SampleBrowser::Init()
     RegisterRenderProgram("99 Hello Scene", std::make_unique<HelloSceneProgram>());
 #ifndef NEKO_SAMETHREAD
     auto initJob = std::make_shared<Task>( [this]() { programs_[currentProgramIndex_]->Init(); } );
-    BasicEngine::GetInstance()->ScheduleTask(initJob, "renderName?");
+    BasicEngine::GetInstance()->ScheduleTask(initJob, WorkerQueue::RENDER_QUEUE_NAME);
     initJob->Join();
 #else
     programs_[currentProgramIndex_]->Init();

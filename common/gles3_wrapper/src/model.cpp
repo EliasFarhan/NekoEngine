@@ -123,15 +123,15 @@ void ModelManager::Update(seconds dt)
 {
     while (!modelLoaders_.empty())
     {
-        auto& modelLoader = modelLoaders_.front();
-        modelLoader.Update();
-        if(modelLoader.HasErrors())
+        const auto& modelLoader = modelLoaders_.front();
+        modelLoader->Update();
+        if(modelLoader->HasErrors())
         {
             modelLoaders_.pop();
         }
-        else if (modelLoader.IsDone())
+        else if (modelLoader->IsDone())
         {
-            modelMap_[modelLoader.GetModelId()] = *modelLoader.GetModel();
+            modelMap_[modelLoader->GetModelId()] = *modelLoader->GetModel();
             modelLoaders_.pop();
         }
         else
@@ -152,8 +152,7 @@ void ModelManager::Destroy()
 
 ModelManager::ModelManager()
 {
-    importer_.SetIOHandler(new NekoIOSystem(
-        BasicEngine::GetInstance()->GetFilesystem()));
+    
 }
 
 ModelId ModelManager::LoadModel(std::string_view path)
@@ -175,8 +174,9 @@ ModelId ModelManager::LoadModel(std::string_view path)
         logError(fmt::format("Could not find model id in json file: {}", metaPath));
         return modelId;
     }
-    modelLoaders_.push(ModelLoader(importer_, path, modelId));
-    modelLoaders_.back().Start();
+    auto modelLoader = std::make_unique<ModelLoader>(path, modelId);
+    modelLoader->Start();
+    modelLoaders_.push(std::move(modelLoader));
     return modelId;
 }
 
@@ -197,21 +197,21 @@ bool ModelManager::IsLoaded(ModelId modelId)
     return GetModel(modelId) != nullptr;
 }
 
-ModelLoader::ModelLoader(Assimp::Importer& importer, std::string_view path, ModelId modelId) :
-    importer_(importer),
+ModelLoader::ModelLoader(std::string_view path, ModelId modelId) :
     path_(path),
     loadModelTask_(std::make_shared<Task>([this]() { LoadModel(); })),
     processModelTask_(std::make_shared<Task>([this]() { ProcessModel(); })),
     uploadMeshesToGLTask_(std::make_shared<Task>([this]() { UploadMeshesToGL(); })),
     modelId_(modelId)
 {
-
+    importer_.SetIOHandler(new NekoIOSystem(
+        BasicEngine::GetInstance()->GetFilesystem()));
 }
 
 void ModelLoader::Start()
 {
     directoryPath_ = path_.substr(0, path_.find_last_of('/'));
-    BasicEngine::GetInstance()->ScheduleTask(loadModelTask_, "resourceName?");
+    BasicEngine::GetInstance()->ScheduleTask(loadModelTask_, WorkerQueue::RESOURCE_QUEUE_NAME);
 }
 
 void ModelLoader::Update()
@@ -367,16 +367,16 @@ void ModelLoader::ProcessMesh(assimp::Mesh& mesh, const aiMesh* aMesh)
 
 void ModelLoader::LoadModel()
 {
-    scene = importer_.get().ReadFile(path_.data(),
+    scene = importer_.ReadFile(path_.data(),
         aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals |
         aiProcess_CalcTangentSpace);
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
         flags_ = ERROR_LOADING;
-        logError(fmt::format("ASSIMP {}", importer_.get().GetErrorString()));
+        logError(fmt::format("ASSIMP {}", importer_.GetErrorString()));
         return;
     }
-    BasicEngine::GetInstance()->ScheduleTask(processModelTask_, "otherName?");
+    BasicEngine::GetInstance()->ScheduleTask(processModelTask_, WorkerQueue::OTHER_QUEUE_NAME);
 }
 
 void ModelLoader::UploadMeshesToGL()

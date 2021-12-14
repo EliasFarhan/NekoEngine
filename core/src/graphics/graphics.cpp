@@ -78,8 +78,8 @@ void Renderer::RenderAll()
 void Renderer::ScheduleTasks() const
 {
     auto* engine = BasicEngine::GetInstance();
-    engine->ScheduleTask(syncTask_, "renderName?");
-    engine->ScheduleTask(renderAllTask_, "renderName?");
+    engine->ScheduleTask(syncTask_, WorkerQueue::RENDER_QUEUE_NAME);
+    engine->ScheduleTask(renderAllTask_, WorkerQueue::RENDER_QUEUE_NAME);
 }
 
 void Renderer::RegisterSyncBuffersFunction(SyncBuffersInterface* syncBuffersInterface)
