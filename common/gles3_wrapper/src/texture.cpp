@@ -147,7 +147,7 @@ TextureName CreateTextureFromKTX(const std::string_view filename, const Filesyst
     auto texture = gli::load(reinterpret_cast<const char*>(textureFile.dataBuffer), textureFile.dataLength);
     if (texture.empty())
     {
-        logError("Could not load texture with GLI");
+        logError(fmt::format("Could not load texture with GLI: {}", filename));
         return INVALID_TEXTURE_NAME;
     }
     const gli::gl::format format = glProfile.translate(texture.format(), texture.swizzles());
@@ -431,34 +431,61 @@ void TextureLoader::UploadToGL()
 #ifdef EASY_PROFILE_USE
       EASY_BLOCK("Upload KTX Texture to GPU");
 #endif
-    gli::gl glProfile(gli::gl::PROFILE_ES30);
+    const gli::gl glProfile(gli::gl::PROFILE_ES30);
 
     auto& texture = texture_.gliTexture;
+    
+    const auto isCube = gli::is_target_cube(texture.target());
     const auto isCompressed = gli::is_compressed(texture.format());
     const auto format = glProfile.translate(texture.format(), texture.swizzles());
     const auto target = glProfile.translate(texture.target());
+
+    glCheckError();
     glGenTextures(1, &texture_.name);
     glBindTexture(target, texture_.name);
 
+    glCheckError();
     glTexParameteri(target, GL_TEXTURE_BASE_LEVEL, 0);
     glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(texture.levels() - 1));
 
-    glm::tvec3<GLsizei> extent{ texture.extent() };
+    glCheckError();
+    const glm::tvec3<GLsizei> extent{ texture.extent() };
+    logDebug(fmt::format("Loading KTX: {} with level count: {}, face count: {} and extend ({},{})", 
+        path_, 
+        texture.levels(),
+        texture.faces(),
+        extent.x, 
+        extent.y));
+
     glTexStorage2D(target, static_cast<GLint>(texture.levels()), format.Internal, extent.x, extent.y);
+    
+    glCheckError();
     for (std::size_t level = 0; level < texture.levels(); ++level)
     {
-        glm::tvec3<GLsizei> levelExtent(texture.extent(level));
-        if(isCompressed)
+        const glm::tvec3<GLsizei> levelExtent(texture.extent(level));
+        for (std::size_t face = 0; face < texture.faces(); ++face)
         {
-            glCompressedTexSubImage2D(
-                    target, static_cast<GLint>(level), 0, 0, levelExtent.x, levelExtent.y,
-                    format.Internal, static_cast<GLsizei>(texture.size(level)), texture.data(0, 0, level));
-        }
-        else
-        {
-            glTexSubImage2D(
-                    target, static_cast<GLint>(level), 0, 0, levelExtent.x, levelExtent.y,
-                    format.Internal, static_cast<GLsizei>(texture.size(level)), texture.data(0, 0, level));
+            GLenum tmpTarget = target;
+            if(texture.faces() >= 1 && isCube)
+            {
+                tmpTarget = GL_TEXTURE_CUBE_MAP_POSITIVE_X + face;
+            }
+            if (isCompressed)
+            {
+                glCompressedTexSubImage2D(
+                    tmpTarget, static_cast<GLint>(level), 0, 0, levelExtent.x, levelExtent.y,
+                    format.Internal, static_cast<GLsizei>(texture.size(level)), texture.data(0, face, level));
+
+                glCheckError();
+            }
+            else
+            {
+                glTexSubImage2D(
+                    tmpTarget, static_cast<GLint>(level), 0, 0, levelExtent.x, levelExtent.y,
+                    format.Internal, static_cast<GLsizei>(texture.size(level)), texture.data(0, face, level));
+
+                glCheckError();
+            }
         }
     }
     glCheckError();

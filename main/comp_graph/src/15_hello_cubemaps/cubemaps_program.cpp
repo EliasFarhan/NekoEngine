@@ -54,7 +54,7 @@ void HelloCubemapsProgram::Init()
     camera_.position = Vec3f(0, 3, 3);
     camera_.WorldLookAt(Vec3f::zero);
     cube_.Init();
-    cubeTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/container.jpg.ktx", gl::Texture::DEFAULT);
+    cubeTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/container.jpg", gl::Texture::DEFAULT);
 
 }
 
