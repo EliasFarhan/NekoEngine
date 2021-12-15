@@ -32,7 +32,6 @@ namespace neko
 {
 void HelloIblProgram::Init()
 {
-	textureManager_.Init();
 	const auto& config = BasicEngine::GetInstance()->GetConfig();
 	sphere_.Init();
 	quad_.Init();
@@ -67,13 +66,14 @@ void HelloIblProgram::Init()
 		{Vec3f(10.0f, -10.0f, 10.0f),Vec3f(300.0f, 300.0f, 300.0f)},
 		}
 	};
-
-	hdrTextureId_ = textureManager_.LoadTexture(
-		config.dataRootPath + "textures/Ridgecrest_Road_Ref.hdr", gl::Texture::TextureFlags(
-		gl::Texture::TextureFlags::CLAMP_WRAP |
-		gl::Texture::TextureFlags::SMOOTH_TEXTURE |
-		gl::Texture::TextureFlags::FLIP_Y |
-		gl::Texture::TextureFlags::HDR));
+	const auto* engine = BasicEngine::GetInstance();
+	const auto& filesystem = engine->GetFilesystem();
+	hdrTexture_ = StbCreateTexture(
+		config.dataRootPath + "textures/Ridgecrest_Road_Ref.hdr", filesystem, static_cast<gl::Texture::TextureFlags>(
+			gl::Texture::TextureFlags::CLAMP_WRAP |
+            gl::Texture::TextureFlags::SMOOTH_TEXTURE |
+            gl::Texture::TextureFlags::FLIP_Y |
+            gl::Texture::TextureFlags::HDR));
 
 	flags_ = FIRST_FRAME;
 
@@ -85,10 +85,11 @@ void HelloIblProgram::Init()
 
 void HelloIblProgram::Update(seconds dt)
 {
-	std::lock_guard<std::mutex> lock(updateMutex_);
+	std::lock_guard lock(updateMutex_);
 	const auto& config = BasicEngine::GetInstance()->GetConfig();
 	camera_.SetAspect(config.windowSize.x, config.windowSize.y);
-	camera_.Update(dt);	textureManager_.Update(dt);
+	camera_.Update(dt);
+	
 }
 
 void HelloIblProgram::Destroy()
@@ -96,8 +97,7 @@ void HelloIblProgram::Destroy()
 	sphere_.Destroy();
 	quad_.Destroy();
 	skybox_.Destroy();
-
-	textureManager_.Destroy();
+	
 	
 	equiToCubemap_.Destroy();
 	irradianceShader_.Destroy();
@@ -152,17 +152,13 @@ void HelloIblProgram::Render()
 {
 
 	std::lock_guard<std::mutex> lock(updateMutex_);
-	if (hdrTexture_ == gl::INVALID_TEXTURE_NAME)
-	{
-		hdrTexture_ = textureManager_.GetTextureName(hdrTextureId_);
-		if (hdrTexture_ == gl::INVALID_TEXTURE_NAME)
-			return;
-	}
+
 	if (flags_ & FIRST_FRAME)
 	{
 #ifdef TRACY_ENABLE
 		ZoneNamedN(iblGenerate, "Generate IBL textures", 1);
 #endif
+		glCheckError();
 		glDepthFunc(GL_LEQUAL);
 		GenerateCubemap();
 		GenerateDiffuseIrradiance();
@@ -244,6 +240,7 @@ void HelloIblProgram::GenerateCubemap()
 	ZoneNamedN(cubemap, "Generate Cubemap", 1);
 #endif
 	logDebug("Generate Cubemap");
+	glCheckError();
     glBindFramebuffer(GL_FRAMEBUFFER, captureFbo_);
     glGenTextures(1, &envCubemap_);
     glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap_);
@@ -251,6 +248,7 @@ void HelloIblProgram::GenerateCubemap()
     {
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, 1024, 1024, 0, GL_RGB, GL_FLOAT, nullptr);
     }
+	glCheckError();
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);

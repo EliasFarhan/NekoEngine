@@ -63,7 +63,9 @@ void HelloCubemapsProgram::Update(seconds dt)
     std::lock_guard<std::mutex> lock(updateMutex_);
     const auto& config = BasicEngine::GetInstance()->GetConfig();
     camera_.SetAspect(config.windowSize.x, config.windowSize.y);
-    camera_.Update(dt);	textureManager_.Update(dt);
+    camera_.Update(dt);
+    textureManager_.Update(dt);
+    modelManager_.Update(dt);
 }
 
 void HelloCubemapsProgram::Destroy()

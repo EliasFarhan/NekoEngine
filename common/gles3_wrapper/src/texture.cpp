@@ -79,7 +79,8 @@ StbCreateTexture(const std::string_view filename, const FilesystemInterface& fil
     TracyCZoneCtx decompress{};
     TracyCZoneName(decompress, "Load From File", 1);
 #endif
-    Image image = StbImageConvert(textureFile);
+    Image image = StbImageConvert(textureFile,
+        flags & Texture::FLIP_Y, flags & Texture::HDR);
     /*if (extension == ".hdr")
     {
         //data = stbi_loadf(filename.data(), &width, &height, &reqComponents, 0);
@@ -101,6 +102,8 @@ StbCreateTexture(const std::string_view filename, const FilesystemInterface& fil
     glGenTextures(1, &texture);
 
     glBindTexture(GL_TEXTURE_2D, texture);
+
+    glCheckError();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, flags & Texture::CLAMP_WRAP ? GL_CLAMP_TO_EDGE : GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, flags & Texture::CLAMP_WRAP ? GL_CLAMP_TO_EDGE : GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, flags & Texture::SMOOTH_TEXTURE ? GL_LINEAR : GL_NEAREST);
@@ -113,6 +116,8 @@ StbCreateTexture(const std::string_view filename, const FilesystemInterface& fil
     {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, flags & Texture::SMOOTH_TEXTURE ? GL_LINEAR : GL_NEAREST);
     }
+
+    glCheckError();
     if (extension == ".jpg" || extension == ".tga")
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image.width, image.height, 0, GL_RGB, GL_UNSIGNED_BYTE, image.data);
@@ -125,10 +130,12 @@ StbCreateTexture(const std::string_view filename, const FilesystemInterface& fil
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, image.width, image.height, 0, GL_RGB, GL_FLOAT, image.data);
     }
+    glCheckError();
     if (flags & Texture::MIPMAPS_TEXTURE)
     {
         glGenerateMipmap(GL_TEXTURE_2D);
     }
+    glCheckError();
     image.Destroy();
     return texture;
 }
