@@ -28,8 +28,8 @@
 #include "imgui.h"
 #include "graphics/graphics.h"
 
-#ifdef EASY_PROFILE_USE
-#include "easy/profiler.h"
+#ifdef TRACY_ENABLE
+#include "Tracy.hpp"
 #endif
 namespace neko
 {
@@ -104,8 +104,8 @@ void Transform2dManager::UpdateDirtyComponent(Entity entity)
 
 void Transform2dManager::Update()
 {
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Update Transform");
+#ifdef TRACY_ENABLE
+	ZoneScoped;
 #endif
     dirtyManager_.UpdateDirtyEntities();
 }
@@ -248,8 +248,8 @@ void Transform3dManager::UpdateDirtyComponent(Entity entity)
 
 void Transform3dManager::Update()
 {
-#ifdef EASY_PROFILE_USE
-	EASY_BLOCK("Update Transform");
+#ifdef TRACY_ENABLE
+	ZoneScoped;
 #endif
 	dirtyManager_.UpdateDirtyEntities();
 }

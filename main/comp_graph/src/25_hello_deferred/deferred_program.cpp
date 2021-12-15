@@ -24,8 +24,8 @@
 #include "25_hello_deferred/deferred_progam.h"
 #include "imgui.h"
 
-#ifdef EASY_PROFILE_USE
-#include "easy/profiler.h"
+#ifdef TRACY_ENABLE
+#include "Tracy.hpp"
 #endif
 
 namespace neko
@@ -158,8 +158,8 @@ void HelloDeferredProgram::Render()
 
     if(flags_ & FORWARD_RENDERING)
     {
-#ifdef EASY_PROFILE_USE
-        EASY_BLOCK("Forward Rendering");
+#ifdef TRACY_ENABLE
+        ZoneNamedN(forward, "Forward Rendering", 1);
 #endif
         forwardShader_.Bind();
         forwardShader_.SetMat4("view", camera_.GenerateViewMatrix());
@@ -174,8 +174,8 @@ void HelloDeferredProgram::Render()
     }
     else
     {
-#ifdef EASY_PROFILE_USE
-        EASY_BLOCK("Deferred Rendering");
+#ifdef TRACY_ENABLE
+        ZoneNamedN(deferred, "Deferred Rendering", 1);
 #endif
         //G-Buffer pass
         glBindFramebuffer(GL_FRAMEBUFFER, gBuffer_);
@@ -264,8 +264,8 @@ void HelloDeferredProgram::CreateFramebuffer()
 
 void HelloDeferredProgram::RenderScene(const gl::Shader& shader)
 {
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("�Render Scene");
+#ifdef TRACY_ENABLE
+    ZoneScoped
 #endif
     for(int x = -2; x < 3; x++)
     {

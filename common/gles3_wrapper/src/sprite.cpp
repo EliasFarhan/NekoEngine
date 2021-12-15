@@ -27,8 +27,8 @@
 #include "graphics/camera.h"
 #include "engine/engine.h"
 
-#ifdef EASY_PROFILE_USE
-#include "easy/profiler.h"
+#ifdef TRACY_ENABLE
+#include "Tracy.hpp"
 #endif
 
 namespace neko::gl
@@ -80,8 +80,8 @@ void SpriteManager::Destroy()
 
 void SpriteManager::Render()
 {
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Render Sprite Manager");
+#ifdef TRACY_ENABLE
+    ZoneScoped;
 #endif
     //TODO batch sprite with the same texture together
     spriteShader_.Bind();

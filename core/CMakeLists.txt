@@ -27,7 +27,9 @@ List(APPEND Neko_SRC
 
 #Utility
 set(UTILITIES_DIR ${EXTERNAL_DIR}/utilities/)
-
+if(Neko_Profile)
+    list(APPEND Neko_SRC "${TRACY_FOLDER}/TracyClient.cpp" "${TRACY_FOLDER}/Tracy.hpp")
+endif()
 add_library(Neko_Core STATIC ${Neko_SRC} include/core_pch.h)
 target_include_directories(Neko_Core PUBLIC "${IMGUI_ROOT}")
 target_link_libraries(Neko_Core PUBLIC imgui::imgui fmt::fmt-header-only nlohmann_json nlohmann_json::nlohmann_json spdlog::spdlog_header_only)
@@ -36,7 +38,6 @@ if(Neko_Assert)
     target_compile_definitions(Neko_Core PUBLIC "NEKO_ASSERT=1")
 endif()
 if(Neko_Profile)
-    list(APPEND CoreFiles "${TRACY_FOLDER}/TracyClient.cpp" "${TRACY_FOLDER}/Tracy.hpp")
     target_compile_definitions(Neko_Core PUBLIC "TRACY_ENABLE=1")
     target_include_directories(Neko_Core PUBLIC "${TRACY_FOLDER}")
 endif()

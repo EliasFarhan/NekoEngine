@@ -29,17 +29,16 @@
 
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
-#ifdef EASY_PROFILE_USE
-#include "easy/profiler.h"
+#ifdef TRACY_ENABLE
+#include "Tracy.hpp"
 #endif
 namespace neko::sdl
 {
 
 void SdlWindow::Init()
 {
-
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("InitSdlWindow");
+#ifdef TRACY_ENABLE
+    ZoneScoped;
 #endif
     auto* engine = (SdlEngine*)BasicEngine::GetInstance();
     engine->RegisterOnEvent(*this);
@@ -86,8 +85,8 @@ void SdlWindow::Init()
 
 void SdlWindow::InitImGui()
 {
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("InitSdlImGui");
+#ifdef TRACY_ENABLE
+    ZoneScoped;
 #endif
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
@@ -106,8 +105,8 @@ void SdlWindow::InitImGui()
 
 void SdlWindow::Destroy()
 {
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("DestroySdlWindow");
+#ifdef TRACY_ENABLE
+    ZoneScoped;
 #endif
     ImGui_ImplSDL2_Shutdown();
     ImGui::DestroyContext();

@@ -31,8 +31,8 @@
 #include "engine/log.h"
 #include "engine/component.h"
 
-#ifdef EASY_PROFILE_USE
-#include "easy/profiler.h"
+#ifdef TRACY_ENABLE
+#include "Tracy.hpp"
 #endif
 
 namespace neko
@@ -40,8 +40,8 @@ namespace neko
 Renderer::Renderer() :
     renderAllTask_(std::make_shared<Task>([this]
         {
-#ifdef EASY_PROFILE_USE
-            EASY_BLOCK("Renderer Update");
+#ifdef TRACY_ENABLE
+            ZoneNamedN(rendererUpdate, "Renderer Update", true);
 #endif
             auto* engine = BasicEngine::GetInstance();
             BeforeRender();
@@ -66,8 +66,8 @@ void Renderer::Render(RenderCommandInterface* command)
 
 void Renderer::RenderAll()
 {
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Render Commands");
+#ifdef TRACY_ENABLE
+    ZoneScoped;
 #endif
     for (auto* renderCommand : currentCommandBuffer_)
     {
@@ -92,8 +92,8 @@ void Renderer::RegisterSyncBuffersFunction(SyncBuffersInterface* syncBuffersInte
 
 void Renderer::SyncBuffers()
 {
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Sync Renderer");
+#ifdef TRACY_ENABLE
+    ZoneScoped;
 #endif
     std::swap(currentCommandBuffer_, nextCommandBuffer_);
     nextCommandBuffer_.clear();
@@ -103,8 +103,8 @@ void Renderer::SyncBuffers()
 
 void Renderer::PreRender()
 {
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Renderer Pre Render");
+#ifdef TRACY_ENABLE
+    ZoneScoped;
 #endif
     using namespace std::chrono_literals;
     microseconds availableLoadingTime(8000);
@@ -153,11 +153,10 @@ void Renderer::PreRender()
 
 void Renderer::Destroy()
 {
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Closing Renderer");
+#ifdef TRACY_ENABLE
+    ZoneScoped;
 #endif
-
-    std::lock_guard<std::mutex> lock(statusMutex_);
+    std::lock_guard lock(statusMutex_);
     flags_ &= ~IS_RUNNING;
 }
 

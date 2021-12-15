@@ -14,8 +14,8 @@
 namespace fs = std::filesystem;
 #endif
 
-#ifdef EASY_PROFILE_USE
-#include <easy/profiler.h>
+#ifdef TRACY_ENABLE
+#include <Tracy.hpp>
 #endif
 
 namespace neko
@@ -55,8 +55,8 @@ void BufferFile::Destroy()
 LoadingAssetTask::LoadingAssetTask(const FilesystemInterface & filesystem) :
     Task(
         [this] {
-#ifdef EASY_PROFILE_USE
-            EASY_BLOCK("Load File in AssetJob");
+#ifdef TRACY_ENABLE
+            ZoneNamedN(loadFile, "Load File in AssetJob", true);
 #endif
             bufferFile_.Destroy();
             bufferFile_ = filesystem_.LoadFile(filePath_);
@@ -81,8 +81,8 @@ void LoadingAssetTask::Reset()
 
 BufferFile Filesystem::LoadFile(std::string_view filename) const
 {
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Load File from Filesystem");
+#ifdef TRACY_ENABLE
+    ZoneScoped;
 #endif
     BufferFile newFile;
     if (FileExists(filename))

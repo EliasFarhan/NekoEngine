@@ -34,9 +34,11 @@
 #include <fmt/core.h>
 
 
-#ifdef EASY_PROFILE_USE
-#include "easy/profiler.h"
+#ifdef TRACY_ENABLE
+#include "Tracy.hpp"
+#include <TracyC.h>
 #endif
+
 #include <utils/json_utility.h>
 namespace neko::gl
 {
@@ -54,9 +56,10 @@ void TextureManager::Destroy()
 TextureName
 StbCreateTexture(const std::string_view filename, const FilesystemInterface& filesystem, Texture::TextureFlags flags)
 {
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Create Texture");
-    EASY_BLOCK("Load From File");
+#ifdef TRACY_ENABLE
+    ZoneScoped;
+    TracyCZoneCtx loadFile{};
+    TracyCZoneName(loadFile, "Load From File", 1);
 #endif
     const std::string extension = GetFilenameExtension(filename);
     if (!filesystem.FileExists(filename))
@@ -71,8 +74,10 @@ StbCreateTexture(const std::string_view filename, const FilesystemInterface& fil
     else if (extension == ".png")
         reqComponents = 4;
     BufferFile textureFile = filesystem.LoadFile(filename);
-#ifdef EASY_PROFILE_USE
-    EASY_END_BLOCK;
+#ifdef TRACY_ENABLE
+    TracyCZoneEnd(loadFile);
+    TracyCZoneCtx decompress{};
+    TracyCZoneName(decompress, "Load From File", 1);
 #endif
     Image image = StbImageConvert(textureFile);
     /*if (extension == ".hdr")
@@ -88,8 +93,9 @@ StbCreateTexture(const std::string_view filename, const FilesystemInterface& fil
         logError(fmt::format("Texture: cannot load {}", filename));
         return INVALID_TEXTURE_NAME;
     }
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Push Texture To GPU");
+#ifdef TRACY_ENABLE
+    TracyCZoneEnd(decompress);
+    ZoneNamedN(uploadGpu, "Push Texture To GPU", true);
 #endif
     TextureName texture;
     glGenTextures(1, &texture);
@@ -130,17 +136,19 @@ StbCreateTexture(const std::string_view filename, const FilesystemInterface& fil
 
 TextureName CreateTextureFromKTX(const std::string_view filename, const FilesystemInterface& filesystem)
 {
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Load KTX Texture");
-    EASY_BLOCK("Open File");
+#ifdef TRACY_ENABLE
+    ZoneScoped;
+    TracyCZoneCtx loadFile{};
+    TracyCZoneName(loadFile, "Load From File", 1);
 #endif
     BufferFile textureFile = filesystem.LoadFile(filename);
-#ifdef EASY_PROFILE_USE
-    EASY_END_BLOCK;
+#ifdef TRACY_ENABLE
+    TracyCZoneEnd(loadFile);
 #endif
 
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Create KTX from memory");
+#ifdef TRACY_ENABLE
+    TracyCZoneCtx fromKtx{};
+    TracyCZoneName(fromKtx, "Create KTX from memory", 1);
 #endif
     gli::gl glProfile(gli::gl::PROFILE_ES30);
 
@@ -157,12 +165,12 @@ TextureName CreateTextureFromKTX(const std::string_view filename, const Filesyst
                          texture.format(),
                          texture.target(),
                          is_compressed(texture.format())));
-#ifdef EASY_PROFILE_USE
-    EASY_END_BLOCK;
+#ifdef TRACY_ENABLE
+    TracyCZoneEnd(fromKtx);
 #endif
 
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Upload Texture to GPU");
+#ifdef TRACY_ENABLE
+    ZoneNamedN(uploadGpu, "Upload Texture to GPU", true);
 #endif
     TextureName textureName = 0;
     glGenTextures(1, &textureName);
@@ -195,9 +203,6 @@ TextureName CreateTextureFromKTX(const std::string_view filename, const Filesyst
         glCheckError();
     }
     glCheckError();
-#ifdef EASY_PROFILE_USE
-    EASY_END_BLOCK;
-#endif
     return textureName;
 }
 
@@ -255,12 +260,13 @@ TextureId TextureManager::LoadTexture(std::string_view path, Texture::TextureFla
         return it->second;
     }
     const std::string metaPath = fmt::format("{}.meta",path);
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Load JSON");
+#ifdef TRACY_ENABLE
+    TracyCZoneCtx loadJson{};
+    TracyCZoneName(loadJson, "Load JSON", 1);
 #endif
     auto metaJson = LoadJson(metaPath);
-#ifdef EASY_PROFILE_USE
-    EASY_END_BLOCK;
+#ifdef TRACY_ENABLE
+    TracyCZoneEnd(loadJson);
 #endif
     TextureId textureId = INVALID_TEXTURE_ID;
     std::string ktxPath;
@@ -393,8 +399,8 @@ bool TextureLoader::IsDone() const
 
 void TextureLoader::LoadTexture()
 {
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Load KTX from disk");
+#ifdef TRACY_ENABLE
+    ZoneScoped;
 #endif
     logDebug(fmt::format("Loading KTX file {} from disk", path_));
     bufferFile_ = filesystem_.get().LoadFile(path_);
@@ -410,8 +416,8 @@ void TextureLoader::LoadTexture()
 void TextureLoader::DecompressTexture()
 {
     {
-#ifdef EASY_PROFILE_USE
-        EASY_BLOCK("Create KTX from memory");
+#ifdef TRACY_ENABLE
+        ZoneNamedN(fromKtx, "Create KTX from memory", 1);
 #endif
         texture_.gliTexture = gli::load(reinterpret_cast<const char*>(
                 bufferFile_.dataBuffer),
@@ -428,8 +434,8 @@ void TextureLoader::DecompressTexture()
 
 void TextureLoader::UploadToGL()
 {
-#ifdef EASY_PROFILE_USE
-      EASY_BLOCK("Upload KTX Texture to GPU");
+#ifdef TRACY_ENABLE
+      ZoneScoped;
 #endif
     const gli::gl glProfile(gli::gl::PROFILE_ES30);
 

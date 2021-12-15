@@ -38,8 +38,8 @@
 #include "gl/gles3_window.h"
 #endif
 
-#ifdef EASY_PROFILE_USE
-#include "easy/profiler.h"
+#ifdef TRACY_ENABLE
+#include "Tracy.hpp"
 #endif
 
 namespace neko::sdl
@@ -47,8 +47,8 @@ namespace neko::sdl
 
 void SdlEngine::Init()
 {
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Init Sdl Engine");
+#ifdef TRACY_ENABLE
+    ZoneScoped;
 #endif
     logDebug(fmt::format("Current path: {}", GetCurrentPath()));
     workerManager_.Init(workerManagerPb_);
@@ -70,9 +70,8 @@ void SdlEngine::Destroy()
 
 void SdlEngine::ManageEvent()
 {
-    
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Manage Event");
+#ifdef TRACY_ENABLE
+    ZoneScoped;
 #endif
     SDL_Event event;
     while (SDL_PollEvent(&event))

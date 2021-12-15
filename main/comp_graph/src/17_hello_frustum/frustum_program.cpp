@@ -23,10 +23,13 @@
  */
 
 #include "17_hello_frustum/frustum_program.h"
+
+
 #include "imgui.h"
 
-#ifdef EASY_PROFILE_USE
-#include "easy/profiler.h"
+#ifdef TRACY_ENABLE
+#include "Tracy.hpp"
+#include <TracyC.h>
 #endif
 namespace neko
 {
@@ -39,8 +42,9 @@ void HelloFrustumProgram::Init()
     asteroidForces_.resize(maxAsteroidNmb_);
     asteroidVelocities_.resize(maxAsteroidNmb_);
     asteroidCulledPositions_.reserve(maxAsteroidNmb_);
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Calculate Positions");
+#ifdef TRACY_ENABLE
+    TracyCZoneCtx pos{};
+    TracyCZoneName(pos, "Calculate Positions", 1);
 #endif
     //Calculate init pos and velocities
     for (size_t i = 0; i < maxAsteroidNmb_; i++)
@@ -52,8 +56,8 @@ void HelloFrustumProgram::Init()
         position *= radius;
         asteroidPositions_[i] = position;
     }
-#ifdef EASY_PROFILE_USE
-    EASY_END_BLOCK;
+#ifdef TRACY_ENABLE
+    TracyCZoneEnd(pos);
 #endif
     const auto& config = BasicEngine::GetInstance()->GetConfig();
     modelId_ = modelManager_.LoadModel(config.dataRootPath + "model/rock/rock.obj");
@@ -120,8 +124,9 @@ void HelloFrustumProgram::Update(seconds dt)
     {
         return;
     }
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Calculate Positions");
+#ifdef TRACY_ENABLE
+    TracyCZoneCtx pos{};
+    TracyCZoneName(pos, "Calculate Positions", 1); 
 #endif
     asteroidCulledPositions_.clear();
     
@@ -130,8 +135,8 @@ void HelloFrustumProgram::Update(seconds dt)
     CalculatePositions(0, asteroidNmb_);
     Culling(0, asteroidNmb_);
 	
-#ifdef EASY_PROFILE_USE
-    EASY_END_BLOCK;
+#ifdef TRACY_ENABLE
+    TracyCZoneEnd(pos);
 #endif
 
 
@@ -152,8 +157,8 @@ void HelloFrustumProgram::Destroy()
 void HelloFrustumProgram::DrawImGui()
 {
     std::lock_guard<std::mutex> lock(updateMutex_);
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Asteroid Draw Imgui");
+#ifdef TRACY_ENABLE
+    ZoneScoped;
 #endif
     ImGui::Begin("Frustum Culling");
 
@@ -192,8 +197,8 @@ void HelloFrustumProgram::Render()
     }
 
 
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Draw Vertex Buffer Instaning");
+#ifdef TRACY_ENABLE
+    ZoneNamedN(drawVb, "Draw Vertex Buffer Instaning", 1);
 #endif
     vertexInstancingDrawShader_.Bind();
     const auto* model = modelManager_.GetModel(modelId_);
@@ -211,15 +216,16 @@ void HelloFrustumProgram::Render()
             if (chunkEndIndex > chunkBeginIndex)
             {
                 const size_t chunkSize = chunkEndIndex - chunkBeginIndex;
-#ifdef EASY_PROFILE_USE
-                EASY_BLOCK("Set VBO Model Matrices");
+#ifdef TRACY_ENABLE
+                TracyCZoneCtx vboModelMatrices{};
+                TracyCZoneName(vboModelMatrices, "Set VBO Model Matrices", 1);
 #endif
                 glBindBuffer(GL_ARRAY_BUFFER, instanceVBO_);
                 glBufferData(GL_ARRAY_BUFFER, sizeof(Vec3f) * chunkSize, &asteroidCulledPositions_[chunkBeginIndex], GL_DYNAMIC_DRAW);
                 glBindBuffer(GL_ARRAY_BUFFER, 0);
-#ifdef EASY_PROFILE_USE
-                EASY_END_BLOCK
-                    EASY_BLOCK("Draw Mesh");
+#ifdef TRACY_ENABLE
+                TracyCZoneEnd(vboModelMatrices);
+                ZoneNamedN(drawMesh, "Draw Mesh", 1);
 
 #endif
                 glBindVertexArray(asteroidMesh.VAO);
@@ -268,8 +274,8 @@ void HelloFrustumProgram::OnEvent(const SDL_Event& event)
 
 void HelloFrustumProgram::CalculateForce(size_t begin, size_t end)
 {
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Calculate Forces");
+#ifdef TRACY_ENABLE
+    ZoneScoped;
 #endif
     const size_t endCount = std::min(end, asteroidNmb_);
     for (auto i = begin; i < endCount; i++)
@@ -283,8 +289,8 @@ void HelloFrustumProgram::CalculateForce(size_t begin, size_t end)
 
 void HelloFrustumProgram::CalculateVelocity(size_t begin, size_t end)
 {
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Calculate Velocities");
+#ifdef TRACY_ENABLE
+    ZoneScoped;
 #endif
     const size_t endCount = std::min(end, asteroidNmb_);
     for (auto i = begin; i < endCount; i++)
@@ -309,8 +315,8 @@ void HelloFrustumProgram::CalculatePositions(size_t begin, size_t end)
 
 void HelloFrustumProgram::Culling(size_t begin, size_t end)
 {
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Culling");
+#ifdef TRACY_ENABLE
+    ZoneScoped;
 #endif
     const auto* model = modelManager_.GetModel(modelId_);
     const auto& asteroidMesh = model->GetMesh(0);

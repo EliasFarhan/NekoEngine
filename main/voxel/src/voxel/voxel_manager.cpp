@@ -26,15 +26,15 @@
 
 #include "engine/engine.h"
 
-#ifdef EASY_PROFILE_USE
-#include "easy/profiler.h"
+#ifdef TRACY_ENABLE
+#include "Tracy.hpp"
 #endif
 
 namespace neko::voxel
 {
 void VoxelManager::Init()
 {
-#ifdef EASY_PROFILE_USE
+#ifdef TRACY_ENABLE
     EASY_BLOCK("Init Voxel Manager");
 #endif
     regions_.emplace_back();
@@ -51,7 +51,7 @@ void VoxelManager::Init()
     const auto workerNumber = BasicEngine::GetInstance()->GetWorkersNumber();
     initJob = Job([this, chunkX, chunkZ, workerNumber]()
         {
-#ifdef EASY_PROFILE_USE
+#ifdef TRACY_ENABLE
             EASY_BLOCK("Init Job Voxel Manager");
 #endif
             for (int dx = -renderDistance_; dx <= renderDistance_; dx++)
@@ -89,7 +89,7 @@ void VoxelManager::Init()
                         const auto chunkId = Region::GetChunkId(newChunkX, newChunkZ, newChunkY);
                         chunkLoadingQueue_.push(ChunkLoadingJob{ Job{ [this, chunkId]()
                         {
-                            #ifdef EASY_PROFILE_USE
+                            #ifdef TRACY_ENABLE
                                 EASY_BLOCK("Generating Chunk");
                             #endif
                             regions_.front().SetChunk(chunkId, chunkGenerator_.GenerateChunk(0, chunkId));

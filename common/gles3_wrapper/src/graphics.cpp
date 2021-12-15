@@ -30,8 +30,8 @@
 
 #include <fmt/core.h>
 
-#ifdef EASY_PROFILE_USE
-#include "easy/profiler.h"
+#ifdef TRACY_ENABLE
+#include "Tracy.hpp"
 #endif
 
 
@@ -105,8 +105,8 @@ Gles3Renderer::Gles3Renderer() : Renderer()
 
 void Gles3Renderer::ClearScreen()
 {
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Clear Screen");
+#ifdef TRACY_ENABLE
+    ZoneScoped;
 #endif
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

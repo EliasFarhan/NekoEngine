@@ -30,8 +30,8 @@
 #include "mathematics/vector.h"
 #include "engine/engine.h"
 
-#ifdef EASY_PROFILE_USE
-#include <easy/profiler.h>
+#ifdef TRACY_ENABLE
+#include <Tracy.hpp>
 #endif
 
 namespace neko::voxel
@@ -39,7 +39,7 @@ namespace neko::voxel
 
 void VoxelRenderProgram::Init()
 {
-#ifdef EASY_PROFILE_USE
+#ifdef TRACY_ENABLE
     EASY_BLOCK("Voxel Init");
 #endif
     glEnable(GL_DEPTH_TEST);
@@ -179,7 +179,7 @@ void VoxelRenderProgram::Destroy()
 
 void VoxelRenderProgram::Render()
 {
-#ifdef EASY_PROFILE_USE
+#ifdef TRACY_ENABLE
     EASY_BLOCK("Voxel Render");
 #endif
     cubeShader_.Bind();
@@ -191,7 +191,7 @@ void VoxelRenderProgram::Render()
     cubeShader_.SetMat4("proj", projection);
     for (size_t chunk = 0; chunk < renderData_.size() / instanceChunkSize_ + 1; chunk++)
     {
-#ifdef EASY_PROFILE_USE
+#ifdef TRACY_ENABLE
         EASY_BLOCK("Chunk Render");
 #endif
         const size_t chunkBeginIndex = chunk * instanceChunkSize_ ;
@@ -261,7 +261,7 @@ void VoxelRenderProgram::AddCube(const Cube& cube, ChunkId chunkId, RegionId reg
 
 void VoxelRenderProgram::SyncBuffers()
 {
-#ifdef EASY_PROFILE_USE
+#ifdef TRACY_ENABLE
     EASY_BLOCK("Voxel Sync Buffer");
 #endif
     std::swap(renderData_, currentRenderData_);

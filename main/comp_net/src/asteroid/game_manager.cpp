@@ -28,8 +28,8 @@
 #include "asteroid/rollback_manager.h"
 #include "asteroid/player_character.h"
 
-#ifdef EASY_PROFILE_USE
-#include "easy/profiler.h"
+#ifdef TRACY_ENABLE
+#include "Tracy.hpp"
 #endif
 
 namespace neko::asteroid
@@ -85,7 +85,7 @@ void GameManager::SetPlayerInput(net::PlayerNumber playerNumber, net::PlayerInpu
 }
 void GameManager::Validate(net::Frame newValidateFrame)
 {
-#ifdef EASY_PROFILE_USE
+#ifdef TRACY_ENABLE
     EASY_BLOCK("Validate Frame");
 #endif
     if (rollbackManager_.GetCurrentFrame() < newValidateFrame)
@@ -166,7 +166,7 @@ void ClientGameManager::Init()
 void ClientGameManager::Update(seconds dt)
 {
     std::lock_guard<std::mutex> lock(renderMutex_);
-#ifdef EASY_PROFILE_USE
+#ifdef TRACY_ENABLE
     EASY_BLOCK("Game Manager Update");
 #endif
     if (state_ & STARTED)
@@ -285,7 +285,7 @@ void ClientGameManager::SetWindowSize(Vec2u windowsSize)
 void ClientGameManager::Render()
 {
     std::lock_guard<std::mutex> lock(renderMutex_);
-#ifdef EASY_PROFILE_USE
+#ifdef TRACY_ENABLE
     EASY_BLOCK("Game Manager Render")
 #endif
     glViewport(0, 0, windowSize_.x, windowSize_.y);
@@ -332,7 +332,7 @@ Entity ClientGameManager::SpawnBullet(net::PlayerNumber playerNumber, Vec2f posi
 
 void ClientGameManager::FixedUpdate()
 {
-#ifdef EASY_PROFILE_USE
+#ifdef TRACY_ENABLE
     EASY_BLOCK("Game Manager Fixed Update");
 #endif
     if (!(state_ & STARTED))

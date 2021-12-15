@@ -26,8 +26,8 @@
 
 #include <mutex>
 
-#ifdef EASY_PROFILE_USE
-#include <easy/profiler.h>
+#ifdef TRACY_ENABLE
+#include <Tracy.hpp>
 #endif
 
 namespace neko::voxel
@@ -44,7 +44,7 @@ const std::vector<Chunk>& Region::GetChunks() const
 
 void Region::GenerateFromHeightMap(const HeightMap& map)
 {
-#ifdef EASY_PROFILE_USE
+#ifdef TRACY_ENABLE
     EASY_BLOCK("Generate From Height Map");
 #endif
     const size_t regionWidth = regionSize * chunkSize;

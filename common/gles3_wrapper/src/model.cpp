@@ -36,8 +36,8 @@
 
 #include <fmt/core.h>
 
-#ifdef EASY_PROFILE_USE
-#include "easy/profiler.h"
+#ifdef TRACY_ENABLE
+#include "Tracy.hpp"
 #endif
 namespace neko::gl
 {
@@ -281,8 +281,8 @@ bool ModelLoader::HasErrors() const
 void ModelLoader::ProcessModel()
 {
     model_.meshes_.reserve(scene->mNumMeshes);
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Process Nodes");
+#ifdef TRACY_ENABLE
+    ZoneScoped;
 #endif
     ProcessNode(scene->mRootNode);
     RendererLocator::get().AddPreRenderTask(uploadMeshesToGLTask_);
@@ -383,30 +383,18 @@ void ModelLoader::UploadMeshesToGL()
 {
     for (auto& mesh : model_.meshes_)
     {
-#ifdef EASY_PROFILE_USE
-        EASY_BLOCK("Create Mesh VAO");
-        EASY_BLOCK("Generate Buffers");
-        EASY_BLOCK("Generate VAO");
+#ifdef TRACY_ENABLE
+        ZoneNamedN(uploadMeshGL, "Upload Mesh to GPU", 1);
 #endif
         glCheckError();
         glGenVertexArrays(1, &mesh.VAO);
-#ifdef EASY_PROFILE_USE
-        EASY_END_BLOCK;
-        EASY_BLOCK("Generate VBO");
-#endif
+
         glGenBuffers(1, &mesh.VBO);
         glCheckError();
-#ifdef EASY_PROFILE_USE
-        EASY_END_BLOCK;
-        EASY_BLOCK("Generate EBO");
-#endif
+
         glGenBuffers(1, &mesh.EBO);
         glCheckError();
-#ifdef EASY_PROFILE_USE
-        EASY_END_BLOCK;
-        EASY_END_BLOCK;
-        EASY_BLOCK("Copy Buffers");
-#endif
+
         glBindVertexArray(mesh.VAO);
         glBindBuffer(GL_ARRAY_BUFFER, mesh.VBO);
         glCheckError();
@@ -416,10 +404,7 @@ void ModelLoader::UploadMeshesToGL()
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.indices.size() * sizeof(unsigned int),
             &mesh.indices[0], GL_STATIC_DRAW);
         glCheckError();
-#ifdef EASY_PROFILE_USE
-        EASY_END_BLOCK;
-        EASY_BLOCK("Vertex Attrib");
-#endif
+
 
         // vertex positions
         glEnableVertexAttribArray(0);

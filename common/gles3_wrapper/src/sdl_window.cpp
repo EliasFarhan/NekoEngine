@@ -33,8 +33,8 @@
 #include "imgui_impl_opengl3.h"
 #include <fmt/core.h>
 
-#ifdef EASY_PROFILE_USE
-#include <easy/profiler.h>
+#ifdef TRACY_ENABLE
+#include <Tracy.hpp>
 #endif
 #include <engine/assert.h>
 
@@ -53,8 +53,8 @@ Gles3Window::Gles3Window()
 
 void Gles3Window::Init()
 {
-#ifdef EASY_PROFILE_USE
-	EASY_BLOCK("GLES3WindowInit");
+#ifdef TRACY_ENABLE
+	ZoneScoped;
 #endif
 	const auto& config = BasicEngine::GetInstance()->GetConfig();
 	// Set our OpenGL version.
@@ -117,8 +117,8 @@ void Gles3Window::Init()
 
 void Gles3Window::InitImGui()
 {
-#ifdef EASY_PROFILE_USE
-	EASY_BLOCK("ImGuiInit");
+#ifdef TRACY_ENABLE
+	ZoneScoped;
 #endif
 	SdlWindow::InitImGui();
 	ImGui_ImplSDL2_InitForOpenGL(window_, glRenderContext_);
@@ -130,8 +130,8 @@ void Gles3Window::InitImGui()
 void Gles3Window::GenerateUiFrame()
 {
 
-#ifdef EASY_PROFILE_USE
-	EASY_BLOCK("ImGuiGenerate");
+#ifdef TRACY_ENABLE
+	ZoneScoped;
 #endif
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplSDL2_NewFrame(window_);
@@ -142,8 +142,8 @@ void Gles3Window::GenerateUiFrame()
 void Gles3Window::SwapBuffer()
 {
 
-#ifdef EASY_PROFILE_USE
-	EASY_BLOCK("SwapBuffer");
+#ifdef TRACY_ENABLE
+	ZoneScoped;
 #endif
 	SDL_GL_SwapWindow(window_);
 }
@@ -151,8 +151,8 @@ void Gles3Window::SwapBuffer()
 void Gles3Window::Destroy()
 {
 
-#ifdef EASY_PROFILE_USE
-	EASY_BLOCK("DestroyWindow");
+#ifdef TRACY_ENABLE
+	ZoneScoped;
 #endif
     const auto leaveContext = std::make_shared<Task>([this]
 		{
@@ -171,8 +171,8 @@ void Gles3Window::Destroy()
 void Gles3Window::RenderUi()
 {
 
-#ifdef EASY_PROFILE_USE
-	EASY_BLOCK("ImGuiRender");
+#ifdef TRACY_ENABLE
+	ZoneScoped;
 #endif
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -181,6 +181,9 @@ void Gles3Window::RenderUi()
 
 void Gles3Window::OnResize(Vec2u newWindowSize)
 {
+#ifdef TRACY_ENABLE
+	ZoneScoped;
+#endif
 	onResizeCommand_.SetWindowSize(newWindowSize);
 	RendererLocator::get().Render(&onResizeCommand_);
 
@@ -188,17 +191,26 @@ void Gles3Window::OnResize(Vec2u newWindowSize)
 
 void Gles3Window::BeforeRenderLoop()
 {
+#ifdef TRACY_ENABLE
+	ZoneScoped;
+#endif
 	MakeCurrentContext();
 	glCheckError();
 }
 
 void Gles3Window::AfterRenderLoop()
 {
+#ifdef TRACY_ENABLE
+	ZoneScoped;
+#endif
 	LeaveCurrentContext();
 }
 
 void Gles3Window::MakeCurrentContext()
 {
+#ifdef TRACY_ENABLE
+	ZoneScoped;
+#endif
 	SDL_GL_MakeCurrent(window_, glRenderContext_);
 	const auto currentContext = SDL_GL_GetCurrentContext();
 
@@ -216,6 +228,9 @@ void Gles3Window::MakeCurrentContext()
 
 void Gles3Window::LeaveCurrentContext()
 {
+#ifdef TRACY_ENABLE
+	ZoneScoped;
+#endif
 	SDL_GL_MakeCurrent(window_, nullptr);
 	const auto currentContext = SDL_GL_GetCurrentContext();
 

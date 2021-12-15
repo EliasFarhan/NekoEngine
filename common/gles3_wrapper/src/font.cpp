@@ -25,8 +25,8 @@
 #include "gl/font.h"
 #include "mathematics/transform.h"
 #include "engine/engine.h"
-#ifdef EASY_PROFILE_USE
-#include "easy/profiler.h"
+#ifdef TRACY_ENABLE
+#include "Tracy.hpp"
 #endif
 namespace neko::gl
 {
@@ -58,8 +58,8 @@ void FontManager::Init()
 
 FontId FontManager::LoadFont(std::string_view fontName, int pixelHeight)
 {
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Load Font");
+#ifdef TRACY_ENABLE
+    ZoneScoped;
 #endif
     const std::string metaPath = std::string(fontName) + ".meta";
     auto metaJson = LoadJson(metaPath);
@@ -180,15 +180,15 @@ void FontManager::Destroy()
 
 void FontManager::Render()
 {
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Render Font Manager");
+#ifdef TRACY_ENABLE
+    ZoneScoped;
 #endif
     textShader_.Bind();
     textShader_.SetMat4("projection", projection_);
     for(auto& command : commands_)
     {
-#ifdef EASY_PROFILE_USE
-        EASY_BLOCK("Render Text");
+#ifdef TRACY_ENABLE
+        ZoneNamedN(renderText, "Render Text", true);
 #endif
         auto& font = fonts_[command.font];
         // activate corresponding render state

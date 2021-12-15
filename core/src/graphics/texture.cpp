@@ -30,8 +30,8 @@
 #include <fmt/core.h>
 #include <utils/json_utility.h>
 
-#ifdef EASY_PROFILE_USE
-#include "easy/profiler.h"
+#ifdef TRACY_ENABLE
+#include "Tracy.hpp"
 #endif
 
 namespace neko
@@ -40,8 +40,8 @@ namespace neko
 
 Image StbImageConvert(const BufferFile& imageFile, bool flipY, bool hdr)
 {
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Convert Image");
+#ifdef TRACY_ENABLE
+    ZoneScoped;
 #endif
     Image image;
 	

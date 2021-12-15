@@ -24,8 +24,8 @@
 
 #include "32_hello_ibl/ibl_program.h"
 #include "imgui.h"
-#ifdef EASY_PROFILE_USE
-#include "easy/profiler.h"
+#ifdef TRACY_ENABLE
+#include "Tracy.hpp"
 #endif
 
 namespace neko
@@ -160,8 +160,8 @@ void HelloIblProgram::Render()
 	}
 	if (flags_ & FIRST_FRAME)
 	{
-#ifdef EASY_PROFILE_USE
-		EASY_BLOCK("Generate IBL textures");
+#ifdef TRACY_ENABLE
+		ZoneNamedN(iblGenerate, "Generate IBL textures", 1);
 #endif
 		glDepthFunc(GL_LEQUAL);
 		GenerateCubemap();
@@ -173,8 +173,8 @@ void HelloIblProgram::Render()
 		glViewport(0, 0, config.windowSize.x, config.windowSize.y);
 		flags_ = flags_ & ~FIRST_FRAME;
 	}
-#ifdef EASY_PROFILE_USE
-	EASY_BLOCK("Render IBL");
+#ifdef TRACY_ENABLE
+	ZoneNamedN(renderIbl, "Render IBL", 1);
 #endif
 	const auto view = camera_.GenerateViewMatrix();
 	const auto projection = camera_.GenerateProjectionMatrix();
@@ -240,8 +240,8 @@ void HelloIblProgram::OnEvent(const SDL_Event& event)
 
 void HelloIblProgram::GenerateCubemap()
 {
-#ifdef EASY_PROFILE_USE
-	EASY_BLOCK("Generate Cubemap");
+#ifdef TRACY_ENABLE
+	ZoneNamedN(cubemap, "Generate Cubemap", 1);
 #endif
 	logDebug("Generate Cubemap");
     glBindFramebuffer(GL_FRAMEBUFFER, captureFbo_);
@@ -296,8 +296,8 @@ void HelloIblProgram::GenerateCubemap()
 
 void HelloIblProgram::GenerateDiffuseIrradiance()
 {
-#ifdef EASY_PROFILE_USE
-	EASY_BLOCK("Generate Diffuse Irradiance");
+#ifdef TRACY_ENABLE
+	ZoneScoped;
 #endif
 	logDebug("Generate DIffuse Irradiance");
 
@@ -352,8 +352,8 @@ void HelloIblProgram::GenerateDiffuseIrradiance()
 
 void HelloIblProgram::GeneratePrefilter()
 {
-#ifdef EASY_PROFILE_USE
-	EASY_BLOCK("Generate Prefilter Convolution Map");
+#ifdef TRACY_ENABLE
+	ZoneScoped;
 #endif
 	logDebug("Generate Prefilter Convolution Map");
 	Camera3D captureCamera;
@@ -420,8 +420,8 @@ void HelloIblProgram::GeneratePrefilter()
 
 void HelloIblProgram::GenerateLUT()
 {
-#ifdef EASY_PROFILE_USE
-	EASY_BLOCK("Generate BRDF LUT");
+#ifdef TRACY_ENABLE
+	ZoneScoped;
 #endif
 	logDebug("Generate BRDF LUT");
 

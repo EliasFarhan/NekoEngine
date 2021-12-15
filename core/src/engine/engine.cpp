@@ -35,8 +35,9 @@
 #include <utils/file_utility.h>
 #include "graphics/graphics.h"
 #include <engine/window.h>
-#ifdef EASY_PROFILE_USE
-#include <easy/profiler.h>
+#ifdef TRACY_ENABLE
+#include <Tracy.hpp>
+#include <TracyC.h>
 #endif
 
 namespace neko
@@ -53,18 +54,15 @@ BasicEngine::BasicEngine(const FilesystemInterface& filesystem, std::optional<Co
     }
 
     workerManagerPb_ = WorkerManager::CreateWorkerManagerDefinition();
-
-#ifdef EASY_PROFILE_USE
-    EASY_PROFILER_ENABLE;
-#endif
+    
 }
 
 BasicEngine::~BasicEngine()
 {
     logDebug("Destroy Basic Engine");
 
-#ifdef EASY_PROFILE_USE
-    profiler::dumpBlocksToFile("Neko_Profile.prof");
+#ifdef TRACY_ENABLE
+    //profiler::dumpBlocksToFile("Neko_Profile.prof");
 #endif
 }
 #ifdef __ANDROID__
@@ -76,7 +74,7 @@ JNIEXPORT void JNICALL
 Java_swiss_sae_gpr5300_MainActivity_finalize([[maybe_unused]] JNIEnv * env, [[maybe_unused]] jclass clazz, [[maybe_unused]] jstring directory)
 {
 
-#ifdef EASY_PROFILE_USE
+#ifdef TRACY_ENABLE
     if (env == nullptr)
     {
         logDebug("[Error] Android environment is null");
@@ -103,8 +101,8 @@ Java_swiss_sae_gpr5300_MainActivity_finalize([[maybe_unused]] JNIEnv * env, [[ma
 void BasicEngine::Init()
 {
 
-#ifdef EASY_PROFILE_USE
-    EASY_FUNCTION(profiler::colors::Magenta);
+#ifdef TRACY_ENABLE
+    ZoneScoped;
 #endif
     logDebug(fmt::format("Current path: {}", GetCurrentPath()));
     workerManager_.Init(workerManagerPb_);
@@ -113,10 +111,12 @@ void BasicEngine::Init()
 
 void BasicEngine::Update(seconds dt)
 {
-    dt_ = dt.count();
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Main Thread Update");
+#ifdef TRACY_ENABLE
+    TracyCZoneCtx update{};
+    TracyCZoneName(update, "Basic Engine Update", 1);
 #endif
+    dt_ = dt.count();
+
     if (renderer_)
         renderer_->ResetTasks();
     if (window_)
@@ -149,12 +149,15 @@ void BasicEngine::Update(seconds dt)
     workerManager_.AddTask(eventTask, WorkerQueue::MAIN_QUEUE_NAME);
     workerManager_.AddTask(updateTask, WorkerQueue::MAIN_QUEUE_NAME);
     workerManager_.ExecuteMainThread();
-#ifdef EASY_PROFILE_USE
-    EASY_END_BLOCK
-    EASY_BLOCK("Waiting for Swap Buffer");
+#ifdef TRACY_ENABLE
+    TracyCZoneEnd(update);
+    ZoneNamedN(swapBuffer, "Waiting for Swap Buffer", true);
 #endif
     if (swapBufferTask)
         swapBufferTask->Join();
+#ifdef TRACY_ENABLE
+    FrameMark;
+#endif
 }
 
 void BasicEngine::Destroy()
@@ -200,8 +203,8 @@ void BasicEngine::SetWindowAndRenderer(Window* window, Renderer* renderer)
 
 void BasicEngine::GenerateUiFrame()
 {
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Generate ImGui Frame");
+#ifdef TRACY_ENABLE
+    ZoneScoped;
 #endif
     ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_FirstUseEver);
     ImGui::Begin("Neko Window");

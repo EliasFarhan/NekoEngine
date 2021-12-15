@@ -23,16 +23,19 @@
  */
 
 #include "26_hello_ssao/ssao_program.h"
+
+
 #include "imgui.h"
-#ifdef EASY_PROFILE_USE
-#include "easy/profiler.h"
+#ifdef TRACY_ENABLE
+#include "Tracy.hpp"
+#include <TracyC.h>
 #endif
 namespace neko
 {
 void HelloSsaoProgram::Init()
 {
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Init SSAO Program");
+#ifdef TRACY_ENABLE
+    ZoneScoped;
 #endif
     const auto& config = BasicEngine::GetInstance()->GetConfig();
     glCheckError();
@@ -144,8 +147,8 @@ void HelloSsaoProgram::Render()
         return;
     }
     std::lock_guard<std::mutex> lock(updateMutex_);
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Render SSAO Program");
+#ifdef TRACY_ENABLE
+    ZoneNamedN(renderSsao, "Render SSAO Program", 1);
 #endif
     if (flags_ & RESIZE_SCREEN)
     {
@@ -157,8 +160,9 @@ void HelloSsaoProgram::Render()
     const auto projection = camera_.GenerateProjectionMatrix();
 
     // 1. geometry pass: render scene's geometry/color data into gbuffer
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Geometry Pass");
+#ifdef TRACY_ENABLE
+    TracyCZoneCtx geom{};
+    TracyCZoneName(geom, "Geometry Pass", 1);
 #endif
     glBindFramebuffer(GL_FRAMEBUFFER, gBuffer_);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -169,9 +173,10 @@ void HelloSsaoProgram::Render()
     RenderScene(ssaoGeometryShader_);
 
     // 2. generate SSAO texture
-#ifdef EASY_PROFILE_USE
-    EASY_END_BLOCK;
-    EASY_BLOCK("Generate SSAO Texture");
+#ifdef TRACY_ENABLE
+    TracyCZoneEnd(geom);
+    TracyCZoneCtx ssaoText{};
+    TracyCZoneName(ssaoText, "Generate SSAO Texture", 1);
 #endif
     glBindFramebuffer(GL_FRAMEBUFFER, ssaoFbo_);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -191,9 +196,10 @@ void HelloSsaoProgram::Render()
     screenPlane_.Draw();
 
     // 3. blur SSAO texture to remove noise
-#ifdef EASY_PROFILE_USE
-    EASY_END_BLOCK;
-    EASY_BLOCK("Blur SSAO Texture");
+#ifdef TRACY_ENABLE
+    TracyCZoneEnd(ssaoText);
+    TracyCZoneCtx blurSsao{};
+    TracyCZoneName(blurSsao, "Blur SSAO Texture", 1);
 #endif
     glBindFramebuffer(GL_FRAMEBUFFER, ssaoBlurFbo_);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -203,9 +209,10 @@ void HelloSsaoProgram::Render()
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     // 4. lighting pass: traditional deferred Blinn-Phong lighting with added screen-space ambient occlusion
-#ifdef EASY_PROFILE_USE
-    EASY_END_BLOCK;
-    EASY_BLOCK("Lighting pass");
+#ifdef TRACY_ENABLE
+    TracyCZoneEnd(blurSsao);
+    TracyCZoneCtx lighting{};
+    TracyCZoneName(lighting, "Lighting pass", 1);
 #endif
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     ssaoLightingShader_.Bind();

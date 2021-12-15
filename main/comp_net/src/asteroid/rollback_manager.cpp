@@ -25,8 +25,8 @@
 #include "asteroid/rollback_manager.h"
 #include "asteroid/game_manager.h"
 
-#ifdef EASY_PROFILE_USE
-#include "easy/profiler.h"
+#ifdef TRACY_ENABLE
+#include "Tracy.hpp"
 #endif
 
 namespace neko::asteroid
@@ -50,7 +50,7 @@ RollbackManager::RollbackManager(GameManager& gameManager, EntityManager& entity
 
 void RollbackManager::SimulateToCurrentFrame()
 {
-#ifdef EASY_PROFILE_USE
+#ifdef TRACY_ENABLE
     EASY_BLOCK("Simulate To Current Frame");
 #endif
     const auto currentFrame = gameManager_.GetCurrentFrame();
@@ -154,7 +154,7 @@ void RollbackManager::StartNewFrame(net::Frame newFrame)
 
 void RollbackManager::ValidateFrame(net::Frame newValidateFrame)
 {
-#ifdef EASY_PROFILE_USE
+#ifdef TRACY_ENABLE
     EASY_BLOCK("Validate Frame");
 #endif
     const auto lastValidateFrame = gameManager_.GetLastValidateFrame();

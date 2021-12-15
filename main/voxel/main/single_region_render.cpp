@@ -34,8 +34,8 @@
 #include "voxel/chunk_generator.h"
 #include "voxel/voxel_render_program.h"
 
-#ifdef EASY_PROFILE_USE
-#include <easy/profiler.h>
+#ifdef TRACY_ENABLE
+#include <Tracy.hpp>
 #endif
 
 namespace neko::voxel
@@ -69,11 +69,11 @@ public:
 
     void Update(neko::seconds dt) override
     {
-#ifdef EASY_PROFILE_USE
+#ifdef TRACY_ENABLE
         EASY_BLOCK("Update Region Manager");
 #endif
         camera3D_.Update(dt);
-#ifdef EASY_PROFILE_USE
+#ifdef TRACY_ENABLE
         EASY_BLOCK("Push Chunks To Renderer");
 #endif
         for(const auto& chunk : region_.GetChunks())
@@ -82,7 +82,7 @@ public:
                 renderProgram_.AddChunk(chunk);
 
         }
-#ifdef EASY_PROFILE_USE
+#ifdef TRACY_ENABLE
         EASY_END_BLOCK;
 #endif
         renderProgram_.SetCurrentCamera(camera3D_);

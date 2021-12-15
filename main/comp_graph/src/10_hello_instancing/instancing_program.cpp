@@ -23,10 +23,13 @@
  */
 
 #include "10_hello_instancing/instancing_program.h"
+
+
 #include "imgui.h"
 
-#ifdef EASY_PROFILE_USE
-#include "easy/profiler.h"
+#ifdef TRACY_ENABLE
+#include <TracyC.h>
+#include "Tracy.hpp"
 #endif
 namespace neko
 {
@@ -38,8 +41,9 @@ void HelloInstancingProgram::Init()
     asteroidPositions_.resize(maxAsteroidNmb_);
     asteroidForces_.resize(maxAsteroidNmb_);
     asteroidVelocities_.resize(maxAsteroidNmb_);
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Calculate Positions");
+#ifdef TRACY_ENABLE
+    TracyCZoneCtx pos{};
+    TracyCZoneName(pos, "Calculate Positions", 1);
 #endif
     //Calculate init pos and velocities
     for (size_t i = 0; i < maxAsteroidNmb_; i++)
@@ -51,8 +55,8 @@ void HelloInstancingProgram::Init()
         position *= radius;
         asteroidPositions_[i] = position;
     }
-#ifdef EASY_PROFILE_USE
-    EASY_END_BLOCK;
+#ifdef TRACY_ENABLE
+    TracyCZoneEnd(pos);
 #endif
     const auto& config = BasicEngine::GetInstance()->GetConfig();
     modelId_ = modelManager_.LoadModel(config.dataRootPath + "model/rock/rock.obj");
@@ -86,14 +90,15 @@ void HelloInstancingProgram::Update(seconds dt)
     dt_ = dt.count();
     auto* engine = BasicEngine::GetInstance();
     //Kicking the velocity calculus for force and velocities
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Calculate Positions");
+#ifdef TRACY_ENABLE
+    TracyCZoneCtx pos{};
+    TracyCZoneName(pos, "Calculate Positions", 1);
 #endif
     CalculateForce(0, asteroidNmb_);
     CalculateVelocity(0, asteroidNmb_);
     CalculatePositions(0, asteroidNmb_);
-#ifdef EASY_PROFILE_USE
-    EASY_END_BLOCK;
+#ifdef TRACY_ENABLE
+    TracyCZoneEnd(pos);
 #endif
 
     const auto& config = BasicEngine::GetInstance()->GetConfig();
@@ -164,8 +169,8 @@ void HelloInstancingProgram::Render()
     {
         case InstancingType::NO_INSTANCING:
         {
-#ifdef EASY_PROFILE_USE
-            EASY_BLOCK("Draw No Instance");
+#ifdef TRACY_ENABLE
+            ZoneNamedN(drawInstance, "Draw No Instance", 1);
 #endif
             singleDrawShader_.Bind();
             singleDrawShader_.SetMat4("view", camera_.GenerateViewMatrix());
@@ -180,8 +185,8 @@ void HelloInstancingProgram::Render()
         }
         case InstancingType::UNIFORM_INSTANCING:
         {
-#ifdef EASY_PROFILE_USE
-            EASY_BLOCK("Draw Uniform Instaning");
+#ifdef TRACY_ENABLE
+            ZoneNamedN(drawUniform, "Draw Uniform Instaning", 1);
 #endif
             uniformInstancingShader_.Bind();
             const auto& asteroidMesh = asteroidModel->GetMesh(0);
@@ -193,17 +198,18 @@ void HelloInstancingProgram::Render()
             {
                 const size_t chunkBeginIndex = chunk * uniformChunkSize_;
                 const size_t chunkEndIndex = std::min(asteroidNmb_, (chunk + 1) * uniformChunkSize_);
-#ifdef EASY_PROFILE_USE
-                EASY_BLOCK("Set Uniform Model Matrices");
+#ifdef TRACY_ENABLE
+                TracyCZoneCtx uniformModel{};
+                TracyCZoneName(uniformModel, "Set Uniform Model Matrices", 1);
 #endif
             	for (size_t index = chunkBeginIndex; index < chunkEndIndex; index++)
                 {
                     const std::string uniformName = "position[" + std::to_string(index - chunkBeginIndex) + "]";
                     uniformInstancingShader_.SetVec3(uniformName, asteroidPositions_[index]);
                 }
-#ifdef EASY_PROFILE_USE
-                EASY_END_BLOCK
-                EASY_BLOCK("Draw Mesh");
+#ifdef TRACY_ENABLE
+                TracyCZoneEnd(uniformModel);
+                ZoneNamedN(drawMesh, "Draw Mesh", 1);
 
 #endif
                 if (chunkEndIndex > chunkBeginIndex)
@@ -218,8 +224,8 @@ void HelloInstancingProgram::Render()
         }
         case InstancingType::BUFFER_INSTANCING:
         {
-#ifdef EASY_PROFILE_USE
-            EASY_BLOCK("Draw Vertex Buffer Instaning");
+#ifdef TRACY_ENABLE
+            ZoneNamedN(drawVertex, "Draw Vertex Buffer Instaning", 1);
 #endif
             vertexInstancingDrawShader_.Bind();
             const auto& asteroidMesh = asteroidModel->GetMesh(0);
@@ -234,15 +240,16 @@ void HelloInstancingProgram::Render()
                 if (chunkEndIndex > chunkBeginIndex)
                 {
                     const size_t chunkSize = chunkEndIndex-chunkBeginIndex;
-#ifdef EASY_PROFILE_USE
-                    EASY_BLOCK("Set VBO Model Matrices");
+#ifdef TRACY_ENABLE
+                    TracyCZoneCtx uniformModel{};
+                    TracyCZoneName(uniformModel, "Set VBO Model Matrices", 1);
 #endif
                     glBindBuffer(GL_ARRAY_BUFFER, instanceVBO_);
                     glBufferData(GL_ARRAY_BUFFER, sizeof(Vec3f) * chunkSize, &asteroidPositions_[chunkBeginIndex], GL_DYNAMIC_DRAW);
                     glBindBuffer(GL_ARRAY_BUFFER, 0);
-#ifdef EASY_PROFILE_USE
-                    EASY_END_BLOCK
-                    EASY_BLOCK("Draw Mesh");
+#ifdef TRACY_ENABLE
+                    TracyCZoneEnd(uniformModel);
+                    ZoneNamedN(drawMesh, "Draw Mesh", 1);
 
 #endif
                     glBindVertexArray(asteroidMesh.VAO);
@@ -267,8 +274,8 @@ void HelloInstancingProgram::OnEvent(const SDL_Event& event)
 
 void HelloInstancingProgram::CalculateForce(size_t begin, size_t end)
 {
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Calculate Forces");
+#ifdef TRACY_ENABLE
+    ZoneScoped;
 #endif
     const size_t endCount = std::min(end, asteroidNmb_);
     for (auto i = begin; i < endCount; i++)
@@ -282,8 +289,8 @@ void HelloInstancingProgram::CalculateForce(size_t begin, size_t end)
 
 void HelloInstancingProgram::CalculateVelocity(size_t begin, size_t end)
 {
-#ifdef EASY_PROFILE_USE
-    EASY_BLOCK("Calculate Velocities");
+#ifdef TRACY_ENABLE
+    ZoneScoped;
 #endif
     const size_t endCount = std::min(end, asteroidNmb_);
     for (auto i = begin; i < endCount; i++)
@@ -299,6 +306,9 @@ void HelloInstancingProgram::CalculateVelocity(size_t begin, size_t end)
 
 void HelloInstancingProgram::CalculatePositions(size_t begin, size_t end)
 {
+#ifdef TRACY_ENABLE
+    ZoneScoped;
+#endif
     const size_t endCount = std::min(end, asteroidNmb_);
     for (auto i = begin; i < endCount; i++)
     {

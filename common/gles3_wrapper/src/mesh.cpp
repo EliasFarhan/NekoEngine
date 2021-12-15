@@ -32,8 +32,8 @@
 #include "graphics/graphics.h"
 #include "graphics/texture.h"
 
-#ifdef EASY_PROFILE_USE
-#include "easy/profiler.h"
+#ifdef TRACY_ENABLE
+#include "Tracy.hpp"
 #endif
 
 namespace neko::assimp
@@ -96,7 +96,7 @@ void OldMesh::ProcessMesh(
     const aiScene* scene,
     const std::string_view directory)
 {
-#ifdef EASY_PROFILE_USE
+#ifdef TRACY_ENABLE
     EASY_BLOCK("Process Assimp Mesh");
 #endif
 
@@ -185,26 +185,26 @@ bool OldMesh::IsLoaded() const
 
 void OldMesh::SetupMesh()
 {
-#ifdef EASY_PROFILE_USE
+#ifdef TRACY_ENABLE
     EASY_BLOCK("Create Mesh VAO");
     EASY_BLOCK("Generate Buffers");
     EASY_BLOCK("Generate VAO");
 #endif
     glCheckError();
     glGenVertexArrays(1, &VAO);
-#ifdef EASY_PROFILE_USE
+#ifdef TRACY_ENABLE
     EASY_END_BLOCK;
     EASY_BLOCK("Generate VBO");
 #endif
     glGenBuffers(1, &VBO);
     glCheckError();
-#ifdef EASY_PROFILE_USE
+#ifdef TRACY_ENABLE
     EASY_END_BLOCK;
     EASY_BLOCK("Generate EBO");
 #endif
     glGenBuffers(1, &EBO);
     glCheckError();
-#ifdef EASY_PROFILE_USE
+#ifdef TRACY_ENABLE
     EASY_END_BLOCK;
     EASY_END_BLOCK;
     EASY_BLOCK("Copy Buffers");
@@ -218,7 +218,7 @@ void OldMesh::SetupMesh()
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_.size() * sizeof(unsigned int),
         &indices_[0], GL_STATIC_DRAW);
         glCheckError();
-#ifdef EASY_PROFILE_USE
+#ifdef TRACY_ENABLE
     EASY_END_BLOCK;
     EASY_BLOCK("Vertex Attrib");
 #endif

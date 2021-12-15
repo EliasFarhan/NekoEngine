@@ -29,8 +29,8 @@
 #include "mathematics/basic.h"
 #include "mathematics/vector.h"
 
-#ifdef EASY_PROFILE_USE
-#include <easy/profiler.h>
+#ifdef TRACY_ENABLE
+#include <Tracy.hpp>
 #endif
 
 namespace neko::voxel
@@ -138,7 +138,7 @@ Chunk ChunkGenerator::GenerateChunk(RegionId regionId, ChunkId chunkId) const
 
 Region ChunkGenerator::GenerateRegion(RegionId regionId) const
 {
-#ifdef EASY_PROFILE_USE
+#ifdef TRACY_ENABLE
     EASY_BLOCK("Generate Region");
     EASY_BLOCK("Generate Height Map");
 #endif
@@ -164,7 +164,7 @@ Region ChunkGenerator::GenerateRegion(RegionId regionId) const
 
         }
     }
-#ifdef EASY_PROFILE_USE
+#ifdef TRACY_ENABLE
     EASY_END_BLOCK;
 #endif
     Region newRegion{};

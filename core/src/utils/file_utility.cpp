@@ -29,8 +29,8 @@
 #include <fmt/core.h>
 
 
-#ifdef EASY_PROFILE_USE
-#include "easy/profiler.h"
+#ifdef TRACY_ENABLE
+#include "Tracy.hpp"
 #endif
 
 #if defined(__ANDROID__)
