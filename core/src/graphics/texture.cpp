@@ -68,7 +68,7 @@ Image StbImageConvert(const BufferFile& imageFile, bool flipY, bool hdr)
 	return image;
 }
 /*
-TextureLoader::TextureLoader(TextureManager& textureManager) :
+KtxTextureLoader::KtxTextureLoader(TextureManager& textureManager) :
 	filesystem_(textureManager.filesystem_),
     textureManager_(textureManager),
 	convertImageJob_([this]
@@ -83,14 +83,14 @@ TextureLoader::TextureLoader(TextureManager& textureManager) :
 {
 }
 
-void TextureLoader::SetTextureId(TextureId textureId)
+void KtxTextureLoader::SetTextureId(TextureId textureId)
 {
 	textureId_ = textureId;
 	const auto path = textureManager_.GetPath(textureId_);
 	diskLoadJob_.SetFilePath(path);
 }
 
-void TextureLoader::LoadFromDisk()
+void KtxTextureLoader::LoadFromDisk()
 {
     if (textureId_ != INVALID_TEXTURE_ID)
     {
@@ -100,7 +100,7 @@ void TextureLoader::LoadFromDisk()
     }
 }
 
-void TextureLoader::Reset()
+void KtxTextureLoader::Reset()
 {
 	convertImageJob_.Reset();
 	diskLoadJob_.Reset();

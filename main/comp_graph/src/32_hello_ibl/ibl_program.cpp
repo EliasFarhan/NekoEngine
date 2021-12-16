@@ -66,10 +66,10 @@ void HelloIblProgram::Init()
 		{Vec3f(10.0f, -10.0f, 10.0f),Vec3f(300.0f, 300.0f, 300.0f)},
 		}
 	};
-	const auto* engine = BasicEngine::GetInstance();
-	const auto& filesystem = engine->GetFilesystem();
-	hdrTexture_ = StbCreateTexture(
-		config.dataRootPath + "textures/Ridgecrest_Road_Ref.hdr", filesystem, static_cast<gl::Texture::TextureFlags>(
+
+	textureManager_.Init();
+	hdrTextureId_ = textureManager_.LoadTexture(
+		config.dataRootPath + "textures/Ridgecrest_Road_Ref.hdr", static_cast<gl::Texture::TextureFlags>(
 			gl::Texture::TextureFlags::CLAMP_WRAP |
             gl::Texture::TextureFlags::SMOOTH_TEXTURE |
             gl::Texture::TextureFlags::FLIP_Y |
@@ -89,6 +89,7 @@ void HelloIblProgram::Update(seconds dt)
 	const auto& config = BasicEngine::GetInstance()->GetConfig();
 	camera_.SetAspect(config.windowSize.x, config.windowSize.y);
 	camera_.Update(dt);
+	textureManager_.Update(dt);
 	
 }
 
@@ -97,7 +98,7 @@ void HelloIblProgram::Destroy()
 	sphere_.Destroy();
 	quad_.Destroy();
 	skybox_.Destroy();
-	
+	textureManager_.Destroy();
 	
 	equiToCubemap_.Destroy();
 	irradianceShader_.Destroy();
@@ -152,7 +153,12 @@ void HelloIblProgram::Render()
 {
 
 	std::lock_guard<std::mutex> lock(updateMutex_);
-
+	if (hdrTexture_ == gl::INVALID_TEXTURE_NAME)
+	{
+		hdrTexture_ = textureManager_.GetTextureName(hdrTextureId_);
+		if (hdrTexture_ == gl::INVALID_TEXTURE_NAME)
+			return;
+	}
 	if (flags_ & FIRST_FRAME)
 	{
 #ifdef TRACY_ENABLE

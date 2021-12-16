@@ -39,6 +39,7 @@
 #include <TracyC.h>
 #endif
 
+#include <stb_image.h>
 #include <utils/json_utility.h>
 namespace neko::gl
 {
@@ -54,7 +55,7 @@ void TextureManager::Destroy()
 
 
 TextureName
-StbCreateTexture(const std::string_view filename, const FilesystemInterface& filesystem, Texture::TextureFlags flags)
+    StbCreateTexture(const std::string_view filename, const FilesystemInterface& filesystem, Texture::TextureFlags flags)
 {
 #ifdef TRACY_ENABLE
     ZoneScoped;
@@ -110,7 +111,7 @@ StbCreateTexture(const std::string_view filename, const FilesystemInterface& fil
     if (flags & Texture::MIPMAPS_TEXTURE)
     {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                        flags & Texture::SMOOTH_TEXTURE ? GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_LINEAR);
+            flags & Texture::SMOOTH_TEXTURE ? GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_LINEAR);
     }
     else
     {
@@ -169,9 +170,9 @@ TextureName CreateTextureFromKTX(const std::string_view filename, const Filesyst
 
     GLenum target = glProfile.translate(texture.target());
     logDebug(fmt::format("texture format: {}, texture target {}, is compressed {}",
-                         texture.format(),
-                         texture.target(),
-                         is_compressed(texture.format())));
+        texture.format(),
+        texture.target(),
+        is_compressed(texture.format())));
 #ifdef TRACY_ENABLE
     TracyCZoneEnd(fromKtx);
 #endif
@@ -195,17 +196,17 @@ TextureName CreateTextureFromKTX(const std::string_view filename, const Filesyst
     for (std::size_t level = 0; level < texture.levels(); ++level)
     {
         glm::tvec3<GLsizei> levelExtent(texture.extent(level));
-        if(gli::is_compressed(texture.format()))
+        if (gli::is_compressed(texture.format()))
         {
             glCompressedTexSubImage2D(
-                    target, static_cast<GLint>(level), 0, 0, levelExtent.x, levelExtent.y,
-                    format.Internal, static_cast<GLsizei>(texture.size(level)), texture.data(0, 0, level));
+                target, static_cast<GLint>(level), 0, 0, levelExtent.x, levelExtent.y,
+                format.Internal, static_cast<GLsizei>(texture.size(level)), texture.data(0, 0, level));
         }
         else
         {
             glTexSubImage2D(
-                    target, static_cast<GLint>(level), 0, 0, levelExtent.x, levelExtent.y,
-                    format.Internal, static_cast<GLsizei>(texture.size(level)), texture.data(0, 0, level));
+                target, static_cast<GLint>(level), 0, 0, levelExtent.x, levelExtent.y,
+                format.Internal, static_cast<GLsizei>(texture.size(level)), texture.data(0, 0, level));
         }
         glCheckError();
     }
@@ -234,7 +235,7 @@ TextureName LoadCubemap(std::vector<std::string> facesFilename, const Filesystem
         if (image.data != nullptr)
         {
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-                         0, GL_RGB, image.width, image.height, 0, GL_RGB, GL_UNSIGNED_BYTE, image.data
+                0, GL_RGB, image.width, image.height, 0, GL_RGB, GL_UNSIGNED_BYTE, image.data
             );
         }
         else
@@ -266,7 +267,7 @@ TextureId TextureManager::LoadTexture(std::string_view path, Texture::TextureFla
     {
         return it->second;
     }
-    const std::string metaPath = fmt::format("{}.meta",path);
+    const std::string metaPath = fmt::format("{}.meta", path);
 #ifdef TRACY_ENABLE
     TracyCZoneCtx loadJson{};
     TracyCZoneName(loadJson, "Load JSON", 1);
@@ -277,7 +278,7 @@ TextureId TextureManager::LoadTexture(std::string_view path, Texture::TextureFla
 #endif
     TextureId textureId = INVALID_TEXTURE_ID;
     std::string ktxPath;
-    if(CheckJsonExists(metaJson, "uuid"))
+    if (CheckJsonExists(metaJson, "uuid"))
     {
         textureId = sole::rebuild(metaJson["uuid"].get<std::string>());
     }
@@ -286,10 +287,28 @@ TextureId TextureManager::LoadTexture(std::string_view path, Texture::TextureFla
         logError(fmt::format("Could not find texture id in json file: {}", metaPath));
         return textureId;
     }
-    if(CheckJsonExists(metaJson, "ktx_path"))
+
+    if (textureId == INVALID_TEXTURE_ID)
+    {
+        logError(" Invalid texture id on texture load");
+        return textureId;
+    }
+    if (CheckJsonExists(metaJson, "ktx_path"))
     {
         ktxPath = metaJson["ktx_path"];
         logDebug(fmt::format("KTX PATH: {}", ktxPath));
+    }
+    else if (flags & Texture::HDR)
+    {
+        auto textureLoader = std::make_unique<HdrTextureLoader>(
+            path,
+            textureId,
+            flags
+            );
+        textureLoader->Start();
+        textureLoaders_.push(std::move(textureLoader));
+        texturePathMap_[path.data()] = textureId;
+        return textureId;
     }
     else
     {
@@ -297,13 +316,8 @@ TextureId TextureManager::LoadTexture(std::string_view path, Texture::TextureFla
         return INVALID_TEXTURE_ID;
     }
 
-    if (textureId == INVALID_TEXTURE_ID)
-    {
-        logError(" Invalid texture id on texture load");
-        return textureId;
-    }
     const auto& config = BasicEngine::GetInstance()->GetConfig();
-    auto textureLoader = std::make_unique<TextureLoader>(
+    auto textureLoader = std::make_unique<KtxTextureLoader>(
 
         config.dataRootPath + ktxPath,
         textureId,
@@ -318,7 +332,7 @@ TextureId TextureManager::LoadTexture(std::string_view path, Texture::TextureFla
 const Texture* TextureManager::GetTexture(TextureId index) const
 {
     const auto it = textureMap_.find(index);
-    if(it != textureMap_.end())
+    if (it != textureMap_.end())
     {
         return &it->second;
     }
@@ -336,22 +350,22 @@ void TextureManager::Init()
     TextureManagerLocator::provide(this);
 }
 
-void TextureManager::Update([[maybe_unused]]seconds dt)
+void TextureManager::Update([[maybe_unused]] seconds dt)
 {
-    while(!textureLoaders_.empty())
+    while (!textureLoaders_.empty())
     {
         const auto& textureLoader = textureLoaders_.front();
-        if(textureLoader->HasErrors())
+        if (textureLoader->HasErrors())
         {
             switch (textureLoader->GetErrors())
             {
-            case TextureLoader::TextureLoaderError::ASSET_LOADING_ERROR:
+            case TextureLoader::ErrorCode::ASSET_LOADING_ERROR:
                 logError(fmt::format(" Could not load texture {} from disk", textureLoader->GetPath()));
                 break;
-            case TextureLoader::TextureLoaderError::DECOMPRESS_ERROR:
+            case TextureLoader::ErrorCode::DECOMPRESS_ERROR:
                 logError(fmt::format(" Could not decompress texture {} from disk", textureLoader->GetPath()));
                 break;
-            case TextureLoader::TextureLoaderError::UPLOAD_TO_GPU_ERROR:
+            case TextureLoader::ErrorCode::UPLOAD_TO_GPU_ERROR:
                 logError(fmt::format(" Could not upload texture {} from disk", textureLoader->GetPath()));
                 break;
             default:
@@ -359,7 +373,7 @@ void TextureManager::Update([[maybe_unused]]seconds dt)
             }
             textureLoaders_.pop();
         }
-        else if(textureLoader->IsDone())
+        else if (textureLoader->IsDone())
         {
             textureMap_[textureLoader->GetTextureId()] = textureLoader->GetTexture();
             textureLoaders_.pop();
@@ -374,27 +388,24 @@ void TextureManager::Update([[maybe_unused]]seconds dt)
 TextureManager::TextureManager() :
     filesystem_(BasicEngine::GetInstance()->GetFilesystem())
 {
-    
+
 }
 
 TextureName TextureManager::GetTextureName(TextureId textureId) const
 {
     const auto* texture = GetTexture(textureId);
-    if(texture == nullptr)
+    if (texture == nullptr)
     {
         return INVALID_TEXTURE_NAME;
     }
     return texture->name;
 }
 
-TextureLoader::TextureLoader(std::string_view path,
-                             TextureId textureId,
-                             Texture::TextureFlags flags) :
-        filesystem_(BasicEngine::GetInstance()->GetFilesystem()),
-        textureId_(textureId), path_(path), flags_(flags),
-        loadingTextureTask_ (std::make_shared<Task>([this]() { LoadTexture(); })),
-        decompressTextureTask_(std::make_shared<Task>([this]() { DecompressTexture(); })),
-        uploadToGLTask_(std::make_shared<Task>([this](){ UploadToGL(); }))
+KtxTextureLoader::KtxTextureLoader(std::string_view path,
+    TextureId textureId,
+    Texture::TextureFlags flags) :
+    TextureLoader(path, textureId, flags)
+
 {
 
 }
@@ -404,50 +415,50 @@ bool TextureLoader::IsDone() const
     return uploadToGLTask_->IsDone();
 }
 
-void TextureLoader::LoadTexture()
+void KtxTextureLoader::LoadTexture()
 {
 #ifdef TRACY_ENABLE
     ZoneScoped;
 #endif
     logDebug(fmt::format("Loading KTX file {} from disk", path_));
-    bufferFile_ = filesystem_.get().LoadFile(path_);
-    if(bufferFile_.dataBuffer == nullptr)
+    bufferFile_ = filesystem_.LoadFile(path_);
+    if (bufferFile_.dataBuffer == nullptr)
     {
-        error_ = TextureLoaderError::ASSET_LOADING_ERROR;
+        error_ = ErrorCode::ASSET_LOADING_ERROR;
         logError(fmt::format("Asset Loading error with path: {}", path_));
         return;
     }
     BasicEngine::GetInstance()->ScheduleTask(decompressTextureTask_, WorkerQueue::OTHER_QUEUE_NAME);
 }
 
-void TextureLoader::DecompressTexture()
+void KtxTextureLoader::DecompressTexture()
 {
     {
 #ifdef TRACY_ENABLE
         ZoneNamedN(fromKtx, "Create KTX from memory", 1);
 #endif
         texture_.gliTexture = gli::load(reinterpret_cast<const char*>(
-                bufferFile_.dataBuffer),
-                                        bufferFile_.dataLength);
+            bufferFile_.dataBuffer),
+            bufferFile_.dataLength);
     }
     if (texture_.gliTexture.empty())
     {
         logError(fmt::format("File: {} OpenGLI error while opening KTX content", path_));
-        error_ = TextureLoaderError::DECOMPRESS_ERROR;
+        error_ = ErrorCode::DECOMPRESS_ERROR;
         return;
     }
     RendererLocator::get().AddPreRenderTask(uploadToGLTask_);
 }
 
-void TextureLoader::UploadToGL()
+void KtxTextureLoader::UploadToGL()
 {
 #ifdef TRACY_ENABLE
-      ZoneScoped;
+    ZoneScoped;
 #endif
     const gli::gl glProfile(gli::gl::PROFILE_ES30);
 
     auto& texture = texture_.gliTexture;
-    
+
     const auto isCube = gli::is_target_cube(texture.target());
     const auto isCompressed = gli::is_compressed(texture.format());
     const auto format = glProfile.translate(texture.format(), texture.swizzles());
@@ -463,15 +474,15 @@ void TextureLoader::UploadToGL()
 
     glCheckError();
     const glm::tvec3<GLsizei> extent{ texture.extent() };
-    logDebug(fmt::format("Loading KTX: {} with level count: {}, face count: {} and extend ({},{})", 
-        path_, 
+    logDebug(fmt::format("Loading KTX: {} with level count: {}, face count: {} and extend ({},{})",
+        path_,
         texture.levels(),
         texture.faces(),
-        extent.x, 
+        extent.x,
         extent.y));
 
     glTexStorage2D(target, static_cast<GLint>(texture.levels()), format.Internal, extent.x, extent.y);
-    
+
     glCheckError();
     for (std::size_t level = 0; level < texture.levels(); ++level)
     {
@@ -479,7 +490,7 @@ void TextureLoader::UploadToGL()
         for (std::size_t face = 0; face < texture.faces(); ++face)
         {
             GLenum tmpTarget = target;
-            if(texture.faces() >= 1 && isCube)
+            if (texture.faces() >= 1 && isCube)
             {
                 tmpTarget = GL_TEXTURE_CUBE_MAP_POSITIVE_X + face;
             }
@@ -505,9 +516,20 @@ void TextureLoader::UploadToGL()
 
 }
 
-void TextureLoader::Start()
+void TextureLoader::Start() const
 {
     BasicEngine::GetInstance()->ScheduleTask(loadingTextureTask_, WorkerQueue::RESOURCE_QUEUE_NAME);
+}
+
+TextureLoader::TextureLoader(std::string_view path, TextureId textureId, Texture::TextureFlags flags) :
+    filesystem_(BasicEngine::GetInstance()->GetFilesystem()),
+    textureId_(textureId),
+    flags_(flags),
+    path_(path),
+    loadingTextureTask_(std::make_shared<Task>([this]() { LoadTexture(); })),
+    decompressTextureTask_(std::make_shared<Task>([this]() { DecompressTexture(); })),
+    uploadToGLTask_(std::make_shared<Task>([this]() { UploadToGL(); }))
+{
 }
 
 std::string_view TextureLoader::GetPath() const
@@ -527,12 +549,144 @@ const Texture& TextureLoader::GetTexture() const
 
 bool TextureLoader::HasErrors() const
 {
-    return error_ != TextureLoaderError::NONE;
+    return error_ != ErrorCode::NONE;
 }
 
-TextureLoader::TextureLoaderError TextureLoader::GetErrors() const
+TextureLoader::ErrorCode TextureLoader::GetErrors() const
 {
     return error_;
+}
+
+HdrTextureLoader::HdrTextureLoader(std::string_view path, TextureId textureId, Texture::TextureFlags flags) :
+    TextureLoader(path, textureId, flags)
+{
+}
+
+
+
+void HdrTextureLoader::LoadTexture()
+{
+    stbi_set_flip_vertically_on_load(flags_ & Texture::FLIP_Y);
+    if (!filesystem_.FileExists(path_))
+    {
+        logError(fmt::format("[Error] Texture: {} does not exist", path_));
+        error_ = ErrorCode::ASSET_LOADING_ERROR;
+        return;
+    }
+    {
+#ifdef TRACY_ENABLE
+        ZoneNamedN(loadFile, "Load Buffer File", true);
+#endif
+        bufferFile_ = filesystem_.LoadFile(path_);
+    }
+    if (bufferFile_.dataBuffer == nullptr)
+    {
+        error_ = ErrorCode::ASSET_LOADING_ERROR;
+        logError(fmt::format("Asset Loading error with path: {}", path_));
+        return;
+    }
+    BasicEngine::GetInstance()->ScheduleTask(decompressTextureTask_, WorkerQueue::OTHER_QUEUE_NAME);
+}
+
+void HdrTextureLoader::DecompressTexture()
+{
+    imageData_ = stbi_loadf_from_memory(
+        bufferFile_.dataBuffer,
+        bufferFile_.dataLength,
+        &texture_.size.x,
+        &texture_.size.y, &channelNmb_, 0);
+
+    if (imageData_ == nullptr)
+    {
+        logError(fmt::format("Could not decompress {}", path_));
+        error_ = ErrorCode::DECOMPRESS_ERROR;
+        return;
+    }
+    RendererLocator::get().AddPreRenderTask(uploadToGLTask_);
+}
+
+void HdrTextureLoader::UploadToGL()
+{
+    glGenTextures(1, &texture_.name);
+    glCheckError();
+
+    glBindTexture(GL_TEXTURE_2D, texture_.name);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
+        flags_ & Texture::CLAMP_WRAP
+        ? GL_CLAMP_TO_EDGE
+        : flags_ & Texture::MIRROR_REPEAT_WRAP
+        ? GL_MIRRORED_REPEAT
+        : GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
+        flags_ & Texture::CLAMP_WRAP
+        ? GL_CLAMP_TO_EDGE
+        : flags_ & Texture::MIRROR_REPEAT_WRAP
+        ? GL_MIRRORED_REPEAT
+        : GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+        flags_ & Texture::SMOOTH_TEXTURE ? GL_LINEAR : GL_NEAREST);
+    glCheckError();
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+        flags_ & Texture::SMOOTH_TEXTURE ? GL_LINEAR : GL_NEAREST);
+    glCheckError();
+    switch (channelNmb_)
+    {
+    case 1:
+    {
+#ifdef TRACY_ENABLE
+        TracyGpuNamedZone(textureRUpload, "Texture RED Upload", true);
+#endif
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_R16F, texture_.size.x, texture_.size.y,
+            0,
+            GL_RED, GL_FLOAT,
+            imageData_);
+        break;
+    }
+    case 2:
+    {
+#ifdef TRACY_ENABLE
+        TracyGpuNamedZone(textureRGUpload, "Texture RG Upload", true);
+#endif
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16F, texture_.size.x, texture_.size.y,
+            0,
+            GL_RG, GL_FLOAT,
+            imageData_);
+        break;
+    }
+    case 3:
+    {
+#ifdef TRACY_ENABLE
+        ZoneNamedN(textureRGBUploadCpu, "Texture RGB Upload", true);
+        TracyGpuNamedZone(textureRGBUpload, "Texture RGB Upload", true);
+#endif
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, texture_.size.x,
+            texture_.size.y,
+            0,
+            GL_RGB, GL_FLOAT,
+            imageData_);
+        break;
+    }
+    case 4:
+    {
+#ifdef TRACY_ENABLE
+        TracyGpuNamedZone(textureRGBAUpload, "Texture RGBA Upload", true);
+#endif
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F,
+            texture_.size.x,
+            texture_.size.y,
+            0,
+            GL_RGBA, GL_FLOAT,
+            imageData_);
+        break;
+    }
+    default:
+        break;
+    }
+
+
+    glCheckError();
+    delete imageData_;
 }
 }
 

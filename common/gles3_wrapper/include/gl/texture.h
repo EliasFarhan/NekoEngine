@@ -90,46 +90,80 @@ public:
 };
 using TextureManagerLocator = Locator<TextureManagerInterface, NullTextureManager>;
 
-
 class TextureLoader
 {
 public:
-    enum class TextureLoaderError : std::uint8_t
+    enum class ErrorCode : std::uint8_t
     {
         NONE = 0u,
         ASSET_LOADING_ERROR = 1u,
         DECOMPRESS_ERROR = 2u,
         UPLOAD_TO_GPU_ERROR = 3u
     };
-    explicit TextureLoader(std::string_view path,
-                           TextureId,
-                           Texture::TextureFlags flags = Texture::DEFAULT);
+
+    TextureLoader(std::string_view path,
+        TextureId textureId,
+        Texture::TextureFlags flags = Texture::DEFAULT);
+    virtual ~TextureLoader() = default;
     TextureLoader(const TextureLoader&) = delete;
     TextureLoader& operator=(const TextureLoader&) = delete;
-    TextureLoader(TextureLoader&&) noexcept = delete ;
+    TextureLoader(TextureLoader&&) noexcept = delete;
     TextureLoader& operator=(TextureLoader&&) = delete;
-    void Start();
+
+    void Start() const;
     [[nodiscard]] std::string_view GetPath() const;
     [[nodiscard]] bool IsDone() const;
     [[nodiscard]] TextureId GetTextureId() const;
     [[nodiscard]] const Texture& GetTexture() const;
     [[nodiscard]] bool HasErrors() const;
-    [[nodiscard]] TextureLoaderError GetErrors() const;
-private:
-    void LoadTexture();
-    void DecompressTexture();
-    void UploadToGL();
-
-    std::reference_wrapper<const FilesystemInterface> filesystem_;
+    [[nodiscard]] ErrorCode GetErrors() const;
+protected:
+    virtual void LoadTexture() = 0;
+    virtual void DecompressTexture() = 0;
+    virtual void UploadToGL() = 0;
+    const FilesystemInterface& filesystem_;
     TextureId textureId_;
-    std::string path_;
     Texture::TextureFlags flags_ = Texture::DEFAULT;
+    ErrorCode error_ = ErrorCode::NONE;
+    std::string path_;
+
+    Texture texture_;
+    BufferFile bufferFile_;
+
     std::shared_ptr<Task> loadingTextureTask_;
     std::shared_ptr<Task> decompressTextureTask_;
     std::shared_ptr<Task> uploadToGLTask_;
-    BufferFile bufferFile_;
-    Texture texture_;
-    TextureLoaderError error_ = TextureLoaderError::NONE;
+};
+
+class HdrTextureLoader : public TextureLoader
+{
+public:
+    HdrTextureLoader(std::string_view path,
+        TextureId textureId,
+        Texture::TextureFlags flags = Texture::DEFAULT);
+    
+private:
+    void LoadTexture() override;
+    void DecompressTexture() override;
+    void UploadToGL() override;
+    float* hdrImageData = nullptr;
+    float* imageData_ = nullptr;
+    int channelNmb_ = 0;
+};
+
+class KtxTextureLoader : public TextureLoader
+{
+public:
+
+    KtxTextureLoader(std::string_view path,
+                           TextureId,
+                           Texture::TextureFlags flags = Texture::DEFAULT);
+
+private:
+    void LoadTexture() override;
+    void DecompressTexture() override;
+    void UploadToGL() override;
+    
 };
 
 class TextureManager : public TextureManagerInterface, public SystemInterface
