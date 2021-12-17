@@ -35,6 +35,7 @@
 
 #ifdef TRACY_ENABLE
 #include <Tracy.hpp>
+#include <TracyOpenGL.hpp>
 #endif
 #include <engine/assert.h>
 
@@ -107,7 +108,10 @@ void Gles3Window::Init()
 	glCheckError();
 	LeaveCurrentContext();
 
-	auto initRenderJob = std::make_shared<Task>([this] { MakeCurrentContext(); });
+    const auto initRenderJob = std::make_shared<Task>([this]
+    {
+        MakeCurrentContext();
+    });
 	auto* engine = BasicEngine::GetInstance();
 	engine->ScheduleTask(initRenderJob, WorkerQueue::RENDER_QUEUE_NAME);
 
@@ -146,6 +150,7 @@ void Gles3Window::SwapBuffer()
 	ZoneScoped;
 #endif
 	SDL_GL_SwapWindow(window_);
+	
 }
 
 void Gles3Window::Destroy()

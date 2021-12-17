@@ -26,19 +26,20 @@
 #include <chrono>
 #include <sstream>
 
-#include <engine/engine.h>
-
-#include "imgui.h"
-
-#include "engine/filesystem.h"
-#include <engine/log.h>
-#include <utils/file_utility.h>
-#include "graphics/graphics.h"
-#include <engine/window.h>
 #ifdef TRACY_ENABLE
 #include <Tracy.hpp>
 #include <TracyC.h>
 #endif
+
+#include "engine/engine.h"
+
+#include "imgui.h"
+
+#include "engine/filesystem.h"
+#include "engine/log.h"
+#include "utils/file_utility.h"
+#include "graphics/graphics.h"
+#include "engine/window.h"
 
 namespace neko
 {

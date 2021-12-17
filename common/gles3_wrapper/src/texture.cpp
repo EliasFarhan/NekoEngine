@@ -634,9 +634,6 @@ void HdrTextureLoader::UploadToGL()
     {
     case 1:
     {
-#ifdef TRACY_ENABLE
-        TracyGpuNamedZone(textureRUpload, "Texture RED Upload", true);
-#endif
         glTexImage2D(GL_TEXTURE_2D, 0, GL_R16F, texture_.size.x, texture_.size.y,
             0,
             GL_RED, GL_FLOAT,
@@ -645,9 +642,6 @@ void HdrTextureLoader::UploadToGL()
     }
     case 2:
     {
-#ifdef TRACY_ENABLE
-        TracyGpuNamedZone(textureRGUpload, "Texture RG Upload", true);
-#endif
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16F, texture_.size.x, texture_.size.y,
             0,
             GL_RG, GL_FLOAT,
@@ -658,7 +652,6 @@ void HdrTextureLoader::UploadToGL()
     {
 #ifdef TRACY_ENABLE
         ZoneNamedN(textureRGBUploadCpu, "Texture RGB Upload", true);
-        TracyGpuNamedZone(textureRGBUpload, "Texture RGB Upload", true);
 #endif
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, texture_.size.x,
             texture_.size.y,
@@ -669,9 +662,6 @@ void HdrTextureLoader::UploadToGL()
     }
     case 4:
     {
-#ifdef TRACY_ENABLE
-        TracyGpuNamedZone(textureRGBAUpload, "Texture RGBA Upload", true);
-#endif
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F,
             texture_.size.x,
             texture_.size.y,
