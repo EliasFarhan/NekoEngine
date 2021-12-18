@@ -199,10 +199,10 @@ bool ModelManager::IsLoaded(ModelId modelId)
 
 ModelLoader::ModelLoader(std::string_view path, ModelId modelId) :
     path_(path),
+    modelId_(modelId),
     loadModelTask_(std::make_shared<Task>([this]() { LoadModel(); })),
     processModelTask_(std::make_shared<Task>([this]() { ProcessModel(); })),
-    uploadMeshesToGLTask_(std::make_shared<Task>([this]() { UploadMeshesToGL(); })),
-    modelId_(modelId)
+    uploadMeshesToGLTask_(std::make_shared<Task>([this]() { UploadMeshesToGL(); }))
 {
     importer_.SetIOHandler(new NekoIOSystem(
         BasicEngine::GetInstance()->GetFilesystem()));

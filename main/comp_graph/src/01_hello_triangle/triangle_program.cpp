@@ -108,8 +108,9 @@ void HelloTriangleProgram::Update(seconds dt)
 
 void HelloTriangleProgram::Render()
 {
-    if(shader_.GetProgram() == 0)
+    if(shader_.GetProgram() == gl::INVALID_PROGRAM)
         return;
+    glCheckError();
     std::lock_guard<std::mutex> lock(updateMutex_);
     switch (renderType_)
     {
@@ -163,7 +164,7 @@ void HelloTriangleProgram::Render()
         default:
             break;
     }
-
+    glCheckError();
 
 }
 

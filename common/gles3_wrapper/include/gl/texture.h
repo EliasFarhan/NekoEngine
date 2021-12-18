@@ -146,7 +146,6 @@ private:
     void LoadTexture() override;
     void DecompressTexture() override;
     void UploadToGL() override;
-    float* hdrImageData = nullptr;
     float* imageData_ = nullptr;
     int channelNmb_ = 0;
 };

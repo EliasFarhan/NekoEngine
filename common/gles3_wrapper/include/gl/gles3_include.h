@@ -27,7 +27,7 @@
 #include <emscripten.h>
 #include <GLES3/gl3.h>
 #else
-#include <gl/glew.h>
+#include <GL/glew.h>
 #define GL_GLEXT_PROTOTYPES 1
 #endif
 

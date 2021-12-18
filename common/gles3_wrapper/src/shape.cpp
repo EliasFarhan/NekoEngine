@@ -112,6 +112,7 @@ void RenderQuad::Draw() const
 {
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glCheckError();
 }
 
 void RenderQuad::Destroy()
@@ -307,6 +308,7 @@ void RenderCuboid::Draw() const
 {
 	glBindVertexArray(VAO);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
+    glCheckError();
 }
 
 void RenderCuboid::Destroy()
@@ -437,6 +439,7 @@ void RenderSphere::Draw() const
 {
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLE_STRIP, static_cast<GLsizei>(indexCount_), GL_UNSIGNED_INT, 0);
+    glCheckError();
 }
 
 void RenderSphere::Destroy()
@@ -497,6 +500,7 @@ void RenderCircle::Draw() const
 {
 	glBindVertexArray(VAO);
 	glDrawArrays(GL_TRIANGLE_FAN, 0, resolution + 2);
+    glCheckError();
 }
 
 void RenderCircle::Destroy()

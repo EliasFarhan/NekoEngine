@@ -55,7 +55,7 @@ void Shader::LoadFromFile(const std::string_view vertexShaderPath, const std::st
     }
 
     shaderProgram_ = CreateShaderProgram(vertexShader, fragmentShader);
-    if(shaderProgram_ == 0)
+    if(shaderProgram_ == INVALID_PROGRAM)
     {
         logError(fmt::format("Loading shader program with vertex: {} and fragment {}",
                              vertexShaderPath, fragmentShaderPath));

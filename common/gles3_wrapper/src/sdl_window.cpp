@@ -149,8 +149,9 @@ void Gles3Window::SwapBuffer()
 #ifdef TRACY_ENABLE
 	ZoneScoped;
 #endif
+    glCheckError();
 	SDL_GL_SwapWindow(window_);
-	
+    glCheckError();
 }
 
 void Gles3Window::Destroy()
@@ -181,7 +182,7 @@ void Gles3Window::RenderUi()
 #endif
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
+    glCheckError();
 }
 
 void Gles3Window::OnResize(Vec2u newWindowSize)

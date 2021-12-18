@@ -1,4 +1,6 @@
-
+find_package(nlohmann_json CONFIG REQUIRED)
 add_executable(image_format image_format.cpp)
-target_include_directories(image_format PUBLIC ${UTILITIES_DIR})
+find_path(STB_INCLUDE_DIRS "stb.h")
+target_link_libraries(image_format PRIVATE nlohmann_json nlohmann_json::nlohmann_json)
+target_include_directories(image_format PUBLIC ${UTILITIES_DIR} ${STB_INCLUDE_DIRS})
 set_target_properties (image_format PROPERTIES FOLDER Neko/Tools)
