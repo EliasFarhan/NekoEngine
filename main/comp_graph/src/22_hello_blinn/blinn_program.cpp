@@ -30,16 +30,16 @@ namespace neko
 void HelloBlinnProgram::Init()
 {
     const auto& config = BasicEngine::GetInstance()->GetConfig();
-    modelShader_.LoadFromFile(config.dataRootPath + "shaders/22_hello_blinn/model.vert",
-        config.dataRootPath + "shaders/22_hello_blinn/model.frag");
-    blinnShader_.LoadFromFile(config.dataRootPath + "shaders/22_hello_blinn/model.vert",
-        config.dataRootPath + "shaders/22_hello_blinn/model_blinn.frag");
+    modelShader_.LoadFromFile(config.data_root() + "shaders/22_hello_blinn/model.vert",
+        config.data_root() + "shaders/22_hello_blinn/model.frag");
+    blinnShader_.LoadFromFile(config.data_root() + "shaders/22_hello_blinn/model.vert",
+        config.data_root() + "shaders/22_hello_blinn/model_blinn.frag");
     floor_.Init();
     floorTextureId_ = textureManager_.LoadTexture(
-        config.dataRootPath + "sprites/brickwall/brickwall.jpg",
+        config.data_root() + "sprites/brickwall/brickwall.jpg",
         gl::Texture::TextureFlags(gl::Texture::REPEAT_WRAP | gl::Texture::DEFAULT));
 
-    modelId_ = modelManager_.LoadModel(config.dataRootPath + "model/nanosuit2/nanosuit.obj");
+    modelId_ = modelManager_.LoadModel(config.data_root() + "model/nanosuit2/nanosuit.obj");
 
     camera_.position = Vec3f(0.0f, 3.0f, 3.0f);
     camera_.WorldLookAt(Vec3f::zero);
@@ -48,9 +48,9 @@ void HelloBlinnProgram::Init()
 
 void HelloBlinnProgram::Update(seconds dt)
 {
-    std::lock_guard<std::mutex> lock(updateMutex_);
-    const auto& config = BasicEngine::GetInstance()->GetConfig();
-    camera_.SetAspect(config.windowSize.x, config.windowSize.y);
+    std::lock_guard lock(updateMutex_);
+    const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
+    camera_.SetAspect(windowSize.x, windowSize.y);
     camera_.Update(dt);
     dt_ += dt.count();
     lightPos_ = Vec3f(3.0f * Cos(radian_t(dt_)), 3.0f, 3.0f * Sin(radian_t(dt_)));

@@ -319,7 +319,7 @@ TextureId TextureManager::LoadTexture(std::string_view path, Texture::TextureFla
     const auto& config = BasicEngine::GetInstance()->GetConfig();
     auto textureLoader = std::make_unique<KtxTextureLoader>(
 
-        config.dataRootPath + ktxPath,
+        config.data_root() + ktxPath,
         textureId,
         flags
         );

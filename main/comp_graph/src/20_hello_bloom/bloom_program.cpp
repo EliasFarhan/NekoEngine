@@ -34,21 +34,21 @@ void HelloBloomProgram::Init()
     textureManager_.Init();
 	const auto& config = BasicEngine::GetInstance()->GetConfig();
     cubeShader_.LoadFromFile(
-            config.dataRootPath + "shaders/20_hello_bloom/cube.vert",
-            config.dataRootPath + "shaders/20_hello_bloom/cube.frag");
+            config.data_root() + "shaders/20_hello_bloom/cube.vert",
+            config.data_root() + "shaders/20_hello_bloom/cube.frag");
     lightShader_.LoadFromFile(
-            config.dataRootPath + "shaders/20_hello_bloom/cube.vert",
-            config.dataRootPath + "shaders/20_hello_bloom/light_cube.frag");
+            config.data_root() + "shaders/20_hello_bloom/cube.vert",
+            config.data_root() + "shaders/20_hello_bloom/light_cube.frag");
     blurShader_.LoadFromFile(
-            config.dataRootPath + "shaders/20_hello_bloom/blur.vert",
-            config.dataRootPath + "shaders/20_hello_bloom/blur.frag");
+            config.data_root() + "shaders/20_hello_bloom/blur.vert",
+            config.data_root() + "shaders/20_hello_bloom/blur.frag");
     bloomShader_.LoadFromFile(
-            config.dataRootPath + "shaders/20_hello_bloom/bloom.vert",
-            config.dataRootPath + "shaders/20_hello_bloom/bloom.frag");
+            config.data_root() + "shaders/20_hello_bloom/bloom.vert",
+            config.data_root() + "shaders/20_hello_bloom/bloom.frag");
 
 	cube_.Init();
     cubeTextureId_ = textureManager_.LoadTexture(
-        config.dataRootPath + "sprites/container.jpg",
+        config.data_root() + "sprites/container.jpg",
         gl::Texture::TextureFlags(gl::Texture::REPEAT_WRAP | gl::Texture::SMOOTH_TEXTURE | gl::Texture::GAMMA_CORRECTION));
 
 
@@ -63,8 +63,8 @@ void HelloBloomProgram::Init()
 void HelloBloomProgram::Update(seconds dt)
 {
 	std::lock_guard<std::mutex> lock(updateMutex_);
-	const auto& config = BasicEngine::GetInstance()->GetConfig();
-	camera_.SetAspect(config.windowSize.x, config.windowSize.y);
+	const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
+	camera_.SetAspect(windowSize.x, windowSize.y);
 	camera_.Update(dt);
 	textureManager_.Update(dt);
 }
@@ -195,7 +195,7 @@ void HelloBloomProgram::Render()
 
 void HelloBloomProgram::CreateFramebuffer()
 {
-    const auto& config = BasicEngine::GetInstance()->GetConfig();
+    const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
     // configure (floating point) framebuffers
     // ---------------------------------------
 
@@ -207,7 +207,7 @@ void HelloBloomProgram::CreateFramebuffer()
     for (unsigned int i = 0; i < 2; i++)
     {
         glBindTexture(GL_TEXTURE_2D, colorBuffers_[i]);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, config.windowSize.x, config.windowSize.y, 0, GL_RGBA, GL_FLOAT, NULL);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, windowSize.x, windowSize.y, 0, GL_RGBA, GL_FLOAT, NULL);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);  // we clamp to the edge as the blur filter would otherwise sample repeated texture values!
@@ -220,7 +220,7 @@ void HelloBloomProgram::CreateFramebuffer()
 
     glGenRenderbuffers(1, &rbo_);
     glBindRenderbuffer(GL_RENDERBUFFER, rbo_);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, config.windowSize.x, config.windowSize.y);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, windowSize.x, windowSize.y);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo_);
     // tell OpenGL which color attachments we'll use (of this framebuffer) for rendering 
     unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
@@ -236,7 +236,7 @@ void HelloBloomProgram::CreateFramebuffer()
     {
         glBindFramebuffer(GL_FRAMEBUFFER, pingpongFbo_[i]);
         glBindTexture(GL_TEXTURE_2D, pingpongColorBuffers_[i]);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, config.windowSize.x, config.windowSize.y, 0, GL_RGBA, GL_FLOAT, NULL);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, windowSize.x, windowSize.y, 0, GL_RGBA, GL_FLOAT, NULL);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); // we clamp to the edge as the blur filter would otherwise sample repeated texture values!

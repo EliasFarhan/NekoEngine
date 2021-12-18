@@ -52,17 +52,17 @@ void HelloSsaoProgram::Init()
     glCheckError();
 
     ssaoBlurShader_.LoadFromFile(
-        config.dataRootPath + "shaders/26_hello_ssao/ssao.vert",
-        config.dataRootPath + "shaders/26_hello_ssao/ssao_blur.frag");
+        config.data_root() + "shaders/26_hello_ssao/ssao.vert",
+        config.data_root() + "shaders/26_hello_ssao/ssao_blur.frag");
     ssaoShader_.LoadFromFile(
-        config.dataRootPath + "shaders/26_hello_ssao/ssao.vert",
-        config.dataRootPath + "shaders/26_hello_ssao/ssao.frag");
+        config.data_root() + "shaders/26_hello_ssao/ssao.vert",
+        config.data_root() + "shaders/26_hello_ssao/ssao.frag");
     ssaoGeometryShader_.LoadFromFile(
-        config.dataRootPath + "shaders/26_hello_ssao/ssao_geometry.vert",
-        config.dataRootPath + "shaders/26_hello_ssao/ssao_geometry.frag");
+        config.data_root() + "shaders/26_hello_ssao/ssao_geometry.vert",
+        config.data_root() + "shaders/26_hello_ssao/ssao_geometry.frag");
     ssaoLightingShader_.LoadFromFile(
-        config.dataRootPath + "shaders/26_hello_ssao/ssao.vert",
-        config.dataRootPath + "shaders/26_hello_ssao/ssao_lighting.frag");
+        config.data_root() + "shaders/26_hello_ssao/ssao.vert",
+        config.data_root() + "shaders/26_hello_ssao/ssao_lighting.frag");
     // generate sample kernel
     ssaoKernel_.clear();
     ssaoKernel_.reserve(maxKernelSize_);
@@ -99,7 +99,7 @@ void HelloSsaoProgram::Init()
     glCheckError();
     plane_.Init();
     screenPlane_.Init();
-    modelId_ = modelManager_.LoadModel(config.dataRootPath + "model/nanosuit2/nanosuit.obj");
+    modelId_ = modelManager_.LoadModel(config.data_root() + "model/nanosuit2/nanosuit.obj");
     glCheckError();
     camera_.Init();
 }
@@ -107,8 +107,8 @@ void HelloSsaoProgram::Init()
 void HelloSsaoProgram::Update(seconds dt)
 {
     std::lock_guard<std::mutex> lock(updateMutex_);
-    const auto& config = BasicEngine::GetInstance()->GetConfig();
-    camera_.SetAspect(config.windowSize.x, config.windowSize.y);
+    const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
+    camera_.SetAspect(windowSize.x, windowSize.y);
     camera_.Update(dt);
 }
 
@@ -262,7 +262,7 @@ void HelloSsaoProgram::DestroyFramebuffer()
 
 void HelloSsaoProgram::CreateFramebuffer()
 {
-    const auto& config = BasicEngine::GetInstance()->GetConfig();
+    const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
     glCheckError();
     glGenFramebuffers(1, &gBuffer_);
     glBindFramebuffer(GL_FRAMEBUFFER, gBuffer_);
@@ -270,7 +270,7 @@ void HelloSsaoProgram::CreateFramebuffer()
     // - position color buffer
     glGenTextures(1, &gPosition_);
     glBindTexture(GL_TEXTURE_2D, gPosition_);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, config.windowSize.x, config.windowSize.y, 0, GL_RGBA, GL_FLOAT, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, windowSize.x, windowSize.y, 0, GL_RGBA, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gPosition_, 0);
@@ -278,7 +278,7 @@ void HelloSsaoProgram::CreateFramebuffer()
     // - normal color buffer
     glGenTextures(1, &gNormal_);
     glBindTexture(GL_TEXTURE_2D, gNormal_);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, config.windowSize.x, config.windowSize.y, 0, GL_RGBA, GL_FLOAT, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, windowSize.x, windowSize.y, 0, GL_RGBA, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gNormal_, 0);
@@ -286,7 +286,7 @@ void HelloSsaoProgram::CreateFramebuffer()
     // - color + specular color buffer
     glGenTextures(1, &gAlbedoSpec_);
     glBindTexture(GL_TEXTURE_2D, gAlbedoSpec_);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, config.windowSize.x, config.windowSize.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, windowSize.x, windowSize.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, gAlbedoSpec_, 0);
@@ -297,7 +297,7 @@ void HelloSsaoProgram::CreateFramebuffer()
 
     glGenRenderbuffers(1, &rbo_);
     glBindRenderbuffer(GL_RENDERBUFFER, rbo_);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, config.windowSize.x, config.windowSize.y);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, windowSize.x, windowSize.y);
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
     //Bind depth-stencil RBO to screen FBO
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo_);
@@ -315,7 +315,7 @@ void HelloSsaoProgram::CreateFramebuffer()
     // SSAO color buffer
     glGenTextures(1, &ssaoColorBuffer_);
     glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer_);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, config.windowSize.x, config.windowSize.y, 0, GL_RED, GL_FLOAT, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, windowSize.x, windowSize.y, 0, GL_RED, GL_FLOAT, NULL);
     glCheckError();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -328,7 +328,7 @@ void HelloSsaoProgram::CreateFramebuffer()
     glBindFramebuffer(GL_FRAMEBUFFER, ssaoBlurFbo_);
     glGenTextures(1, &ssaoColorBufferBlur_);
     glBindTexture(GL_TEXTURE_2D, ssaoColorBufferBlur_);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, config.windowSize.x, config.windowSize.y, 0, GL_RED, GL_FLOAT, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, windowSize.x, windowSize.y, 0, GL_RED, GL_FLOAT, NULL);
     glCheckError();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);

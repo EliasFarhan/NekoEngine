@@ -45,15 +45,11 @@ namespace neko
 {
 BasicEngine* BasicEngine::instance_ = nullptr;
 
-BasicEngine::BasicEngine(const FilesystemInterface& filesystem, std::optional<Configuration> config) :
+BasicEngine::BasicEngine(const FilesystemInterface& filesystem) :
     filesystem_(filesystem)
 {
     instance_ = this;
-    if (config.has_value())
-    {
-        config_ = config.value();
-    }
-
+    config_ = GenerateDefaultConfig();
     workerManagerPb_ = WorkerManager::CreateWorkerManagerDefinition();
     
 }
@@ -233,9 +229,28 @@ void BasicEngine::ScheduleTask(const std::shared_ptr<Task>& task, std::string_vi
     workerManager_.AddTask(task, queueName);
 }
 
-const Configuration& BasicEngine::GetConfig()
+Vec2u BasicEngine::GetWindowSize() const
 {
-    return config_;
+    if (window_ == nullptr)
+        return {};
+    return window_->GetWindowSize();
+}
+
+void BasicEngine::SetWindowSize(Vec2u windowSize) const
+{
+    if (window_ != nullptr)
+        window_->SetWindowSize(windowSize);
+}
+
+core::pb::Config BasicEngine::GenerateDefaultConfig()
+{
+    core::pb::Config config;
+    config.set_vertical_sync(true);
+    config.set_window_size_x(1024);
+    config.set_window_size_y(1024);
+    *config.mutable_window_name() = "NekoEngine 1.0";
+    *config.mutable_data_root() = "data/";
+    return config;
 }
 
 const FilesystemInterface& BasicEngine::GetFilesystem() const

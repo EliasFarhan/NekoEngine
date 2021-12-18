@@ -92,7 +92,7 @@ void Gles3Window::Init()
 	glRenderContext_ = SDL_GL_CreateContext(window_);
 	MakeCurrentContext();
 #ifndef __EMSCRIPTEN__
-	SDL_GL_SetSwapInterval(config.flags & Configuration::VSYNC ? 1 : 0);
+	SDL_GL_SetSwapInterval(config.vertical_sync() ? 1 : 0);
 
 	if (GLEW_OK != glewInit())
 	{

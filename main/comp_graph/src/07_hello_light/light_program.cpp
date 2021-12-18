@@ -33,11 +33,11 @@ void HelloLightProgram::Init()
 	cube_.Init();
 	const auto config =  BasicEngine::GetInstance()->GetConfig();
     lightShader_.LoadFromFile(
-            config.dataRootPath + "shaders/07_hello_light/lamp.vert",
-            config.dataRootPath + "shaders/07_hello_light/lamp.frag");
+            config.data_root() + "shaders/07_hello_light/lamp.vert",
+            config.data_root() + "shaders/07_hello_light/lamp.frag");
     phongShader_.LoadFromFile(
-            config.dataRootPath + "shaders/07_hello_light/light.vert",
-            config.dataRootPath + "shaders/07_hello_light/light.frag");
+            config.data_root() + "shaders/07_hello_light/light.vert",
+            config.data_root() + "shaders/07_hello_light/light.frag");
 }
 
 void HelloLightProgram::Update(seconds dt)
@@ -48,8 +48,8 @@ void HelloLightProgram::Update(seconds dt)
 		Cos(radian_t(time_)),
 		0.0f,
 		Sin(radian_t(time_)))* lightDist_;
-	const auto& config = BasicEngine::GetInstance()->GetConfig();
-	camera_.SetAspect(config.windowSize.x, config.windowSize.y);;
+	const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
+	camera_.SetAspect(windowSize.x, windowSize.y);;
 	camera_.Update(dt);
 }
 

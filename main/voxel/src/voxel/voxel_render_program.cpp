@@ -46,20 +46,20 @@ void VoxelRenderProgram::Init()
     glEnable(GL_CULL_FACE);
 
     const auto& config = BasicEngine::GetInstance()->GetConfig();
-    cubeShader_.LoadFromFile(config.dataRootPath+"shaders/voxel/cube.vert",
-                             config.dataRootPath+"shaders/voxel/cube.frag");
+    cubeShader_.LoadFromFile(config.data_root()+"shaders/voxel/cube.vert",
+                             config.data_root()+"shaders/voxel/cube.frag");
     skyboxShader_.LoadFromFile(
-        config.dataRootPath + "shaders/voxel/skybox.vert", 
-        config.dataRootPath + "shaders/voxel/skybox.frag");
+        config.data_root() + "shaders/voxel/skybox.vert", 
+        config.data_root() + "shaders/voxel/skybox.frag");
     const auto& filesystem = BasicEngine::GetInstance()->GetFilesystem();
-    tilesheetTexture_ = gl::CreateTextureFromKTX(config.dataRootPath+"sprites/tilesheet.png.ktx", filesystem);
+    tilesheetTexture_ = gl::CreateTextureFromKTX(config.data_root()+"sprites/tilesheet.png.ktx", filesystem);
     glBindTexture(GL_TEXTURE_2D, tilesheetTexture_);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    skyboxTexture_ = gl::CreateTextureFromKTX(config.dataRootPath + "skybox/skybox.skybox.ktx", filesystem);
+    skyboxTexture_ = gl::CreateTextureFromKTX(config.data_root() + "skybox/skybox.skybox.ktx", filesystem);
 
     struct Vertex
     {

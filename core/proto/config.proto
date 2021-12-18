@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package core.pb;
+
+message Config
+{
+    string window_name = 1;
+    int32 window_size_x = 2;
+    int32 window_size_y = 3;
+    int32 framerate_limit = 4;
+    bool fullscreen = 5;
+    bool vertical_sync = 6;
+    string data_root = 7;
+}

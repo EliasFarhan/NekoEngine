@@ -42,14 +42,14 @@ TEST(Engine, TestAssetImport)
 {
 	neko::Configuration config;
 	neko::Filesystem filesystem;
-	config.dataRootPath = "../";
+	config.data_root() = "../";
 	std::vector<std::string> filenames =
 	{
-		config.dataRootPath+"data/sprites/platform.jpg",
-		config.dataRootPath+"data/sprites/wall.jpg",
-		config.dataRootPath+"data/sprites/icons/icons8-road-48.png",
-		config.dataRootPath+"fake/path/file.png",
-		config.dataRootPath+"other/fake/path/file.png",
+		config.data_root()+"data/sprites/platform.jpg",
+		config.data_root()+"data/sprites/wall.jpg",
+		config.data_root()+"data/sprites/icons/icons8-road-48.png",
+		config.data_root()+"fake/path/file.png",
+		config.data_root()+"other/fake/path/file.png",
 	};
 	std::vector<xxh::hash_t<64>> fileHashes;
 	fileHashes.reserve(filenames.size());

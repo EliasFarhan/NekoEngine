@@ -41,26 +41,26 @@ void HelloLightCastersProgram::Init()
 
 	const auto& config = BasicEngine::GetInstance()->GetConfig();
 	const auto& filesystem = BasicEngine::GetInstance()->GetFilesystem();
-	containerDiffuse_ = gl::StbCreateTexture(config.dataRootPath + "material/container2.png",
+	containerDiffuse_ = gl::StbCreateTexture(config.data_root() + "material/container2.png",
                                           filesystem);
-	containerSpecular_ = gl::StbCreateTexture(config.dataRootPath + "material/container2_specular.png",
+	containerSpecular_ = gl::StbCreateTexture(config.data_root() + "material/container2_specular.png",
                                               filesystem);
     containerShaders_[0].LoadFromFile(
-            config.dataRootPath + "shaders/09_hello_lightcasters/container.vert",
-            config.dataRootPath + "shaders/09_hello_lightcasters/container_directional.frag");
+            config.data_root() + "shaders/09_hello_lightcasters/container.vert",
+            config.data_root() + "shaders/09_hello_lightcasters/container_directional.frag");
     containerShaders_[1].LoadFromFile(
-            config.dataRootPath + "shaders/09_hello_lightcasters/container.vert",
-            config.dataRootPath + "shaders/09_hello_lightcasters/container_point.frag");
+            config.data_root() + "shaders/09_hello_lightcasters/container.vert",
+            config.data_root() + "shaders/09_hello_lightcasters/container_point.frag");
     containerShaders_[2].LoadFromFile(
-            config.dataRootPath + "shaders/09_hello_lightcasters/container.vert",
-            config.dataRootPath + "shaders/09_hello_lightcasters/container_flash.frag");
+            config.data_root() + "shaders/09_hello_lightcasters/container.vert",
+            config.data_root() + "shaders/09_hello_lightcasters/container_flash.frag");
     containerShaders_[3].LoadFromFile(
-            config.dataRootPath + "shaders/09_hello_lightcasters/container.vert",
-            config.dataRootPath + "shaders/09_hello_lightcasters/container_spot.frag");
+            config.data_root() + "shaders/09_hello_lightcasters/container.vert",
+            config.data_root() + "shaders/09_hello_lightcasters/container_spot.frag");
 
     lampShader_.LoadFromFile(
-            config.dataRootPath + "shaders/07_hello_light/lamp.vert",
-            config.dataRootPath + "shaders/07_hello_light/lamp.frag");
+            config.data_root() + "shaders/07_hello_light/lamp.vert",
+            config.data_root() + "shaders/07_hello_light/lamp.frag");
 	cube_.Init();
 	camera_.Init();
 	camera_.position = Vec3f(15.0f, 12.0f, -14.0f);
@@ -76,8 +76,8 @@ void HelloLightCastersProgram::Update(seconds dt)
 		Cos(radian_t(time_)),
 		0.0f,
 		Sin(radian_t(time_))) * lightDist_;
-	const auto& config = BasicEngine::GetInstance()->GetConfig();
-	camera_.SetAspect(config.windowSize.x, config.windowSize.y);;
+	const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
+	camera_.SetAspect(windowSize.x, windowSize.y);;
 	camera_.Update(dt);
 }
 

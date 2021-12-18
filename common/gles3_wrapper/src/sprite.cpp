@@ -62,8 +62,8 @@ void SpriteManagerInterface::Update([[maybe_unused]]neko::seconds dt)
 void SpriteManager::Init()
 {
     const auto& config = BasicEngine::GetInstance()->GetConfig();
-    spriteShader_.LoadFromFile(config.dataRootPath + "shaders/engine/sprite.vert",
-        config.dataRootPath + "shaders/engine/sprite.frag");
+    spriteShader_.LoadFromFile(config.data_root() + "shaders/engine/sprite.vert",
+        config.data_root() + "shaders/engine/sprite.frag");
     spriteQuad_.Init();
 }
 

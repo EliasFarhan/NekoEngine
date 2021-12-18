@@ -29,7 +29,9 @@ namespace neko
 {
 void HelloDepthProgram::Init()
 {
-	const auto& config = BasicEngine::GetInstance()->GetConfig();
+	const auto* engine = BasicEngine::GetInstance();
+	const auto& config = engine->GetConfig();
+	const auto windowSize = engine->GetWindowSize();
 	cube_.Init();
 	floor_.Init();
 	screenPlane_.Init();
@@ -39,7 +41,7 @@ void HelloDepthProgram::Init()
 	
 	glGenTextures(1, &screenTexture_);
 	glBindTexture(GL_TEXTURE_2D, screenTexture_);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, config.windowSize.x, config.windowSize.y, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, windowSize.x, windowSize.y, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture_, 0);
@@ -47,7 +49,7 @@ void HelloDepthProgram::Init()
 	
 	glGenTextures(1, &depthTexture_);
 	glBindTexture(GL_TEXTURE_2D, depthTexture_);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, config.windowSize.x, config.windowSize.y, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, windowSize.x, windowSize.y, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, depthTexture_, 0);
@@ -56,12 +58,12 @@ void HelloDepthProgram::Init()
 	glCheckFramebuffer();
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    sceneShader_.LoadFromFile(config.dataRootPath + "shaders/99_hello_scene/cube.vert",
-                              config.dataRootPath + "shaders/99_hello_scene/cube.frag");
-    screenShader_.LoadFromFile(config.dataRootPath + "shaders/13_hello_depth/screen.vert",
-                               config.dataRootPath + "shaders/13_hello_depth/screen.frag");
-    depthOnlyShader_.LoadFromFile(config.dataRootPath + "shaders/13_hello_depth/screen.vert",
-                                  config.dataRootPath + "shaders/13_hello_depth/screen_depth.frag");
+    sceneShader_.LoadFromFile(config.data_root() + "shaders/99_hello_scene/cube.vert",
+                              config.data_root() + "shaders/99_hello_scene/cube.frag");
+    screenShader_.LoadFromFile(config.data_root() + "shaders/13_hello_depth/screen.vert",
+                               config.data_root() + "shaders/13_hello_depth/screen.frag");
+    depthOnlyShader_.LoadFromFile(config.data_root() + "shaders/13_hello_depth/screen.vert",
+                                  config.data_root() + "shaders/13_hello_depth/screen_depth.frag");
 	camera_.position = Vec3f(0, 4, 4);
 	camera_.WorldLookAt(Vec3f::zero);
 }

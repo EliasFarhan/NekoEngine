@@ -60,14 +60,14 @@ void HelloFrustumProgram::Init()
     TracyCZoneEnd(pos);
 #endif
     const auto& config = BasicEngine::GetInstance()->GetConfig();
-    modelId_ = modelManager_.LoadModel(config.dataRootPath + "model/rock/rock.obj");
+    modelId_ = modelManager_.LoadModel(config.data_root() + "model/rock/rock.obj");
 
 
     vertexInstancingDrawShader_.LoadFromFile(
-            config.dataRootPath + "shaders/17_hello_frustum/asteroid_vertex_instancing.vert",
-            config.dataRootPath + "shaders/17_hello_frustum/asteroid.frag");
-    screenShader_.LoadFromFile(config.dataRootPath + "shaders/17_hello_frustum/screen.vert",
-                               config.dataRootPath + "shaders/17_hello_frustum/screen.frag");
+            config.data_root() + "shaders/17_hello_frustum/asteroid_vertex_instancing.vert",
+            config.data_root() + "shaders/17_hello_frustum/asteroid.frag");
+    screenShader_.LoadFromFile(config.data_root() + "shaders/17_hello_frustum/screen.vert",
+                               config.data_root() + "shaders/17_hello_frustum/screen.frag");
 
     camera_.position = Vec3f(0.0f, 600.0f, -500.0f);
     camera_.farPlane = 1'000.0f;
@@ -115,9 +115,8 @@ void HelloFrustumProgram::Update(seconds dt)
 
     std::lock_guard<std::mutex> lock(updateMutex_);
     dt_ = dt.count();
-    auto* engine = BasicEngine::GetInstance();
-    const auto& config = BasicEngine::GetInstance()->GetConfig();
-    camera_.SetAspect(config.windowSize.x, config.windowSize.y);
+    const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
+    camera_.SetAspect(windowSize.x, windowSize.y);
     camera_.Update(dt);
     //Kicking the velocity calculus for force and velocities
     if (!modelManager_.IsLoaded(modelId_))
@@ -246,8 +245,8 @@ void HelloFrustumProgram::Render()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    const auto& config = BasicEngine::GetInstance()->GetConfig();
-    glViewport(0, 0, config.windowSize.x, config.windowSize.y);
+    const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
+    glViewport(0, 0, windowSize.x, windowSize.y);
     vertexInstancingDrawShader_.SetMat4("view", camera_.GenerateViewMatrix());
     vertexInstancingDrawShader_.SetMat4("projection", camera_.GenerateProjectionMatrix());
     drawAsteroids();

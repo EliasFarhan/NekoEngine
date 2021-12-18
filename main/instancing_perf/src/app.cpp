@@ -128,10 +128,10 @@ void PerfApp::InitGraphics()
     logDebug("Init graphics");
     const auto& config = BasicEngine::GetInstance()->GetConfig();
     instanceShader_.LoadFromFile(
-        config.dataRootPath+"shaders/sphere.vert",
-        config.dataRootPath+"shaders/sphere.frag");
+        config.data_root()+"shaders/sphere.vert",
+        config.data_root()+"shaders/sphere.frag");
     texture_ = gl::CreateTextureFromKTX(
-        config.dataRootPath + "textures/wall.jpg.ktx", 
+        config.data_root() + "textures/wall.jpg.ktx", 
         BasicEngine::GetInstance()->GetFilesystem());
     ReloadSample(minInstanceNmb, minSegmentNmb);
 

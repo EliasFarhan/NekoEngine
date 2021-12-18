@@ -34,13 +34,13 @@ void HelloModelProgram::Init()
     textureManager_.Init();
     const auto& config = BasicEngine::GetInstance()->GetConfig();
 
-    const std::string path = config.dataRootPath + "model/nanosuit2/nanosuit.obj";
+    const std::string path = config.data_root() + "model/nanosuit2/nanosuit.obj";
     glCheckError();
     modelId_ = modelManager_.LoadModel(path);
     camera_.Init();
     shader_.LoadFromFile(
-        config.dataRootPath + "shaders/06_hello_model/model.vert",
-        config.dataRootPath + "shaders/06_hello_model/model.frag");
+        config.data_root() + "shaders/06_hello_model/model.vert",
+        config.data_root() + "shaders/06_hello_model/model.frag");
 
     glCheckError();
 
@@ -51,11 +51,11 @@ void HelloModelProgram::Update(seconds dt)
     std::lock_guard<std::mutex> lock(updateMutex_);
 
     camera_.Update(dt);
-    const auto& config = BasicEngine::GetInstance()->GetConfig();
+    const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
 
     projection_ = Transform3d::Perspective(
         degree_t(45.0f),
-        static_cast<float>(config.windowSize.x) / config.windowSize.y,
+        static_cast<float>(windowSize.x) / windowSize.y,
         0.1f,
         100.0f);
     textureManager_.Update(dt);

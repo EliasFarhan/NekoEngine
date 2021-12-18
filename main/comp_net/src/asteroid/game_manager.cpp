@@ -158,7 +158,7 @@ void ClientGameManager::Init()
     fontManager_.Init();
 
     const auto& config = BasicEngine::GetInstance()->GetConfig();
-    fontId_ = fontManager_.LoadFont(config.dataRootPath + "font/8-bit-hud.ttf", 36);
+    fontId_ = fontManager_.LoadFont(config.data_root() + "font/8-bit-hud.ttf", 36);
 
     GameManager::Init();
 }
@@ -302,7 +302,7 @@ void ClientGameManager::SpawnPlayer(net::PlayerNumber playerNumber, Vec2f positi
     const auto& config = BasicEngine::GetInstance()->GetConfig();
     if (shipTextureId_ == gl::INVALID_TEXTURE_ID)
     {
-        shipTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/asteroid/ship.png", gl::Texture::DEFAULT);
+        shipTextureId_ = textureManager_.LoadTexture(config.data_root() + "sprites/asteroid/ship.png", gl::Texture::DEFAULT);
     }
     spriteManager_.AddComponent(entity);
     spriteManager_.SetTexture(entity, shipTextureId_);
@@ -318,7 +318,7 @@ Entity ClientGameManager::SpawnBullet(net::PlayerNumber playerNumber, Vec2f posi
     const auto& config = BasicEngine::GetInstance()->GetConfig();
     if (bulletTextureId_ == gl::INVALID_TEXTURE_ID)
     {
-        bulletTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/asteroid/bullet.png",
+        bulletTextureId_ = textureManager_.LoadTexture(config.data_root() + "sprites/asteroid/bullet.png",
                                                        gl::Texture::DEFAULT);
     }
     spriteManager_.AddComponent(entity);

@@ -32,14 +32,14 @@ namespace neko
 		textureManager_.Init();
 		const auto& config = BasicEngine::GetInstance()->GetConfig();
 		cutoffShader_.LoadFromFile(
-			config.dataRootPath + "shaders/27_hello_cutoff/cutoff.vert",
-			config.dataRootPath + "shaders/27_hello_cutoff/cutoff.frag");
+			config.data_root() + "shaders/27_hello_cutoff/cutoff.vert",
+			config.data_root() + "shaders/27_hello_cutoff/cutoff.frag");
 		camera_.Init();
 		grassTextureId_ = textureManager_.LoadTexture(
-			config.dataRootPath + "sprites/grass.png",
+			config.data_root() + "sprites/grass.png",
 			static_cast<gl::Texture::TextureFlags>(gl::Texture::CLAMP_WRAP));
 		
-		cubeTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/container.jpg", gl::Texture::DEFAULT);
+		cubeTextureId_ = textureManager_.LoadTexture(config.data_root() + "sprites/container.jpg", gl::Texture::DEFAULT);
 
 
 		plane_.Init();
@@ -58,9 +58,9 @@ namespace neko
 
 	void HelloCutoffProgram::Update(seconds dt)
 	{
-		std::lock_guard<std::mutex> lock(updateMutex_);
-		const auto& config = BasicEngine::GetInstance()->GetConfig();
-		camera_.SetAspect(config.windowSize.x, config.windowSize.y);
+		std::lock_guard lock(updateMutex_);
+		const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
+		camera_.SetAspect(windowSize.x, windowSize.y);
 		camera_.Update(dt);	textureManager_.Update(dt);
 	}
 

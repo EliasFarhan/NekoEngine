@@ -46,8 +46,8 @@ void LineRenderer::Init()
 
 	const auto& config = BasicEngine::GetInstance()->GetConfig();
     lineShader_.LoadFromFile(
-            config.dataRootPath + "shaders/engine/line.vert",
-            config.dataRootPath + "shaders/engine/line.frag");
+            config.data_root() + "shaders/engine/line.vert",
+            config.data_root() + "shaders/engine/line.frag");
 }
 
 void LineRenderer::Render()

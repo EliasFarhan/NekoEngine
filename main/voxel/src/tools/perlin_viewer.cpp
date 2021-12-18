@@ -38,8 +38,8 @@ void PerlinViewer::Init()
     Job renderInit([this]()
     {
         const auto& config = BasicEngine::GetInstance()->GetConfig();
-        viewerShader_.LoadFromFile(config.dataRootPath+"shaders/tools/perlin_viewer.vert",
-                                   config.dataRootPath+"shaders/tools/perlin_viewer.frag");
+        viewerShader_.LoadFromFile(config.data_root()+"shaders/tools/perlin_viewer.vert",
+                                   config.data_root()+"shaders/tools/perlin_viewer.frag");
         renderQuad_.Init();
         ReloadTexture();
 

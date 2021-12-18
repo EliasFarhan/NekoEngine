@@ -26,8 +26,8 @@
 
 namespace neko
 {
-CompGraphEngine::CompGraphEngine(const FilesystemInterface& filesystem, std::optional<Configuration> config) :
-    SdlEngine(filesystem, config)
+CompGraphEngine::CompGraphEngine(const FilesystemInterface& filesystem) :
+    SdlEngine(filesystem)
 {
     RegisterSystem(sampleBrowser_);
     RegisterOnDrawUi(sampleBrowser_);

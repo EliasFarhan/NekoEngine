@@ -36,11 +36,11 @@ void HelloTextureProgram::Init()
     const auto& config = BasicEngine::GetInstance()->GetConfig();
     const auto& filesystem = BasicEngine::GetInstance()->GetFilesystem();
     shader_.LoadFromFile(
-            config.dataRootPath + "shaders/02_hello_texture/texture.vert",
-            config.dataRootPath + "shaders/02_hello_texture/texture.frag");
+            config.data_root() + "shaders/02_hello_texture/texture.vert",
+            config.data_root() + "shaders/02_hello_texture/texture.frag");
     quad_.Init();
 
-    const auto texturePath = config.dataRootPath + "sprites/wall.jpg";
+    const auto texturePath = config.data_root() + "sprites/wall.jpg";
     textureId_ = textureManager_.LoadTexture(texturePath, gl::Texture::DEFAULT);
     texture_ = gl::StbCreateTexture(texturePath, filesystem, gl::Texture::DEFAULT);
 	//textureId_ = neko::gl::stbCreateTexture(texturePath);

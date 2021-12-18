@@ -12,7 +12,7 @@ void HelloMaterialProgram::Init()
 {
     const auto& config = BasicEngine::GetInstance()->GetConfig();
     quad_.Init();
-    material_.LoadFromFile(config.dataRootPath+"material/test.mat");
+    material_.LoadFromFile(config.data_root()+"material/test.mat");
 }
 
 void HelloMaterialProgram::Update(seconds dt)

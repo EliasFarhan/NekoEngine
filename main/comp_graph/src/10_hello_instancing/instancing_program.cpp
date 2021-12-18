@@ -59,16 +59,16 @@ void HelloInstancingProgram::Init()
     TracyCZoneEnd(pos);
 #endif
     const auto& config = BasicEngine::GetInstance()->GetConfig();
-    modelId_ = modelManager_.LoadModel(config.dataRootPath + "model/rock/rock.obj");
+    modelId_ = modelManager_.LoadModel(config.data_root() + "model/rock/rock.obj");
 
-    singleDrawShader_.LoadFromFile(config.dataRootPath + "shaders/10_hello_instancing/asteroid_single.vert",
-                                   config.dataRootPath + "shaders/10_hello_instancing/asteroid.frag");
+    singleDrawShader_.LoadFromFile(config.data_root() + "shaders/10_hello_instancing/asteroid_single.vert",
+                                   config.data_root() + "shaders/10_hello_instancing/asteroid.frag");
     uniformInstancingShader_.LoadFromFile(
-            config.dataRootPath + "shaders/10_hello_instancing/asteroid_uniform_instancing.vert",
-            config.dataRootPath + "shaders/10_hello_instancing/asteroid.frag");
+            config.data_root() + "shaders/10_hello_instancing/asteroid_uniform_instancing.vert",
+            config.data_root() + "shaders/10_hello_instancing/asteroid.frag");
     vertexInstancingDrawShader_.LoadFromFile(
-            config.dataRootPath + "shaders/10_hello_instancing/asteroid_vertex_instancing.vert",
-            config.dataRootPath + "shaders/10_hello_instancing/asteroid.frag");
+            config.data_root() + "shaders/10_hello_instancing/asteroid_vertex_instancing.vert",
+            config.data_root() + "shaders/10_hello_instancing/asteroid.frag");
 
     camera_.position = Vec3f(0.0f, 500.0f, -500.0f);
     camera_.farPlane = 1'000.0f;
@@ -101,8 +101,8 @@ void HelloInstancingProgram::Update(seconds dt)
     TracyCZoneEnd(pos);
 #endif
 
-    const auto& config = BasicEngine::GetInstance()->GetConfig();
-    camera_.SetAspect(config.windowSize.x, config.windowSize.y);
+    const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
+    camera_.SetAspect(windowSize.x, windowSize.y);
     camera_.Update(dt);
 
 }

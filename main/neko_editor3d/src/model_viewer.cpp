@@ -14,7 +14,7 @@ namespace neko::editor
 void ModelViewer::Init()
 {
     const auto& config = BasicEngine::GetInstance()->GetConfig();
-    IterateDirectory(config.dataRootPath, [this](const std::string_view path)
+    IterateDirectory(config.data_root(), [this](const std::string_view path)
         {
             const auto extension = GetFilenameExtension(path);
             if (extension == ".fbx" || extension == ".obj" || extension == ".blend")

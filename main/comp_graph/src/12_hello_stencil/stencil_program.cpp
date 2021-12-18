@@ -34,11 +34,11 @@ void HelloStencilProgam::Init()
 	plane_.Init();
 
 	const auto& config = BasicEngine::GetInstance()->GetConfig();
-    cubeShader_.LoadFromFile(config.dataRootPath + "shaders/12_hello_stencil/cube.vert",
-                             config.dataRootPath + "shaders/12_hello_stencil/cube.frag");
-    floorShader_.LoadFromFile(config.dataRootPath + "shaders/12_hello_stencil/floor.vert",
-                              config.dataRootPath + "shaders/12_hello_stencil/floor.frag");
-	cubeTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/container.jpg", gl::Texture::DEFAULT);
+    cubeShader_.LoadFromFile(config.data_root() + "shaders/12_hello_stencil/cube.vert",
+                             config.data_root() + "shaders/12_hello_stencil/cube.frag");
+    floorShader_.LoadFromFile(config.data_root() + "shaders/12_hello_stencil/floor.vert",
+                              config.data_root() + "shaders/12_hello_stencil/floor.frag");
+	cubeTextureId_ = textureManager_.LoadTexture(config.data_root() + "sprites/container.jpg", gl::Texture::DEFAULT);
 
 
 	camera_.position = Vec3f(0.0f, 4.0f, 4.0f);
@@ -48,8 +48,8 @@ void HelloStencilProgam::Init()
 void HelloStencilProgam::Update(seconds dt)
 {
 	std::lock_guard<std::mutex> lock(updateMutex_);
-	const auto& config = BasicEngine::GetInstance()->GetConfig();
-	camera_.SetAspect(config.windowSize.x, config.windowSize.y);
+	const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
+	camera_.SetAspect(windowSize.x, windowSize.y);
 	camera_.Update(dt);	textureManager_.Update(dt);
 }
 

@@ -1,6 +1,6 @@
 file(GLOB_RECURSE comp_graph_src include/*.h src/*.cpp)
 
-file(GLOB_RECURSE shaders_src data/shaders/*.vert data/shaders/*.frag)
+file(GLOB_RECURSE shaders_src data/shaders/*.vert data/shaders/*.frag data/shaders/*.comp)
 
 source_group("Shaders"	FILES ${shaders_src})
 add_library(comp_graph_lib STATIC ${comp_graph_src} ${shaders_src})

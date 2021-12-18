@@ -32,22 +32,22 @@ void HelloCullingProgram::Init()
     textureManager_.Init();
     const auto& config = BasicEngine::GetInstance()->GetConfig();
 
-    modelId_ = modelManager_.LoadModel(config.dataRootPath + "model/nanosuit2/nanosuit.obj");
+    modelId_ = modelManager_.LoadModel(config.data_root() + "model/nanosuit2/nanosuit.obj");
     modelShader_.LoadFromFile(
-        config.dataRootPath + "shaders/16_hello_culling/model.vert",
-        config.dataRootPath + "shaders/16_hello_culling/model.frag");
+        config.data_root() + "shaders/16_hello_culling/model.vert",
+        config.data_root() + "shaders/16_hello_culling/model.frag");
     camera_.position = Vec3f(0, 3, 3);
     camera_.WorldLookAt(Vec3f::zero);
     cube_.Init();
-    cubeTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/container.jpg", gl::Texture::DEFAULT);
+    cubeTextureId_ = textureManager_.LoadTexture(config.data_root() + "sprites/container.jpg", gl::Texture::DEFAULT);
 
 }
 
 void HelloCullingProgram::Update(seconds dt)
 {
     std::lock_guard<std::mutex> lock(updateMutex_);
-    const auto& config = BasicEngine::GetInstance()->GetConfig();
-    camera_.SetAspect(config.windowSize.x, config.windowSize.y);
+    const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
+    camera_.SetAspect(windowSize.x, windowSize.y);
     camera_.Update(dt);	textureManager_.Update(dt);
 }
 

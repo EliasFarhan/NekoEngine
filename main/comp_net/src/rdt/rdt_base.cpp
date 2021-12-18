@@ -21,8 +21,8 @@ void RdtManager::Send(std::string_view msg)
 void RdtManager::Init()
 {
     const auto& config = BasicEngine::GetInstance()->GetConfig();
-    shapeShader_.LoadFromFile(config.dataRootPath+"shaders/comp_net/shape.vert",
-                              config.dataRootPath+"shaders/comp_net/shape.frag");
+    shapeShader_.LoadFromFile(config.data_root()+"shaders/comp_net/shape.vert",
+                              config.data_root()+"shaders/comp_net/shape.frag");
     camera_.SetExtends(Vec2f(config.windowSize));
     camera_.position = Vec3f(0, 0, 1);
     camera_.WorldLookAt(Vec3f::zero);

@@ -36,9 +36,9 @@ void HelloCoordsProgram::Init()
     textureManager_.Init();
     const auto& config = BasicEngine::GetInstance()->GetConfig();
     shader_.LoadFromFile(
-            config.dataRootPath + "shaders/04_hello_coords/coords.vert",
-            config.dataRootPath + "shaders/04_hello_coords/coords.frag");
-    textureWallId_ = textureManager_.LoadTexture(config.dataRootPath+"sprites/wall.jpg", gl::Texture::DEFAULT);
+            config.data_root() + "shaders/04_hello_coords/coords.vert",
+            config.data_root() + "shaders/04_hello_coords/coords.frag");
+    textureWallId_ = textureManager_.LoadTexture(config.data_root()+"sprites/wall.jpg", gl::Texture::DEFAULT);
 
     cube_.Init();
 
@@ -58,10 +58,10 @@ void HelloCoordsProgram::Update(seconds dt)
     std::lock_guard<std::mutex> lock(updateMutex_);
     timeSinceInit_ += dt;
 
-    const auto& config = BasicEngine::GetInstance()->GetConfig();
+    const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
     projection = Transform3d::Perspective(
         degree_t(45.0f), 
-        static_cast<float>(config.windowSize.x) / config.windowSize.y, 
+        static_cast<float>(windowSize.x) / windowSize.y, 
         0.1f, 
         100.0f);
     textureManager_.Update(dt);

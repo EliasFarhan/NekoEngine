@@ -33,8 +33,8 @@ void HelloPbrProgram::Init()
 	const auto& config = BasicEngine::GetInstance()->GetConfig();
 	sphere_.Init();
 	pbrShader_.LoadFromFile(
-		config.dataRootPath + "shaders/30_hello_pbr/pbr.vert",
-		config.dataRootPath + "shaders/30_hello_pbr/pbr.frag");
+		config.data_root() + "shaders/30_hello_pbr/pbr.vert",
+		config.data_root() + "shaders/30_hello_pbr/pbr.frag");
 	camera_.position = Vec3f::forward * 30.0f;
 	camera_.WorldLookAt(Vec3f::zero);
 
@@ -51,8 +51,8 @@ void HelloPbrProgram::Init()
 void HelloPbrProgram::Update(seconds dt)
 {
 	std::lock_guard<std::mutex> lock(updateMutex_);
-	const auto& config = BasicEngine::GetInstance()->GetConfig();
-	camera_.SetAspect(config.windowSize.x, config.windowSize.y);
+	const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
+	camera_.SetAspect(windowSize.x, windowSize.y);
 	camera_.Update(dt);
 }
 

@@ -32,22 +32,22 @@ void HelloOutlineProgram::Init()
 	textureManager_.Init();
 	const auto& config = BasicEngine::GetInstance()->GetConfig();
 	cube_.Init();
-	cubeTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/container.jpg", gl::Texture::DEFAULT);
+	cubeTextureId_ = textureManager_.LoadTexture(config.data_root() + "sprites/container.jpg", gl::Texture::DEFAULT);
 
 
-    modelShader_.LoadFromFile(config.dataRootPath + "shaders/14_hello_outline/model.vert",
-                              config.dataRootPath + "shaders/14_hello_outline/model.frag");
-    outlineShader_.LoadFromFile(config.dataRootPath + "shaders/14_hello_outline/outline.vert",
-                                config.dataRootPath + "shaders/14_hello_outline/outline.frag");
+    modelShader_.LoadFromFile(config.data_root() + "shaders/14_hello_outline/model.vert",
+                              config.data_root() + "shaders/14_hello_outline/model.frag");
+    outlineShader_.LoadFromFile(config.data_root() + "shaders/14_hello_outline/outline.vert",
+                                config.data_root() + "shaders/14_hello_outline/outline.frag");
 	camera_.position = Vec3f(0.0f, 3.0f, 3.0f);
 	camera_.WorldLookAt(Vec3f::zero);
 }
 
 void HelloOutlineProgram::Update(seconds dt)
 {
-	std::lock_guard<std::mutex> lock(updateMutex_);
-	const auto& config = BasicEngine::GetInstance()->GetConfig();
-	camera_.SetAspect(config.windowSize.x, config.windowSize.y);
+	std::lock_guard lock(updateMutex_);
+	const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
+	camera_.SetAspect(windowSize.x, windowSize.y);
 	camera_.Update(dt);	textureManager_.Update(dt);
 }
 

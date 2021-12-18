@@ -55,8 +55,11 @@ public:
 
     virtual void BeforeRenderLoop() {}
     virtual void AfterRenderLoop() {}
+    void SetWindowSize(Vec2u windowSize) { windowSize_ = windowSize; }
+    [[nodiscard]] Vec2u GetWindowSize() const { return windowSize_; }
 protected:
     std::shared_ptr<Task> swapBufferTask_;
+    Vec2u windowSize_{};
 };
 
 

@@ -31,16 +31,16 @@ namespace neko
 void HelloLightMapsProgram::Init()
 {
 	const auto& config = BasicEngine::GetInstance()->GetConfig();
-	containerDiffuse_ = gl::StbCreateTexture(config.dataRootPath + "material/container2.png",
+	containerDiffuse_ = gl::StbCreateTexture(config.data_root() + "material/container2.png",
                                           BasicEngine::GetInstance()->GetFilesystem());
-	containerSpecular_ = gl::StbCreateTexture(config.dataRootPath + "material/container2_specular.png",
+	containerSpecular_ = gl::StbCreateTexture(config.data_root() + "material/container2_specular.png",
                                               BasicEngine::GetInstance()->GetFilesystem());
     containerShader_.LoadFromFile(
-            config.dataRootPath + "shaders/08_hello_lightmaps/container.vert",
-            config.dataRootPath + "shaders/08_hello_lightmaps/container.frag");
+            config.data_root() + "shaders/08_hello_lightmaps/container.vert",
+            config.data_root() + "shaders/08_hello_lightmaps/container.frag");
     lampShader_.LoadFromFile(
-            config.dataRootPath + "shaders/07_hello_light/lamp.vert",
-            config.dataRootPath + "shaders/07_hello_light/lamp.frag");
+            config.data_root() + "shaders/07_hello_light/lamp.vert",
+            config.data_root() + "shaders/07_hello_light/lamp.frag");
 	cube_.Init();
 	camera_.Init();
 }
@@ -53,8 +53,8 @@ void HelloLightMapsProgram::Update(seconds dt)
 		Cos(radian_t(time_)),
 		0.0f,
 		Sin(radian_t(time_))) * lightDist_;
-	const auto& config = BasicEngine::GetInstance()->GetConfig();
-	camera_.SetAspect(config.windowSize.x, config.windowSize.y);;
+	const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
+	camera_.SetAspect(windowSize.x, windowSize.y);;
 	camera_.Update(dt);
 }
 

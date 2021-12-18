@@ -34,9 +34,9 @@ void HelloCameraProgram::Init()
 {
 	const auto& config = BasicEngine::GetInstance()->GetConfig();
     shader_.LoadFromFile(
-            config.dataRootPath + "shaders/04_hello_coords/coords.vert",
-            config.dataRootPath + "shaders/04_hello_coords/coords.frag");
-	textureWall_ = gl::StbCreateTexture(config.dataRootPath + "sprites/wall.jpg", BasicEngine::GetInstance()->GetFilesystem());
+            config.data_root() + "shaders/04_hello_coords/coords.vert",
+            config.data_root() + "shaders/04_hello_coords/coords.frag");
+	textureWall_ = gl::StbCreateTexture(config.data_root() + "sprites/wall.jpg", BasicEngine::GetInstance()->GetFilesystem());
 
 	cube_.Init();
 	
@@ -49,10 +49,10 @@ void HelloCameraProgram::Update(seconds dt)
 {
 	std::lock_guard<std::mutex> lock(updateMutex_);
 	
-	const auto& config = BasicEngine::GetInstance()->GetConfig();
+	const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
 	projection_ = Transform3d::Perspective(
 		degree_t(45.0f),
-		static_cast<float>(config.windowSize.x) / config.windowSize.y,
+		static_cast<float>(windowSize.x) / windowSize.y,
 		0.1f,
 		100.0f);
 	if (!(cameraMovement_ & DISABLE))

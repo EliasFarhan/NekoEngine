@@ -22,18 +22,15 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-#include <mutex>
-#include <string>
 #include <optional>
 
 #include <engine/system.h>
 #include <utils/action_utility.h>
-#include <graphics/color.h>
 #include <utils/time_utility.h>
-#include <engine/configuration.h>
 
 #include "worker_system.h"
 #include "engine/filesystem.h"
+#include "proto/config.pb.h"
 
 
 namespace neko
@@ -49,7 +46,7 @@ class Window;
 class BasicEngine : public SystemInterface
 {
 public:
-    explicit BasicEngine(const FilesystemInterface&,std::optional<Configuration> config = std::nullopt);
+    explicit BasicEngine(const FilesystemInterface&);
 	BasicEngine() = delete;
     ~BasicEngine() override;
     void Init() override;
@@ -63,15 +60,14 @@ public:
     void EngineLoop();
 
     void SetWindowAndRenderer(Window* window, Renderer* renderer);
-
-    const Configuration& GetConfig();
+    
     const FilesystemInterface& GetFilesystem() const;
 
     void RegisterSystem(SystemInterface& system);
     void RegisterOnDrawUi(DrawImGuiInterface& drawUi);
 
     [[nodiscard]] float GetDeltaTime() const { return dt_; }
-    [[nodiscard]] Renderer* GetRenderer() { return renderer_; }
+    [[nodiscard]] Renderer* GetRenderer() const { return renderer_; }
 
     static BasicEngine* GetInstance(){return instance_;}
 
@@ -79,12 +75,16 @@ public:
 
     [[nodiscard]] std::uint8_t GetWorkersNumber() const { return workerManager_.GetWorkersCount(); }
 
-    //template <typename T = BasicEngine>
-    //static T* GetInstance(){ return dynamic_cast<T*>(instance_);};
+
+    [[nodiscard]] Vec2u GetWindowSize() const;
+    void SetWindowSize(Vec2u windowSize) const;
+    [[nodiscard]] const core::pb::Config& GetConfig() const { return config_; }
+    [[nodiscard]] core::pb::Config& MutableConfig() { return config_; }
+    [[nodiscard]] static core::pb::Config GenerateDefaultConfig();
 protected:
     static BasicEngine* instance_;
     const FilesystemInterface& filesystem_;
-    Configuration config_;
+    core::pb::Config config_;
     Renderer* renderer_ = nullptr;
     Window* window_ = nullptr;
     WorkerManager workerManager_;

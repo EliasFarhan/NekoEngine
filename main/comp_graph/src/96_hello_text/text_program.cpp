@@ -24,20 +24,23 @@
 
 #include "96_hello_text/text_program.h"
 #include "mathematics/transform.h"
+#include <include/graphics/color.h>
 
 namespace neko
 {
 void HelloTextProgram::Init()
 {
-	const auto& config = BasicEngine::GetInstance()->GetConfig();
-	textShader_.LoadFromFile(config.dataRootPath + "shaders/96_hello_text/text.vert",
-		config.dataRootPath + "shaders/96_hello_text/text.frag");
+    const auto* engine = BasicEngine::GetInstance();
+    const auto windowSize = engine->GetWindowSize();
+	const auto& config = engine->GetConfig();
+	textShader_.LoadFromFile(config.data_root() + "shaders/96_hello_text/text.vert",
+		config.data_root() + "shaders/96_hello_text/text.frag");
 	
 
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	projection_ = Transform3d::Orthographic(0.0f, config.windowSize.x, 0.0f, config.windowSize.y);
+	projection_ = Transform3d::Orthographic(0.0f, windowSize.x, 0.0f, windowSize.y);
 	textShader_.Bind();
 	textShader_.SetMat4("projection", projection_);
 	FT_Library ft;
@@ -47,7 +50,7 @@ void HelloTextProgram::Init()
 		logError( "Freetype could not init FreeType Library");
 		return;
 	}
-	const std::string font_name = config.dataRootPath+"font/8-bit-hud.ttf";
+	const std::string font_name = config.data_root()+"font/8-bit-hud.ttf";
 	FT_Face face;
 	if (FT_New_Face(ft, font_name.c_str(), 0, &face)) {
 		logError("Freetype: Failed to load font");
@@ -120,8 +123,8 @@ void HelloTextProgram::Update(seconds dt)
 {
 
     std::lock_guard<std::mutex> lock(updateMutex_);
-    const auto& config = BasicEngine::GetInstance()->GetConfig();
-    projection_ = Transform3d::Orthographic(0.0f, config.windowSize.x, 0.0f, config.windowSize.y);
+    const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
+    projection_ = Transform3d::Orthographic(0.0f, windowSize.x, 0.0f, windowSize.y);
 }
 
 void HelloTextProgram::Destroy()
@@ -137,12 +140,12 @@ void HelloTextProgram::Render()
 {
 
     std::lock_guard<std::mutex> lock(updateMutex_);
-    const auto& config = BasicEngine::GetInstance()->GetConfig();
+    const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
     glClear(GL_COLOR_BUFFER_BIT);
     textShader_.Bind();
     textShader_.SetMat4("projection", projection_);
     RenderText(textShader_, "Neko Engine!", 25.0f, 25.0f, 1.0f, Color3(0.5, 0.8f, 0.2f));
-    RenderText(textShader_, "Meow!", config.windowSize.x/2.0f, config.windowSize.y/2.0f,0.5f, Color3(0.3, 0.7f, 0.9f));
+    RenderText(textShader_, "Meow!", windowSize.x/2.0f, windowSize.y/2.0f,0.5f, Color3(0.3, 0.7f, 0.9f));
     glEnable(GL_DEPTH_TEST);
 }
 

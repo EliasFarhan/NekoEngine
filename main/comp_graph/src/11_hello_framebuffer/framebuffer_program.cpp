@@ -39,7 +39,9 @@ HelloFramebufferProgram::HelloFramebufferProgram() :
 void HelloFramebufferProgram::Init()
 {
     textureManager_.Init();
-    const auto& config = BasicEngine::GetInstance()->GetConfig();
+    const auto* engine = BasicEngine::GetInstance();
+    const auto& config = engine->GetConfig();
+    const auto windowSize = engine->GetWindowSize();
     screenFrame_.Init();
     cube_.Init();
 	//Create Screen FBO
@@ -48,7 +50,7 @@ void HelloFramebufferProgram::Init()
     //Generate Color Buffer for FBO
     glGenTextures(1, &fboColorBufferTexture_);
     glBindTexture(GL_TEXTURE_2D, fboColorBufferTexture_);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, config.windowSize.x, config.windowSize.y, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, windowSize.x, windowSize.y, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -57,7 +59,7 @@ void HelloFramebufferProgram::Init()
     //Generate the Depth-Stencil RenderBuffer Object
     glGenRenderbuffers(1, &rbo_);
     glBindRenderbuffer(GL_RENDERBUFFER, rbo_);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, config.windowSize.x, config.windowSize.y);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, windowSize.x, windowSize.y);
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
 	//Bind depth-stencil RBO to screen FBO 
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo_);
@@ -68,34 +70,34 @@ void HelloFramebufferProgram::Init()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     screenShader_.LoadFromFile(
-            config.dataRootPath + "shaders/11_hello_framebuffer/screen.vert",
-            config.dataRootPath + "shaders/11_hello_framebuffer/screen.frag");
+            config.data_root() + "shaders/11_hello_framebuffer/screen.vert",
+            config.data_root() + "shaders/11_hello_framebuffer/screen.frag");
     screenInverseShader_.LoadFromFile(
-            config.dataRootPath + "shaders/11_hello_framebuffer/screen.vert",
-            config.dataRootPath + "shaders/11_hello_framebuffer/screen_inverse.frag");
+            config.data_root() + "shaders/11_hello_framebuffer/screen.vert",
+            config.data_root() + "shaders/11_hello_framebuffer/screen_inverse.frag");
     screenGrayscaleShader_.LoadFromFile(
-            config.dataRootPath + "shaders/11_hello_framebuffer/screen.vert",
-            config.dataRootPath + "shaders/11_hello_framebuffer/screen_grayscale.frag");
+            config.data_root() + "shaders/11_hello_framebuffer/screen.vert",
+            config.data_root() + "shaders/11_hello_framebuffer/screen_grayscale.frag");
     screenBlurShader_.LoadFromFile(
-            config.dataRootPath + "shaders/11_hello_framebuffer/screen.vert",
-            config.dataRootPath + "shaders/11_hello_framebuffer/screen_blur.frag");
+            config.data_root() + "shaders/11_hello_framebuffer/screen.vert",
+            config.data_root() + "shaders/11_hello_framebuffer/screen_blur.frag");
     screenEdgeDetectionShader_.LoadFromFile(
-            config.dataRootPath + "shaders/11_hello_framebuffer/screen.vert",
-            config.dataRootPath + "shaders/11_hello_framebuffer/screen_edge_detection.frag");
-    containerTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/container.jpg", gl::Texture::DEFAULT);
+            config.data_root() + "shaders/11_hello_framebuffer/screen.vert",
+            config.data_root() + "shaders/11_hello_framebuffer/screen_edge_detection.frag");
+    containerTextureId_ = textureManager_.LoadTexture(config.data_root() + "sprites/container.jpg", gl::Texture::DEFAULT);
 
 
-    modelShader_.LoadFromFile(config.dataRootPath + "shaders/11_hello_framebuffer/model.vert",
-                              config.dataRootPath + "shaders/11_hello_framebuffer/model.frag");
+    modelShader_.LoadFromFile(config.data_root() + "shaders/11_hello_framebuffer/model.vert",
+                              config.data_root() + "shaders/11_hello_framebuffer/model.frag");
     camera_.position = Vec3f(0.0f,-5.0f,-5.0f);
     camera_.WorldLookAt(Vec3f::zero);
 }
 
 void HelloFramebufferProgram::Update(seconds dt)
 {
-    std::lock_guard<std::mutex> lock(updateMutex_);
-    const auto& config = BasicEngine::GetInstance()->GetConfig();
-    camera_.SetAspect(config.windowSize.x, config.windowSize.y);
+    std::lock_guard lock(updateMutex_);
+    const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
+    camera_.SetAspect(windowSize.x, windowSize.y);
     camera_.Update(dt);	textureManager_.Update(dt);
 }
 
@@ -153,13 +155,13 @@ void HelloFramebufferProgram::Render()
         glDeleteTextures(1, &fboColorBufferTexture_);
         glDeleteRenderbuffers(1, &rbo_);
 
-        const auto& config = BasicEngine::GetInstance()->GetConfig();
+        const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
         glGenFramebuffers(1, &fbo_);
         glBindFramebuffer(GL_FRAMEBUFFER, fbo_);
 
         glGenTextures(1, &fboColorBufferTexture_);
         glBindTexture(GL_TEXTURE_2D, fboColorBufferTexture_);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, config.windowSize.x, config.windowSize.y, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, windowSize.x, windowSize.y, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBindTexture(GL_TEXTURE_2D, 0);
@@ -168,7 +170,7 @@ void HelloFramebufferProgram::Render()
 
         glGenRenderbuffers(1, &rbo_);
         glBindRenderbuffer(GL_RENDERBUFFER, rbo_);
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, config.windowSize.x, config.windowSize.y);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, windowSize.x, windowSize.y);
         glBindRenderbuffer(GL_RENDERBUFFER, 0);
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo_);
         if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
@@ -178,7 +180,7 @@ void HelloFramebufferProgram::Render()
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         hasScreenResize_ = false;
 
-        logDebug("Framebuffer resized with size: "+std::to_string(config.windowSize.x)+", "+std::to_string(config.windowSize.y));
+        logDebug(fmt::format("Framebuffer resized with size: {},{}", windowSize.x, windowSize.y));
     }
 
     //Bind framebuffer

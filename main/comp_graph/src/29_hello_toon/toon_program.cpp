@@ -31,24 +31,24 @@ void HelloToonShadingProgram::Init()
 {
 
 	const auto& config = BasicEngine::GetInstance()->GetConfig();
-	const std::string path = config.dataRootPath + "model/nanosuit2/nanosuit.obj";
+	const std::string path = config.data_root() + "model/nanosuit2/nanosuit.obj";
 	glCheckError();
 	modelId_ = modelManager_.LoadModel(path);
 	camera_.Init();
 	toonShader_.LoadFromFile(
-		config.dataRootPath + "shaders/29_hello_toon/toon.vert",
-		config.dataRootPath + "shaders/29_hello_toon/toon.frag");
+		config.data_root() + "shaders/29_hello_toon/toon.vert",
+		config.data_root() + "shaders/29_hello_toon/toon.frag");
 
 	glCheckError();
 }
 
 void HelloToonShadingProgram::Update(seconds dt)
 {
-	std::lock_guard<std::mutex> lock(updateMutex_);
-	const auto& config = BasicEngine::GetInstance()->GetConfig();
+	std::lock_guard lock(updateMutex_);
+	const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
 	textureManager_.Update(dt);
 	modelManager_.Update(dt);
-	camera_.SetAspect(config.windowSize.x, config.windowSize.y);
+	camera_.SetAspect(windowSize.x, windowSize.y);
 	camera_.Update(dt);
 	dt_ += dt.count();
 	light_.position = 4.0f * Vec3f(Cos(radian_t(dt_)), 0.5f, Sin(radian_t(dt_)));

@@ -36,15 +36,15 @@ void HelloPointShadowProgram::Init()
 	cube_.Init();
 
 	simpleDepthShader_.LoadFromFile(
-		config.dataRootPath + "shaders/23_hello_point_shadow/simpleDepth.vert",
-		config.dataRootPath + "shaders/23_hello_point_shadow/simpleDepth.frag");
-	cubeShader_.LoadFromFile(config.dataRootPath + "shaders/23_hello_point_shadow/shadow.vert",
-		config.dataRootPath + "shaders/23_hello_point_shadow/shadow.frag");
-	lightCubeShader_.LoadFromFile(config.dataRootPath + "shaders/23_hello_point_shadow/lamp.vert",
-		config.dataRootPath + "shaders/23_hello_point_shadow/lamp.frag");
+		config.data_root() + "shaders/23_hello_point_shadow/simpleDepth.vert",
+		config.data_root() + "shaders/23_hello_point_shadow/simpleDepth.frag");
+	cubeShader_.LoadFromFile(config.data_root() + "shaders/23_hello_point_shadow/shadow.vert",
+		config.data_root() + "shaders/23_hello_point_shadow/shadow.frag");
+	lightCubeShader_.LoadFromFile(config.data_root() + "shaders/23_hello_point_shadow/lamp.vert",
+		config.data_root() + "shaders/23_hello_point_shadow/lamp.frag");
 
 	cubeTextureId_ = textureManager_.LoadTexture(
-	        config.dataRootPath + "sprites/brickwall/brickwall.jpg", gl::Texture::DEFAULT);
+	        config.data_root() + "sprites/brickwall/brickwall.jpg", gl::Texture::DEFAULT);
 
 	glGenFramebuffers(1, &depthMapFbo_);
 	// create depth cubemap texture
@@ -85,8 +85,8 @@ void HelloPointShadowProgram::Init()
 void HelloPointShadowProgram::Update(seconds dt)
 {
 	std::lock_guard<std::mutex> lock(updateMutex_);
-	const auto& config = BasicEngine::GetInstance()->GetConfig();
-	camera3D_.SetAspect(config.windowSize.x, config.windowSize.y);
+	const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
+	camera3D_.SetAspect(windowSize.x, windowSize.y);
 	camera3D_.Update(dt);
 	dt_ += dt.count();
 	lightCamera_.position = 4.0f * Vec3f(Sin(radian_t(dt_)), 0.0f, Sin(radian_t(dt_)));
@@ -158,8 +158,8 @@ void HelloPointShadowProgram::Render()
 		RenderScene(simpleDepthShader_);
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	const auto& config = BasicEngine::GetInstance()->GetConfig();
-	glViewport(0, 0, config.windowSize.x, config.windowSize.y);
+	const auto& windowSize = BasicEngine::GetInstance()->GetWindowSize();
+	glViewport(0, 0, windowSize.x, windowSize.y);
 	cubeShader_.Bind();
 	const auto view = camera3D_.GenerateViewMatrix();
 	const auto projection = camera3D_.GenerateProjectionMatrix();

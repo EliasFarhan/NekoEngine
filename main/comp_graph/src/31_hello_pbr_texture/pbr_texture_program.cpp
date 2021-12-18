@@ -32,8 +32,8 @@ void HelloPbrTextureProgram::Init()
 	const auto& config = BasicEngine::GetInstance()->GetConfig();
 	sphere_.Init();
 	pbrShader_.LoadFromFile(
-		config.dataRootPath + "shaders/31_hello_pbr_texture/pbr.vert",
-		config.dataRootPath + "shaders/31_hello_pbr_texture/pbr.frag");
+		config.data_root() + "shaders/31_hello_pbr_texture/pbr.vert",
+		config.data_root() + "shaders/31_hello_pbr_texture/pbr.frag");
 	camera_.position = Vec3f::forward * 5.0f;
 	camera_.WorldLookAt(Vec3f::zero);
 
@@ -56,21 +56,21 @@ void HelloPbrTextureProgram::Init()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glCheckError();
 
-	albedoId_ = textureManager_.LoadTexture(config.dataRootPath + "textures/rustediron2/rustediron2_basecolor.png", gl::Texture::DEFAULT);
+	albedoId_ = textureManager_.LoadTexture(config.data_root() + "textures/rustediron2/rustediron2_basecolor.png", gl::Texture::DEFAULT);
 	
-	normalId_ = textureManager_.LoadTexture(config.dataRootPath + "textures/rustediron2/rustediron2_normal.png", gl::Texture::DEFAULT);
+	normalId_ = textureManager_.LoadTexture(config.data_root() + "textures/rustediron2/rustediron2_normal.png", gl::Texture::DEFAULT);
 	
-	metallicId_ = textureManager_.LoadTexture(config.dataRootPath + "textures/rustediron2/rustediron2_metallic.png", gl::Texture::DEFAULT);
+	metallicId_ = textureManager_.LoadTexture(config.data_root() + "textures/rustediron2/rustediron2_metallic.png", gl::Texture::DEFAULT);
 	
-	roughnessId_ = textureManager_.LoadTexture(config.dataRootPath + "textures/rustediron2/rustediron2_roughness.png", gl::Texture::DEFAULT);
+	roughnessId_ = textureManager_.LoadTexture(config.data_root() + "textures/rustediron2/rustediron2_roughness.png", gl::Texture::DEFAULT);
 	
 }
 
 void HelloPbrTextureProgram::Update(seconds dt)
 {
 	std::lock_guard<std::mutex> lock(updateMutex_);
-	const auto& config = BasicEngine::GetInstance()->GetConfig();
-	camera_.SetAspect(config.windowSize.x, config.windowSize.y);
+	const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
+	camera_.SetAspect(windowSize.x, windowSize.y);
 	camera_.Update(dt);	textureManager_.Update(dt);
 }
 

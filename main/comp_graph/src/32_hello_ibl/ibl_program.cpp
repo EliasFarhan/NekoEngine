@@ -37,24 +37,24 @@ void HelloIblProgram::Init()
 	quad_.Init();
 	skybox_.Init();
 	equiToCubemap_.LoadFromFile(
-		config.dataRootPath + "shaders/32_hello_ibl/cube.vert",
-		config.dataRootPath + "shaders/32_hello_ibl/cube.frag");
+		config.data_root() + "shaders/32_hello_ibl/cube.vert",
+		config.data_root() + "shaders/32_hello_ibl/cube.frag");
 
 	skyboxShader_.LoadFromFile(
-		config.dataRootPath + "shaders/32_hello_ibl/skybox.vert",
-		config.dataRootPath + "shaders/32_hello_ibl/skybox.frag");
+		config.data_root() + "shaders/32_hello_ibl/skybox.vert",
+		config.data_root() + "shaders/32_hello_ibl/skybox.frag");
 	pbrShader_.LoadFromFile(
-		config.dataRootPath + "shaders/32_hello_ibl/pbr.vert",
-		config.dataRootPath + "shaders/32_hello_ibl/pbr.frag");
+		config.data_root() + "shaders/32_hello_ibl/pbr.vert",
+		config.data_root() + "shaders/32_hello_ibl/pbr.frag");
 	irradianceShader_.LoadFromFile(
-		config.dataRootPath + "shaders/32_hello_ibl/cube.vert",
-		config.dataRootPath + "shaders/32_hello_ibl/irradiance.frag");
+		config.data_root() + "shaders/32_hello_ibl/cube.vert",
+		config.data_root() + "shaders/32_hello_ibl/irradiance.frag");
 	prefilterShader_.LoadFromFile(
-		config.dataRootPath + "shaders/32_hello_ibl/cube.vert",
-		config.dataRootPath + "shaders/32_hello_ibl/prefilter.frag");
+		config.data_root() + "shaders/32_hello_ibl/cube.vert",
+		config.data_root() + "shaders/32_hello_ibl/prefilter.frag");
 	brdfShader_.LoadFromFile(
-		config.dataRootPath + "shaders/32_hello_ibl/brdf.vert",
-		config.dataRootPath + "shaders/32_hello_ibl/brdf.frag");
+		config.data_root() + "shaders/32_hello_ibl/brdf.vert",
+		config.data_root() + "shaders/32_hello_ibl/brdf.frag");
 	camera_.position = Vec3f::forward * 30.0f;
 	camera_.WorldLookAt(Vec3f::zero);
 
@@ -69,7 +69,7 @@ void HelloIblProgram::Init()
 
 	textureManager_.Init();
 	hdrTextureId_ = textureManager_.LoadTexture(
-		config.dataRootPath + "textures/Ridgecrest_Road_Ref.hdr", static_cast<gl::Texture::TextureFlags>(
+		config.data_root() + "textures/Ridgecrest_Road_Ref.hdr", static_cast<gl::Texture::TextureFlags>(
 			gl::Texture::TextureFlags::CLAMP_WRAP |
             gl::Texture::TextureFlags::SMOOTH_TEXTURE |
             gl::Texture::TextureFlags::FLIP_Y |
@@ -86,8 +86,8 @@ void HelloIblProgram::Init()
 void HelloIblProgram::Update(seconds dt)
 {
 	std::lock_guard lock(updateMutex_);
-	const auto& config = BasicEngine::GetInstance()->GetConfig();
-	camera_.SetAspect(config.windowSize.x, config.windowSize.y);
+	const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
+	camera_.SetAspect(windowSize.x, windowSize.y);
 	camera_.Update(dt);
 	textureManager_.Update(dt);
 	
@@ -171,8 +171,8 @@ void HelloIblProgram::Render()
 		GeneratePrefilter();
 		GenerateLUT();
 		glDepthFunc(GL_LESS);
-		const auto& config = BasicEngine::GetInstance()->GetConfig();
-		glViewport(0, 0, config.windowSize.x, config.windowSize.y);
+		const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
+		glViewport(0, 0, windowSize.x, windowSize.y);
 		flags_ = flags_ & ~FIRST_FRAME;
 	}
 #ifdef TRACY_ENABLE

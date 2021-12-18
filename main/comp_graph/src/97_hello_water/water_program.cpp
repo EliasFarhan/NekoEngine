@@ -32,30 +32,30 @@ void HelloWaterProgram::Init()
 	const auto& config = BasicEngine::GetInstance()->GetConfig();
 	skyboxCube_.Init();
 	skyboxTexture_ = gl::LoadCubemap({
-                                             config.dataRootPath + "sprites/skybox/right.jpg",
-                                             config.dataRootPath + "sprites/skybox/left.jpg",
-                                             config.dataRootPath + "sprites/skybox/top.jpg",
-                                             config.dataRootPath + "sprites/skybox/bottom.jpg",
-                                             config.dataRootPath + "sprites/skybox/front.jpg",
-                                             config.dataRootPath + "sprites/skybox/back.jpg"
+                                             config.data_root() + "sprites/skybox/right.jpg",
+                                             config.data_root() + "sprites/skybox/left.jpg",
+                                             config.data_root() + "sprites/skybox/top.jpg",
+                                             config.data_root() + "sprites/skybox/bottom.jpg",
+                                             config.data_root() + "sprites/skybox/front.jpg",
+                                             config.data_root() + "sprites/skybox/back.jpg"
                                      }, BasicEngine::GetInstance()->GetFilesystem());
 
 	quad_.Init();
 	skyboxShader_.LoadFromFile(
-		config.dataRootPath + "shaders/15_hello_cubemaps/skybox.vert",
-		config.dataRootPath + "shaders/15_hello_cubemaps/skybox.frag");
-	modelId_ = modelManager_.LoadModel(config.dataRootPath + "model/nanosuit2/nanosuit.obj");
+		config.data_root() + "shaders/15_hello_cubemaps/skybox.vert",
+		config.data_root() + "shaders/15_hello_cubemaps/skybox.frag");
+	modelId_ = modelManager_.LoadModel(config.data_root() + "model/nanosuit2/nanosuit.obj");
 	modelShader_.LoadFromFile(
-		config.dataRootPath + "shaders/97_hello_water/model.vert", 
-		config.dataRootPath + "shaders/97_hello_water/model.frag");
+		config.data_root() + "shaders/97_hello_water/model.vert", 
+		config.data_root() + "shaders/97_hello_water/model.frag");
 	waterShader_.LoadFromFile(
-		config.dataRootPath + "shaders/97_hello_water/water.vert",
-		config.dataRootPath + "shaders/97_hello_water/water.frag");
+		config.data_root() + "shaders/97_hello_water/water.vert",
+		config.data_root() + "shaders/97_hello_water/water.frag");
 
 	dudvTexturerId_ = textureManager_.LoadTexture(
-		config.dataRootPath + "sprites/water/waveDUDV.png", gl::Texture::DEFAULT);
+		config.data_root() + "sprites/water/waveDUDV.png", gl::Texture::DEFAULT);
 	normalMapId_ = textureManager_.LoadTexture(
-	        config.dataRootPath + "sprites/water/waveNM.png", gl::Texture::DEFAULT);
+	        config.data_root() + "sprites/water/waveNM.png", gl::Texture::DEFAULT);
 	
 	CreateFramebuffer();
 	CreateDepthbuffer();
@@ -65,8 +65,8 @@ void HelloWaterProgram::Init()
 void HelloWaterProgram::Update(seconds dt)
 {
 	std::lock_guard<std::mutex> lock(updateMutex_);
-	const auto& config = BasicEngine::GetInstance()->GetConfig();
-	camera_.SetAspect(config.windowSize.x, config.windowSize.y);
+	const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
+	camera_.SetAspect(windowSize.x, windowSize.y);
 	camera_.Update(dt);
 	textureManager_.Update(dt);
 	dt_ += dt.count();
@@ -170,8 +170,8 @@ void HelloWaterProgram::Render()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	renderScene(2, view, projection);
 	//Render Scene
-	const auto& config = BasicEngine::GetInstance()->GetConfig();
-	glViewport(0, 0, config.windowSize.x, config.windowSize.y);
+	const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
+	glViewport(0, 0, windowSize.x, windowSize.y);
 	//Depth pass
 	glBindFramebuffer(GL_FRAMEBUFFER, depthFramebuffer_);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -264,12 +264,12 @@ void HelloWaterProgram::CreateFramebuffer()
 
 void HelloWaterProgram::CreateDepthbuffer()
 {
-	const auto& config = BasicEngine::GetInstance()->GetConfig();
+	const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
 	glGenFramebuffers(1, &depthFramebuffer_);
 	glGenTextures(1, &depthBuffer_);
 	glBindTexture(GL_TEXTURE_2D, depthBuffer_);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16,
-		config.windowSize.x,config.windowSize.y, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
+		windowSize.x,windowSize.y, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);

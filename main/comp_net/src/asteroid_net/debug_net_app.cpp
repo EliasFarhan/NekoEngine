@@ -48,8 +48,8 @@ void NetworkDebugApp::Init()
             }
             quad_.Init();
             //client shader init
-            clientShader_.LoadFromFile(config.dataRootPath + "shaders/comp_net/client.vert",
-                config.dataRootPath + "shaders/comp_net/client.frag");
+            clientShader_.LoadFromFile(config.data_root() + "shaders/comp_net/client.vert",
+                config.data_root() + "shaders/comp_net/client.frag");
             for (auto& client : clients_)
             {
                 client.Init();

@@ -52,34 +52,34 @@ void SdlWindow::Init()
     config.fullscreen = true;
 #endif
     ;
-    auto windowSize = config.windowSize;
-    if (config.flags & Configuration::FULLSCREEN)
+    auto windowSize = Vec2i(config.window_size_x(), config.window_size_y());
+    if (config.fullscreen())
     {
-        windowSize = Vec2u::zero;
+        windowSize = Vec2i::zero;
         flags_ |= SDL_WINDOW_FULLSCREEN_DESKTOP;
     }
     window_ = SDL_CreateWindow(
-        config.windowName.c_str(),
+        config.window_name().c_str(),
         SDL_WINDOWPOS_UNDEFINED,
         SDL_WINDOWPOS_UNDEFINED,
         windowSize.x,
         windowSize.y,
         flags_
     );
-    if (config.flags & Configuration::FULLSCREEN)
+    if (config.fullscreen())
     {
         int windowSizeW = 0;
         int windowSizeH = 0;
         SDL_GetWindowSize(window_, &windowSizeW, &windowSizeH);
         windowSize.x = windowSizeW;
         windowSize.y = windowSizeH;
-        //config.windowSize = windowSize;
+       
     }
+    SetWindowSize(static_cast<Vec2u>(windowSize));
     // Check that everything worked out okay
     if (window_ == nullptr)
     {
         logError("Unable to create window\n");
-        return;
     }
 }
 

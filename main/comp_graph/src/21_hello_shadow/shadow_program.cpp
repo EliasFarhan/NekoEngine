@@ -37,10 +37,10 @@ void HelloShadowProgram::Init()
     cube_.Init();
     floor_.Init();
 
-    modelId_ = modelManager_.LoadModel(config.dataRootPath + "model/nanosuit2/nanosuit.obj");
+    modelId_ = modelManager_.LoadModel(config.data_root() + "model/nanosuit2/nanosuit.obj");
 
     floorTextureId_ = textureManager_.LoadTexture(
-        config.dataRootPath + "sprites/brickwall/brickwall.jpg", gl::Texture::DEFAULT);
+        config.data_root() + "sprites/brickwall/brickwall.jpg", gl::Texture::DEFAULT);
 
     glGenFramebuffers(1, &depthMapFbo_);
     glGenTextures(1, &depthMap_);
@@ -73,18 +73,18 @@ void HelloShadowProgram::Init()
     camera_.position = Vec3f(0, 3, 3);
     camera_.WorldLookAt(Vec3f::zero);
 
-    simpleDepthShader_.LoadFromFile(config.dataRootPath + "shaders/21_hello_shadow/simple_depth.vert",
-        config.dataRootPath + "shaders/21_hello_shadow/simple_depth.frag");
-    modelShader_.LoadFromFile(config.dataRootPath + "shaders/21_hello_shadow/shadow.vert",
-        config.dataRootPath + "shaders/21_hello_shadow/shadow.frag");
+    simpleDepthShader_.LoadFromFile(config.data_root() + "shaders/21_hello_shadow/simple_depth.vert",
+        config.data_root() + "shaders/21_hello_shadow/simple_depth.frag");
+    modelShader_.LoadFromFile(config.data_root() + "shaders/21_hello_shadow/shadow.vert",
+        config.data_root() + "shaders/21_hello_shadow/shadow.frag");
     glCheckError();
 }
 
 void HelloShadowProgram::Update(seconds dt)
 {
     std::lock_guard<std::mutex> lock(updateMutex_);
-    const auto& config = BasicEngine::GetInstance()->GetConfig();
-    camera_.SetAspect(config.windowSize.x, config.windowSize.y);
+    const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
+    camera_.SetAspect(windowSize.x, windowSize.y);
     camera_.Update(dt);
     textureManager_.Update(dt);
     modelManager_.Update(dt);
@@ -165,7 +165,7 @@ void HelloShadowProgram::Render()
     glCheckError();
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
-    const auto& config = BasicEngine::GetInstance()->GetConfig();
+    const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
     const auto lightView = depthCamera_.GenerateViewMatrix();
     const auto lightProjection = depthCamera_.GenerateProjectionMatrix();
     const auto lightSpaceMatrix = lightProjection * lightView;
@@ -190,7 +190,7 @@ void HelloShadowProgram::Render()
         //Render scene with shadow
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glCheckError();
-        glViewport(0, 0, config.windowSize.x, config.windowSize.y);
+        glViewport(0, 0, windowSize.x, windowSize.y);
     }
     modelShader_.Bind();
     modelShader_.SetMat4("view", camera_.GenerateViewMatrix());

@@ -66,17 +66,17 @@ void HelloCascadedShadowProgram::Init()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     simpleDepthShader_.LoadFromFile(
-            config.dataRootPath + "shaders/24_hello_cascaded_shadow/simple_depth.vert",
-            config.dataRootPath + "shaders/24_hello_cascaded_shadow/simple_depth.frag"
+            config.data_root() + "shaders/24_hello_cascaded_shadow/simple_depth.vert",
+            config.data_root() + "shaders/24_hello_cascaded_shadow/simple_depth.frag"
     );
     shadowShader_.LoadFromFile(
-            config.dataRootPath + "shaders/24_hello_cascaded_shadow/shadow.vert",
-            config.dataRootPath + "shaders/24_hello_cascaded_shadow/shadow.frag"
+            config.data_root() + "shaders/24_hello_cascaded_shadow/shadow.vert",
+            config.data_root() + "shaders/24_hello_cascaded_shadow/shadow.frag"
     );
     brickWallId_ = textureManager_.LoadTexture
-            (config.dataRootPath + "sprites/brickwall/brickwall.jpg", gl::Texture::DEFAULT);
+            (config.data_root() + "sprites/brickwall/brickwall.jpg", gl::Texture::DEFAULT);
 
-    dragonModelId_ = modelManager_.LoadModel(config.dataRootPath + "model/dragon/dragon.obj");
+    dragonModelId_ = modelManager_.LoadModel(config.data_root() + "model/dragon/dragon.obj");
     glGenTextures(1, &whiteTexture_);
     glBindTexture(GL_TEXTURE_2D, whiteTexture_);
     unsigned char white[] = {255, 255, 255};
@@ -95,8 +95,8 @@ void HelloCascadedShadowProgram::Init()
 void HelloCascadedShadowProgram::Update(seconds dt)
 {
     std::lock_guard<std::mutex> lock(updateMutex_);
-    const auto& config = BasicEngine::GetInstance()->GetConfig();
-    camera_.SetAspect(config.windowSize.x, config.windowSize.y);
+    const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
+    camera_.SetAspect(windowSize.x, windowSize.y);
     camera_.Update(dt);	textureManager_.Update(dt);
     modelManager_.Update(dt);
 }
@@ -157,8 +157,8 @@ void HelloCascadedShadowProgram::Render()
         ShadowPass(i);
     }
     //Render scene from camera
-    const auto& config = BasicEngine::GetInstance()->GetConfig();
-    glViewport(0, 0, config.windowSize.x, config.windowSize.y);
+    const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
+    glViewport(0, 0, windowSize.x, windowSize.y);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     shadowShader_.Bind();
 

@@ -31,12 +31,12 @@ void HelloBlendingProgram::Init()
 {
 	const auto& config = BasicEngine::GetInstance()->GetConfig();
 	cutoffShader_.LoadFromFile(
-		config.dataRootPath + "shaders/28_hello_blending/blending.vert",
-		config.dataRootPath + "shaders/28_hello_blending/blending.frag");
+		config.data_root() + "shaders/28_hello_blending/blending.vert",
+		config.data_root() + "shaders/28_hello_blending/blending.frag");
 	camera_.Init();
-	windowTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/blending_transparent_window.png", gl::Texture::DEFAULT);
+	windowTextureId_ = textureManager_.LoadTexture(config.data_root() + "sprites/blending_transparent_window.png", gl::Texture::DEFAULT);
 	
-	cubeTextureId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/container.jpg", gl::Texture::DEFAULT);
+	cubeTextureId_ = textureManager_.LoadTexture(config.data_root() + "sprites/container.jpg", gl::Texture::DEFAULT);
 	
 	plane_.Init();
 	cube_.Init();
@@ -56,8 +56,8 @@ void HelloBlendingProgram::Init()
 void HelloBlendingProgram::Update(seconds dt)
 {
 	std::lock_guard<std::mutex> lock(updateMutex_);
-	const auto& config = BasicEngine::GetInstance()->GetConfig();
-	camera_.SetAspect(config.windowSize.x, config.windowSize.y);
+	const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
+	camera_.SetAspect(windowSize.x, windowSize.y);
 	camera_.Update(dt);
 	textureManager_.Update(dt);
 }

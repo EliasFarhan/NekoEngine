@@ -32,21 +32,21 @@ void HelloNormalProgram::Init()
 {
     textureManager_.Init();
     const auto& config = BasicEngine::GetInstance()->GetConfig();
-    diffuseTexId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/brickwall/brickwall.jpg", gl::Texture::DEFAULT);
+    diffuseTexId_ = textureManager_.LoadTexture(config.data_root() + "sprites/brickwall/brickwall.jpg", gl::Texture::DEFAULT);
 
-    normalTexId_ = textureManager_.LoadTexture(config.dataRootPath + "sprites/brickwall/brickwall_normal.jpg", gl::Texture::DEFAULT);
+    normalTexId_ = textureManager_.LoadTexture(config.data_root() + "sprites/brickwall/brickwall_normal.jpg", gl::Texture::DEFAULT);
 
 
     normalShader_.LoadFromFile(
-        config.dataRootPath + "shaders/18_hello_normal/normal.vert",
-        config.dataRootPath + "shaders/18_hello_normal/normal.frag");
+        config.data_root() + "shaders/18_hello_normal/normal.vert",
+        config.data_root() + "shaders/18_hello_normal/normal.frag");
     diffuseShader_.LoadFromFile(
-        config.dataRootPath + "shaders/18_hello_normal/model.vert",
-        config.dataRootPath + "shaders/18_hello_normal/model.frag");
+        config.data_root() + "shaders/18_hello_normal/model.vert",
+        config.data_root() + "shaders/18_hello_normal/model.frag");
 
     plane_.Init();
     cube_.Init();
-    modelId_ = modelManager_.LoadModel(config.dataRootPath + "model/nanosuit2/nanosuit.obj");
+    modelId_ = modelManager_.LoadModel(config.data_root() + "model/nanosuit2/nanosuit.obj");
     sphere_.Init();
     camera_.position = Vec3f(-3.0f, 3.0f, 3.0f);
     camera_.WorldLookAt(Vec3f::zero);
@@ -55,11 +55,12 @@ void HelloNormalProgram::Init()
 void HelloNormalProgram::Update(seconds dt)
 {
     std::lock_guard<std::mutex> lock(updateMutex_);
-    const auto& config = BasicEngine::GetInstance()->GetConfig();
+    const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
     dt_ += dt.count();
     lightPos_ = Vec3f(Cos(radian_t(dt_)), 1.0f, Sin(radian_t(dt_))) * 3.0f;
-    camera_.SetAspect(config.windowSize.x, config.windowSize.y);
-    camera_.Update(dt);	textureManager_.Update(dt);
+    camera_.SetAspect(windowSize.x, windowSize.y);
+    camera_.Update(dt);
+    textureManager_.Update(dt);
     modelManager_.Update(dt);
 }
 

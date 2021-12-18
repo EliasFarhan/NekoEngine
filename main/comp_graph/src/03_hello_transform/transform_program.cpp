@@ -37,9 +37,9 @@ void HelloTransformProgram::Init()
 
     const auto& config = BasicEngine::GetInstance()->GetConfig();
     shaderProgram_.LoadFromFile(
-            config.dataRootPath + "shaders/03_hello_transform/transform.vert",
-            config.dataRootPath + "shaders/03_hello_transform/transform.frag");
-    const auto texturePath = config.dataRootPath + "sprites/wall.jpg";
+            config.data_root() + "shaders/03_hello_transform/transform.vert",
+            config.data_root() + "shaders/03_hello_transform/transform.frag");
+    const auto texturePath = config.data_root() + "sprites/wall.jpg";
     textureWall_ = gl::StbCreateTexture(texturePath.c_str(), BasicEngine::GetInstance()->GetFilesystem());
     quad_.Init();
     cube_.Init();

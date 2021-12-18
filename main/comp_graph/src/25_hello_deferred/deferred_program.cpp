@@ -41,16 +41,16 @@ void HelloDeferredProgram::Init()
     CreateFramebuffer();
 
     deferredShader_.LoadFromFile(
-            config.dataRootPath+"shaders/25_hello_deferred/deferred.vert",
-            config.dataRootPath+"shaders/25_hello_deferred/deferred.frag"
+            config.data_root()+"shaders/25_hello_deferred/deferred.vert",
+            config.data_root()+"shaders/25_hello_deferred/deferred.frag"
             );
     lightingShader_.LoadFromFile(
-            config.dataRootPath+"shaders/25_hello_deferred/lighting.vert",
-            config.dataRootPath+"shaders/25_hello_deferred/lighting.frag"
+            config.data_root()+"shaders/25_hello_deferred/lighting.vert",
+            config.data_root()+"shaders/25_hello_deferred/lighting.frag"
     );
     forwardShader_.LoadFromFile(
-            config.dataRootPath+"shaders/25_hello_deferred/forward.vert",
-            config.dataRootPath+"shaders/25_hello_deferred/forward.frag"
+            config.data_root()+"shaders/25_hello_deferred/forward.vert",
+            config.data_root()+"shaders/25_hello_deferred/forward.frag"
     );
 
     glGenTextures(1, &whiteTexture_);
@@ -63,10 +63,10 @@ void HelloDeferredProgram::Init()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glCheckError();
 
-    modelId_ = modelManager_.LoadModel(config.dataRootPath+"model/nanosuit2/nanosuit.obj");
+    modelId_ = modelManager_.LoadModel(config.data_root()+"model/nanosuit2/nanosuit.obj");
     cube_.Init();
-    containerId_ = textureManager_.LoadTexture(config.dataRootPath + "material/container2.png", gl::Texture::DEFAULT);
-    containerSpecularId_ = textureManager_.LoadTexture(config.dataRootPath + "material/container2_specular.png", gl::Texture::DEFAULT);
+    containerId_ = textureManager_.LoadTexture(config.data_root() + "material/container2.png", gl::Texture::DEFAULT);
+    containerSpecularId_ = textureManager_.LoadTexture(config.data_root() + "material/container2_specular.png", gl::Texture::DEFAULT);
 
 
     camera_.position = Vec3f(0.0f, 3.0f, -3.0f);
@@ -88,8 +88,8 @@ void HelloDeferredProgram::Update(seconds dt)
 {
 
     std::lock_guard<std::mutex> lock(updateMutex_);
-    const auto& config = BasicEngine::GetInstance()->GetConfig();
-    camera_.SetAspect(config.windowSize.x, config.windowSize.y);
+    const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
+    camera_.SetAspect(windowSize.x, windowSize.y);
     camera_.Update(dt);	textureManager_.Update(dt);
 
 }
@@ -215,7 +215,7 @@ void HelloDeferredProgram::OnEvent(const SDL_Event& event)
 void HelloDeferredProgram::CreateFramebuffer()
 {
 	
-    const auto& config = BasicEngine::GetInstance()->GetConfig();
+    const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
     glCheckError();
     glGenFramebuffers(1, &gBuffer_);
     glBindFramebuffer(GL_FRAMEBUFFER, gBuffer_);
@@ -223,7 +223,7 @@ void HelloDeferredProgram::CreateFramebuffer()
 // - position color buffer
     glGenTextures(1, &gPosition_);
     glBindTexture(GL_TEXTURE_2D, gPosition_);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, config.windowSize.x, config.windowSize.y, 0, GL_RGBA, GL_FLOAT, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, windowSize.x, windowSize.y, 0, GL_RGBA, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gPosition_, 0);
@@ -231,7 +231,7 @@ void HelloDeferredProgram::CreateFramebuffer()
 // - normal color buffer
     glGenTextures(1, &gNormal_);
     glBindTexture(GL_TEXTURE_2D, gNormal_);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, config.windowSize.x, config.windowSize.y, 0, GL_RGBA, GL_FLOAT, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, windowSize.x, windowSize.y, 0, GL_RGBA, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gNormal_, 0);
@@ -239,7 +239,7 @@ void HelloDeferredProgram::CreateFramebuffer()
 // - color + specular color buffer
     glGenTextures(1, &gAlbedoSpec_);
     glBindTexture(GL_TEXTURE_2D, gAlbedoSpec_);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, config.windowSize.x, config.windowSize.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, windowSize.x, windowSize.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, gAlbedoSpec_, 0);
@@ -250,7 +250,7 @@ void HelloDeferredProgram::CreateFramebuffer()
 
     glGenRenderbuffers(1, &rbo_);
     glBindRenderbuffer(GL_RENDERBUFFER, rbo_);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, config.windowSize.x, config.windowSize.y);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, windowSize.x, windowSize.y);
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
     //Bind depth-stencil RBO to screen FBO
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo_);

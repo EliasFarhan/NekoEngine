@@ -132,7 +132,7 @@ int main([[maybe_unused]]int argc, [[maybe_unused]]char** argv)
     config.flags = neko::Configuration::NONE;
     neko::physfs::PhysFsFilesystem filesystem (argv[0]);
     filesystem.Init();
-    filesystem.AddMount(config.dataRootPath + "voxel.pkg", config.dataRootPath, 1);
+    filesystem.AddMount(config.data_root() + "voxel.pkg", config.data_root(), 1);
    
     neko::sdl::Gles3Window window;
     neko::gl::Gles3Renderer renderer;

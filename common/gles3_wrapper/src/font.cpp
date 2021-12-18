@@ -40,8 +40,8 @@ FontManager::FontManager(const FilesystemInterface& filesystem) :
 void FontManager::Init()
 {
     const auto& config = BasicEngine::GetInstance()->GetConfig();
-    textShader_.LoadFromFile(config.dataRootPath + "shaders/engine/text.vert",
-                             config.dataRootPath + "shaders/engine/text.frag");
+    textShader_.LoadFromFile(config.data_root() + "shaders/engine/text.vert",
+                             config.data_root() + "shaders/engine/text.frag");
 
     // configure VAO/VBO for texture quads
     // -----------------------------------

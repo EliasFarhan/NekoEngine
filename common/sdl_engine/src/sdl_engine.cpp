@@ -87,8 +87,9 @@ void SdlEngine::ManageEvent()
             {
                 logDebug(fmt::format("Windows resized with new size: ({},{})", 
                     event.window.data1, event.window.data2));
-                config_.windowSize = Vec2u(event.window.data1, event.window.data2);
-                window_->OnResize(config_.windowSize);
+                const auto newWindowSize = Vec2u(event.window.data1, event.window.data2);
+                SetWindowSize(newWindowSize);
+                window_->OnResize(newWindowSize);
             }
         }
         onEventAction_.Execute(event);

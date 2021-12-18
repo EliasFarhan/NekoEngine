@@ -35,11 +35,11 @@ void HelloHdrProgram::Init()
     const auto& config = BasicEngine::GetInstance()->GetConfig();
     cube_.Init();
     cubeShader_.LoadFromFile(
-            config.dataRootPath + "shaders/19_hello_hdr/tunnel.vert",
-            config.dataRootPath + "shaders/19_hello_hdr/tunnel.frag");
+            config.data_root() + "shaders/19_hello_hdr/tunnel.vert",
+            config.data_root() + "shaders/19_hello_hdr/tunnel.frag");
 
     cubeTextureId_ = textureManager_.LoadTexture(
-        config.dataRootPath+"sprites/brickwall/brickwall.jpg",
+        config.data_root()+"sprites/brickwall/brickwall.jpg",
         gl::Texture::TextureFlags(gl::Texture::MIRROR_REPEAT_WRAP | gl::Texture::GAMMA_CORRECTION | gl::Texture::DEFAULT));
 
 
@@ -47,8 +47,8 @@ void HelloHdrProgram::Init()
     
     hdrPlane_.Init();
     hdrShader_.LoadFromFile(
-            config.dataRootPath + "shaders/19_hello_hdr/hdr_screen.vert",
-            config.dataRootPath + "shaders/19_hello_hdr/hdr_screen.frag");
+            config.data_root() + "shaders/19_hello_hdr/hdr_screen.vert",
+            config.data_root() + "shaders/19_hello_hdr/hdr_screen.frag");
     camera_.position = Vec3f::zero;
     camera_.WorldLookAt(camera_.position+Vec3f::forward);
 
@@ -57,8 +57,8 @@ void HelloHdrProgram::Init()
 void HelloHdrProgram::Update(seconds dt)
 {
     std::lock_guard<std::mutex> lock(updateMutex_);
-    const auto& config = BasicEngine::GetInstance()->GetConfig();
-    camera_.SetAspect(config.windowSize.x, config.windowSize.y);
+    const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
+    camera_.SetAspect(windowSize.x, windowSize.y);
     camera_.Update(dt);	textureManager_.Update(dt);
 }
 
@@ -117,8 +117,8 @@ void HelloHdrProgram::Render()
     glBindTexture(GL_TEXTURE_2D, cubeTexture_);
     for(size_t i = 0; i < lights_.size(); i++)
     {
-        cubeShader_.SetVec3("lights["+std::to_string(i)+"].Position", lights_[i].lightPos_);
-        cubeShader_.SetVec3("lights["+std::to_string(i)+"].Color", lights_[i].lightColor_);
+        cubeShader_.SetVec3(fmt::format("lights[{}].Position", i), lights_[i].lightPos_);
+        cubeShader_.SetVec3(fmt::format("lights[{}].Color", i), lights_[i].lightColor_);
     }
     cubeShader_.SetInt("lightNmb", lights_.size());
     cubeShader_.SetBool("inverseNormals", true);
@@ -147,19 +147,20 @@ void HelloHdrProgram::OnEvent(const SDL_Event& event)
 
 void HelloHdrProgram::CreateFramebuffer()
 {
-    const auto& config = BasicEngine::GetInstance()->GetConfig();
+    const auto* engine = BasicEngine::GetInstance();
+    const auto windowSize = engine->GetWindowSize();
     glGenFramebuffers(1, &hdrFbo_);
     // create floating point color buffer
     glGenTextures(1, &hdrColorBuffer_);
     glBindTexture(GL_TEXTURE_2D, hdrColorBuffer_);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, config.windowSize.x, config.windowSize.y, 0, GL_RGBA, GL_FLOAT, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, windowSize.x, windowSize.y, 0, GL_RGBA, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glBindTexture(GL_TEXTURE_2D, 0);
     // create depth buffer (renderbuffer)
     glGenRenderbuffers(1, &hdrRbo_);
     glBindRenderbuffer(GL_RENDERBUFFER, hdrRbo_);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, config.windowSize.x, config.windowSize.y);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, windowSize.x, windowSize.y);
     // attach buffers
     glBindFramebuffer(GL_FRAMEBUFFER, hdrFbo_);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, hdrColorBuffer_, 0);

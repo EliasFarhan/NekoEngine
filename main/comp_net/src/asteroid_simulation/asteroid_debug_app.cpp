@@ -48,8 +48,8 @@ void SimulationDebugApp::Init()
             quad_.Init();
             //client shader init
             const auto& config = BasicEngine::GetInstance()->GetConfig();
-            clientShader_.LoadFromFile(config.dataRootPath + "shaders/comp_net/client.vert",
-                config.dataRootPath + "shaders/comp_net/client.frag");
+            clientShader_.LoadFromFile(config.data_root() + "shaders/comp_net/client.vert",
+                config.data_root() + "shaders/comp_net/client.frag");
             windowSize_ = config.windowSize;
             for (auto& framebuffer : clientsFramebuffer_)
             {
