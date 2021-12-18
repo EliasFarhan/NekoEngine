@@ -40,7 +40,7 @@ namespace neko::voxel
 void VoxelRenderProgram::Init()
 {
 #ifdef TRACY_ENABLE
-    EASY_BLOCK("Voxel Init");
+    ZoneScoped;
 #endif
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -180,7 +180,7 @@ void VoxelRenderProgram::Destroy()
 void VoxelRenderProgram::Render()
 {
 #ifdef TRACY_ENABLE
-    EASY_BLOCK("Voxel Render");
+    ZoneScoped;
 #endif
     cubeShader_.Bind();
     cubeShader_.SetTexture("tilesheet", tilesheetTexture_);
@@ -192,7 +192,7 @@ void VoxelRenderProgram::Render()
     for (size_t chunk = 0; chunk < renderData_.size() / instanceChunkSize_ + 1; chunk++)
     {
 #ifdef TRACY_ENABLE
-        EASY_BLOCK("Chunk Render");
+        ZoneNamedN(chunkRender, "Chunk Render", true);
 #endif
         const size_t chunkBeginIndex = chunk * instanceChunkSize_ ;
         const size_t chunkEndIndex = std::min(renderData_.size() , (chunk + 1) * instanceChunkSize_ );
@@ -262,7 +262,7 @@ void VoxelRenderProgram::AddCube(const Cube& cube, ChunkId chunkId, RegionId reg
 void VoxelRenderProgram::SyncBuffers()
 {
 #ifdef TRACY_ENABLE
-    EASY_BLOCK("Voxel Sync Buffer");
+    ZoneScoped;
 #endif
     std::swap(renderData_, currentRenderData_);
     std::swap(camera3D_, currentCamera3D_);

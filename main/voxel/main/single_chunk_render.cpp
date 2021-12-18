@@ -26,7 +26,7 @@
 #include "gl/shape.h"
 #include "gl/shader.h"
 #include "sdl_engine/sdl_engine.h"
-#include "gl/gles3_window.h"
+#include "gl/sdl_window.h"
 #include "gl/graphics.h"
 #include "sdl_engine/sdl_camera.h"
 
@@ -43,12 +43,12 @@ class SingleChunkManager :
 public:
     void Init() override
     {
-        Job renderInit(
+        const auto renderInit = std::make_shared<Task>(
             [this]()
             {
                 renderProgram_.Init();
             });
-        BasicEngine::GetInstance()->ScheduleJob(&renderInit, neko::JobThreadType::RENDER_THREAD);
+        BasicEngine::GetInstance()->ScheduleTask(renderInit, WorkerQueue::RENDER_QUEUE_NAME);
 
         camera3D_.Init();
         camera3D_.farPlane = 3000.0f;
@@ -76,7 +76,7 @@ public:
             }
         }
 
-        renderInit.Join();
+        renderInit->Join();
         RendererLocator::get().RegisterSyncBuffersFunction(&renderProgram_);
     }
 
@@ -90,13 +90,13 @@ public:
 
     void Destroy() override
     {
-        Job renderDestroy(
+        const auto renderDestroy = std::make_shared<Task>(
             [this]()
             {
                 renderProgram_.Destroy();
             });
-        BasicEngine::GetInstance()->ScheduleJob(&renderDestroy, JobThreadType::RENDER_THREAD);
-        renderDestroy.Join();
+        BasicEngine::GetInstance()->ScheduleTask(renderDestroy, WorkerQueue::RENDER_QUEUE_NAME);
+        renderDestroy->Join();
     }
 
     void OnEvent(const SDL_Event& event) override
@@ -116,7 +116,7 @@ private:
 int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 {
     neko::Filesystem filesystem;
-    neko::sdl::Gles3Window window;
+    neko::gl::Gles3Window window;
     neko::gl::Gles3Renderer renderer;
     neko::sdl::SdlEngine engine(filesystem);
     engine.SetWindowAndRenderer(&window, &renderer);

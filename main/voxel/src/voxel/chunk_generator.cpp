@@ -25,12 +25,14 @@
 #include "voxel/chunk_generator.h"
 
 
+
 #include "engine/assert.h"
 #include "mathematics/basic.h"
 #include "mathematics/vector.h"
 
 #ifdef TRACY_ENABLE
 #include <Tracy.hpp>
+#include <TracyC.h>
 #endif
 
 namespace neko::voxel
@@ -139,8 +141,9 @@ Chunk ChunkGenerator::GenerateChunk(RegionId regionId, ChunkId chunkId) const
 Region ChunkGenerator::GenerateRegion(RegionId regionId) const
 {
 #ifdef TRACY_ENABLE
-    EASY_BLOCK("Generate Region");
-    EASY_BLOCK("Generate Height Map");
+    ZoneScoped;
+    TracyCZoneCtx generateHeightMap{};
+    TracyCZoneName(generateHeightMap, "Generate Height Map", 1);
 #endif
 
     const Vec2df regionOriginPos = Region::GetRegionPos(regionId);
@@ -165,7 +168,7 @@ Region ChunkGenerator::GenerateRegion(RegionId regionId) const
         }
     }
 #ifdef TRACY_ENABLE
-    EASY_END_BLOCK;
+    TracyCZoneEnd(generateHeightMap);
 #endif
     Region newRegion{};
     newRegion.Init();

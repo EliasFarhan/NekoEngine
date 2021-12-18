@@ -33,6 +33,5 @@ namespace neko
 void logDebug(std::string_view msg);
 void logWarning(std::string_view msg);
 void logError(std::string_view msg);
-const std::vector<std::string>& getLog();
 
 }

@@ -28,14 +28,14 @@
 
 #include "chunk_generator.h"
 #include "region.h"
-#include "engine/jobsystem.h"
+#include "engine/worker_system.h"
 
 namespace neko::voxel
 {
 
 struct ChunkLoadingJob
 {
-    Job loadingJob;
+    std::shared_ptr<Task> loadingJob;
     ChunkId chunkId = 0;
     RegionId regionId = 0;
 };
@@ -57,6 +57,6 @@ private:
     std::vector<const Chunk*> currentChunks_;
     std::vector<Region> regions_;
     std::queue<ChunkLoadingJob> chunkLoadingQueue_;
-    Job initJob{ []() {} };
+    std::shared_ptr<Task> initTask_;
 };
 }

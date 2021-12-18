@@ -45,7 +45,7 @@ const std::vector<Chunk>& Region::GetChunks() const
 void Region::GenerateFromHeightMap(const HeightMap& map)
 {
 #ifdef TRACY_ENABLE
-    EASY_BLOCK("Generate From Height Map");
+    ZoneScoped;
 #endif
     const size_t regionWidth = regionSize * chunkSize;
     for(size_t x = 0; x < regionWidth; x++)

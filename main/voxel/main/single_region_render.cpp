@@ -22,11 +22,12 @@
  SOFTWARE.
  */
 
+
 #include "engine/system.h"
 #include "gl/shape.h"
 #include "gl/shader.h"
 #include "sdl_engine/sdl_engine.h"
-#include "gl/gles3_window.h"
+#include "gl/sdl_window.h"
 #include "gl/graphics.h"
 #include "sdl_engine/sdl_camera.h"
 
@@ -36,6 +37,7 @@
 
 #ifdef TRACY_ENABLE
 #include <Tracy.hpp>
+#include <TracyC.h>
 #endif
 
 namespace neko::voxel
@@ -48,12 +50,12 @@ class SingleRegionManager :
 public:
     void Init() override
     {
-        Job renderInit(
+        const auto renderInit = std::make_shared<Task>(
                 [this]()
                 {
                     renderProgram_.Init();
                 });
-        BasicEngine::GetInstance()->ScheduleJob(&renderInit, neko::JobThreadType::RENDER_THREAD);
+        BasicEngine::GetInstance()->ScheduleTask(renderInit, WorkerQueue::RENDER_QUEUE_NAME);
         camera3D_.position = Vec3f(0, 100, 0);
         camera3D_.WorldLookAt(camera3D_.position + Vec3f::forward + Vec3f::right);
         camera3D_.farPlane = 5000.0f;
@@ -63,18 +65,19 @@ public:
 
         region_ = chunkGenerator_.GenerateRegion(0);
 
-        renderInit.Join();
+        renderInit->Join();
         RendererLocator::get().RegisterSyncBuffersFunction(&renderProgram_);
     }
 
-    void Update(neko::seconds dt) override
+    void Update(seconds dt) override
     {
 #ifdef TRACY_ENABLE
-        EASY_BLOCK("Update Region Manager");
+        ZoneScoped;
 #endif
         camera3D_.Update(dt);
 #ifdef TRACY_ENABLE
-        EASY_BLOCK("Push Chunks To Renderer");
+        TracyCZoneCtx pushChunks{};
+        TracyCZoneName(pushChunks, "Push Chunks To Renderer", 1);
 #endif
         for(const auto& chunk : region_.GetChunks())
         {
@@ -83,7 +86,7 @@ public:
 
         }
 #ifdef TRACY_ENABLE
-        EASY_END_BLOCK;
+        TracyCZoneEnd(pushChunks);
 #endif
         renderProgram_.SetCurrentCamera(camera3D_);
         RendererLocator::get().Render(&renderProgram_);
@@ -91,13 +94,13 @@ public:
 
     void Destroy() override
     {
-        Job renderDestroy(
+        const auto renderDestroy = std::make_shared<Task>(
                 [this]()
                 {
                     renderProgram_.Destroy();
                 });
-        BasicEngine::GetInstance()->ScheduleJob(&renderDestroy, JobThreadType::RENDER_THREAD);
-        renderDestroy.Join();
+        BasicEngine::GetInstance()->ScheduleTask(renderDestroy, WorkerQueue::RENDER_QUEUE_NAME);
+        renderDestroy->Join();
     }
 
     void OnEvent(const SDL_Event& event) override
@@ -118,7 +121,7 @@ private:
 int main([[maybe_unused]]int argc, [[maybe_unused]]char** argv)
 {
     neko::Filesystem filesystem;
-    neko::sdl::Gles3Window window;
+    neko::gl::Gles3Window window;
     neko::gl::Gles3Renderer renderer;
     neko::sdl::SdlEngine engine(filesystem);
     engine.SetWindowAndRenderer(&window, &renderer);

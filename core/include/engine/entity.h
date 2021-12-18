@@ -45,9 +45,9 @@ using EntityHash = xxh::hash_t<64>;
  * \brief EntityMask is a bitmask representation of the activated components
  */
 using EntityMask = std::uint32_t;
-const Entity INVALID_ENTITY = std::numeric_limits<Index>::max();
-const EntityMask INVALID_ENTITY_MASK = 0u;
-const EntityHash INVALID_ENTITY_HASH = EntityHash(0);
+constexpr Entity INVALID_ENTITY = std::numeric_limits<Index>::max();
+constexpr EntityMask INVALID_ENTITY_MASK = 0u;
+constexpr EntityHash INVALID_ENTITY_HASH = static_cast<EntityHash>(0);
 enum class ComponentType : std::uint32_t;
 
 template<typename T, EntityMask componentType>
@@ -108,7 +108,7 @@ public:
 
     void RegisterOnChangeParent(OnChangeParentInterface* onChangeInterface);
 
-    Entity GetEntityParent(Entity entity) const;
+    [[nodiscard]] Entity GetEntityParent(Entity entity) const;
 
 	/**
 	 * \brief Set the entity parent and check if child is not recursive parent.

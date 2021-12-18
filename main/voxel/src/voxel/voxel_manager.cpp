@@ -35,7 +35,7 @@ namespace neko::voxel
 void VoxelManager::Init()
 {
 #ifdef TRACY_ENABLE
-    EASY_BLOCK("Init Voxel Manager");
+    ZoneScoped;
 #endif
     regions_.emplace_back();
     auto& region = regions_.front();
@@ -49,10 +49,10 @@ void VoxelManager::Init()
         initialHeight_ = float(height) - float(regionHeight / 2 * chunkSize);
     }
     const auto workerNumber = BasicEngine::GetInstance()->GetWorkersNumber();
-    initJob = Job([this, chunkX, chunkZ, workerNumber]()
+    initTask_ = std::make_shared<Task>([this, chunkX, chunkZ, workerNumber]()
         {
 #ifdef TRACY_ENABLE
-            EASY_BLOCK("Init Job Voxel Manager");
+            ZoneNamedN(initVoxelManager, "Init Job Voxel Manager", true);
 #endif
             for (int dx = -renderDistance_; dx <= renderDistance_; dx++)
             {
@@ -87,31 +87,34 @@ void VoxelManager::Init()
                     {
                         const auto newChunkY = (height + dy) / chunkSize;
                         const auto chunkId = Region::GetChunkId(newChunkX, newChunkZ, newChunkY);
-                        chunkLoadingQueue_.push(ChunkLoadingJob{ Job{ [this, chunkId]()
+                        chunkLoadingQueue_.push(ChunkLoadingJob{
+                            std::make_shared<Task>( [this, chunkId]()
                         {
                             #ifdef TRACY_ENABLE
-                                EASY_BLOCK("Generating Chunk");
+                                ZoneNamedN(generateChunk, "Generating Chunk", true);
                             #endif
                             regions_.front().SetChunk(chunkId, chunkGenerator_.GenerateChunk(0, chunkId));
-                        } }, chunkId, 0 });
+                        }), 
+                                chunkId, 
+                            0 });
 
-                        BasicEngine::GetInstance()->ScheduleJob(&chunkLoadingQueue_.back().loadingJob,
-                                                                JobThreadType::OTHER_THREAD);
+                        BasicEngine::GetInstance()->ScheduleTask(chunkLoadingQueue_.back().loadingJob,
+                                                                WorkerQueue::OTHER_QUEUE_NAME);
                     }
                 }
             }
         });
-    BasicEngine::GetInstance()->ScheduleJob(&initJob, JobThreadType::RESOURCE_THREAD);
+    BasicEngine::GetInstance()->ScheduleTask(initTask_, WorkerQueue::RESOURCE_QUEUE_NAME);
     
 }
 
 void VoxelManager::Update(seconds dt)
 {
-    if (!initJob.IsDone())
+    if (!initTask_->IsDone())
         return;
     while (!chunkLoadingQueue_.empty())
     {
-        if(chunkLoadingQueue_.front().loadingJob.IsDone())
+        if(chunkLoadingQueue_.front().loadingJob->IsDone())
         {
             const auto& chunkLoadingJob = chunkLoadingQueue_.front();
             currentChunks_.push_back(regions_[chunkLoadingJob.regionId]

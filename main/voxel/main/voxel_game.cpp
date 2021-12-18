@@ -22,12 +22,13 @@
  SOFTWARE.
  */
 
+
 #include "engine/system.h"
 #include "fs/physfs.h"
 #include "gl/shape.h"
 #include "gl/shader.h"
 #include "sdl_engine/sdl_engine.h"
-#include "gl/gles3_window.h"
+#include "gl/sdl_window.h"
 #include "gl/graphics.h"
 #include "sdl_engine/sdl_camera.h"
 
@@ -38,6 +39,7 @@
 
 #ifdef TRACY_ENABLE
 #include <Tracy.hpp>
+#include <TracyC.h>
 #endif
 
 namespace neko::voxel
@@ -51,37 +53,40 @@ class VoxelGame :
 public:
     void Init() override
     {
-        Job renderInit(
+        const auto renderInit = std::make_shared<Task>(
                 [this]()
                 {
                     renderProgram_.Init();
                 });
-        BasicEngine::GetInstance()->ScheduleJob(&renderInit, neko::JobThreadType::RENDER_THREAD);
+        BasicEngine::GetInstance()->ScheduleTask(renderInit, WorkerQueue::RENDER_QUEUE_NAME);
         voxelManager_.Init();
 
-        const auto& config = BasicEngine::GetInstance()->GetConfig();
+        const auto* engine = BasicEngine::GetInstance();
+        const auto& config = engine->GetConfig();
+        const auto windowSize = engine->GetWindowSize();
         camera3D_.position = Vec3f(0, voxelManager_.GetInitialHeight() + 2.0f, 0);
         camera3D_.WorldLookAt(camera3D_.position + Vec3f::forward + Vec3f::right);
         camera3D_.farPlane = 5000.0f;
         camera3D_.cameraSpeed_ = 10.0f;
         camera3D_.cameraFast_ = 100.0f;
         camera3D_.fovY = degree_t(45.0f / 2.0f);
-        camera3D_.SetAspect(config.windowSize.x, config.windowSize.y);
+        camera3D_.SetAspect(windowSize.x, windowSize.y);
 
-        renderInit.Join();
+        renderInit->Join();
         RendererLocator::get().RegisterSyncBuffersFunction(&renderProgram_);
     }
 
     void Update(neko::seconds dt) override
     {
 #ifdef TRACY_ENABLE
-        EASY_BLOCK("Update Region Manager");
+        ZoneScoped;
 #endif
         voxelManager_.Update(dt);
         camera3D_.Update(dt);
         renderProgram_.SetCurrentCamera(camera3D_);
 #ifdef TRACY_ENABLE
-        EASY_BLOCK("Push Chunks To Renderer");
+        TracyCZoneCtx pushChunks{};
+        TracyCZoneName(pushChunks, "Push Chunks To Renderer", 1);
 #endif
         for(const auto* chunk : voxelManager_.GetChunks())
         {
@@ -90,20 +95,20 @@ public:
 
         }
 #ifdef TRACY_ENABLE
-        EASY_END_BLOCK;
+        TracyCZoneEnd(pushChunks);
 #endif
         RendererLocator::get().Render(&renderProgram_);
     }
 
     void Destroy() override
     {
-        Job renderDestroy(
+        const auto renderDestroy = std::make_shared<Task>(
                 [this]()
                 {
                     renderProgram_.Destroy();
                 });
-        BasicEngine::GetInstance()->ScheduleJob(&renderDestroy, JobThreadType::RENDER_THREAD);
-        renderDestroy.Join();
+        BasicEngine::GetInstance()->ScheduleTask(renderDestroy, WorkerQueue::RENDER_QUEUE_NAME);
+        renderDestroy->Join();
     }
 
     void OnEvent(const SDL_Event& event) override
@@ -126,17 +131,19 @@ private:
 
 int main([[maybe_unused]]int argc, [[maybe_unused]]char** argv)
 {
-    neko::Configuration config;
-    config.windowSize = neko::Vec2u(1280, 720);
-    //config.workerNumber = 3;
-    config.flags = neko::Configuration::NONE;
+
     neko::physfs::PhysFsFilesystem filesystem (argv[0]);
     filesystem.Init();
-    filesystem.AddMount(config.data_root() + "voxel.pkg", config.data_root(), 1);
-   
-    neko::sdl::Gles3Window window;
+    
+    neko::gl::Gles3Window window;
     neko::gl::Gles3Renderer renderer;
-    neko::sdl::SdlEngine engine(filesystem, config);
+    neko::sdl::SdlEngine engine(filesystem);
+    auto& config = engine.MutableConfig();
+    config.set_window_size_x(1280);
+    config.set_window_size_y(720);
+    config.set_vertical_sync(false);
+    filesystem.AddMount(config.data_root() + "voxel.pkg", config.data_root(), 1);
+
     engine.SetWindowAndRenderer(&window, &renderer);
 
     neko::voxel::VoxelGame chunkManager;

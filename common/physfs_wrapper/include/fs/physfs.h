@@ -24,6 +24,7 @@ SOFTWARE.
 */
 
 #include "engine/filesystem.h"
+#include "engine/system.h"
 
 namespace neko::physfs
 {
@@ -31,13 +32,13 @@ class PhysFsFilesystem : public FilesystemInterface, public SystemInterface
 {
 public:
     explicit PhysFsFilesystem(const char* argv0);
-    BufferFile LoadFile(std::string_view path) const override;
+    [[nodiscard]] BufferFile LoadFile(std::string_view path) const override;
 
-    bool FileExists(std::string_view filename) const override;
+    [[nodiscard]] bool FileExists(std::string_view filename) const override;
 
-    bool IsRegularFile(std::string_view view) const override;
+    [[nodiscard]] bool IsRegularFile(std::string_view view) const override;
 
-    bool IsDirectory(std::string_view filename) const override;
+    [[nodiscard]] bool IsDirectory(std::string_view filename) const override;
 
     void Init() override;
 

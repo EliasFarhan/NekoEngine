@@ -35,7 +35,7 @@ namespace neko::voxel
 void PerlinViewer::Init()
 {
     perlinValues_.resize(textureSize_);
-    Job renderInit([this]()
+    const auto renderInit = std::make_shared<Task>([this]()
     {
         const auto& config = BasicEngine::GetInstance()->GetConfig();
         viewerShader_.LoadFromFile(config.data_root()+"shaders/tools/perlin_viewer.vert",
@@ -44,8 +44,8 @@ void PerlinViewer::Init()
         ReloadTexture();
 
     });
-    BasicEngine::GetInstance()->ScheduleJob(&renderInit, JobThreadType::RENDER_THREAD);
-    renderInit.Join();
+    BasicEngine::GetInstance()->ScheduleTask(renderInit, WorkerQueue::RENDER_QUEUE_NAME);
+    renderInit->Join();
 }
 
 void PerlinViewer::Update(seconds dt)
@@ -55,15 +55,15 @@ void PerlinViewer::Update(seconds dt)
 
 void PerlinViewer::Destroy()
 {
-    Job renderDestroy([this]()
+    const auto renderDestroy = std::make_shared<Task>([this]()
                    {
                        const auto& config = BasicEngine::GetInstance()->GetConfig();
                        viewerShader_.Destroy();
                        renderQuad_.Destroy();
                        glDeleteTextures(1, &perlinTexture_);
                    });
-    BasicEngine::GetInstance()->ScheduleJob(&renderDestroy, JobThreadType::RENDER_THREAD);
-    renderDestroy.Join();
+    BasicEngine::GetInstance()->ScheduleTask(renderDestroy, WorkerQueue::RENDER_QUEUE_NAME);
+    renderDestroy->Join();
 }
 
 void PerlinViewer::DrawImGui()

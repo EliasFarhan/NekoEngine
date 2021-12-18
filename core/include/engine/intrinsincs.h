@@ -22,10 +22,6 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-#if defined(EMSCRIPTEN)
-#include <wasm_simd128.h>
-typedef float v4f __attribute__ ((vector_size (16)));
-#endif
 
 #ifdef WIN32
 	#include <intrin.h>

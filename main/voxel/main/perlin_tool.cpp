@@ -24,7 +24,7 @@
 
 #include <array>
 
-#include <gl/gles3_window.h>
+#include <gl/sdl_window.h>
 #include <sdl_engine/sdl_engine.h>
 #include <gl/graphics.h>
 
@@ -33,7 +33,7 @@
 int main([[maybe_unused]]int argc, [[maybe_unused]]char** argv)
 {
     neko::Filesystem filesystem;
-    neko::sdl::Gles3Window window;
+    neko::gl::Gles3Window window;
     neko::gl::Gles3Renderer renderer;
     neko::sdl::SdlEngine engine(filesystem);
     engine.SetWindowAndRenderer(&window, &renderer);

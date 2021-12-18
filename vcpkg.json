@@ -22,6 +22,7 @@
       "freetype",
       "glew",
       "nlohmann-json",
-      "valijson"
+      "valijson",
+      "physfs"
     ]
   }

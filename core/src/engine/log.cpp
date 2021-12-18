@@ -29,8 +29,7 @@
 #endif
 namespace neko
 {
-
-static std::vector<std::string> logs;
+    
 void logDebug(std::string_view msg)
 {
 #if defined(__ANDROID__)
@@ -58,8 +57,4 @@ void logError(std::string_view msg)
 #endif
 }
 
-const std::vector<std::string>& getLog()
-{
-    return logs;
-}
 }
