@@ -103,8 +103,6 @@ void Gles3Window::Init()
 #endif
 	glCheckError();
 	InitImGui();
-
-	ImGui_ImplSDL2_InitForOpenGL(window_, &glRenderContext_);
 	glCheckError();
 	LeaveCurrentContext();
 
@@ -125,7 +123,7 @@ void Gles3Window::InitImGui()
 	ZoneScoped;
 #endif
 	SdlWindow::InitImGui();
-	ImGui_ImplSDL2_InitForOpenGL(window_, glRenderContext_);
+	ImGui_ImplSDL2_InitForOpenGL(window_, &glRenderContext_);
 	ImGui_ImplOpenGL3_Init("#version 300 es");
 
 }

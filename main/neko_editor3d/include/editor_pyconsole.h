@@ -15,7 +15,7 @@ public:
 private:
     std::vector<std::string> previousCommands_;
     static constexpr size_t commandBufferSize_ = 128;
-    char currentCommand_[128];
+    std::array<char, commandBufferSize_> currentCommand_{};
 };
 
 }

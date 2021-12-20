@@ -9,7 +9,7 @@
       "stb",
       {
         "name": "imgui",
-        "features": [ "sdl2-binding", "opengl3-binding" ]
+        "features": [ "sdl2-binding", "opengl3-binding", "docking-experimental" ]
       },
       "spdlog",
       "argh",

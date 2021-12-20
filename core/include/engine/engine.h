@@ -22,11 +22,11 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-#include <optional>
 
 #include <engine/system.h>
 #include <utils/action_utility.h>
 #include <utils/time_utility.h>
+#include "mathematics/vector.h"
 
 #include "worker_system.h"
 #include "engine/filesystem.h"

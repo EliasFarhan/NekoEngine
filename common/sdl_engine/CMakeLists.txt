@@ -5,7 +5,7 @@ if(Neko_Android)
 else()
     find_package(SDL2 CONFIG REQUIRED)
 
-    LIST(APPEND sdl_engine_libs SDL2::SDL2 SDL2::SDL2main Neko_Core)
+    LIST(APPEND sdl_engine_libs Neko_Core SDL2::SDL2 SDL2::SDL2main )
 endif()
 
 

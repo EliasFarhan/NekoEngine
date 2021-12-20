@@ -5,7 +5,6 @@
 #include "utils/file_utility.h"
 #include "engine/engine.h"
 #include "gl/model.h"
-#include "engine/configuration.h"
 #include <model_viewer.h>
 
 namespace neko::editor

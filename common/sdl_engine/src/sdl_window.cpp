@@ -96,8 +96,9 @@ void SdlWindow::InitImGui()
 
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Keyboard Gamepad
-    //io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
+    logDebug(fmt::format("ImGui IO: {}", io.ConfigFlags));
     // Setup Dear ImGui style
     //ImGui::StyleColorsDark();
     ImGui::StyleColorsClassic();

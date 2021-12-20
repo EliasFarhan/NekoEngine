@@ -1,5 +1,5 @@
 #include "editor_pyconsole.h"
-
+#include "utils/time_utility.h"
 #include <imgui.h>
 #include <pybind11/embed.h> // everything needed for embedding
 namespace py = pybind11;
@@ -21,21 +21,21 @@ void EditorPyConsole::Destroy()
 void EditorPyConsole::DrawImGui()
 {
     ImGui::Begin("PyConsole");
-    bool confirmCommand = ImGui::InputText("Command", currentCommand_, commandBufferSize_, ImGuiInputTextFlags_EnterReturnsTrue);
+    const bool confirmCommand = ImGui::InputText("Command", currentCommand_.data(), commandBufferSize_, ImGuiInputTextFlags_EnterReturnsTrue);
     //bool pressed_enter = IsItemActivePreviousFrame() && !IsItemActive() && IsKeyPressed(io.KeyMap[ImGuiKey_Enter]);
     ImGui::SameLine();
-    if(ImGui::Button("Execute") or confirmCommand)
+    if(ImGui::Button("Execute") || confirmCommand)
     {
 
         try
         {
-            py::exec(currentCommand_);
+            py::exec(currentCommand_.data());
         }
         catch (py::error_already_set& e)
         {
             e.discard_as_unraisable(__func__);
         }
-        previousCommands_.emplace_back(currentCommand_);
+        previousCommands_.emplace_back(currentCommand_.data());
         currentCommand_[0] = 0;
         
     }
