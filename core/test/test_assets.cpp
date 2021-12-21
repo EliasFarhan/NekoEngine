@@ -40,9 +40,9 @@ TEST(Engine, TestUUIDToStringToUUID)
 
 TEST(Engine, TestAssetImport)
 {
-	neko::Configuration config;
+	core::pb::Config config;
 	neko::Filesystem filesystem;
-	config.data_root() = "../";
+	*config.mutable_data_root() = "../";
 	std::vector<std::string> filenames =
 	{
 		config.data_root()+"data/sprites/platform.jpg",

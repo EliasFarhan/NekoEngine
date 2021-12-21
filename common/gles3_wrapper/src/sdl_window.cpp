@@ -59,11 +59,11 @@ void Gles3Window::Init()
 #endif
 	const auto& config = BasicEngine::GetInstance()->GetConfig();
 	// Set our OpenGL version.
-#ifdef WIN32
+
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6);
-#else
+#if false
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
@@ -123,7 +123,7 @@ void Gles3Window::InitImGui()
 	ZoneScoped;
 #endif
 	SdlWindow::InitImGui();
-	ImGui_ImplSDL2_InitForOpenGL(window_, &glRenderContext_);
+	ImGui_ImplSDL2_InitForOpenGL(window_, glRenderContext_);
 	ImGui_ImplOpenGL3_Init("#version 300 es");
 
 }
