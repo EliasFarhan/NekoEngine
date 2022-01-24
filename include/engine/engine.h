@@ -99,7 +99,7 @@ protected:
 class MainEngine : public BasicEngine
 {
 public:
-    MainEngine(Configuration* config);
+    MainEngine(Configuration* config = nullptr);
 
     ~MainEngine() override;
 
