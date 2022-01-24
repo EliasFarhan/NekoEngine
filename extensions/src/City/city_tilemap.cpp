@@ -33,6 +33,7 @@
 
 #ifdef TRACY_ENABLE
 #include <Tracy.hpp>
+#include <TracyC.h>
 #endif
 namespace neko
 {
@@ -429,25 +430,46 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 		//ENVIRONMENT
 	case CityTilesheetType::ENVIRONMENT:
 	{
+#ifdef TRACY_ENABLE
+		TracyCZoneN(grassCtx, "Grass", true);
+#endif
+
+		const auto topLeft = sf::Vector2f(windowView_.left, windowView_.top);
+		const auto bottomRight = sf::Vector2f(windowView_.left+windowView_.width, windowView_.top+windowView_.height);
 		constexpr auto grassIndex = static_cast<Index>(CityTileType::GRASS);
+		const unsigned startX = std::floor((topLeft.x + tileSize_.x / 2) / tileSize_.x);
+		const unsigned startY = std::floor((topLeft.y + tileSize_.y / 2) / tileSize_.y);
+		const unsigned endX = std::ceil((bottomRight.x + tileSize_.x / 2) / tileSize_.x);
+		const unsigned endY = std::ceil((bottomRight.y + tileSize_.y / 2) / tileSize_.y);
+
 		//Fill the vertex array with grass
-		for (auto x = 0u; x < cityBuilderMap.city.mapSize.x; x++)
+		for (auto x = startX; x < endX; x++)
 		{
-			for (auto y = 0u; y < cityBuilderMap.city.mapSize.y; y++)
+			for (auto y = startY; y < endY; y++)
 			{
 
 				const auto position = sf::Vector2f(
 					static_cast<float>(x * tileSize_.x),
 					static_cast<float>(y * tileSize_.y));
 				auto& rect = textureRects_[grassIndex];
+				const sf::FloatRect tileRect = sf::FloatRect(sf::Vector2f(
+					position.x - tileSize_.x / 2,
+					position.y - tileSize_.y / 2), sf::Vector2f(tileSize_));
+
+				if (!windowView_.intersects(tileRect))
+					continue;
 				auto& center = rectCenter_[grassIndex];
 				AddNewCityTile(position, sf::Vector2f(tileSize_), rect, center, updatedCityTileType);
 			}
 		}
+#ifdef TRACY_ENABLE
+		TracyCZoneEnd(grassCtx);
+		TracyCZoneN(waterCtx, "Water", true);
+#endif
 		//Add water on top of it
-		for (auto x = 0u; x < cityBuilderMap.city.mapSize.x; x++)
+		for (auto x = startX; x < endX; x++)
 		{
-			for (auto y = 0u; y < cityBuilderMap.city.mapSize.y; y++)
+			for (auto y = startY; y < endY; y++)
 			{
 
 				Index waterIndex = 0u;
@@ -537,6 +559,9 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 				AddNewCityTile(position, sf::Vector2f(tileSize_), rect, center, updatedCityTileType);
 			}
 		}
+#ifdef TRACY_ENABLE
+		TracyCZoneEnd(waterCtx);
+#endif
 		break;
 	}
 	case CityTilesheetType::TRANSPORT:
@@ -547,6 +572,9 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 
 	case CityTilesheetType::CITY:
 	{
+#ifdef TRACY_ENABLE
+		TracyCZoneN(elementsCtx, "Elements", true);
+#endif
 		for (auto& element : cityBuilderMap.elements_)
 		{
 			switch (element.elementType)
@@ -563,6 +591,10 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 				const auto position = sf::Vector2f(
 					static_cast<float>(element.position.x * tileSize_.x),
 					static_cast<float>(element.position.y * tileSize_.y));
+				const sf::FloatRect tileRect = sf::FloatRect(sf::Vector2f(
+					position.x - tileSize_.x / 2,
+					position.y - tileSize_.y / 2), sf::Vector2f(tileSize_));
+
 				const auto rect = textureRects_[treesIndex];
 				const auto center = rectCenter_[treesIndex];
 				const auto size = sf::Vector2f(
@@ -591,7 +623,10 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 				break;
 			}
 		}
-
+#ifdef TRACY_ENABLE
+		TracyCZoneEnd(elementsCtx);
+		TracyCZoneN(buildingsCtx, "Buildings", true);
+#endif
 		for (const auto& building : buildingManager.GetBuildingsVector())
 		{
 			const auto buildingIndex = static_cast<Index>(building.buildingType);
@@ -599,6 +634,9 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 			const auto size = rectCenter_[buildingIndex] * 2.0f;
 			AddNewCityTile(position, size, textureRects_[buildingIndex], rectCenter_[buildingIndex], updatedCityTileType);
 		}
+#ifdef TRACY_ENABLE
+		TracyCZoneEnd(buildingsCtx);
+#endif
 		break;
 	}
 	case CityTilesheetType::CAR:
@@ -613,7 +651,7 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 			const auto position = transformManager.GetPosition(car.entity);
 			auto deltaPos = car.currentPath[car.currentIndex + 1] - car.currentPath[car.currentIndex];
 
-			AddCar(position, car.spriteSize, rect, center, deltaPos.x > 0 ? false : true, false);
+			AddCar(position, car.spriteSize, rect, center, deltaPos.x > 0 ? false : true, true);
 		}
 		break;
 	}
