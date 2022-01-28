@@ -48,15 +48,13 @@ namespace neko {
 			}
 			if (element.value().is_boolean())
 			{
-				nodeVariables.vecVariables.push_back(
-					{ element.key(),
-					(element.value().get<bool>()) ? "true" : "false" });
+				nodeVariables.vecVariables.emplace_back(element.key(),
+                                                        (element.value().get<bool>()) ? "true" : "false");
 			}
 			if (element.value().is_number())
 			{
-				nodeVariables.vecVariables.push_back(
-					{ element.key(),
-					std::to_string(element.value().get<double>()) });
+				nodeVariables.vecVariables.emplace_back(element.key(),
+                                                        std::to_string(element.value().get<double>()));
 			}
 			if (element.value().is_object())
 			{
@@ -77,7 +75,7 @@ namespace neko {
 					behaviorTreeElementType == 
 					BehaviorTreeElementType::BTT_COMPOSITE)
 				{
-					for (auto elementArray : element.value().items()) {
+					for (const auto& elementArray : element.value().items()) {
 						nodeVariables.vecNodes.push_back(
 							ParseJsonObject(comp, elementArray.value()));
 					}
@@ -98,7 +96,7 @@ namespace neko {
 		return nodeVariables;
 	}
 
-	std::shared_ptr<BehaviorTreeNode>
+	std::unique_ptr<BehaviorTreeNode>
 		BehaviorTreeManager::ParseJsonCompositeSequence(
 			Index comp,
 			const json& jsonContent) const
@@ -109,14 +107,14 @@ namespace neko {
 				comp, 
 				jsonContent, 
 				BehaviorTreeElementType::BTT_COMPOSITE);
-		std::shared_ptr<BehaviorTreeCompositeSequence> compositeSequence =
-			std::make_shared<BehaviorTreeCompositeSequence>(
-				nodeVariables.vecNodes,
+		auto compositeSequence =
+			std::make_unique<BehaviorTreeCompositeSequence>(
+				std::move(nodeVariables.vecNodes),
 				nodeVariables.vecVariables);
 		return compositeSequence;
 	}
 
-	std::shared_ptr<BehaviorTreeNode>
+	std::unique_ptr<BehaviorTreeNode>
 		BehaviorTreeManager::ParseJsonCompositeSelector(
 			Index comp,
 			const json& jsonContent) const
@@ -127,14 +125,14 @@ namespace neko {
 				comp, 
 				jsonContent, 
 				BehaviorTreeElementType::BTT_COMPOSITE);
-		std::shared_ptr<BehaviorTreeCompositeSelector> compositeSelector =
-			std::make_shared<BehaviorTreeCompositeSelector>(
-				nodeVariables.vecNodes,
+		auto compositeSelector =
+			std::make_unique<BehaviorTreeCompositeSelector>(
+				std::move(nodeVariables.vecNodes),
 				nodeVariables.vecVariables);
 		return compositeSelector;
 	}
 
-	std::shared_ptr<BehaviorTreeNode> BehaviorTreeManager::ParseJsonComposite(
+	std::unique_ptr<BehaviorTreeNode> BehaviorTreeManager::ParseJsonComposite(
 		Index comp,
 		const json& jsonContent) const
 	{
@@ -145,14 +143,14 @@ namespace neko {
 				comp, 
 				jsonContent, 
 				BehaviorTreeElementType::BTT_COMPOSITE);
-		std::shared_ptr<BehaviorTreeComposite> composite =
-			std::make_shared<BehaviorTreeComposite>(
-				nodeVariables.vecNodes,
+		auto composite =
+			std::make_unique<BehaviorTreeComposite>(
+				std::move(nodeVariables.vecNodes),
 				nodeVariables.vecVariables);
 		return composite;
 	}
 
-	std::shared_ptr<BehaviorTreeNode> BehaviorTreeManager::ParseJsonDecorator(
+	std::unique_ptr<BehaviorTreeNode> BehaviorTreeManager::ParseJsonDecorator(
 		Index comp,
 		const json& jsonContent) const
 	{
@@ -164,76 +162,76 @@ namespace neko {
 				jsonContent, 
 				BehaviorTreeElementType::BTT_DECORATOR);
 		assert(nodeVariables.vecNodes.size() == 1);
-		std::shared_ptr<BehaviorTreeDecorator> decorator =
-			std::make_shared<BehaviorTreeDecorator>(
+		auto decorator =
+			std::make_unique<BehaviorTreeDecorator>(
 				comp,
-				nodeVariables.vecNodes[0],
+				std::move(nodeVariables.vecNodes[0]),
 				nodeVariables.vecVariables);
 		assert(nodeVariables.vecNodes.size() == 1);
-		decorator->SetChild(nodeVariables.vecNodes[0]);
+		//decorator->SetChild(nodeVariables.vecNodes[0]);
 		return decorator;
 	}
 
-	std::shared_ptr<BehaviorTreeNode> BehaviorTreeManager::ParseJsonLeafCondition(
+	std::unique_ptr<BehaviorTreeNode> BehaviorTreeManager::ParseJsonLeafCondition(
 		Index comp,
 		const json& jsonContent) const
 	{
 		
 		auto nodeVariables = ParseJsonVariablesNodes(comp, jsonContent);
-		std::shared_ptr<BehaviorTreeLeafCondition> condition =
-			std::make_shared<BehaviorTreeLeafCondition>(
+		auto condition =
+			std::make_unique<BehaviorTreeLeafCondition>(
 				comp,
 				nodeVariables.vecVariables);
 		return condition;
 	}
 
-	std::shared_ptr<BehaviorTreeNode> BehaviorTreeManager::ParseJsonLeafWait(
+	std::unique_ptr<BehaviorTreeNode> BehaviorTreeManager::ParseJsonLeafWait(
 		Index comp,
 		const json& jsonContent) const
 	{
 		
 		auto nodeVariables = ParseJsonVariablesNodes(comp, jsonContent);
-		std::shared_ptr<BehaviorTreeLeafWait> wait =
-			std::make_shared<BehaviorTreeLeafWait>(
+		auto wait =
+			std::make_unique<BehaviorTreeLeafWait>(
 				nodeVariables.vecVariables);
 		return wait;
 	}
 
-	std::shared_ptr<BehaviorTreeNode> BehaviorTreeManager::ParseJsonLeafMoveTo(
+	std::unique_ptr<BehaviorTreeNode> BehaviorTreeManager::ParseJsonLeafMoveTo(
 		Index comp,
 		const json& jsonContent) const
 	{
 		
 		auto nodeVariables = ParseJsonVariablesNodes(comp, jsonContent);
-		std::shared_ptr<BehaviorTreeLeafMoveTo> moveTo =
-			std::make_shared<BehaviorTreeLeafMoveTo>(
+		auto moveTo =
+			std::make_unique<BehaviorTreeLeafMoveTo>(
 				comp,
 				nodeVariables.vecVariables);
 		return moveTo;
 	}
 
-	std::shared_ptr<BehaviorTreeNode> BehaviorTreeManager::ParseJsonLeafFunctional(
+	std::unique_ptr<BehaviorTreeNode> BehaviorTreeManager::ParseJsonLeafFunctional(
 		Index comp,
 		const json& jsonContent) const 
 	{
 		
 		auto nodeVariables = ParseJsonVariablesNodes(comp, jsonContent);
-		std::shared_ptr<BehaviorTreeLeafFunctional> functional =
-			std::make_shared<BehaviorTreeLeafFunctional>(
+		auto functional =
+			std::make_unique<BehaviorTreeLeafFunctional>(
 				comp,
 				nodeVariables.vecVariables);
 		return functional;
 	}
 
-	std::shared_ptr<BehaviorTreeNode> BehaviorTreeManager::ParseJsonLeaf(
+	std::unique_ptr<BehaviorTreeNode> BehaviorTreeManager::ParseJsonLeaf(
 		Index comp,
 		const json& jsonContent) const
 	{
 		
 		logDebug("WARNING trying to parse a leaf node!");
 		auto nodeVariables = ParseJsonVariablesNodes(comp, jsonContent);
-		std::shared_ptr<BehaviorTreeLeaf> leaf =
-			std::make_shared<BehaviorTreeLeaf>(
+		auto leaf =
+			std::make_unique<BehaviorTreeLeaf>(
 				nodeVariables.vecVariables);
 		return leaf;
 	}
@@ -261,7 +259,7 @@ namespace neko {
 		return it->second;
 	}
 
-	std::shared_ptr<BehaviorTreeNode> BehaviorTreeManager::ParseJsonObject(
+	std::unique_ptr<BehaviorTreeNode> BehaviorTreeManager::ParseJsonObject(
 		Index comp,
 		const json& jsonContent) const
 	{
@@ -296,8 +294,8 @@ namespace neko {
 	}
 
 	void BehaviorTreeManager::LogBehaviorTree(
-		const std::shared_ptr<BehaviorTreeNode> behaviorTree) const
-	{
+		const BehaviorTreeNode* behaviorTree)
+    {
 		
 		static int indent = 0;
 		std::ostringstream oss_indent;
@@ -325,7 +323,7 @@ namespace neko {
 			logDebug(oss_indent.str() + "children : {");
 			indent++;
 			const auto interfaceComposite =
-				std::dynamic_pointer_cast<const BehaviorTreeComposite>(behaviorTree);
+				dynamic_cast<const BehaviorTreeComposite*>(behaviorTree);
 			if (!interfaceComposite)
 			{
 				logDebug(oss_indent.str() + "ERROR in composite!");
@@ -334,7 +332,7 @@ namespace neko {
 			{
 				for (const auto& child : interfaceComposite->GetChildrenList())
 				{
-					LogBehaviorTree(child);
+					LogBehaviorTree(child.get());
 				}
 			}
 			indent--;
@@ -346,7 +344,7 @@ namespace neko {
 			logDebug(oss_indent.str() + "decorator : {");
 			indent++;
 			const auto childDecorator =
-				std::dynamic_pointer_cast<const BehaviorTreeDecorator>(
+			    dynamic_cast<const BehaviorTreeDecorator*>(
 					behaviorTree);
 			if (!childDecorator)
 			{
@@ -377,7 +375,7 @@ namespace neko {
 		}
 	}
 
-	std::shared_ptr<BehaviorTreeNode>
+	std::unique_ptr<BehaviorTreeNode>
 		BehaviorTreeManager::ParseBehaviorTreeFromJson(
 			Index comp,
 			const json& jsonContent) const
@@ -385,7 +383,7 @@ namespace neko {
 		return ParseJsonObject(comp, jsonContent);
 	}
 
-	std::shared_ptr<BehaviorTreeNode>
+	std::unique_ptr<BehaviorTreeNode>
 		BehaviorTreeManager::LoadBehaviorTreeFromJsonFile(
 			Index comp,
 			const std::string & jsonFile) const
@@ -404,7 +402,7 @@ namespace neko {
 		Index comp,
 		const json& jsonContent)
 	{
-        const auto behaviorTree = ParseBehaviorTreeFromJson(comp, jsonContent);
+        auto behaviorTree = ParseBehaviorTreeFromJson(comp, jsonContent);
 		size_t futureSize = vecBehaviorTree_.capacity();
 		if (futureSize <= comp)
 		{
@@ -415,10 +413,10 @@ namespace neko {
 			vecBehaviorTree_.resize(futureSize);
 		}
 		if (behaviorTree) {
-			vecBehaviorTree_.at(comp) = behaviorTree;
+			vecBehaviorTree_.at(comp) = std::move(behaviorTree);
 			return comp;
 		}
-		logDebug("ERROR could not parse the file: " + jsonContent.get<std::string>());
+		logDebug("ERROR could not parse the file: {}" + jsonContent.get<std::string>());
 		return INDEX_INVALID;
 	}
 
@@ -437,7 +435,7 @@ namespace neko {
 			LoadBehaviorTreeFromJsonFile(comp, jsonFile);
 		if (behaviorTree)
 		{
-			vecBehaviorTree_.at(comp) = behaviorTree;
+			vecBehaviorTree_.at(comp) = std::move(behaviorTree);
 			return comp;
 		}
 		logDebug("ERROR could not parse the file: " + jsonFile);
@@ -447,18 +445,18 @@ namespace neko {
 	void BehaviorTreeManager::LogBehaviorTreeIndex(Index id) const
 	{
 		assert(id < vecBehaviorTree_.size());
-		LogBehaviorTree(vecBehaviorTree_[id]);
+		LogBehaviorTree(vecBehaviorTree_[id].get());
 	}
 
-	std::shared_ptr<BehaviorTreeNode>
-		BehaviorTreeManager::GetBehaviorTreeRootIndex(Index id)
-	{
+	BehaviorTreeNode*
+		BehaviorTreeManager::GetBehaviorTreeRootIndex(Index id) const
+    {
 		assert(id < vecBehaviorTree_.size());
-		return vecBehaviorTree_[id];
+		return vecBehaviorTree_[id].get();
 	}
 
-	BehaviorTreeFlow BehaviorTreeManager::ExecuteIndex(Index id)
-	{
+	BehaviorTreeFlow BehaviorTreeManager::ExecuteIndex(Index id) const
+    {
 		assert(id < vecBehaviorTree_.size());
 		if (vecBehaviorTree_[id] == nullptr)
 			return BehaviorTreeFlow::FAILURE;

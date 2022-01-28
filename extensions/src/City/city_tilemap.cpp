@@ -437,10 +437,10 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 		const auto topLeft = sf::Vector2f(windowView_.left, windowView_.top);
 		const auto bottomRight = sf::Vector2f(windowView_.left+windowView_.width, windowView_.top+windowView_.height);
 		constexpr auto grassIndex = static_cast<Index>(CityTileType::GRASS);
-		const unsigned startX = std::floor((topLeft.x + tileSize_.x / 2) / tileSize_.x);
-		const unsigned startY = std::floor((topLeft.y + tileSize_.y / 2) / tileSize_.y);
-		const unsigned endX = std::ceil((bottomRight.x + tileSize_.x / 2) / tileSize_.x);
-		const unsigned endY = std::ceil((bottomRight.y + tileSize_.y / 2) / tileSize_.y);
+		const auto startX = static_cast<unsigned>(std::floor((topLeft.x + tileSize_.x / 2) / tileSize_.x));
+		const auto startY = static_cast<unsigned>(std::floor((topLeft.y + tileSize_.y / 2) / tileSize_.y));
+		const auto endX = static_cast<unsigned>(std::ceil((bottomRight.x + tileSize_.x / 2) / tileSize_.x));
+		const auto endY = static_cast<unsigned>(std::ceil((bottomRight.y + tileSize_.y / 2) / tileSize_.y));
 
 		//Fill the vertex array with grass
 		for (auto x = startX; x < endX; x++)

@@ -108,26 +108,26 @@ namespace neko {
 		BehaviorTreeDecorator(Index comp) : funcMap_(comp) {}
 		BehaviorTreeDecorator(
 			Index comp,
-			std::shared_ptr<BehaviorTreeNode> child) :
-			funcMap_(comp),	child_(child) {}
+			std::unique_ptr<BehaviorTreeNode> child) :
+			funcMap_(comp),	child_(std::move(child)) {}
 		BehaviorTreeDecorator(
 			Index comp,
 			const std::vector<std::pair<std::string, std::string>>& il) :
 			BehaviorTreeNode(il), funcMap_(comp) {}
 		BehaviorTreeDecorator(
 			Index comp,
-			std::shared_ptr<BehaviorTreeNode> child,
+			std::unique_ptr<BehaviorTreeNode> child,
 			const std::vector<std::pair<std::string, std::string>>& il) :
-			BehaviorTreeNode(il), funcMap_(comp), child_(child) {}
+			BehaviorTreeNode(il), funcMap_(comp), child_(std::move(child)) {}
 
 		virtual BehaviorTreeFlow Execute() override;
-		void SetChild(const std::shared_ptr<BehaviorTreeNode>& child)
+		void SetChild(std::unique_ptr<BehaviorTreeNode> child)
 		{
-			child_ = child;
+			child_ = std::move(child);
 		}
-		const std::shared_ptr<BehaviorTreeNode> GetChild() const
+		const BehaviorTreeNode* GetChild() const
 		{
-			return child_;
+			return child_.get();
 		}
 		virtual BehaviorTreeObjectType GetType() const override
 		{
@@ -138,7 +138,7 @@ namespace neko {
 		std::string decorator_ = "";
 		std::string functionName_ = "";
 		FunctionMap funcMap_;
-		std::shared_ptr<BehaviorTreeNode> child_;
+		std::unique_ptr<BehaviorTreeNode> child_;
 	};
 
 	// Composite in a behavior tree.
@@ -147,22 +147,22 @@ namespace neko {
 	public:
 		BehaviorTreeComposite() = default;
 		BehaviorTreeComposite(
-			const std::vector<std::shared_ptr<BehaviorTreeNode>>& ilNodes) :
-			children_(ilNodes) {}
+			std::vector<std::unique_ptr<BehaviorTreeNode>>&& ilNodes) :
+			children_(std::move(ilNodes)) {}
 		BehaviorTreeComposite(
 			const std::vector<std::pair<std::string, std::string>>& ilVariables) :
 			BehaviorTreeNode(ilVariables) {}
 		BehaviorTreeComposite(
-			const std::vector<std::shared_ptr<BehaviorTreeNode>>& ilNodes,
+			std::vector<std::unique_ptr<BehaviorTreeNode>>&& ilNodes,
 			const std::vector<std::pair<std::string, std::string>>& ilVariables) :
 			BehaviorTreeNode(ilVariables),
-			children_(ilNodes) {}
+			children_(std::move(ilNodes)) {}
 
-		void AddChild(const std::shared_ptr<BehaviorTreeNode>& child)
+		void AddChild(std::unique_ptr<BehaviorTreeNode> child)
 		{
-			children_.push_back(child);
+			children_.push_back(std::move(child));
 		}
-		const std::vector<std::shared_ptr<BehaviorTreeNode>> 
+		const std::vector<std::unique_ptr<BehaviorTreeNode>>& 
 			GetChildrenList() const
 		{
 			return children_;
@@ -177,7 +177,7 @@ namespace neko {
 		}
 
 	protected:
-		std::vector<std::shared_ptr<BehaviorTreeNode>> children_;
+		std::vector<std::unique_ptr<BehaviorTreeNode>> children_;
 		uint32_t currentCount_ = 0;
 	};
 
@@ -206,15 +206,15 @@ namespace neko {
 	public:
 		BehaviorTreeCompositeSequence() = default;
 		BehaviorTreeCompositeSequence(
-			const std::vector<std::shared_ptr<BehaviorTreeNode>>& ilNodes) :
-			BehaviorTreeComposite(ilNodes) {}
+			std::vector<std::unique_ptr<BehaviorTreeNode>>&& ilNodes) :
+			BehaviorTreeComposite(std::move(ilNodes)) {}
 		BehaviorTreeCompositeSequence(
 			const std::vector<std::pair<std::string, std::string>>& ilVariables) :
 			BehaviorTreeComposite(ilVariables) {}
 		BehaviorTreeCompositeSequence(
-			const std::vector<std::shared_ptr<BehaviorTreeNode>>& ilNodes,
-			const std::vector<std::pair<std::string, std::string>>& ilVariables) :
-			BehaviorTreeComposite(ilNodes, ilVariables) {}
+			std::vector<std::unique_ptr<BehaviorTreeNode>>&& ilNodes,
+			const std::vector<std::pair<std::string, std::string>> ilVariables) :
+			BehaviorTreeComposite(std::move(ilNodes), ilVariables) {}
 
 		virtual BehaviorTreeFlow Execute() final;
 		virtual BehaviorTreeObjectType GetType() const final
@@ -229,15 +229,15 @@ namespace neko {
 	public:
 		BehaviorTreeCompositeSelector() = default;
 		BehaviorTreeCompositeSelector(
-			const std::vector<std::shared_ptr<BehaviorTreeNode>>& ilNodes) :
-			BehaviorTreeComposite(ilNodes) {}
+			std::vector<std::unique_ptr<BehaviorTreeNode>>&& ilNodes) :
+			BehaviorTreeComposite(std::move(ilNodes)) {}
 		BehaviorTreeCompositeSelector(
 			const std::vector<std::pair<std::string, std::string>>& ilVariables) :
 			BehaviorTreeComposite(ilVariables) {}
 		BehaviorTreeCompositeSelector(
-			const std::vector<std::shared_ptr<BehaviorTreeNode>>& ilNodes,
+			std::vector<std::unique_ptr<BehaviorTreeNode>>&& ilNodes,
 			const std::vector<std::pair<std::string, std::string>>& ilVariables) :
-			BehaviorTreeComposite(ilNodes, ilVariables) {}
+			BehaviorTreeComposite(std::move(ilNodes), ilVariables) {}
 
 		virtual BehaviorTreeFlow Execute() final;
 		virtual BehaviorTreeObjectType GetType() const final
@@ -267,9 +267,9 @@ namespace neko {
 
 	private:
 		FunctionMap funcMap_;
-		std::string condition_ = "";
-		std::string functionName_ = "";
-		std::string valueName_ = "";
+		std::string condition_;
+		std::string functionName_;
+		std::string valueName_;
 	};
 
 	// Leaf Wait in a behavior tree.

@@ -34,12 +34,12 @@ namespace neko {
 	{
 	public:
 		// These will probably be removed or turned private.
-		void LogBehaviorTree(
-			const std::shared_ptr<BehaviorTreeNode> behaviorTree) const;
-		std::shared_ptr<BehaviorTreeNode> ParseBehaviorTreeFromJson(
+        static void LogBehaviorTree(
+			const BehaviorTreeNode* behaviorTree);
+		std::unique_ptr<BehaviorTreeNode> ParseBehaviorTreeFromJson(
 			Index comp,
 			const json& jsonContent) const;
-		std::shared_ptr<BehaviorTreeNode> LoadBehaviorTreeFromJsonFile(
+		std::unique_ptr<BehaviorTreeNode> LoadBehaviorTreeFromJsonFile(
 			Index comp,
 			const std::string& jsonFile) const;
 
@@ -53,14 +53,14 @@ namespace neko {
 			Index comp,
 			const std::string& jsonFile);
 		void LogBehaviorTreeIndex(Index id) const;
-		std::shared_ptr<BehaviorTreeNode> GetBehaviorTreeRootIndex(Index id);
-		BehaviorTreeFlow ExecuteIndex(Index id);
+		BehaviorTreeNode* GetBehaviorTreeRootIndex(Index id) const;
+		BehaviorTreeFlow ExecuteIndex(Index id) const;
 
 	protected:
 		struct NodeVariableDesc
 		{
 			std::vector<std::pair<std::string, std::string>> vecVariables;
-			std::vector<std::shared_ptr<BehaviorTreeNode>> vecNodes;
+			std::vector<std::unique_ptr<BehaviorTreeNode>> vecNodes;
 		};
 		// Basic type of element in a behavior tree.
 		enum class BehaviorTreeElementType : uint32_t {
@@ -69,7 +69,7 @@ namespace neko {
 			BTT_DECORATOR = 2,
 			BTT_LEAF = 3,
 		};
-		std::shared_ptr<BehaviorTreeNode> ParseJsonObject(
+		std::unique_ptr<BehaviorTreeNode> ParseJsonObject(
 			Index comp,
 			const json& jsonContent) const;
 		NodeVariableDesc ParseJsonVariablesNodes(
@@ -77,31 +77,31 @@ namespace neko {
 			const json& jsonContent,
 			BehaviorTreeElementType behaviorTreeElementType = 
 				BehaviorTreeElementType::BTT_LEAF) const;
-		std::shared_ptr<BehaviorTreeNode> ParseJsonCompositeSequence(
+		std::unique_ptr<BehaviorTreeNode> ParseJsonCompositeSequence(
 			Index comp,
 			const json& jsonContent) const;
-		std::shared_ptr<BehaviorTreeNode> ParseJsonCompositeSelector(
+		std::unique_ptr<BehaviorTreeNode> ParseJsonCompositeSelector(
 			Index comp,
 			const json& jsonContent) const;
-		std::shared_ptr<BehaviorTreeNode> ParseJsonComposite(
+		std::unique_ptr<BehaviorTreeNode> ParseJsonComposite(
 			Index comp,
 			const json& jsonContent) const;
-		std::shared_ptr<BehaviorTreeNode> ParseJsonDecorator(
+		std::unique_ptr<BehaviorTreeNode> ParseJsonDecorator(
 			Index comp,
 			const json& jsonContent) const;
-		std::shared_ptr<BehaviorTreeNode> ParseJsonLeafCondition(
+		std::unique_ptr<BehaviorTreeNode> ParseJsonLeafCondition(
 			Index comp,
 			const json& jsonContent) const;
-		std::shared_ptr<BehaviorTreeNode> ParseJsonLeafWait(
+		std::unique_ptr<BehaviorTreeNode> ParseJsonLeafWait(
 			Index comp,
 			const json& jsonContent) const;
-		std::shared_ptr<BehaviorTreeNode> ParseJsonLeafMoveTo(
+		std::unique_ptr<BehaviorTreeNode> ParseJsonLeafMoveTo(
 			Index comp,
 			const json& jsonContent) const;
-		std::shared_ptr<BehaviorTreeNode> ParseJsonLeafFunctional(
+		std::unique_ptr<BehaviorTreeNode> ParseJsonLeafFunctional(
 			Index comp,
 			const json& jsonContent) const;
-		std::shared_ptr<BehaviorTreeNode> ParseJsonLeaf(
+		std::unique_ptr<BehaviorTreeNode> ParseJsonLeaf(
 			Index comp,
 			const json& jsonContent) const;
 		BehaviorTreeObjectType GetTypeFromJson(const json& jsonContent) const;
