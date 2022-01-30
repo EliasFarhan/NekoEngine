@@ -35,7 +35,7 @@
 namespace neko
 {
 
-enum class EnvironmentTile : unsigned
+enum class EnvironmentTile : std::uint8_t
 {
 	GRASS = 0,
 	WATER

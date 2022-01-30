@@ -377,17 +377,25 @@ void CityBuilderTilemap::UpdateTransportTilemap(const CityBuilderMap& cityBuilde
 			AddNewCityTile(position, size, rect, center, updatedCityTileType, false, false, true, true);
 		}
 	};
+
+	const auto topLeft = sf::Vector2f(windowView_.left, windowView_.top);
+	const auto bottomRight = sf::Vector2f(windowView_.left + windowView_.width, windowView_.top + windowView_.height);
+	const auto startX = std::max(0, static_cast<int>(std::floor((topLeft.x + tileSize_.x / 2) / tileSize_.x)));
+	const auto startY = std::max(0, static_cast<int>(std::floor((topLeft.y + tileSize_.y / 2) / tileSize_.y)));
+	const auto endX = std::min(static_cast<int>(cityBuilderMap.city.mapSize.x),
+		static_cast<int>(std::ceil((bottomRight.x + tileSize_.x / 2) / tileSize_.x)));
+	const auto endY = std::min(static_cast<int>(cityBuilderMap.city.mapSize.y),
+		static_cast<int>(std::ceil((bottomRight.y + tileSize_.y / 2) / tileSize_.y)));
+
 	//ROAD
 	for (const auto& cityElement : cityBuilderMap.elements_)
 	{
 		if (cityElement.elementType != CityElementType::ROAD && cityElement.elementType != CityElementType::RAIL) continue;
 
-		const sf::FloatRect tileRect = sf::FloatRect(sf::Vector2f(
-			static_cast<float>(cityElement.position.x * tileSize_.x - tileSize_.x / 2),
-			static_cast<float>(cityElement.position.y * tileSize_.y - tileSize_.y / 2)),
-			2.0f * sf::Vector2f(tileSize_));
-		if (!windowView_.intersects(tileRect))
+		const auto tilePos = cityElement.position;
+		if (tilePos.x < startX || tilePos.x > endX || tilePos.y < startY || tilePos.y > endY)
 			continue;
+
 		if(cityElement.elementType == CityElementType::ROAD)
 		{
 			addRoad(cityElement);
@@ -412,7 +420,14 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 	const Index frameIndex = MainEngine::GetInstance()->frameIndex % 2;
 	//Manage window view
 	windowView_ = sf::FloatRect((mainView.getCenter() - mainView.getSize() / 2.0f), mainView.getSize());
-
+	const auto topLeft = sf::Vector2f(windowView_.left, windowView_.top);
+	const auto bottomRight = sf::Vector2f(windowView_.left + windowView_.width, windowView_.top + windowView_.height);
+	const auto startX = std::max(0, static_cast<int>(std::floor((topLeft.x + tileSize_.x / 2) / tileSize_.x)));
+	const auto startY = std::max(0, static_cast<int>(std::floor((topLeft.y + tileSize_.y / 2) / tileSize_.y)));
+	const auto endX = std::min(static_cast<int>(cityBuilderMap.city.mapSize.x), 
+		static_cast<int>(std::ceil((bottomRight.x + tileSize_.x / 2) / tileSize_.x)));
+	const auto endY = std::min(static_cast<int>(cityBuilderMap.city.mapSize.y),
+		static_cast<int>(std::ceil((bottomRight.y + tileSize_.y / 2) / tileSize_.y)));
 	if (updatedCityTileType == CityTilesheetType::LENGTH)
 	{
 		for (Index i = 0u; i < static_cast<Index>(CityTilesheetType::LENGTH); i++)
@@ -433,14 +448,8 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 #ifdef TRACY_ENABLE
 		TracyCZoneN(grassCtx, "Grass", true);
 #endif
-
-		const auto topLeft = sf::Vector2f(windowView_.left, windowView_.top);
-		const auto bottomRight = sf::Vector2f(windowView_.left+windowView_.width, windowView_.top+windowView_.height);
+		
 		constexpr auto grassIndex = static_cast<Index>(CityTileType::GRASS);
-		const auto startX = static_cast<unsigned>(std::floor((topLeft.x + tileSize_.x / 2) / tileSize_.x));
-		const auto startY = static_cast<unsigned>(std::floor((topLeft.y + tileSize_.y / 2) / tileSize_.y));
-		const auto endX = static_cast<unsigned>(std::ceil((bottomRight.x + tileSize_.x / 2) / tileSize_.x));
-		const auto endY = static_cast<unsigned>(std::ceil((bottomRight.y + tileSize_.y / 2) / tileSize_.y));
 
 		//Fill the vertex array with grass
 		for (auto x = startX; x < endX; x++)
@@ -481,12 +490,6 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 				{
 					continue;
 				}
-				const sf::FloatRect tileRect = sf::FloatRect(sf::Vector2f(
-					static_cast<float>(tmpPos.x * tileSize_.x - tileSize_.x / 2),
-					static_cast<float>(tmpPos.y * tileSize_.y - tileSize_.y / 2)), sf::Vector2f(tileSize_));
-
-				if (!windowView_.intersects(tileRect))
-					continue;
 				//UP
 				{
 					const sf::Vector2i upPos = tmpPos + sf::Vector2i(0, -1);
@@ -581,6 +584,7 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 			{
 			case CityElementType::TREES:
 			{
+
 				//TREES
 				const auto treesIndex = static_cast<Index>(CityTileType::TREES);
 				if (cityBuilderMap.environmentTiles_[cityBuilderMap.Position2Index(element.position)] ==
@@ -591,9 +595,6 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 				const auto position = sf::Vector2f(
 					static_cast<float>(element.position.x * tileSize_.x),
 					static_cast<float>(element.position.y * tileSize_.y));
-				const sf::FloatRect tileRect = sf::FloatRect(sf::Vector2f(
-					position.x - tileSize_.x / 2,
-					position.y - tileSize_.y / 2), sf::Vector2f(tileSize_));
 
 				const auto rect = textureRects_[treesIndex];
 				const auto center = rectCenter_[treesIndex];
@@ -641,11 +642,15 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 	}
 	case CityTilesheetType::CAR:
 	{
+
 		for (const auto& car : cityCarManager.GetCarsVector())
 		{
 			if (car.entity == INVALID_ENTITY)
 				continue;
 
+			const auto tilePos = car.position;
+			if(tilePos.x > endX || tilePos.x < startX || tilePos.y > endY || tilePos.y < startY)
+				continue;
 			const auto rect = textureRects_[static_cast<Index>(car.carType)];
 			const auto center = rectCenter_[static_cast<Index>(car.carType)];
 			const auto position = transformManager.GetPosition(car.entity);
