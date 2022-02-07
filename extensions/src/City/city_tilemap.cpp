@@ -586,7 +586,7 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 			{
 
 				//TREES
-				const auto treesIndex = static_cast<Index>(CityTileType::TREES);
+				constexpr auto treesIndex = static_cast<Index>(CityTileType::TREES);
 				if (cityBuilderMap.environmentTiles_[cityBuilderMap.Position2Index(element.position)] ==
 					EnvironmentTile::WATER)
 				{
@@ -608,7 +608,7 @@ void CityBuilderTilemap::UpdateTilemap(const CityBuilderMap& cityBuilderMap, con
 			case CityElementType::TRAIN_STATION:
 			{
 				//TRAIN STATION
-				const auto trainStationIndex = static_cast<Index>(CityTileType::TRAIN_STATION);
+				constexpr auto trainStationIndex = static_cast<Index>(CityTileType::TRAIN_STATION);
 				const auto position = sf::Vector2f(
 					static_cast<float>(element.position.x * tileSize_.x),
 					static_cast<float>(element.position.y * tileSize_.y));

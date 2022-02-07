@@ -134,7 +134,11 @@ void CityCommandManager::ExecuteCommand(const std::shared_ptr<CityCommand>& comm
 		{
 			Sound::PlaySound(soundOut_);
 		}
-		engine_->GetZoneManager().AddZone(zoneCommand->position, zoneCommand->zoneType, engine_->GetCityMap());
+		engine_->GetZoneManager().AddZone(
+			zoneCommand->position, 
+			zoneCommand->zoneType, 
+			engine_->GetCityMap(), 
+			engine_->GetBuildingManager());
 		Sound::PlaySound(soundBuild_);
 		break;
 	}

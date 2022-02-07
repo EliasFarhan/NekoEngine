@@ -74,7 +74,7 @@ public:
 
     void PushCommand(GraphicsManager* graphicsManager);
 
-    void AddZone(sf::Vector2i position, ZoneType zoneType, CityBuilderMap& cityMap);
+    void AddZone(sf::Vector2i position, ZoneType zoneType, CityBuilderMap& cityMap, CityBuildingManager& cityBuildingMap);
 
     void RemoveZone(sf::Vector2i position, ZoneType zoneType);
 
