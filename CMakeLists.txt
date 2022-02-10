@@ -113,6 +113,9 @@ LIST(APPEND Neko_LIBRARIES ImGui-SFML::ImGui-SFML)
 #glm
 find_package(glm CONFIG REQUIRED)
 LIST(APPEND Neko_LIBRARIES  glm::glm)
+
+find_package(fmt CONFIG REQUIRED)
+LIST(APPEND Neko_LIBRARIES fmt::fmt)
 #Utility
 set(UTILITIES_DIR ${EXTERNAL_DIR}/utilities/)
 include_directories(${UTILITIES_DIR})

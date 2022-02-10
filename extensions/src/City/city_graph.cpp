@@ -26,7 +26,7 @@
 #include <unordered_map>
 #include <cmath>
 #include <engine/log.h>
-
+#include <fmt/format.h>
 #include "allocator/allocator.h"
 #include "City/city_engine.h"
 #include "engine/engine.h"
@@ -156,7 +156,7 @@ std::vector<sf::Vector2i>
 TileMapGraph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vector2i& endPos) const
 {
 #ifdef TRACY_ENABLE
-	ZoneScoped
+	ZoneNamedN(shortestPath, "Calculate Shortest Path", true);
 #endif
 	auto path = std::vector<sf::Vector2i>();
 	if (startPos == INVALID_TILE_POS || endPos == INVALID_TILE_POS)
@@ -205,9 +205,13 @@ TileMapGraph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vect
 	nodePathDatas[startNodeIndex].parentIndex = startNodeIndex;
 #ifdef TRACY_ENABLE
 	TracyCZoneN(pathExplore, "Path Explore", true);
+	std::size_t count = 0;
 #endif
 	while (!frontier.empty())
 	{
+#ifdef TRACY_ENABLE
+		ZoneNamedN(frontierCheck, "Frontier Check", true);
+#endif
 		const auto currentNodePair = frontier.front();
 		frontier.erase(frontier.begin());
 		const auto currentNodeIndex = currentNodePair.first;
@@ -223,6 +227,9 @@ TileMapGraph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vect
 		for (size_t i = 0; i < maxNeighborsNmb; i++)
 		{
 			if (!HasNeighbor(currentNode, static_cast<NeighborType>(1u << i))) continue;
+#ifdef TRACY_ENABLE
+			ZoneNamedN(neighborCheck, "Neighbor Check", true);
+#endif
 			const auto neighborIndex = currentNode.neighborsIndex[i];
 			const auto neighborPos = currentNode.position + GetDirection(static_cast<NeighborType>(1 << i));
 			const float newCost = nodePathDatas[currentNodeIndex].cost + distance(neighborPos, currentNode.position);
@@ -235,7 +242,9 @@ TileMapGraph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vect
                 });
 				if (neighborCost < 0.0f && neighborIt != frontier.end())
 				{
-
+#ifdef TRACY_ENABLE
+					ZoneNamedN(removeAndPutBack, "Remove and put back", true);
+#endif
 					//Remove pair and put it back with new cost
 					auto neighbor = *neighborIt;
 					frontier.erase(neighborIt);
@@ -246,6 +255,9 @@ TileMapGraph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vect
 				}
 				else
 				{
+#ifdef TRACY_ENABLE
+					ZoneNamedN(newNeighbor, "New Neighbor", true);
+#endif
 					NodePair neighbor = { neighborIndex, newCost + distance(neighborPos, endPos) };
 					const auto lower = std::ranges::lower_bound(frontier, neighbor, comp);
 					frontier.insert(lower, neighbor);
@@ -253,6 +265,7 @@ TileMapGraph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vect
 				nodePathDatas[neighborIndex] = { newCost, currentNodeIndex };
 			}
 		}
+		count++;
 	}
 #ifdef TRACY_ENABLE
 	TracyCZoneEnd(pathExplore);
@@ -284,7 +297,8 @@ TileMapGraph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vect
 #endif
 	}
 #ifdef TRACY_ENABLE
-	ZoneValue(path.size());
+	const auto msg = fmt::format("Path size: {}, Frontier count: {}", path.size(), count);
+    ZoneTextV(shortestPath, msg.data(), msg.size());
 #endif
 	return path;
 }
@@ -351,11 +365,6 @@ NeighborType GetNeighborType(const sf::Vector2i& direction)
 
 sf::Vector2i GetDirection(NeighborType neighborType)
 {
-
-#ifdef TRACY_ENABLE
-	ZoneScoped
-#endif
-
 	static constexpr std::array<std::pair<int, int>, 4> neighborTypeMap{
 		{{0,-1},
 		{0,1},
@@ -389,10 +398,6 @@ void TileMapGraph::RemoveNeighbor(Node& node, NeighborType neighborBit)
 	RemoveNeighborToBit(node.neighborBitwise, neighborBit);
 }
 
-bool TileMapGraph::HasNeighbor(const Node& node, NeighborType neighborBit)
-{
-	return HasBitNeighbor(node.neighborBitwise, neighborBit);
-}
 
 
 }

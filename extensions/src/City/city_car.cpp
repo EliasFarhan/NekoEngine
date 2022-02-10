@@ -88,7 +88,9 @@ Entity CityCarManager::AddCar(Entity entity, CarType carType, sf::Vector2i posit
 #ifdef TRACY_ENABLE
 			ZoneNamedN(carRealloc, "Car Realloc", true);
 #endif
-		    cars_.resize(static_cast<std::size_t>(entity) + 1u);
+			const auto wantedSize = static_cast<std::size_t>(entity) + 1u;
+			const auto newSize = wantedSize + wantedSize / 2;
+		    cars_.resize(newSize);
 	    }
 	}
 	std::shared_lock lock(carMutex_);

@@ -79,7 +79,11 @@ public:
 private:
     static void AddNeighbor(Node& node, NeighborType neighborBit);
     static void RemoveNeighbor(Node& node, NeighborType neighborBit);
-    static bool HasNeighbor(const Node& node, NeighborType neighborBit);
+    static bool HasNeighbor(const Node& node, NeighborType neighborBit)
+    {
+        return (node.neighborBitwise & static_cast<NeighborBit>(neighborBit)) == static_cast<NeighborBit>(neighborBit);
+        
+    }
     std::vector<Node> nodes_;
 };
 }
