@@ -95,7 +95,7 @@ void CityZoneManager::PushCommand(GraphicsManager* graphicsManager)
     graphicsManager->Draw(zoneVertexArray_[frameIndex]);
 }
 
-void CityZoneManager::AddZone(sf::Vector2i position, ZoneType zoneType, CityBuilderMap& cityMap)
+void CityZoneManager::AddZone(sf::Vector2i position, ZoneType zoneType, CityBuilderMap& cityMap, CityBuildingManager& cityBuildingMap)
 {
 
 #ifdef TRACY_ENABLE
@@ -109,7 +109,7 @@ void CityZoneManager::AddZone(sf::Vector2i position, ZoneType zoneType, CityBuil
 	{
 		return;
 	}
-    const auto func = [this, zoneType, engine, position, &cityMap](std::vector<Zone>& zones_) {
+    const auto func = [this, zoneType, engine, position, &cityMap, &cityBuildingMap](std::vector<Zone>& zones_) {
 
         //No zone on water
         if (!cityMap.IsGrass(position))
@@ -118,6 +118,12 @@ void CityZoneManager::AddZone(sf::Vector2i position, ZoneType zoneType, CityBuil
         auto* cityElement = cityMap.GetCityElementAt(position);
         if (cityElement != nullptr && cityElement->elementType != CityElementType::TREES)
             return;
+        {
+            const auto buildingPair = cityBuildingMap.GetBuildingAt(position);
+            if (buildingPair.first != nullptr)
+                return;
+
+        }
         for (auto& road : cityMap.GetRoadGraph().GetNodesVector())
         {
             const auto roadPos = road.position;

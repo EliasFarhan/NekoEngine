@@ -216,7 +216,7 @@ void CityBuilderMap::Init()
 			    {
 			        if(y%8 != 0)
 			        {
-						zoneManager.AddZone(centerPos + sf::Vector2i(x, y), y > 0 ? ZoneType::RESIDENTIAL : ZoneType::COMMERCIAL, * this);
+						zoneManager.AddZone(centerPos + sf::Vector2i(x, y), y > 0 ? ZoneType::RESIDENTIAL : ZoneType::COMMERCIAL, * this, engine->GetBuildingManager());
 			        }
 			    }
 			}
