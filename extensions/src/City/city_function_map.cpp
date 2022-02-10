@@ -71,10 +71,14 @@ namespace neko {
 		const std::string_view name, 
 		const std::vector<double>& values) const
     {
+#ifdef TRACY_ENABLE
+		ZoneScoped
+		ZoneText(name.data(), name.size())
+#endif
 		const auto retrieveFunction = [this, &name]()->std::function<bool(unsigned, const std::vector<double>&)>*{
-
-			static std::mutex mutex;
-		    std::lock_guard lock(mutex);
+#ifdef TRACY_ENABLE
+			ZoneScoped
+#endif
 			const auto it = staticNameFunctionMap_.find(std::string(name));
 			if (it != staticNameFunctionMap_.end())
 			{

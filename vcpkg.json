@@ -1,11 +1,12 @@
 {
     "name": "rollbackgame",
     "version-string": "1.0",
-	"builtin-baseline": "709e9ec32e27319636c047a38744e1ce0e229ae4",
+	"builtin-baseline": "67e4272121ee24eb743d5b38b5e56004c6490aae",
     "dependencies": [
 		{
 			"name": "freetype"
 		},
+        "openal-soft",
         "sfml",
         "imgui-sfml",
         "box2d",
