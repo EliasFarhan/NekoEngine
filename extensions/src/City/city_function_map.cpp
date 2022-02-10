@@ -34,14 +34,12 @@ namespace neko {
 		std::string, 
 		std::function<bool(Index, const std::vector<double>&)>>
 		FunctionMap::staticNameFunctionMap_;
-
-	std::mutex FunctionMap::mutex;
+	
 
 	void FunctionMap::SetFunction(
 		const std::string_view name,
 		std::function<bool(Index, const std::vector<double>&)> func)
 	{
-		std::lock_guard lock(mutex);
 		staticNameFunctionMap_.insert(std::make_pair(std::string(name), func));
 	}
 
@@ -50,7 +48,6 @@ namespace neko {
 		const auto retrieveFunction = [this, &name]()->std::function<bool(unsigned, const std::vector<double>&)>* {
 
 			
-			std::lock_guard lock(mutex);
 			const auto it = staticNameFunctionMap_.find(std::string(name));
 			if (it != staticNameFunctionMap_.end())
 			{
@@ -77,7 +74,8 @@ namespace neko {
 #endif
 		const auto retrieveFunction = [this, &name]()->std::function<bool(unsigned, const std::vector<double>&)>*{
 #ifdef TRACY_ENABLE
-			ZoneScoped
+			ZoneNamedN(retrieve, "Retrieve Function", true);
+			ZoneTextV(retrieve, name.data(), name.size());
 #endif
 			const auto it = staticNameFunctionMap_.find(std::string(name));
 			if (it != staticNameFunctionMap_.end())

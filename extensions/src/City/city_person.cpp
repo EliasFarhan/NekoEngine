@@ -6,6 +6,7 @@
 
 #ifdef TRACY_ENABLE
 #include <Tracy.hpp>
+#include <TracyC.h>
 #endif
 namespace neko
 {
@@ -92,6 +93,9 @@ void CityPeopleManager::Init()
 
 	const auto moveToFunc = [this](Index entity, const std::vector<double>&) -> bool
 	{
+#ifdef TRACY_ENABLE
+		ZoneNamedN(moveTo, "Move To Func", true);
+#endif
 		auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
 		Person* personPtr = engine->GetPeopleManager().GetPersonAt(entity);
 		if (personPtr == nullptr)
@@ -99,9 +103,14 @@ void CityPeopleManager::Init()
 			DestroyPerson(entity);
 			return true;
 		}
-		
+#ifdef TRACY_ENABLE
+		TracyCZoneN(carCtx, "Get Car Lock", true);
+#endif
 		auto [car, lock] = engine->GetCarManager().GetCar(personPtr->carEntity);
-		if (car == nullptr)
+#ifdef TRACY_ENABLE
+		TracyCZoneEnd(carCtx);
+#endif
+	    if (car == nullptr)
 		{
 			DestroyPerson(entity);
 			return true;

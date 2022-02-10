@@ -64,6 +64,9 @@ Entity EntityManager::CreateEntity()
 
 void EntityManager::DestroyEntity(Entity entity)
 {
+#ifdef TRACY_ENABLE
+    ZoneScoped
+#endif
     std::lock_guard lock(mutex_);
     entityMaskArray_[entity] = INVALID_ENTITY_MASK;
 }

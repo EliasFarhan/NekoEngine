@@ -56,9 +56,6 @@ namespace neko {
 	const std::string BehaviorTreeNode::GetVariable(
 		const std::string& variable) const
 	{
-#ifdef TRACY_ENABLE
-		ZoneScoped
-#endif
         const auto it = variables_.find(variable);
 		if (it != variables_.end())
 		{
@@ -69,9 +66,6 @@ namespace neko {
 
 	BehaviorTreeFlow BehaviorTreeCompositeSequence::Execute()
 	{
-#ifdef TRACY_ENABLE
-		ZoneScoped
-#endif
 		if (currentCount_ >= children_.size()) currentCount_ = 0;
 		BehaviorTreeFlow flow = children_[currentCount_]->Execute();
 		if (flow == BehaviorTreeFlow::RUNNING) 
@@ -84,9 +78,6 @@ namespace neko {
 
 	BehaviorTreeFlow BehaviorTreeCompositeSelector::Execute()
 	{
-#ifdef TRACY_ENABLE
-		ZoneScoped
-#endif
 		if (currentCount_ >= children_.size()) currentCount_ = 0;
 		BehaviorTreeFlow flow = children_[currentCount_]->Execute();
 		if (flow == BehaviorTreeFlow::RUNNING) 
@@ -99,9 +90,6 @@ namespace neko {
 
 	BehaviorTreeFlow BehaviorTreeDecorator::Execute()
 	{
-#ifdef TRACY_ENABLE
-		ZoneScoped
-#endif
         const std::string decorator = GetVariable("decorator");
 		if (decorator != decorator_)
 		{
@@ -127,9 +115,6 @@ namespace neko {
 
 	BehaviorTreeFlow BehaviorTreeLeafCondition::Execute()
 	{
-#ifdef TRACY_ENABLE
-		ZoneScoped
-#endif
         const std::string condition = GetVariable("condition");
 		if (condition != condition_)
 		{
@@ -149,9 +134,6 @@ namespace neko {
 
 	BehaviorTreeFlow BehaviorTreeLeafWait::Execute()
 	{
-#ifdef TRACY_ENABLE
-		ZoneScoped
-#endif
 		if (!started_)
 		{
 			durationDelay_ = 
@@ -181,6 +163,9 @@ namespace neko {
 		if (to_.x == std::numeric_limits<int>::max() &&
 			to_.y == std::numeric_limits<int>::max()) 
 		{
+#ifdef TRACY_ENABLE
+		    ZoneNamedN(setTo, "Set Destination", true);
+#endif
 			if (GetVariable("to") == "<null>")
 			{
 				logDebug("Could not find \"to\" in a leaf move to node");
@@ -232,9 +217,6 @@ namespace neko {
 
 	BehaviorTreeFlow BehaviorTreeLeafFunctional::Execute()
 	{
-#ifdef TRACY_ENABLE
-		ZoneScoped
-#endif
         const std::string functional = GetVariable("functional");
 		std::vector<double> values;
 		if (functional != functional_) 

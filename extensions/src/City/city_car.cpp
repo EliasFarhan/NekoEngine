@@ -77,14 +77,21 @@ Entity CityCarManager::SpawnCar(sf::Vector2i position, CarType carType)
 
 Entity CityCarManager::AddCar(Entity entity, CarType carType, sf::Vector2i position)
 {
-	std::lock_guard lock(carMutex_);
 #ifdef TRACY_ENABLE
 	ZoneScoped
 #endif
-	if (cars_.size() <= entity)
+
 	{
-		cars_.resize(static_cast<std::size_t>(entity) + 1u);
+	    std::lock_guard lock(carMutex_);
+	    if (cars_.size() <= entity)
+	    {
+#ifdef TRACY_ENABLE
+			ZoneNamedN(carRealloc, "Car Realloc", true);
+#endif
+		    cars_.resize(static_cast<std::size_t>(entity) + 1u);
+	    }
 	}
+	std::shared_lock lock(carMutex_);
 	cars_[entity].carType = carType;
 	cars_[entity].currentPath.clear();
 	if (position == INVALID_TILE_POS)
@@ -145,10 +152,11 @@ size_t CityCarManager::CountCar() const
 
 std::pair<CityCar*, std::shared_lock<std::shared_mutex>>  CityCarManager::GetCar(Index carEntity)
 {
-	std::shared_lock lock(carMutex_);
+
 #ifdef TRACY_ENABLE
 	ZoneScoped
 #endif
+	std::shared_lock lock(carMutex_);
 	if (carEntity >= cars_.size())
 		return {nullptr, std::move(lock)};
 	return { &cars_[carEntity], std::move(lock) };
