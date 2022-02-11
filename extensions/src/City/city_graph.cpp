@@ -265,7 +265,9 @@ TileMapGraph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vect
 				nodePathDatas[neighborIndex] = { newCost, currentNodeIndex };
 			}
 		}
+#ifdef TRACY_ENABLE
 		count++;
+#endif
 	}
 #ifdef TRACY_ENABLE
 	TracyCZoneEnd(pathExplore);
