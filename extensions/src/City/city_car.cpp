@@ -80,19 +80,32 @@ Entity CityCarManager::AddCar(Entity entity, CarType carType, sf::Vector2i posit
 #ifdef TRACY_ENABLE
 	ZoneScoped
 #endif
-
 	{
-	    std::lock_guard lock(carMutex_);
-	    if (cars_.size() <= entity)
-	    {
 #ifdef TRACY_ENABLE
-			ZoneNamedN(carRealloc, "Car Realloc", true);
+	ZoneNamedN(carSize, "Car Size", true);
 #endif
-			const auto wantedSize = static_cast<std::size_t>(entity) + 1u;
-			const auto newSize = wantedSize + wantedSize / 2;
-		    cars_.resize(newSize);
+		std::size_t carCount;
+	    {
+			std::shared_lock lock(carMutex_);
+			carCount = cars_.size();
 	    }
+		if (carCount <= entity)
+		{
+			std::lock_guard lock(carMutex_);
+			if (cars_.size() <= entity)
+			{
+#ifdef TRACY_ENABLE
+				ZoneNamedN(carRealloc, "Car Realloc", true);
+#endif
+				const auto wantedSize = static_cast<std::size_t>(entity) + 1u;
+				const auto newSize = wantedSize + wantedSize / 2;
+				cars_.resize(newSize);
+			}
+		}
 	}
+#ifdef TRACY_ENABLE
+	ZoneNamedN(addCar, "Setup Car", true);
+#endif
 	std::shared_lock lock(carMutex_);
 	cars_[entity].carType = carType;
 	cars_[entity].currentPath.clear();

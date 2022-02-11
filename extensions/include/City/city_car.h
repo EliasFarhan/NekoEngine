@@ -70,6 +70,7 @@ public:
 	size_t CountCar() const;
 	std::pair<CityCar*, std::shared_lock<std::shared_mutex>> GetCar(Index carEntity);
 private:
+
 	mutable std::shared_mutex carMutex_;
 	std::vector<CityCar> cars_;
 	EntityManager* entityManagerPtr_ = nullptr;
