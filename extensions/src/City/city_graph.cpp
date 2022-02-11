@@ -209,9 +209,6 @@ TileMapGraph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vect
 #endif
 	while (!frontier.empty())
 	{
-#ifdef TRACY_ENABLE
-		ZoneNamedN(frontierCheck, "Frontier Check", true);
-#endif
 		const auto currentNodePair = frontier.front();
 		frontier.erase(frontier.begin());
 		const auto currentNodeIndex = currentNodePair.first;
@@ -227,9 +224,6 @@ TileMapGraph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vect
 		for (size_t i = 0; i < maxNeighborsNmb; i++)
 		{
 			if (!HasNeighbor(currentNode, static_cast<NeighborType>(1u << i))) continue;
-#ifdef TRACY_ENABLE
-			ZoneNamedN(neighborCheck, "Neighbor Check", true);
-#endif
 			const auto neighborIndex = currentNode.neighborsIndex[i];
 			const auto neighborPos = currentNode.position + GetDirection(static_cast<NeighborType>(1 << i));
 			const float newCost = nodePathDatas[currentNodeIndex].cost + distance(neighborPos, currentNode.position);
@@ -242,9 +236,6 @@ TileMapGraph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vect
                 });
 				if (neighborCost < 0.0f && neighborIt != frontier.end())
 				{
-#ifdef TRACY_ENABLE
-					ZoneNamedN(removeAndPutBack, "Remove and put back", true);
-#endif
 					//Remove pair and put it back with new cost
 					auto neighbor = *neighborIt;
 					frontier.erase(neighborIt);
@@ -255,9 +246,6 @@ TileMapGraph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vect
 				}
 				else
 				{
-#ifdef TRACY_ENABLE
-					ZoneNamedN(newNeighbor, "New Neighbor", true);
-#endif
 					NodePair neighbor = { neighborIndex, newCost + distance(neighborPos, endPos) };
 					const auto lower = std::ranges::lower_bound(frontier, neighbor, comp);
 					frontier.insert(lower, neighbor);
@@ -365,13 +353,15 @@ NeighborType GetNeighborType(const sf::Vector2i& direction)
 
 sf::Vector2i GetDirection(NeighborType neighborType)
 {
-	static constexpr std::array<std::pair<int, int>, 4> neighborTypeMap{
+	static constexpr std::array<std::pair<int, int>, 5> neighborTypeMap{
 		{{0,-1},
 		{0,1},
 		{1,0},
-		{-1,0} }
+		{-1,0},
+		{-1,0}
+		}
 	};
-	const auto [dirX, dirY] = neighborTypeMap[static_cast<int>(neighborType)];
+	const auto [dirX, dirY] = neighborTypeMap[static_cast<int>(neighborType)>>1];
 	return {dirX, dirY};
 }
 

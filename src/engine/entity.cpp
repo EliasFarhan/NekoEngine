@@ -37,7 +37,7 @@ EntityManager::EntityManager()
     entityMaskArray_.reserve(INIT_ENTITY_NMB);
 }
 
-EntityMask EntityManager::GetMask(Entity entity)
+EntityMask EntityManager::GetMask(Entity entity) const
 {
     std::shared_lock lock(mutex_);
     return entityMaskArray_[entity];
@@ -45,7 +45,7 @@ EntityMask EntityManager::GetMask(Entity entity)
 
 Entity EntityManager::CreateEntity()
 {
-    std::lock_guard lock(mutex_);
+    std::unique_lock lock(mutex_);
     const auto entityMaskIt = std::ranges::find_if(entityMaskArray_,[](EntityMask entityMask){
        return  entityMask == INVALID_ENTITY_MASK;
     });
@@ -67,11 +67,11 @@ void EntityManager::DestroyEntity(Entity entity)
 #ifdef TRACY_ENABLE
     ZoneScoped
 #endif
-    std::lock_guard lock(mutex_);
+    std::shared_lock lock(mutex_);
     entityMaskArray_[entity] = INVALID_ENTITY_MASK;
 }
 
-bool EntityManager::HasComponent(Entity entity, EntityMask componentType)
+bool EntityManager::HasComponent(Entity entity, EntityMask componentType) const
 {
     std::shared_lock lock(mutex_);
 	if (entity >= entityMaskArray_.size())
@@ -81,17 +81,17 @@ bool EntityManager::HasComponent(Entity entity, EntityMask componentType)
 
 void EntityManager::AddComponentType(Entity entity, EntityMask componentType)
 {
-    std::lock_guard lock(mutex_);
+    std::shared_lock lock(mutex_);
     entityMaskArray_[entity] |= componentType;
 }
 
 void EntityManager::RemoveComponentType(Entity entity, EntityMask componentType)
 {
-    std::lock_guard lock(mutex_);
+    std::shared_lock lock(mutex_);
     entityMaskArray_[entity] &= ~componentType;
 }
 
-size_t EntityManager::GetEntitiesNmb(EntityMask filterComponents)
+size_t EntityManager::GetEntitiesNmb(EntityMask filterComponents) const
 {
     std::shared_lock lock(mutex_);
     return std::ranges::count_if(entityMaskArray_,[&filterComponents](EntityMask entityMask){
@@ -99,7 +99,7 @@ size_t EntityManager::GetEntitiesNmb(EntityMask filterComponents)
     });
 }
 
-std::vector<Entity, StandardAllocator<Entity>> EntityManager::FilterEntities(EntityMask filterComponents)
+std::vector<Entity, StandardAllocator<Entity>> EntityManager::FilterEntities(EntityMask filterComponents) const
 {
 #ifdef TRACY_ENABLE
     ZoneScoped;
@@ -117,7 +117,7 @@ std::vector<Entity, StandardAllocator<Entity>> EntityManager::FilterEntities(Ent
 	return entities;
 }
 
-bool EntityManager::EntityExists(Entity entity)
+bool EntityManager::EntityExists(Entity entity) const
 {
     std::shared_lock lock(mutex_);
     return entityMaskArray_[entity] != INVALID_ENTITY_MASK;
