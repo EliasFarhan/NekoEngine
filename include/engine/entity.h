@@ -51,19 +51,19 @@ class EntityManager
 public:
 	EntityManager();
 
-	EntityMask GetMask(Entity entity);
+	EntityMask GetMask(Entity entity) const;
 
 	Entity CreateEntity();
 
 	void DestroyEntity(Entity entity);
 
-	bool HasComponent(Entity entity, EntityMask componentType);
+	bool HasComponent(Entity entity, EntityMask componentType) const;
 
-	bool EntityExists(Entity entity);
+	bool EntityExists(Entity entity) const;
 
-	size_t GetEntitiesNmb(EntityMask filterComponents = INVALID_ENTITY_MASK);
+	size_t GetEntitiesNmb(EntityMask filterComponents = INVALID_ENTITY_MASK) const;
 
-	std::vector<Entity, StandardAllocator<Entity>> FilterEntities(EntityMask filterComponents = INVALID_ENTITY_MASK);
+	std::vector<Entity, StandardAllocator<Entity>> FilterEntities(EntityMask filterComponents = INVALID_ENTITY_MASK) const;
 
 	void AddComponentType(Entity entity, EntityMask componentType);
 

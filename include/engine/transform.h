@@ -51,7 +51,7 @@ public:
 private:
     friend class SpriteManager;
     friend class ShapeManager;
-
+    mutable std::shared_mutex mutex_;
     std::vector<sf::Vector2f> positions_;
     std::vector<sf::Vector2f> scales_;
     std::vector<float> angles_;

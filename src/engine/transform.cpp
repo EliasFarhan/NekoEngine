@@ -30,6 +30,7 @@ namespace neko
 
 Transform2dManager::Transform2dManager()
 {
+	std::lock_guard lock(mutex_);
 	positions_.resize(INIT_ENTITY_NMB);
 	scales_.resize(INIT_ENTITY_NMB);
 	angles_.resize(INIT_ENTITY_NMB);
@@ -39,19 +40,27 @@ Index Transform2dManager::AddPosition(sf::Vector2f position, Entity entity)
 {
 	if (entity == INVALID_ENTITY)
 	{
+		std::lock_guard lock(mutex_);
 		positions_.push_back(position);
-		return Index(positions_.size());
+		return static_cast<Index>(positions_.size());
 	}
-	
-	size_t futureSize = positions_.size();
+
+	std::size_t futureSize;
+	{
+		std::shared_lock lock(mutex_);
+	    futureSize = positions_.size();
+	}
 	if (futureSize <= entity)
 	{
-		while (futureSize <= entity)
-		{
-			futureSize *= 2;
+        {
+            const auto wantedSize = entity + 1;
+            std::shared_lock lock(mutex_);
+			futureSize = wantedSize + wantedSize / 2;
 		}
+		std::lock_guard lock(mutex_);
 		positions_.resize(futureSize);
 	}
+	std::shared_lock lock(mutex_);
 	positions_[entity] = position;
 	return entity;
 }
@@ -88,11 +97,13 @@ Index Transform2dManager::AddAngle(float angle, Entity entity)
 
 sf::Vector2f Transform2dManager::GetPosition(Index i) const
 {
+	std::shared_lock lock(mutex_);
 	return positions_[i];
 }
 
 void Transform2dManager::SetPosition(const sf::Vector2f& position, Index i)
 {
+	std::shared_lock lock(mutex_);
 	positions_[i] = position;
 }
 }
