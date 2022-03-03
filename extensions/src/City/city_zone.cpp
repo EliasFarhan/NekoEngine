@@ -101,7 +101,7 @@ void CityZoneManager::AddZone(sf::Vector2i position, ZoneType zoneType, CityBuil
 #ifdef TRACY_ENABLE
     ZoneScoped
 #endif
-	auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+	auto* engine = static_cast<CityBuilderEngine*>(MainEngine::GetInstance());
 	if(engine->GetCityMoney() < zoneCost)
 		return;
 	if(position.x < 0 || position.y < 0 || 

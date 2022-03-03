@@ -130,6 +130,12 @@ add_dependencies(Neko_COMMON DataTarget)
 set_target_properties(Neko_COMMON PROPERTIES UNITY_BUILD ON)
 target_compile_definitions(Neko_COMMON PUBLIC $<$<CONFIG:Debug>:__neko_dbg__>)
 target_compile_definitions(Neko_COMMON PUBLIC $<$<CONFIG:RelWithDebInfo>:__neko_dbg__>)
+if(MSVC)
+	target_compile_options(Neko_COMMON PUBLIC /arch:AVX2 /Oi /GR- /EHs-c- /FA /Oy- /GL /fp:fast)
+	target_link_options(Neko_COMMON PUBLIC /LTCG)
+else()
+
+endif()
 #Neko TEST
 SET(Neko_TEST_DIR ${CMAKE_SOURCE_DIR}/test)
 file(GLOB TEST_FILES ${Neko_TEST_DIR}/*.cpp )

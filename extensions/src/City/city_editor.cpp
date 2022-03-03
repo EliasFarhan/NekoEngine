@@ -39,7 +39,7 @@ void CityEditor::Init()
 #ifdef TRACY_ENABLE
 	ZoneScoped
 #endif
-	engine_ = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+	engine_ = static_cast<CityBuilderEngine*>(MainEngine::GetInstance());
 	for (Index i = 0; i < static_cast<Index>(ButtonIconType::LENGTH); i++)
 	{
 		buttonUiIndex[i] = engine_->GetTextureManager().LoadTexture(buttonIconTexture[i]);

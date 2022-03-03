@@ -96,7 +96,7 @@ void CityPeopleManager::Init()
 #ifdef TRACY_ENABLE
 		ZoneNamedN(moveTo, "Move To Func", true);
 #endif
-		auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+		auto* engine = static_cast<CityBuilderEngine*>(MainEngine::GetInstance());
 		Person* personPtr = engine->GetPeopleManager().GetPersonAt(entity);
 		if (personPtr == nullptr)
 		{
@@ -153,7 +153,7 @@ void CityPeopleManager::Init()
 	{
 
 		logDebug("Find House " + std::to_string(entity));
-		auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+		auto* engine = static_cast<CityBuilderEngine*>(MainEngine::GetInstance());
 		Person* personPtr = engine->GetPeopleManager().GetPersonAt(entity);
 		if (personPtr == nullptr)
 		{
@@ -215,7 +215,7 @@ void CityPeopleManager::Init()
 	functionMap.SetFunction("FindWork", [this](Index entity, const std::vector<double>&) -> bool
 	{
 		logDebug("Find Work " + std::to_string(entity));
-		auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+		auto* engine = static_cast<CityBuilderEngine*>(MainEngine::GetInstance());
 		Person* personPtr = engine->GetPeopleManager().GetPersonAt(entity);
 		if (personPtr == nullptr)
 		{
@@ -275,7 +275,7 @@ void CityPeopleManager::Init()
 	});
 	functionMap.SetFunction("CheckHomeAndWork", [this](Index entity, const std::vector<double>&) -> bool
 	{
-		auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+		auto* engine = static_cast<CityBuilderEngine*>(MainEngine::GetInstance());
 		logDebug("CheckHomeAndWork " + std::to_string(entity));
 		auto* person = GetPersonAt(entity);
 		if (person == nullptr)
@@ -339,7 +339,7 @@ void CityPeopleManager::Init()
 	});
 	functionMap.SetFunction("IncreaseDayCount", [&](Index entity, const std::vector<double>&)->bool
 	{
-		auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+		auto* engine = static_cast<CityBuilderEngine*>(MainEngine::GetInstance());
 		auto* person = GetPersonAt(entity);
 		if( person != nullptr)
 		{
@@ -362,7 +362,7 @@ void CityPeopleManager::Update(float dt)
 #ifdef TRACY_ENABLE
 	ZoneScoped;
 #endif
-    const auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+    const auto* engine = static_cast<CityBuilderEngine*>(MainEngine::GetInstance());
 	const auto cheatData = engine->GetCheatData();
 	if(cheatData & CheatModeData::QUICK_PEOPLE_SPAWN)
 	{
@@ -389,7 +389,7 @@ Entity CityPeopleManager::SpawnPerson()
 #ifdef TRACY_ENABLE
 	ZoneScoped
 #endif
-	auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+	auto* engine = static_cast<CityBuilderEngine*>(MainEngine::GetInstance());
 	const auto mapEnds = engine->GetCityMap().GetRoadEnds();
 	if (mapEnds.empty())
 		return INVALID_ENTITY;
@@ -450,7 +450,7 @@ Index CityPeopleManager::GetPeopleCount()
 #ifdef TRACY_ENABLE
 	ZoneScoped
 #endif
-	auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+	auto* engine = static_cast<CityBuilderEngine*>(MainEngine::GetInstance());
 	return static_cast<Index>(std::ranges::count_if(people_, [&engine](const Person& person)
     {
         return engine->GetEntityManager().HasComponent(person.personEntity, static_cast<EntityMask>(CityComponentType::PERSON)) &&
@@ -466,7 +466,7 @@ void CityPeopleManager::DestroyPerson(Entity entity)
 #endif
 		if (entity == INVALID_ENTITY)
 			return;
-	auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+	auto* engine = static_cast<CityBuilderEngine*>(MainEngine::GetInstance());
 	auto* person = GetPersonAt(entity);
 	if (person == nullptr)
 		return;

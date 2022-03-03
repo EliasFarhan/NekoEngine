@@ -41,7 +41,7 @@ void CityBuildingManager::Update(CityZoneManager& zoneManager, CityBuilderMap& c
 #ifdef TRACY_ENABLE
 	ZoneScoped
 #endif
-    const auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+    const auto* engine = static_cast<CityBuilderEngine*>(MainEngine::GetInstance());
 	spawnTimer_.Update(dt);
 	if (spawnTimer_.IsOver() || (engine->GetCheatData() & CheatModeData::QUICK_HOUSE_SPAWN))
 	{
@@ -205,7 +205,7 @@ sf::Vector2i CityBuildingManager::FindBuilding(ZoneType zoneType)
 	}
 	case ZoneType::COMMERCIAL:
 	{
-        const auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+        const auto* engine = static_cast<CityBuilderEngine*>(MainEngine::GetInstance());
 		std::vector<Building*> workBuildings;
 		workBuildings.reserve(buildings_.size());
 		for (auto& building : buildings_)

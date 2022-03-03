@@ -93,7 +93,7 @@ void CityBuilderMap::Init()
 				trainStation.position = pos + sf::Vector2i(0, 1);//bottom left
 				trainStation.size = sf::Vector2u(5, 3);
 				trainStation.elementType = CityElementType::TRAIN_STATION;
-				auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+				auto* engine = static_cast<CityBuilderEngine*>(MainEngine::GetInstance());
 				engine->mainView.setCenter(sf::Vector2f(
 					static_cast<float>(trainStation.position.x)*city.tileSize.x, 
 					static_cast<float>(trainStation.position.y)*city.tileSize.y));
@@ -185,7 +185,7 @@ void CityBuilderMap::Init()
 	}
 
 	//Spawn city beginning in cheat
-	auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+	auto* engine = static_cast<CityBuilderEngine*>(MainEngine::GetInstance());
 	if(engine->GetCheatData() & CheatModeData::CITY_SPAWN_INIT)
 	{
 		const auto centerPos = sf::Vector2i(city.mapSize.x / 2, city.mapSize.y / 2);

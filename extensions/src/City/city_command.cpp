@@ -69,7 +69,7 @@ void CityCommandManager::Init()
 #ifdef TRACY_ENABLE
 	ZoneScoped
 #endif
-	engine_ = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+	engine_ = static_cast<CityBuilderEngine*>(MainEngine::GetInstance());
 	soundBufferErase_ = Sound::LoadSoundBuffer("data/Swip.wav");
 	soundBufferBuild_ = Sound::LoadSoundBuffer("data/Truip.wav");
 	soundBufferRoad_ = Sound::LoadSoundBuffer("data/Buip.wav");
@@ -92,7 +92,7 @@ void CityCommandManager::ExecuteCommand(const std::shared_ptr<CityCommand>& comm
 	{
 	case CityCommandType::CHANGE_CURSOR_MODE:
 	{
-        const auto* cursorCommand = dynamic_cast<ChangeModeCommand*>(command.get());
+        const auto* cursorCommand = static_cast<ChangeModeCommand*>(command.get());
 		engine_->GetCursor().SetCursorMode(cursorCommand->newCursorMode);
 		Sound::PlaySound(soundSelect_);
 		break;
@@ -104,7 +104,7 @@ void CityCommandManager::ExecuteCommand(const std::shared_ptr<CityCommand>& comm
 			Sound::PlaySound(soundOut_);
 			break;
 		}
-        const auto* buildCommand = dynamic_cast<BuildElementCommand*>(command.get());
+        const auto* buildCommand = static_cast<BuildElementCommand*>(command.get());
 		engine_->GetZoneManager().RemoveZone(buildCommand->position,ZoneType::RESIDENTIAL);
 		engine_->GetZoneManager().RemoveZone(buildCommand->position,ZoneType::COMMERCIAL);
 		engine_->GetCityMap().AddCityElement(buildCommand->elementType, buildCommand->position);
@@ -118,7 +118,7 @@ void CityCommandManager::ExecuteCommand(const std::shared_ptr<CityCommand>& comm
 	}
 	case CityCommandType::DELETE_CITY_ELEMENT:
 	{
-        const auto* buildCommand = dynamic_cast<DestroyElementCommand*>(command.get());
+        const auto* buildCommand = static_cast<DestroyElementCommand*>(command.get());
 		engine_->GetCityMap().RemoveCityElement(buildCommand->position);
 		engine_->GetCarManager().RescheduleCarPathfinding(buildCommand->position);
 		engine_->GetZoneManager().RemoveZone(buildCommand->position,ZoneType::RESIDENTIAL);
@@ -129,7 +129,7 @@ void CityCommandManager::ExecuteCommand(const std::shared_ptr<CityCommand>& comm
 	}
 	case CityCommandType::ADD_CITY_ZONE:
 	{
-        const auto* zoneCommand = dynamic_cast<AddZoneCommand*>(command.get());
+        const auto* zoneCommand = static_cast<AddZoneCommand*>(command.get());
 		if (engine_->GetCityMoney() < zoneCost)
 		{
 			Sound::PlaySound(soundOut_);
@@ -144,7 +144,7 @@ void CityCommandManager::ExecuteCommand(const std::shared_ptr<CityCommand>& comm
 	}
 	case CityCommandType::CHANGE_TAX:
 	{
-        const auto* taxCommand = dynamic_cast<ChangeTaxCommand*>(command.get());
+        const auto* taxCommand = static_cast<ChangeTaxCommand*>(command.get());
 		engine_->houseTax = taxCommand->houseTax;
 		engine_->workTax = taxCommand->workTax;
 	}

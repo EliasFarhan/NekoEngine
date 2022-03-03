@@ -674,7 +674,7 @@ void CityBuilderTilemap::PushCommand(GraphicsManager* graphicsManager)
 	const Index frameIndex = MainEngine::GetInstance()->frameIndex % 2;
 
 	{
-		auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+		auto* engine = static_cast<CityBuilderEngine*>(MainEngine::GetInstance());
         const auto& city = engine->GetCityMap().city;
 		auto& rect = bgRect[frameIndex];
 		rect.setPosition(sf::Vector2f(0, 0));

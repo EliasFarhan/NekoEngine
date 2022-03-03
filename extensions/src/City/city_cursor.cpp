@@ -45,7 +45,7 @@ void CityCursor::Init()
 #ifdef TRACY_ENABLE
 	ZoneScoped
 #endif
-	engine_ = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+	engine_ = static_cast<CityBuilderEngine*>(MainEngine::GetInstance());
 }
 
 void CityCursor::Update(float dt)
@@ -332,7 +332,8 @@ sf::Vector2i CityCursor::GetMouseTilePos() const
 	const auto tileSize = engine_->GetCityMap().city.tileSize;
 	const auto worldMousePos = GetMouseWorldPos() + sf::Vector2i(tileSize) / 2;
 	return sf::Vector2i(
-		static_cast<int>(worldMousePos.x) / tileSize.x,
-		static_cast<int>(worldMousePos.y) / tileSize.y);
+        static_cast<int>(worldMousePos.x) / tileSize.x,
+		static_cast<int>(worldMousePos.y) / tileSize.y
+    );
 }
 }

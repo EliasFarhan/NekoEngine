@@ -323,7 +323,7 @@ namespace neko {
 			logDebug(oss_indent.str() + "children : {");
 			indent++;
 			const auto interfaceComposite =
-				dynamic_cast<const BehaviorTreeComposite*>(behaviorTree);
+				static_cast<const BehaviorTreeComposite*>(behaviorTree);
 			if (!interfaceComposite)
 			{
 				logDebug(oss_indent.str() + "ERROR in composite!");
@@ -344,7 +344,7 @@ namespace neko {
 			logDebug(oss_indent.str() + "decorator : {");
 			indent++;
 			const auto childDecorator =
-			    dynamic_cast<const BehaviorTreeDecorator*>(
+			    static_cast<const BehaviorTreeDecorator*>(
 					behaviorTree);
 			if (!childDecorator)
 			{

@@ -37,7 +37,7 @@ void CityCarManager::Init()
 #ifdef TRACY_ENABLE
 	ZoneScoped
 #endif
-	auto* engine = dynamic_cast<CityBuilderEngine*>(MainEngine::GetInstance());
+	auto* engine = static_cast<CityBuilderEngine*>(MainEngine::GetInstance());
 	entityManagerPtr_ = &engine->GetEntityManager();
 	transformManagerPtr_ = &engine->GetTransformManager();
 
