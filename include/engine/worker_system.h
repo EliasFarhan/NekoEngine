@@ -57,6 +57,7 @@ namespace neko
 
         [[nodiscard]] bool IsEmpty() const;
         [[nodiscard]] std::shared_ptr<Task> PopNextTask();
+        [[nodiscard]] bool IsRunning() const;
         void AddTask(std::shared_ptr<Task> task);
         void WaitForTask();
         void Destroy();
@@ -64,6 +65,7 @@ namespace neko
         std::vector<std::shared_ptr<Task>> tasks_;
         mutable std::shared_mutex queueMutex_;
         std::condition_variable_any conditionVariable_;
+        bool isRunning_ = true;
     };
 
 
@@ -84,7 +86,6 @@ namespace neko
         void Loop();
         WorkerQueue& taskQueue_;
         std::thread thread_;
-        bool isRunning_ = true;
     };
 
     struct WorkerQueueDefinition

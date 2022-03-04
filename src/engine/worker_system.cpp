@@ -111,10 +111,14 @@ namespace neko
 
     void WorkerThread::Loop()
     {
-        while (isRunning_)
+        while (taskQueue_.IsRunning())
         {
             if (taskQueue_.IsEmpty())
             {
+                if (!taskQueue_.IsRunning())
+                {
+                    break;
+                }
                 taskQueue_.WaitForTask();
             }
             else
@@ -200,8 +204,8 @@ namespace neko
 
     void WorkerManager::Destroy()
     {
-        std::ranges::for_each(threads_, [](auto& thread) {thread.Destroy(); });
-        std::ranges::for_each(queues_, [](auto& queue) {queue.Destroy(); });
+        std::for_each(queues_.begin(), queues_.end(), [](auto& queue) {queue.Destroy(); });
+        std::for_each(threads_.begin(), threads_.end(), [](auto& thread) {thread.Destroy(); });
     }
 
     WorkerThread::~WorkerThread()
@@ -211,8 +215,6 @@ namespace neko
 
     void WorkerThread::Destroy()
     {
-        isRunning_ = false;
-        taskQueue_.Destroy();
         if (thread_.joinable())
         {
             thread_.join();
@@ -233,6 +235,12 @@ namespace neko
 
         std::shared_lock<std::shared_mutex> lock(queueMutex_);
         return tasks_.empty();
+    }
+
+    bool WorkerQueue::IsRunning() const
+    {
+        std::shared_lock lock(queueMutex_);
+        return isRunning_;
     }
 
     std::shared_ptr<Task> WorkerQueue::PopNextTask()
@@ -261,6 +269,10 @@ namespace neko
 
     void WorkerQueue::Destroy()
     {
+        {
+            std::unique_lock lock(queueMutex_);
+            isRunning_ = false;
+        }
         conditionVariable_.notify_all();
     }
 
