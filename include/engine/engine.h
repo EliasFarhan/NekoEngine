@@ -80,6 +80,8 @@ public:
 
     virtual void OnEvent(sf::Event& event);
 
+    WorkerManager& GetWorkerManager() { return workerManager_; }
+
     Configuration config;
     bool isRunning = false;
     std::unique_ptr<sf::RenderWindow> renderWindow = nullptr;

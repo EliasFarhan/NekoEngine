@@ -380,6 +380,79 @@ bool HasBitNeighbor(const NeighborBit& node, NeighborType neighborType)
 	return (node & static_cast<NeighborBit>(neighborType)) == static_cast<NeighborBit>(neighborType);
 }
 
+PathFindingManager::PathFindingManager(TileMapGraph& graph) :  graph_(graph)
+{
+	updateTask_ = std::make_shared<Task>([this]() { Update(0.0f); });
+}
+
+void PathFindingManager::Init()
+{
+	isRunning_ = true;
+	auto* engine = MainEngine::GetInstance();
+	engine->GetWorkerManager().AddTask(updateTask_, "other");
+}
+
+void PathFindingManager::Update(float dt)
+{
+	while(isRunning_)
+	{
+	    if(jobQueue_.empty())
+	    {
+			std::unique_lock lock(jobMutex_);
+			cond_.wait(lock);
+			if (!isRunning_)
+				break;
+	    }
+		PathJob tmp{};
+		{
+			std::shared_lock lock(jobMutex_);
+			tmp = jobQueue_.front();
+		}
+	    auto newPath = graph_.CalculateShortestPath(tmp.startPos, tmp.endPos);
+		std::unique_lock lock(pathMutex_);
+	    pathMap_[tmp.id] = std::move(newPath);
+	}
+}
+
+void PathFindingManager::Destroy()
+{
+	isRunning_ = false;
+	cond_.notify_all();
+}
+
+PathFindingManager::PathId PathFindingManager::SchedulePathFinding(const sf::Vector2i& startPos,
+    const sf::Vector2i& endPos)
+{
+	std::unique_lock writeLock(jobMutex_);
+	//Generate new path id
+	const auto newId = id_;
+	id_++;
+	jobQueue_.push({ newId, startPos, endPos });
+	return newId;
+}
+
+bool PathFindingManager::IsPathDone(PathId id) const
+{
+	std::shared_lock lock(pathMutex_);
+	return pathMap_.contains(id);
+}
+
+std::vector<sf::Vector2i> PathFindingManager::GetPath(PathId id)
+{
+	std::vector<sf::Vector2i> result;
+	{
+		std::shared_lock lock(pathMutex_);
+        const auto it = pathMap_.find(id);
+		result = std::move(it->second);
+		lock.release();
+
+		std::unique_lock writeLock(pathMutex_);
+		pathMap_.erase(it);
+	}
+	return result;
+
+}
+
 void TileMapGraph::AddNeighbor(Node& node, NeighborType neighborBit)
 {
 	AddNeighborToBit(node.neighborBitwise, neighborBit);

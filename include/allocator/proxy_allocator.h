@@ -4,7 +4,7 @@
 namespace neko
 {
 
-class ProxyAllocator : public AllocatorInterface
+class ProxyAllocator final : public AllocatorInterface
 {
 public:
     ProxyAllocator(AllocatorInterface& allocator);

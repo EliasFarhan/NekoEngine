@@ -30,7 +30,7 @@ namespace neko
         std::size_t numAllocations_ = 0;
     };
 
-    class DumbAllocator : public AllocatorInterface
+    class DumbAllocator final : public AllocatorInterface
     {
     public:
         void* Allocate(std::size_t allocatedSize, std::size_t alignment) override;

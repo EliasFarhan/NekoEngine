@@ -28,11 +28,15 @@
 #include <SFML/System/Vector2.hpp>
 #include <array>
 #include <vector>
+#include <queue>
 #include <map>
 #include "engine/globals.h"
+#include "engine/system.h"
+#include "engine/worker_system.h"
 
 namespace neko
 {
+class TileMapGraph;
 
 using NeighborBit = std::uint16_t;
 enum class NeighborType : NeighborBit
@@ -64,6 +68,37 @@ struct Node
 	sf::Vector2i position = INVALID_TILE_POS;
 	std::array<Index, maxNeighborsNmb> neighborsIndex;
     NeighborBit neighborBitwise = 0u;
+};
+
+class PathFindingManager : public System
+{
+public:
+    using PathId = std::uint64_t;
+    
+    PathFindingManager(TileMapGraph& graph);
+    void Init() override;
+    void Update(float dt) override;
+    void Destroy() override;
+
+    PathId SchedulePathFinding(const sf::Vector2i& startPos, const sf::Vector2i& endPos);
+    bool IsPathDone(PathId id) const;
+    std::vector<sf::Vector2i> GetPath(PathId id);
+private:
+    struct PathJob
+    {
+        PathId id;
+        sf::Vector2i startPos;
+        sf::Vector2i endPos;
+    };
+    mutable std::shared_mutex pathMutex_;
+    mutable std::shared_mutex jobMutex_;
+    std::condition_variable_any cond_;
+    std::shared_ptr<Task> updateTask_;
+    TileMapGraph& graph_;
+    std::unordered_map<PathId, std::vector<sf::Vector2i>> pathMap_;
+    std::queue<PathJob> jobQueue_;
+    inline static PathId id_ = 1;
+    bool isRunning_ = false;
 };
 
 class TileMapGraph
