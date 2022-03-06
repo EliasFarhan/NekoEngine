@@ -42,6 +42,7 @@ void CityCarManager::Init()
 	transformManagerPtr_ = &engine->GetTransformManager();
 
 	cityMap_ = &engine->GetCityMap();
+	pathFindingManager_ = &engine->GetPathFindingManager();
 	roadGraphPtr_ = &cityMap_->GetRoadGraph();
 }
 
@@ -128,6 +129,7 @@ void CityCarManager::RescheduleCarPathfinding(const sf::Vector2i& removedPositio
 #ifdef TRACY_ENABLE
 	ZoneScoped
 #endif
+		
 	for (Entity carEntity = 0u; carEntity < cars_.size(); carEntity++)
 	{
 		if (entityManagerPtr_->HasComponent(carEntity, static_cast<EntityMask>(CityComponentType::CAR) | static_cast<EntityMask>(CityComponentType::TRANSFORM)))
@@ -137,11 +139,16 @@ void CityCarManager::RescheduleCarPathfinding(const sf::Vector2i& removedPositio
 			if (posIt != car->currentPath.end())
 			{
 				car->carState = CarState::RESCHEDULE;
+
 				//Destroy car if it is in the destroyed area
 				if (posIt - car->currentPath.begin() == car->currentIndex)
 				{
 					entityManagerPtr_->DestroyEntity(carEntity);
 				}
+                else
+                {
+					//TODO Reschedule pathfinding
+                }
 			}
 		}
 	}

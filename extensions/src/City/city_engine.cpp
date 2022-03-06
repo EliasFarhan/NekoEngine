@@ -34,6 +34,10 @@
 
 namespace neko
 {
+CityBuilderEngine::CityBuilderEngine(Configuration* config) : pathfindingManager_(cityBuilderMap_.GetRoadGraph())
+{
+}
+
     void CityBuilderEngine::Init()
     {
 #ifdef TRACY_ENABLE
@@ -53,7 +57,7 @@ namespace neko
         cursor_.Init();
         commandManager_.Init();
         cityCarManager_.Init();
-
+        pathfindingManager_.Init();
         cityPeopleManager_.Init();
         musicInd_ = Sound::LoadMusic("data/Meydn01.ogg");
         if (!Sound::PlayMusic(musicInd_))
@@ -266,9 +270,10 @@ namespace neko
 #ifdef TRACY_ENABLE
         ZoneScoped
 #endif
-            Sound::RemoveMusic(musicInd_);
+        Sound::RemoveMusic(musicInd_);
         cursor_.Destroy();
         commandManager_.Destroy();
+        pathfindingManager_.Destroy();
         MainEngine::Destroy();
     }
 

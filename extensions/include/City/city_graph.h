@@ -73,7 +73,7 @@ struct Node
 class PathFindingManager : public System
 {
 public:
-    using PathId = std::uint64_t;
+    using PathId = std::uint32_t;
     
     PathFindingManager(TileMapGraph& graph);
     void Init() override;

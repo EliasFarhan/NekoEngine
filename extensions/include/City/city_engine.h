@@ -77,7 +77,7 @@ struct CheatModeData
 class CityBuilderEngine : public MainEngine
 {
 public:
-    using MainEngine::MainEngine;
+    CityBuilderEngine(Configuration* config = nullptr);
     void Init() override;
 
     void Update(float dt) override;
@@ -104,6 +104,7 @@ public:
 
     CityZoneManager& GetZoneManager();
     CityPeopleManager& GetPeopleManager();
+    PathFindingManager& GetPathFindingManager() { return pathfindingManager_; }
 
     sf::View mainView;
     float workTax = 0.125;
@@ -131,6 +132,7 @@ private:
     CityCursor cursor_;
     CityZoneManager cityZoneManager_;
     CityBuildingManager cityBuildingManager_;
+    PathFindingManager pathfindingManager_;
 	BehaviorTreeManager behaviorTreeManager_;
 
     const float scrollDelta_ = 0.1f;

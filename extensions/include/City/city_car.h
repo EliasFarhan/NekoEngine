@@ -28,6 +28,7 @@
 #include "engine/system.h"
 #include "utilities/time_utility.h"
 #include "engine/entity.h"
+#include "city_graph.h"
 
 namespace neko
 {
@@ -37,7 +38,7 @@ class CityBuilderMap;
 
 enum class CarType : std::uint8_t;
 
-enum class CarState : Index
+enum class CarState : std::uint8_t
 {
 	ARRIVED,
 	MOVING_TO_NEXT_POS,
@@ -46,11 +47,13 @@ enum class CarState : Index
 
 struct CityCar : Component
 {
-	CarType carType;
+	
 	std::vector<sf::Vector2i> currentPath;
 	Index currentIndex = 0;
-	Timer movingTimer = Timer(0.0f, 0.1f);//2 tiles per second
+	PathFindingManager::PathId pathId = 0;
+    CarType carType;
 	CarState carState = CarState::ARRIVED;
+	Timer movingTimer = Timer(0.0f, 0.1f);//2 tiles per second
 	sf::Vector2i position = INVALID_TILE_POS;
 	const sf::Vector2f spriteSize = sf::Vector2f(32.0f, 16.0f);
 };
@@ -78,5 +81,6 @@ private:
 	TileMapGraph* roadGraphPtr_ = nullptr;
 	CityBuilderMap* cityMap_ = nullptr;
 	Timer spawningTimer = Timer(1.0f, 1.0f);
+	PathFindingManager* pathFindingManager_ = nullptr;
 };
 }
