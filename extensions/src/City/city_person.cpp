@@ -110,14 +110,32 @@ void CityPeopleManager::Init()
 #ifdef TRACY_ENABLE
 		TracyCZoneEnd(carCtx);
 #endif
+		
 	    if (car == nullptr)
 		{
 			DestroyPerson(entity);
 			return true;
 		}
-		car->movingTimer.Update(engine->clockDeltatime.asSeconds());
+		if(car->carState == CarState::RESCHEDULE)
+		{
+			auto& pathfindingManager = static_cast<CityBuilderEngine*>(MainEngine::GetInstance())->GetPathFindingManager();
+            if(!pathfindingManager.IsPathDone(car->pathId))
+            {
+				return false;
+            }
+			car->currentPath = pathfindingManager.GetPath(car->pathId);
+			if(car->currentPath.empty())
+			{
+				engine->GetEntityManager().DestroyEntity(personPtr->carEntity);
+				engine->GetEntityManager().DestroyEntity(personPtr->personEntity);
+				return true;
+			}
+			car->carState = CarState::MOVING_TO_NEXT_POS;
+		}
+
+	    car->movingTimer.Update(engine->clockDeltatime.asSeconds());
 		const auto tileSize = engine->GetCityMap().city.tileSize;
-		sf::Vector2f deltaPos = sf::Vector2f(0.0f, 0.0f);
+		auto deltaPos = sf::Vector2f(0.0f, 0.0f);
 		if (car->movingTimer.IsOver())
 		{
 			personPtr->position = car->position;
@@ -148,6 +166,7 @@ void CityPeopleManager::Init()
 		return false; //return false means still running
 	};
 
+	
 	FunctionMap functionMap;
 	functionMap.SetFunction("FindHouse", [this](Index entity, const std::vector<double>&) -> bool
 	{
@@ -191,21 +210,22 @@ void CityPeopleManager::Init()
 		}
 		if (housePos != INVALID_TILE_POS)
 		{
+			auto& pathfindingManager = static_cast<CityBuilderEngine*>(MainEngine::GetInstance())->GetPathFindingManager();
 
 			const auto closestCurrentPos = engine->GetCityMap().GetRoadGraph().GetClosestNode(personPtr->position)->position;
 			const auto closestHousePos = engine->GetCityMap().GetRoadGraph().GetClosestNode(housePos)->position;
-			const auto path = engine->GetCityMap().GetRoadGraph().CalculateShortestPath(closestCurrentPos, closestHousePos);
+			/*const auto path = engine->GetCityMap().GetRoadGraph().CalculateShortestPath(closestCurrentPos, closestHousePos);
 			if (path.empty())
 			{
 				logDebug("[Error] Empty path to house pos from Person pos");
 				DestroyPerson(entity);
 				return false;
-			}
+			}*/
 			personPtr->carEntity = engine->GetCarManager().SpawnCar(closestCurrentPos, CarType::AVG_CAR);
 			auto [car, lock] = engine->GetCarManager().GetCar(personPtr->carEntity);
-		    car->currentPath = path;
-
-			car->carState = CarState::MOVING_TO_NEXT_POS;
+		    //car->currentPath = path;
+			car->pathId = pathfindingManager.SchedulePathFinding(closestCurrentPos, closestHousePos);
+			car->carState = CarState::RESCHEDULE;
 			car->currentIndex = 0u;
 			car->movingTimer.Reset();
 
@@ -253,20 +273,22 @@ void CityPeopleManager::Init()
 		}
 		if (workPos != INVALID_TILE_POS)
 		{
+			auto& pathfindingManager = static_cast<CityBuilderEngine*>(MainEngine::GetInstance())->GetPathFindingManager();
+
 			const auto closestCurrentPos = engine->GetCityMap().GetRoadGraph().GetClosestNode(personPtr->position)->position;
 			const auto closestWorkPos = engine->GetCityMap().GetRoadGraph().GetClosestNode(workPos)->position;
-			const auto path = engine->GetCityMap().GetRoadGraph().CalculateShortestPath(closestCurrentPos, closestWorkPos);
+			/*const auto path = engine->GetCityMap().GetRoadGraph().CalculateShortestPath(closestCurrentPos, closestWorkPos);
 			if (path.empty())
 			{
 				logDebug("[Error] Empty path to work pos from Person pos");
 				DestroyPerson(entity);
 				return false;
-			}
+			}*/
 			personPtr->carEntity = engine->GetCarManager().SpawnCar(closestCurrentPos, CarType::BIG_CAR);
 			auto [car, lock] = engine->GetCarManager().GetCar(personPtr->carEntity);
-			car->currentPath = path;
-
-			car->carState = CarState::MOVING_TO_NEXT_POS;
+			//car->currentPath = path;
+			car->pathId = pathfindingManager.SchedulePathFinding(closestCurrentPos, closestWorkPos);
+			car->carState = CarState::RESCHEDULE;
 			car->currentIndex = 0u;
 			car->movingTimer.Reset();
 
@@ -311,21 +333,24 @@ void CityPeopleManager::Init()
 		if(leaving)
 		{
 			//Pathfinding to exit
+			auto& pathfindingManager = static_cast<CityBuilderEngine*>(MainEngine::GetInstance())->GetPathFindingManager();
+
 			const auto ends = engine->GetCityMap().GetRoadEnds();
 			const auto finalPos = ends[rand() % ends.size()];
 			const auto closestCurrentPos = engine->GetCityMap().GetRoadGraph().GetClosestNode(person->position)->position;
 			const auto closestFinalPos = engine->GetCityMap().GetRoadGraph().GetClosestNode(finalPos)->position;
-			const auto path = engine->GetCityMap().GetRoadGraph().CalculateShortestPath(closestCurrentPos, closestFinalPos);
+			/*const auto path = engine->GetCityMap().GetRoadGraph().CalculateShortestPath(closestCurrentPos, closestFinalPos);
 			if (path.empty())
 			{
 				logDebug("[Error] Empty path to house pos from Person pos");
 				DestroyPerson(entity);
 				return false;
-			}
+			}*/
 			person->carEntity = engine->GetCarManager().SpawnCar(closestCurrentPos, CarType::BUS);
 			auto [car, lock] = engine->GetCarManager().GetCar(person->carEntity);
-			car->currentPath = path;
-			car->carState = CarState::MOVING_TO_NEXT_POS;
+			//car->currentPath = path;
+			car->pathId = pathfindingManager.SchedulePathFinding(closestCurrentPos, closestFinalPos);
+			car->carState = CarState::RESCHEDULE;
 			car->currentIndex = 0u;
 			car->movingTimer.Reset();
 		}

@@ -36,7 +36,8 @@ namespace neko
 {
 void SfmlCommand::Draw(sf::RenderTarget* renderTarget)
 {
-    renderTarget->draw(*drawable);
+    if(drawable != nullptr)
+        renderTarget->draw(*drawable);
 }
 
 GraphicsManager::GraphicsManager()

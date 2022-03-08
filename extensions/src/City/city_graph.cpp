@@ -396,6 +396,9 @@ void PathFindingManager::Update(float dt)
 {
 	while(isRunning_)
 	{
+#ifdef TRACY_ENABLE
+		ZoneNamedN(pathfindingUpdate, "Pathfinding Update", true);
+#endif
 	    if(jobQueue_.empty())
 	    {
 			std::unique_lock lock(jobMutex_);
@@ -408,6 +411,9 @@ void PathFindingManager::Update(float dt)
 			std::shared_lock lock(jobMutex_);
 			tmp = jobQueue_.front();
 		}
+#ifdef TRACY_ENABLE
+		ZoneNamedN(shortestPath, "Shortest Path", true);
+#endif
 	    auto newPath = graph_.CalculateShortestPath(tmp.startPos, tmp.endPos);
 		std::unique_lock lock(pathMutex_);
 	    pathMap_[tmp.id] = std::move(newPath);
@@ -428,6 +434,7 @@ PathFindingManager::PathId PathFindingManager::SchedulePathFinding(const sf::Vec
 	const auto newId = id_;
 	id_++;
 	jobQueue_.push({ newId, startPos, endPos });
+	cond_.notify_one();
 	return newId;
 }
 

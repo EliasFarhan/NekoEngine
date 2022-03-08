@@ -145,10 +145,6 @@ void CityCarManager::RescheduleCarPathfinding(const sf::Vector2i& removedPositio
 				{
 					entityManagerPtr_->DestroyEntity(carEntity);
 				}
-                else
-                {
-					//TODO Reschedule pathfinding
-                }
 			}
 		}
 	}
