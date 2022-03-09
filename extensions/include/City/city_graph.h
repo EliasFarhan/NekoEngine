@@ -30,6 +30,9 @@
 #include <vector>
 #include <queue>
 #include <map>
+
+#include "allocator/linear_allocator.h"
+#include "allocator/proxy_allocator.h"
 #include "engine/globals.h"
 #include "engine/system.h"
 #include "engine/worker_system.h"
@@ -90,6 +93,7 @@ private:
         sf::Vector2i startPos;
         sf::Vector2i endPos;
     };
+    inline static constexpr std::size_t PathfindingAllocatorSize = 2'000'000ull;
     mutable std::shared_mutex pathMutex_;
     mutable std::shared_mutex jobMutex_;
     std::condition_variable_any cond_;
@@ -99,6 +103,10 @@ private:
     std::queue<PathJob> jobQueue_;
     inline static PathId id_ = 1;
     bool isRunning_ = false;
+    void* pathfindingAllocatedMemory_ = nullptr;
+    LinearAllocator pathfindingAllocator_;
+    ProxyAllocator proxyAllocator_{pathfindingAllocator_};
+    void* address_ = nullptr;
 };
 
 class TileMapGraph

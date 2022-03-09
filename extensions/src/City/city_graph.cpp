@@ -53,6 +53,9 @@ struct hash<sf::Vector2i>
 }
 namespace neko
 {
+
+static ProxyAllocator* pathfindingAllocator = nullptr;
+
 const std::vector<Node>& TileMapGraph::GetNodesVector() const
 {
 	return nodes_;
@@ -193,12 +196,12 @@ TileMapGraph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vect
 		Index parentIndex = INDEX_INVALID;
 	};
 	auto* engine = MainEngine::GetInstance();
-	std::vector<NodePathData, StandardAllocator<NodePathData>> nodePathDatas(nodes_.size(), {engine->GetFrameAllocator()});
+	std::vector<NodePathData, StandardAllocator<NodePathData>> nodePathDatas(nodes_.size(), {*pathfindingAllocator});
 	auto comp = [](const NodePair& nodeA, const NodePair& nodeB) -> bool
 	{
 		return nodeA.second < nodeB.second;
 	};
-	std::vector<NodePair, StandardAllocator<NodePair>> frontier(StandardAllocator<NodePair>{engine->GetFrameAllocator()});
+	std::vector<NodePair, StandardAllocator<NodePair>> frontier(StandardAllocator<NodePair>{*pathfindingAllocator});
 	frontier.reserve(nodes_.size());
 	frontier.emplace_back(startNodeIndex, 0.0f);
 	nodePathDatas[startNodeIndex].cost = 0.0f;
@@ -216,7 +219,7 @@ TileMapGraph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vect
 		if (currentNode.position == endPos)
 		{
 #ifdef __neko_dbg__
-			logDebug("Manage to go to the end");
+			//logDebug("Manage to go to the end");
 #endif
 			break;
 		}
@@ -259,7 +262,7 @@ TileMapGraph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vect
 	}
 #ifdef TRACY_ENABLE
 	TracyCZoneEnd(pathExplore);
-	ZoneNamedN(reverse, "Come Back And Reverse", true);
+	//ZoneNamedN(reverse, "Come Back And Reverse", true);
 #endif
 	if (nodePathDatas[endNodeIndex].parentIndex != INDEX_INVALID)
 	{
@@ -287,7 +290,9 @@ TileMapGraph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vect
 #endif
 	}
 #ifdef TRACY_ENABLE
-	const auto msg = fmt::format("Path size: {}, Frontier count: {}", path.size(), count);
+	const auto msg = fmt::format(
+		"Path size: {}, Frontier count: {}, startPos: {},{} endPos: {},{}", 
+		path.size(), count, startPos.x, startPos.y, endPos.x, endPos.y);
     ZoneTextV(shortestPath, msg.data(), msg.size());
 #endif
 	return path;
@@ -388,6 +393,9 @@ PathFindingManager::PathFindingManager(TileMapGraph& graph) :  graph_(graph)
 void PathFindingManager::Init()
 {
 	isRunning_ = true;
+	address_ = pathfindingAllocatedMemory_ = std::malloc(PathfindingAllocatorSize);
+	pathfindingAllocator_.Init(address_, PathfindingAllocatorSize);
+	pathfindingAllocator = &proxyAllocator_;
 	auto* engine = MainEngine::GetInstance();
 	engine->GetWorkerManager().AddTask(updateTask_, "other");
 }
@@ -406,17 +414,19 @@ void PathFindingManager::Update(float dt)
 			if (!isRunning_)
 				break;
 	    }
-		PathJob tmp{};
+		PathJob currentPathJob{};
 		{
 			std::shared_lock lock(jobMutex_);
-			tmp = jobQueue_.front();
+			currentPathJob = jobQueue_.front();
+			jobQueue_.pop();
 		}
 #ifdef TRACY_ENABLE
 		ZoneNamedN(shortestPath, "Shortest Path", true);
 #endif
-	    auto newPath = graph_.CalculateShortestPath(tmp.startPos, tmp.endPos);
+	    auto newPath = graph_.CalculateShortestPath(currentPathJob.startPos, currentPathJob.endPos);
+		pathfindingAllocator_.Clear();
 		std::unique_lock lock(pathMutex_);
-	    pathMap_[tmp.id] = std::move(newPath);
+	    pathMap_[currentPathJob.id] = std::move(newPath);
 	}
 }
 
@@ -424,6 +434,9 @@ void PathFindingManager::Destroy()
 {
 	isRunning_ = false;
 	cond_.notify_all();
+	updateTask_->Join();
+	pathfindingAllocator_.Clear();
+	std::free(address_);
 }
 
 PathFindingManager::PathId PathFindingManager::SchedulePathFinding(const sf::Vector2i& startPos,
@@ -440,18 +453,27 @@ PathFindingManager::PathId PathFindingManager::SchedulePathFinding(const sf::Vec
 
 bool PathFindingManager::IsPathDone(PathId id) const
 {
+
+#ifdef TRACY_ENABLE
+	ZoneScoped
+#endif
 	std::shared_lock lock(pathMutex_);
 	return pathMap_.contains(id);
 }
 
 std::vector<sf::Vector2i> PathFindingManager::GetPath(PathId id)
 {
+#ifdef TRACY_ENABLE
+	ZoneScoped
+#endif
 	std::vector<sf::Vector2i> result;
 	{
-		std::shared_lock lock(pathMutex_);
-        const auto it = pathMap_.find(id);
-		result = std::move(it->second);
-		lock.release();
+		std::unordered_map<PathId, std::vector<sf::Vector2i>>::iterator it;
+		{
+			std::shared_lock lock(pathMutex_);
+			it = pathMap_.find(id);
+			result = std::move(it->second);
+		}
 
 		std::unique_lock writeLock(pathMutex_);
 		pathMap_.erase(it);

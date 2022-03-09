@@ -27,13 +27,17 @@
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 {
-    const argh::parser cmdl(argv);
+    argh::parser cmdl({ "--fpslimit" });
+	cmdl.parse(argv);
     neko::Configuration config{};
 
-	bool vsync = true;
-	if (cmdl({"--vsync"}) >> vsync)
+	if(cmdl[{"--vsync"}])
 	{
-		config.vSync = vsync;
+		config.vSync = true;
+	}
+	else
+	{
+		config.vSync = false;
 	}
 	int framerateLimit = 0;
 	if (cmdl({ "--fpslimit" }) >> framerateLimit)

@@ -34,7 +34,9 @@
 
 namespace neko
 {
-CityBuilderEngine::CityBuilderEngine(Configuration* config) : pathfindingManager_(cityBuilderMap_.GetRoadGraph())
+CityBuilderEngine::CityBuilderEngine(Configuration* config) :
+    MainEngine(config),
+    pathfindingManager_(cityBuilderMap_.GetRoadGraph())
 {
 }
 
@@ -105,7 +107,7 @@ CityBuilderEngine::CityBuilderEngine(Configuration* config) : pathfindingManager
         workerManager_.AddTask(generateBtEntities, "other");
 
         //Behavior Tree Update tasks
-        std::vector<std::shared_ptr<Task>> btUpdateTasks(std::thread::hardware_concurrency()-2);
+        std::vector<std::shared_ptr<Task>> btUpdateTasks(std::thread::hardware_concurrency()-3);
         for (std::size_t i = 0; i < btUpdateTasks.size(); i++)
         {
             
