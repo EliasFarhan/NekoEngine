@@ -227,6 +227,9 @@ CityBuilderEngine::CityBuilderEngine(Configuration* config) :
 
         const auto editorUpdateTask = std::make_shared<Task>([&]() {
             graphicsManager_->editor->AddInspectorInfo("FPS", std::to_string(1.0f / dt));
+            graphicsManager_->editor->AddInspectorInfo("Min FPS", std::to_string(1.0 / lowestDt_));
+            graphicsManager_->editor->AddInspectorInfo("Max FPS", std::to_string(1.0 / highestDt_));
+            graphicsManager_->editor->AddInspectorInfo("Avg FPS", std::to_string(1.0 / averageDt_));
             graphicsManager_->editor->AddInspectorInfo("Budget", std::to_string(cityMoney_) + "$");
             graphicsManager_->editor->AddInspectorInfo("People", std::to_string(cityPeopleManager_.GetPeopleCount()));
             });

@@ -140,7 +140,11 @@ protected:
     void* frameTmpDataPtr = nullptr;
     LinearAllocator linearAllocator_;
     ProxyAllocator frameAllocator_{ linearAllocator_ };
-
+    float averageDt_ = -1.0;
+    std::size_t frameCount = 0;
+    float lowestDt_ = -1.0;
+    float highestDt_ = -1.0;
+    static constexpr std::size_t refreshFrameCount = 100;
     /**
      * static instance use to access the engine from anywhere, because I don't want to have thousands of MainEngine& ref
      */

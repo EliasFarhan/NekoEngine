@@ -256,7 +256,37 @@ namespace neko
 
     void MainEngine::Update(float dt)
     {
-
+        if(highestDt_ < 0.0)
+        {
+            highestDt_ = dt;
+        }
+        else if(dt > highestDt_)
+        {
+            highestDt_ = dt;
+        }
+        if(lowestDt_ < 0.0)
+        {
+            lowestDt_ = dt;
+        }
+        else if(dt < lowestDt_)
+        {
+            lowestDt_ = dt;
+        }
+        if(averageDt_ < 0.0)
+        {
+            averageDt_ = dt;
+        }
+        else
+        {
+            averageDt_ = averageDt_ + (dt - averageDt_) / static_cast<float>(frameCount % refreshFrameCount);
+        }
+        frameCount++;
+        if(frameCount % refreshFrameCount == 0)
+        {
+            averageDt_ = -1.0;
+            lowestDt_ = -1.0;
+            highestDt_ = -1.0;
+        }
     }
 
     void MainEngine::Destroy()

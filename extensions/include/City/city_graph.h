@@ -57,7 +57,19 @@ const static std::map<NeighborType, sf::Vector2i> neighborTypeMap = {
         {NeighborType::LEFT, sf::Vector2i(-1,0)},
 };
 NeighborType GetNeighborType(const sf::Vector2i& direction);
-sf::Vector2i GetDirection(NeighborType neighborType);
+inline sf::Vector2i GetDirection(NeighborType neighborType)
+{
+    static constexpr std::array<std::pair<int, int>, 5> neighborTypeMap{
+    {{0,-1},
+    {0,1},
+    {1,0},
+    {-1,0},
+    {-1,0}
+    }
+    };
+    const auto [dirX, dirY] = neighborTypeMap[static_cast<int>(neighborType) >> 1];
+    return { dirX, dirY };
+}
 
 void AddNeighborToBit(NeighborBit& neighborBit, NeighborType neighborType);
 
