@@ -33,25 +33,25 @@ namespace neko::gl
 
 void RenderQuad::Init()
 {
-	Vec2f vertices[4] = {
+    const Vec2f vertices[4] = {
 			Vec2f(0.5f, 0.5f) * size_ + Vec2f(offset_),  // top right
 			Vec2f(0.5f, -0.5f) * size_ + Vec2f(offset_),  // bottom right
 			Vec2f(-0.5f, -0.5f) * size_ + Vec2f(offset_),  // bottom left
 			Vec2f(-0.5f, 0.5f) * size_ + Vec2f(offset_)   // top left
 	};
 
-	Vec2f texCoords[4] = {
+    constexpr Vec2f texCoords[4] = {
 			Vec2f(1.0f, 1.0f),      // top right
 			Vec2f(1.0f, 0.0f),   // bottom right
 			Vec2f(0.0f, 0.0f),   // bottom left
 			Vec2f(0.0f, 1.0f),   // bottom left
 	};
 
-	Vec3f normals[4] = {
-		Vec3f::back,
-		Vec3f::back,
-		Vec3f::back,
-		Vec3f::back
+	constexpr Vec3f normals[4] = {
+		Vec3f::back(),
+		Vec3f::back(),
+		Vec3f::back(),
+		Vec3f::back()
 	};
 
 	std::array<Vec3f, 4> tangent{};
@@ -463,16 +463,16 @@ void RenderCircle::Init()
 	Vec2f vertices[resolution + 2];
 	Vec2f texCoords[resolution + 2];
 	vertices[0] = Vec2f(offset_);
-	texCoords[0] = Vec2f::one / 2.0f;
+	texCoords[0] = Vec2f::one() / 2.0f;
 
 	for (size_t i = 1; i < resolution + 1; i++)
 	{
-		Vec2f vertex = Vec2f::up * radius_;
-		auto angle = degree_t(360.0f / resolution * static_cast<float>(i - 1));
+		Vec2f vertex = Vec2f::up() * radius_;
+		auto angle = Degree(360.0f / resolution * static_cast<float>(i - 1));
 		vertex = vertex.Rotate(angle);
 		vertices[i] = vertex;
 
-		texCoords[i] = Vec2f::one / 2.0f + Vec2f::one / 2.0f * Vec2f(Sin(angle), Cos(angle));
+		texCoords[i] = Vec2f::one() / 2.0f + Vec2f::one() / 2.0f * Vec2f(Sin(angle), Cos(angle));
 	}
 	vertices[resolution + 1] = vertices[1];
 	texCoords[resolution + 1] = texCoords[resolution + 1];

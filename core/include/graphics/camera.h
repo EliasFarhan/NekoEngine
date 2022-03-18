@@ -36,10 +36,10 @@ struct Camera
 {
     virtual ~Camera() = default;
     Vec3f position;
-    Vec3f reverseDir = Vec3f::back, rightDir = Vec3f::right, upDir = Vec3f::up;
+    Vec3f reverseDir = Vec3f::back(), rightDir = Vec3f::right(), upDir = Vec3f::up();
     float nearPlane = 0.1f;
     float farPlane = 100.0f;
-    void WorldLookAt(Vec3f target, Vec3f lookUp = Vec3f::down);
+    void WorldLookAt(Vec3f target, Vec3f lookUp = Vec3f::down());
 
     [[nodiscard]] Mat4f GenerateViewMatrix() const;
 
@@ -59,13 +59,13 @@ struct Camera2D : Camera
 struct Camera3D : Camera
 {
 	float aspect = 1.0f;
-	degree_t fovY = degree_t(45.0f);
+	Degree fovY = Degree(45.0f);
 
 	[[nodiscard]] Mat4f GenerateProjectionMatrix() const override;;
 
 	void SetAspect(int width, int height);
 
-	[[nodiscard]] radian_t GetFovX() const;
+	[[nodiscard]] Radian GetFovX() const;
 
 	
 };

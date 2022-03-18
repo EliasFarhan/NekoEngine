@@ -47,7 +47,7 @@ private:
 	gl::TextureName containerSpecular_;
 	int specularPow_ = 32;
 
-	gl::RenderCuboid cube_{ Vec3f::zero, Vec3f::one };
+	gl::RenderCuboid cube_{ Vec3f::zero(), Vec3f::one() };
 
 	sdl::Camera3D camera_;
 	float time_ = 0.0f;

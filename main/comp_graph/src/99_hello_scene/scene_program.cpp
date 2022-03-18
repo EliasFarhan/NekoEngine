@@ -24,6 +24,7 @@
 
 #include "99_hello_scene/scene_program.h"
 #include "imgui.h"
+#include "graphics/color.h"
 
 namespace neko
 {
@@ -48,11 +49,11 @@ void HelloSceneProgram::Init()
 			RandomRange(-10.0f, 10.0f),
 			RandomRange(0.0f, 10.0f)
 		));
-		transform3dManager_.SetScale(entity, Vec3f::one * RandomRange(0.5f, 3.0f));
+		transform3dManager_.SetScale(entity, Vec3f::one() * RandomRange(0.5f, 3.0f));
 		transform3dManager_.SetRotation(entity, EulerAngles(
-			degree_t(RandomRange(0.0f,90.0f)),
-			degree_t(RandomRange(0.0f, 90.0f)),
-			degree_t(RandomRange(0.0f, 90.0f))
+			Degree(RandomRange(0.0f,90.0f)),
+			Degree(RandomRange(0.0f, 90.0f)),
+			Degree(RandomRange(0.0f, 90.0f))
 		));
 	}
 	const auto& config = BasicEngine::GetInstance()->GetConfig();

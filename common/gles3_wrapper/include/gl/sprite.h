@@ -76,6 +76,6 @@ public:
 	
 private:
     gl::Shader spriteShader_;
-    gl::RenderQuad spriteQuad_{Vec3f::zero, Vec2f::one};
+    gl::RenderQuad spriteQuad_{Vec3f::zero(), Vec2f::one()};
 };
 }

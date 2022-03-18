@@ -56,7 +56,7 @@ Mat4f const ScalingMatrixFrom(const Vec3f& scale)
                             Vec4f(0, 0, 0, 1)});
 }
 
-Mat4f const RotationMatrixFrom(const degree_t angle, const Vec3f axis)
+Mat4f const RotationMatrixFrom(const Degree angle, const Vec3f axis)
 {
     const Vec3f normalizedAxis = axis.Normalized();
 
@@ -86,7 +86,7 @@ Mat4f const RotationMatrixFrom(const degree_t angle, const Vec3f axis)
 }
 
 
-Mat4f const RotationMatrixFrom(const radian_t angle, const Vec3f axis)
+Mat4f const RotationMatrixFrom(const Radian angle, const Vec3f axis)
 {
     const Vec3f normalizedAxis = axis.Normalized();
 
@@ -118,9 +118,9 @@ Mat4f const RotationMatrixFrom(const radian_t angle, const Vec3f axis)
 
 Mat4<float> const RotationMatrixFrom(const EulerAngles cardinalRotation)
 {
-    const radian_t rotX = cardinalRotation[0];
-    const radian_t rotY = cardinalRotation[1];
-    const radian_t rotZ = cardinalRotation[2];
+    const Radian rotX = cardinalRotation[0];
+    const Radian rotY = cardinalRotation[1];
+    const Radian rotZ = cardinalRotation[2];
     const float cosX = Cos(rotX);
     const float sinX = Sin(rotX);
     const float cosY = Cos(rotY);
@@ -188,13 +188,13 @@ Mat4f Scale(const Mat4f& transform, const Vec3f scale)
 }
 
 
-Mat4f Rotate(const Mat4f& transform, const degree_t angle, const Vec3f axis)
+Mat4f Rotate(const Mat4f& transform, const Degree angle, const Vec3f axis)
 {
     return RotationMatrixFrom(angle, axis) * transform;
 }
 
 
-Mat4f Rotate(const Mat4f& transform, const radian_t angle, const Vec3f axis)
+Mat4f Rotate(const Mat4f& transform, const Radian angle, const Vec3f axis)
 {
     return RotationMatrixFrom(angle, axis) * transform;
 }
@@ -214,12 +214,12 @@ Mat4f Rotate(const Mat4f& transform, const EulerAngles eulerAngles)
 
 
 
-Mat4f Perspective(radian_t fovy, float aspect, float nearPlane, float farPlane)
+Mat4f Perspective(Radian fovy, float aspect, float nearPlane, float farPlane)
 {
     neko_assert(fabsf(aspect - std::numeric_limits<float>::epsilon()) > 0.0f, "Aspect should not be zero");
 
     const float tanHalfFovy = Tan(fovy / 2.0f);
-    Mat4f perspective{Mat4f::Zero};
+    Mat4f perspective{Mat4f::zero()};
 
     perspective[0][0] = 1.0f/ (aspect * tanHalfFovy);
     perspective[1][1] = 1.0f / (tanHalfFovy);

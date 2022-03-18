@@ -55,9 +55,9 @@ private:
 	
 	sdl::Camera3D camera_;
 	
-	gl::RenderCuboid cube_{Vec3f::zero, Vec3f::one};
-	gl::RenderQuad floor_{Vec3f::zero, Vec2f::one*5.0f};
-	gl::RenderQuad screenPlane_{Vec3f::zero, Vec2f::one*2.0f};
+	gl::RenderCuboid cube_{Vec3f::zero(), Vec3f::one()};
+	gl::RenderQuad floor_{Vec3f::zero(), Vec2f::one()*5.0f};
+	gl::RenderQuad screenPlane_{Vec3f::zero(), Vec2f::one()*2.0f};
 
 	gl::Shader depthOnlyShader_;
 	gl::Shader screenShader_;

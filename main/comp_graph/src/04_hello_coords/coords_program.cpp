@@ -43,7 +43,7 @@ void HelloCoordsProgram::Init()
     cube_.Init();
 
     // note that we're translating the scene in the reverse direction of where we want to move
-    view = Mat4f::Identity;
+    view = Mat4f::identity();
     view = Transform3d::Translate(view, Vec3f(0.0f, 0.0f, -3.0f));
 
 
@@ -60,7 +60,7 @@ void HelloCoordsProgram::Update(seconds dt)
 
     const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
     projection = Transform3d::Perspective(
-        degree_t(45.0f), 
+        Degree(45.0f),
         static_cast<float>(windowSize.x) / windowSize.y, 
         0.1f, 
         100.0f);
@@ -84,9 +84,9 @@ void HelloCoordsProgram::Render()
 
     for (const auto cubePosition : cubePositions)
     {
-        Mat4f model = Mat4f::Identity; //model transform matrix
-        model = Transform3d::Rotate(model, degree_t(timeSinceInit_.count()*45.0f), Vec3f(1.0f, 0.0f, 0.0f));
-        model = Transform3d::Rotate(model, degree_t(timeSinceInit_.count()*45.0f), Vec3f(0.0f, 1.0f, 0.0f));
+        Mat4f model = Mat4f::identity(); //model transform matrix
+        model = Transform3d::Rotate(model, Degree(timeSinceInit_.count()*45.0f), Vec3f(1.0f, 0.0f, 0.0f));
+        model = Transform3d::Rotate(model, Degree(timeSinceInit_.count()*45.0f), Vec3f(0.0f, 1.0f, 0.0f));
 
         model = Transform3d::Translate(model, cubePosition);
         shader_.SetMat4("model", model);

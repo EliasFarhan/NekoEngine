@@ -43,48 +43,47 @@ template<typename T>
 class Mat3
 {
 public:
-	Mat3()
+	constexpr Mat3()
 	{
 		columns_ = Identity.columns_;
 	}
-	Mat3& operator=(Mat3 m)
+	constexpr Mat3& operator=(Mat3 m)
 	{
 		columns_ = m.columns_;
 		return *this;
 	}
 
-	Mat3(const Mat3& m) noexcept
+	constexpr Mat3(const Mat3& m) noexcept
 	{
 		columns_ = m.columns_;
 	}
 
 	
 
-	explicit Mat3(const std::array<Vec3 < T>, 3>& v)
-	{
-		columns_ = v;
-	}
+	constexpr explicit Mat3(const std::array<Vec3 < T>, 3>& v) : columns_(v)
+    {
+    }
 
-	const T& operator()(size_t row, size_t column) const
+	constexpr const T& operator()(size_t row, size_t column) const
 	{
 		return columns_[column][row];
 	}
 
-	T& operator()(size_t row, size_t column)
+	constexpr T& operator()(size_t row, size_t column)
 	{
 		return columns_[column][row];
 	}
 
-	const Vec3 <T>& operator[](size_t column) const
+	constexpr const Vec3 <T>& operator[](size_t column) const
 	{
 		return columns_[column];
 	}
 
-	Vec3 <T>& operator[](size_t column)
+	constexpr Vec3 <T>& operator[](size_t column)
 	{
 		return columns_[column];
 	}
-	inline Mat3<T> Transpose() const
+	constexpr  Mat3<T> Transpose() const
 	{
 		std::array<Vec3<T>, 3> v;
 		for (int column = 0; column < 3; column++)
@@ -97,7 +96,7 @@ public:
 		return Mat3<T>(v);
 	}
 
-	[[nodiscard]] float Determinant() const
+	[[nodiscard]] constexpr  float Determinant() const
 	{
 		return
 			columns_[0][0] * columns_[1][1] * columns_[2][2] +
@@ -107,8 +106,26 @@ public:
 			columns_[0][0] * columns_[2][1] * columns_[1][2] -
 			columns_[1][0] * columns_[0][1] * columns_[2][2];
 	}
-	const static Mat3<T> Identity;
-	const static Mat3<T> Zero;
+	constexpr  static Mat3<T> identity()
+	{
+		return {
+			std::array<Vec3f, 3>
+		{
+			Vec3f(1, 0, 0),
+				Vec3f(0, 1, 0),
+				Vec3f(0, 0, 1)
+		} };
+	}
+	constexpr  static Mat3<T> zero()
+	{
+	    return Mat3f(
+			std::array<Vec3f, 3>
+		{
+			Vec3f::zero(),
+				Vec3f::zero(),
+				Vec3f::zero()
+		});
+	}
 private:
 	std::array<Vec3<T>, 3> columns_; //row vector
 };
@@ -117,27 +134,24 @@ template<typename T>
 class alignas(4 * sizeof(T)) Mat4
 {
 public:
-	Mat4()
-	{
-		columns_ = Identity.columns_;
-	}
+	constexpr Mat4() : columns_(identity().columns_)
+    {
+    }
 
-	Mat4& operator=(Mat4 m)
+	constexpr Mat4& operator=(Mat4 m)
 	{
 		columns_ = m.columns_;
 		return *this;
 	}
 
-	Mat4(const Mat4 & m) noexcept
-	{
-		columns_ = m.columns_;
-	}
+	constexpr Mat4(const Mat4 & m) noexcept : columns_(m.columns_)
+    {
+    }
 
-	explicit Mat4(const std::array<Vec4 < T>, 4> & v)
-	{
-		columns_ = v;
-	}
-	explicit Mat4(const Mat3<T>& m) noexcept
+	constexpr explicit Mat4(const std::array<Vec4 < T>, 4> & v) : columns_(v)
+    {
+    }
+	constexpr explicit Mat4(const Mat3<T>& m) noexcept
 	{
 		for (int col = 0; col < 4; col++)
 		{
@@ -155,27 +169,27 @@ public:
 		}
 	}
 
-	const T& operator()(size_t row, size_t column) const
+	constexpr const T& operator()(size_t row, size_t column) const
 	{
 		return columns_[column][row];
 	}
 
-	T& operator()(size_t row, size_t column)
+	constexpr T& operator()(size_t row, size_t column)
 	{
 		return columns_[column][row];
 	}
 
-	const Vec4 <T>& operator[](size_t column) const
+	constexpr const Vec4 <T>& operator[](size_t column) const
 	{
 		return columns_[column];
 	}
 
-	Vec4 <T>& operator[](size_t column)
+	constexpr Vec4 <T>& operator[](size_t column)
 	{
 		return columns_[column];
 	}
 
-	[[nodiscard]] Mat4<T> Transpose() const
+	[[nodiscard]] inline Mat4<T> Transpose() const
 	{
 		std::array<Vec4<T>, 4> v;
 		for (int column = 0; column < 4; column++)
@@ -188,7 +202,7 @@ public:
 		return Mat4<T>(v);
 	}
 
-	Mat4<T> operator+(const Mat4<T> & rhs) const
+	constexpr Mat4<T> operator+(const Mat4<T> & rhs) const
 	{
 		std::array<Vec4<T>, 4> v;
 		for (int i = 0; i < 4; i++)
@@ -198,7 +212,7 @@ public:
 		return Mat4<T>(v);
 	}
 
-	Mat4<T> operator-(const Mat4<T> & rhs) const
+	constexpr Mat4<T> operator-(const Mat4<T> & rhs) const
 	{
 		std::array<Vec4<T>, 4> v;
 		for (int i = 0; i < 4; i++)
@@ -208,7 +222,7 @@ public:
 		return Mat4<T>(v);
 	}
 
-	Vec4 <T> operator*(const Vec4 <T> & rhs) const
+	constexpr Vec4 <T> operator*(const Vec4 <T> & rhs) const
 	{
 		Vec4<T> v;
 		for (int column = 0; column < 4; column++)
@@ -221,7 +235,7 @@ public:
 		}
 		return Vec4<T>(v);
 	}
-	Mat4<T> operator*(float rhs) const noexcept
+	constexpr Mat4<T> operator*(float rhs) const noexcept
 	{
 		Mat4<T> m;
 		for(int col = 0; col < 4; col++)
@@ -233,12 +247,12 @@ public:
 		}
 		return m;
 	}
-	Mat4<T> operator*(const Mat4<T> & rhs) const noexcept
+	constexpr Mat4<T> operator*(const Mat4<T> & rhs) const noexcept
 	{
 		return MultiplyIntrinsincs(rhs);
 	}
 
-	inline Mat4<T> MultiplyNaive(const Mat4<T> & rhs) const noexcept
+	constexpr Mat4<T> MultiplyNaive(const Mat4<T> & rhs) const noexcept
 	{
 		std::array<Vec4<T>, 4> v;
 		for (int column = 0; column < 4; column++)
@@ -255,7 +269,7 @@ public:
 		return Mat4<T>(v);
 	}
 
-	inline Mat4<T> MultiplyTranpose(const Mat4<T> & rhs) const noexcept
+	constexpr Mat4<T> MultiplyTranpose(const Mat4<T> & rhs) const noexcept
 	{
 		const auto lhsT = this->Transpose();
 		std::array<Vec4<T>, 4> v;
@@ -269,11 +283,11 @@ public:
 		return Mat4<T>(v);
 	}
 
-	inline Mat4<T> MultiplyAoSoA(const Mat4<T> & rhs) const noexcept;
+	constexpr Mat4<T> MultiplyAoSoA(const Mat4<T> & rhs) const noexcept;
 
-	inline Mat4<T> MultiplyIntrinsincs(const Mat4<T> & rhs) const noexcept;
+	Mat4<T> MultiplyIntrinsincs(const Mat4<T> & rhs) const noexcept;
 
-	static T MatrixDifference(const Mat4<T> & rhs, const Mat4<T> & lhs)
+	constexpr static T MatrixDifference(const Mat4<T> & rhs, const Mat4<T> & lhs)
 	{
 		T result = 0;
 		for (int column = 0; column < 4; column++)
@@ -302,7 +316,7 @@ public:
 		return os;
 	}
 
-	[[nodiscard]] float Determinant() const
+	[[nodiscard]] constexpr float Determinant() const
 	{
 		float result = 0.0f;
 		for (int i = 0; i < 4; i++)
@@ -317,9 +331,9 @@ public:
 		}
 		return result;
 	}
-	[[nodiscard]] Mat4 Inverse() const
+	[[nodiscard]] constexpr  Mat4 Inverse() const
 	{
-		Mat4 inverse = Zero;
+		Mat4 inverse = zero();
         const float determinant = Determinant();
 		/*
 		for (int i = 0; i < 4; i++)
@@ -336,7 +350,7 @@ public:
 		}
 		*/
 		if (Equal(determinant, 0.0f))
-			return Zero;
+			return zero();
 		//Calculate the cofactor matrix
 		for (int col = 0; col < 4; col++)
 		{
@@ -362,7 +376,7 @@ public:
 		return inverse;
 	}
 
-	[[nodiscard]] Mat3<T> ToMat3() const
+	[[nodiscard]] constexpr  Mat3<T> ToMat3() const
 	{
 		std::array<Vec3<T>, 3> column;
 		for(int col = 0; col < 3; col++)
@@ -374,8 +388,27 @@ public:
 		}
 		return Mat3<T>(column);
 	}
-	const static Mat4<T> Identity;
-	const static Mat4<T> Zero;
+	constexpr  static Mat4<T> identity()
+	{
+	    return Mat4f(
+			std::array<Vec4f, 4>
+		{
+			Vec4f(1, 0, 0, 0),
+				Vec4f(0, 1, 0, 0),
+				Vec4f(0, 0, 1, 0),
+				Vec4f(0, 0, 0, 1)});
+	}
+	constexpr  static Mat4<T> zero()
+	{
+	    return Mat4f(
+			std::array<Vec4f, 4>
+		{
+			Vec4f::zero(),
+				Vec4f::zero(),
+				Vec4f::zero(),
+				Vec4f::zero()
+		});
+	}
 private:
 	std::array<Vec4 < T>, 4>
 		columns_; //row vector
@@ -411,7 +444,7 @@ inline Mat4f Mat4f::Transpose() const
 #endif
 
 template<typename T>
-inline Mat4<T> Mat4<T>::MultiplyAoSoA(const Mat4<T>& rhs) const noexcept
+constexpr Mat4<T> Mat4<T>::MultiplyAoSoA(const Mat4<T>& rhs) const noexcept
 {
 	const auto lhsT(Transpose());
 	std::array<Vec4f, 4> v;
@@ -461,7 +494,7 @@ inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
 
 #if false
 template<>
-inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
+constexpr  Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
 {
 	std::array<Vec4f, 4> v;
 	float32x4_t c1 = vld1q_f32(&this->columns_[0][0]);
@@ -495,7 +528,7 @@ inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
 
 #if defined(EMSCRIPTEN) || defined(__arm__) || defined(__ANDROID__) || defined(__aarch64__)
 template<>
-inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
+constexpr  Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
 {
 	std::array<Vec4f, 4> v;
 	v4f c1 = *(v4f*)(&this->columns_[0][0]);
@@ -526,39 +559,6 @@ inline Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
 }
 #endif
 
-template<>
-const inline Mat4f Mat4f::Identity = Mat4f(
-	std::array<Vec4f, 4>
-{
-	Vec4f(1, 0, 0, 0),
-		Vec4f(0, 1, 0, 0),
-		Vec4f(0, 0, 1, 0),
-		Vec4f(0, 0, 0, 1)});
-template <>
-const inline Mat4f Mat4f::Zero = Mat4f(
-	std::array<Vec4f, 4>
-{
-	Vec4f::zero,
-		Vec4f::zero,
-		Vec4f::zero,
-		Vec4f::zero
-});
 
-template<>
-const inline Mat3f Mat3f::Identity = Mat3f(
-	std::array<Vec3f, 3>
-{
-	Vec3f(1, 0, 0),
-	Vec3f(0, 1, 0),
-	Vec3f(0, 0, 1)
-});
-template <>
-const inline Mat3f Mat3f::Zero = Mat3f(
-	std::array<Vec3f,3>
-{
-	Vec3f::zero,
-	Vec3f::zero,
-	Vec3f::zero
-});
 
 }

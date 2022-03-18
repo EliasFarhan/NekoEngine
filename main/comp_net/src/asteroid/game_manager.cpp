@@ -55,7 +55,7 @@ void GameManager::Destroy()
 
 }
 
-void GameManager::SpawnPlayer(net::PlayerNumber playerNumber, Vec2f position, degree_t rotation)
+void GameManager::SpawnPlayer(net::PlayerNumber playerNumber, Vec2f position, Degree rotation)
 {
     if (GetEntityFromPlayerNumber(playerNumber) != INVALID_ENTITY)
         return;
@@ -101,8 +101,8 @@ Entity GameManager::SpawnBullet(net::PlayerNumber playerNumber, Vec2f position, 
     entityManager_.AddComponentType(entity, static_cast<EntityMask>(ComponentType::BULLET));
     transformManager_.AddComponent(entity);
     transformManager_.SetPosition(entity, position);
-    transformManager_.SetScale(entity, Vec2f::one * bulletScale);
-    transformManager_.SetRotation(entity, degree_t(0.0f));
+    transformManager_.SetScale(entity, Vec2f::one() * bulletScale);
+    transformManager_.SetRotation(entity, Degree(0.0f));
     transformManager_.UpdateDirtyComponent(entity);
     rollbackManager_.SpawnBullet(playerNumber, entity, position, velocity);
     return entity;
@@ -149,7 +149,7 @@ ClientGameManager::ClientGameManager(PacketSenderInterface& packetSenderInterfac
 void ClientGameManager::Init()
 {
     camera_.position = Vec3f::back;
-    camera_.WorldLookAt(Vec3f::zero);
+    camera_.WorldLookAt(Vec3f::zero());
     camera_.nearPlane = 0.0f;
     camera_.farPlane = 2.0f;
 

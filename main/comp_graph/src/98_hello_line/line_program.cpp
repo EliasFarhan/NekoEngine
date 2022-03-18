@@ -36,7 +36,7 @@ namespace neko
 	void HelloLineProgram::Update(seconds dt)
 	{
 
-		lineRenderer_.DrawLine(Line(-Vec3f::one, Vec3f::one));
+		lineRenderer_.DrawLine(Line(-Vec3f::one(), Vec3f::one()));
 		lineRenderer_.DrawLine(Line(Vec3f(1,-1,0), Vec3f(-1,1,0)));
 		lineRenderer_.Update(dt);
 	}

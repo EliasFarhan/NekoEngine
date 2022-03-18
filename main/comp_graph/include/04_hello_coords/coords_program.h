@@ -46,7 +46,7 @@ public:
     void OnEvent(const SDL_Event& event) override;
 
 private:
-    gl::RenderCuboid cube_{Vec3f::zero, Vec3f::one};
+    gl::RenderCuboid cube_{Vec3f::zero(), Vec3f::one()};
     const static size_t cubeNumbers_ = 10;
     Vec3f cubePositions[cubeNumbers_] =
     {
@@ -66,8 +66,8 @@ private:
     gl::TextureName  textureWall_ = gl::INVALID_TEXTURE_NAME;
     gl::TextureId  textureWallId_;
 
-    Mat4f view{Mat4f::Identity};
-    Mat4f projection{Mat4f::Identity};
+    Mat4f view{Mat4f::identity()};
+    Mat4f projection{Mat4f::identity()};
 
     seconds timeSinceInit_{0};
 };

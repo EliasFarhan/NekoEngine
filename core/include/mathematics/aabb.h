@@ -47,7 +47,7 @@ struct Obb2d {
     }
 
     /// Set the center, the extends and the rotation of the OBB.
-    void FromCenterExtendsRotation(Vec2f newCenter, Vec2f localExtends, degree_t rot) {
+    void FromCenterExtendsRotation(Vec2f newCenter, Vec2f localExtends, Degree rot) {
         center = newCenter;
         localLowerLeftBound = localExtends * -1.0f;
         localUpperRightBound = localExtends;
@@ -67,22 +67,21 @@ struct Obb2d {
             return extend;
         }
 		
-		float rotationToAxis = Vec2f::AngleBetween(axis, CalculateDirection()).
-            value();
+		float rotationToAxis = Vec2f::AngleBetween(axis, CalculateDirection()).GetValue();
 		rotationToAxis = std::fmod(rotationToAxis, PI);
 
 		if((rotationToAxis >= 0 && rotationToAxis <= PI / 2) || (rotationToAxis >= -PI && rotationToAxis <= -PI / 2))
 		{
 			Vec2f lowerLeftToTopRight = localLowerLeftBound - localUpperRightBound;
 
-            extend = (lowerLeftToTopRight.Magnitude() * Vec2f::AngleBetween(lowerLeftToTopRight, axis)).value();
+            extend = (lowerLeftToTopRight.Magnitude() * Vec2f::AngleBetween(lowerLeftToTopRight, axis)).GetValue();
 		}
 		else
 		{
 			Vec2f upperLeftBound = GetOppositeBound(localUpperRightBound, true);
 			Vec2f lowerRightToUpperLeft = (upperLeftBound - GetCenter()) * 2;
 
-            extend = (lowerRightToUpperLeft.Magnitude() * Vec2f::AngleBetween(lowerRightToUpperLeft, axis)).value();
+            extend = (lowerRightToUpperLeft.Magnitude() * Vec2f::AngleBetween(lowerRightToUpperLeft, axis)).GetValue();
 		}
 
         return extend;
@@ -168,7 +167,7 @@ struct Obb2d {
     Vec2f localLowerLeftBound;	///< the lower vertex
     Vec2f  localUpperRightBound;	///< the upper vertex
     Vec2f center;
-    radian_t rotation;       ///< the angle of rotation in rd
+    Radian rotation;       ///< the angle of rotation in rd
 };
 
 struct Obb3d {
@@ -247,22 +246,21 @@ struct Obb3d {
             return extend;
         }
 
-        float rotationToAxis = Vec3f::AngleBetween(axis, GetUp()).
-            value();
+        float rotationToAxis = Vec3f::AngleBetween(axis, GetUp()).GetValue();
         rotationToAxis = std::fmod(rotationToAxis, PI);
 
         if ((rotationToAxis >= 0 && rotationToAxis <= PI / 2) || (rotationToAxis >= -PI && rotationToAxis <= -PI / 2))
         {
             Vec3f lowerLeftToTopRight = localLowerLeftBound - localUpperRightBound;
 
-            extend = (lowerLeftToTopRight.Magnitude() * Vec3f::AngleBetween(lowerLeftToTopRight, axis)).value();
+            extend = (lowerLeftToTopRight.Magnitude() * Vec3f::AngleBetween(lowerLeftToTopRight, axis)).GetValue();
         }
         else
         {
             Vec3f upperLeftBound = GetOppositeBound(localUpperRightBound, true);
             Vec3f lowerRightToUpperLeft = (upperLeftBound - GetCenter()) * 2;
 
-            extend = (lowerRightToUpperLeft.Magnitude() * Vec3f::AngleBetween(lowerRightToUpperLeft, axis)).value();
+            extend = (lowerRightToUpperLeft.Magnitude() * Vec3f::AngleBetween(lowerRightToUpperLeft, axis)).GetValue();
         }
 
         return extend;
@@ -374,12 +372,13 @@ struct Aabb2d {
     void FromCenterExtendsRotation(
         const Vec2f center,
         Vec2f extends,
-        const degree_t rotation) {
+        const Degree rotation)
+    {
         extends.x = abs(extends.x);
         extends.y = abs(extends.y);
         Vec2f relativeLowerLeftBound = extends *-1.0f;
         Vec2f relativeUpperRightBound = extends;
-        radian_t newAngle = rotation;
+        Radian newAngle = rotation;
         std::array<Vec2f, 4> corners;
         corners[0] = relativeLowerLeftBound.Rotate(newAngle);
         corners[1] = Vec2f(relativeLowerLeftBound.x, relativeUpperRightBound.y).Rotate(newAngle);
@@ -452,8 +451,8 @@ struct Aabb2d {
     }
 
 
-    Vec2f lowerLeftBound = Vec2f::zero; // the lower vertex
-    Vec2f upperRightBound = Vec2f::zero; // the upper vertex
+    Vec2f lowerLeftBound = Vec2f::zero(); // the lower vertex
+    Vec2f upperRightBound = Vec2f::zero(); // the upper vertex
 };
 
 struct Aabb3d {
@@ -467,7 +466,8 @@ struct Aabb3d {
     void FromCenterExtends(
         const Vec3f center,
         Vec3f extends,
-        const Vec3f rotation = Vec3f::zero) {
+        const Vec3f rotation = Vec3f::zero())
+    {
         extends.x = abs(extends.x);
         extends.y = abs(extends.y);
         extends.z = abs(extends.z);
@@ -591,8 +591,8 @@ struct Aabb3d {
         return newAxis;
     }
 
-    Vec3f lowerLeftBound = Vec3f::zero; // the lower vertex
-    Vec3f upperRightBound = Vec3f::zero; // the upper vertex
+    Vec3f lowerLeftBound = Vec3f::zero(); // the lower vertex
+    Vec3f upperRightBound = Vec3f::zero(); // the upper vertex
 };
 
 }

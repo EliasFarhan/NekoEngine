@@ -41,7 +41,7 @@ private:
 	struct Light
 	{
 		Vec3f position;
-		Vec3f color = Vec3f::one;
+		Vec3f color = Vec3f::one();
 		float ambient = 0.1f;
 	};
 	float dt_ = 0.0f;

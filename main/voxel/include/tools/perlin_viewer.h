@@ -55,10 +55,10 @@ private:
     float currentScale_ = 1.0f;
     inline static const size_t textureSize_ = 1024;
     std::vector<std::array<float, textureSize_>> perlinValues_;
-    neko::gl::TextureName perlinTexture_ = neko::gl::INVALID_TEXTURE_NAME;
+    gl::TextureName perlinTexture_ = gl::INVALID_TEXTURE_NAME;
 
-    neko::gl::RenderQuad renderQuad_{Vec3f::zero, Vec2f::one};
-    neko::gl::Shader viewerShader_;
+    gl::RenderQuad renderQuad_{Vec3f::zero(), Vec2f::one()};
+    gl::Shader viewerShader_;
 
 };
 }

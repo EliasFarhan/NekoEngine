@@ -36,19 +36,19 @@ namespace neko
 
 void Scale2dManager::AddComponent(Entity entity)
 {
-	ResizeIfNecessary(components_, entity, Vec2f::one);
+	ResizeIfNecessary(components_, entity, Vec2f::one());
 	return ComponentManager::AddComponent(entity);
 }
 
 void Scale3dManager::AddComponent(Entity entity)
 {
-	ResizeIfNecessary(components_, entity, Vec3f::one);
+	ResizeIfNecessary(components_, entity, Vec3f::one());
 	return ComponentManager::AddComponent(entity);
 }
 
 
 Transform2dManager::Transform2dManager(EntityManager& entityManager) :
-	ComponentManager<Mat4f, EntityMask(neko::ComponentType::TRANSFORM2D)>(entityManager),
+	ComponentManager<Mat4f, static_cast<EntityMask>(neko::ComponentType::TRANSFORM2D)>(entityManager),
 	positionManager_(entityManager),
 	scaleManager_(entityManager),
     rotationManager_(entityManager),
@@ -64,7 +64,7 @@ void Transform2dManager::SetPosition(Entity entity, Vec2f position)
     dirtyManager_.SetDirty(entity);
 }
 
-void Transform2dManager::SetRotation(Entity entity, degree_t angles)
+void Transform2dManager::SetRotation(Entity entity, Degree angles)
 {
 	rotationManager_.SetComponent(entity, angles);
 	dirtyManager_.SetDirty(entity);
@@ -75,7 +75,7 @@ Vec2f Transform2dManager::GetPosition(Entity entity) const
 	return positionManager_.GetComponent(entity);
 }
 
-degree_t Transform2dManager::GetRotation(Entity entity) const
+Degree Transform2dManager::GetRotation(Entity entity) const
 {
 	return rotationManager_.GetComponent(entity);
 }
@@ -112,8 +112,8 @@ void Transform2dManager::Update()
 
 void Transform2dManager::UpdateTransform(Entity entity)
 {
-    Mat4f transform = Mat4f::Identity;
-    const auto eulerAngles = EulerAngles(degree_t (0),degree_t (0),-rotationManager_.GetComponent(entity));
+    auto transform = Mat4f::identity();
+    const auto eulerAngles = EulerAngles(Degree (0),Degree (0),-rotationManager_.GetComponent(entity));
     transform = Transform3d::Rotate(transform, eulerAngles);
     const auto scale = scaleManager_.GetComponent(entity);
     transform = Transform3d::Scale(transform, Vec3f(scale, 1.0f));
@@ -133,7 +133,7 @@ void Transform2dManager::AddComponent(Entity entity)
 {
     positionManager_.AddComponent(entity);
     scaleManager_.AddComponent(entity);
-    scaleManager_.SetComponent(entity, Vec2f::one);
+    scaleManager_.SetComponent(entity, Vec2f::one());
     rotationManager_.AddComponent(entity);
     return ComponentManager::AddComponent(entity);
 }
@@ -157,7 +157,7 @@ void Transform3dManager::Init()
 
 void Transform3dManager::UpdateTransform(Entity entity)
 {
-    Mat4f transform = Mat4f::Identity;
+    Mat4f transform = Mat4f::identity();
 	transform = Transform3d::Rotate(transform, rotation3DManager_.GetComponent(entity));
 	transform = Transform3d::Scale(transform, scale3DManager_.GetComponent(entity));
     transform = Transform3d::Translate(transform, position3DManager_.GetComponent(entity));
@@ -194,10 +194,10 @@ void Transform3dViewer::DrawImGui()
 			transform3dManager_.SetScale(selectedEntity_, scale);
 		}
 		const auto eulerAngles = transform3dManager_.GetAngles(selectedEntity_);
-		float angles[3] = { eulerAngles.x.value(), eulerAngles.y.value(), eulerAngles.z.value() };
+		float angles[3] = { eulerAngles.x.GetValue(), eulerAngles.y.GetValue(), eulerAngles.z.GetValue() };
 		if(ImGui::InputFloat3("Euler Angles", &angles[0]))
 		{
-			const EulerAngles newEulerAngles = EulerAngles(degree_t(angles[0]), degree_t(angles[1]), degree_t(angles[2]));
+			const EulerAngles newEulerAngles = EulerAngles(Degree(angles[0]), Degree(angles[1]), Degree(angles[2]));
 			transform3dManager_.SetRotation(selectedEntity_, newEulerAngles);
 		}
 	}
@@ -258,7 +258,7 @@ void Transform3dManager::AddComponent(Entity entity)
 {
 	position3DManager_.AddComponent(entity);
 	scale3DManager_.AddComponent(entity);
-	scale3DManager_.SetComponent(entity, Vec3f::one);
+	scale3DManager_.SetComponent(entity, Vec3f::one());
 	rotation3DManager_.AddComponent(entity);
 	return DoubleBufferComponentManager::AddComponent(entity);
 }

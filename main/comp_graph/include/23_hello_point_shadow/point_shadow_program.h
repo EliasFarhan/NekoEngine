@@ -48,10 +48,10 @@ public:
 private:
     struct Transform
     {
-        Vec3f position = Vec3f::zero;
-        Vec3f scale = Vec3f::one;
-        Vec3f axis = Vec3f::up;
-        radian_t angle = radian_t(0.0f);
+        Vec3f position = Vec3f::zero();
+        Vec3f scale = Vec3f::one();
+        Vec3f axis = Vec3f::up();
+        Radian angle = Radian(0.0f);
     };
 
 
@@ -59,7 +59,7 @@ private:
     void RenderScene(const gl::Shader& shader);
 
     sdl::Camera3D camera3D_;
-    gl::RenderCuboid cube_{Vec3f::zero, Vec3f::one};
+    gl::RenderCuboid cube_{Vec3f::zero(), Vec3f::one()};
 
     gl::Shader lightCubeShader_;
     Camera3D lightCamera_;
@@ -83,7 +83,7 @@ private:
                             {Vec3f(2.0f, 3.0f, 1.0f), Vec3f(0.75f)},
                             {Vec3f(-3.0f, -1.0f, 0.0f), Vec3f(0.5f)},
                             {Vec3f(-1.5f, 1.0f, 1.5f), Vec3f(0.5f)},
-                            {Vec3f(-1.5f, 2.0f, -3.0f), Vec3f(0.75f), Vec3f(1, 0, 1).Normalized(), degree_t(60.0f)}
+                            {Vec3f(-1.5f, 2.0f, -3.0f), Vec3f(0.75f), Vec3f(1, 0, 1).Normalized(), Degree(60.0f)}
                     }
             };
 };

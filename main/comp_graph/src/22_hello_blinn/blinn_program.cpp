@@ -42,7 +42,7 @@ void HelloBlinnProgram::Init()
     modelId_ = modelManager_.LoadModel(config.data_root() + "model/nanosuit2/nanosuit.obj");
 
     camera_.position = Vec3f(0.0f, 3.0f, 3.0f);
-    camera_.WorldLookAt(Vec3f::zero);
+    camera_.WorldLookAt(Vec3f::zero());
     textureManager_.Init();
 }
 
@@ -53,7 +53,7 @@ void HelloBlinnProgram::Update(seconds dt)
     camera_.SetAspect(windowSize.x, windowSize.y);
     camera_.Update(dt);
     dt_ += dt.count();
-    lightPos_ = Vec3f(3.0f * Cos(radian_t(dt_)), 3.0f, 3.0f * Sin(radian_t(dt_)));
+    lightPos_ = Vec3f(3.0f * Cos(Radian(dt_)), 3.0f, 3.0f * Sin(Radian(dt_)));
 
     textureManager_.Update(dt);
     modelManager_.Update(dt);
@@ -104,7 +104,7 @@ void HelloBlinnProgram::Render()
     shader.SetFloat("light.quadratic", 0.032f);
     shader.SetMat4("view", camera_.GenerateViewMatrix());
     shader.SetMat4("projection", camera_.GenerateProjectionMatrix());
-    auto model = Mat4f::Identity;
+    auto model = Mat4f::identity();
     model = Transform3d::Scale(model, Vec3f(0.1f, 0.1f, 0.1f));
     shader.SetMat4("model", model);
     shader.SetMat4("transposeInverseModel", model.Inverse().Transpose());
@@ -116,8 +116,8 @@ void HelloBlinnProgram::Render()
     const auto* mod = modelManager_.GetModel(modelId_);
     mod->Draw(shader);
 
-    model = Mat4f::Identity;
-    model = Transform3d::Rotate(model, degree_t(-90.0f), Vec3f::right);
+    model = Mat4f::identity();
+    model = Transform3d::Rotate(model, Degree(-90.0f), Vec3f::right());
     shader.SetMat4("model", model);
     shader.SetMat4("transposeInverseModel", model.Inverse().Transpose());
     shader.SetInt("material.texture_diffuse1", 0);

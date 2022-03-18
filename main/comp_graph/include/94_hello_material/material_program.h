@@ -22,7 +22,7 @@ public:
 
     void OnEvent(const SDL_Event& event) override;
 private:
-    gl::RenderQuad quad_{Vec3f::zero, Vec2f::one};
+    gl::RenderQuad quad_{Vec3f::zero(), Vec2f::one()};
     gl::TextureManager textureManager_;
     gl::Material material_;
 };

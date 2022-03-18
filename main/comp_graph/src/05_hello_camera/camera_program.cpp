@@ -51,7 +51,7 @@ void HelloCameraProgram::Update(seconds dt)
 	
 	const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
 	projection_ = Transform3d::Perspective(
-		degree_t(45.0f),
+		Degree(45.0f),
 		static_cast<float>(windowSize.x) / windowSize.y,
 		0.1f,
 		100.0f);
@@ -67,11 +67,11 @@ void HelloCameraProgram::Update(seconds dt)
 		if(cameraMovement_ & MOUSE_MOVE && mouseMotion_.SquareMagnitude() > 0.001f)
 		{
 			camera_.Rotate(EulerAngles(
-				degree_t(mouseMotion_.y),
-				degree_t(mouseMotion_.x),
-				degree_t(0.0f)
+				Degree(mouseMotion_.y),
+				Degree(mouseMotion_.x),
+				Degree(0.0f)
 			));
-			mouseMotion_ = Vec2f::zero;
+			mouseMotion_ = Vec2f::zero();
 		}
 		
 		//Checking if keys are down
@@ -132,13 +132,13 @@ void HelloCameraProgram::DrawImGui()
 	ImGui::Begin("Camera Controls");
 	ImGui::InputFloat3("Position", &camera_.position[0]);
 	ImGui::InputFloat3("Direction", &camera_.reverseDir[0]);
-	Vec3f eulerAngles = Vec3f(cameraAngles.x.value(), cameraAngles.y.value(), cameraAngles.z.value());
+	Vec3f eulerAngles = Vec3f(cameraAngles.x.GetValue(), cameraAngles.y.GetValue(), cameraAngles.z.GetValue());
 	if(ImGui::InputFloat3("Euler Angles", &eulerAngles[0]))
 	{
 		cameraAngles = EulerAngles(
-			degree_t(eulerAngles.x),
-			degree_t(eulerAngles.y),
-			degree_t(eulerAngles.z)
+			Degree(eulerAngles.x),
+			Degree(eulerAngles.y),
+			Degree(eulerAngles.z)
 		);
 		camera_.SetDirectionFromEuler(cameraAngles);
 	}
@@ -173,13 +173,13 @@ void HelloCameraProgram::Render()
 	
 	for(int i = -cubeNumbers_/2; i <= cubeNumbers_/2; i++)
 	{
-		Mat4f model = Mat4f::Identity; //model transform matrix
+		Mat4f model = Mat4f::identity(); //model transform matrix
 		Vec3f cubePosition(cubeDistance_ * i, 0, cubeDistance_*i);
 		model = Transform3d::Translate(model, cubePosition);
 		shader_.SetMat4("model", model);
 		cube_.Draw();
 
-		model = Mat4f::Identity;
+		model = Mat4f::identity();
 		cubePosition = Vec3f(cubeDistance_ * i, 0, -cubeDistance_ * i);
 		model = Transform3d::Translate(model, cubePosition);
 		shader_.SetMat4("model", model);

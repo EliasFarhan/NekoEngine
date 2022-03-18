@@ -22,9 +22,9 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-#include <engine/component.h>
-#include <mathematics/vector.h>
-#include "mathematics/trigo.h"
+#include "engine/component.h"
+#include "mathematics/vector.h"
+#include "mathematics/angle.h"
 
 
 namespace neko
@@ -49,35 +49,35 @@ struct Quaternion
 #ifdef _MSC_VER
 #pragma warning( pop )
 #endif
-	Quaternion()
+	constexpr Quaternion()
 	{
 		x = y = z = w = 0;
 	}
 
-	explicit Quaternion(float same)
+	constexpr explicit Quaternion(float same)
 		: x(same), y(same), z(same), w(same)
 	{
 	}
 
-	Quaternion(float X, float Y, float Z, float W) noexcept
+	constexpr Quaternion(float X, float Y, float Z, float W) noexcept
 		: x(X), y(Y), z(Z), w(W)
 	{
 	}
 
 
-	const float& operator[](size_t p_axis) const
+	constexpr const float& operator[](size_t p_axis) const
 	{
 		return coord[p_axis];
 	}
 
-	float& operator[](size_t p_axis)
+	constexpr float& operator[](size_t p_axis)
 	{
 
 		return coord[p_axis];
 	}
 
 	//The dot product between two rotations.
-	static float Dot(Quaternion a, Quaternion b)
+	constexpr static float Dot(Quaternion a, Quaternion b)
 	{
 		return	a.x * b.x +
 				a.y * b.y +
@@ -100,7 +100,7 @@ struct Quaternion
 	}
 
 	//Rotates the Quaternion of angle degrees around axis.
-	static Quaternion AngleAxis(radian_t rad, neko::Vec3f axis)
+	static Quaternion AngleAxis(Radian rad, Vec3f axis)
 	{
 		if (axis.SquareMagnitude() == 0.0f)
 			return Quaternion::Identity();
@@ -118,13 +118,13 @@ struct Quaternion
 
 
 	//Returns the angle in degrees between two rotations a and b.
-	static degree_t Angle(Quaternion a, Quaternion b)
+	constexpr static Degree Angle(Quaternion a, Quaternion b)
 	{
 		
 		return 2.0f * Acos(std::abs(Dot(a, b)));
 	}
 
-    [[nodiscard]] Quaternion Conjugate() const
+	constexpr [[nodiscard]] Quaternion Conjugate() const
 	{
 		return {-x, -y, -z, w};
 	}
@@ -160,9 +160,9 @@ struct Quaternion
         };
 	}
 
-	static Quaternion Identity()
+	constexpr static Quaternion Identity()
 	{
-		return Quaternion(0, 0, 0, 1);
+		return {0, 0, 0, 1};
 	}
 	
 	//Operators
@@ -171,7 +171,7 @@ struct Quaternion
 		return *this * rhs.Inverse();
 	}
 
-	Quaternion operator/(const float rhs) const {
+	constexpr Quaternion operator/(const float rhs) const {
 		return Quaternion(
 			x / rhs,
 			y / rhs,
@@ -179,7 +179,7 @@ struct Quaternion
 			w / rhs);
 	}
 
-	Quaternion& operator+=(const float rhs)
+	constexpr Quaternion& operator+=(const float rhs)
 	{
 		x /= rhs;
 		y /= rhs;
@@ -188,7 +188,7 @@ struct Quaternion
 		return *this;
 	}
 
-	Quaternion operator-(const Quaternion& rhs) const
+	constexpr Quaternion operator-(const Quaternion& rhs) const
 	{
 		return Quaternion(
 			x - rhs.x,
@@ -196,7 +196,7 @@ struct Quaternion
 			z - rhs.z, 
 			w - rhs.w);
 	}
-	Quaternion& operator-=(const Quaternion& rhs)
+	constexpr Quaternion& operator-=(const Quaternion& rhs)
 	{
 		x -= rhs.x;
 		y -= rhs.y;
@@ -205,7 +205,7 @@ struct Quaternion
 		return *this;
 	}
 
-	Quaternion operator+(const Quaternion& rhs) const
+	constexpr Quaternion operator+(const Quaternion& rhs) const
 	{
 		return Quaternion(
 			x + rhs.x,
@@ -214,7 +214,7 @@ struct Quaternion
 			w + rhs.w);
 	}
 
-	Quaternion& operator+=(const Quaternion& rhs)
+	constexpr Quaternion& operator+=(const Quaternion& rhs)
 	{
 		x += rhs.x;
 		y += rhs.y;
@@ -224,7 +224,7 @@ struct Quaternion
 	}
 	
 
-	Quaternion operator*(const Quaternion& rhs) const
+	constexpr Quaternion operator*(const Quaternion& rhs) const
 	{
 		return Quaternion(
 			w * rhs.x + x * rhs.w + y * rhs.z - z * rhs.y,
@@ -233,7 +233,7 @@ struct Quaternion
 			w * rhs.w - x * rhs.x - y * rhs.y - z * rhs.z);
 	}
 
-	Quaternion operator*(const float rhs) const {
+	constexpr Quaternion operator*(const float rhs) const {
 		return Quaternion(
 			x * rhs,
 			y * rhs,
@@ -241,7 +241,7 @@ struct Quaternion
 			w * rhs);
 	}
 	
-	Quaternion& operator*=(const Quaternion& rhs)
+	constexpr Quaternion& operator*=(const Quaternion& rhs)
 	{
 		x *= rhs.x;
 		y *= rhs.y;
@@ -250,12 +250,12 @@ struct Quaternion
 		return *this;
 	}
 	
-	bool operator==(const Quaternion& right) const
+	constexpr bool operator==(const Quaternion& right) const
 	{
 		return x == right.x && y == right.y && z == right.z && w == right.w;
 	}
 	
-	bool operator!=(const Quaternion& right) const
+	constexpr bool operator!=(const Quaternion& right) const
 	{
 		return !(*this == right);
 	}

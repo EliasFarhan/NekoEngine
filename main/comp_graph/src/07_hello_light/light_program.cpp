@@ -45,9 +45,9 @@ void HelloLightProgram::Update(seconds dt)
 	std::lock_guard<std::mutex> lock(updateMutex_);
     time_ += dt.count();
 	lightPos_ = Vec3f(
-		Cos(radian_t(time_)),
+		Cos(Radian(time_)),
 		0.0f,
-		Sin(radian_t(time_)))* lightDist_;
+		Sin(Radian(time_)))* lightDist_;
 	const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
 	camera_.SetAspect(windowSize.x, windowSize.y);;
 	camera_.Update(dt);
@@ -79,7 +79,7 @@ void HelloLightProgram::Render()
 	const Mat4f projection = camera_.GenerateProjectionMatrix();
     //Render cube light
     lightShader_.Bind();
-	Mat4f model = Mat4f::Identity;
+	Mat4f model = Mat4f::identity();
 	model = Transform3d::Scale(model, Vec3f(0.2f, 0.2f, 0.2f));
 	model = Transform3d::Translate(model, lightPos_);
 	lightShader_.SetMat4("model", model);
@@ -91,7 +91,7 @@ void HelloLightProgram::Render()
 	
 	//Render center cube
 	phongShader_.Bind();
-	model = Mat4f::Identity;
+	model = Mat4f::identity();
 	phongShader_.SetMat4("model", model);
 	phongShader_.SetMat4("view", view);
 	phongShader_.SetMat4("projection", projection);

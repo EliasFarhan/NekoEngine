@@ -346,18 +346,18 @@ void HelloSsaoProgram::RenderScene(const gl::Shader& shader)
     const auto view = camera_.GenerateViewMatrix();
 
     //Draw floor
-    auto model = Mat4f::Identity;
-    model = Transform3d::Rotate(model, Quaternion::AngleAxis(degree_t(-90.0f), Vec3f::right));
-    model = Transform3d::Scale(model, Vec3f::one * 5.0f);
+    auto model = Mat4f::identity();
+    model = Transform3d::Rotate(model, Quaternion::AngleAxis(Degree(-90.0f), Vec3f::right()));
+    model = Transform3d::Scale(model, Vec3f::one() * 5.0f);
     //model = Transform3d::Translate(model, Vec3f::forward * camera_.farPlane / 2.0f);
     shader.SetMat4("model", model);
     shader.SetMat4("normalMatrix", (view * model).Inverse().Transpose());
     plane_.Draw();
     //Draw model
-    model = Mat4f::Identity;
-    model = model = Transform3d::Rotate(model, degree_t(90.0f), Vec3f::right);
-    model = Transform3d::Scale(model, Vec3f::one * 0.1f);
-    model = Transform3d::Translate(model, Vec3f::up * 0.1f);
+    model = Mat4f::identity();
+    model = model = Transform3d::Rotate(model, Degree(90.0f), Vec3f::right());
+    model = Transform3d::Scale(model, Vec3f::one() * 0.1f);
+    model = Transform3d::Translate(model, Vec3f::up() * 0.1f);
     shader.SetMat4("model", model);
     shader.SetMat4("normalMatrix", (view * model).Inverse().Transpose());
     auto* mod = modelManager_.GetModel(modelId_);

@@ -40,7 +40,7 @@ void HelloOutlineProgram::Init()
     outlineShader_.LoadFromFile(config.data_root() + "shaders/14_hello_outline/outline.vert",
                                 config.data_root() + "shaders/14_hello_outline/outline.frag");
 	camera_.position = Vec3f(0.0f, 3.0f, 3.0f);
-	camera_.WorldLookAt(Vec3f::zero);
+	camera_.WorldLookAt(Vec3f::zero());
 }
 
 void HelloOutlineProgram::Update(seconds dt)
@@ -102,7 +102,7 @@ void HelloOutlineProgram::Render()
 	modelShader_.Bind();
 	modelShader_.SetMat4("view", view);
 	modelShader_.SetMat4("projection", projection);
-	modelShader_.SetMat4("model", Mat4f::Identity);
+	modelShader_.SetMat4("model", Mat4f::identity());
 
 	modelShader_.SetInt("texture_diffuse1", 0);
 	glActiveTexture(GL_TEXTURE0);
@@ -120,8 +120,8 @@ void HelloOutlineProgram::Render()
 		outlineShader_.Bind();
 		outlineShader_.SetMat4("view", view);
 		outlineShader_.SetMat4("projection", projection);
-		auto model = Mat4f::Identity;
-		model = Transform3d::Scale(model, Vec3f::one * outlineScale_);
+		auto model = Mat4f::identity();
+		model = Transform3d::Scale(model, Vec3f::one() * outlineScale_);
 		outlineShader_.SetMat4("model", model);
 		outlineShader_.SetVec3("color", outlineColor_);
 

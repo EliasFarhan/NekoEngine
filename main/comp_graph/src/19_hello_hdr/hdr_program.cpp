@@ -49,8 +49,8 @@ void HelloHdrProgram::Init()
     hdrShader_.LoadFromFile(
             config.data_root() + "shaders/19_hello_hdr/hdr_screen.vert",
             config.data_root() + "shaders/19_hello_hdr/hdr_screen.frag");
-    camera_.position = Vec3f::zero;
-    camera_.WorldLookAt(camera_.position+Vec3f::forward);
+    camera_.position = Vec3f::zero();
+    camera_.WorldLookAt(camera_.position+Vec3f::forward());
 
 }
 
@@ -110,8 +110,8 @@ void HelloHdrProgram::Render()
     cubeShader_.Bind();
     cubeShader_.SetMat4("view", camera_.GenerateViewMatrix());
     cubeShader_.SetMat4("projection", camera_.GenerateProjectionMatrix());
-    cubeShader_.SetMat4("model", Mat4f::Identity);
-    cubeShader_.SetMat4("transposeInverseModel", Mat4f::Identity);
+    cubeShader_.SetMat4("model", Mat4f::identity());
+    cubeShader_.SetMat4("transposeInverseModel", Mat4f::identity());
     cubeShader_.SetInt("diffuseTexture", 0);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, cubeTexture_);

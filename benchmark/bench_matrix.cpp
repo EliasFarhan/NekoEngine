@@ -14,7 +14,7 @@ const long toRange = 1 << 10;
 static void BM_MatrixInverse(benchmark::State& state)
 {
     const size_t n = state.range(0);
-    std::vector<neko::Mat4f> v1(n, neko::Mat4f::Identity);
+    std::vector<neko::Mat4f> v1(n, neko::Mat4f::identity());
 
     std::for_each(v1.begin(), v1.end(), [](neko::Mat4f& m) { RandomFill(m); });
 
@@ -32,8 +32,8 @@ BENCHMARK(BM_MatrixInverse)->Range(fromRange, toRange);
 static void BM_MatrixMultNaive(benchmark::State& state)
 {
     const size_t n = state.range(0);
-    std::vector<neko::Mat4f> v1(n, neko::Mat4f::Identity);
-    std::vector<neko::Mat4f> v2(n, neko::Mat4f::Identity);
+    std::vector<neko::Mat4f> v1(n, neko::Mat4f::identity());
+    std::vector<neko::Mat4f> v2(n, neko::Mat4f::identity());
 
     std::for_each(v1.begin(), v1.end(), [](neko::Mat4f& m) { RandomFill(m); });
     std::for_each(v2.begin(), v2.end(), [](neko::Mat4f& m) { RandomFill(m); });
@@ -51,8 +51,8 @@ BENCHMARK(BM_MatrixMultNaive)->Range(fromRange, toRange);
 static void BM_MatrixMultTranspose(benchmark::State& state)
 {
     const size_t n = state.range(0);
-    std::vector<neko::Mat4f> v1(n, neko::Mat4f::Identity);
-    std::vector<neko::Mat4f> v2(n, neko::Mat4f::Identity);
+    std::vector<neko::Mat4f> v1(n, neko::Mat4f::identity());
+    std::vector<neko::Mat4f> v2(n, neko::Mat4f::identity());
 
     std::for_each(v1.begin(), v1.end(), [](neko::Mat4f& m) { RandomFill(m); });
     std::for_each(v2.begin(), v2.end(), [](neko::Mat4f& m) { RandomFill(m); });
@@ -79,8 +79,8 @@ BENCHMARK(BM_MatrixMultTranspose)->Range(fromRange, toRange);
 static void BM_MatrixMultAoSoA(benchmark::State& state)
 {
     const size_t n = state.range(0);
-    std::vector<neko::Mat4f> v1(n, neko::Mat4f::Identity);
-    std::vector<neko::Mat4f> v2(n, neko::Mat4f::Identity);
+    std::vector<neko::Mat4f> v1(n, neko::Mat4f::identity());
+    std::vector<neko::Mat4f> v2(n, neko::Mat4f::identity());
 
     std::for_each(v1.begin(), v1.end(), [](neko::Mat4f& m) { RandomFill(m); });
     std::for_each(v2.begin(), v2.end(), [](neko::Mat4f& m) { RandomFill(m); });
@@ -108,8 +108,8 @@ BENCHMARK(BM_MatrixMultAoSoA)->Range(fromRange, toRange);
 static void BM_MatrixMultIntrinsics(benchmark::State& state)
 {
     const size_t n = state.range(0);
-    std::vector<neko::Mat4f> v1(n, neko::Mat4f::Identity);
-    std::vector<neko::Mat4f> v2(n, neko::Mat4f::Identity);
+    std::vector<neko::Mat4f> v1(n, neko::Mat4f::identity());
+    std::vector<neko::Mat4f> v2(n, neko::Mat4f::identity());
 
     std::for_each(v1.begin(), v1.end(), [](neko::Mat4f& m) { RandomFill(m); });
     std::for_each(v2.begin(), v2.end(), [](neko::Mat4f& m) { RandomFill(m); });

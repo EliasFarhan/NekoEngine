@@ -57,31 +57,31 @@ private:
 	};
     struct DirectionalLight
     {
-        Vec3f lightPos = Vec3f::one*10.0f;
-        Vec3f lightDir = (-Vec3f::one).Normalized();
+        Vec3f lightPos = Vec3f::one()*10.0f;
+        Vec3f lightDir = (-Vec3f::one()).Normalized();
     };
 
     struct Transform
     {
-        Vec3f position = Vec3f::zero;
-        Vec3f scale = Vec3f::one;
-        radian_t angle = radian_t(0.0f);
-        Vec3f axis = Vec3f::up;
+        Vec3f position = Vec3f::zero();
+        Vec3f scale = Vec3f::one();
+        Radian angle = Radian(0.0f);
+        Vec3f axis = Vec3f::up();
     };
     void RenderScene(const gl::Shader& shader);
 	
-    gl::RenderQuad floor_{Vec3f::zero, Vec2f::one*5.0f};
+    gl::RenderQuad floor_{Vec3f::zero(), Vec2f::one()*5.0f};
     gl::TextureManager textureManager_;
     gl::TextureName floorTexture_ = gl::INVALID_TEXTURE_NAME;
     gl::TextureId floorTextureId_;
 
-    gl::RenderCuboid cube_{Vec3f::zero, Vec3f::one};
+    gl::RenderCuboid cube_{Vec3f::zero(), Vec3f::one()};
     std::array<Transform, 4> cubeTransforms_ = {
         {
 	        {Vec3f(0.0f, 3.0f, 0.0f), Vec3f(0.5f)},
         	{Vec3f(2.0f, 1.5f, 1.0f), Vec3f(0.5f)},
         	{Vec3f(4.0f, 0.25f, 4.0f), Vec3f(0.5f)},
-        	{Vec3f(-1.0f, 1.5f, 2.0f), Vec3f(0.25f), degree_t(60.0f), Vec3f(1,0,1).Normalized()}
+        	{Vec3f(-1.0f, 1.5f, 2.0f), Vec3f(0.25f), Degree(60.0f), Vec3f(1,0,1).Normalized()}
         }
     };
     gl::ModelManager modelManager_;

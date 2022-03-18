@@ -133,9 +133,9 @@ void HelloWaterProgram::Render()
 		modelShader_.Bind();
 		modelShader_.SetMat4("view", view);
 		modelShader_.SetMat4("projection", projection);
-		auto model = Mat4f::Identity;
+		auto model = Mat4f::identity();
 
-		model = Transform3d::Rotate(model, degree_t(180.0f), Vec3f::up);
+		model = Transform3d::Rotate(model, Degree(180.0f), Vec3f::up());
 		model = Transform3d::Scale(model, Vec3f(0.1f));
 
 		modelShader_.SetMat4("model", model);
@@ -157,9 +157,9 @@ void HelloWaterProgram::Render()
 	};
 	//Reflection
 	Camera3D underWaterCamera = static_cast<Camera3D>(camera_);
-	underWaterCamera.reverseDir = Vec3f::Reflect(underWaterCamera.reverseDir, Vec3f::up);
+	underWaterCamera.reverseDir = Vec3f::Reflect(underWaterCamera.reverseDir, Vec3f::up());
 	underWaterCamera.position.y = underWaterCamera.position.y - 2.0f * std::abs(underWaterCamera.position.y - waterHeight_);
-	underWaterCamera.WorldLookAt(underWaterCamera.position - underWaterCamera.reverseDir, Vec3f::up);
+	underWaterCamera.WorldLookAt(underWaterCamera.position - underWaterCamera.reverseDir, Vec3f::up());
 	glViewport(0, 0, reflectionFrameSize.x, reflectionFrameSize.y);
 	glBindFramebuffer(GL_FRAMEBUFFER, reflectionFramebuffer_);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -181,8 +181,8 @@ void HelloWaterProgram::Render()
 	renderScene(0, view, projection);
 	//Draw water
 	waterShader_.Bind();
-	auto model = Mat4f::Identity;
-	model = Transform3d::Rotate(model, degree_t(-90.0f), Vec3f::right);
+	auto model = Mat4f::identity();
+	model = Transform3d::Rotate(model, Degree(-90.0f), Vec3f::right());
 	model = Transform3d::Scale(model, Vec3f(5.0f));
 	model = Transform3d::Translate(model, Vec3f(0.0f,waterHeight_, 0.0f));
 	waterShader_.SetMat4("model", model);

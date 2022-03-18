@@ -52,7 +52,7 @@ void HelloCubemapsProgram::Init()
     modelRefractionShader_.LoadFromFile(config.data_root() + "shaders/15_hello_cubemaps/model.vert",
         config.data_root() + "shaders/15_hello_cubemaps/model_refraction.frag");
     camera_.position = Vec3f(0, 3, 3);
-    camera_.WorldLookAt(Vec3f::zero);
+    camera_.WorldLookAt(Vec3f::zero());
     cube_.Init();
     cubeTextureId_ = textureManager_.LoadTexture(config.data_root() + "sprites/container.jpg", gl::Texture::DEFAULT);
 
@@ -142,14 +142,14 @@ void HelloCubemapsProgram::Render()
         modelShader_.Bind();
         modelShader_.SetMat4("view", view);
         modelShader_.SetMat4("projection", projection);
-        auto model = Mat4f::Identity;
+        auto model = Mat4f::identity();
         model = Transform3d::Scale(model, Vec3f(0.1f, 0.1f, 0.1f));
         modelShader_.SetMat4("model", model);
         modelShader_.SetMat4("transposeInverseModel", model.Inverse().Transpose());
        
         mod->Draw(modelShader_);
-        model = Mat4f::Identity;
-        model = Transform3d::Translate(model, Vec3f::left * 2.0f);
+        model = Mat4f::identity();
+        model = Transform3d::Translate(model, Vec3f::left() * 2.0f);
         modelShader_.SetMat4("model", model);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, cubeTexture_);
@@ -161,7 +161,7 @@ void HelloCubemapsProgram::Render()
         modelReflectionShader_.Bind();
         modelReflectionShader_.SetMat4("view", view);
         modelReflectionShader_.SetMat4("projection", projection);
-        auto model = Mat4f::Identity;
+        auto model = Mat4f::identity();
         model = Transform3d::Scale(model, Vec3f(0.1f, 0.1f, 0.1f));
         modelReflectionShader_.SetMat4("model", model);
         modelReflectionShader_.SetMat4("transposeInverseModel", model.Inverse().Transpose());
@@ -171,8 +171,8 @@ void HelloCubemapsProgram::Render()
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture_);
         mod->Draw(modelReflectionShader_);
-        model = Mat4f::Identity;
-        model = Transform3d::Translate(model, Vec3f::left * 2.0f);
+        model = Mat4f::identity();
+        model = Transform3d::Translate(model, Vec3f::left() * 2.0f);
         modelReflectionShader_.SetMat4("model", model);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, cubeTexture_);
@@ -184,7 +184,7 @@ void HelloCubemapsProgram::Render()
         modelRefractionShader_.Bind();
         modelRefractionShader_.SetMat4("view", view);
         modelRefractionShader_.SetMat4("projection", projection);
-        auto model = Mat4f::Identity;
+        auto model = Mat4f::identity();
         model = Transform3d::Scale(model, Vec3f(0.1f, 0.1f, 0.1f));
         modelRefractionShader_.SetMat4("model", model);
         modelRefractionShader_.SetMat4("transposeInverseModel", model.Inverse().Transpose());
@@ -196,8 +196,8 @@ void HelloCubemapsProgram::Render()
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture_);
         mod->Draw(modelRefractionShader_);
-        model = Mat4f::Identity;
-        model = Transform3d::Translate(model, Vec3f::left * 2.0f);
+        model = Mat4f::identity();
+        model = Transform3d::Translate(model, Vec3f::left() * 2.0f);
         modelRefractionShader_.SetMat4("model", model);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, cubeTexture_);

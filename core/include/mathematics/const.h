@@ -30,7 +30,8 @@
 #include <cmath>
 namespace neko
 {
-const float PI = static_cast<float>(M_PI);
+
+inline static constexpr float PI = static_cast<float>(M_PI);
 
 
 }

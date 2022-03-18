@@ -27,7 +27,7 @@ void RandomFill(std::vector<float>& numbers, float start = -maxNmb, float end = 
 
 TEST(Engine, TestSinTable)
 {
-	neko::FuncTable<float> sinFuncTable(0.0f, neko::PI, [](float x) { return neko::Sin(neko::radian_t(x)); });
+	neko::FuncTable<float> sinFuncTable(0.0f, neko::PI, [](float x) { return neko::Sin(neko::Radian(x)); });
 	sinFuncTable.GenerateTable();
 	const size_t sampleSize = 1024;
 	std::vector<float> localNumbers(sampleSize);
@@ -36,7 +36,7 @@ TEST(Engine, TestSinTable)
 	float error = 0.0f;
 	for (auto v : localNumbers)
 	{
-		error += std::abs(sinFuncTable.GetValue(v) - neko::Sin(neko::radian_t(v)));
+		error += std::abs(sinFuncTable.GetValue(v) - neko::Sin(neko::Radian(v)));
 	}
 	error /= float(sampleSize);
 	EXPECT_LT(error, 0.01f);
@@ -70,7 +70,7 @@ TEST(Engine, Quaternion_Magnitude)
 TEST(Engine, Quaternion_AngleAxis)
 {
     neko::Quaternion q = neko::Quaternion::Identity();
-    neko::radian_t rad(30);
+    neko::Radian rad(30);
     neko::Vec3f axis(1, 1, 1);
     neko::Quaternion expectedAngleAxisQuaternion = neko::Quaternion(0, 0, 0, 1);    //TODO: Calculate the expected value
     q = q.AngleAxis(rad, axis);
@@ -81,8 +81,8 @@ TEST(Engine, Quaternion_Angle)
 {
     neko::Quaternion q1 = neko::Quaternion::Identity();
     neko::Quaternion q2 = neko::Quaternion::Identity();
-    neko::degree_t expectedAngle(0);
-    neko::degree_t angle(neko::Quaternion::Angle(q1, q2));
+    neko::Degree expectedAngle(0);
+    neko::Degree angle(neko::Quaternion::Angle(q1, q2));
     EXPECT_EQ(expectedAngle, angle);
 }
 
@@ -457,7 +457,7 @@ TEST(Aabb, Aabb3d_Plane)
 
 TEST(Aabb, Obb2d_Obb2d)
 {
-    neko::radian_t angle = static_cast<neko::radian_t>(neko::PI / 4);
+    auto angle = static_cast<neko::Radian>(neko::PI / 4);
 
     //Same Intersect
     neko::Obb2d obb1;
@@ -511,7 +511,7 @@ TEST(Aabb, Obb2d_Obb2d)
 
 TEST(Aabb, Obb3d_Obb3d)
 {
-    neko::RadianAngles angles = neko::RadianAngles(static_cast<neko::radian_t>(0), static_cast<neko::radian_t>(0), static_cast<neko::radian_t>(neko::PI / 4));
+    neko::RadianAngles angles = neko::RadianAngles(static_cast<neko::Radian>(0), static_cast<neko::Radian>(0), static_cast<neko::Radian>(neko::PI / 4));
     //Same Intersect
     neko::Obb3d obb1;
     obb1.FromCenterExtendsRotation(neko::Vec3f(0, 0, 0), neko::Vec3f(0.5f, 0.5f, 0.5f), angles);
@@ -520,7 +520,7 @@ TEST(Aabb, Obb3d_Obb3d)
     EXPECT_TRUE(obb1.IntersectObb(obb2));
     EXPECT_TRUE(obb2.IntersectObb(obb1));
 
-    angles = neko::RadianAngles(static_cast<neko::radian_t>(-neko::PI / 4), static_cast<neko::radian_t>(0), static_cast<neko::radian_t>(-neko::PI / 4));
+    angles = neko::RadianAngles(static_cast<neko::Radian>(-neko::PI / 4), static_cast<neko::Radian>(0), static_cast<neko::Radian>(-neko::PI / 4));
     //Transverse Intersect
     obb1.FromCenterExtendsRotation(neko::Vec3f(0, 0, 0), neko::Vec3f(0.5f, 0.5f, 0.5f), angles);
     obb2.FromCenterExtendsRotation(neko::Vec3f(1, 1, 1), neko::Vec3f(0.2f, 5.0f, 0.2f), angles);
@@ -532,7 +532,7 @@ TEST(Aabb, Obb3d_Obb3d)
     EXPECT_FALSE(obb1.IntersectObb(obb2));
     EXPECT_FALSE(obb2.IntersectObb(obb1));
 
-    angles = neko::RadianAngles(static_cast<neko::radian_t>(neko::PI / 4), static_cast<neko::radian_t>(0), static_cast<neko::radian_t>(neko::PI / 4));
+    angles = neko::RadianAngles(static_cast<neko::Radian>(neko::PI / 4), static_cast<neko::Radian>(0), static_cast<neko::Radian>(neko::PI / 4));
     obb1.FromCenterExtendsRotation(neko::Vec3f(0.0f, 0.0f, 0.0f), neko::Vec3f(0.5f, 0.5f, 0.5f), angles);
     obb2.FromCenterExtendsRotation(neko::Vec3f(1.0f, 1.0f, 1.0f), neko::Vec3f(1.0f, 1.0f, 1.0f), angles);
     EXPECT_TRUE(obb1.IntersectObb(obb2));
@@ -601,7 +601,7 @@ TEST(Aabb, TestAabb)
     aabb2.FromCenterExtends(neko::Vec2f(1, 1), neko::Vec2f(1.0f, 1.0f));
     EXPECT_TRUE(aabb1.ContainsAabb(aabb2));
 
-    neko::radian_t angle = static_cast<neko::radian_t>(neko::PI / 4);
+    auto angle = static_cast<neko::Radian>(neko::PI / 4);
     neko::Obb2d obb1;
     obb1.FromCenterExtendsRotation(neko::Vec2f(0, 0), neko::Vec2f(0.5, 0.5), angle);
     neko::Obb2d obb2;
@@ -636,7 +636,7 @@ TEST(Aabb, TestAabb)
     //std::cout << "AABB1 (" << aabb3.lowerLeftBound << " , " << aabb3.upperRightBound << "); Plane (" << origin3 << " , " << normal3 << ")  Intersect :" << aabb3.IntersectPlane(normal3, origin3) << "\n";
     EXPECT_TRUE(aabb3.IntersectPlane(normal3, origin3));
 
-    neko::RadianAngles angles = neko::RadianAngles(static_cast<neko::radian_t>(0), static_cast<neko::radian_t>(0), static_cast<neko::radian_t>(neko::PI / 4));
+    neko::RadianAngles angles = neko::RadianAngles(static_cast<neko::Radian>(0), static_cast<neko::Radian>(0), static_cast<neko::Radian>(neko::PI / 4));
     neko::Obb3d obb3;
     obb3.FromCenterExtendsRotation(neko::Vec3f(0, 0, 0), neko::Vec3f(0.5, 0.5, 0.5), angles);
     neko::Obb3d obb4;
@@ -644,7 +644,7 @@ TEST(Aabb, TestAabb)
     //std::cout << "OBB1 (" << obb3.localLowerLeftBound << " , " << obb3.localUpperRightBound << "); OBB2 (" << obb4.localLowerLeftBound << " , " << obb4.localUpperRightBound << ")  Intersect :" << obb3.IntersectObb(obb4) << "\n";
     EXPECT_FALSE(obb3.IntersectObb(obb4));
 
-    angles = neko::RadianAngles(static_cast<neko::radian_t>(neko::PI / 4), static_cast<neko::radian_t>(neko::PI / 4), static_cast<neko::radian_t>(0));
+    angles = neko::RadianAngles(static_cast<neko::Radian>(neko::PI / 4), static_cast<neko::Radian>(neko::PI / 4), static_cast<neko::Radian>(0));
     obb3.FromCenterExtendsRotation(neko::Vec3f(0.0f, 0.0f, 0.0f), neko::Vec3f(0.5f, 0.5f, 0.5f), angles);
     obb4.FromCenterExtendsRotation(neko::Vec3f(1.0f, 1.0f, 1.0f), neko::Vec3f(1.0f, 1.0f, 1.0f), angles);
     //std::cout << "OBB1 (" << obb3.localLowerLeftBound << " , " << obb3.localUpperRightBound << "); OBB2 (" << obb4.localLowerLeftBound << " , " << obb4.localUpperRightBound << ")  Intersect :" << obb3.IntersectObb(obb4) << "\n";
@@ -713,8 +713,8 @@ TEST(Engine, TestMatrix4)
 	EXPECT_LT(neko::Mat4f::MatrixDifference(m1.MultiplyIntrinsincs(m1), result), 0.01f);
 	EXPECT_LT(neko::Mat4f::MatrixDifference(m1.MultiplyNaive(m1), m1.MultiplyIntrinsincs(m1)), 0.01f);
 
-	EXPECT_LT(neko::Mat4f::MatrixDifference(neko::Mat4f::Identity, neko::Mat4f::Identity.Inverse()), 0.01f);
-	EXPECT_LT(neko::Mat4f::MatrixDifference(neko::Mat4f::Zero, neko::Mat4f::Zero.Inverse()), 0.01f);
+	EXPECT_LT(neko::Mat4f::MatrixDifference(neko::Mat4f::identity(), neko::Mat4f::identity().Inverse()), 0.01f);
+	EXPECT_LT(neko::Mat4f::MatrixDifference(neko::Mat4f::zero(), neko::Mat4f::zero().Inverse()), 0.01f);
 	
 	const neko::Mat4f m = neko::Mat4f(std::array<neko::Vec4f, 4>
 	{
@@ -736,5 +736,5 @@ TEST(Engine, TestMatrix4)
 	
 	
 	EXPECT_LT(neko::Mat4f::MatrixDifference(mInvCalculus, mInv), 0.01f);
-	EXPECT_GT(neko::Mat4f::MatrixDifference(mInvCalculus, neko::Mat4f::Identity), 0.01f);
+	EXPECT_GT(neko::Mat4f::MatrixDifference(mInvCalculus, neko::Mat4f::identity()), 0.01f);
 }

@@ -40,21 +40,21 @@ public:
 	void Render() override;
 	void OnEvent(const SDL_Event& event) override;
 private:
-	gl::RenderCuboid cube_{ Vec3f::zero, Vec3f::one };
+	gl::RenderCuboid cube_{ Vec3f::zero(), Vec3f::one() };
 	gl::Shader shader_;
 	gl::TextureName  textureWall_;
 	Camera3D camera_;
-	Mat4f projection_{ Mat4f::Identity };
-	EulerAngles cameraAngles{ degree_t(0.0f), degree_t(0.0f), degree_t(0.0f) };
+	Mat4f projection_{ Mat4f::identity() };
+	EulerAngles cameraAngles{ Degree(0.0f), Degree(0.0f), Degree(0.0f) };
 
-	Vec2f mouseMotion_ = Vec2f::zero;
+	Vec2f mouseMotion_ = Vec2f::zero();
 
 	const float mouseMotionRatio_ = 50.0f;
 	const float cubeDistance_ = 2.0f;
 	const int cubeNumbers_ = 10;
 	const Vec3f cameraOriginPos = Vec3f(0.0f, 3.0f, -3.0f);
 	const EulerAngles cameraOriginAngles = EulerAngles(
-		degree_t(45.0f), degree_t(0.0f), degree_t(0.0f));
+		Degree(45.0f), Degree(0.0f), Degree(0.0f));
 
 	enum CameraMovement : std::uint8_t
 	{

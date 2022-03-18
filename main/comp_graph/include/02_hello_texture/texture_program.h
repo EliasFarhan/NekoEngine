@@ -48,7 +48,7 @@ public:
     static gl::TextureName LoadTextureWithGli(std::string_view path);
 
 private:
-    gl::RenderQuad quad_{Vec3f::zero, Vec2f::one};
+    gl::RenderQuad quad_{Vec3f::zero(), Vec2f::one()};
     gl::Shader shader_;
 
     gl::TextureManager textureManager_;

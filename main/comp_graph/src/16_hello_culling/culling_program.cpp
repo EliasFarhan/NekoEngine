@@ -37,7 +37,7 @@ void HelloCullingProgram::Init()
         config.data_root() + "shaders/16_hello_culling/model.vert",
         config.data_root() + "shaders/16_hello_culling/model.frag");
     camera_.position = Vec3f(0, 3, 3);
-    camera_.WorldLookAt(Vec3f::zero);
+    camera_.WorldLookAt(Vec3f::zero());
     cube_.Init();
     cubeTextureId_ = textureManager_.LoadTexture(config.data_root() + "sprites/container.jpg", gl::Texture::DEFAULT);
 
@@ -102,14 +102,14 @@ void HelloCullingProgram::Render()
     modelShader_.Bind();
     modelShader_.SetMat4("view", camera_.GenerateViewMatrix());
     modelShader_.SetMat4("projection", camera_.GenerateProjectionMatrix());
-    auto model = Mat4f::Identity;
-    model = Transform3d::Scale(model, Vec3f::one * 0.1f);
+    auto model = Mat4f::identity();
+    model = Transform3d::Scale(model, Vec3f::one() * 0.1f);
     modelShader_.SetMat4("model", model);
     modelShader_.SetMat4("transposeInverseModel", model.Inverse().Transpose());
     auto* mod = modelManager_.GetModel(modelId_);
     mod->Draw(modelShader_);
-    model = Mat4f::Identity;
-    model = Transform3d::Translate(model, Vec3f::left * 2.0f);
+    model = Mat4f::identity();
+    model = Transform3d::Translate(model, Vec3f::left() * 2.0f);
     modelShader_.SetMat4("model", model);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, cubeTexture_);

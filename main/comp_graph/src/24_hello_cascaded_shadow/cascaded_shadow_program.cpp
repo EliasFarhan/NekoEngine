@@ -88,7 +88,7 @@ void HelloCascadedShadowProgram::Init()
     glCheckError();
 
     camera_.position = Vec3f(0, 3.0f, -3.0f);
-    camera_.WorldLookAt(Vec3f::forward * camera_.farPlane / 2.0f);
+    camera_.WorldLookAt(Vec3f::forward() * camera_.farPlane / 2.0f);
     camera_.farPlane = 100.0f;
 }
 
@@ -194,7 +194,7 @@ Camera2D HelloCascadedShadowProgram::CalculateOrthoLight(float cascadeNear, floa
     Camera3D camera = static_cast<Camera3D>(camera_);
     camera.nearPlane = cascadeNear;
     camera.farPlane = cascadeFar;
-    lightCamera.position = Vec3f::zero;
+    lightCamera.position = Vec3f::zero();
     lightCamera.WorldLookAt(lightDir);
 
     const auto tanHalfFovY = Tan(camera_.fovY / 2.0f);
@@ -228,7 +228,7 @@ Camera2D HelloCascadedShadowProgram::CalculateOrthoLight(float cascadeNear, floa
     float maxZ = std::numeric_limits<float>::lowest();
 
     float radius = 0.0f;
-    Vec3f center = Vec3f::zero;
+    Vec3f center = Vec3f::zero();
     for (auto & frustumCorner : frustumCorners)
     {
         center += frustumCorner;
@@ -306,8 +306,8 @@ void HelloCascadedShadowProgram::RenderScene(const gl::Shader& shader)
     {
         for (int x = -1; x < 2; x++)
         {
-            auto model = Mat4f::Identity;
-            model = Transform3d::Scale(model, Vec3f::one * 0.2f);
+            auto model = Mat4f::identity();
+            model = Transform3d::Scale(model, Vec3f::one() * 0.2f);
             model = Transform3d::Translate(model,
                                            Vec3f(-10.0f * float(x), 0.0f, 10.0f * float(z) + 5.0f));
             shader.SetMat4("model", model);
@@ -315,10 +315,10 @@ void HelloCascadedShadowProgram::RenderScene(const gl::Shader& shader)
             dragonModel->Draw(shader);
         }
     }
-    auto model = Mat4f::Identity;
-    model = Transform3d::Rotate(model, Quaternion::AngleAxis(degree_t(-90.0f), Vec3f::right));
-    model = Transform3d::Scale(model, Vec3f::one * camera_.farPlane);
-    model = Transform3d::Translate(model, Vec3f::forward * camera_.farPlane / 2.0f);
+    auto model = Mat4f::identity();
+    model = Transform3d::Rotate(model, Quaternion::AngleAxis(Degree(-90.0f), Vec3f::right()));
+    model = Transform3d::Scale(model, Vec3f::one() * camera_.farPlane);
+    model = Transform3d::Translate(model, Vec3f::forward() * camera_.farPlane / 2.0f);
     shader.SetTexture("material.texture_diffuse1", brickWall_);
     shader.SetMat4("model", model);
     shader.SetMat4("transposeInverseModel", model.Inverse().Transpose());

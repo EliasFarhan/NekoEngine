@@ -48,8 +48,8 @@ private:
 		USE_STENCIL = 1u<<0u,
 		REMOVE_ONLY_DEPTH = 1u<<2u
 	};
-	gl::RenderCuboid cube_{Vec3f::zero, Vec3f::one*2.0f};
-	gl::RenderQuad plane_{ Vec3f::zero, Vec2f::one * 4.0f };
+	gl::RenderCuboid cube_{Vec3f::zero(), Vec3f::one()*2.0f};
+	gl::RenderQuad plane_{ Vec3f::zero(), Vec2f::one() * 4.0f };
 	gl::Shader cubeShader_;
 	gl::Shader floorShader_;
 	gl::TextureManager textureManager_;

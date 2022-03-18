@@ -59,10 +59,10 @@ private:
 	};
 	struct Transform
 	{
-		Vec3f position = Vec3f::zero;
-		Vec3f scale = Vec3f::one;
-		radian_t angle = radian_t(0.0f);
-		Vec3f axis = Vec3f::up;
+		Vec3f position = Vec3f::zero();
+		Vec3f scale = Vec3f::one();
+		Radian angle = Radian(0.0f);
+		Vec3f axis = Vec3f::up();
 	};
 
 	void CreateFramebuffer();
@@ -74,25 +74,25 @@ private:
 	gl::TextureManager textureManager_;
 	gl::TextureName cubeTexture_ = gl::INVALID_TEXTURE_NAME;
 	gl::TextureId cubeTextureId_;
-	gl::RenderCuboid cube_{ Vec3f::zero, Vec3f::one };
+	gl::RenderCuboid cube_{ Vec3f::zero(), Vec3f::one() };
 
 	std::array<Transform, 6> cubeTransforms_ = {
 		{
 			{Vec3f(0.0f, 1.5f, 0.0),Vec3f(0.5f)},
 			{Vec3f(2.0f, 0.0f, 1.0), Vec3f(0.5f)},
-			{Vec3f(-1.0f, -1.0f, 2.0),Vec3f::one,
-				degree_t(60.0f), Vec3f(1,0,1).Normalized()},
+			{Vec3f(-1.0f, -1.0f, 2.0),Vec3f::one(),
+				Degree(60.0f), Vec3f(1,0,1).Normalized()},
 			{Vec3f(0.0f, 2.7f, 4.0), Vec3f(1.25f),
-				degree_t(23.0f),Vec3f(1.0, 0.0, 1.0).Normalized()},
-			{Vec3f(-2.0f, 1.0f, -3.0),Vec3f::one,
-				degree_t(124.0f),Vec3f(1.0, 0.0, 1.0).Normalized()},
+				Degree(23.0f),Vec3f(1.0, 0.0, 1.0).Normalized()},
+			{Vec3f(-2.0f, 1.0f, -3.0),Vec3f::one(),
+				Degree(124.0f),Vec3f(1.0, 0.0, 1.0).Normalized()},
 			{Vec3f(-3.0f, 0.0f, 0.0),Vec3f(0.5f)}
 
 		} };
 	std::array<Light, 4> lights_ = {
 		{
 			{Vec3f(0.0f, 0.5f,  1.5f), Color3(5.0f,   5.0f,  5.0f)},
-			{Vec3f(-4.0f, 0.5f, -3.0f), Color3{10.0f,  0.0f,  0.0f}},
+			{Vec3f(-4.0f, 0.5f, -3.0f), Color3(10.0f,  0.0f,  0.0f)},
 			{Vec3f(3.0f, 0.5f,  1.0f), Color3(0.0f,   0.0f,  15.0f)},
 			{Vec3f(-.8f,  2.4f, -1.0f), Color3(0.0f,   5.0f,  0.0f)}
 		}
@@ -107,7 +107,7 @@ private:
 	unsigned int pingpongFbo_[2]{};
 	unsigned int pingpongColorBuffers_[2]{};
 	int blurAmount_ = 10;
-	gl::RenderQuad screenPlane_{Vec3f::zero, Vec2f::one*2.0f};
+	gl::RenderQuad screenPlane_{Vec3f::zero(), Vec2f::one()*2.0f};
 	std::uint8_t flags_ = NONE;
 	float exposure_ = 1.0f;
 };

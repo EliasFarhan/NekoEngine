@@ -48,7 +48,7 @@ public:
 
 };
 
-class Rotation2dManager : public ComponentManager<degree_t, EntityMask(ComponentType::ROTATION2D)>
+class Rotation2dManager : public ComponentManager<Degree, EntityMask(ComponentType::ROTATION2D)>
 {
     using ComponentManager::ComponentManager;
 };
@@ -91,10 +91,10 @@ public:
     explicit Transform2dManager(EntityManager& entityManager);
     void SetPosition(Entity entity, Vec2f position);
     void SetScale(Entity entity, Vec2f scale);
-    void SetRotation(Entity entity, degree_t angles);
+    void SetRotation(Entity entity, Degree angles);
     [[nodiscard]] Vec2f GetPosition(Entity entity) const;
     [[nodiscard]] Vec2f GetScale(Entity entity) const;
-    [[nodiscard]] degree_t GetRotation(Entity entity) const;
+    [[nodiscard]] Degree GetRotation(Entity entity) const;
     void OnChangeParent(Entity entity, Entity newParent, Entity oldParent) override;
     void UpdateDirtyComponent(Entity entity) override;
     void Update() override;

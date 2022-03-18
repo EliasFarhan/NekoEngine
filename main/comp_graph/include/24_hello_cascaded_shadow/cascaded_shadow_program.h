@@ -51,8 +51,8 @@ private:
 
     struct DirectionalLight
     {
-        Vec3f position = Vec3f::zero;
-        Vec3f direction = -Vec3f::one;
+        Vec3f position = Vec3f::zero();
+        Vec3f direction = -Vec3f::one();
         Mat4f lightSpaceMatrix;
     };
 
@@ -74,7 +74,7 @@ private:
     std::uint8_t flags_ = NONE;
     std::array<DirectionalLight, 3> lights_;
 
-    gl::RenderQuad plane_{ Vec3f::zero, Vec2f::one };
+    gl::RenderQuad plane_{ Vec3f::zero(), Vec2f::one() };
     gl::ModelManager modelManager_;
     gl::ModelId dragonModelId_ = gl::INVALID_MODEL_ID;
 

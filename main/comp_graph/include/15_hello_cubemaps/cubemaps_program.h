@@ -49,7 +49,7 @@ private:
 		REFRACTION,
 		LENGTH
 	};
-	gl::RenderCuboid skyboxCube_{ Vec3f::zero, Vec3f::one*2.0f };
+	gl::RenderCuboid skyboxCube_{ Vec3f::zero(), Vec3f::one()*2.0f };
 	gl::Shader skyboxShader_;
 	
 	gl::TextureName skyboxTexture_ = gl::INVALID_TEXTURE_NAME;
@@ -61,7 +61,7 @@ private:
 	gl::Shader modelRefractionShader_;
     gl::ModelId modelId_ = gl::INVALID_MODEL_ID;
     gl::ModelManager modelManager_;
-	gl::RenderCuboid cube_{Vec3f::zero, Vec3f::one};
+	gl::RenderCuboid cube_{Vec3f::zero(), Vec3f::one()};
 	gl::TextureManager textureManager_;
 	gl::TextureName cubeTexture_ = gl::INVALID_TEXTURE_NAME;
 	gl::TextureId cubeTextureId_;

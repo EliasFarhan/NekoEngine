@@ -65,13 +65,13 @@ void HelloShadowProgram::Init()
     glCheckFramebuffer();
     glCheckError();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    depthCamera_.SetExtends(Vec2f::one * 4.0f);
+    depthCamera_.SetExtends(Vec2f::one() * 4.0f);
     depthCamera_.position = light_.lightPos;
     depthCamera_.WorldLookAt(light_.lightPos + light_.lightDir);
 
 
     camera_.position = Vec3f(0, 3, 3);
-    camera_.WorldLookAt(Vec3f::zero);
+    camera_.WorldLookAt(Vec3f::zero());
 
     simpleDepthShader_.LoadFromFile(config.data_root() + "shaders/21_hello_shadow/simple_depth.vert",
         config.data_root() + "shaders/21_hello_shadow/simple_depth.frag");
@@ -211,16 +211,16 @@ void HelloShadowProgram::Render()
 void HelloShadowProgram::RenderScene(const gl::Shader& shader)
 {
     //Render model
-    auto model = Mat4f::Identity;
-    model = Transform3d::Translate(model, Vec3f::forward * 5.0f);
+    auto model = Mat4f::identity();
+    model = Transform3d::Translate(model, Vec3f::forward() * 5.0f);
     model = Transform3d::Scale(model, Vec3f(0.1f));
     shader.SetMat4("model", model);
     shader.SetMat4("transposeInverseModel", model.Inverse().Transpose());
     auto* mod = modelManager_.GetModel(modelId_);
     mod->Draw(shader);
     //Render floor
-    model = Mat4f::Identity;
-    model = Transform3d::Rotate(model, degree_t(-90.0f), Vec3f::right);
+    model = Mat4f::identity();
+    model = Transform3d::Rotate(model, Degree(-90.0f), Vec3f::right());
     shader.SetMat4("model", model);
     shader.SetMat4("transposeInverseModel", model.Inverse().Transpose());
     shader.SetTexture("material.texture_diffuse1", floorTexture_, 0);
@@ -228,7 +228,7 @@ void HelloShadowProgram::RenderScene(const gl::Shader& shader)
     //Render cubes
     for (const auto& transform : cubeTransforms_)
     {
-        model = Mat4f::Identity;
+        model = Mat4f::identity();
         model = Transform3d::Translate(model, transform.position);
         model = Transform3d::Rotate(model, transform.angle, transform.axis);
         model = Transform3d::Scale(model, transform.scale);

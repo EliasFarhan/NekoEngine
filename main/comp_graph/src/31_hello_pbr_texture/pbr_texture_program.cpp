@@ -34,8 +34,8 @@ void HelloPbrTextureProgram::Init()
 	pbrShader_.LoadFromFile(
 		config.data_root() + "shaders/31_hello_pbr_texture/pbr.vert",
 		config.data_root() + "shaders/31_hello_pbr_texture/pbr.frag");
-	camera_.position = Vec3f::forward * 5.0f;
-	camera_.WorldLookAt(Vec3f::zero);
+	camera_.position = Vec3f::forward() * 5.0f;
+	camera_.WorldLookAt(Vec3f::zero());
 
 	lights_ = {
 		{
@@ -131,8 +131,8 @@ void HelloPbrTextureProgram::Render()
 		pbrShader_.SetVec3("lights[" + std::to_string(i) + "].color", lights_[i].color);
 
 	}
-	pbrShader_.SetMat4("model", Mat4f::Identity);
-	pbrShader_.SetMat4("normalMatrix", Mat4f::Identity);
+	pbrShader_.SetMat4("model", Mat4f::identity());
+	pbrShader_.SetMat4("normalMatrix", Mat4f::identity());
 	sphere_.Draw();
 		
 	

@@ -51,7 +51,7 @@ void HelloToonShadingProgram::Update(seconds dt)
 	camera_.SetAspect(windowSize.x, windowSize.y);
 	camera_.Update(dt);
 	dt_ += dt.count();
-	light_.position = 4.0f * Vec3f(Cos(radian_t(dt_)), 0.5f, Sin(radian_t(dt_)));
+	light_.position = 4.0f * Vec3f(Cos(Radian(dt_)), 0.5f, Sin(Radian(dt_)));
 }
 
 void HelloToonShadingProgram::Destroy()
@@ -83,8 +83,8 @@ void HelloToonShadingProgram::Render()
 	gl::Shader& shader = toonShader_;
 	shader.SetMat4("view", camera_.GenerateViewMatrix());
 	shader.SetMat4("projection", camera_.GenerateProjectionMatrix());
-	Mat4f model = Mat4f::Identity;
-	model = Transform3d::Rotate(model, degree_t(180.0f), Vec3f::up);
+	Mat4f model = Mat4f::identity();
+	model = Transform3d::Rotate(model, Degree(180.0f), Vec3f::up());
 	model = Transform3d::Scale(model, Vec3f(0.1f, 0.1f, 0.1f));
 	shader.SetMat4("model", model);
 	shader.SetMat4("normalMatrix", model.Inverse().Transpose());

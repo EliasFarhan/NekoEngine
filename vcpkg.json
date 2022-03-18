@@ -16,7 +16,6 @@
       "gtest",
       "benchmark",
       "protobuf",
-      "units",
       "sqlite3",
       "gli",
       "freetype",

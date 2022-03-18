@@ -52,13 +52,13 @@ public:
 
 private:
 	LightCasterType casterType_ = LightCasterType::DIRECTIONAL;
-	gl::Shader containerShaders_[(int)LightCasterType::LENGTH];
+	gl::Shader containerShaders_[static_cast<int>(LightCasterType::LENGTH)];
 	gl::Shader lampShader_;
 	gl::TextureName containerDiffuse_;
 	gl::TextureName containerSpecular_;
 	int specularPow_ = 32;
 
-	gl::RenderCuboid cube_{ Vec3f::zero, Vec3f::one };
+	gl::RenderCuboid cube_{ Vec3f::zero(), Vec3f::one() };
 
 	sdl::Camera3D camera_;
 	float time_ = 0.0f;
@@ -68,8 +68,8 @@ private:
 	float ambientStrength_ = 0.1f;
 	float diffuseStrength_ = 1.0f;
 	float specularStrength_ = 0.5f;
-	degree_t lightCutOffAngle_{ 10.0f };
-	degree_t lightOuterCutOffAngle_{15.0f};
+	Degree lightCutOffAngle_{ 10.0f };
+	Degree lightOuterCutOffAngle_{15.0f};
 
 	const static size_t cubeNumbers_ = 10;
 	Vec3f cubePositions_[cubeNumbers_] =

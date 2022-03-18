@@ -30,9 +30,9 @@ namespace neko::Transform3d
 Mat4f const TranslationMatrixFrom(const Vec3f translation);
 Mat4f const ScalingMatrixFrom(const Vec3f& scale);
 
-Mat4f const RotationMatrixFrom(const degree_t angle, const Vec3f axis);
+Mat4f const RotationMatrixFrom(const Degree angle, const Vec3f axis);
 
-Mat4f const RotationMatrixFrom(const radian_t angle, const Vec3f axis);
+Mat4f const RotationMatrixFrom(const Radian angle, const Vec3f axis);
 
 
 Mat4<float> const RotationMatrixFrom(const EulerAngles cardinalRotation);
@@ -45,9 +45,9 @@ Mat4f Translate(const Mat4f& transform, const Vec3f translation);
 
 Mat4f Scale(const Mat4f& transform, const Vec3f scale);
 
-Mat4f Rotate(const Mat4f& transform, const degree_t angle, const Vec3f axis);
+Mat4f Rotate(const Mat4f& transform, const Degree angle, const Vec3f axis);
 
-Mat4f Rotate(const Mat4f& transform, const radian_t angle, const Vec3f axis);
+Mat4f Rotate(const Mat4f& transform, const Radian angle, const Vec3f axis);
 
 
 Mat4f Rotate(const Mat4f& transform, const Quaternion& quaternion);
@@ -55,7 +55,7 @@ Mat4f Rotate(const Mat4f& transform, const Quaternion& quaternion);
 Mat4f Rotate(const Mat4f& transform, const EulerAngles eulerAngles);
 
 
-Mat4f Perspective(radian_t fovy, float aspect, float near, float far);
+Mat4f Perspective(Radian fovy, float aspect, float near, float far);
 Mat4f Orthographic(float left, float right, float bottom, float top, float nearPlane = 0.0f, float farPlane = 100.0f);
 
 }

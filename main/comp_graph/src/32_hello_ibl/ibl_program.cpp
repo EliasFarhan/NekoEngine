@@ -55,8 +55,8 @@ void HelloIblProgram::Init()
 	brdfShader_.LoadFromFile(
 		config.data_root() + "shaders/32_hello_ibl/brdf.vert",
 		config.data_root() + "shaders/32_hello_ibl/brdf.frag");
-	camera_.position = Vec3f::forward * 30.0f;
-	camera_.WorldLookAt(Vec3f::zero);
+	camera_.position = Vec3f::forward() * 30.0f;
+	camera_.WorldLookAt(Vec3f::zero());
 
 	lights_ = {
 		{
@@ -212,7 +212,7 @@ void HelloIblProgram::Render()
 			// on direct lighting.
 			pbrShader_.SetFloat("roughness", Clamp(static_cast<float>(col) / static_cast<float>(nrColumns - 1), 0.05f, 1.0f));
 
-			auto model = Mat4f::Identity;
+			auto model = Mat4f::identity();
 			model = Transform3d::Translate(model, Vec3f(
 				static_cast<float>(col - nrColumns / 2) * spacing_,
 				static_cast<float>(row - nrRows / 2) * spacing_,
@@ -270,9 +270,9 @@ void HelloIblProgram::GenerateCubemap()
 	glCheckError();
 
 	Camera3D captureCamera;
-	captureCamera.position = Vec3f::zero;
+	captureCamera.position = Vec3f::zero();
 	captureCamera.aspect = 1.0f;
-	captureCamera.fovY = degree_t(90.0f);
+	captureCamera.fovY = Degree(90.0f);
 	captureCamera.nearPlane = 0.1f;
 	captureCamera.farPlane = 10.0f;
 
@@ -326,9 +326,9 @@ void HelloIblProgram::GenerateDiffuseIrradiance()
     glCheckError();
 
 	Camera3D captureCamera;
-	captureCamera.position = Vec3f::zero;
+	captureCamera.position = Vec3f::zero();
 	captureCamera.aspect = 1.0f;
-	captureCamera.fovY = degree_t(90.0f);
+	captureCamera.fovY = Degree(90.0f);
 	captureCamera.nearPlane = 0.1f;
 	captureCamera.farPlane = 10.0f;
 
@@ -361,9 +361,9 @@ void HelloIblProgram::GeneratePrefilter()
 #endif
 	logDebug("Generate Prefilter Convolution Map");
 	Camera3D captureCamera;
-	captureCamera.position = Vec3f::zero;
+	captureCamera.position = Vec3f::zero();
 	captureCamera.aspect = 1.0f;
-	captureCamera.fovY = degree_t(90.0f);
+	captureCamera.fovY = Degree(90.0f);
 	captureCamera.nearPlane = 0.1f;
 	captureCamera.farPlane = 10.0f;
 

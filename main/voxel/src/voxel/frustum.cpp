@@ -119,7 +119,7 @@ bool Frustum::Contains(const Cube& cube, Vec3f chunkPos, RegionId regionId) cons
 bool Frustum::Contains(Vec3f chunkPos, RegionId regionId) const
 {
     constexpr float radius = Sqrt(3.0f * static_cast<float>(chunkSize / 2u * chunkSize / 2u));
-    const auto chunkHalfSize = Vec3f::one * static_cast<float>(chunkSize / 2u);
+    constexpr auto chunkHalfSize = Vec3f::one() * static_cast<float>(chunkSize / 2u);
     const auto center = chunkPos + chunkHalfSize;
     //Near
     {

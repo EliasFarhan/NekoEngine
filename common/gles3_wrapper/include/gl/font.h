@@ -73,7 +73,7 @@ protected:
         float scale;
         Color4 color;
     };
-    Vec2f CalculateTextPosition(Vec2f position, TextAnchor anchor);
+    Vec2f CalculateTextPosition(Vec2f position, TextAnchor anchor) const;
 
     const FilesystemInterface& filesystem_;
     std::vector<FontRenderingCommand> commands_;

@@ -46,7 +46,7 @@ private:
 		Vec3f color;
 	};
 	std::array<Light, 4> lights_;
-	gl::RenderSphere sphere_{ Vec3f::zero, 1.0f };
+	gl::RenderSphere sphere_{ Vec3f::zero(), 1.0f };
 	gl::Shader pbrShader_;
 	sdl::Camera3D camera_;
 	gl::TextureManager textureManager_;

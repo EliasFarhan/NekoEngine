@@ -66,7 +66,7 @@ private:
     unsigned int hdrRbo_ = 0;
 	//Shader applying tone mapping
     gl::Shader hdrShader_;
-    gl::RenderQuad hdrPlane_{Vec3f::zero, Vec2f::one*2.0f};
+    gl::RenderQuad hdrPlane_{Vec3f::zero(), Vec2f::one()*2.0f};
 
     std::array<Light, 4> lights_=std::array<Light,4>{{
             {Vec3f( 0.0f,  0.0f, 27.5f),Color3(200.0f, 200.0f, 200.0f)},
@@ -75,7 +75,7 @@ private:
             {Vec3f( 0.8f, -1.7f, 6.0f), Color3(0.0f, 0.1f, 0.0f)}
     }};
 
-    gl::RenderCuboid cube_{Vec3f::forward*10.0f, Vec3f(5.0f,5.0f,50.0f)};
+    gl::RenderCuboid cube_{Vec3f::forward()*10.0f, Vec3f(5.0f,5.0f,50.0f)};
 
     gl::TextureManager textureManager_;
     gl::TextureName cubeTexture_;

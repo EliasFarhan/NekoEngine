@@ -11,14 +11,14 @@ const long to = 1024;
 
 static void BM_Translate(benchmark::State& s)
 {
-    int arraySize = s.range(0);
+    const int arraySize = s.range(0);
     std::vector<Mat4f> transforms(arraySize);
     std::vector<Vec3f> translations(arraySize);
 
     for (int i = 0; i < arraySize; ++i)
     {
         translations[i] = Vec3f(rand(), rand(), rand());
-        transforms[i] = Mat4f::Identity;
+        transforms[i] = Mat4f::identity();
     }
 
     for (auto _ : s)
@@ -42,7 +42,7 @@ static void BM_Scale(benchmark::State& s)
     for (int i = 0; i < arraySize; ++i)
     {
         scales[i] = Vec3f(rand(), rand(), rand());
-        transforms[i] = Mat4f::Identity;
+        transforms[i] = Mat4f::identity();
     }
 
     for (auto _ : s)
@@ -62,13 +62,13 @@ static void BM_RotateAroundAxisDegrees(benchmark::State& s)
     int arraySize = s.range(0);
     std::vector<Mat4f> transforms(arraySize);
     std::vector<Vec3f> axes(arraySize);
-    std::vector<degree_t> angles(arraySize);
+    std::vector<Degree> angles(arraySize);
 
     for (int i = 0; i < arraySize; ++i)
     {
         axes[i] = Vec3f(rand(), rand(), rand());
-        transforms[i] = Mat4f::Identity;
-        angles[i] = degree_t(rand());
+        transforms[i] = Mat4f::identity();
+        angles[i] = Degree(rand());
     }
 
     for (auto _ : s)
@@ -87,13 +87,13 @@ static void BM_RotateAroundAxisRadians(benchmark::State& s)
     int arraySize = s.range(0);
     std::vector<Mat4f> transforms(arraySize);
     std::vector<Vec3f> axes(arraySize);
-    std::vector<radian_t> angles(arraySize);
+    std::vector<Radian> angles(arraySize);
 
     for (int i = 0; i < arraySize; ++i)
     {
         axes[i] = Vec3f(rand(), rand(), rand());
-        transforms[i] = Mat4f::Identity;
-        angles[i] = radian_t(rand());
+        transforms[i] = Mat4f::identity();
+        angles[i] = Radian(rand());
     }
 
     for (auto _ : s)
@@ -116,8 +116,8 @@ static void BM_RotateUsingCardinals(benchmark::State& s)
 
     for (int i = 0; i < arraySize; ++i)
     {
-        angles[i] = EulerAngles(degree_t(rand()), degree_t(rand()), degree_t(rand()));
-        transforms[i] = Mat4f::Identity;
+        angles[i] = EulerAngles(Degree(rand()), Degree(rand()), Degree(rand()));
+        transforms[i] = Mat4f::identity();
     }
 
     for (auto _ : s)
@@ -141,7 +141,7 @@ static void BM_RotateUsingQuaternion(benchmark::State& s)
     for (int i = 0; i < arraySize; ++i)
     {
         quaternions[i] = Quaternion(rand(), rand(), rand(), rand());
-        transforms[i] = Mat4f::Identity;
+        transforms[i] = Mat4f::identity();
     }
 
     for (auto _ : s)

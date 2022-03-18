@@ -55,7 +55,7 @@ void SdlWindow::Init()
     auto windowSize = Vec2i(config.window_size_x(), config.window_size_y());
     if (config.fullscreen())
     {
-        windowSize = Vec2i::zero;
+        windowSize = Vec2i::zero();
         flags_ |= SDL_WINDOW_FULLSCREEN_DESKTOP;
     }
     window_ = SDL_CreateWindow(

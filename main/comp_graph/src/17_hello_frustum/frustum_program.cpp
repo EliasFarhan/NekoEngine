@@ -50,9 +50,9 @@ void HelloFrustumProgram::Init()
     for (size_t i = 0; i < maxAsteroidNmb_; i++)
     {
         const float radius = RandomRange(20.0f, 300.0f);
-        const degree_t angle = degree_t(RandomRange(0.0f, 360.0f));
-        Vec3f position = Vec3f::forward;
-        position = Vec3f(Transform3d::RotationMatrixFrom(angle, Vec3f::up) * Vec4f(position));
+        const auto angle = Degree(RandomRange(0.0f, 360.0f));
+        Vec3f position = Vec3f::forward();
+        position = Vec3f(Transform3d::RotationMatrixFrom(angle, Vec3f::up()) * Vec4f(position));
         position *= radius;
         asteroidPositions_[i] = position;
     }
@@ -71,11 +71,11 @@ void HelloFrustumProgram::Init()
 
     camera_.position = Vec3f(0.0f, 600.0f, -500.0f);
     camera_.farPlane = 1'000.0f;
-    camera_.WorldLookAt(Vec3f::zero);
+    camera_.WorldLookAt(Vec3f::zero());
 
     overCamera_.position = Vec3f(0.0f, 600.0f, -500.0f);
     overCamera_.farPlane = 1'000.0f;
-    overCamera_.WorldLookAt(Vec3f::zero);
+    overCamera_.WorldLookAt(Vec3f::zero());
     overCamera_.SetAspect(1024,1024);
 	
     mainPlane_.Init();
@@ -279,7 +279,7 @@ void HelloFrustumProgram::CalculateForce(size_t begin, size_t end)
     const size_t endCount = std::min(end, asteroidNmb_);
     for (auto i = begin; i < endCount; i++)
     {
-        const auto deltaToCenter = Vec3f::zero - asteroidPositions_[i];
+        const auto deltaToCenter = Vec3f::zero() - asteroidPositions_[i];
         const auto r = deltaToCenter.Magnitude();
         const auto force = gravityConst * centerMass * asteroidMass / (r * r);
         asteroidForces_[i] = deltaToCenter / r * force;
@@ -294,7 +294,7 @@ void HelloFrustumProgram::CalculateVelocity(size_t begin, size_t end)
     const size_t endCount = std::min(end, asteroidNmb_);
     for (auto i = begin; i < endCount; i++)
     {
-        const auto deltaToCenter = Vec3f::zero - asteroidPositions_[i];
+        const auto deltaToCenter = Vec3f::zero() - asteroidPositions_[i];
         auto velDir = Vec3f(-deltaToCenter.z, 0.0f, deltaToCenter.x);
         velDir = velDir.Normalized();
 

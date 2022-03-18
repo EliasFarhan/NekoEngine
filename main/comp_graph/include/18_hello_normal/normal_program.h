@@ -64,15 +64,15 @@ private:
     gl::TextureId diffuseTexId_;
     gl::TextureName normalTex_ = gl::INVALID_TEXTURE_NAME;
     gl::TextureId normalTexId_;
-    gl::RenderQuad plane_{Vec3f::zero, Vec2f::one};
-    gl::RenderCuboid cube_{ Vec3f::zero, Vec3f::one };
-    gl::RenderSphere sphere_{ Vec3f::zero, 1.0f };
+    gl::RenderQuad plane_{Vec3f::zero(), Vec2f::one()};
+    gl::RenderCuboid cube_{ Vec3f::zero(), Vec3f::one() };
+    gl::RenderSphere sphere_{ Vec3f::zero(), 1.0f };
     gl::ModelManager modelManager_;
     gl::ModelId modelId_ = gl::INVALID_MODEL_ID;
 
 
     sdl::Camera3D camera_;
-    Vec3f lightPos_ = Vec3f::one * 3.0f;
+    Vec3f lightPos_ = Vec3f::one() * 3.0f;
     float dt_ = 0.0f;
     std::uint8_t flags_ = ENABLE_CUBE | ENABLE_NORMAL_MAP;
 };

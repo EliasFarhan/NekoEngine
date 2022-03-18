@@ -42,7 +42,7 @@ void HelloStencilProgam::Init()
 
 
 	camera_.position = Vec3f(0.0f, 4.0f, 4.0f);
-	camera_.WorldLookAt(Vec3f::zero);
+	camera_.WorldLookAt(Vec3f::zero());
 }
 
 void HelloStencilProgam::Update(seconds dt)
@@ -93,7 +93,7 @@ void HelloStencilProgam::Render()
 	const auto view = camera_.GenerateViewMatrix();
 	const auto projection = camera_.GenerateProjectionMatrix();
 
-	auto model = Mat4f::Identity;
+	auto model = Mat4f::identity();
 	model = Transform3d::Translate(model, Vec3f(0, 1, 0));
 	
 	
@@ -101,7 +101,7 @@ void HelloStencilProgam::Render()
 	cubeShader_.SetMat4("view", view);
 	cubeShader_.SetMat4("projection", projection);
 	cubeShader_.SetMat4("model", model);
-	cubeShader_.SetVec3("overrideColor", Vec3f::one);
+	cubeShader_.SetVec3("overrideColor", Vec3f::one());
 
 	cubeShader_.SetInt("ourTexture", 0);
 	glActiveTexture(GL_TEXTURE0);
@@ -126,10 +126,10 @@ void HelloStencilProgam::Render()
 	floorShader_.Bind();
 	floorShader_.SetMat4("view", view);
 	floorShader_.SetMat4("projection", projection);
-	model = Mat4f::Identity;
-	model = Transform3d::Rotate(model, degree_t(90.0f), Vec3f::right);
+	model = Mat4f::identity();
+	model = Transform3d::Rotate(model, Degree(90.0f), Vec3f::right());
 	floorShader_.SetMat4("model", model);
-	floorShader_.SetVec3("color", Vec3f::one * 0.1f);
+	floorShader_.SetVec3("color", Vec3f::one() * 0.1f);
 	plane_.Draw();
 	//Draw cube reflection
 	if(flags_ & USE_STENCIL)
@@ -142,11 +142,11 @@ void HelloStencilProgam::Render()
 		glDepthMask(GL_TRUE); // Write to depth buffer
 	}
 	cubeShader_.Bind();
-	model = Mat4f::Identity;
+	model = Mat4f::identity();
 	model = Transform3d::Scale(model, Vec3f(1, -1, 1));
 	model = Transform3d::Translate(model, Vec3f(0, -1, 0));
 	cubeShader_.SetMat4("model", model);
-	cubeShader_.SetVec3("overrideColor", Vec3f::one * 0.3f);
+	cubeShader_.SetVec3("overrideColor", Vec3f::one() * 0.3f);
 	cube_.Draw();
 	if(flags_ & USE_STENCIL)
 	{

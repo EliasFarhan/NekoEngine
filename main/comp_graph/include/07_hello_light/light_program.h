@@ -41,7 +41,7 @@ public:
 	void Render() override;
 	void OnEvent(const SDL_Event& event) override;
 private:
-	gl::RenderCuboid cube_{ Vec3f::zero, Vec3f::one };
+	gl::RenderCuboid cube_{ Vec3f::zero(), Vec3f::one() };
 	sdl::Camera3D camera_;
 
 	

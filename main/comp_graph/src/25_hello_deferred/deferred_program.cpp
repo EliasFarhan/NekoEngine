@@ -70,7 +70,7 @@ void HelloDeferredProgram::Init()
 
 
     camera_.position = Vec3f(0.0f, 3.0f, -3.0f);
-    camera_.WorldLookAt(Vec3f::zero);
+    camera_.WorldLookAt(Vec3f::zero());
 
 
     for(int x = -2; x < 3; x++)
@@ -273,23 +273,23 @@ void HelloDeferredProgram::RenderScene(const gl::Shader& shader)
         {
             shader.SetTexture("material.texture_diffuse1", container_, 0);
             shader.SetTexture("material.texture_specular1", containerSpecular_, 1);
-            auto model = Mat4f::Identity;
+            auto model = Mat4f::identity();
             model = Transform3d::Translate(model, Vec3f(2.0f*float(x), 0.0f, 2.0f*(float(z)+2.0f)));
             shader.SetMat4("model", model);
             shader.SetMat4("transposeInverseModel", model.Inverse().Transpose());
             cube_.Draw();
-            model = Mat4f::Identity;
-            model = Transform3d::Scale(model, Vec3f::one*0.2f);
+            model = Mat4f::identity();
+            model = Transform3d::Scale(model, Vec3f::one()*0.2f);
             model = Transform3d::Translate(model, Vec3f(2.0f*(float(x)+0.5f), 0.0f, 2.0f*(float(z)+2.5f)));
             shader.SetMat4("model", model);
             shader.SetMat4("transposeInverseModel", model.Inverse().Transpose());
             modelManager_.GetModel(modelId_)->Draw(shader);
         }
     }
-    auto model = Mat4f::Identity;
-    model = Transform3d::Rotate(model, Quaternion::AngleAxis(degree_t(-90.0f), Vec3f::right));
-    model = Transform3d::Scale(model, Vec3f::one * camera_.farPlane);
-    model = Transform3d::Translate(model, Vec3f::forward * camera_.farPlane / 2.0f);
+    auto model = Mat4f::identity();
+    model = Transform3d::Rotate(model, Quaternion::AngleAxis(Degree(-90.0f), Vec3f::right()));
+    model = Transform3d::Scale(model, Vec3f::one() * camera_.farPlane);
+    model = Transform3d::Translate(model, Vec3f::forward() * camera_.farPlane / 2.0f);
     shader.SetTexture("material.texture_diffuse1", whiteTexture_, 0);
     shader.SetTexture("material.texture_specular1", whiteTexture_, 1);
     shader.SetMat4("model", model);

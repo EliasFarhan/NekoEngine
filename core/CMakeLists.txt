@@ -50,7 +50,6 @@ target_compile_options(Neko_Core PRIVATE $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_C
 if(MSVC)
     target_compile_definitions(Neko_Core PUBLIC WIN32_LEAN_AND_MEAN NOMINMAX)
 endif()
-target_compile_definitions(Neko_Core PUBLIC UNIT_LIB_DISABLE_IOSTREAM DISABLE_PREDEFINED_UNITS ENABLE_PREDEFINED_ANGLE_UNITS UNIT_LIB_DEFAULT_TYPE=float)
 target_compile_definitions(Neko_Core PUBLIC $<$<CONFIG:Debug>:__neko_dbg__>)
 target_compile_definitions(Neko_Core PUBLIC $<$<CONFIG:RelWithDebInfo>:__neko_dbg__>)
 target_compile_definitions(Neko_Core PUBLIC SOURCE_PATH="${CMAKE_SOURCE_DIR}")

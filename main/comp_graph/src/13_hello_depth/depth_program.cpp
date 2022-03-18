@@ -65,7 +65,7 @@ void HelloDepthProgram::Init()
     depthOnlyShader_.LoadFromFile(config.data_root() + "shaders/13_hello_depth/screen.vert",
                                   config.data_root() + "shaders/13_hello_depth/screen_depth.frag");
 	camera_.position = Vec3f(0, 4, 4);
-	camera_.WorldLookAt(Vec3f::zero);
+	camera_.WorldLookAt(Vec3f::zero());
 }
 
 void HelloDepthProgram::Update(seconds dt)
@@ -149,7 +149,7 @@ void HelloDepthProgram::OnEvent(const SDL_Event& event)
 
 void HelloDepthProgram::DrawScene()
 {
-	auto model = Mat4f::Identity;
+	auto model = Mat4f::identity();
 	model = Transform3d::Translate(model, Vec3f(0, 0.5f, 0));
 
 	sceneShader_.Bind();
@@ -160,8 +160,8 @@ void HelloDepthProgram::DrawScene()
 	sceneShader_.SetVec3("color", Vec3f(0.5f, 0.0f, 0.5f));
 	cube_.Draw();
 
-	model = Mat4f::Identity;
-	model = Transform3d::Rotate(model, degree_t(90), Vec3f::right);
+	model = Mat4f::identity();
+	model = Transform3d::Rotate(model, Degree(90), Vec3f::right());
 	model = Transform3d::Scale(model, Vec3f(5.0f, 5.0f, 5.0f));
 	sceneShader_.SetMat4("model", model);
 	sceneShader_.SetVec3("color", Vec3f(0.3f, 0.0f, 0.3f));

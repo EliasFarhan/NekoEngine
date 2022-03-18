@@ -42,8 +42,8 @@ namespace neko
 		void Render() override;
 		void OnEvent(const SDL_Event& event) override;
 	private:
-		gl::RenderQuad plane_{Vec3f::zero, Vec2f::one};
-		gl::RenderCuboid cube_{ Vec3f::zero, Vec3f::one };
+		gl::RenderQuad plane_{Vec3f::zero(), Vec2f::one()};
+		gl::RenderCuboid cube_{ Vec3f::zero(), Vec3f::one() };
 		gl::Shader cutoffShader_;
 		gl::TextureManager textureManager_;
 		gl::TextureName grassTexture_ = gl::INVALID_TEXTURE_NAME;

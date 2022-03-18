@@ -48,7 +48,7 @@ private:
 	gl::ModelManager modelManager_;
 	gl::ModelId modelId_ = gl::INVALID_MODEL_ID;
 
-	gl::RenderQuad floor_{Vec3f::zero, Vec2f::one*10.0f};
+	gl::RenderQuad floor_{Vec3f::zero(), Vec2f::one()*10.0f};
 	gl::TextureManager textureManager_;
     gl::TextureName floorTexture_ = gl::INVALID_TEXTURE_NAME;
     gl::TextureId floorTextureId_;

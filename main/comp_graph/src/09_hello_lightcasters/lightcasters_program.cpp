@@ -33,9 +33,9 @@ void HelloLightCastersProgram::Init()
 	for (auto& cubeAngle : cubeAngles_)
 	{
 		cubeAngle = EulerAngles(
-			degree_t(RandomRange(0.0f, 180.0f)),
-			degree_t(RandomRange(0.0f, 180.0f)),
-			degree_t(RandomRange(0.0f, 180.0f))
+			Degree(RandomRange(0.0f, 180.0f)),
+			Degree(RandomRange(0.0f, 180.0f)),
+			Degree(RandomRange(0.0f, 180.0f))
 		);
 	}
 
@@ -73,9 +73,9 @@ void HelloLightCastersProgram::Update(seconds dt)
 	std::lock_guard<std::mutex> lock(updateMutex_);
 	time_ += dt.count();
 	lightPointPos_ = Vec3f(
-		Cos(radian_t(time_)),
+		Cos(Radian(time_)),
 		0.0f,
-		Sin(radian_t(time_))) * lightDist_;
+		Sin(Radian(time_))) * lightDist_;
 	const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
 	camera_.SetAspect(windowSize.x, windowSize.y);;
 	camera_.Update(dt);
@@ -116,24 +116,24 @@ void HelloLightCastersProgram::DrawImGui()
 	case LightCasterType::POINT: break;
 	case LightCasterType::FLASH:
 	{
-		float angle = lightCutOffAngle_.value();
+		float angle = lightCutOffAngle_.GetValue();
 		if(ImGui::InputFloat("Light CutOff", &angle))
 		{
-			lightCutOffAngle_ = degree_t(angle);
+			lightCutOffAngle_ = Degree(angle);
 		}
 		break;
 	}
 	case LightCasterType::SPOT:
 	{
-		float angle = lightCutOffAngle_.value();
+		float angle = lightCutOffAngle_.GetValue();
 		if (ImGui::InputFloat("Light CutOff", &angle))
 		{
-			lightCutOffAngle_ = degree_t(angle);
+			lightCutOffAngle_ = Degree(angle);
 		}
-		angle = lightOuterCutOffAngle_.value();
+		angle = lightOuterCutOffAngle_.GetValue();
 		if (ImGui::InputFloat("Light Outer CutOff", &angle))
 		{
-			lightOuterCutOffAngle_ = degree_t(angle);
+			lightOuterCutOffAngle_ = Degree(angle);
 		}
 		break;
 	}
@@ -166,7 +166,7 @@ void HelloLightCastersProgram::Render()
 	if (casterType_ == LightCasterType::POINT)
 	{
 		lampShader_.Bind();
-		Mat4f model = Mat4f::Identity;
+		Mat4f model = Mat4f::identity();
 		model = Transform3d::Scale(model, Vec3f(0.2f, 0.2f, 0.2f));
 		model = Transform3d::Translate(model, lightPointPos_);
 		lampShader_.SetMat4("model", model);
@@ -201,7 +201,7 @@ void HelloLightCastersProgram::Render()
 	case LightCasterType::FLASH: {
 		containerShader.SetVec3("light.color", Vec3f(1, 1, 1));
 		containerShader.SetVec3("light.position", camera_.position);
-		containerShader.SetVec3("light.direction", Vec3f::zero - camera_.reverseDir);
+		containerShader.SetVec3("light.direction", Vec3f::zero() - camera_.reverseDir);
 		containerShader.SetFloat("light.cutOff", Cos(lightCutOffAngle_));
 		break;
 	}
@@ -209,7 +209,7 @@ void HelloLightCastersProgram::Render()
 	{
 		containerShader.SetVec3("light.color", Vec3f(1, 1, 1));
 		containerShader.SetVec3("light.position", camera_.position);
-		containerShader.SetVec3("light.direction", Vec3f::zero - camera_.reverseDir);
+		containerShader.SetVec3("light.direction", Vec3f::zero() - camera_.reverseDir);
 		containerShader.SetFloat("light.cutOff", Cos(lightCutOffAngle_));
 		containerShader.SetFloat("light.outerCutOff", Cos(lightOuterCutOffAngle_));
 		break;
@@ -234,10 +234,10 @@ void HelloLightCastersProgram::Render()
 	for (size_t i = 0; i < cubeNumbers_; i++)
 	{
 
-		Mat4f model = Mat4f::Identity;
-		model = Transform3d::Rotate(model, cubeAngles_[i].x, Vec3f::left);
-		model = Transform3d::Rotate(model, cubeAngles_[i].y, Vec3f::up);
-		model = Transform3d::Rotate(model, cubeAngles_[i].z, Vec3f::forward);
+		Mat4f model = Mat4f::identity();
+		model = Transform3d::Rotate(model, cubeAngles_[i].x, Vec3f::left());
+		model = Transform3d::Rotate(model, cubeAngles_[i].y, Vec3f::up());
+		model = Transform3d::Rotate(model, cubeAngles_[i].z, Vec3f::forward());
 		model = Transform3d::Translate(model, cubePositions_[i]);
 		containerShader.SetMat4("model", model);
 

@@ -43,6 +43,6 @@ private:
     gl::ModelId modelId_ = gl::INVALID_MODEL_ID;
     gl::ModelManager modelManager_;
 	gl::Shader shader_;
-	Mat4f projection_{ Mat4f::Identity };
+	Mat4f projection_{ Mat4f::identity() };
 };
 }

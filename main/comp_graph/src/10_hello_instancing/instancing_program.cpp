@@ -49,9 +49,9 @@ void HelloInstancingProgram::Init()
     for (size_t i = 0; i < maxAsteroidNmb_; i++)
     {
         const float radius = RandomRange(100.0f, 300.0f);
-        const degree_t angle = degree_t(RandomRange(0.0f, 360.0f));
-        Vec3f position = Vec3f::forward;
-        position = Vec3f(Transform3d::RotationMatrixFrom(angle, Vec3f::up) * Vec4f(position));
+        const auto angle = Degree(RandomRange(0.0f, 360.0f));
+        Vec3f position = Vec3f::forward();
+        position = Vec3f(Transform3d::RotationMatrixFrom(angle, Vec3f::up()) * Vec4f(position));
         position *= radius;
         asteroidPositions_[i] = position;
     }
@@ -280,7 +280,7 @@ void HelloInstancingProgram::CalculateForce(size_t begin, size_t end)
     const size_t endCount = std::min(end, asteroidNmb_);
     for (auto i = begin; i < endCount; i++)
     {
-        const auto deltaToCenter = Vec3f::zero - asteroidPositions_[i];
+        const auto deltaToCenter = Vec3f::zero() - asteroidPositions_[i];
         const auto r = deltaToCenter.Magnitude();
         const auto force = gravityConst * centerMass * asteroidMass / (r * r);
         asteroidForces_[i] = deltaToCenter / r * force;
@@ -295,7 +295,7 @@ void HelloInstancingProgram::CalculateVelocity(size_t begin, size_t end)
     const size_t endCount = std::min(end, asteroidNmb_);
     for (auto i = begin; i < endCount; i++)
     {
-        const auto deltaToCenter = Vec3f::zero - asteroidPositions_[i];
+        const auto deltaToCenter = Vec3f::zero() - asteroidPositions_[i];
         auto velDir = Vec3f(-deltaToCenter.z, 0.0f, deltaToCenter.x);
         velDir = velDir.Normalized();
 

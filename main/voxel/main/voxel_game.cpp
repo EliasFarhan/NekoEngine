@@ -65,11 +65,11 @@ public:
         const auto& config = engine->GetConfig();
         const auto windowSize = engine->GetWindowSize();
         camera3D_.position = Vec3f(0, voxelManager_.GetInitialHeight() + 2.0f, 0);
-        camera3D_.WorldLookAt(camera3D_.position + Vec3f::forward + Vec3f::right);
+        camera3D_.WorldLookAt(camera3D_.position + Vec3f::forward() + Vec3f::right());
         camera3D_.farPlane = 5000.0f;
         camera3D_.cameraSpeed_ = 10.0f;
         camera3D_.cameraFast_ = 100.0f;
-        camera3D_.fovY = degree_t(45.0f / 2.0f);
+        camera3D_.fovY = Degree(45.0f / 2.0f);
         camera3D_.SetAspect(windowSize.x, windowSize.y);
 
         renderInit->Join();

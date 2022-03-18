@@ -71,8 +71,8 @@ private:
 	gl::Shader ssaoLightingShader_;
 	gl::Shader ssaoShader_;
 	gl::Shader ssaoBlurShader_;
-	gl::RenderQuad screenPlane_{ Vec3f::zero, Vec2f::one * 2.0f };
-	gl::RenderQuad plane_{Vec3f::zero, Vec2f::one};
+	gl::RenderQuad screenPlane_{ Vec3f::zero(), Vec2f::one() * 2.0f };
+	gl::RenderQuad plane_{Vec3f::zero(), Vec2f::one()};
 	gl::ModelManager modelManager_;
 	gl::ModelId modelId_ = gl::INVALID_MODEL_ID;
 

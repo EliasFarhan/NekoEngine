@@ -119,8 +119,8 @@ private:
 	};
 	EboProgram eboProgram_;
 
-	gl::RenderQuad quad_{ Vec3f::zero, Vec2f::one };
-	gl::RenderCircle circle_{ Vec3f::zero, 0.5f };
+	gl::RenderQuad quad_{ Vec3f::zero(), Vec2f::one() };
+	gl::RenderCircle circle_{ Vec3f::zero(), 0.5f };
 	seconds timeSinceInit_ = seconds(0.0f);
 	gl::Shader shader_;
 	gl::Shader nekoShader_;

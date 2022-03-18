@@ -31,7 +31,7 @@ namespace neko
 
 
 HelloFramebufferProgram::HelloFramebufferProgram() :
-    screenFrame_(gl::RenderQuad(Vec3f::zero, Vec2f(2.0f,2.0f)))
+    screenFrame_(gl::RenderQuad(Vec3f::zero(), Vec2f(2.0f,2.0f)))
 {
 
 }
@@ -90,7 +90,7 @@ void HelloFramebufferProgram::Init()
     modelShader_.LoadFromFile(config.data_root() + "shaders/11_hello_framebuffer/model.vert",
                               config.data_root() + "shaders/11_hello_framebuffer/model.frag");
     camera_.position = Vec3f(0.0f,-5.0f,-5.0f);
-    camera_.WorldLookAt(Vec3f::zero);
+    camera_.WorldLookAt(Vec3f::zero());
 }
 
 void HelloFramebufferProgram::Update(seconds dt)
@@ -190,7 +190,7 @@ void HelloFramebufferProgram::Render()
     glEnable(GL_DEPTH_TEST);
     //Draw scene
     modelShader_.Bind();
-    modelShader_.SetMat4("model", Mat4f::Identity);
+    modelShader_.SetMat4("model", Mat4f::identity());
     modelShader_.SetMat4("view", camera_.GenerateViewMatrix());
     modelShader_.SetMat4("projection", camera_.GenerateProjectionMatrix());
 

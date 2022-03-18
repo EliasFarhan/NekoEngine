@@ -60,7 +60,7 @@ public:
 private:
     sdl::Camera3D camera_;
 
-    gl::RenderCuboid cube_{Vec3f::zero, Vec3f::one};
+    gl::RenderCuboid cube_{Vec3f::zero(), Vec3f::one()};
     gl::Shader modelShader_;
     gl::TextureManager textureManager_;
     gl::TextureName containerTexture_ = gl::INVALID_TEXTURE_NAME;

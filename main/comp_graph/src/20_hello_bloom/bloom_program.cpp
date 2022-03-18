@@ -54,8 +54,8 @@ void HelloBloomProgram::Init()
 
     screenPlane_.Init();
 
-    camera_.position = Vec3f::forward*5.0f;
-    camera_.WorldLookAt(Vec3f::zero);
+    camera_.position = Vec3f::forward()*5.0f;
+    camera_.WorldLookAt(Vec3f::zero());
     
     CreateFramebuffer();
 }
@@ -139,7 +139,7 @@ void HelloBloomProgram::Render()
     cubeShader_.SetVec3("viewPos", camera_.position);
 	for(const auto& transform : cubeTransforms_)
 	{
-        auto model = Mat4f::Identity;
+        auto model = Mat4f::identity();
         model = Transform3d::Translate(model, transform.position);
         model = Transform3d::Rotate(model, transform.angle, transform.axis);
         model = Transform3d::Scale(model, transform.scale);
@@ -153,7 +153,7 @@ void HelloBloomProgram::Render()
     lightShader_.SetMat4("projection", projection);
 	for(const auto& light : lights_)
 	{
-        auto model = Mat4f::Identity;
+        auto model = Mat4f::identity();
         model = Transform3d::Translate(model, light.position_);
         model = Transform3d::Scale(model, Vec3f(0.25f));
         lightShader_.SetMat4("model", model);

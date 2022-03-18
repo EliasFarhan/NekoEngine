@@ -71,13 +71,13 @@ void HelloPointShadowProgram::Init()
 	glCheckFramebuffer();
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	camera3D_.position = Vec3f::one * 3.0f;
-	camera3D_.WorldLookAt(Vec3f::zero);
+	camera3D_.position = Vec3f::one() * 3.0f;
+	camera3D_.WorldLookAt(Vec3f::zero());
 
-	lightCamera_.position = Vec3f::zero;
+	lightCamera_.position = Vec3f::zero();
 	lightCamera_.farPlane = 50.0f;
 	lightCamera_.nearPlane = 0.1f;
-	lightCamera_.fovY = degree_t(90.0f);
+	lightCamera_.fovY = Degree(90.0f);
 	lightCamera_.aspect = 1.0f;
 
 }
@@ -89,7 +89,7 @@ void HelloPointShadowProgram::Update(seconds dt)
 	camera3D_.SetAspect(windowSize.x, windowSize.y);
 	camera3D_.Update(dt);
 	dt_ += dt.count();
-	lightCamera_.position = 4.0f * Vec3f(Sin(radian_t(dt_)), 0.0f, Sin(radian_t(dt_)));
+	lightCamera_.position = 4.0f * Vec3f(Sin(Radian(dt_)), 0.0f, Sin(Radian(dt_)));
 	textureManager_.Update(dt);
 }
 
@@ -123,23 +123,23 @@ void HelloPointShadowProgram::Render()
 	std::lock_guard<std::mutex> lock(updateMutex_);
 	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFbo_);
 
-	const Vec3f lightDirs[6] =
+	constexpr Vec3f lightDirs[6] =
 	{
-		Vec3f::right,
-		Vec3f::left,
-		Vec3f::up,
-		Vec3f::down,
-		Vec3f::forward,
-		Vec3f::back
+		Vec3f::right(),
+		Vec3f::left(),
+		Vec3f::up(),
+		Vec3f::down(),
+		Vec3f::forward(),
+		Vec3f::back()
 	};
-	const Vec3f lightUps[6] =
+	constexpr Vec3f lightUps[6] =
 	{
-		Vec3f::up,
-		Vec3f::up,
-		Vec3f::back,
-		Vec3f::forward,
-		Vec3f::up,
-		Vec3f::up
+		Vec3f::up(),
+		Vec3f::up(),
+		Vec3f::back(),
+		Vec3f::forward(),
+		Vec3f::up(),
+		Vec3f::up()
 	};
 	simpleDepthShader_.Bind();
 	simpleDepthShader_.SetVec3("lightPos", lightCamera_.position);
@@ -179,12 +179,12 @@ void HelloPointShadowProgram::Render()
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 	//Render the white light cube
 	lightCubeShader_.Bind();
-	lightCubeShader_.SetVec3("lightColor", Vec3f::one);
+	lightCubeShader_.SetVec3("lightColor", Vec3f::one());
 	lightCubeShader_.SetMat4("view", view);
 	lightCubeShader_.SetMat4("projection", projection);
-	auto model = Mat4f::Identity;
+	auto model = Mat4f::identity();
 	model = Transform3d::Translate(model, lightCamera_.position);
-	model = Transform3d::Scale(model, Vec3f::one * 0.2f);
+	model = Transform3d::Scale(model, Vec3f::one() * 0.2f);
 	lightCubeShader_.SetMat4("model", model);
 	cube_.Draw();
 }
@@ -196,12 +196,12 @@ void HelloPointShadowProgram::OnEvent(const SDL_Event& event)
 
 void HelloPointShadowProgram::RenderScene(const gl::Shader& shader)
 {
-	auto model = Mat4f::Identity;
+	auto model = Mat4f::identity();
 	shader.SetBool("inverseNormals", false);
 
 	for (const auto& transform : transforms_)
 	{
-		model = Mat4f::Identity;
+		model = Mat4f::identity();
 		model = Transform3d::Translate(model, transform.position);
 		model = Transform3d::Rotate(model, transform.angle, transform.axis);
 		model = Transform3d::Scale(model, transform.scale);
@@ -211,8 +211,8 @@ void HelloPointShadowProgram::RenderScene(const gl::Shader& shader)
 	}
 
 	//Render bigger cube
-	model = Mat4f::Identity;
-	model = Transform3d::Scale(model, Vec3f::one * 10.0f);
+	model = Mat4f::identity();
+	model = Transform3d::Scale(model, Vec3f::one() * 10.0f);
 	shader.SetMat4("model", model);
 	shader.SetMat4("transposeInverseModel", model.Inverse().Transpose());
 	shader.SetBool("inverseNormals", true);

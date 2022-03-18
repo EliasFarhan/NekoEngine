@@ -94,7 +94,7 @@ void SpriteManager::Render()
         {
             if (!entityManager_.get().HasComponent(entity, EntityMask(ComponentType::TRANSFORM2D)))
             {
-                spriteShader_.SetMat4("model", Mat4f::Identity);
+                spriteShader_.SetMat4("model", Mat4f::identity());
             }
             else
             {

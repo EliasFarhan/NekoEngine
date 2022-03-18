@@ -50,9 +50,9 @@ void HelloLightMapsProgram::Update(seconds dt)
 	std::lock_guard<std::mutex> lock(updateMutex_);
 	time_ += dt.count();
 	lightPos_ = Vec3f(
-		Cos(radian_t(time_)),
+		Cos(Radian(time_)),
 		0.0f,
-		Sin(radian_t(time_))) * lightDist_;
+		Sin(Radian(time_))) * lightDist_;
 	const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
 	camera_.SetAspect(windowSize.x, windowSize.y);;
 	camera_.Update(dt);
@@ -84,7 +84,7 @@ void HelloLightMapsProgram::Render()
 	const Mat4f projection = camera_.GenerateProjectionMatrix();
 	//Render lamp
 	lampShader_.Bind();
-	Mat4f model = Mat4f::Identity;
+	Mat4f model = Mat4f::identity();
 	model = Transform3d::Scale(model, Vec3f(0.2f, 0.2f, 0.2f));
 	model = Transform3d::Translate(model, lightPos_);
 	lampShader_.SetMat4("model", model);
@@ -95,7 +95,7 @@ void HelloLightMapsProgram::Render()
 	cube_.Draw();
 	//Render container cube
 	containerShader_.Bind();
-	model = Mat4f::Identity;
+	model = Mat4f::identity();
 	containerShader_.SetMat4("model", model);
 	containerShader_.SetMat4("view", view);
 	containerShader_.SetMat4("projection", projection);

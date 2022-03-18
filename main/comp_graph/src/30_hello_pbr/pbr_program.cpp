@@ -35,8 +35,8 @@ void HelloPbrProgram::Init()
 	pbrShader_.LoadFromFile(
 		config.data_root() + "shaders/30_hello_pbr/pbr.vert",
 		config.data_root() + "shaders/30_hello_pbr/pbr.frag");
-	camera_.position = Vec3f::forward * 30.0f;
-	camera_.WorldLookAt(Vec3f::zero);
+	camera_.position = Vec3f::forward() * 30.0f;
+	camera_.WorldLookAt(Vec3f::zero());
 
 	lights_ = {
 		{
@@ -98,7 +98,7 @@ void HelloPbrProgram::Render()
 			// on direct lighting.
 			pbrShader_.SetFloat("roughness", Clamp(static_cast<float>(col) / static_cast<float>(nrColumns-1), 0.05f, 1.0f));
 
-			auto model = Mat4f::Identity;
+			auto model = Mat4f::identity();
 			model = Transform3d::Translate(model, Vec3f(
 				static_cast<float>(col - nrColumns / 2) * spacing_,
 				static_cast<float>(row - nrRows / 2) * spacing_,

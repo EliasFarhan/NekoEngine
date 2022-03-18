@@ -84,12 +84,12 @@ void HelloTransformProgram::Destroy()
 void HelloTransformProgram::Update(seconds dt)
 {
     std::lock_guard<std::mutex> lock(updateMutex_);
-    transform_ = Mat4f::Identity;
+    transform_ = Mat4f::identity();
     transform_ = Transform3d::Scale(transform_, scale_);
     switch(shape_)
     {
         case ShapeType::PLANE:
-            transform_ = Transform3d::Rotate(transform_, degree_t(angle_), Vec3f(0.0f, 0.0f, 1.0f));
+            transform_ = Transform3d::Rotate(transform_, Degree(angle_), Vec3f(0.0f, 0.0f, 1.0f));
             break;
         case ShapeType::CUBE:
             transform_ = Transform3d::Rotate(transform_, eulerAngle_);
@@ -120,10 +120,10 @@ void HelloTransformProgram::DrawImGui()
     switch (shape_)
     {
         case ShapeType::PLANE:
-            ImGui::InputFloat("Rotation", (float*) &angle_);
+            ImGui::InputFloat("Rotation", reinterpret_cast<float*>(&angle_));
             break;
         case ShapeType::CUBE:
-            ImGui::InputFloat3("Euler Angles", (float*) &eulerAngle_[0]);
+            ImGui::InputFloat3("Euler Angles", reinterpret_cast<float*>(&eulerAngle_[0]));
             break;
         default:
             break;

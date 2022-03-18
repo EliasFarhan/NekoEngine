@@ -112,7 +112,7 @@ namespace neko
 		};
 		for (const auto& position : vegetationPositions)
 		{
-			auto model = Mat4f::Identity;
+			auto model = Mat4f::identity();
 			model = Transform3d::Scale(model, Vec3f(1, -1, 1));
 			model = Transform3d::Translate(model, position);
 			
@@ -122,12 +122,12 @@ namespace neko
 		//Draw cube
 		cutoffShader_.SetTexture("texture1", cubeTexture_, 0);
 
-		auto model = Mat4f::Identity;
+		auto model = Mat4f::identity();
 		model = Transform3d::Translate(model, Vec3f(-1.0f, 0.0f, -1.0f));
 		cutoffShader_.SetMat4("model", model);
 
 		cube_.Draw();
-		model = Mat4f::Identity;
+		model = Mat4f::identity();
 		model = Transform3d::Translate(model, Vec3f(2.0f, 0.0f, 0.0f));
 		cutoffShader_.SetMat4("model", model);
 		cube_.Draw();
@@ -135,10 +135,10 @@ namespace neko
 		//Draw floor
 
 		cutoffShader_.SetTexture("texture1", whiteTexture_, 0);
-		model = Mat4f::Identity;
-		model = Transform3d::Rotate(model, Quaternion::AngleAxis(degree_t(-90.0f), Vec3f::right));
-		model = Transform3d::Scale(model, Vec3f::one*5.0f);
-		model = Transform3d::Translate(model, Vec3f::down*0.5f);
+		model = Mat4f::identity();
+		model = Transform3d::Rotate(model, Quaternion::AngleAxis(Degree(-90.0f), Vec3f::right()));
+		model = Transform3d::Scale(model, Vec3f::one()*5.0f);
+		model = Transform3d::Translate(model, Vec3f::down()*0.5f);
 		cutoffShader_.SetMat4("model", model);
 		plane_.Draw();
 		

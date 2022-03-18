@@ -54,7 +54,7 @@ void HelloModelProgram::Update(seconds dt)
     const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
 
     projection_ = Transform3d::Perspective(
-        degree_t(45.0f),
+        Degree(45.0f),
         static_cast<float>(windowSize.x) / windowSize.y,
         0.1f,
         100.0f);
@@ -86,8 +86,8 @@ void HelloModelProgram::Render()
     shader_.Bind();
     shader_.SetMat4("view", camera_.GenerateViewMatrix());
     shader_.SetMat4("projection", projection_);
-    Mat4f model = Mat4f::Identity;
-    model = Transform3d::Rotate(model, degree_t(180.0f), Vec3f::up);
+    Mat4f model = Mat4f::identity();
+    model = Transform3d::Rotate(model, Degree(180.0f), Vec3f::up());
     model = Transform3d::Scale(model, Vec3f(0.1f, 0.1f, 0.1f));
     shader_.SetMat4("model", model);
     shader_.SetMat4("normalMatrix", model.Inverse().Transpose());

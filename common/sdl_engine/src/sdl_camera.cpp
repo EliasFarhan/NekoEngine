@@ -57,7 +57,7 @@ namespace neko::sdl
 	void Camera3D::Init()
 	{
 		position = cameraOriginPos;
-		WorldLookAt(Vec3f::zero);
+		WorldLookAt(Vec3f::zero());
 	}
 
 	void Camera3D::Update(seconds dt)
@@ -119,11 +119,11 @@ namespace neko::sdl
 			auto rotate = Vec2f(rightX, rightY) / std::numeric_limits<short>::max();
 			if (rotate.SquareMagnitude() > 0.1f)
 			{ 
-				rotate = rotate * cameraRotationSpeed_.value() * dt.count();
+				rotate = rotate * cameraRotationSpeed_.GetValue() * dt.count();
 				Rotate(EulerAngles(
-					degree_t(rotate.y),
-					-degree_t(rotate.x),
-					degree_t(0.0f)
+					Degree(rotate.y),
+					-Degree(rotate.x),
+					Degree(0.0f)
 				)) ;
 			}
 			SDL_GameControllerClose(controller);
@@ -139,13 +139,13 @@ namespace neko::sdl
 			cameraMovement_ & ~MOUSE_MOVE;
 		if (cameraMovement_ & MOUSE_MOVE && mouseMotion_.SquareMagnitude() > 0.001f)
 		{
-			const auto rotate = Vec2f(mouseMotion_.x, mouseMotion_.y)  * cameraRotationSpeed_.value() * dt.count();
+			const auto rotate = Vec2f(mouseMotion_.x, mouseMotion_.y)  * cameraRotationSpeed_.GetValue() * dt.count();
 			Rotate(EulerAngles(
-				degree_t(rotate.y),
-				degree_t(rotate.x),
-				degree_t(0.0f)
+				Degree(rotate.y),
+				Degree(rotate.x),
+				Degree(0.0f)
 			));
-			mouseMotion_ = Vec2f::zero;
+			mouseMotion_ = Vec2f::zero();
 		}
 	}
 

@@ -49,7 +49,7 @@ void HelloNormalProgram::Init()
     modelId_ = modelManager_.LoadModel(config.data_root() + "model/nanosuit2/nanosuit.obj");
     sphere_.Init();
     camera_.position = Vec3f(-3.0f, 3.0f, 3.0f);
-    camera_.WorldLookAt(Vec3f::zero);
+    camera_.WorldLookAt(Vec3f::zero());
 }
 
 void HelloNormalProgram::Update(seconds dt)
@@ -57,7 +57,7 @@ void HelloNormalProgram::Update(seconds dt)
     std::lock_guard<std::mutex> lock(updateMutex_);
     const auto windowSize = BasicEngine::GetInstance()->GetWindowSize();
     dt_ += dt.count();
-    lightPos_ = Vec3f(Cos(radian_t(dt_)), 1.0f, Sin(radian_t(dt_))) * 3.0f;
+    lightPos_ = Vec3f(Cos(Radian(dt_)), 1.0f, Sin(Radian(dt_))) * 3.0f;
     camera_.SetAspect(windowSize.x, windowSize.y);
     camera_.Update(dt);
     textureManager_.Update(dt);
@@ -124,14 +124,14 @@ void HelloNormalProgram::Render()
 
     const std::function<void(NormalFlags)> draw = [this](NormalFlags flag)
     {
-        auto model = Mat4f::Identity;
+        auto model = Mat4f::identity();
         if (flag == ENABLE_MODEL)
         {
-            model = Transform3d::Scale(model, Vec3f::one * 0.1f);
+            model = Transform3d::Scale(model, Vec3f::one() * 0.1f);
         }
         else
         {
-            model = Transform3d::Scale(model, Vec3f::one * 3.0f);
+            model = Transform3d::Scale(model, Vec3f::one() * 3.0f);
         }
         const auto transposeInverseModel = model.Inverse().Transpose();
         if (flags_ & ENABLE_NORMAL_MAP)

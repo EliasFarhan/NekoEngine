@@ -250,18 +250,18 @@ void FontManager::DestroyFont(FontId font)
     fonts_.erase(font);
 }
 
-Vec2f FontManager::CalculateTextPosition(Vec2f position, TextAnchor anchor)
+Vec2f FontManager::CalculateTextPosition(Vec2f position, TextAnchor anchor) const
 {
     switch (anchor)
     {
         case TextAnchor::TOP_LEFT:
-            return position + windowSize_ * Vec2f::up;
+            return position + windowSize_ * Vec2f::up();
         case TextAnchor::TOP:
             return position + windowSize_ * Vec2f(0.5f, 1.0f);
         case TextAnchor::TOP_RIGHT:
             return position + windowSize_;
         case TextAnchor::CENTER_LEFT:
-            return position + windowSize_ * (Vec2f::up/2.0f);
+            return position + windowSize_ * (Vec2f::up()/2.0f);
         case TextAnchor::CENTER:
             return position + windowSize_ /2.0f;
         case TextAnchor::CENTER_RIGHT:
@@ -269,9 +269,9 @@ Vec2f FontManager::CalculateTextPosition(Vec2f position, TextAnchor anchor)
         case TextAnchor::BOTTOM_LEFT:
             return position;
         case TextAnchor::BOTTOM:
-            return position + windowSize_ * (Vec2f::right/2.0f);
+            return position + windowSize_ * (Vec2f::right()/2.0f);
         case TextAnchor::BOTTOM_RIGHT:
-            return position + windowSize_ * Vec2f::right;
+            return position + windowSize_ * Vec2f::right();
     default:
         break;
     }

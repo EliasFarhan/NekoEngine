@@ -101,7 +101,7 @@ void Camera3D::SetAspect(int width, int height)
     aspect = static_cast<float>(width) / static_cast<float>(height);
 }
 
-radian_t Camera3D::GetFovX() const
+Radian Camera3D::GetFovX() const
 {
     return 2.0f*Atan(Tan(fovY*0.5f) * aspect);
 }

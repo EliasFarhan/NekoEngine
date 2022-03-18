@@ -47,7 +47,7 @@ private:
 		DRAW_OUTLINE = 1u << 0u,
 		USE_STENCIL = 1u << 1u
 	};
-	gl::RenderCuboid cube_{Vec3f::zero, Vec3f::one};
+	gl::RenderCuboid cube_{Vec3f::zero(), Vec3f::one()};
 	gl::Shader modelShader_;
 	gl::Shader outlineShader_;
 	gl::TextureManager textureManager_;
@@ -56,7 +56,7 @@ private:
 
 	sdl::Camera3D camera_;
 
-	Vec3f outlineColor_ = Vec3f::one;
+	Vec3f outlineColor_ = Vec3f::one();
 	float outlineScale_ = 1.1f;
 	std::uint8_t flags_ = NONE;
 };

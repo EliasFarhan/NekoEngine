@@ -83,7 +83,7 @@ private:
 	unsigned int overViewTexture_ = 0;
 	unsigned int rbo_ = 0;
 
-	gl::RenderQuad mainPlane_{ Vec3f::zero, Vec2f::one * 2.0f };
+	gl::RenderQuad mainPlane_{ Vec3f::zero(), Vec2f::one() * 2.0f };
 };
 
 

@@ -65,9 +65,9 @@ private:
 	gl::TextureManager textureManager_;
     gl::TextureName hdrTexture_ = gl::INVALID_TEXTURE_NAME;
 	gl::TextureId hdrTextureId_ = gl::INVALID_TEXTURE_ID;
-	gl::RenderSphere sphere_{Vec3f::zero, 1.0f};
-	gl::RenderCuboid skybox_{ Vec3f::zero, Vec3f::one*2.0f };
-	gl::RenderQuad quad_{ Vec3f::zero, Vec2f::one*2.0f };
+	gl::RenderSphere sphere_{Vec3f::zero(), 1.0f};
+	gl::RenderCuboid skybox_{ Vec3f::zero(), Vec3f::one()*2.0f };
+	gl::RenderQuad quad_{ Vec3f::zero(), Vec2f::one()*2.0f };
 
 	gl::Shader equiToCubemap_;
 	gl::Shader skyboxShader_;
