@@ -45,7 +45,7 @@ class Mat3
 public:
 	constexpr Mat3()
 	{
-		columns_ = Identity.columns_;
+		columns_ = identity().columns_;
 	}
 	constexpr Mat3& operator=(Mat3 m)
 	{
@@ -118,12 +118,12 @@ public:
 	}
 	constexpr  static Mat3<T> zero()
 	{
-	    return Mat3f(
-			std::array<Vec3f, 3>
+	    return Mat3(
+			std::array<Vec3<T>, 3>
 		{
-			Vec3f::zero(),
-				Vec3f::zero(),
-				Vec3f::zero()
+			Vec3<T>::zero(),
+            Vec3<T>::zero(),
+            Vec3<T>::zero()
 		});
 	}
 private:
@@ -390,23 +390,23 @@ public:
 	}
 	constexpr  static Mat4<T> identity()
 	{
-	    return Mat4f(
-			std::array<Vec4f, 4>
+	    return Mat4(
+			std::array<Vec4<T>, 4>
 		{
-			Vec4f(1, 0, 0, 0),
-				Vec4f(0, 1, 0, 0),
-				Vec4f(0, 0, 1, 0),
-				Vec4f(0, 0, 0, 1)});
+			Vec4<T>(1, 0, 0, 0),
+            Vec4<T>(0, 1, 0, 0),
+            Vec4<T>(0, 0, 1, 0),
+            Vec4<T>(0, 0, 0, 1)});
 	}
 	constexpr  static Mat4<T> zero()
 	{
-	    return Mat4f(
+	    return Mat4(
 			std::array<Vec4f, 4>
 		{
-			Vec4f::zero(),
-				Vec4f::zero(),
-				Vec4f::zero(),
-				Vec4f::zero()
+			Vec4<T>::zero(),
+            Vec4<T>::zero(),
+            Vec4<T>::zero(),
+            Vec4<T>::zero()
 		});
 	}
 private:

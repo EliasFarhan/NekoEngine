@@ -118,13 +118,13 @@ struct Quaternion
 
 
 	//Returns the angle in degrees between two rotations a and b.
-	constexpr static Degree Angle(Quaternion a, Quaternion b)
+	static Degree Angle(Quaternion a, Quaternion b)
 	{
 		
 		return 2.0f * Acos(std::abs(Dot(a, b)));
 	}
 
-	constexpr [[nodiscard]] Quaternion Conjugate() const
+    [[nodiscard]] constexpr Quaternion Conjugate() const
 	{
 		return {-x, -y, -z, w};
 	}
