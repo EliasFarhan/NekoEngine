@@ -1,18 +1,15 @@
-set(COMPILER_WARNING_FLAGS "")
-set(COMPILER_FLAGS "")
+set(NEKO_WARNING_FLAGS "")
 if(MSVC)
-    set(COMPILER_WARNING_FLAGS " /W4 ")
-    set(COMPILER_FLAGS " /arch:AVX2 /Oi /GR- /EHs-c- ")
+    set(NEKO_WARNING_FLAGS " /W4 ")
 elseif(UNIX)
-    set(COMPILER_WARNING_FLAGS "-Wall -Wextra -Wswitch-default -Wmissing-declarations \
+    set(NEKO_WARNING_FLAGS "-Wall -Wextra -Wswitch-default -Wmissing-declarations \
         -Wmissing-include-dirs -Wredundant-decls  -Wshadow -Wdouble-promotion \
         -Wundef -fno-common ")
-    set(COMPILER_FLAGS " -fno-rtti -fno-exceptions ")
 endif()
 
 function(neko_bin_config binary)
     set_target_properties(${binary} PROPERTIES UNITY_BUILD ON)
-    set_property(TARGET ${binary} APPEND_STRING PROPERTY COMPILE_FLAGS " ${COMPILER_FLAGS} ${COMPILER_WARNING_FLAGS} ")
+    set_property(TARGET ${binary} APPEND_STRING PROPERTY COMPILE_FLAGS " ${NEKO_WARNING_FLAGS} ")
     if(UNIX)
         if(NOT ARM AND NOT Neko_Android)
             set_property(TARGET ${binary} APPEND_STRING PROPERTY COMPILE_FLAGS " -march=haswell ")
@@ -22,7 +19,7 @@ endfunction()
 
 function(neko_lib_config library)
     set_target_properties(${library} PROPERTIES UNITY_BUILD ON)
-    set_property(TARGET ${library} APPEND_STRING PROPERTY COMPILE_FLAGS " ${COMPILER_FLAGS} ${COMPILER_WARNING_FLAGS} ")
+    set_property(TARGET ${library} APPEND_STRING PROPERTY COMPILE_FLAGS " ${NEKO_WARNING_FLAGS} ")
     if(UNIX)
         if(NOT ARM AND NOT Neko_Android)
             set_property(TARGET ${library} APPEND_STRING PROPERTY COMPILE_FLAGS " -march=haswell ")

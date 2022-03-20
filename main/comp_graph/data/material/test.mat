@@ -1,6 +1,0 @@
-{
-  "name" : "HelloMaterial",
-  "diffuse_map_path": "sprites/wall.jpg",
-  "vert_shader_path": "shaders/94_hello_material/quad.vert",
-  "frag_shader_path": "shaders/94_hello_material/quad.frag"
-}

@@ -1,9 +1,0 @@
-{
-  "name": "skybox",
-  "left": "left.jpg",
-  "right": "right.jpg",
-  "back": "back.jpg",
-  "bottom": "bottom.jpg",
-  "top": "top.jpg",
-  "front": "front.jpg"
-}

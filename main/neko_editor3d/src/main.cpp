@@ -6,7 +6,7 @@
 #include "gl/sdl_window.h"
 
 
-int main([[nodiscard]] int argc, [[nodiscard]] char** argv)
+int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 {
 
 

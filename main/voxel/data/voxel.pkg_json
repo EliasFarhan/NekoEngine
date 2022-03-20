@@ -1,4 +1,0 @@
-{
-  "name": "voxel",
-  "files": ["sprites/tilesheet.png.ktx", "skybox/skybox.skybox.ktx", "shaders/voxel/*"]
-}

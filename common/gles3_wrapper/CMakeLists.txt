@@ -31,4 +31,6 @@ target_include_directories(gles3_wrapper PUBLIC "include/")
 
 target_precompile_headers(gles3_wrapper PUBLIC "include/gles3_wrapper_pch.h")
 neko_lib_config(gles3_wrapper)
+target_compile_options(gles3_wrapper PRIVATE ${NEKO_COMPILE_FLAGS})
+target_link_options(gles3_wrapper PRIVATE ${NEKO_LINK_FLAGS})
 set_target_properties (gles3_wrapper PROPERTIES FOLDER Neko/Common)

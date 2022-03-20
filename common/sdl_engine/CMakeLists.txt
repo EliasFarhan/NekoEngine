@@ -18,5 +18,7 @@ target_link_libraries(sdl_engine PUBLIC ${sdl_engine_libs})
 target_include_directories(sdl_engine PUBLIC "include/")
 target_precompile_headers(sdl_engine PUBLIC "include/sdl_wrapper_pch.h")
 neko_lib_config(sdl_engine)
+target_compile_options(sdl_engine PRIVATE ${NEKO_COMPILE_FLAGS})
+target_link_options(sdl_engine PRIVATE ${NEKO_LINK_FLAGS})
 set_target_properties (sdl_engine PROPERTIES FOLDER Neko/Common)
 

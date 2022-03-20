@@ -286,7 +286,7 @@ struct Vec2
     /// \param v2 The vector to project on.
     static Vec2<T> Project(const Vec2<T>& v1, const Vec2<T>& v2)
     {
-        constexpr auto dot = Dot(v1, v2);
+        const auto dot = Dot(v1, v2);
         const auto mag = v2.Magnitude();
         return {(dot / mag) * v2.x,
                 (dot / mag) * v2.y};
@@ -602,7 +602,7 @@ public:
     	const T k = 1 - eta * eta * (1.0 - Dot(N, inVec) * Dot(N, inVec));
     	if(k < 0)
     	{
-            return Vec3<T>::zero;
+            return Vec3<T>::zero();
     	}
         else
         {

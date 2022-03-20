@@ -1,9 +1,0 @@
-{
-  "name": "skybox.skybox",
-  "right": "Sky_Day_BlueSky_Nothing_Cam_2_Left+X.png",
-  "left": "Sky_Day_BlueSky_Nothing_Cam_3_Right-X.png",
-  "back": "Sky_Day_BlueSky_Nothing_Cam_1_Back-Z.png",
-  "bottom": "Sky_Day_BlueSky_Nothing_Cam_5_Down-Y.png",
-  "top": "Sky_Day_BlueSky_Nothing_Cam_4_Up+Y.png",
-  "front": "Sky_Day_BlueSky_Nothing_Cam_0_Front+Z.png"
-}
