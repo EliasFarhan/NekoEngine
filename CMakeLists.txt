@@ -1,21 +1,46 @@
 cmake_minimum_required(VERSION 3.16)
+
+option(Neko_Profile "Activate Profiling with Easy Profile" OFF )
+option(Neko_GLES3 "Activate OpenGL ES 3.0" ON)
+option(Neko_SDL2 "Activate SDL2" ON)
+option(Neko_Box2D "Activate Box2D" OFF)
+option(Neko_Test "Activate Test" ON )
+option(Neko_Assert "Activate Neko Assertion" ON)
+option(Neko_Benchmark  "Activate Benchmark" ON)
+option(Neko_SFML_NET  "Activate SFML Net Wrapper" ON)
+option(Neko_PhysFS "Activate PhysFS Wrapper" ON)
+option(Neko_Assimp "Activate Assimp Wrapper" ON)
+option(Neko_sqlite3 "Activate sqlite3 dependency" ON)
+
+if(Neko_sqlite3)
+    list(APPEND VCPKG_MANIFEST_FEATURES "sqlite")
+endif()
+if(Neko_Test)
+    list(APPEND VCPKG_MANIFEST_FEATURES "tests")
+endif()
+if(Neko_Benchmark)
+    list(APPEND VCPKG_MANIFEST_FEATURES "benchmarks")
+endif()
+if(Neko_GLES3)
+    list(APPEND VCPKG_MANIFEST_FEATURES "gl")
+endif()
+if(Neko_PhysFS)
+    list(APPEND VCPKG_MANIFEST_FEATURES "physfs")
+endif()
+if(Neko_Box2D)
+    list(APPEND VCPKG_MANIFEST_FEATURES "box2d")
+endif()
+if(Neko_Assimp)
+    list(APPEND VCPKG_MANIFEST_FEATURES "assimp")
+endif()
+
+
 project(Neko)
 
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-
-set(Neko_Profile OFF CACHE BOOL "Activate Profiling with Easy Profile")
-set(Neko_GLES3 ON CACHE BOOL "Activate OpenGL ES 3.0")
-set(Neko_SDL2 ON CACHE BOOL "Activate SDL2")
-set(Neko_Box2D OFF CACHE BOOL "Activate Box2D")
-set(Neko_Test ON CACHE BOOL "Activate Test")
-set(Neko_Assert ON CACHE BOOL "Activate Neko Assertion")
-set(Neko_Benchmark ON CACHE BOOL "Activate Benchmark")
-set(Neko_SFML_NET ON CACHE BOOL "Activate SFML Net Wrapper")
-set(Neko_PhysFS ON CACHE BOOL "Activate PhysFS Wrapper")
-set(Neko_sqlite3 ON CACHE BOOL "Activate sqlite3 dependency")
 
 MESSAGE("CMAKE SYSTEM NAME: ${CMAKE_SYSTEM_NAME}")
 
@@ -24,9 +49,10 @@ if(UNIX)
     MESSAGE("UNIX Architecture: ${ARCHITECTURE}")
     if("${ARCHITECTURE}" MATCHES "arm")
         include(cmake/platforms/arm.cmake)
-    endif()
-    if("${ARCHITECTURE}" MATCHES "aarch")
+    elseif("${ARCHITECTURE}" MATCHES "aarch")
         include(cmake/platforms/arm.cmake)
+    else()
+        include(cmake/platforms/linux.cmake)
     endif()
 endif()
 
@@ -43,15 +69,6 @@ set(EXTERNAL_DIR ${CMAKE_SOURCE_DIR}/externals CACHE INTERNAL "Externals folder"
 set(UTILITIES_DIR "${EXTERNAL_DIR}/utilities" CACHE INTERNAL "")
 
 
-if(Neko_PhysFS)
-
-    add_subdirectory(common/physfs_wrapper)
-endif()
-
-if(Neko_Profile)
-    MESSAGE("Enable profiling")
-    set(TRACY_FOLDER "${EXTERNAL_DIR}/tracy" CACHE INTERNAL "")
-endif()
 
 set(tools_project_dir "tools/")
 file(GLOB tools_projects "${tools_project_dir}/*")
@@ -73,10 +90,16 @@ include("cmake/data_generation.cmake")
 set(NEKO_CORE_DIR "${CMAKE_SOURCE_DIR}/core/" CACHE INTERNAL "")
 add_subdirectory(${NEKO_CORE_DIR})
 
+if(Neko_PhysFS)
+    add_subdirectory(common/physfs_wrapper)
+endif()
+
+if(Neko_Profile)
+    MESSAGE("Enable profiling")
+    set(TRACY_FOLDER "${EXTERNAL_DIR}/tracy" CACHE INTERNAL "")
+endif()
+
 target_precompile_headers(Neko_Core PRIVATE "${NEKO_CORE_DIR}/include/core_pch.h")
-
-
-
 
 if(Neko_SDL2)
     #sdl2

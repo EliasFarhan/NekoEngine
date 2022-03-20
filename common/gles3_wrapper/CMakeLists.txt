@@ -1,9 +1,13 @@
 
-find_package(assimp CONFIG REQUIRED)
+if(Neko_Assimp)
+    find_package(assimp CONFIG REQUIRED)
+    LIST(APPEND GLES3_WRAPPER_LIBS assimp::assimp)
+endif()
+
 find_package(freetype CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
 find_package(gli CONFIG REQUIRED)
-LIST(APPEND GLES3_WRAPPER_LIBS Neko_Core freetype assimp::assimp glm::glm gli sdl_engine)
+LIST(APPEND GLES3_WRAPPER_LIBS Neko_Core freetype glm::glm gli sdl_engine)
 
 if(NOT Neko_Android)
     set(OpenGL_GL_PREFERENCE GLVND)
@@ -16,8 +20,6 @@ endif()
 if(Neko_Android)
     LIST(APPEND GLES3_WRAPPER_LIBS GLEW::GLEW)
 endif()
-
-
 
 file(GLOB_RECURSE gles3_wrapper_src include/*.h src/*.cpp)
 add_library(gles3_wrapper STATIC ${gles3_wrapper_src})

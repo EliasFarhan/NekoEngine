@@ -53,7 +53,8 @@ endif()
 target_compile_definitions(Neko_Core PUBLIC $<$<CONFIG:Debug>:__neko_dbg__>)
 target_compile_definitions(Neko_Core PUBLIC $<$<CONFIG:RelWithDebInfo>:__neko_dbg__>)
 target_compile_definitions(Neko_Core PUBLIC SOURCE_PATH="${CMAKE_SOURCE_DIR}")
-
+target_compile_options(Neko_Core PUBLIC ${NEKO_COMPILE_FLAGS})
+target_link_options(Neko_Core PUBLIC ${NEKO_LINK_FLAGS})
 set_target_properties (Neko_Core PROPERTIES FOLDER Neko/Core)
 
 target_include_directories(Neko_Core PUBLIC "${IMGUI_ROOT}")

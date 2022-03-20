@@ -1,27 +1,70 @@
 {
     "name": "nekoengine",
     "version-string": "1.0",
-    "dependencies": [
-      "assimp",
-      "glm",
-      "sdl2",
-      "fmt",
-      "stb",
-      {
-        "name": "imgui",
-        "features": [ "sdl2-binding", "opengl3-binding", "docking-experimental" ]
+    "default-features":["core-engine"],
+    "features":{
+      "core-engine":{
+        "description": "Core engine",
+        "dependencies": [
+          "fmt",
+          "stb",
+          "imgui",
+          "spdlog",
+          "argh",
+          "protobuf",
+          "nlohmann-json",
+          "valijson"
+        ]
       },
-      "spdlog",
-      "argh",
-      "gtest",
-      "benchmark",
-      "protobuf",
-      "sqlite3",
-      "gli",
-      "freetype",
-      "glew",
-      "nlohmann-json",
-      "valijson",
-      "physfs"
-    ]
+      "sqlite": {
+        "description": "SQLite dep",
+        "dependencies": [
+          "sqlite3"
+        ]
+      },
+      "box2d": {
+        "description": "Box2D dep",
+        "dependencies": [
+          "box2d"
+        ]
+      },
+      "tests": {
+        "description": "Tests",
+        "dependencies": [
+          "gtest"
+        ]
+      },
+      "benchmarks":{
+        "description": "Benchmark",
+        "dependencies": [
+          "benchmark"
+        ]
+      },
+      "gl":{
+        "description": "OpenGL backends",
+        "dependencies": [
+          "glm",
+          "sdl2",
+          {
+            "name": "imgui",
+            "features": [ "sdl2-binding", "opengl3-binding", "docking-experimental" ]
+          },
+          "gli",
+          "freetype",
+          "glew"
+        ]
+      },
+      "physfs": {
+        "description": "PhysFS backends",
+        "dependencies": [
+          "physfs"
+        ]
+      },
+      "assimp": {
+        "description": "Assimp backends",
+        "dependencies": [
+          "assimp"
+        ]
+      }
+    }
   }
