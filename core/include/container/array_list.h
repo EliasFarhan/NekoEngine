@@ -3,6 +3,8 @@
 #include "container/custom_allocator.h"
 
 #include <memory>
+#include <functional>
+
 namespace neko::tl
 {
 
@@ -219,6 +221,42 @@ public:
         }
         endPtr_ = beginPtr_ + newSize;
     }
+
+    void PushBack(const T& val, std::function<std::size_t(std::size_t)> reallocSizeFunc = [](std::size_t n) {return n * 2; })
+    {
+        const auto oldCapacity = capacity_ == 0 ? 1 : capacity_;
+        const auto newSize = Size() + 1;
+
+        if(newSize > oldCapacity)
+        {
+            auto newCapacity = oldCapacity;
+            while(newCapacity < newSize)
+            {
+                newCapacity = reallocSizeFunc(newCapacity);
+            }
+            Reserve(newCapacity);
+        }
+        beginPtr_[newSize - 1] = val;
+        ++endPtr_;
+    }
+    void PushBack(T&& val, std::function<std::size_t(std::size_t)> reallocSizeFunc = [](std::size_t n) {return n * 2; })
+    {
+        const auto oldCapacity = capacity_ == 0 ? 1 : capacity_;
+        const auto newSize = Size() + 1;
+
+        if (newSize > oldCapacity)
+        {
+            auto newCapacity = oldCapacity;
+            while (newCapacity < newSize)
+            {
+                newCapacity = reallocSizeFunc(newCapacity);
+            }
+            Reserve(newCapacity);
+        }
+        beginPtr_[newSize - 1] = std::move(val);
+        ++endPtr_;
+    }
+
     [[nodiscard]] T& Front() { return *beginPtr_; }
     [[nodiscard]] const T& Front() const { return *beginPtr_; }
 

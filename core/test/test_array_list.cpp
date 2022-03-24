@@ -99,6 +99,7 @@ private:
 TEST(ArrayList, MovableOnlyObject)
 {
     neko::tl::ArrayList<MovableObject> movable(10);
+    EXPECT_EQ(movable.Size(), 10);
     auto newMovable(std::move(movable));
     EXPECT_EQ(movable.Capacity(), 0);
     //no move, only the pointer got moved
@@ -110,4 +111,7 @@ TEST(ArrayList, MovableOnlyObject)
     //When reserving the movable object should have moved
     EXPECT_EQ(newMovable.Front().GetCountMoveAssignment(), 1);
     EXPECT_EQ(newMovable.Front().GetCountMoveConstruct(), 0);
+    MovableObject m;
+    newMovable.PushBack(std::move(m));
+    EXPECT_EQ(newMovable.Size(), 11);
 }
