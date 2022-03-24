@@ -4,6 +4,7 @@ find_package(nlohmann_json CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 #source files
 file(GLOB_RECURSE Neko_ENGINE_SRC src/engine/*.cpp include/engine/*.h)
+file(GLOB_RECURSE Neko_CONTAINER_SRC src/container/*.cpp include/container/*.h)
 file(GLOB_RECURSE Neko_GRAPHICS_SRC src/graphics/*.cpp include/graphics/*.h)
 file(GLOB_RECURSE Neko_UTILITY_SRC src/utils/*.cpp include/utils/*.h)
 file(GLOB_RECURSE Neko_PHYSICS_SRC src/physics/*.cpp include/physics/*.h)
@@ -12,10 +13,11 @@ file(GLOB_RECURSE Neko_MATH_SRC src/mathematics/*.cpp include/mathematics/*.h)
 
 source_group("Graphics"				FILES ${Neko_GRAPHICS_SRC})
 source_group("Engine"				FILES ${Neko_ENGINE_SRC})
+source_group("Container"			FILES ${Neko_CONTAINER_SRC})
 source_group("Utility"				FILES ${Neko_UTILITY_SRC})
 source_group("Physics"				FILES ${Neko_PHYSICS_SRC})
 source_group("Sound"				FILES ${Neko_SOUND_SRC})
-source_group("Maths"			FILES ${Neko_MATH_SRC})
+source_group("Maths"			    FILES ${Neko_MATH_SRC})
 
 List(APPEND Neko_SRC
         ${Neko_ENGINE_SRC}
@@ -23,7 +25,8 @@ List(APPEND Neko_SRC
         ${Neko_UTILITY_SRC}
         ${Neko_PHYSICS_SRC}
         ${Neko_SOUND_SRC}
-        ${Neko_MATH_SRC})
+        ${Neko_MATH_SRC}
+        ${Neko_CONTAINER_SRC})
 
 #Utility
 set(UTILITIES_DIR ${EXTERNAL_DIR}/utilities/)

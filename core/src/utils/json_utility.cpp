@@ -94,11 +94,11 @@ json LoadJson(const std::string_view jsonPath)
 {
 
     json jsonContent;
-    if (!neko::FileExists(jsonPath))
+    /*if (!neko::FileExists(jsonPath))
     {
         logError(fmt::format("File does not exist: {}", jsonPath));
         return jsonContent;
-    }
+    }*/
 
     const auto jsonStrContent = LoadFile(jsonPath.data());
     jsonContent = json::parse(jsonStrContent, nullptr, false);
