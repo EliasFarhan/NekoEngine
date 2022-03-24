@@ -70,6 +70,42 @@ TEST(ArrayList, ResizeLess)
     EXPECT_EQ(numbers.Capacity(), 6);
 }
 
+
+TEST(ArrayList, EraseOne)
+{
+    const auto args = { 1, 2, 3, 4, 5 };
+    neko::tl::ArrayList numbers = args;
+    EXPECT_EQ(numbers.Size(), 5);
+    EXPECT_EQ(numbers.Capacity(), 5);
+    numbers.Erase(numbers.cbegin());
+    EXPECT_EQ(numbers.Size(), 4);
+    EXPECT_EQ(numbers.Capacity(), 5);
+    EXPECT_EQ(numbers.Front(), 2);
+}
+
+TEST(ArrayList, EraseTwo)
+{
+    const auto args = { 1, 2, 3, 4, 5 };
+    neko::tl::ArrayList numbers = args;
+    EXPECT_EQ(numbers.Size(), 5);
+    EXPECT_EQ(numbers.Capacity(), 5);
+    numbers.Erase(numbers.cbegin(), numbers.cbegin()+2);
+    EXPECT_EQ(numbers.Size(), 3);
+    EXPECT_EQ(numbers.Capacity(), 5);
+    EXPECT_EQ(numbers.Front(), 3);
+}
+
+TEST(ArrayList, EraseAll)
+{
+    const auto args = { 1, 2, 3, 4, 5 };
+    neko::tl::ArrayList numbers = args;
+    EXPECT_EQ(numbers.Size(), 5);
+    EXPECT_EQ(numbers.Capacity(), 5);
+    numbers.Erase(numbers.cbegin(), numbers.cend());
+    EXPECT_EQ(numbers.Size(), 0);
+    EXPECT_EQ(numbers.Capacity(), 5);
+}
+
 class MovableObject
 {
 public:
@@ -100,8 +136,10 @@ TEST(ArrayList, MovableOnlyObject)
 {
     neko::tl::ArrayList<MovableObject> movable(10);
     EXPECT_EQ(movable.Size(), 10);
+    EXPECT_EQ(movable.Capacity(), 10);
     auto newMovable(std::move(movable));
     EXPECT_EQ(movable.Capacity(), 0);
+    EXPECT_EQ(movable.Size(), 0);
     //no move, only the pointer got moved
     EXPECT_EQ(newMovable.Front().GetCountMoveAssignment(), 0);
     EXPECT_EQ(newMovable.Front().GetCountMoveConstruct(), 0);

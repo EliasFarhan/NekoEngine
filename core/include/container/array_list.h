@@ -25,7 +25,7 @@ public:
         iterator(T* ptr) : ptr_(ptr) {}
         self_type operator++() { self_type i = *this; ++ptr_; return i; }
         self_type operator++(int junk) { ++ptr_; return *this; }
-        reference operator*() { return *ptr_; }
+        pointer operator*() { return ptr_; }
         pointer operator->() { return ptr_; }
         bool operator==(const self_type& rhs) { return ptr_ == rhs.ptr_; }
         bool operator!=(const self_type& rhs) { return ptr_ != rhs.ptr_; }
@@ -41,23 +41,25 @@ public:
         using pointer = T*;
         using reference = T&;
         using iterator_category = std::random_access_iterator_tag;
-        using self_type = iterator;
+        using self_type = const_iterator;
 
         const_iterator(T* ptr) : ptr_(ptr) {}
         self_type operator++() { self_type i = *this; ++ptr_; return i; }
         self_type operator++(int junk) { ++ptr_; return *this; }
-        const reference operator*() { return *ptr_; }
+        pointer operator*() { return ptr_; }
         const pointer operator->() { return ptr_; }
-        bool operator==(const self_type& rhs) { return ptr_ == rhs.ptr_; }
-        bool operator!=(const self_type& rhs) { return ptr_ != rhs.ptr_; }
+        bool operator==(const self_type& rhs) const { return ptr_ == rhs.ptr_; }
+        bool operator!=(const self_type& rhs) const { return ptr_ != rhs.ptr_; }
+        auto operator+(std::size_t i) const { return self_type{ ptr_ + i }; }
+        auto operator-(self_type it) const{ return  ptr_ - it.ptr_; }
     private:
         T* ptr_ = nullptr;
     };
 
     iterator begin() { return { beginPtr_ }; }
     iterator end() { return { endPtr_ }; }
-    const_iterator cbegin() const { return { beginPtr_ }; }
-    const_iterator cend() const { return { endPtr_ }; }
+    [[nodiscard]] const_iterator cbegin() const { return { beginPtr_ }; }
+    [[nodiscard]] const_iterator cend() const { return { endPtr_ }; }
 
     ArrayList() : allocator_(defaultAllocator_)
     {
@@ -257,9 +259,53 @@ public:
         ++endPtr_;
     }
 
+    void PopBack()
+    {
+        if constexpr (!std::is_trivially_constructible_v<T>)
+        {
+            beginPtr_[Size() - 1].~T();
+        }
+        --endPtr_;
+    }
+
+    void Erase(const_iterator it)
+    {
+        if constexpr (std::is_trivially_destructible_v<T>)
+        {
+            (*it)->~T();
+        }
+        const auto lastElementsCount = std::distance(it, cend())-1;
+        if (lastElementsCount != 0)
+        {
+            std::memmove(*it, (*it) + 1, lastElementsCount*sizeof(T));
+        }
+        --endPtr_;
+    }
+
+    void Erase(const_iterator beginIt, const_iterator endIt)
+    {
+        const auto elementCount = std::distance(beginIt, endIt);
+        if constexpr (std::is_trivially_destructible_v<T>)
+        {
+            for (auto it = beginIt; it != endIt; ++it)
+            {
+                (*it)->~T();
+            }
+        }
+        const auto lastElementsCount = std::distance(beginIt, cend()) - elementCount;
+        if (lastElementsCount != 0)
+        {
+            std::memmove(*beginIt, (*beginIt) + elementCount, lastElementsCount*sizeof(T));
+        }
+        endPtr_-=elementCount;
+
+    }
+
     [[nodiscard]] T& Front() { return *beginPtr_; }
     [[nodiscard]] const T& Front() const { return *beginPtr_; }
 
+    [[nodiscard]] T& Back() { return *(beginPtr_+Size()-1); }
+    [[nodiscard]] const T& Back() const { return *(beginPtr_+Size()-1); }
     [[nodiscard]] T& operator[](std::size_t index) { return beginPtr_[index]; }
     [[nodiscard]] const T& operator[](std::size_t index) const { return beginPtr_[index]; }
 private:
