@@ -70,6 +70,20 @@ TEST(ArrayList, ResizeLess)
     EXPECT_EQ(numbers.Capacity(), 6);
 }
 
+TEST(ArrayList, PopBack)
+{
+    const auto args = { 1, 2, 3, 4, 5 };
+    neko::tl::ArrayList numbers = args;
+    EXPECT_EQ(numbers.Size(), 5);
+    EXPECT_EQ(numbers.Capacity(), 5);
+    EXPECT_EQ(numbers.Front(), 1);
+    EXPECT_EQ(numbers.Back(), 5);
+    numbers.PopBack();
+    EXPECT_EQ(numbers.Size(), 4);
+    EXPECT_EQ(numbers.Capacity(), 5);
+    EXPECT_EQ(numbers.Front(), 1);
+    EXPECT_EQ(numbers.Back(), 4);
+}
 
 TEST(ArrayList, EraseOne)
 {
@@ -152,4 +166,10 @@ TEST(ArrayList, MovableOnlyObject)
     MovableObject m;
     newMovable.PushBack(std::move(m));
     EXPECT_EQ(newMovable.Size(), 11);
+    newMovable.PopBack();
+    EXPECT_EQ(newMovable.Size(), 10);
+    newMovable.Erase(newMovable.cbegin());
+    //Using memmove does call the move assignment
+    EXPECT_EQ(newMovable.Size(), 9);
+    EXPECT_EQ(newMovable.Front().GetCountMoveAssignment(), 1);
 }

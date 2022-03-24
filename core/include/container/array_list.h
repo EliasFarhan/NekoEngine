@@ -66,14 +66,12 @@ public:
         
     }
 
-    ArrayList(std::size_t count, Allocator& allocator = defaultAllocator_) :
+    explicit ArrayList(std::size_t count, Allocator& allocator = defaultAllocator_) :
         beginPtr_(static_cast<T*>(allocator.Allocate(sizeof(T) * count, alignof(T)))),
         endPtr_(beginPtr_ + count),
         capacity_(endPtr_ - beginPtr_),
         allocator_(allocator)
     {
-        const auto beginIt = begin();
-        const auto endIt = end();
         for (auto* ptr = beginPtr_; ptr != endPtr_; ++ptr)
         {
             ::new(ptr) T();
@@ -224,7 +222,7 @@ public:
         endPtr_ = beginPtr_ + newSize;
     }
 
-    void PushBack(const T& val, std::function<std::size_t(std::size_t)> reallocSizeFunc = [](std::size_t n) {return n * 2; })
+    void PushBack(const T& val, const std::function<std::size_t(std::size_t)>& reallocSizeFunc = defaultReallocSizeFunc)
     {
         const auto oldCapacity = capacity_ == 0 ? 1 : capacity_;
         const auto newSize = Size() + 1;
@@ -241,7 +239,7 @@ public:
         beginPtr_[newSize - 1] = val;
         ++endPtr_;
     }
-    void PushBack(T&& val, std::function<std::size_t(std::size_t)> reallocSizeFunc = [](std::size_t n) {return n * 2; })
+    void PushBack(T&& val, const std::function<std::size_t(std::size_t)>& reallocSizeFunc = defaultReallocSizeFunc)
     {
         const auto oldCapacity = capacity_ == 0 ? 1 : capacity_;
         const auto newSize = Size() + 1;
@@ -308,6 +306,8 @@ public:
     [[nodiscard]] const T& Back() const { return *(beginPtr_+Size()-1); }
     [[nodiscard]] T& operator[](std::size_t index) { return beginPtr_[index]; }
     [[nodiscard]] const T& operator[](std::size_t index) const { return beginPtr_[index]; }
+
+    inline static constexpr auto defaultReallocSizeFunc = [](std::size_t n) { return n * 2; };
 private:
     T* beginPtr_ = nullptr;
     T* endPtr_ = nullptr;

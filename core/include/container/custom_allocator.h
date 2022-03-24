@@ -223,7 +223,7 @@ protected:
 };
 
 template<typename T>
-class PoolAllocator  final : public Allocator
+class PoolAllocator final : public Allocator
 {
     static_assert(sizeof(T) >= sizeof(void*));
 public:
