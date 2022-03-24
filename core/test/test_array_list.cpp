@@ -85,6 +85,22 @@ TEST(ArrayList, PopBack)
     EXPECT_EQ(numbers.Back(), 4);
 }
 
+TEST(ArrayList, PushBack)
+{
+    const auto args = { 1, 2, 3, 4, 5 };
+    neko::tl::ArrayList numbers = args;
+    EXPECT_EQ(numbers.Size(), 5);
+    EXPECT_EQ(numbers.Capacity(), 5);
+    EXPECT_EQ(numbers.Front(), 1);
+    EXPECT_EQ(numbers.Back(), 5);
+    const int newValue = 6;
+    numbers.PushBack(newValue);
+    EXPECT_EQ(numbers.Size(), 6);
+    EXPECT_GE(numbers.Capacity(), 6);
+    EXPECT_EQ(numbers.Front(), 1);
+    EXPECT_EQ(numbers.Back(), 6);
+}
+
 TEST(ArrayList, EraseOne)
 {
     const auto args = { 1, 2, 3, 4, 5 };
@@ -168,8 +184,25 @@ TEST(ArrayList, MovableOnlyObject)
     EXPECT_EQ(newMovable.Size(), 11);
     newMovable.PopBack();
     EXPECT_EQ(newMovable.Size(), 10);
-    newMovable.Erase(newMovable.cbegin());
+    newMovable.Erase(newMovable.begin());
     //Using memmove does call the move assignment
     EXPECT_EQ(newMovable.Size(), 9);
     EXPECT_EQ(newMovable.Front().GetCountMoveAssignment(), 1);
+}
+
+class ConstructorWithArgs
+{
+public:
+    ConstructorWithArgs(int a, float b) : a(a), b(b){}
+private:
+    int a;
+    float b;
+};
+
+
+TEST(ArrayList, ConstructorWithArgs)
+{
+    neko::tl::ArrayList<ConstructorWithArgs> objects(10, {10, 0.3f});
+
+    objects.EmplaceBack(1, 2.5f);
 }

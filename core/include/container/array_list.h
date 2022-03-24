@@ -43,6 +43,7 @@ public:
         using iterator_category = std::random_access_iterator_tag;
         using self_type = const_iterator;
 
+        const_iterator(iterator it) : ptr_(*it){}
         const_iterator(T* ptr) : ptr_(ptr) {}
         self_type operator++() { self_type i = *this; ++ptr_; return i; }
         self_type operator++(int junk) { ++ptr_; return *this; }
@@ -77,6 +78,19 @@ public:
             ::new(ptr) T();
         }
         
+    }
+
+    explicit ArrayList(std::size_t count, const T& value, Allocator& allocator = defaultAllocator_) :
+            beginPtr_(static_cast<T*>(allocator.Allocate(sizeof(T) * count, alignof(T)))),
+            endPtr_(beginPtr_ + count),
+            capacity_(endPtr_ - beginPtr_),
+            allocator_(allocator)
+    {
+        for (auto* ptr = beginPtr_; ptr != endPtr_; ++ptr)
+        {
+            *ptr = value;
+        }
+
     }
 
     ArrayList(std::initializer_list<T> init, Allocator& allocator = defaultAllocator_) :
@@ -222,7 +236,7 @@ public:
         endPtr_ = beginPtr_ + newSize;
     }
 
-    void PushBack(const T& val, const std::function<std::size_t(std::size_t)>& reallocSizeFunc = defaultReallocSizeFunc)
+    void PushBack(const T& val)
     {
         const auto oldCapacity = capacity_ == 0 ? 1 : capacity_;
         const auto newSize = Size() + 1;
@@ -232,14 +246,14 @@ public:
             auto newCapacity = oldCapacity;
             while(newCapacity < newSize)
             {
-                newCapacity = reallocSizeFunc(newCapacity);
+                newCapacity = defaultReallocSizeFunc(newCapacity);
             }
             Reserve(newCapacity);
         }
         beginPtr_[newSize - 1] = val;
         ++endPtr_;
     }
-    void PushBack(T&& val, const std::function<std::size_t(std::size_t)>& reallocSizeFunc = defaultReallocSizeFunc)
+    void PushBack(T&& val)
     {
         const auto oldCapacity = capacity_ == 0 ? 1 : capacity_;
         const auto newSize = Size() + 1;
@@ -249,12 +263,30 @@ public:
             auto newCapacity = oldCapacity;
             while (newCapacity < newSize)
             {
-                newCapacity = reallocSizeFunc(newCapacity);
+                newCapacity = defaultReallocSizeFunc(newCapacity);
             }
             Reserve(newCapacity);
         }
         beginPtr_[newSize - 1] = std::move(val);
         ++endPtr_;
+    }
+
+    template<typename... Args>
+    void EmplaceBack(Args... args)
+    {
+        const auto oldCapacity = capacity_ == 0 ? 1 : capacity_;
+        const auto newSize = Size() + 1;
+
+        if (newSize > oldCapacity)
+        {
+            auto newCapacity = oldCapacity;
+            while (newCapacity < newSize)
+            {
+                newCapacity = defaultReallocSizeFunc(newCapacity);
+            }
+            Reserve(newCapacity);
+        }
+        ::new (beginPtr_+newSize-1) T(args...);
     }
 
     void PopBack()
