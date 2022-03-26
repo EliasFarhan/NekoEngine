@@ -3,7 +3,7 @@
 //
 
 #include <gtest/gtest.h>
-#include <mathematics/matrix.h>
+#include <mathematics/matrix4.h>
 #include "mathematics/vec4.h"
 
 

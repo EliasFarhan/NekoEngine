@@ -24,10 +24,10 @@
  */
 
 #include "mathematics/vec2.h"
-#include "matrix.h"
-#include "const.h"
+#include "mathematics/matrix4.h"
+#include "mathematics/const.h"
 #include "engine/assert.h"
-#include "transform.h"
+#include "mathematics/transform.h"
 
 namespace neko {
 struct Obb2d {

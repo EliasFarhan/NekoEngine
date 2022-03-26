@@ -25,7 +25,7 @@
 
 #include "globals.h"
 #include <engine/entity.h>
-#include <mathematics/matrix.h>
+#include <mathematics/matrix4.h>
 #include "engine/component.h"
 #include "graphics/graphics.h"
 #include "mathematics/quaternion.h"

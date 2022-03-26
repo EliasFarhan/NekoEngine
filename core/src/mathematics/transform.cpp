@@ -23,11 +23,12 @@
  */
 
 #include "mathematics/vec4.h"
-#include "mathematics/matrix.h"
+#include "mathematics/matrix4.h"
 #include "mathematics/transform.h"
 #include "mathematics/const.h"
 #include "mathematics/angle.h"
 #include "mathematics/quaternion.h"
+#include "engine/assert.h"
 
 namespace neko::Transform3d
 {

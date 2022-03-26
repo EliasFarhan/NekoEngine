@@ -22,10 +22,12 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-#include <string_view>
+#include "engine/system.h"
 #include <graphics/texture.h>
 #include "gl/gles3_include.h"
 #include <gli/gli.hpp>
+#include <string_view>
+
 
 struct ktxTexture;
 namespace neko::gl

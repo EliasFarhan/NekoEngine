@@ -194,6 +194,9 @@ class ConstructorWithArgs
 {
 public:
     ConstructorWithArgs(int a, float b) : a(a), b(b){}
+
+    [[nodiscard]] int GetA() const {return a;}
+    [[nodiscard]] float GetB() const {return b;}
 private:
     int a;
     float b;
@@ -202,7 +205,10 @@ private:
 
 TEST(ArrayList, ConstructorWithArgs)
 {
+    constexpr int a = 1;
+    constexpr float b = 2.5f;
     neko::tl::ArrayList<ConstructorWithArgs> objects(10, {10, 0.3f});
-
-    objects.EmplaceBack(1, 2.5f);
+    objects.EmplaceBack(a, b);
+    EXPECT_EQ(objects.Back().GetA(), a);
+    EXPECT_FLOAT_EQ(objects.Back().GetB(), b);
 }
