@@ -34,30 +34,18 @@ public:
     {
         columns_ = identity().columns_;
     }
-
-    constexpr Mat2& operator=(Mat2 m)
-    {
-        columns_ = m.columns_;
-        return *this;
-    }
-
-    constexpr Mat2(const Mat2& m) noexcept
-    {
-        columns_ = m.columns_;
-    }
-
     constexpr explicit Mat2(const std::array<Vec2 < T>, 2>& v) : columns_(v)
     {
     }
 
-    constexpr const T& operator()(std::size_t row, std::size_t column) const
+    constexpr const T& operator()(std::size_t col, std::size_t row) const
     {
-        return columns_[column][row];
+        return columns_[col][row];
     }
 
-    constexpr T& operator()(std::size_t row, std::size_t column)
+    constexpr T& operator()(std::size_t col, std::size_t row)
     {
-        return columns_[column][row];
+        return columns_[col][row];
     }
 
     constexpr const Vec2<T>& operator[](std::size_t column) const
@@ -70,17 +58,17 @@ public:
         return columns_[column];
     }
 
-    constexpr Mat2 operator+(const Mat2& other) const
+    Mat2 operator+(const Mat2& other) const
     {
         std::array<Vec2<T>, 2> m;
         for (int column = 0; column < 2; column++)
         {
             for (int row = 0; row < 2; row++)
             {
-                m[row][column] = columns_[column][row]+other[column][row];
+                m[column][row] = columns_[column][row]+other[column][row];
             }
         }
-        return {m};
+        return Mat2{m};
     }
 
     constexpr Mat2 operator-(const Mat2& other) const
@@ -90,10 +78,10 @@ public:
         {
             for (int row = 0; row < 2; row++)
             {
-                m[row][column] = columns_[column][row]-other[column][row];
+                m[column][row] = columns_[column][row]-other[column][row];
             }
         }
-        return {m};
+        return Mat2{m};
     }
 
     constexpr Mat2 operator*(const Mat2& other) const
@@ -108,10 +96,10 @@ public:
                 {
                     sum += columns_[i][row]*other[column][i];
                 }
-                m[row][column] = sum;
+                m[column][row] = sum;
             }
         }
-        return {m};
+        return Mat2{m};
     }
 
     constexpr Vec2<T> operator*(const Vec2<T>& other) const
@@ -128,7 +116,7 @@ public:
             m[row] = sum;
         }
 
-        return {m};
+        return Mat2{m};
     }
 
     constexpr Vec2<T> operator*(T other) const
@@ -139,11 +127,11 @@ public:
         {
             for (int row = 0; row < 2; row++)
             {
-                m[row][column] = columns_[column][row]*other;
+                m[column][row] = columns_[column][row] * other;
             }
         }
 
-        return {m};
+        return Mat2{m};
     }
 
     constexpr Mat2<T> Transpose() const
@@ -161,12 +149,14 @@ public:
 
     [[nodiscard]] constexpr float Determinant() const
     {
-        return columns_[0][0]*columns_[1][1]-columns_[0][1]*columns_[1][0];
+        return columns_[0][0] * columns_[1][1] - columns_[0][1] * columns_[1][0];
     }
+
+
 
     constexpr static Mat2<T> identity()
     {
-        return {
+        return Mat2{
                 std::array<Vec2<T>, 2>
                                     {
                                             Vec2<T>(1, 0),

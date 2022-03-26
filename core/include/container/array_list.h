@@ -24,7 +24,6 @@ public:
 
         iterator(T* ptr) : ptr_(ptr) {}
         self_type operator++() { self_type i = *this; ++ptr_; return i; }
-        self_type operator++(int junk) { ++ptr_; return *this; }
         pointer operator*() { return ptr_; }
         pointer operator->() { return ptr_; }
         bool operator==(const self_type& rhs) { return ptr_ == rhs.ptr_; }
@@ -46,7 +45,6 @@ public:
         const_iterator(iterator it) : ptr_(*it){}
         const_iterator(T* ptr) : ptr_(ptr) {}
         self_type operator++() { self_type i = *this; ++ptr_; return i; }
-        self_type operator++(int junk) { ++ptr_; return *this; }
         pointer operator*() { return ptr_; }
         const pointer operator->() { return ptr_; }
         bool operator==(const self_type& rhs) const { return ptr_ == rhs.ptr_; }
@@ -287,6 +285,7 @@ public:
             Reserve(newCapacity);
         }
         ::new (beginPtr_+newSize-1) T(args...);
+        endPtr_++;
     }
 
     void PopBack()
