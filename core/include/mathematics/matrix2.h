@@ -58,7 +58,7 @@ public:
         return columns_[column];
     }
 
-    Mat2 operator+(const Mat2& other) const
+    constexpr Mat2 operator+(const Mat2& other) const
     {
         std::array<Vec2<T>, 2> m;
         for (int column = 0; column < 2; column++)
@@ -104,7 +104,7 @@ public:
 
     constexpr Vec2<T> operator*(const Vec2<T>& other) const
     {
-        Vec2<T> m;
+        Vec2<T> v;
 
         for (int row = 0; row < 2; row++)
         {
@@ -113,13 +113,13 @@ public:
             {
                 sum += columns_[i][row]*other[i];
             }
-            m[row] = sum;
+            v[row] = sum;
         }
 
-        return Mat2{m};
+        return v;
     }
 
-    constexpr Vec2<T> operator*(T other) const
+    constexpr Mat2 operator*(T other) const
     {
         std::array<Vec2<T>, 2> m;
 
@@ -152,6 +152,18 @@ public:
         return columns_[0][0] * columns_[1][1] - columns_[0][1] * columns_[1][0];
     }
 
+    constexpr Mat2 Inverse() const
+    {
+        std::array<Vec2<T>, 2> v;
+        const auto determinant = Determinant();
+        v[0][0] = columns_[1][1];
+        v[1][1] = columns_[0][0];
+        v[0][1] = -columns_[0][1];
+        v[1][0] = -columns_[1][0];
+        Mat2 result(v);
+        result = result * (1.0f/determinant);
+        return result;
+    }
 
 
     constexpr static Mat2<T> identity()
@@ -163,12 +175,11 @@ public:
                                             Vec2<T>(0, 1)
                                     } };
     }
-    constexpr static Mat3<T> zero()
+    constexpr static Mat2<T> zero()
     {
         return Mat2(
                 std::array<Vec2<T>, 2>
                                     {
-                                            Vec2<T>::zero(),
                                             Vec2<T>::zero(),
                                             Vec2<T>::zero()
                                     });

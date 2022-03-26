@@ -27,6 +27,8 @@
 #include "mathematics/vec2.h"
 #include "mathematics/vec3.h"
 
+#include "fmt/compile.h"
+
 
 namespace neko
 {
@@ -37,25 +39,9 @@ namespace neko
 template<typename T>
 struct alignas(4 * sizeof(T)) Vec4
 {
-#ifdef _MSC_VER
-    #pragma warning( push )
-#pragma warning(disable : 4201)
-#endif
-    union
-    {
-        struct
-        {
-            T x, y, z, w;
-        };
-        struct
-        {
-            T r, g, b, a;
-        };
-        T coord[4];
-    };
-#ifdef _MSC_VER
-#pragma warning( pop )
-#endif
+
+    T x, y, z, w;
+
     constexpr static Vec4 zero() { return Vec4(); }
     constexpr static Vec4 one() { return Vec4(1, 1, 1, 1); }
 
@@ -75,10 +61,10 @@ struct alignas(4 * sizeof(T)) Vec4
 
     constexpr explicit Vec4(const std::array<T, 4>& v)  noexcept
     {
-        for (int i = 0; i < 4; i++)
-        {
-            coord[i] = v[i];
-        }
+        x = v[0];
+        y = v[1];
+        z = v[2];
+        w = v[3];
     }
 
     constexpr Vec4(T X, T Y, T Z, T W)  noexcept
@@ -248,18 +234,17 @@ struct alignas(4 * sizeof(T)) Vec4
 
     constexpr const T& operator[](size_t p_axis) const
     {
-
-        return coord[p_axis];
+        return p_axis == 0?x:p_axis==1?y:p_axis==2?z:w;
     }
 
     constexpr T& operator[](size_t p_axis)
     {
-        return coord[p_axis];
+        return p_axis == 0?x:p_axis==1?y:p_axis==2?z:w;
     }
 
     explicit operator auto() const
     {
-        return fmt::format("Vec4({},{},{},{})", x, y, z, w);
+        return fmt::format(FMT_COMPILE("Vec4({},{},{},{})"), x, y, z, w);
     }
 
     //-----------------------------------------------------------------------------
@@ -334,6 +319,7 @@ constexpr Vec4<T> operator*(const Vec4<T>& rhs, T lhs)
 //-----------------------------------------------------------------------------
 using Vec4f = Vec4<float>;
 using Vec4df = Vec4<double>;
+using Vec4i = Vec4<int>;
 
 
 //-----------------------------------------------------------------------------

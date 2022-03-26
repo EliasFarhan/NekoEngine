@@ -25,6 +25,7 @@
 
 
 #include "mathematics/vec3.h"
+#include "mathematics/matrix2.h"
 #include <array>
 
 namespace neko
@@ -38,18 +39,8 @@ public:
     {
         columns_ = identity().columns_;
     }
-    constexpr Mat3& operator=(Mat3 m) noexcept
-    {
-        columns_ = m.columns_;
-        return *this;
-    }
 
-    constexpr Mat3(const Mat3& m) noexcept
-    {
-        columns_ = m.columns_;
-    }
-
-    constexpr explicit Mat3(const std::array<Vec3 < T>, 3>& v) : columns_(v)
+    constexpr explicit Mat3(const std::array<Vec3<T>, 3>& v) : columns_(v)
     {
     }
 
@@ -63,12 +54,12 @@ public:
         return columns_[column][row];
     }
 
-    constexpr const Vec3 <T>& operator[](std::size_t column) const
+    constexpr const Vec3<T>& operator[](std::size_t column) const
     {
         return columns_[column];
     }
 
-    constexpr Vec3 <T>& operator[](std::size_t column)
+    constexpr Vec3<T>& operator[](std::size_t column)
     {
         return columns_[column];
     }
@@ -81,10 +72,10 @@ public:
         {
             for (int row = 0; row < 3; row++)
             {
-                m[row][column] = columns_[column][row]+other[column][row];
+                m[column][row] = columns_[column][row]+other[column][row];
             }
         }
-        return {m};
+        return Mat3{m};
     }
 
     constexpr Mat3 operator-(const Mat3& other) const
@@ -94,10 +85,10 @@ public:
         {
             for (int row = 0; row < 3; row++)
             {
-                m[row][column] = columns_[column][row]-other[column][row];
+                m[column][row] = columns_[column][row]-other[column][row];
             }
         }
-        return {m};
+        return Mat3{m};
     }
 
     constexpr Mat3 operator*(const Mat3& other) const
@@ -112,15 +103,15 @@ public:
                 {
                     sum += columns_[i][row]*other[column][i];
                 }
-                m[row][column] = sum;
+                m[column][row] = sum;
             }
         }
-        return {m};
+        return Mat3{m};
     }
 
     constexpr Vec3<T> operator*(const Vec3<T>& other) const
     {
-        Vec3<T> m;
+        Vec3<T> v;
 
         for (int row = 0; row < 3; row++)
         {
@@ -129,13 +120,13 @@ public:
             {
                 sum += columns_[i][row]*other[i];
             }
-            m[row] = sum;
+            v[row] = sum;
         }
 
-        return {m};
+        return v;
     }
 
-    constexpr Vec3<T> operator*(T other) const
+    constexpr Mat3<T> operator*(T other) const
     {
         std::array<Vec3<T>, 3> m;
 
@@ -143,11 +134,11 @@ public:
         {
             for (int row = 0; row < 3; row++)
             {
-                m[row][column] = columns_[column][row]*other;
+                m[column][row] = columns_[column][row]*other;
             }
         }
 
-        return {m};
+        return Mat3{m};
     }
 
     constexpr Mat3<T> Transpose() const
@@ -163,7 +154,7 @@ public:
         return Mat3<T>(v);
     }
 
-    [[nodiscard]] constexpr  float Determinant() const
+    [[nodiscard]] constexpr float Determinant() const
     {
         return
                 columns_[0][0] * columns_[1][1] * columns_[2][2] +
@@ -173,9 +164,37 @@ public:
                 columns_[0][0] * columns_[2][1] * columns_[1][2] -
                 columns_[1][0] * columns_[0][1] * columns_[2][2];
     }
+
+    constexpr Mat3 Inverse() const
+    {
+        Mat3 result;
+
+        const auto determinant = Determinant();
+        for (int column = 0; column < 3; column++)
+        {
+            for (int row = 0; row < 3; row++)
+            {
+                Mat2<T> subMatrix;
+                int subCol = column==0?1:0;
+                int subRow = row==0?1:0;
+                subMatrix[0][0] = columns_[subCol][subRow];
+                const int nextRow = (subRow+1 == row)?subRow+2:subRow+1;
+                subMatrix[0][1] = columns_[subCol][nextRow];
+                subCol = (subCol+1 == column)?subCol+2:subCol+1;
+                subMatrix[1][0] = columns_[subCol][subRow];
+                subRow = nextRow;
+                subMatrix[1][1] = columns_[subCol][subRow];
+                result[column][row] = ((column+row)%2==1?-1:1)*subMatrix.Determinant();
+            }
+        }
+        result = result.Transpose();
+        result = result * (1.0f/determinant);
+        return result;
+    }
+
     constexpr static Mat3<T> identity()
     {
-        return {
+        return Mat3{
                 std::array<Vec3<T>, 3>
                                   {
                                           Vec3<T>(1, 0, 0),
@@ -185,13 +204,13 @@ public:
     }
     constexpr static Mat3<T> zero()
     {
-        return Mat3(
+        return Mat3{
                 std::array<Vec3<T>, 3>
                                     {
                                             Vec3<T>::zero(),
                                             Vec3<T>::zero(),
                                             Vec3<T>::zero()
-                                    });
+                                    }};
     }
 private:
     std::array<Vec3<T>, 3> columns_; //row vector

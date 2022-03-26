@@ -60,3 +60,30 @@ const neko::Mat3f m4 = neko::Mat3f(std::array<neko::Vec3f, 3>
 const float det4 = 0.0f;
 EXPECT_TRUE(neko::Equal(m4.Determinant(), det4));
 }
+
+TEST(Matrix3, Inverse)
+{
+    constexpr std::array<neko::Vec3f, 3> mArray{
+    {
+        neko::Vec3f(3,2,0),
+        neko::Vec3f(0,0,1),
+        neko::Vec3f(2,-2,1)
+    }};
+    constexpr std::array<neko::Vec3f, 3> mInvArray{
+    {
+        neko::Vec3f(0.2f,-0.2f,0.2f),
+        neko::Vec3f(0.2f,0.3f,-0.3f),
+        neko::Vec3f(0,1,0)
+    }};
+    constexpr neko::Mat3f m(mArray);
+
+    EXPECT_FLOAT_EQ(m.Determinant(), 10.0f);
+    constexpr auto result = m.Inverse();
+    for(int i = 0; i < 3; i++)
+    {
+        for(int j = 0; j < 3; j++)
+        {
+            EXPECT_FLOAT_EQ(result[i][j], mInvArray[i][j]);
+        }
+    }
+}

@@ -25,6 +25,7 @@
  */
 
 #include "mathematics/vec2.h"
+#include <fmt/compile.h>
 
 namespace neko
 {
@@ -36,30 +37,10 @@ namespace neko
 template<typename T>
 struct Vec3
 {
-#ifdef _MSC_VER
-    #pragma warning( push )
-#pragma warning(disable : 4201)
-#endif
-    union
-    {
-        struct
-        {
-            T x; ///< X coordinate of the vector
-            T y; ///< Y coordinate of the vector
-            T z;
-        };
-        //For color
-        struct
-        {
-            T r; ///< X coordinate of the vector
-            T g; ///< Y coordinate of the vector
-            T b;
-        };
-        T coord[3];
-    };
-#ifdef _MSC_VER
-#pragma warning( pop )
-#endif
+
+    T x; ///< X coordinate of the vector
+    T y; ///< Y coordinate of the vector
+    T z; ///< Z coordinate of the vector
     constexpr static Vec3 zero() { return Vec3(); }
     constexpr static Vec3 one() { return Vec3(1, 1, 1); }
     constexpr static Vec3 up() { return Vec3(0, 1, 0); }
@@ -141,13 +122,13 @@ struct Vec3
 
     constexpr const T& operator[](size_t p_axis) const
     {
-        return coord[p_axis];
+        return p_axis == 0?x:p_axis==1?y:z;
     }
 
     constexpr T& operator[](size_t p_axis)
     {
 
-        return coord[p_axis];
+        return p_axis == 0?x:p_axis==1?y:z;
     }
 
     //-----------------------------------------------------------------------------
@@ -221,7 +202,7 @@ struct Vec3
 
     explicit operator std::string() const
     {
-        return fmt::format("Vec3({},{},{})", x, y, z);
+        return fmt::format(FMT_COMPILE("Vec3({},{},{})"), x, y, z);
     }
 
     //-----------------------------------------------------------------------------

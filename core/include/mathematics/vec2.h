@@ -26,6 +26,7 @@
 
 #include "mathematics/angle.h"
 #include <fmt/core.h>
+#include <fmt/compile.h>
 #include <string>
 
 namespace neko
@@ -40,29 +41,12 @@ struct Vec4;
 template<typename T>
 struct Vec2
 {
-#ifdef _MSC_VER
-#pragma warning( push )
-#pragma warning(disable : 4201)
-#endif
-    union
-    {
-        struct
-        {
-            T x; ///< X coordinate of the vector
-            T y; ///< Y coordinate of the vector
 
-        };
-        struct
-        {
-            T u; ///< X coordinate of the vector
-            T v; ///< Y coordinate of the vector
+    T x; ///< X coordinate of the vector
+    T y; ///< Y coordinate of the vector
 
-        };
-        T coord[2];
-    };
-#ifdef _MSC_VER
-#pragma warning( pop )
-#endif
+
+
 
     constexpr static Vec2 zero()
     {
@@ -191,20 +175,20 @@ struct Vec2
         return !(*this == other);
     }
 
-    constexpr const T& operator[](size_t p_axis) const
+    constexpr const T& operator[](std::size_t p_axis) const
     {
-        return coord[p_axis];
+        return p_axis == 0?x:y;
     }
 
-    constexpr T& operator[](size_t p_axis)
+    constexpr T& operator[](std::size_t p_axis)
     {
 
-        return coord[p_axis];
+        return p_axis == 0?x:y;
     }
 
     [[nodiscard]] explicit operator std::string() const
     {
-        return fmt::format("Vec2({},{})", x, y);
+        return fmt::format(FMT_COMPILE("Vec2({},{})"), x, y);
     }
 
     //Used to specialize in case of other kind of vector
