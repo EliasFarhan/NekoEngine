@@ -22,7 +22,7 @@
  SOFTWARE.
  */
 
-#include "mathematics/vector.h"
+#include "mathematics/vec4.h"
 #include "mathematics/matrix.h"
 #include "mathematics/transform.h"
 #include "mathematics/const.h"

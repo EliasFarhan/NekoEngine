@@ -43,7 +43,7 @@ namespace neko::gl
 {
 void OnResizeRenderCommand::Render()
 {
-	logDebug(fmt::format("Resize window with new size: {}", newWindowSize_.ToString()));
+	logDebug(fmt::format("Resize window with new size: {}", (std::string)newWindowSize_));
 	glViewport(0, 0, newWindowSize_.x, newWindowSize_.y);
 }
 

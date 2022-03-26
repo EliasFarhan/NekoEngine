@@ -24,8 +24,8 @@
  */
 
 
-#include <mathematics/vector.h>
-#include <mathematics/matrix.h>
+#include "mathematics/vec3.h"
+#include "mathematics/matrix.h"
 #include "mathematics/transform.h"
 #include "utils/service_locator.h"
 

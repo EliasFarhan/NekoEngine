@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mathematics/vector.h"
+#include "mathematics/vec4.h"
 #include "mathematics/matrix.h"
 
 

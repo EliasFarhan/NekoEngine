@@ -28,11 +28,11 @@
 #include <xxhash.hpp>
 #include <sole.hpp>
 
-#include <engine/assert.h>
-#include <engine/log.h>
-#include <utils/service_locator.h>
-#include <mathematics/vector.h>
-#include <engine/filesystem.h>
+#include "engine/assert.h"
+#include "engine/log.h"
+#include "utils/service_locator.h"
+#include "mathematics/vec2.h"
+#include "engine/filesystem.h"
 
 namespace neko
 {

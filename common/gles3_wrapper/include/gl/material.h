@@ -24,7 +24,7 @@
  */
 #include <map>
 #include <string>
-#include <mathematics/vector.h>
+#include <mathematics/vec3.h>
 #include <mathematics/matrix.h>
 #include <gl/texture.h>
 #include "gl/shader.h"

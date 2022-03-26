@@ -9,7 +9,7 @@ file(GLOB_RECURSE Neko_GRAPHICS_SRC src/graphics/*.cpp include/graphics/*.h)
 file(GLOB_RECURSE Neko_UTILITY_SRC src/utils/*.cpp include/utils/*.h)
 file(GLOB_RECURSE Neko_PHYSICS_SRC src/physics/*.cpp include/physics/*.h)
 file(GLOB_RECURSE Neko_SOUND_SRC src/sound/*.cpp include/sound/*.h)
-file(GLOB_RECURSE Neko_MATH_SRC src/mathematics/*.cpp include/mathematics/*.h)
+file(GLOB_RECURSE Neko_MATH_SRC src/mathematics/*.cpp include/mathematics/*.h )
 
 source_group("Graphics"				FILES ${Neko_GRAPHICS_SRC})
 source_group("Engine"				FILES ${Neko_ENGINE_SRC})

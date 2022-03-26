@@ -25,7 +25,7 @@
 
 #include "basic.h"
 #include "engine/assert.h"
-#include "mathematics/vector.h"
+#include "mathematics/vec4.h"
 #include "mathematics/angle.h"
 #include "mathematics/quaternion.h"
 #include "engine/intrinsincs.h"

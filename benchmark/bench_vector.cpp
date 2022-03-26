@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <numeric>
 #include <vector>
-#include <mathematics/vector.h>
+#include <mathematics/vec4.h>
 
 const long fromRange = 8;
 const long toRange = 1 << 15;

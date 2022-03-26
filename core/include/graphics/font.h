@@ -24,7 +24,7 @@
  */
 #include "graphics.h"
 #include "graphics/color.h"
-#include "mathematics/vector.h"
+#include "mathematics/vec3.h"
 
 #include <string_view>
 namespace neko

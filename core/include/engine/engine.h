@@ -26,7 +26,7 @@
 #include <engine/system.h>
 #include <utils/action_utility.h>
 #include <utils/time_utility.h>
-#include "mathematics/vector.h"
+#include "mathematics/vec2.h"
 
 #include "worker_system.h"
 #include "engine/filesystem.h"

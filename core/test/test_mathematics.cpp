@@ -12,7 +12,7 @@
 
 #include <mathematics/quaternion.h>
 #include <mathematics/matrix.h>
-#include "mathematics/vector.h"
+#include "mathematics/vec4.h"
 
 
 const float maxNmb = 100.0f;

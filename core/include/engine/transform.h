@@ -28,7 +28,6 @@
 #include <mathematics/matrix.h>
 #include "engine/component.h"
 #include "graphics/graphics.h"
-#include "mathematics/vector.h"
 #include "mathematics/quaternion.h"
 
 namespace neko

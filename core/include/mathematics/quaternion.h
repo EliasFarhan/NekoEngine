@@ -23,7 +23,6 @@
  SOFTWARE.
  */
 #include "engine/component.h"
-#include "mathematics/vector.h"
 #include "mathematics/angle.h"
 
 

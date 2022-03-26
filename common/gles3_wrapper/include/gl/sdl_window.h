@@ -23,7 +23,7 @@
  SOFTWARE.
  */
 
-#include <mathematics/vector.h>
+#include <mathematics/vec2.h>
 #include "gl/gles3_include.h"
 #include "sdl_engine/sdl_window.h"
 #include "graphics/graphics.h"

@@ -22,7 +22,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-#include <mathematics/vector.h>
+#include <mathematics/vec3.h>
 #include <mathematics/circle.h>
 
 namespace neko

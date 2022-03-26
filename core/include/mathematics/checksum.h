@@ -2,6 +2,7 @@
 #include <vector>
 #include <numeric>
 #include <cstring>
+#include <cstdint>
 
 namespace neko
 {

@@ -28,7 +28,7 @@
 #include "graphics.h"
 #include "shape.h"
 #include "graphics/line.h"
-#include "mathematics/vector.h"
+#include "mathematics/vec3.h"
 #include "graphics/graphics.h"
 
 namespace neko

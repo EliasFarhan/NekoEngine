@@ -23,7 +23,7 @@
  SOFTWARE.
  */
 
-#include "mathematics/vector.h"
+#include "mathematics/vec2.h"
 #include "matrix.h"
 #include "const.h"
 #include "engine/assert.h"
@@ -384,8 +384,7 @@ struct Aabb2d {
         corners[1] = Vec2f(relativeLowerLeftBound.x, relativeUpperRightBound.y).Rotate(newAngle);
         corners[2] = Vec2f(relativeUpperRightBound.x, relativeLowerLeftBound.y).Rotate(newAngle);
         corners[3] = relativeUpperRightBound.Rotate(newAngle);
-        const float cosAngle = Cos(newAngle);
-        const float sinAngle = Sin(newAngle);
+
         for (const Vec2f corner : corners) {
             if (corner.x > relativeUpperRightBound.x) { relativeUpperRightBound.x = corner.x; }
             if (corner.x < relativeLowerLeftBound.x) { relativeLowerLeftBound.x = corner.x; }
@@ -401,19 +400,19 @@ struct Aabb2d {
         FromCenterExtendsRotation(obb.GetCenter(), Vec2f(obb.GetExtendOnAxis(obb.GetRight()), obb.GetExtendOnAxis(obb.GetUp())),obb.rotation);
     }
 
-    bool ContainsPoint(const Vec2f point) const {
+    [[nodiscard]] bool ContainsPoint(const Vec2f point) const {
         bool contains = point.x <= upperRightBound.x && point.x >= lowerLeftBound.x;
         contains = point.y <= upperRightBound.y && point.y >= lowerLeftBound.y &&
                    contains;
         return contains;
     }
 
-    bool ContainsAabb(const Aabb2d& aabb) const {
+    [[nodiscard]] bool ContainsAabb(const Aabb2d& aabb) const {
         return (ContainsPoint(aabb.upperRightBound) && ContainsPoint(aabb.lowerLeftBound)
         );
     }
 
-    bool IntersectAabb(const Aabb2d& aabb) const {
+    [[nodiscard]] bool IntersectAabb(const Aabb2d& aabb) const {
         bool x = abs(aabb.CalculateCenter().x - CalculateCenter().x) <= (aabb.CalculateExtends().x + CalculateExtends().x);
         bool y = abs(aabb.CalculateCenter().y - CalculateCenter().y) <= (aabb.CalculateExtends().y + CalculateExtends().y);
 
@@ -421,7 +420,7 @@ struct Aabb2d {
     }
 
 
-    bool IntersectRay(const Vec2f& dirRay, const Vec2f& origin) const {
+    [[nodiscard]] bool IntersectRay(const Vec2f& dirRay, const Vec2f& origin) const {
         neko_assert(Vec2f(0, 0) != dirRay, "Null Ray Direction");
         if (ContainsPoint(origin))
         {
@@ -457,10 +456,10 @@ struct Aabb2d {
 
 struct Aabb3d {
     ///\brief Get the center of the AABB.
-    Vec3f CalculateCenter() const { return (lowerLeftBound + upperRightBound) * 0.5f; }
+    [[nodiscard]] Vec3f CalculateCenter() const { return (lowerLeftBound + upperRightBound) * 0.5f; }
 
     ///\brief Get the extends of the AABB (half-widths).
-    Vec3f CalculateExtends() const { return (upperRightBound - lowerLeftBound) * 0.5f; }
+    [[nodiscard]] Vec3f CalculateExtends() const { return (upperRightBound - lowerLeftBound) * 0.5f; }
 
     ///\brief Set the AABB from the center, extends.
     void FromCenterExtends(
@@ -511,7 +510,7 @@ struct Aabb3d {
     	FromCenterExtendsRotation(obb.GetCenter(), Vec3f(obb.GetExtendOnAxis(obb.GetRight()), obb.GetExtendOnAxis(obb.GetUp()), obb.GetExtendOnAxis(obb.GetForward())), obb.rotation);
     }
 
-    bool ContainsPoint(const Vec3f point) const {
+    [[nodiscard]] bool ContainsPoint(const Vec3f point) const {
         bool contains = point.x <= upperRightBound.x && point.x >= lowerLeftBound.x;
         contains = point.y <= upperRightBound.y && point.y >= lowerLeftBound.y &&
                    contains;
@@ -520,12 +519,12 @@ struct Aabb3d {
         return contains;
     }
 
-    bool ContainsAabb(const Aabb3d& aabb) const {
+    [[nodiscard]] bool ContainsAabb(const Aabb3d& aabb) const {
         return (ContainsPoint(aabb.upperRightBound) &&
                 ContainsPoint(aabb.lowerLeftBound));
     }
 
-    bool IntersectAabb(const Aabb3d& aabb) const {
+    [[nodiscard]] bool IntersectAabb(const Aabb3d& aabb) const {
         bool x = abs(aabb.CalculateCenter().x - CalculateCenter().x) <= (aabb.CalculateExtends().x + CalculateExtends().x);
         bool y = abs(aabb.CalculateCenter().y - CalculateCenter().y) <= (aabb.CalculateExtends().y + CalculateExtends().y);
         bool z = abs(aabb.CalculateCenter().z - CalculateCenter().z) <= (aabb.CalculateExtends().z + CalculateExtends().z);
@@ -533,7 +532,7 @@ struct Aabb3d {
         return x && y && z;
     }
 
-    bool IntersectRay(const Vec3f& dirRay, const Vec3f& origin) const {
+    [[nodiscard]] bool IntersectRay(const Vec3f& dirRay, const Vec3f& origin) const {
 
         neko_assert(Vec3f(0, 0, 0) != dirRay, "Null Ray Direction");
         if (ContainsPoint(origin))
@@ -566,7 +565,7 @@ struct Aabb3d {
     }
 
 
-    bool IntersectPlane(const Vec3f& normal, const Vec3f& point) const {
+    [[nodiscard]] bool IntersectPlane(const Vec3f& normal, const Vec3f& point) const {
         if (ContainsPoint(point))
         {
             return true;
@@ -580,7 +579,7 @@ struct Aabb3d {
     }
 
 
-    Vec3f RotateAxis(Vec3f axis, RadianAngles rotation)	///< return the normal of the upper side
+    static Vec3f RotateAxis(Vec3f axis, RadianAngles rotation)	///< return the normal of the upper side
     {
         EulerAngles euler(rotation.x, rotation.y, rotation.z);
         Quaternion q = Quaternion::FromEuler(euler);
