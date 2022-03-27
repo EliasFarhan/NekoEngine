@@ -35,21 +35,20 @@ template<typename T>
 class Mat3
 {
 public:
-    constexpr Mat3()
+    constexpr Mat3() : columns_(identity().columns_)
     {
-        columns_ = identity().columns_;
     }
 
     constexpr explicit Mat3(const std::array<Vec3<T>, 3>& v) : columns_(v)
     {
     }
 
-    constexpr const T& operator()(std::size_t row, std::size_t column) const
+    constexpr const T& operator()(std::size_t column, std::size_t row) const
     {
         return columns_[column][row];
     }
 
-    constexpr T& operator()(std::size_t row, std::size_t column)
+    constexpr T& operator()(std::size_t column, std::size_t row)
     {
         return columns_[column][row];
     }
@@ -141,7 +140,7 @@ public:
         return Mat3{m};
     }
 
-    constexpr Mat3<T> Transpose() const
+    [[nodiscard]] constexpr Mat3<T> Transpose() const
     {
         std::array<Vec3<T>, 3> v;
         for (int column = 0; column < 3; column++)
@@ -165,7 +164,7 @@ public:
                 columns_[1][0] * columns_[0][1] * columns_[2][2];
     }
 
-    constexpr Mat3 Inverse() const
+    [[nodiscard]] constexpr Mat3 Inverse() const
     {
         Mat3 result;
 
@@ -218,5 +217,6 @@ private:
 
 
 using Mat3f = Mat3<float>;
+using Mat3i = Mat3<int>;
 
 }

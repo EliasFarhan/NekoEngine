@@ -28,15 +28,10 @@
 #include <fmt/core.h>
 #include <fmt/compile.h>
 #include <string>
+#include <array>
 
 namespace neko
 {
-
-template<typename T>
-struct Vec3;
-
-template<typename T>
-struct Vec4;
 
 template<typename T>
 struct Vec2
@@ -191,10 +186,6 @@ struct Vec2
         return fmt::format(FMT_COMPILE("Vec2({},{})"), x, y);
     }
 
-    //Used to specialize in case of other kind of vector
-    template<typename U>
-    constexpr explicit operator U() const;
-
     //-----------------------------------------------------------------------------
     // Formulas
     //-----------------------------------------------------------------------------
@@ -258,13 +249,6 @@ struct Vec2
                 x * Sin(angle) + y * Cos(angle)};
     }
 
-    //-----------------------------------------------------------------------------
-    // Other
-    //-----------------------------------------------------------------------------
-    //Used to specialize in case of other kind of vector
-    template<typename U>
-    constexpr explicit Vec2(const U& v);
-
 };
 
 
@@ -318,24 +302,6 @@ public:
     }
 
     explicit NVec2(const Vec2<T>* soaV)
-    {
-        for (int i = 0; i < N; i++)
-        {
-            xs[i] = soaV[i].x;
-            ys[i] = soaV[i].y;
-        }
-    }
-
-    explicit NVec2(const Vec3<T>* soaV)
-    {
-        for (int i = 0; i < N; i++)
-        {
-            xs[i] = soaV[i].x;
-            ys[i] = soaV[i].y;
-        }
-    }
-
-    explicit NVec2(const Vec4 <T>* soaV)
     {
         for (int i = 0; i < N; i++)
         {

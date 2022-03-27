@@ -23,14 +23,13 @@
  */
 
 #include "mathematics/matrix4.h"
-#include "engine/intrinsincs.h"
 
 namespace neko
 {
 
 #ifdef __SSE__
 template<>
-Mat4f Mat4f::Transpose() const
+Mat4f Mat4f::TransposeIntrinsics() const
 {
     std::array<Vec4f, 4> v;
     auto xmm3 = _mm_load_ps(&columns_[1][0]);

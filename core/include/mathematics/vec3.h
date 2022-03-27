@@ -80,13 +80,13 @@ struct Vec3
 
     constexpr explicit operator Vec2<T>()
     {
-        return {x, y};
+        return Vec2<T>{x, y};
     }
 
     template<typename U>
     constexpr explicit operator Vec2<T>()
     {
-        return {static_cast<U>(x), static_cast<U>(y)};
+        return Vec2<T>{static_cast<U>(x), static_cast<U>(y)};
     }
 
     /**
@@ -353,16 +353,6 @@ public:
     }
 
     explicit NVec3(const Vec3<T>* soaV)
-    {
-        for (int i = 0; i < N; i++)
-        {
-            xs[i] = soaV[i].x;
-            ys[i] = soaV[i].y;
-            zs[i] = soaV[i].z;
-        }
-    }
-
-    explicit NVec3(const Vec4<T>* soaV)
     {
         for (int i = 0; i < N; i++)
         {

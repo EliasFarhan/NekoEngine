@@ -27,6 +27,7 @@
 #include "mathematics/matrix3.h"
 #include "mathematics/matrix2.h"
 #include "mathematics/basic.h"
+#include "engine/intrinsincs.h"
 #include <array>
 #include <ostream>
 
@@ -118,7 +119,7 @@ public:
         return columns_[column];
     }
 
-    [[nodiscard]] inline Mat4<T> Transpose() const
+    [[nodiscard]] constexpr Mat4<T> Transpose() const
     {
         std::array<Vec4<T>, 4> v;
         for (int column = 0; column < 4; column++)
@@ -130,6 +131,8 @@ public:
         }
         return Mat4<T>(v);
     }
+
+    Mat4<T> TransposeIntrinsics() const;
 
     constexpr Mat4<T> operator+(const Mat4<T> & rhs) const
     {
@@ -305,7 +308,7 @@ public:
         return inverse;
     }
 
-    [[nodiscard]] constexpr  Mat3<T> ToMat3() const
+    [[nodiscard]] constexpr explicit operator Mat3<T>() const
     {
         std::array<Vec3<T>, 3> column;
         for(int col = 0; col < 3; col++)
@@ -347,7 +350,7 @@ using Mat4f = Mat4<float>;
 
 #ifdef __SSE__
 template<>
-Mat4f Mat4f::Transpose() const;
+[[nodiscard]] Mat4f Mat4f::TransposeIntrinsics() const;
 #endif
 
 template<typename T>
