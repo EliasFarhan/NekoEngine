@@ -135,6 +135,11 @@ struct Vec2
         return Vec2<T>(x * rhs.x, y * rhs.y);
     }
 
+    constexpr Vec2<T> operator*(T rhs) const
+    {
+        return Vec2<T>(x * rhs, y * rhs);
+    }
+
 
     constexpr Vec2<T>& operator*=(T rhs)
     {
@@ -150,7 +155,7 @@ struct Vec2
 
     constexpr Vec2<T> operator/(T rhs) const
     {
-        return (*this) * (1.0f / rhs);
+        return Vec2<T>(x / rhs, y / rhs);
     }
 
     constexpr Vec2<T>& operator/=(T rhs)
