@@ -27,7 +27,6 @@
 #include <memory>
  //Externals includes
 #include <nlohmann/json.hpp>
-#include "mathematics/vector.h"
 #include "mathematics/rect.h"
 
 using json = nlohmann::json;

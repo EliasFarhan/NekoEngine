@@ -26,7 +26,7 @@
 #include <vector>
 
 #include "assimp/material.h"
-#include "mathematics/vector.h"
+#include "mathematics/vec3.h"
 #include "gl/shader.h"
 #include "gl/texture.h"
 #include "mathematics/circle.h"

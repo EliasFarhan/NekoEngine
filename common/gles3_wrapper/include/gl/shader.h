@@ -26,8 +26,8 @@
 #include <graphics/shader.h>
 #include "gl/texture.h"
 #include "gl/gles3_include.h"
-#include "mathematics/vector.h"
-#include "mathematics/matrix.h"
+#include "mathematics/vec4.h"
+#include "mathematics/matrix4.h"
 
 namespace neko::gl
 {

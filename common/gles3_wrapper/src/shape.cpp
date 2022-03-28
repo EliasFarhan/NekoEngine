@@ -267,10 +267,10 @@ void RenderCuboid::Init()
 		const Vec2f deltaUV1 = texCoords[i+1] - texCoords[i];
 		const Vec2f deltaUV2 = texCoords[i+2] - texCoords[i];
 
-		const float f = 1.0f / (deltaUV1.u * deltaUV2.v - deltaUV2.u * deltaUV1.v);
-		tangent[i].x = f * (deltaUV2.v * edge1.x - deltaUV1.v * edge2.x);
-		tangent[i].y = f * (deltaUV2.v * edge1.y - deltaUV1.v * edge2.y);
-		tangent[i].z = f * (deltaUV2.v * edge1.z - deltaUV1.v * edge2.z);
+		const float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+		tangent[i].x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+		tangent[i].y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+		tangent[i].z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
 		tangent[i + 1] = tangent[i];
 		tangent[i + 2] = tangent[i];
 	}
@@ -385,10 +385,10 @@ void RenderSphere::Init()
 		const Vec2f deltaUV1 = uv[indices[i + 1]] - uv[indices[i]];
 		const Vec2f deltaUV2 = uv[indices[i + 2]] - uv[indices[i]];
 
-		const float f = 1.0f / (deltaUV1.u * deltaUV2.v - deltaUV2.u * deltaUV1.v);
-		tangent[indices[i]].x = f * (deltaUV2.v * edge1.x - deltaUV1.v * edge2.x);
-		tangent[indices[i]].y = f * (deltaUV2.v * edge1.y - deltaUV1.v * edge2.y);
-		tangent[indices[i]].z = f * (deltaUV2.v * edge1.z - deltaUV1.v * edge2.z);
+		const float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+		tangent[indices[i]].x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+		tangent[indices[i]].y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+		tangent[indices[i]].z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
 
 	}
 

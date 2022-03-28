@@ -40,7 +40,7 @@ class Allocator
 {
 public:
 
-    Allocator() = delete;
+    Allocator() = default;
     Allocator(size_t size, void* start);
     Allocator(const Allocator&);
     Allocator(Allocator&&) = default;
@@ -63,8 +63,7 @@ public:
         return adjustment;
     }
 
-    inline static size_t
-    CalculateAlignForwardAdjustmentWithHeader(const void* address, size_t alignment, size_t headerSize)
+    inline static std::size_t CalculateAlignForwardAdjustmentWithHeader(const void* address, size_t alignment, size_t headerSize)
     {
         auto adjustment = CalculateAlignForwardAdjustment(address, alignment);
         size_t neededSpace = headerSize;
@@ -113,7 +112,14 @@ protected:
     size_t numAllocations_ = 0;
 };
 
-class LinearAllocator : public Allocator
+class DumbAllocator final : public Allocator
+{
+public:
+    void* Allocate(size_t allocatedSize, size_t alignment) override;
+    void Deallocate(void* p) override;
+};
+
+class LinearAllocator final : public Allocator
 {
 public:
     LinearAllocator(size_t size, void* start) : Allocator(size, start), currentPos_(start_)
@@ -140,7 +146,7 @@ protected:
     void* currentPos_ = nullptr;
 };
 
-class StackAllocator : public Allocator
+class StackAllocator final : public Allocator
 {
 public:
     StackAllocator(size_t size, void* start) : Allocator(size, start), currentPos_(start)
@@ -181,7 +187,7 @@ protected:
 
 };
 
-class FreeListAllocator : public Allocator
+class FreeListAllocator final : public Allocator
 {
 public:
     FreeListAllocator(size_t size, void* start) : Allocator(size, start), freeBlocks_((FreeBlock*)start)
@@ -217,7 +223,7 @@ protected:
 };
 
 template<typename T>
-class PoolAllocator : public Allocator
+class PoolAllocator final : public Allocator
 {
     static_assert(sizeof(T) >= sizeof(void*));
 public:

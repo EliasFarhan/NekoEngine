@@ -22,8 +22,9 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-#include "mathematics/matrix.h"
 
+#include "mathematics/quaternion.h"
+#include "mathematics/matrix4.h"
 
 namespace neko::Transform3d
 {

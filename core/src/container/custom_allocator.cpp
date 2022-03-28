@@ -22,11 +22,12 @@
  SOFTWARE.
  */
 
-#include "engine/custom_allocator.h"
+#include "container/custom_allocator.h"
 
 
 namespace neko
 {
+    
 Allocator::Allocator(size_t size, void* start) : start_(start), size_(size)
 {
 #ifdef NEKO_ALLOCATOR_LOG
@@ -67,6 +68,16 @@ void Allocator::Destroy()
     neko_assert(numAllocations_ == 0 && usedMemory_ == 0, "Allocator should be emptied before destroy");
     start_ = nullptr;
     size_ = 0;
+}
+
+void* DumbAllocator::Allocate(size_t allocatedSize, size_t alignment)
+{
+    return operator new (allocatedSize);
+}
+
+void DumbAllocator::Deallocate(void* p)
+{
+    return operator delete(p);
 }
 
 void* LinearAllocator::Allocate(size_t allocatedSize, size_t alignment)

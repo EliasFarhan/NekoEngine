@@ -5,7 +5,7 @@
 #include <random>
 #include "random_fill.h"
 #include <benchmark/benchmark.h>
-#include "mathematics/matrix.h"
+#include "mathematics/matrix4.h"
 
 const long fromRange = 8;
 const long toRange = 1 << 10;

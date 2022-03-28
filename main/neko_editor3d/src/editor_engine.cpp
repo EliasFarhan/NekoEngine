@@ -10,7 +10,7 @@ namespace py = pybind11;
 
 #include "editor_pyconsole.h"
 #include "engine/entity.h"
-#include "mathematics/matrix.h"
+#include "mathematics/matrix4.h"
 
 
 PYBIND11_EMBEDDED_MODULE(neko, m)

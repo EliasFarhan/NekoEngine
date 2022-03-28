@@ -22,7 +22,7 @@
  SOFTWARE.
  */
 #include <sstream>
-#include <mathematics/vector.h>
+#include <mathematics/vec4.h>
 #include "sdl_engine/sdl_engine.h"
 #include "engine/log.h"
 

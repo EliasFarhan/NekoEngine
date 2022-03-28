@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <numeric>
 #include <vector>
-#include <mathematics/vector.h>
+#include <mathematics/vec4.h>
 
 const long fromRange = 8;
 const long toRange = 1 << 15;
@@ -24,13 +24,13 @@ float accumulate_magnitude_v4(const std::vector<neko::Vec4f>& v)
 
 float accumulate_then_magnitude_v3(const std::vector<neko::Vec3f>& v)
 {
-    const auto total= std::accumulate(v.cbegin(), v.cend(), neko::Vec3f::zero);
+    const auto total= std::accumulate(v.cbegin(), v.cend(), neko::Vec3f::zero());
     return total.Magnitude();
 }
 
 float accumulate_then_magnitude_v4(const std::vector<neko::Vec4f>& v)
 {
-    const auto total =  std::accumulate(v.cbegin(), v.cend(), neko::Vec4f::zero);
+    const auto total =  std::accumulate(v.cbegin(), v.cend(), neko::Vec4f::zero());
     return total.Magnitude();
 }
 

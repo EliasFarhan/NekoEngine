@@ -23,7 +23,8 @@
  SOFTWARE.
  */
 
-#include "mathematics/vector.h"
+#include "mathematics/vec2.h"
+#include "mathematics/vec3.h"
 
 namespace neko
 {

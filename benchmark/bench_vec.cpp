@@ -2,8 +2,7 @@
 // Created by efarhan on 02.12.19.
 //
 #include <benchmark/benchmark.h>
-#include <mathematics/vector.h>
-#include "mathematics/vector_nvec.h"
+#include <mathematics/vec4.h>
 #include <vector>
 #include <random>
 #include <iostream>
