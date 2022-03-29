@@ -159,6 +159,8 @@ void WorkerThread::Loop() const
             while (!taskQueue_.IsEmpty())
             {
                 auto newTask = taskQueue_.PopNextTask();
+                if(newTask == nullptr)
+                    continue;
                 if (!newTask->CheckDependenciesStarted())
                 {
                     taskQueue_.AddTask(std::move(newTask));

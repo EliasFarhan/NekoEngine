@@ -17,6 +17,7 @@ TEST(Engine, TestFixedArray)
         EXPECT_NE(allocator.GetUsedMemory(), 0);
     }
     EXPECT_EQ(allocator.GetUsedMemory(), 0);
+    std::free(data);
 }
 
 TEST(Engine, TestFixedArrayList)
@@ -102,6 +103,7 @@ TEST(Engine, TestFixedMap)
             EXPECT_EQ(map[8], 16);
         }
     }
+    std::free(data);
 
 }
 
