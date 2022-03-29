@@ -195,5 +195,57 @@ TEST(Vector2, Dot)
     constexpr auto v2 = neko::Vec2i(2, 3);
     constexpr auto result = neko::Vec2i::Dot(v1, v2);
     EXPECT_EQ(result, v1.x*v2.x+v1.y*v2.y);
+}
 
+TEST(Vector2, SqrMagnitude)
+{
+    constexpr auto v2 = neko::Vec2i(2, 3);
+    constexpr auto result = v2.SquareMagnitude();
+    EXPECT_EQ(result, v2.x * v2.x + v2.y * v2.y);
+}
+
+TEST(Vector2, Magnitude)
+{
+    constexpr auto v2 = neko::Vec2f(3.0f, 4.0f);
+    const auto result = v2.Magnitude();
+    EXPECT_FLOAT_EQ(result, 5.0f);
+}
+
+TEST(Vector2, Normalized)
+{
+    constexpr auto v2 = neko::Vec2f(3.0f, 4.0f);
+    const auto result = v2.Normalized();
+    EXPECT_FLOAT_EQ(result.Magnitude(), 1.0f);
+}
+TEST(Vector2, Lerp)
+{
+    constexpr auto v1 = neko::Vec2i(1, 2);
+    constexpr auto v2 = neko::Vec2i(2, 3);
+    EXPECT_EQ(v1, neko::Vec2i::Lerp(v1, v2, 0));
+    EXPECT_EQ(v2, neko::Vec2i::Lerp(v1, v2, 1));
+
+    constexpr auto v3 = neko::Vec2f(3.0f, 4.0f);
+    constexpr auto v4 = neko::Vec2f(3.0f, 4.0f);
+
+    EXPECT_FLOAT_EQ(v3.x, neko::Vec2f::Lerp(v3, v4, 0.0f).x);
+    EXPECT_FLOAT_EQ(v3.y, neko::Vec2f::Lerp(v3, v4, 0.0f).y);
+    EXPECT_FLOAT_EQ(v4.x, neko::Vec2f::Lerp(v3, v4, 1.0f).x);
+    EXPECT_FLOAT_EQ(v4.y, neko::Vec2f::Lerp(v3, v4, 1.0f).y);
+
+    constexpr auto midResult = neko::Vec2f::Lerp(v3, v4, 0.5f);
+    constexpr auto delta = v4 - v3;
+    EXPECT_FLOAT_EQ(v3.x + 0.5f * delta.x, midResult.x);
+    EXPECT_FLOAT_EQ(v3.y + 0.5f * delta.y, midResult.y);
+}
+
+TEST(Vector2, Reflect)
+{
+    constexpr auto v1 = neko::Vec2i(1, -1);
+    constexpr auto normal = neko::Vec2i::up();
+    constexpr auto result = neko::Vec2i::Reflect(v1, normal);
+    EXPECT_EQ(result, neko::Vec2i::one());
+
+    constexpr auto n2 = neko::Vec2i::left();
+    constexpr auto result2 = neko::Vec2i::Reflect(v1, n2);
+    EXPECT_EQ(result2, neko::Vec2i::one() * -1);
 }

@@ -225,12 +225,12 @@ struct Vec2
         return v1 + (v2 - v1) * t;
     }
 
-    /// \brief Reflect the inVec using the normal given (doesn't need to be normalized).
+    /// \brief Reflect the inVec using the normal given (need to be normalized).
     /// \param inVec The vector to reflect.
     /// \param normal The normal vector of the line to reflect off.
     static constexpr Vec2<T> Reflect(const Vec2<T>& inVec, const Vec2<T>& normal)
     {
-        return inVec - normal * 2 * Dot(inVec, normal);
+        return inVec - 2 * Dot(inVec, normal) * normal ;
     }
 
     /// \brief Project v1 on v2 (doesn't need to be normalized).
