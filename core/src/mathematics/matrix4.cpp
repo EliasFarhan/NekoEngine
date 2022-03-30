@@ -118,7 +118,7 @@ constexpr  Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
 
 #if defined(EMSCRIPTEN) || defined(__arm__) || defined(__ANDROID__) || defined(__aarch64__)
 template<>
-constexpr Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
+Mat4f Mat4f::MultiplyIntrinsincs(const Mat4f& rhs) const noexcept
 {
 	std::array<Vec4f, 4> v;
 	v4f c1 = *(v4f*)(&this->columns_[0][0]);
