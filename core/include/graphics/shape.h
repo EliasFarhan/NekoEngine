@@ -41,7 +41,7 @@ class RenderShape : RenderableObject
 {
 public:
     RenderShape() = delete;
-    explicit RenderShape(Vec3f offset) : offset_(offset){};
+    explicit RenderShape(Vec3f offset) : offset_(offset){}
 protected:
     Vec3f offset_;
 };
@@ -53,7 +53,7 @@ public:
     explicit RenderCircle(Vec3f offset, float radius) : RenderShape(offset), radius_(radius){}
 protected:
     float radius_ = 0.0f;
-    static const size_t resolution = 50;
+    static constexpr std::size_t resolution = 50;
 };
 
 class RenderQuad : public RenderShape
@@ -68,14 +68,14 @@ protected:
 class RenderCuboid : public RenderShape
 {
 public:
-    RenderCuboid()=delete;
+    RenderCuboid() = delete;
     explicit RenderCuboid(Vec3f offset, Vec3f size) : RenderShape(offset), size_(size){}
 
     [[nodiscard]] Sphere GenerateBoundingSphere() const
     {
         Sphere s;
-        s.center_ = offset_;
-        s.radius_ = std::max(std::max(size_.x, size_.y), size_.z);
+        s.center = offset_;
+        s.radius = std::max(std::max(size_.x, size_.y), size_.z);
         return s;
     }
 

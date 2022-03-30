@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package core.pb;
+
+message Texture
+{
+    enum TextureType
+    {
+        KTX = 0;
+        DDS = 1;
+        JPG = 2;
+        PNG = 3;
+        BMP = 4;
+    }
+    string filename = 1;
+    string path = 2;
+    TextureType type = 3;
+    uint64 id = 4;
+}
+
+enum ShaderType
+{
+    VERTEX = 0;
+    FRAGMENT = 1;
+    COMPUTE = 2;
+    GEOMETRY = 3;
+    TESC = 4;
+    TESE = 5;
+}
+
+message Shader
+{
+    string filename = 1;
+    string path = 2;
+    ShaderType type = 3;
+}
+
+message Uniform
+{
+    enum Format
+    {
+        VEC3F = 0;
+        VEC4F = 1;
+        MAT4F = 2;
+        VEC2F = 3;
+    }
+    int32 binding = 1;
+    int32 location = 2;
+    ShaderType stage = 3;
+    Format format = 4;
+}
+
+message Sampler
+{
+    int32 binding = 1;
+    int32 location = 2;
+    ShaderType stage = 3;
+}
+
+message Material
+{
+    repeated Shader shaders = 1;
+    repeated Texture textures = 2;
+    repeated Uniform uniforms = 3;
+    repeated Sampler samplers = 4;
+}
