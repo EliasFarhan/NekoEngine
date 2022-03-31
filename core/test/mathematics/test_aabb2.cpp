@@ -24,15 +24,15 @@ SOFTWARE.
 
 
 #include <gtest/gtest.h>
-#include "mathematics/aabb.h"
+#include "mathematics/aabb2.h"
 
 
 TEST(Aabb, Aabb2d_Aabb2d)
 {
 //Same Aabb
-neko::Aabb2d aabb1;
+neko::Aabb2f aabb1;
 aabb1.FromCenterExtends(neko::Vec2f(0.0f, 0.0f), neko::Vec2f(0.5f, 0.5f));
-neko::Aabb2d aabb2;
+neko::Aabb2f aabb2;
 aabb2.FromCenterExtends(neko::Vec2f(0.0f, 0.0f), neko::Vec2f(0.5f, 0.5f));
 EXPECT_TRUE(aabb1.ContainsAabb(aabb2));
 EXPECT_TRUE(aabb1.IntersectAabb(aabb2));
@@ -142,7 +142,7 @@ EXPECT_TRUE(aabb2.IntersectAabb(aabb1));
 
 TEST(Aabb, Aabb2d_Ray)
 {
-neko::Aabb2d aabb1;
+neko::Aabb2f aabb1;
 aabb1.FromCenterExtends(neko::Vec2f(0.0f, 0.0f), neko::Vec2f(0.5f, 0.5f));
 //Inside Intersect
 neko::Vec2f origin1 = neko::Vec2f(-0.1f, -0.1f);

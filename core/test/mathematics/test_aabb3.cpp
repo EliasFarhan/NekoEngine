@@ -24,7 +24,7 @@ SOFTWARE.
 
 
 #include <gtest/gtest.h>
-#include "mathematics/aabb.h"
+#include "mathematics/aabb3.h"
 
 
 TEST(Aabb, Aabb3d_Aabb3d)

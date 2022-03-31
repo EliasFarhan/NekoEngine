@@ -41,7 +41,7 @@ class Allocator
 public:
 
     Allocator() = default;
-    Allocator(size_t size, void* start);
+    Allocator(std::size_t size, void* start);
     Allocator(const Allocator&);
     Allocator(Allocator&&) = default;
     Allocator& operator=(const Allocator&) = delete;
@@ -49,24 +49,24 @@ public:
 
     virtual ~Allocator() noexcept;
 
-    virtual void* Allocate(size_t allocatedSize, size_t alignment) = 0;
+    virtual void* Allocate(std::size_t allocatedSize, std::size_t alignment) = 0;
 
     virtual void Deallocate(void* p) = 0;
 
-    inline static size_t CalculateAlignForwardAdjustment(const void* address, size_t alignment)
+    inline static std::uintptr_t CalculateAlignForwardAdjustment(void* address, std::size_t alignment)
     {
         //Check if alignement is power of 2
         neko_assert((alignment & (alignment - 1)) == 0, "Alignement needs to be a power of two");
-        const size_t adjustment = alignment - ((std::size_t) const_cast<void*>(address) & ((alignment - 1)));
+        const auto adjustment = alignment - (reinterpret_cast<std::uintptr_t>(address) & (alignment - 1));
 
         if (adjustment == alignment) return 0;
         return adjustment;
     }
 
-    inline static std::size_t CalculateAlignForwardAdjustmentWithHeader(const void* address, size_t alignment, size_t headerSize)
+    inline static std::uintptr_t CalculateAlignForwardAdjustmentWithHeader(void* address, std::size_t alignment, std::size_t headerSize)
     {
         auto adjustment = CalculateAlignForwardAdjustment(address, alignment);
-        size_t neededSpace = headerSize;
+        auto neededSpace = headerSize;
         if (adjustment < neededSpace)
         {
             neededSpace -= adjustment;
@@ -76,18 +76,18 @@ public:
         return adjustment;
     }
 
-    inline static void* AlignForward(void* address, size_t alignment)
+    inline static void* AlignForward(void* address, std::uintptr_t alignment)
     {
         return reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(address) + CalculateAlignForwardAdjustment(address, alignment));
     }
 
-    inline static void* AlignForwardWithHeader(void* address, size_t alignment, size_t headerSize)
+    inline static void* AlignForwardWithHeader(void* address, std::uintptr_t alignment, std::uintptr_t headerSize)
     {
         return reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(address) +
                                        CalculateAlignForwardAdjustmentWithHeader(address, alignment, headerSize));
     }
 
-    [[nodiscard]] size_t GetUsedMemory() const
+    [[nodiscard]] std::size_t GetUsedMemory() const
     {
         return usedMemory_;
     }
@@ -97,7 +97,7 @@ public:
         return start_;
     }
 
-    [[nodiscard]] size_t GetSize() const
+    [[nodiscard]] std::size_t GetSize() const
     {
         return size_;
     }
@@ -107,22 +107,22 @@ public:
 
 protected:
     void* start_ = nullptr;
-    size_t size_ = 0;
-    size_t usedMemory_ = 0;
-    size_t numAllocations_ = 0;
+    std::size_t size_ = 0;
+    std::size_t usedMemory_ = 0;
+    std::size_t numAllocations_ = 0;
 };
 
 class DumbAllocator final : public Allocator
 {
 public:
-    void* Allocate(size_t allocatedSize, size_t alignment) override;
+    void* Allocate(std::size_t allocatedSize, std::size_t alignment) override;
     void Deallocate(void* p) override;
 };
 
 class LinearAllocator final : public Allocator
 {
 public:
-    LinearAllocator(size_t size, void* start) : Allocator(size, start), currentPos_(start_)
+    LinearAllocator(std::size_t size, void* start) : Allocator(size, start), currentPos_(start_)
     {
         neko_assert(size > 0, "Linear Allocator cannot be empty");
     }
@@ -136,7 +136,7 @@ public:
 
     LinearAllocator& operator=(const LinearAllocator&) = delete;
 
-    void* Allocate(size_t allocatedSize, size_t alignment) override;
+    void* Allocate(std::size_t allocatedSize, std::size_t alignment) override;
 
     void Deallocate(void* p) override;
 
@@ -149,7 +149,7 @@ protected:
 class StackAllocator final : public Allocator
 {
 public:
-    StackAllocator(size_t size, void* start) : Allocator(size, start), currentPos_(start)
+    StackAllocator(std::size_t size, void* start) : Allocator(size, start), currentPos_(start)
     {
         neko_assert(size > 0, "Stack Allocator cannot be empty");
     }
@@ -166,7 +166,7 @@ public:
 
     StackAllocator& operator=(const StackAllocator&) = delete;
 
-    void* Allocate(size_t allocatedSize, size_t alignment) override;
+    void* Allocate(std::size_t allocatedSize, std::size_t alignment) override;
 
     void Deallocate(void* p) override;
 
@@ -190,7 +190,7 @@ protected:
 class FreeListAllocator final : public Allocator
 {
 public:
-    FreeListAllocator(size_t size, void* start) : Allocator(size, start), freeBlocks_((FreeBlock*)start)
+    FreeListAllocator(std::size_t size, void* start) : Allocator(size, start), freeBlocks_((FreeBlock*)start)
     {
         neko_assert(size > sizeof(FreeBlock), "Free List Allocator cannot be empty");
         freeBlocks_->size = size;
@@ -203,19 +203,19 @@ public:
 
     FreeListAllocator& operator=(const FreeListAllocator&) = delete;
 
-    void* Allocate(size_t allocatedSize, size_t alignment) override;
+    void* Allocate(std::size_t allocatedSize, std::size_t alignment) override;
 
     void Deallocate(void* p) override;
 
 protected:
     struct AllocationHeader
     {
-        size_t size = 0;
+        std::size_t size = 0;
         std::uint8_t adjustment = 0;
     };
     struct FreeBlock
     {
-        size_t size = 0;
+        std::size_t size = 0;
         FreeBlock* next = nullptr;
     };
 
@@ -227,14 +227,14 @@ class PoolAllocator final : public Allocator
 {
     static_assert(sizeof(T) >= sizeof(void*));
 public:
-    PoolAllocator(size_t size, void* mem);
+    PoolAllocator(std::size_t size, void* mem);
 
     ~PoolAllocator() override
     {
         freeBlocks_ = nullptr;
     }
 
-    void* Allocate(size_t allocatedSize, size_t alignment) override;
+    void* Allocate(std::size_t allocatedSize, std::size_t alignment) override;
 
     void Deallocate(void* p) override;
 
@@ -247,13 +247,13 @@ protected:
 };
 
 template<typename T>
-PoolAllocator<T>::PoolAllocator(size_t size, void* mem) : Allocator(size, mem)
+PoolAllocator<T>::PoolAllocator(std::size_t size, void* mem) : Allocator(size, mem)
 {
     const auto adjustment = CalculateAlignForwardAdjustment(mem, alignof(T));
     freeBlocks_ = reinterpret_cast<FreeBlock*>(reinterpret_cast<std::uintptr_t>(mem) + adjustment);
     FreeBlock* freeBlock = freeBlocks_;
-    const size_t numObjects = (size - adjustment) / sizeof(T);
-    for (size_t i = 0; i < numObjects - 1; i++)
+    const std::size_t numObjects = (size - adjustment) / sizeof(T);
+    for (std::size_t i = 0; i < numObjects - 1; i++)
     {
         freeBlock->next = reinterpret_cast<FreeBlock*>(reinterpret_cast<std::uintptr_t>(freeBlock) + sizeof(T));
         freeBlock = freeBlock->next;
@@ -262,7 +262,7 @@ PoolAllocator<T>::PoolAllocator(size_t size, void* mem) : Allocator(size, mem)
 }
 
 template<typename T>
-void* PoolAllocator<T>::Allocate(size_t allocatedSize, [[maybe_unused]] size_t alignment)
+void* PoolAllocator<T>::Allocate(std::size_t allocatedSize, [[maybe_unused]] std::size_t alignment)
 {
     neko_assert(allocatedSize == sizeof(T) && alignment == alignof(T), "Pool Allocator can only allocate one Object pooled at once");
     if (freeBlocks_ == nullptr)
@@ -296,7 +296,7 @@ public:
     ProxyAllocator& operator=(const ProxyAllocator&) = delete;
     ~ProxyAllocator() override;
 
-    void* Allocate(size_t allocatedSize, size_t alignment) override;
+    void* Allocate(std::size_t allocatedSize, std::size_t alignment) override;
 
     void Deallocate(void* p) override;
 
@@ -319,7 +319,7 @@ public:
     ~StandardLibraryAllocator();
 
     using value_type = T;
-    using size_type = size_t;
+    using size_type = std::size_t;
     using pointer = T*;
     using const_pointer = const T*;
 
