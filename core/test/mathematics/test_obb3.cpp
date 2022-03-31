@@ -31,9 +31,9 @@ TEST(Aabb, Obb3d_Obb3d)
 {
     neko::RadianAngles angles = neko::RadianAngles(static_cast<neko::Radian>(0), static_cast<neko::Radian>(0), static_cast<neko::Radian>(neko::PI / 4));
     //Same Intersect
-    neko::Obb3d obb1;
+    neko::Obb3f obb1;
     obb1.FromCenterExtendsRotation(neko::Vec3f(0, 0, 0), neko::Vec3f(0.5f, 0.5f, 0.5f), angles);
-    neko::Obb3d obb2;
+    neko::Obb3f obb2;
     obb2.FromCenterExtendsRotation(neko::Vec3f(0, 0, 0), neko::Vec3f(0.5f, 0.5f, 0.5f), angles);
     EXPECT_TRUE(obb1.IntersectObb(obb2));
     EXPECT_TRUE(obb2.IntersectObb(obb1));
@@ -79,8 +79,8 @@ TEST(Aabb, Obb3d_Obb3d)
     EXPECT_FALSE(obb2.IntersectObb(obb1));
 
     //From Obb
-    neko::Aabb3d aabb1;
-    neko::Aabb3d aabb2;
+    neko::Aabb3f aabb1;
+    neko::Aabb3f aabb2;
     aabb1.FromObb(obb1);
     aabb2.FromObb(obb2);
     EXPECT_FALSE(aabb1.ContainsAabb(aabb2));

@@ -30,9 +30,9 @@ SOFTWARE.
 TEST(Aabb, Aabb3d_Aabb3d)
 {
 //Same Aabb
-neko::Aabb3d aabb1;
+neko::Aabb3f aabb1;
 aabb1.FromCenterExtends(neko::Vec3f(0.0f, 0.0f, 0.0f), neko::Vec3f(0.5f, 0.5f, 0.5f));
-neko::Aabb3d aabb2;
+neko::Aabb3f aabb2;
 aabb2.FromCenterExtends(neko::Vec3f(0.0f, 0.0f, 0.0f), neko::Vec3f(0.5f, 0.5f, 0.5f));
 EXPECT_TRUE(aabb1.ContainsAabb(aabb2));
 EXPECT_TRUE(aabb1.IntersectAabb(aabb2));
@@ -140,7 +140,7 @@ EXPECT_TRUE(aabb2.IntersectAabb(aabb1));
 
 TEST(Aabb, Aabb3d_Ray)
 {
-neko::Aabb3d aabb1;
+neko::Aabb3f aabb1;
 aabb1.FromCenterExtends(neko::Vec3f(0.0f, 0.0f, 0.0f), neko::Vec3f(0.5f, 0.5f, 0.5f));
 //Inside Intersect
 neko::Vec3f origin1 = neko::Vec3f(-0.1f, -0.1f, -0.1f);
@@ -184,7 +184,7 @@ EXPECT_FALSE(aabb1.IntersectRay(dir1, origin1));
 
 TEST(Aabb, Aabb3d_Plane)
 {
-neko::Aabb3d aabb1;
+neko::Aabb3f aabb1;
 aabb1.FromCenterExtends(neko::Vec3f(0, 0, 0), neko::Vec3f(1, 1, 1));
 //Inside Intersect
 neko::Vec3f origin = neko::Vec3f(0, 0, 0);

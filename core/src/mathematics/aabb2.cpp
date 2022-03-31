@@ -47,7 +47,7 @@ void Aabb2f::FromCenterExtendsRotation(Vec2f center, Vec2f extends, Degree rotat
     neko_assert(extends.y >= 0.0f, "Extends height should be positive");
     Vec2f relativeLowerLeftBound = -extends;
     Vec2f relativeUpperRightBound = extends;
-    Radian newAngle = rotation;
+    const Radian newAngle = rotation;
     std::array<Vec2f, 4> corners;
     corners[0] = relativeLowerLeftBound.Rotate(newAngle);
     corners[1] = Vec2f(relativeLowerLeftBound.x, relativeUpperRightBound.y).Rotate(newAngle);
@@ -64,12 +64,12 @@ void Aabb2f::FromCenterExtendsRotation(Vec2f center, Vec2f extends, Degree rotat
     lowerLeftBound = relativeLowerLeftBound + center;
 }
 
-void Aabb2f::FromObb(Obb2d obb)
+void Aabb2f::FromObb(Obb2f obb)
 {
     FromCenterExtendsRotation(obb.center, Vec2f(obb.GetExtendOnAxis(obb.GetRight()), obb.GetExtendOnAxis(obb.GetUp())),obb.rotation);
 }
 
-bool Aabb2f::ContainsPoint(const Vec2f point) const
+bool Aabb2f::ContainsPoint(Vec2f point) const
 {
     bool contains = point.x <= upperRightBound.x && point.x >= lowerLeftBound.x;
     contains = point.y <= upperRightBound.y && point.y >= lowerLeftBound.y &&
@@ -84,8 +84,8 @@ bool Aabb2f::ContainsAabb(const Aabb2f& aabb) const
 
 bool Aabb2f::IntersectAabb(const Aabb2f& aabb) const
 {
-    bool x = std::abs(aabb.CalculateCenter().x - CalculateCenter().x) <= (aabb.CalculateExtends().x + CalculateExtends().x);
-    bool y = std::abs(aabb.CalculateCenter().y - CalculateCenter().y) <= (aabb.CalculateExtends().y + CalculateExtends().y);
+    const bool x = std::abs(aabb.CalculateCenter().x - CalculateCenter().x) <= (aabb.CalculateExtends().x + CalculateExtends().x);
+    const bool y = std::abs(aabb.CalculateCenter().y - CalculateCenter().y) <= (aabb.CalculateExtends().y + CalculateExtends().y);
 
     return x && y;
 }
@@ -102,8 +102,8 @@ bool Aabb2f::IntersectRay(const Vec2f& dirRay, const Vec2f& origin) const
     touch[1] = (upperRightBound.x - origin.x) / dirRay.x;
     touch[2] = (lowerLeftBound.y - origin.y) / dirRay.y;
     touch[3] = (upperRightBound.y - origin.y) / dirRay.y;
-    float touchMin = std::max(std::min(touch[0], touch[1]), std::min(touch[2], touch[3]));
-    float touchMax = std::min(std::max(touch[0], touch[1]), std::max(touch[2], touch[3]));
+    const float touchMin = std::max(std::min(touch[0], touch[1]), std::min(touch[2], touch[3]));
+    const float touchMax = std::min(std::max(touch[0], touch[1]), std::max(touch[2], touch[3]));
 
     // if tmax < 0, ray (line) is intersecting AABB, but the whole AABB is behind us
     if (touchMax < 0)

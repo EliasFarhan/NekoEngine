@@ -29,7 +29,9 @@
 
 namespace neko
 {
-
+/*
+ * \brief Axis-Aligned Bounding Box in 2d with single-floating point number
+ */
 struct Aabb2f
 {
     ///\brief Get the center of the AABB.
@@ -48,9 +50,9 @@ struct Aabb2f
             Degree rotation);
 
     ///\brief Set the AABB from OBB.
-    void FromObb(Obb2d obb);
+    void FromObb(Obb2f obb);
 
-    [[nodiscard]] bool ContainsPoint(const Vec2f point) const;
+    [[nodiscard]] bool ContainsPoint(Vec2f point) const;
     [[nodiscard]] bool ContainsAabb(const Aabb2f& aabb) const;
     [[nodiscard]] bool IntersectAabb(const Aabb2f& aabb) const;
     [[nodiscard]] bool IntersectRay(const Vec2f& dirRay, const Vec2f& origin) const;

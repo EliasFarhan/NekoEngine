@@ -29,24 +29,24 @@
 namespace neko
 {
 
-struct Obb3d
+struct Obb3f
 {
 
-    Vec3f GetRight();
+    Vec3f GetRight() const;
 
-    Vec3f GetUp();
+    Vec3f GetUp() const;
 
-    Vec3f GetForward();
+    Vec3f GetForward() const;
 
     /// Set the center, the extends and the rotation of the OBB.
     void FromCenterExtendsRotation(Vec3f newCenter, Vec3f localExtends, RadianAngles rot);
     float GetExtendOnAxis(Vec3f axis);
 
-    Vec3f GetOppositeBound(Vec3f bound, bool isUpper);
+    Vec3f GetOppositeBound(Vec3f bound, bool isUpper) const;
 
-    Vec2f ProjectOnAxis(const Vec3f& axis);
+    Vec2f ProjectOnAxis(const Vec3f& axis) const;
 
-    bool IntersectObb(Obb3d& obb1);
+    bool IntersectObb(const Obb3f& obb1) const;
 
     static Vec3f RotateAxis(Vec3f axis, RadianAngles rotation);
 

@@ -73,7 +73,7 @@ public:
 
     void ScheduleTask(const std::shared_ptr<Task>& task, std::string_view queueName);
 
-    [[nodiscard]] std::uint8_t GetWorkersNumber() const { return workerManager_.GetWorkersCount(); }
+    [[nodiscard]] auto GetWorkersNumber() const { return workerManager_.GetWorkersCount(); }
 
 
     [[nodiscard]] Vec2u GetWindowSize() const;

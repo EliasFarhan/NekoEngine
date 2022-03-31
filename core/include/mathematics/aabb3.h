@@ -29,7 +29,7 @@
 namespace neko
 {
 
-struct Aabb3d {
+struct Aabb3f {
     ///\brief Get the center of the AABB.
     [[nodiscard]] Vec3f CalculateCenter() const;
 
@@ -49,13 +49,13 @@ struct Aabb3d {
             RadianAngles rotation);
 
     //\brief Set the AABB3d from OBB3d.
-    void FromObb(Obb3d obb);
+    void FromObb(Obb3f obb);
 
     [[nodiscard]] bool ContainsPoint(Vec3f point) const;
 
-    [[nodiscard]] bool ContainsAabb(const Aabb3d& aabb) const;
+    [[nodiscard]] bool ContainsAabb(const Aabb3f& aabb) const;
 
-    [[nodiscard]] bool IntersectAabb(const Aabb3d& aabb) const;
+    [[nodiscard]] bool IntersectAabb(const Aabb3f& aabb) const;
 
     [[nodiscard]] bool IntersectRay(const Vec3f& dirRay, const Vec3f& origin) const;
 

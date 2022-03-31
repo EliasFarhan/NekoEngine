@@ -29,24 +29,24 @@
 
 namespace neko
 {
-struct Obb2d
+struct Obb2f
 {
     /// Get the direction of the OBB rotated 90 degrees clockwise.
-    Vec2f GetRight();
+    Vec2f GetRight() const;
 
     /// Get the direction of the OBB rotated 90 degrees clockwise.
-    Vec2f GetUp();
+    Vec2f GetUp() const;
 
     /// Set the center, the extends and the rotation of the OBB.
     void FromCenterExtendsRotation(Vec2f newCenter, Vec2f localExtends, Degree rot);
 
     float GetExtendOnAxis(Vec2f axis);
 
-    Vec2f GetOppositeBound(Vec2f bound, bool isUpper);
+    Vec2f GetOppositeBound(Vec2f bound, bool isUpper) const;
 
     [[nodiscard]] Vec2f ProjectOnAxis(const Vec2f& axis) const;
 
-    bool IntersectObb(Obb2d& obb1);
+    bool IntersectObb(const Obb2f& obb1) const;
 
     Vec2f CalculateDirection() const;
 

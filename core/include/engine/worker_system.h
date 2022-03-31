@@ -132,7 +132,7 @@ public:
     bool AddTask(const std::shared_ptr<Task>& task, std::string_view queueName);
     void ExecuteMainThread();
     void Destroy();
-    [[nodiscard]] std::uint8_t GetWorkersCount() const { return threads_.size(); }
+    [[nodiscard]] auto GetWorkersCount() const { return threads_.size(); }
 
     static core::pb::WorkerManager CreateWorkerManagerDefinition();
 private:

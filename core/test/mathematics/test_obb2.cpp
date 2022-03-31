@@ -32,9 +32,9 @@ TEST(Aabb, Obb2d_Obb2d)
     auto angle = neko::Radian(neko::PI / 4);
 
     //Same Intersect
-    neko::Obb2d obb1;
+    neko::Obb2f obb1;
     obb1.FromCenterExtendsRotation(neko::Vec2f(0.0f, 0.0f), neko::Vec2f(0.5f, 0.5f), angle);
-    neko::Obb2d obb2;
+    neko::Obb2f obb2;
     obb2.FromCenterExtendsRotation(neko::Vec2f(0.0f, 0.0f), neko::Vec2f(0.5f, 0.5f), angle);
     EXPECT_TRUE(obb1.IntersectObb(obb2));
     EXPECT_TRUE(obb2.IntersectObb(obb1));

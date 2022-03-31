@@ -34,7 +34,7 @@
     { \
         logError(fmt::format("Assert failed:\t{}\nSource:\t\t{}, line {}", \
             #Msg, __FILE__,__LINE__)); \
-            std::abort(); \
+        std::abort(); \
     }
 #else
 #define neko_assert(Expr, Msg) \
