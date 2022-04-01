@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.16)
 option(Neko_Profile "Activate Profiling with Easy Profile" OFF )
 option(Neko_GLES3 "Activate OpenGL ES 3.0" ON)
 option(Neko_SDL2 "Activate SDL2" ON)
-option(Neko_Box2D "Activate Box2D" OFF)
+option(Neko_Box2D "Activate Box2D" ON)
 option(Neko_Test "Activate Test" ON )
 option(Neko_Assert "Activate Neko Assertion" ON)
 option(Neko_Benchmark  "Activate Benchmark" ON)
@@ -87,6 +87,11 @@ foreach(tools_project_path ${tools_projects} )
 endforeach()
 
 
+if(Neko_Profile)
+    MESSAGE("Enable profiling")
+    set(TRACY_FOLDER "${EXTERNAL_DIR}/tracy" CACHE INTERNAL "")
+endif()
+
 include("cmake/data_generation.cmake")
 set(NEKO_CORE_DIR "${CMAKE_SOURCE_DIR}/core/" CACHE INTERNAL "")
 add_subdirectory(${NEKO_CORE_DIR})
@@ -95,16 +100,17 @@ if(Neko_PhysFS)
     add_subdirectory(common/physfs_wrapper)
 endif()
 
-if(Neko_Profile)
-    MESSAGE("Enable profiling")
-    set(TRACY_FOLDER "${EXTERNAL_DIR}/tracy" CACHE INTERNAL "")
-endif()
+
 
 target_precompile_headers(Neko_Core PRIVATE "${NEKO_CORE_DIR}/include/core_pch.h")
 
 if(Neko_SDL2)
     #sdl2
     add_subdirectory("common/sdl_engine")
+endif()
+
+if(Neko_Box2D)
+    add_subdirectory("common/box2d_wrapper")
 endif()
 
 if(Neko_GLES3)
