@@ -34,15 +34,13 @@ namespace neko::gl
 
 struct Sprite
 {
-    Sprite() = default;
-    ~Sprite() = default;
     Color4 color = Color4(Color::white, 1.0f);
     TextureId textureId = INVALID_TEXTURE_ID;
     Texture texture{};
 };
 
 class SpriteManagerInterface :
-        public ComponentManager<Sprite, EntityMask(ComponentType::SPRITE2D)>,
+        public ComponentManager<Sprite, static_cast<EntityMask>(ComponentType::SPRITE2D)>,
         public SystemInterface,
         public RenderCommandInterface
 {

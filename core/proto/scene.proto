@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package core.pb;
+
+message Uuid
+{
+    uint64 ab = 1;
+    uint64 cd = 2;
+}
+
+// A file to load when loading a scene
+message Resource
+{
+    Uuid id = 1;
+    string name = 2;
+    string path = 3;
+}
+
+enum ComponentType
+{
+    POSITION2D = 0;
+    SCALE2D = 1;
+    ROTATION2D = 2;
+    POSITION3D = 3;
+    SCALE3D = 4;
+    ROTATION3D = 5;
+    SPRITE2D = 6;
+    BODY2D = 7;
+    BOX_BOLLIDER2D = 8;
+    CIRCLE_COLLIDER2D = 9;
+    POLYGON_COLLIDER2D = 10;
+    CONVEX_SHAPE2D = 11;
+    PREFAB = 12;
+}
+
+message Component
+{
+    ComponentType type = 1;
+    Uuid resource_id = 2;
+}
+
+message Entity
+{
+    uint32 index = 1;
+    repeated Component components = 2;
+    uint32 child_index = 3;
+    uint32 next_child_index = 4;
+}
+
+message Scene
+{
+    repeated Entity entities = 1;
+    repeated Resource resources = 2;
+}

@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package core.pb;
 
+
 message Texture
 {
     enum TextureType
@@ -30,7 +31,7 @@ enum ShaderType
 
 message Shader
 {
-    string filename = 1;
+    string name = 1;
     string path = 2;
     ShaderType type = 3;
 }
@@ -60,7 +61,40 @@ message Sampler
 message Material
 {
     repeated Shader shaders = 1;
-    repeated Texture textures = 2;
     repeated Uniform uniforms = 3;
     repeated Sampler samplers = 4;
+}
+
+
+message Pipeline
+{
+    Material material = 1;
+    enum CullMode
+    {
+        BACK = 0;
+        FRONT = 1;
+        FRONT_AND_BACK = 2;
+    }
+    CullMode cull_mode = 2;
+    enum FrontFace
+    {
+        CLOCKWISE = 0;
+        COUNTER_CLOCKWISE = 1;
+    }
+    FrontFace front_face = 3;
+    enum DepthCompareOp
+    {
+        LESS = 0;
+        LESS_OR_EQUAL = 1;
+        EQUAL = 2;
+        GREATER = 3;
+        NOT_EQUAL = 4;
+        GREATER_OR_EQUAL = 5;
+        ALWAYS = 6;
+        NEVER = 7;
+    };
+    DepthCompareOp depth_compare_op = 4;
+    bool depth_test_enable = 5;
+    //TODO Add blending mode (6) and op (7)
+    bool blend_enable = 8;
 }
