@@ -1,6 +1,3 @@
-
-
-
 #pybind11
 set(PYBIND11_VERSION "2.6.1")
 set(PYBIND11_DIR "${EXTERNAL_DIR}/pybind11-${PYBIND11_VERSION}")

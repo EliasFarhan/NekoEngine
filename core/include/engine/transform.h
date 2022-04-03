@@ -83,7 +83,7 @@ protected:
 };
 
 class Transform2dManager :
-        public ComponentManager<Mat4f, EntityMask(ComponentType::TRANSFORM2D)>,
+        public ComponentManager<Mat4f, static_cast<EntityMask>(ComponentType::TRANSFORM2D)>,
         public TransformManagerInterface
 {
 public:

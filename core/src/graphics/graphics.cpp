@@ -160,7 +160,7 @@ void Renderer::Destroy()
     flags_ &= ~IS_RUNNING;
 }
 
-void Renderer::SetFlag(Renderer::RendererFlag flag)
+void Renderer::SetFlag(RendererFlag flag)
 {
     std::lock_guard<std::mutex> lock(statusMutex_);
     flags_ |= flag;

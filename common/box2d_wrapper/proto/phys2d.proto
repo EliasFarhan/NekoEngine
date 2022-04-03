@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package phys2d.pb;
+
+message PhysicsConfig
+{
+    float gravity_x = 1;
+    float gravity_y = 2;
+    float fixed_timestep = 3;
+    int32 velocity_iterations = 4;
+    int32 position_iterations = 5;
+}
+
+message Body2dDef
+{
+    enum BodyType
+    {
+        STATIC = 0;
+        DYNAMIC = 1;
+        KINEMATIC = 2;
+    }
+    float position_x = 1;
+    float position_y = 2;
+    float angle = 3;
+    float linear_velocity_x = 4;
+    float linear_velocity_y = 5;
+    float angular_velocity = 6;
+    float linear_damping = 7;
+    float angular_damping = 8;
+    bool allow_sleep = 9;
+    bool awake = 10;
+    bool fixed_rotation = 11;
+    bool bullet = 12;
+    BodyType type = 13;
+    bool enable = 14;
+    float gravity_scale = 15;
+}
