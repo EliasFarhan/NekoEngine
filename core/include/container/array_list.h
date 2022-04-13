@@ -24,11 +24,12 @@ public:
 
         iterator(T* ptr) : ptr_(ptr) {}
         self_type operator++() { self_type i = *this; ++ptr_; return i; }
-        pointer operator*() { return ptr_; }
+        reference operator*() { return *ptr_; }
         pointer operator->() { return ptr_; }
         bool operator==(const self_type& rhs) { return ptr_ == rhs.ptr_; }
         bool operator!=(const self_type& rhs) { return ptr_ != rhs.ptr_; }
     private:
+        friend class const_iterator;
         T* ptr_ = nullptr;
     };
 
@@ -42,10 +43,10 @@ public:
         using iterator_category = std::random_access_iterator_tag;
         using self_type = const_iterator;
 
-        const_iterator(iterator it) : ptr_(*it){}
+        const_iterator(iterator it) : ptr_(it.ptr_){}
         const_iterator(T* ptr) : ptr_(ptr) {}
         self_type operator++() { self_type i = *this; ++ptr_; return i; }
-        pointer operator*() { return ptr_; }
+        const reference operator*() { return *ptr_; }
         const pointer operator->() { return ptr_; }
         bool operator==(const self_type& rhs) const { return ptr_ == rhs.ptr_; }
         bool operator!=(const self_type& rhs) const { return ptr_ != rhs.ptr_; }
@@ -126,9 +127,9 @@ public:
             const auto endIt = end();
             if constexpr (!std::is_trivially_destructible_v<T>)
             {
-                for (auto it = beginIt; it != endIt; ++it)
+                for (auto it = beginPtr_; it != endPtr_; ++it)
                 {
-                    (*it)->~T();
+                    it->~T();
                 }
             }
             if(capacity_ < otherSize)
@@ -178,9 +179,9 @@ public:
         const auto endIt = end();
         if constexpr (!std::is_trivially_destructible_v<T>)
         {
-            for (auto it = beginIt; it != endIt; ++it)
+            for (auto it = beginPtr_; it != endPtr_; ++it)
             {
-                (*it)->~T();
+                it->~T();
             }
         }
         allocator_.Deallocate(beginPtr_);
@@ -199,6 +200,7 @@ public:
         const auto oldSize = Size();
         //TODO implement using realloc as well
         T* newBeginPtr = static_cast<T*>(allocator_.Allocate(sizeof(T) * newCapacity, alignof(T)));
+        std::memset(newBeginPtr, 0, sizeof(T) * newCapacity);
         for(std::size_t i = 0; i < oldSize; i++)
         {
             newBeginPtr[i] = std::move(beginPtr_[i]);
@@ -236,27 +238,13 @@ public:
 
     void PushBack(const T& val)
     {
-        const auto oldCapacity = capacity_ == 0 ? 1 : capacity_;
+        const auto oldCapacity = capacity_;
         const auto newSize = Size() + 1;
-
-        if(newSize > oldCapacity)
+        if (capacity_ == 0)
         {
-            auto newCapacity = oldCapacity;
-            while(newCapacity < newSize)
-            {
-                newCapacity = defaultReallocSizeFunc(newCapacity);
-            }
-            Reserve(newCapacity);
+            Reserve(1);
         }
-        beginPtr_[newSize - 1] = val;
-        ++endPtr_;
-    }
-    void PushBack(T&& val)
-    {
-        const auto oldCapacity = capacity_ == 0 ? 1 : capacity_;
-        const auto newSize = Size() + 1;
-
-        if (newSize > oldCapacity)
+        else if (newSize > oldCapacity)
         {
             auto newCapacity = oldCapacity;
             while (newCapacity < newSize)
@@ -265,17 +253,46 @@ public:
             }
             Reserve(newCapacity);
         }
+        
+        beginPtr_[newSize - 1] = val;
+        ++endPtr_;
+    }
+    void PushBack(T&& val)
+    {
+        const auto oldCapacity =  capacity_;
+        const auto newSize = Size() + 1;
+        if(oldCapacity == 0)
+        {
+            Reserve(1);
+        }
+        else
+        {
+            if (newSize > oldCapacity)
+            {
+                auto newCapacity = oldCapacity;
+                while (newCapacity < newSize)
+                {
+                    newCapacity = defaultReallocSizeFunc(newCapacity);
+                }
+                Reserve(newCapacity);
+            }
+        }
+
         beginPtr_[newSize - 1] = std::move(val);
+
         ++endPtr_;
     }
 
     template<typename... Args>
     void EmplaceBack(Args... args)
     {
-        const auto oldCapacity = capacity_ == 0 ? 1 : capacity_;
+        const auto oldCapacity = capacity_;
         const auto newSize = Size() + 1;
-
-        if (newSize > oldCapacity)
+        if (oldCapacity == 0)
+        {
+            Reserve(1);
+        }
+        else if (newSize > oldCapacity)
         {
             auto newCapacity = oldCapacity;
             while (newCapacity < newSize)
@@ -285,7 +302,7 @@ public:
             Reserve(newCapacity);
         }
         ::new (beginPtr_+newSize-1) T(args...);
-        endPtr_++;
+        ++endPtr_;
     }
 
     void PopBack()
@@ -299,34 +316,37 @@ public:
 
     void Erase(const_iterator it)
     {
+        auto ptr = &(*it);
         if constexpr (std::is_trivially_destructible_v<T>)
         {
-            (*it)->~T();
+            ptr->~T();
         }
         const auto lastElementsCount = std::distance(it, cend())-1;
         if (lastElementsCount != 0)
         {
-            std::memmove(*it, (*it) + 1, lastElementsCount*sizeof(T));
+            std::memmove(ptr, ptr + 1, lastElementsCount*sizeof(T));
         }
         --endPtr_;
     }
 
     void Erase(const_iterator beginIt, const_iterator endIt)
     {
-        const auto elementCount = std::distance(beginIt, endIt);
+        auto beginPtr = &(*beginIt);
+        auto endPtr = &(*endIt);
+        const auto elementCount = std::distance(beginPtr, endPtr);
         if constexpr (std::is_trivially_destructible_v<T>)
         {
-            for (auto it = beginIt; it != endIt; ++it)
+            for (auto it = beginPtr; it != endPtr; ++it)
             {
-                (*it)->~T();
+                it->~T();
             }
         }
-        const auto lastElementsCount = std::distance(beginIt, cend()) - elementCount;
+        const auto lastElementsCount = std::distance(beginPtr, endPtr_) - elementCount;
         if (lastElementsCount != 0)
         {
-            std::memmove(*beginIt, (*beginIt) + elementCount, lastElementsCount*sizeof(T));
+            std::memmove(beginPtr, beginPtr + elementCount, lastElementsCount*sizeof(T));
         }
-        endPtr_-=elementCount;
+        endPtr_ -= elementCount;
 
     }
 

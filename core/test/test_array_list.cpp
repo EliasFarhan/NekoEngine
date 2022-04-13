@@ -101,6 +101,32 @@ TEST(ArrayList, PushBack)
     EXPECT_EQ(numbers.Back(), 6);
 }
 
+
+TEST(ArrayList, EmplaceBack)
+{
+    const auto args = { 1, 2, 3, 4, 5 };
+    neko::tl::ArrayList numbers = args;
+    EXPECT_EQ(numbers.Size(), 5);
+    EXPECT_EQ(numbers.Capacity(), 5);
+    EXPECT_EQ(numbers.Front(), 1);
+    EXPECT_EQ(numbers.Back(), 5);
+    constexpr int newValue = 6;
+    numbers.EmplaceBack(newValue);
+    EXPECT_EQ(numbers.Size(), 6);
+    EXPECT_GE(numbers.Capacity(), 6);
+    EXPECT_EQ(numbers.Front(), 1);
+    EXPECT_EQ(numbers.Back(), 6);
+
+    neko::tl::ArrayList<int> emptyArray;
+    EXPECT_EQ(emptyArray.Size(), 0);
+    EXPECT_GE(emptyArray.Capacity(), 0);
+    emptyArray.EmplaceBack(newValue);
+    EXPECT_EQ(emptyArray.Size(), 1);
+    EXPECT_GE(emptyArray.Capacity(), 1);
+    EXPECT_EQ(emptyArray.Front(), newValue);
+    EXPECT_EQ(emptyArray.Back(), newValue);
+}
+
 TEST(ArrayList, EraseOne)
 {
     const auto args = { 1, 2, 3, 4, 5 };
@@ -211,4 +237,46 @@ TEST(ArrayList, ConstructorWithArgs)
     objects.EmplaceBack(a, b);
     EXPECT_EQ(objects.Back().GetA(), a);
     EXPECT_FLOAT_EQ(objects.Back().GetB(), b);
+}
+
+enum class Status
+{
+    Initializable,
+    Running
+};
+
+class Node
+{
+public:
+    Node() = default;
+    virtual ~Node() = default;
+    Node(const Node&) = default;
+    Node(Node&&) noexcept = default;
+    Node& operator=(const Node&) = default;
+    Node& operator=(Node&& other) noexcept = default;
+    /**
+     * @brief Method call before executing the node (might be reset by repeater decorator)
+     * It sets the status to Running.
+     */
+    virtual void Init() { status_ = Status::Running; }
+    virtual Status Execute() = 0;
+    [[nodiscard]] Status GetStatus() const { return status_; }
+protected:
+    Status status_ = Status::Initializable;
+};
+
+class DumbNode : public Node
+{
+    public:
+        Status Execute() override { return Status::Running; }
+};
+
+TEST(ArrayList, UniquePtr)
+{
+    neko::tl::ArrayList<std::unique_ptr<Node>> nodes;
+    nodes.PushBack(std::make_unique<DumbNode>());
+    for(const auto& node : nodes)
+    {
+        node->Execute();
+    }
 }

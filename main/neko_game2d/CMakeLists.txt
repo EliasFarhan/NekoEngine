@@ -1,5 +1,5 @@
-if(NOT Neko_GLES3 and NOT Neko_Box2D and NOT Neko_SDL2)
-	return
+if(NOT Neko_GLES3 AND NOT Neko_Box2D AND NOT Neko_SDL2)
+	return()
 endif()
 
 file(GLOB_RECURSE neko_game2d_src include/*.h src/*.cpp)

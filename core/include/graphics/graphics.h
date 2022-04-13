@@ -67,6 +67,7 @@ class RenderProgram : public RenderCommandInterface, public SystemInterface
 class RendererInterface
 {
 public:
+    virtual ~RendererInterface() = default;
     virtual void Render(RenderCommandInterface* command) = 0;
     virtual void AddPreRenderTask(std::weak_ptr<Task> job) = 0;
     virtual void RegisterSyncBuffersFunction(SyncBuffersInterface* syncBuffersInterface) = 0;
@@ -75,8 +76,7 @@ public:
 class NullRenderer final : public RendererInterface
 {
 public:
-    void Render([[maybe_unused]]RenderCommandInterface* command) override
-    {};
+    void Render([[maybe_unused]]RenderCommandInterface* command) override {}
 	void AddPreRenderTask([[maybe_unused]] std::weak_ptr<Task> job) override {}
     void RegisterSyncBuffersFunction([[maybe_unused]] SyncBuffersInterface* syncBuffersInterface) override {}
 
@@ -94,8 +94,6 @@ public:
     };
 
     Renderer();
-
-    virtual ~Renderer() = default;
 
     /**
      * \brief Send the RenderCommand to the queue for next frame
