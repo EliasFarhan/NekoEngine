@@ -32,8 +32,8 @@
 #include <City/city_engine.h>
 
 #ifdef TRACY_ENABLE
-#include <Tracy.hpp>
-#include <TracyC.h>
+#include <tracy/Tracy.hpp>
+#include <tracy/TracyC.h>
 #endif
 namespace neko
 {
@@ -41,7 +41,7 @@ void CityBuilderTilemap::Init(TextureManager& textureManager)
 {
 
 #ifdef TRACY_ENABLE
-	ZoneScoped
+	ZoneScoped;
 #endif
 	static const auto reverseCityMap =
 		[]() ->std::map<std::string, CityTileType>
@@ -671,7 +671,7 @@ void CityBuilderTilemap::PushCommand(GraphicsManager* graphicsManager)
 {
 
 #ifdef TRACY_ENABLE
-	ZoneScoped
+	ZoneScoped;
 #endif
 	const Index frameIndex = MainEngine::GetInstance()->frameIndex % 2;
 

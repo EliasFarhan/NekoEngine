@@ -30,7 +30,7 @@
 #include "engine/log.h"
 
 #ifdef TRACY_ENABLE
-#include <Tracy.hpp>
+#include <tracy/Tracy.hpp>
 #endif
 namespace neko {
 
@@ -158,7 +158,7 @@ namespace neko {
 	BehaviorTreeFlow BehaviorTreeLeafMoveTo::Execute()
 	{
 #ifdef TRACY_ENABLE
-		ZoneScoped
+		ZoneScoped;
 #endif
 		if (to_.x == std::numeric_limits<int>::max() &&
 			to_.y == std::numeric_limits<int>::max()) 

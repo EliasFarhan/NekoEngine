@@ -29,7 +29,7 @@
 #include <City/city_engine.h>
 
 #ifdef TRACY_ENABLE
-#include <Tracy.hpp>
+#include <tracy/Tracy.hpp>
 #endif
 namespace neko
 {
@@ -37,7 +37,7 @@ void CityEditor::Init()
 {
 
 #ifdef TRACY_ENABLE
-	ZoneScoped
+	ZoneScoped;
 #endif
 	engine_ = static_cast<CityBuilderEngine*>(MainEngine::GetInstance());
 	for (Index i = 0; i < static_cast<Index>(ButtonIconType::LENGTH); i++)
@@ -50,7 +50,7 @@ void CityEditor::Update(float dt)
 {
 
 #ifdef TRACY_ENABLE
-	ZoneScoped
+	ZoneScoped;
 #endif
 	const Index frameIndex = (engine_->frameIndex - 1) % 2; //Render frame is always the previous one
 	ImGui::SFML::Update(*renderWindow_, engine_->clockDeltatime);

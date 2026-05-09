@@ -27,7 +27,7 @@
 #include <City/city_map.h>
 
 #ifdef TRACY_ENABLE
-#include <Tracy.hpp>
+#include <tracy/Tracy.hpp>
 #endif
 namespace neko
 {
@@ -35,7 +35,7 @@ void CityCarManager::Init()
 {
 
 #ifdef TRACY_ENABLE
-	ZoneScoped
+	ZoneScoped;
 #endif
 	auto* engine = static_cast<CityBuilderEngine*>(MainEngine::GetInstance());
 	entityManagerPtr_ = &engine->GetEntityManager();
@@ -50,7 +50,7 @@ void CityCarManager::Update(float dt)
 {
 
 #ifdef TRACY_ENABLE
-	ZoneScoped
+	ZoneScoped;
 #endif
 
 }
@@ -63,7 +63,7 @@ Entity CityCarManager::SpawnCar(sf::Vector2i position, CarType carType)
 {
 
 #ifdef TRACY_ENABLE
-	ZoneScoped
+	ZoneScoped;
 #endif
 	const Entity newCarEntity = entityManagerPtr_->CreateEntity();
 	AddCar(newCarEntity, carType, position);
@@ -79,7 +79,7 @@ Entity CityCarManager::SpawnCar(sf::Vector2i position, CarType carType)
 Entity CityCarManager::AddCar(Entity entity, CarType carType, sf::Vector2i position)
 {
 #ifdef TRACY_ENABLE
-	ZoneScoped
+	ZoneScoped;
 #endif
 	{
 #ifdef TRACY_ENABLE
@@ -127,7 +127,7 @@ void CityCarManager::RescheduleCarPathfinding(const sf::Vector2i& removedPositio
 {
 
 #ifdef TRACY_ENABLE
-	ZoneScoped
+	ZoneScoped;
 #endif
 		
 	for (Entity carEntity = 0u; carEntity < cars_.size(); carEntity++)
@@ -154,7 +154,7 @@ size_t CityCarManager::CountCar() const
 {
 
 #ifdef TRACY_ENABLE
-	ZoneScoped
+	ZoneScoped;
 #endif
 	std::shared_lock lock(carMutex_);
 	Index count = 0;
@@ -172,7 +172,7 @@ std::pair<CityCar*, std::shared_lock<std::shared_mutex>>  CityCarManager::GetCar
 {
 
 #ifdef TRACY_ENABLE
-	ZoneScoped
+	ZoneScoped;
 #endif
 	std::shared_lock lock(carMutex_);
 	if (carEntity >= cars_.size())

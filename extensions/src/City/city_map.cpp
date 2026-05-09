@@ -5,7 +5,7 @@
 #include <City/city_engine.h>
 #include <sstream>
 #ifdef TRACY_ENABLE
-#include <Tracy.hpp>
+#include <tracy/Tracy.hpp>
 #endif
 
 namespace neko
@@ -16,7 +16,7 @@ void CityBuilderMap::Init()
 {
 
 #ifdef TRACY_ENABLE
-	ZoneScoped
+	ZoneScoped;
 #endif
 	//River
 	environmentTiles_.resize(static_cast<std::size_t>(city.mapSize.x) * city.mapSize.y, EnvironmentTile::GRASS);
@@ -249,7 +249,7 @@ void CityBuilderMap::AddCityElement(CityElementType cityElement, const sf::Vecto
 {
 
 #ifdef TRACY_ENABLE
-	ZoneScoped
+	ZoneScoped;
 #endif
 	if(position.x < 0 || position.y < 0 || position.x >= static_cast<int>(city.mapSize.x) || position.y >= static_cast<int>(city.mapSize.y))
 	{
@@ -299,7 +299,7 @@ void CityBuilderMap::RemoveCityElement(const sf::Vector2i& position)
 {
 
 #ifdef TRACY_ENABLE
-	ZoneScoped
+	ZoneScoped;
 #endif
 	//TODO need to check each element positions taking into account the size
 	auto elementIt = std::ranges::find_if(elements_, [&position](const CityElement& element)
@@ -343,7 +343,7 @@ std::vector<sf::Vector2i> CityBuilderMap::GetRoadEnds() const
 {
 
 #ifdef TRACY_ENABLE
-	ZoneScoped
+	ZoneScoped;
 #endif
 	std::vector<sf::Vector2i> ends;
 	for (auto& node : roadGraph_.GetNodesVector())
@@ -373,7 +373,7 @@ CityElement* CityBuilderMap::GetCityElementAt(sf::Vector2i position)
 {
 
 #ifdef TRACY_ENABLE
-	ZoneScoped
+	ZoneScoped;
 #endif
 	const auto result = std::ranges::find_if(elements_, [&position](const CityElement& cityElement)
     {

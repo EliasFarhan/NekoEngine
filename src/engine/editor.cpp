@@ -30,7 +30,7 @@
 
 #include <utility>
 #ifdef TRACY_ENABLE
-#include <Tracy.hpp>
+#include <tracy/Tracy.hpp>
 #endif
 namespace neko
 {
@@ -42,7 +42,7 @@ void Editor::Init()
 void Editor::Update(float dt)
 {
 #ifdef TRACY_ENABLE
-	ZoneScoped
+	ZoneScoped;
 #endif
 	const auto* engine = MainEngine::GetInstance();
 	const Index frameIndex = (engine->frameIndex - 1) % 2; //Render frame is always the previous one

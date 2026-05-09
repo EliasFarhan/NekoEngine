@@ -32,7 +32,7 @@
 
 
 #ifdef TRACY_ENABLE
-#include <Tracy.hpp>
+#include <tracy/Tracy.hpp>
 #endif
 
 namespace neko
@@ -41,7 +41,7 @@ void CityCommandManager::AddCommand(std::unique_ptr<CityCommand> command, bool f
 {
 
 #ifdef TRACY_ENABLE
-	ZoneScoped
+	ZoneScoped;
 #endif
 	const Index frameIndex = (MainEngine::GetInstance()->frameIndex - (fromRenderThread ? 1 : 0)) % 2;
 	if (command->commandType == CityCommandType::CHANGE_CURSOR_MODE)
@@ -67,7 +67,7 @@ void CityCommandManager::Init()
 {
 
 #ifdef TRACY_ENABLE
-	ZoneScoped
+	ZoneScoped;
 #endif
 	engine_ = static_cast<CityBuilderEngine*>(MainEngine::GetInstance());
 	soundBufferErase_ = Sound::LoadSoundBuffer("data/Swip.wav");
@@ -86,7 +86,7 @@ void CityCommandManager::ExecuteCommand(const std::shared_ptr<CityCommand>& comm
 {
 
 #ifdef TRACY_ENABLE
-	ZoneScoped
+	ZoneScoped;
 #endif
 	switch (command->commandType)
 	{
@@ -157,7 +157,7 @@ void CityCommandManager::Update(float dt)
 {
 
 #ifdef TRACY_ENABLE
-	ZoneScoped
+	ZoneScoped;
 #endif
 	const Index frameIndex = (MainEngine::GetInstance()->frameIndex) % 2;
 	const auto commandNmb = commandQueue_[frameIndex].size();
@@ -173,7 +173,7 @@ void CityCommandManager::Destroy()
 {
 
 #ifdef TRACY_ENABLE
-	ZoneScoped
+	ZoneScoped;
 #endif
 	Sound::RemoveSoundBuffer(soundBufferErase_);
 	Sound::RemoveSoundBuffer(soundBufferBuild_);

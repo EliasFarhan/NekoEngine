@@ -28,7 +28,7 @@
 #include <City/city_engine.h>
 
 #ifdef TRACY_ENABLE
-#include <Tracy.hpp>
+#include <tracy/Tracy.hpp>
 #endif
 namespace neko
 {
@@ -43,7 +43,7 @@ const static sf::Color cursorColor[static_cast<std::size_t>(ButtonIconType::LENG
 void CityCursor::Init()
 {
 #ifdef TRACY_ENABLE
-	ZoneScoped
+	ZoneScoped;
 #endif
 	engine_ = static_cast<CityBuilderEngine*>(MainEngine::GetInstance());
 }
@@ -52,7 +52,7 @@ void CityCursor::Update(float dt)
 {
 
 #ifdef TRACY_ENABLE
-	ZoneScoped
+	ZoneScoped;
 #endif
 	const Index frameIndex = MainEngine::GetInstance()->frameIndex % 2;
 
@@ -162,7 +162,7 @@ void CityCursor::OnEvent(sf::Event& event)
 {
 
 #ifdef TRACY_ENABLE
-	ZoneScoped
+	ZoneScoped;
 #endif
 	if (event.type == sf::Event::MouseButtonPressed)
 	{
@@ -302,7 +302,7 @@ void CityCursor::SetCursorMode(ButtonIconType cursorMode)
 {
 
 #ifdef TRACY_ENABLE
-	ZoneScoped
+	ZoneScoped;
 #endif
 	originPos_ = INVALID_TILE_POS;
 	this->cursorMode_ = cursorMode;
@@ -313,7 +313,7 @@ sf::Vector2i CityCursor::GetMouseWorldPos() const
 {
 
 #ifdef TRACY_ENABLE
-	ZoneScoped
+	ZoneScoped;
 #endif
 	const auto mousePos = engine_->GetMouseManager().GetPosition();
 	const auto view = engine_->mainView;
@@ -327,7 +327,7 @@ sf::Vector2i CityCursor::GetMouseTilePos() const
 {
 
 #ifdef TRACY_ENABLE
-	ZoneScoped
+	ZoneScoped;
 #endif
 	const auto tileSize = engine_->GetCityMap().city.tileSize;
 	const auto worldMousePos = GetMouseWorldPos() + sf::Vector2i(tileSize) / 2;

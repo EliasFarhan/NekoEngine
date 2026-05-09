@@ -26,7 +26,7 @@
 #include "engine/engine.h"
 #include <algorithm>
 #ifdef TRACY_ENABLE
-#include <Tracy.hpp>
+#include <tracy/Tracy.hpp>
 #endif
 namespace neko
 {
@@ -65,7 +65,7 @@ Entity EntityManager::CreateEntity()
 void EntityManager::DestroyEntity(Entity entity)
 {
 #ifdef TRACY_ENABLE
-    ZoneScoped
+    ZoneScoped;
 #endif
     std::shared_lock lock(mutex_);
     entityMaskArray_[entity] = INVALID_ENTITY_MASK;

@@ -23,7 +23,7 @@
  */
 
 #ifdef TRACY_ENABLE
-#include <Tracy.hpp>
+#include <tracy/Tracy.hpp>
 #endif
 #include <City/city_engine.h>
 #include <City/city_editor.h>
@@ -43,7 +43,7 @@ CityBuilderEngine::CityBuilderEngine(Configuration* config) :
     void CityBuilderEngine::Init()
     {
 #ifdef TRACY_ENABLE
-        ZoneScoped
+        ZoneScoped;
 #endif
             config.windowStyle = sf::Style::Titlebar | sf::Style::Close;
         MainEngine::Init();
@@ -80,7 +80,7 @@ CityBuilderEngine::CityBuilderEngine(Configuration* config) :
     void CityBuilderEngine::Update(float dt)
     {
 #ifdef TRACY_ENABLE
-        ZoneScoped
+        ZoneScoped;
 #endif
         MainEngine::Update(dt);
         //Update car task
@@ -249,7 +249,7 @@ CityBuilderEngine::CityBuilderEngine(Configuration* config) :
     void CityBuilderEngine::OnEvent(sf::Event& event)
     {
 #ifdef TRACY_ENABLE
-        ZoneScoped
+        ZoneScoped;
 #endif
             MainEngine::OnEvent(event);
         cursor_.OnEvent(event);
@@ -273,7 +273,7 @@ CityBuilderEngine::CityBuilderEngine(Configuration* config) :
     void CityBuilderEngine::Destroy()
     {
 #ifdef TRACY_ENABLE
-        ZoneScoped
+        ZoneScoped;
 #endif
         Sound::RemoveMusic(musicInd_);
         cursor_.Destroy();

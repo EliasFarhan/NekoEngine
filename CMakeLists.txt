@@ -14,7 +14,7 @@ set(TRACY_ON_DEMAND ON CACHE BOOL "")
 if(TRACY_ENABLE)
     add_compile_definitions(TRACY_ENABLE)
     set(TRACY_FOLDER "${CMAKE_SOURCE_DIR}/externals/tracy/")
-    include_directories("${TRACY_FOLDER}")
+    add_subdirectory("${TRACY_FOLDER}")
 	if(TRACY_ON_DEMAND)
 		add_compile_definitions(TRACY_ON_DEMAND)
 	endif()
@@ -95,15 +95,16 @@ List(APPEND Neko_SRC
 	${IMG_FILES}
 	${SND_FILES})
 
-if(TRACY_ENABLE)
-	list(APPEND Neko_SRC "${TRACY_FOLDER}/TracyClient.cpp" "${TRACY_FOLDER}/Tracy.hpp")
-endif()
+
 
 #SFML
 find_package(SFML COMPONENTS system window graphics audio CONFIG REQUIRED)
 LIST(APPEND Neko_LIBRARIES
 		sfml-audio sfml-graphics sfml-window sfml-system)
-
+if(TRACY_ENABLE)
+list(APPEND Neko_LIBRARIES TracyClient)
+	#list(APPEND Neko_SRC "${TRACY_FOLDER}/TracyClient.cpp" "${TRACY_FOLDER}/Tracy.hpp")
+endif()
 #Google Test
 find_package(GTest CONFIG REQUIRED)
 #SFML Imgui

@@ -32,8 +32,8 @@
 #include "engine/engine.h"
 
 #ifdef TRACY_ENABLE
-#include <Tracy.hpp>
-#include <TracyC.h>
+#include <tracy/Tracy.hpp>
+#include <tracy/TracyC.h>
 #endif
 namespace std
 {
@@ -66,7 +66,7 @@ void TileMapGraph::AddNode(sf::Vector2i pos)
 {
 
 #ifdef TRACY_ENABLE
-	ZoneScoped
+	ZoneScoped;
 #endif
 	if (ContainNode(pos))
 		return;
@@ -110,7 +110,7 @@ void TileMapGraph::RemoveNode(sf::Vector2i pos)
 {
 
 #ifdef TRACY_ENABLE
-	ZoneScoped
+	ZoneScoped;
 #endif
 	const auto nodeIt = std::ranges::find_if(nodes_, [&pos](const Node& node)
     {
@@ -309,7 +309,7 @@ Node* TileMapGraph::GetClosestNode(sf::Vector2i position)
 {
 
 #ifdef TRACY_ENABLE
-	ZoneScoped
+	ZoneScoped;
 #endif
 	Node* closestNode = nullptr;
 	float closestDistance = -1.0f;
@@ -329,7 +329,7 @@ bool TileMapGraph::ContainNode(sf::Vector2i pos) const
 {
 
 #ifdef TRACY_ENABLE
-	ZoneScoped
+	ZoneScoped;
 #endif
 	const auto nodeIt = std::ranges::find_if(nodes_, [&pos](const Node& node)
     {
@@ -342,7 +342,7 @@ NeighborType GetNeighborType(const sf::Vector2i& direction)
 {
 
 #ifdef TRACY_ENABLE
-	ZoneScoped
+	ZoneScoped;
 #endif
 	const static auto reverseMap = []() -> std::unordered_map<sf::Vector2i, NeighborType>
 	{
@@ -448,7 +448,7 @@ bool PathFindingManager::IsPathDone(PathId id) const
 {
 
 #ifdef TRACY_ENABLE
-	ZoneScoped
+	ZoneScoped;
 #endif
 	std::shared_lock lock(pathMutex_);
 	return pathMap_.contains(id);
@@ -457,7 +457,7 @@ bool PathFindingManager::IsPathDone(PathId id) const
 std::vector<sf::Vector2i> PathFindingManager::GetPath(PathId id)
 {
 #ifdef TRACY_ENABLE
-	ZoneScoped
+	ZoneScoped;
 #endif
 	std::vector<sf::Vector2i> result;
 	{

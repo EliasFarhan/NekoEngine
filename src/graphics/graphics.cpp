@@ -25,9 +25,8 @@
 #include <engine/engine.h>
 #include "SFML/Graphics/RenderTexture.hpp"
 #include "engine/log.h"
-#include <sstream>
 #ifdef TRACY_ENABLE
-#include <Tracy.hpp>
+#include <tracy/Tracy.hpp>
 #endif
 
 #include "engine/globals.h"
@@ -44,7 +43,7 @@ GraphicsManager::GraphicsManager()
 {
 
 #ifdef TRACY_ENABLE
-    ZoneScoped
+    ZoneScoped;
 #endif
 	commandBuffers_[0].fill(nullptr);
 	commandBuffers_[1].fill(nullptr);
@@ -55,7 +54,7 @@ void GraphicsManager::Draw(sf::Drawable& drawable)
 {
 
 #ifdef TRACY_ENABLE
-    ZoneScoped
+    ZoneScoped;
 #endif
     if (nextRenderLength_ >= MAX_COMMAND_NMB)
     {
@@ -81,7 +80,7 @@ void TilemapCommand::Draw(sf::RenderTarget* renderTarget)
 {
 
 #ifdef TRACY_ENABLE
-    ZoneScoped
+    ZoneScoped;
 #endif
     sf::RenderStates states;
     states.texture = texture;
@@ -92,7 +91,7 @@ void TilemapCommand::Draw(sf::RenderTarget* renderTarget)
 void GraphicsManager::Draw(sf::VertexArray* vertexArray, sf::Texture* texture)
 {
 #ifdef TRACY_ENABLE
-    ZoneScoped
+    ZoneScoped;
 #endif
     const int index = MainEngine::GetInstance()->frameIndex % 2;
     TilemapCommand tilemapCommand;
@@ -125,11 +124,6 @@ void GraphicsManager::Update()
     auto* engine = MainEngine::GetInstance();
 
     {
-        /*{
-            std::ostringstream oss;
-            oss << "Graphics Frame Start: " << MainEngine::GetInstance()->frameIndex << " and Graphics frame: " << frameIndex;
-            logDebug(oss.str());
-        }*/
         std::unique_lock<std::mutex> lock(engine->renderStartMutex);
 
         isRendering_ = true;
@@ -149,17 +143,8 @@ void GraphicsManager::Update()
         renderWindow_->clear(engine->config.bgColor);
 
         //manage command buffers
-        auto& commandBuffer = commandBuffers_[frameIndex % 2];
-#ifdef __neko_dbg__
         {
-            std::ostringstream oss;
-            oss << "Command Buffers length: " << renderLength_ << "\n";
-            oss << "Engine frame: " << engine->frameIndex << " Graphics Frame: " << frameIndex;
-            logDebug(oss.str());
-
-        }
-#endif
-        {
+            auto& commandBuffer = commandBuffers_[frameIndex % 2];
 #ifdef TRACY_ENABLE
             ZoneNamedN(RendererDrawCommand, "Draw Commands", true);
 #endif

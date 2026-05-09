@@ -36,7 +36,7 @@
 #include "imgui-SFML.h"
 
 #ifdef TRACY_ENABLE
-#include <Tracy.hpp>
+#include <tracy/Tracy.hpp>
 #endif
 
 
@@ -211,7 +211,7 @@ namespace neko
 
             ++frameIndex;
 #ifdef TRACY_ENABLE
-            FrameMark
+            FrameMark;
 #endif
         }
 
@@ -234,7 +234,7 @@ namespace neko
     void MainEngine::Init()
     {
 #ifdef TRACY_ENABLE
-        ZoneScoped
+        ZoneScoped;
 #endif
 
             //workingThreadPool.resize(std::max(1u,std::thread::hardware_concurrency() - 3));//removing main and render and audio thread

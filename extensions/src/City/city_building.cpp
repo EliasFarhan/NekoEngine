@@ -29,7 +29,7 @@
 
 
 #ifdef TRACY_ENABLE
-#include <Tracy.hpp>
+#include <tracy/Tracy.hpp>
 #endif
 
 namespace neko
@@ -39,7 +39,7 @@ void CityBuildingManager::Update(CityZoneManager& zoneManager, CityBuilderMap& c
 {
 
 #ifdef TRACY_ENABLE
-	ZoneScoped
+	ZoneScoped;
 #endif
     const auto* engine = static_cast<CityBuilderEngine*>(MainEngine::GetInstance());
 	spawnTimer_.Update(dt);

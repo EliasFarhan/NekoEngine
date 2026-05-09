@@ -26,7 +26,7 @@
 #include <engine/log.h>
 
 #ifdef TRACY_ENABLE
-#include <Tracy.hpp>
+#include <tracy/Tracy.hpp>
 #endif
 namespace neko {
 
@@ -69,8 +69,8 @@ namespace neko {
 		const std::vector<double>& values) const
     {
 #ifdef TRACY_ENABLE
-		ZoneScoped
-		ZoneText(name.data(), name.size())
+		ZoneScoped;
+		ZoneText(name.data(), name.size());
 #endif
 		const auto retrieveFunction = [this, &name]()->std::function<bool(unsigned, const std::vector<double>&)>*{
 #ifdef TRACY_ENABLE
