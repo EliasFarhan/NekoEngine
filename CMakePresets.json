@@ -56,6 +56,15 @@
             }
         },
         {
+            "name": "relwithdebinfo",
+            "displayName": "RelWithDebInfo",
+            "description": "Optimized build with debug info (Tracy off).",
+            "inherits": "_base",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+            }
+        },
+        {
             "name": "relwithdebinfo-profiling",
             "displayName": "RelWithDebInfo + Tracy profiling",
             "description": "Optimized build with debug info and Tracy on-demand profiling enabled.",
@@ -79,6 +88,11 @@
             "jobs": 0
         },
         {
+            "name": "relwithdebinfo",
+            "configurePreset": "relwithdebinfo",
+            "jobs": 0
+        },
+        {
             "name": "relwithdebinfo-profiling",
             "configurePreset": "relwithdebinfo-profiling",
             "jobs": 0
@@ -99,6 +113,17 @@
         {
             "name": "release",
             "configurePreset": "release",
+            "output": {
+                "outputOnFailure": true
+            },
+            "execution": {
+                "noTestsAction": "error",
+                "stopOnFailure": false
+            }
+        },
+        {
+            "name": "relwithdebinfo",
+            "configurePreset": "relwithdebinfo",
             "output": {
                 "outputOnFailure": true
             },
