@@ -13,8 +13,6 @@
         "glm",
         "units",
         "gtest",
-        "fmt",
-        "spdlog",
         "argh"
     ],
 	"overrides": [

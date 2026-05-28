@@ -26,7 +26,7 @@
 #include <unordered_map>
 #include <cmath>
 #include <engine/log.h>
-#include <fmt/format.h>
+#include <format>
 #include "allocator/allocator.h"
 #include "City/city_engine.h"
 #include "engine/engine.h"

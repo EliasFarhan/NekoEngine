@@ -9,34 +9,6 @@
       <option name="SPACE_AFTER_POINTER_IN_DECLARATION" value="true" />
       <option name="SPACE_BEFORE_REFERENCE_IN_DECLARATION" value="false" />
       <option name="SPACE_AFTER_REFERENCE_IN_DECLARATION" value="true" />
-      <option name="NAMESPACES_NAMING_CONVENTION">
-        <value prefix="" style="LOWERCASE" suffix="" />
-      </option>
-      <option name="CLASSES_AND_STRUCTS_NAMING_CONVENTION">
-        <value prefix="" style="PASCAL_CASE" suffix="" />
-      </option>
-      <option name="ENUMS_NAMING_CONVENTION">
-        <value prefix="" style="PASCAL_CASE" suffix="" />
-      </option>
-      <option name="TYPEDEFS_NAMING_CONVENTION">
-        <value prefix="" style="PASCAL_CASE" suffix="" />
-      </option>
-      <option name="UNIONS_NAMING_CONVENTION">
-        <value prefix="" style="PASCAL_CASE" suffix="" />
-      </option>
-      <option name="METHODS_NAMING_CONVENTION">
-        <value prefix="" style="PASCAL_CASE" suffix="" />
-      </option>
-      <option name="GLOBAL_FUNCTIONS_NAMING_CONVENTION">
-        <value prefix="" style="PASCAL_CASE" suffix="" />
-      </option>
     </Objective-C>
-    <codeStyleSettings language="ObjectiveC">
-      <option name="BRACE_STYLE" value="2" />
-      <option name="CLASS_BRACE_STYLE" value="2" />
-      <option name="ELSE_ON_NEW_LINE" value="true" />
-      <option name="WHILE_ON_NEW_LINE" value="true" />
-      <option name="CATCH_ON_NEW_LINE" value="true" />
-    </codeStyleSettings>
   </code_scheme>
 </component>
