@@ -297,8 +297,8 @@ TileMapGraph::CalculateShortestPath(const sf::Vector2i& startPos, const sf::Vect
 #endif
 	}
 #ifdef TRACY_ENABLE
-	const auto msg = fmt::format(
-		"Path size: {}, Frontier count: {}, startPos: {},{} endPos: {},{}", 
+	const auto msg = std::format(
+		"Path size: {}, Frontier count: {}, startPos: {},{} endPos: {},{}",
 		path.size(), count, startPos.x, startPos.y, endPos.x, endPos.y);
     ZoneTextV(shortestPath, msg.data(), msg.size());
 #endif
